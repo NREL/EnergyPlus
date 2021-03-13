@@ -106,8 +106,8 @@ namespace EnergyPlus::Pumps {
     using DataHVACGlobals::NumPlantLoops;
     using DataHVACGlobals::SmallWaterVolFlow;
     using DataHVACGlobals::TimeStepSys;
-    using DataLoopNode::NodeConnectionType_Inlet;
-    using DataLoopNode::NodeConnectionType_Outlet;
+    using DataLoopNode::NodeConnectionType::Inlet;
+    using DataLoopNode::NodeConnectionType::Outlet;
     using DataLoopNode::ObjectIsNotParent;
 
     // Data
@@ -324,10 +324,10 @@ namespace EnergyPlus::Pumps {
             state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpVariableSpeed;
 
             state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Water Nodes");
 
             if (UtilityRoutines::SameString(cAlphaArgs(4), "Continuous")) {
@@ -531,10 +531,10 @@ namespace EnergyPlus::Pumps {
             state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpConstantSpeed;
 
             state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Water Nodes");
 
             state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = rNumericArgs(1);
@@ -669,10 +669,10 @@ namespace EnergyPlus::Pumps {
             state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpCondensate;
 
             state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Steam, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Steam, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Water Nodes");
 
             state.dataPumps->PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
@@ -779,10 +779,10 @@ namespace EnergyPlus::Pumps {
             state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpBankVariableSpeed;
 
             state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Water Nodes");
 
             if (UtilityRoutines::SameString(cAlphaArgs(4), "Optimal")) {
@@ -901,10 +901,10 @@ namespace EnergyPlus::Pumps {
             state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpBankConstantSpeed;
 
             state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Water Nodes");
 
             if (UtilityRoutines::SameString(cAlphaArgs(4), "Optimal")) {

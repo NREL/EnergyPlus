@@ -682,7 +682,7 @@ namespace BranchInputManager {
                                        state.dataLoopNodes->NodeID(OutletNodeNum),
                                        "Connector:Mixer",
                                        MixerName,
-                                       DataLoopNode::ValidConnectionTypes(NodeConnectionType_Outlet),
+                                       DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet),
                                        1,
                                        ObjectIsNotParent,
                                        errFlag);
@@ -708,7 +708,7 @@ namespace BranchInputManager {
                                                state.dataLoopNodes->NodeID(InletNodeNums(Loop)),
                                                "Connector:Mixer",
                                                MixerName,
-                                               DataLoopNode::ValidConnectionTypes(NodeConnectionType_Inlet),
+                                               DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet),
                                                1,
                                                ObjectIsNotParent,
                                                errFlag);
@@ -827,7 +827,7 @@ namespace BranchInputManager {
                                        state.dataLoopNodes->NodeID(InletNodeNum),
                                        "Connector:Splitter",
                                        SplitterName,
-                                       DataLoopNode::ValidConnectionTypes(NodeConnectionType_Inlet),
+                                       DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet),
                                        1,
                                        ObjectIsNotParent,
                                        errFlag);
@@ -853,7 +853,7 @@ namespace BranchInputManager {
                                                state.dataLoopNodes->NodeID(OutletNodeNums(Loop)),
                                                "Connector:Splitter",
                                                SplitterName,
-                                               DataLoopNode::ValidConnectionTypes(NodeConnectionType_Outlet),
+                                               DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet),
                                                1,
                                                ObjectIsNotParent,
                                                errFlag);
@@ -1132,9 +1132,9 @@ namespace BranchInputManager {
             state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName = Alphas(Loop + 2);
             // If first component on branch, then inlet node is inlet to branch, otherwise node is internal
             if (Loop == 3) {
-                ConnectionType = NodeConnectionType_Inlet;
+                ConnectionType = DataLoopNode::NodeConnectionType::Inlet;
             } else {
-                ConnectionType = NodeConnectionType_Internal;
+                ConnectionType = DataLoopNode::NodeConnectionType::Internal;
             }
             if (!lAlphaBlanks(Loop + 2)) {
                 GetNodeNums(state,
@@ -1170,9 +1170,9 @@ namespace BranchInputManager {
             state.dataBranchInputManager->Branch(BCount).Component(Comp).OutletNodeName = Alphas(Loop + 3);
             // If last component on branch, then outlet node is outlet from branch, otherwise node is internal
             if (Loop == NumAlphas - 3) {
-                ConnectionType = NodeConnectionType_Outlet;
+                ConnectionType = DataLoopNode::NodeConnectionType::Outlet;
             } else {
-                ConnectionType = NodeConnectionType_Internal;
+                ConnectionType = DataLoopNode::NodeConnectionType::Internal;
             }
             if (!lAlphaBlanks(Loop + 3)) {
                 GetNodeNums(state,

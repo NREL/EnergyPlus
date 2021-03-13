@@ -355,11 +355,11 @@ namespace HVACSingleDuctInduc {
             if (lNumericBlanks(2)) IndUnit(IUNum).InducRatio = 2.5;
 
             IndUnit(IUNum).PriAirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsParent, cAlphaFields(3));
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent, cAlphaFields(3));
             IndUnit(IUNum).SecAirInNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsParent, cAlphaFields(4));
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent, cAlphaFields(4));
             IndUnit(IUNum).OutAirNode = GetOnlySingleNode(state,
-                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsParent, cAlphaFields(5));
+                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent, cAlphaFields(5));
 
             IndUnit(IUNum).HCoilType = Alphas(6); // type (key) of heating coil
             if (UtilityRoutines::SameString(IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
@@ -375,7 +375,7 @@ namespace HVACSingleDuctInduc {
                 ErrorsFound = true;
             }
             //      GetOnlySingleNode(state, Alphas(6),ErrorsFound,'AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction',Alphas(1), &
-            //                        DataLoopNode::NodeFluidType::Water,NodeConnectionType_Actuator,1,ObjectIsParent)
+            //                        DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             IndUnit(IUNum).MaxVolHotWaterFlow = Numbers(3);
             IndUnit(IUNum).MinVolHotWaterFlow = Numbers(4);
             IndUnit(IUNum).HotControlOffset = Numbers(5);
@@ -397,7 +397,7 @@ namespace HVACSingleDuctInduc {
                 ErrorsFound = true;
             }
             //      GetOnlySingleNode(state, Alphas(7),ErrorsFound,'AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction',Alphas(1), &
-            //                        DataLoopNode::NodeFluidType::Water,NodeConnectionType_Actuator,1,ObjectIsParent)
+            //                        DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             IndUnit(IUNum).MaxVolColdWaterFlow = Numbers(6);
             IndUnit(IUNum).MinVolColdWaterFlow = Numbers(7);
             IndUnit(IUNum).ColdControlOffset = Numbers(8);

@@ -242,7 +242,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                                                                     cCurrentModuleObject,
                                                                                                     cAlphaArgs(1),
                                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                                    DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                                                     1,
                                                                                                     DataLoopNode::ObjectIsNotParent);
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.outletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(4),
@@ -250,7 +250,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                                                                      cCurrentModuleObject,
                                                                                                      cAlphaArgs(1),
                                                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                                                     DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                                      1,
                                                                                                      DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Loop Demand Side Plant Nodes");
@@ -264,7 +264,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                                                                     cCurrentModuleObject,
                                                                                                     cAlphaArgs(1),
                                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                                    DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                                                     2,
                                                                                                     DataLoopNode::ObjectIsNotParent);
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.outletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(6),
@@ -272,7 +272,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                                                                      cCurrentModuleObject,
                                                                                                      cAlphaArgs(1),
                                                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                                                     DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                                      2,
                                                                                                      DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(5), cAlphaArgs(6), "Loop Supply Side Plant Nodes");
@@ -350,7 +350,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                                                             cCurrentModuleObject,
                                                                                             cAlphaArgs(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                            DataLoopNode::NodeConnectionType_Sensor,
+                                                                                            DataLoopNode::NodeConnectionType::Sensor,
                                                                                             1,
                                                                                             DataLoopNode::ObjectIsNotParent);
                     // check that node actually has setpoints on it
@@ -430,7 +430,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                             cCurrentModuleObject,
                                                             cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::NodeConnectionType_Actuator,
+                                                            DataLoopNode::NodeConnectionType::Actuator,
                                                             1,
                                                             DataLoopNode::ObjectIsNotParent);
                 } else {
@@ -448,7 +448,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                             cCurrentModuleObject,
                                                             cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::NodeConnectionType_Actuator,
+                                                            DataLoopNode::NodeConnectionType::Actuator,
                                                             1,
                                                             DataLoopNode::ObjectIsNotParent);
                 } else {

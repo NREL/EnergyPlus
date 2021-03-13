@@ -6756,7 +6756,7 @@ namespace SurfaceGeometry {
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
-        using DataLoopNode::NodeConnectionType_Inlet;
+        using DataLoopNode::NodeConnectionType::Inlet;
         using DataLoopNode::ObjectIsParent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -6850,7 +6850,7 @@ namespace SurfaceGeometry {
                 // Assign outdoor air node number;
                 if (!lAlphaFieldBlanks(5)) {
                     NodeNum = GetOnlySingleNode(state,
-                        cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                        cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
                     if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                         cAlphaFieldNames(5) + " has been found.");
@@ -6901,7 +6901,7 @@ namespace SurfaceGeometry {
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
-        using DataLoopNode::NodeConnectionType_Inlet;
+        using DataLoopNode::NodeConnectionType::Inlet;
         using DataLoopNode::ObjectIsParent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:

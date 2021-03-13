@@ -234,7 +234,7 @@ namespace ZoneAirLoopEquipmentManager {
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name = AlphArray(1);
                 // Input Outlet Node Num
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).OutletNodeNum = GetOnlySingleNode(state,
-                    AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                    AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).InletNodeNum = 0;
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).NumComponents = 1;
                 AirDistCompUnitNum = 1;

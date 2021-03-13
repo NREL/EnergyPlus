@@ -218,7 +218,7 @@ namespace SplitterComponent {
 
             state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName = AlphArray(1);
             state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode = GetOnlySingleNode(state,
-                AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes = NumAlphas - 2;
 
             state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode.allocate(state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes);
@@ -241,7 +241,7 @@ namespace SplitterComponent {
                                                                                   CurrentModuleObject,
                                                                                   AlphArray(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                  NodeConnectionType_Outlet,
+                                                                                  DataLoopNode::NodeConnectionType::Outlet,
                                                                                   1,
                                                                                   ObjectIsNotParent);
                 if (lAlphaBlanks(2 + NodeNum)) {

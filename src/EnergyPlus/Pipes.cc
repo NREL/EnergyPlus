@@ -181,9 +181,9 @@ namespace EnergyPlus::Pipes {
             state.dataPipes->LocalPipe(PipeNum).TypeOf = DataPlant::TypeOf_Pipe;
 
             state.dataPipes->LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, DataLoopNode::ObjectIsNotParent);
             state.dataPipes->LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, DataLoopNode::ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
         }
 
@@ -197,9 +197,9 @@ namespace EnergyPlus::Pipes {
             state.dataPipes->LocalPipe(PipeNum).Name = cAlphaArgs(1);
             state.dataPipes->LocalPipe(PipeNum).TypeOf = DataPlant::TypeOf_PipeSteam;
             state.dataPipes->LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Steam, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Steam, DataLoopNode::NodeConnectionType::Inlet, 1, DataLoopNode::ObjectIsNotParent);
             state.dataPipes->LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Steam, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Steam, DataLoopNode::NodeConnectionType::Outlet, 1, DataLoopNode::ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
         }
 

@@ -622,10 +622,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
 
             state.dataPTHP->PTUnit(PTUnitNum).AirInNode =
-                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).AirOutNode =
-                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
             state.dataPTHP->PTUnit(PTUnitNum).OAMixName = Alphas(6);
@@ -1442,7 +1442,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 } else if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
@@ -1452,7 +1452,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                     DataLoopNode::NodeFluidType::Steam,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 }
@@ -1518,10 +1518,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
 
             state.dataPTHP->PTUnit(PTUnitNum).AirInNode =
-                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).AirOutNode =
-                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
             state.dataPTHP->PTUnit(PTUnitNum).OAMixName = Alphas(6);
@@ -2242,7 +2242,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 } else if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
@@ -2252,7 +2252,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                     DataLoopNode::NodeFluidType::Steam,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 }
@@ -2323,10 +2323,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
 
             state.dataPTHP->PTUnit(PTUnitNum).AirInNode =
-                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).AirOutNode =
-                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
             state.dataPTHP->PTUnit(PTUnitNum).OAMixName = Alphas(6);
@@ -2655,7 +2655,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                        CurrentModuleObject,
                                                                        Alphas(1),
                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                       NodeConnectionType_OutsideAirReference,
+                                                                       DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                        1,
                                                                        ObjectIsNotParent);
                 // need better verification.
@@ -2972,7 +2972,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 } else if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
@@ -2982,7 +2982,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                     DataLoopNode::NodeFluidType::Steam,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 }

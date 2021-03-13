@@ -1104,7 +1104,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                                                        cCurrentModuleObject,
                                                                                        thisPLHP.name,
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType_Inlet,
+                                                                                       DataLoopNode::NodeConnectionType::Inlet,
                                                                                        flowPath1,
                                                                                        DataLoopNode::ObjectIsNotParent);
                     thisPLHP.loadSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state, loadSideOutletNodeName,
@@ -1112,22 +1112,22 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                                                         cCurrentModuleObject,
                                                                                         thisPLHP.name,
                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                        DataLoopNode::NodeConnectionType_Outlet,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                                         flowPath1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                     DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::blank;
-                    int condenserNodeConnectionType_Inlet = 0;
-                    int condenserNodeConnectionType_Outlet = 0;
+                    int condenserDataLoopNode::NodeConnectionType::Inlet = 0;
+                    int condenserDataLoopNode::NodeConnectionType::Outlet = 0;
                     if (condenserType == "WATERSOURCE") {
                         thisPLHP.waterSource = true;
                         condenserNodeType = DataLoopNode::NodeFluidType::Water;
-                        condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType_Inlet;
-                        condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType_Outlet;
+                        condenserDataLoopNode::NodeConnectionType::Inlet = DataLoopNode::NodeConnectionType::Inlet;
+                        condenserDataLoopNode::NodeConnectionType::Outlet = DataLoopNode::NodeConnectionType::Outlet;
                     } else if (condenserType == "AIRSOURCE") {
                         thisPLHP.airSource = true;
                         condenserNodeType = DataLoopNode::NodeFluidType::Air;
-                        condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType_OutsideAir;
-                        condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType_OutsideAir;
+                        condenserDataLoopNode::NodeConnectionType::Inlet = DataLoopNode::NodeConnectionType::OutsideAir;
+                        condenserDataLoopNode::NodeConnectionType::Outlet = DataLoopNode::NodeConnectionType::OutsideAir;
                     } else {
                         // Again, this should be protected by the input processor
                         ShowErrorMessage(state, "Invalid heat pump condenser type (name=" + thisPLHP.name + // LCOV_EXCL_LINE
@@ -1139,7 +1139,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                                                          cCurrentModuleObject,
                                                                                          thisPLHP.name,
                                                                                          condenserNodeType,
-                                                                                         condenserNodeConnectionType_Inlet,
+                                                                                         condenserDataLoopNode::NodeConnectionType::Inlet,
                                                                                          flowPath2,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state, sourceSideOutletNodeName,
@@ -1147,7 +1147,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                                                           cCurrentModuleObject,
                                                                                           thisPLHP.name,
                                                                                           condenserNodeType,
-                                                                                          condenserNodeConnectionType_Outlet,
+                                                                                          condenserDataLoopNode::NodeConnectionType::Outlet,
                                                                                           flowPath2,
                                                                                           DataLoopNode::ObjectIsNotParent);
                     if (nodeErrorsFound) errorsFound = true;

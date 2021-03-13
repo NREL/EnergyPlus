@@ -1489,7 +1489,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
-        using DataLoopNode::NodeConnectionType_Inlet;
+        using DataLoopNode::NodeConnectionType::Inlet;
         using DataLoopNode::ObjectIsParent;
         using HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent;
         using MixedAir::GetOAMixerNumber;
@@ -2318,7 +2318,7 @@ namespace AirflowNetworkBalanceManager {
                                                     CurrentModuleObject,
                                                     "AirflowNetwork:Multizone:Surface",
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    NodeConnectionType_Inlet,
+                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                     1,
                                                     ObjectIsParent);
                         MultizoneExternalNodeData(i).OutAirNodeNum = NodeNum;               // Name of outdoor air node
@@ -9638,7 +9638,7 @@ namespace AirflowNetworkBalanceManager {
             //     Example (using AirflowNetwork_MultiZone_SmallOffice.idf with a single OA Mixer):
             //             (the example shown below is identical to AirflowNetwork_SimpleHouse.idf with no OA Mixer except
             //              that the NodeConnections indexes are (7) and (31), respectively and the NodeNumber = 6)
-            //   The GetNodeConnectionType CALL below returns NodeConnectionType_OutsideAir = 7 and NodeConnectionType_OutsideAirReference = 14.
+            //   The GetNodeConnectionType CALL below returns DataLoopNode::NodeConnectionType::OutsideAir = 7 and DataLoopNode::NodeConnectionType::OutsideAirReference = 14.
             //     NodeConnections info from OUTSIDE AIR NODE object read:
             //     NodeConnections(9)NodeNumber      = 10
             //     NodeConnections(9)NodeName        = ACDXCOIL 1 CONDENSER NODE
@@ -9659,7 +9659,7 @@ namespace AirflowNetworkBalanceManager {
             } else {
                 //   skip nodes for air cooled condensers
                 for (j = 1; j <= isize(NodeConnectionType); ++j) {
-                    if (NodeConnectionType(j) == NodeConnectionType_OutsideAirReference) {
+                    if (NodeConnectionType(j) == DataLoopNode::NodeConnectionType::OutsideAirReference) {
                         NodeFound(i) = true;
                     }
                 }

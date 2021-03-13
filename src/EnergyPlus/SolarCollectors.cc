@@ -353,7 +353,7 @@ namespace SolarCollectors {
                                                                                         CurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
@@ -361,7 +361,7 @@ namespace SolarCollectors {
                                                                                          CurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
 
@@ -608,7 +608,7 @@ namespace SolarCollectors {
                                                                                         CurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
@@ -616,7 +616,7 @@ namespace SolarCollectors {
                                                                                          CurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
 

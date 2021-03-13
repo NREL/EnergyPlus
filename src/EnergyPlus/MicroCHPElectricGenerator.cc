@@ -315,7 +315,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               AlphArray(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
                 state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantOutletNodeID = NodeInputManager::GetOnlySingleNode(state, AlphArray(5),
@@ -323,7 +323,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
                                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                                AlphArray(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
@@ -336,7 +336,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                                             2,
                                                                                             DataLoopNode::ObjectIsNotParent);
 
@@ -346,7 +346,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
                                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                                              2,
                                                                                              DataLoopNode::ObjectIsNotParent);
 

@@ -308,7 +308,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                                                             CurrentModuleObject,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            NodeConnectionType_ZoneNode,
+                                                                            DataLoopNode::NodeConnectionType::ZoneNode,
                                                                             1,
                                                                             ObjectIsNotParent); // all zone air state variables are
             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == 0) {
@@ -661,7 +661,7 @@ namespace EnergyPlus::DataZoneEquipment {
                         DataLoopNode::NodeFluidType::Air,
                         "ZoneHVAC:EquipmentConnections",
                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                        NodeConnectionType_ZoneInlet,
+                        DataLoopNode::NodeConnectionType::ZoneInlet,
                         1,
                         ObjectIsNotParent);
 
@@ -707,7 +707,7 @@ namespace EnergyPlus::DataZoneEquipment {
                         DataLoopNode::NodeFluidType::Air,
                         "ZoneHVAC:EquipmentConnections",
                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                        NodeConnectionType_ZoneExhaust,
+                        DataLoopNode::NodeConnectionType::ZoneExhaust,
                         1,
                         ObjectIsNotParent);
 
@@ -741,7 +741,7 @@ namespace EnergyPlus::DataZoneEquipment {
                         DataLoopNode::NodeFluidType::Air,
                         "ZoneHVAC:EquipmentConnections",
                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                        NodeConnectionType_ZoneReturn,
+                        DataLoopNode::NodeConnectionType::ZoneReturn,
                         1,
                         ObjectIsNotParent);
 
@@ -784,7 +784,7 @@ namespace EnergyPlus::DataZoneEquipment {
                         DataLoopNode::NodeFluidType::Air,
                         "ZoneHVAC:EquipmentConnections",
                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                        NodeConnectionType_Sensor,
+                        DataLoopNode::NodeConnectionType::Sensor,
                         1,
                         ObjectIsNotParent);
 
@@ -884,7 +884,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                                                     CurrentModuleObject,
                                                                     AlphArray(1),
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    NodeConnectionType_Inlet,
+                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                     1,
                                                                     ObjectIsParent);
 
@@ -951,7 +951,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                                                      CurrentModuleObject,
                                                                      AlphArray(1),
                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                     NodeConnectionType_Outlet,
+                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                      1,
                                                                      ObjectIsParent);
 

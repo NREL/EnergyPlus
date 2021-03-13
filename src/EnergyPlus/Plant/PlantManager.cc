@@ -451,16 +451,16 @@ namespace EnergyPlus::PlantManager {
 
                 this_supply_side.NodeNumIn = GetOnlySingleNode(state,
                         Alpha(6), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
-                        NodeConnectionType_Inlet, 1, ObjectIsParent);
+                        DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
                 this_supply_side.NodeNumOut = GetOnlySingleNode(state,
                         Alpha(7), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
-                        NodeConnectionType_Outlet, 1, ObjectIsParent);
+                        DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
                 this_demand_side.NodeNumIn = GetOnlySingleNode(state,
                         Alpha(10), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
-                        NodeConnectionType_Inlet, 1, ObjectIsParent);
+                        DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
                 this_demand_side.NodeNumOut = GetOnlySingleNode(state,
                         Alpha(11), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
-                        NodeConnectionType_Outlet, 1, ObjectIsParent);
+                        DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
 
                 this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.NodeNumIn, localTempSetPt);
                 this_demand_side.OutletNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.NodeNumOut, localTempSetPt);
@@ -468,7 +468,7 @@ namespace EnergyPlus::PlantManager {
                 this_supply_side.OutletNodeSetPt = IsNodeOnSetPtManager(state, this_supply_side.NodeNumOut, localTempSetPt);
                 this_loop.TempSetPointNodeNum = GetOnlySingleNode(state,
                         Alpha(5), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
-                        NodeConnectionType_Sensor, 1, ObjectIsParent);
+                        DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsParent);
 
                 // Load the load distribution scheme.
                 LoadingScheme = Alpha(14);

@@ -425,9 +425,9 @@ namespace Fans {
             Fan(FanNum).MinAirFlowRate = 0.0;
 
             Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 4) {
                 Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(5);
@@ -508,9 +508,9 @@ namespace Fans {
                 ShowContinueError(state, "For " + cCurrentModuleObject + ", Fan=" + cAlphaArgs(1));
             }
             Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 5) {
                 Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(6);
@@ -579,9 +579,9 @@ namespace Fans {
             }
 
             Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
                 Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(5);
@@ -711,9 +711,9 @@ namespace Fans {
             Fan(FanNum).MinAirFlowRate = 0.0;
 
             Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
                 Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex = GetCurveIndex(state, cAlphaArgs(5));
@@ -814,7 +814,7 @@ namespace Fans {
                                                          cCurrentModuleObject,
                                                          cAlphaArgs(1),
                                                          DataLoopNode::NodeFluidType::Air,
-                                                         NodeConnectionType_Inlet,
+                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                          1,
                                                          ObjectIsNotParent); // Air inlet node name
             Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state, cAlphaArgs(3),
@@ -822,7 +822,7 @@ namespace Fans {
                                                           cCurrentModuleObject,
                                                           cAlphaArgs(1),
                                                           DataLoopNode::NodeFluidType::Air,
-                                                          NodeConnectionType_Outlet,
+                                                          DataLoopNode::NodeConnectionType::Outlet,
                                                           1,
                                                           ObjectIsNotParent); // Air outlet node name
 

@@ -1552,7 +1552,7 @@ namespace EnergyPlus {
                 thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
                 thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                         DataIPShortCuts::cAlphaArgs(2), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
-                        DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType_Inlet, 1,
+                        DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1,
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
                     CurIndex = 2;
@@ -1564,7 +1564,7 @@ namespace EnergyPlus {
                 thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
                 thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                         DataIPShortCuts::cAlphaArgs(3), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
-                        DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType_Outlet, 1,
+                        DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1,
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {
                     CurIndex = 3;
@@ -1670,7 +1670,7 @@ namespace EnergyPlus {
                                                                                ObjName_HorizTrench,
                                                                                thisTrenchName,
                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                               DataLoopNode::NodeConnectionType_Inlet,
+                                                                               DataLoopNode::NodeConnectionType::Inlet,
                                                                                1,
                                                                                DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
@@ -1682,7 +1682,7 @@ namespace EnergyPlus {
                                                                                 ObjName_HorizTrench,
                                                                                 thisTrenchName,
                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                DataLoopNode::NodeConnectionType_Outlet,
+                                                                                DataLoopNode::NodeConnectionType::Outlet,
                                                                                 1,
                                                                                 DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {

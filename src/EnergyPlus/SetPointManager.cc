@@ -554,7 +554,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -656,7 +656,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -778,7 +778,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -858,9 +858,9 @@ namespace EnergyPlus::SetPointManager {
                                          state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
             state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
             GetNodeNums(state,
                         cAlphaArgs(6),
@@ -870,7 +870,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -959,9 +959,9 @@ namespace EnergyPlus::SetPointManager {
                                          state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
             state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(
-                state, cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(
-                state, cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
             GetNodeNums(state,
                         cAlphaArgs(6),
@@ -971,7 +971,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -1059,9 +1059,9 @@ namespace EnergyPlus::SetPointManager {
                                          state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
             state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
             GetNodeNums(state,
                         cAlphaArgs(6),
@@ -1071,7 +1071,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -1148,7 +1148,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -1178,7 +1178,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_Sensor,
+                        DataLoopNode::NodeConnectionType::Sensor,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -1256,7 +1256,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -1286,7 +1286,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_Sensor,
+                        DataLoopNode::NodeConnectionType::Sensor,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -1364,11 +1364,11 @@ namespace EnergyPlus::SetPointManager {
                 ErrorsFound = true;
             }
             state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).RefNode = GetOnlySingleNode(
-                state, cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode = GetOnlySingleNode(
-                state, cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode = GetOnlySingleNode(
-                state, cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
             GetNodeNums(state,
                         cAlphaArgs(6),
@@ -1378,7 +1378,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -1417,9 +1417,9 @@ namespace EnergyPlus::SetPointManager {
 
             if (NumAlphas > 7) {
                 state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CoolCoilInNode = GetOnlySingleNode(state,
-                    cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                    cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
                 state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CoolCoilOutNode = GetOnlySingleNode(state,
-                    cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                    cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
                 if (NumNums == 1) {
                     state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).MinCoolCoilOutTemp = rNumericArgs(1);
                 }
@@ -1518,13 +1518,13 @@ namespace EnergyPlus::SetPointManager {
             }
 
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).RefNode = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode = GetOnlySingleNode(state,
-                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
             GetNodeNums(state,
                         cAlphaArgs(7),
@@ -1534,7 +1534,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -1649,7 +1649,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -1751,7 +1751,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -1862,7 +1862,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -2012,7 +2012,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -2095,7 +2095,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -2178,7 +2178,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -2262,7 +2262,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -2346,7 +2346,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -2430,7 +2430,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -2537,7 +2537,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -2617,7 +2617,7 @@ namespace EnergyPlus::SetPointManager {
                                                                                                              cCurrentModuleObject,
                                                                                                              cAlphaArgs(1),
                                                                                                              DataLoopNode::NodeFluidType::blank,
-                                                                                                             NodeConnectionType_Sensor,
+                                                                                                             DataLoopNode::NodeConnectionType::Sensor,
                                                                                                              1,
                                                                                                              ObjectIsNotParent);
             state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType = cAlphaArgs(4);
@@ -2654,7 +2654,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -2799,7 +2799,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -2911,7 +2911,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -2993,7 +2993,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -3094,7 +3094,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -3192,7 +3192,7 @@ namespace EnergyPlus::SetPointManager {
                         DataLoopNode::NodeFluidType::blank,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
-                        NodeConnectionType_SetPoint,
+                        DataLoopNode::NodeConnectionType::SetPoint,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -3256,7 +3256,7 @@ namespace EnergyPlus::SetPointManager {
                                                                                          cCurrentModuleObject,
                                                                                          cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::blank,
-                                                                                         NodeConnectionType_SetPoint,
+                                                                                         DataLoopNode::NodeConnectionType::SetPoint,
                                                                                          1,
                                                                                          ObjectIsNotParent,
                                                                                          cAlphaFieldNames(2)); // setpoint nodes
@@ -3265,7 +3265,7 @@ namespace EnergyPlus::SetPointManager {
                                                                                          cCurrentModuleObject,
                                                                                          cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::blank,
-                                                                                         NodeConnectionType_Sensor,
+                                                                                         DataLoopNode::NodeConnectionType::Sensor,
                                                                                          1,
                                                                                          ObjectIsNotParent,
                                                                                          cAlphaFieldNames(3)); // setpoint nodes
@@ -3339,7 +3339,7 @@ namespace EnergyPlus::SetPointManager {
                                                                                         cCurrentModuleObject,
                                                                                         cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::blank,
-                                                                                        NodeConnectionType_SetPoint,
+                                                                                        DataLoopNode::NodeConnectionType::SetPoint,
                                                                                         1,
                                                                                         ObjectIsNotParent,
                                                                                         cAlphaFieldNames(2)); // setpoint nodes
@@ -3348,7 +3348,7 @@ namespace EnergyPlus::SetPointManager {
                                                                                         cCurrentModuleObject,
                                                                                         cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::blank,
-                                                                                        NodeConnectionType_Sensor,
+                                                                                        DataLoopNode::NodeConnectionType::Sensor,
                                                                                         1,
                                                                                         ObjectIsNotParent,
                                                                                         cAlphaFieldNames(3)); // setpoint nodes

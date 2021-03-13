@@ -667,7 +667,7 @@ namespace HVACControllers {
                                                                     CurrentModuleObject,
                                                                     AlphArray(1),
                                                                     DataLoopNode::NodeFluidType::blank,
-                                                                    NodeConnectionType_Sensor,
+                                                                    DataLoopNode::NodeConnectionType::Sensor,
                                                                     1,
                                                                     ObjectIsNotParent);
                 ControllerProps(Num).ActuatedNode = GetOnlySingleNode(state, AlphArray(6),
@@ -675,7 +675,7 @@ namespace HVACControllers {
                                                                       CurrentModuleObject,
                                                                       AlphArray(1),
                                                                       DataLoopNode::NodeFluidType::blank,
-                                                                      NodeConnectionType_Actuator,
+                                                                      DataLoopNode::NodeConnectionType::Actuator,
                                                                       1,
                                                                       ObjectIsNotParent);
                 ControllerProps(Num).Offset = NumArray(1);

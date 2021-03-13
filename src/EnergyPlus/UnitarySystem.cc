@@ -2801,7 +2801,7 @@ namespace UnitarySystems {
                                                                             cCurrentModuleObject,
                                                                             thisObjectName,
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsParent);
 
@@ -2813,7 +2813,7 @@ namespace UnitarySystems {
                                                                              cCurrentModuleObject,
                                                                              thisObjectName,
                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsParent);
 
@@ -6743,7 +6743,7 @@ namespace UnitarySystems {
                                                                                          cCurrentModuleObject,
                                                                                          thisObjectName,
                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::NodeConnectionType_Inlet,
+                                                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsParent);
                     } else {
@@ -6782,7 +6782,7 @@ namespace UnitarySystems {
                                                                                                  cCurrentModuleObject,
                                                                                                  thisObjectName,
                                                                                                  DataLoopNode::NodeFluidType::Water,
-                                                                                                 DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                 DataLoopNode::NodeConnectionType::Inlet,
                                                                                                  3,
                                                                                                  DataLoopNode::ObjectIsNotParent);
                         thisSys.m_HeatRecoveryOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, loc_heatRecoveryOutletNodeName,
@@ -6790,7 +6790,7 @@ namespace UnitarySystems {
                                                                                                   cCurrentModuleObject,
                                                                                                   thisObjectName,
                                                                                                   DataLoopNode::NodeFluidType::Water,
-                                                                                                  DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                  DataLoopNode::NodeConnectionType::Outlet,
                                                                                                   3,
                                                                                                   DataLoopNode::ObjectIsNotParent);
 

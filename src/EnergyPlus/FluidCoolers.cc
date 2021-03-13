@@ -225,7 +225,7 @@ namespace EnergyPlus::FluidCoolers {
                                                                                                       cCurrentModuleObject,
                                                                                                       AlphArray(1),
                                                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                                                      DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                      DataLoopNode::NodeConnectionType::Inlet,
                                                                                                       1,
                                                                                                       DataLoopNode::ObjectIsNotParent);
             state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(3),
@@ -233,7 +233,7 @@ namespace EnergyPlus::FluidCoolers {
                                                                                                        cCurrentModuleObject,
                                                                                                        AlphArray(1),
                                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                                                        1,
                                                                                                        DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
@@ -268,7 +268,7 @@ namespace EnergyPlus::FluidCoolers {
                                                         cCurrentModuleObject,
                                                         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                        DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                         1,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum)) {
@@ -312,7 +312,7 @@ namespace EnergyPlus::FluidCoolers {
                                                                                                       cCurrentModuleObject,
                                                                                                       AlphArray(1),
                                                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                                                      DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                      DataLoopNode::NodeConnectionType::Inlet,
                                                                                                       1,
                                                                                                       DataLoopNode::ObjectIsNotParent);
             state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(3),
@@ -320,7 +320,7 @@ namespace EnergyPlus::FluidCoolers {
                                                                                                        cCurrentModuleObject,
                                                                                                        AlphArray(1),
                                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                                                        1,
                                                                                                        DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
@@ -376,7 +376,7 @@ namespace EnergyPlus::FluidCoolers {
                                                         cCurrentModuleObject,
                                                         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                        DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                         1,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum)) {

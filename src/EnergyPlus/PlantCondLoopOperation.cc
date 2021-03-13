@@ -1002,7 +1002,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                                                    CurrentModuleObject,
                                                                                                    AlphArray(1),
                                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                                   NodeConnectionType_Sensor,
+                                                                                                   DataLoopNode::NodeConnectionType::Sensor,
                                                                                                    1,
                                                                                                    ObjectIsNotParent);
                     // For DO Loop below -- Check for lower limit > upper limit.(invalid)
@@ -1352,7 +1352,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                                                                             CurrentModuleObject,
                                                                                                                             cAlphaArgs(1),
                                                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                                                            NodeConnectionType_Sensor,
+                                                                                                                            DataLoopNode::NodeConnectionType::Sensor,
                                                                                                                             1,
                                                                                                                             ObjectIsNotParent);
                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName = cAlphaArgs(CompNumA);
@@ -1362,7 +1362,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                               CurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataLoopNode::NodeFluidType::Water,
-                                              NodeConnectionType_Sensor,
+                                              DataLoopNode::NodeConnectionType::Sensor,
                                               1,
                                               ObjectIsNotParent);
                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate = rNumericArgs(CompNumN);

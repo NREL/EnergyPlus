@@ -755,7 +755,7 @@ namespace IceThermalStorage {
                                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                                            DataIPShortCuts::cAlphaArgs(1),
                                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                                            1,
                                                                                            DataLoopNode::ObjectIsNotParent);
 
@@ -765,7 +765,7 @@ namespace IceThermalStorage {
                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                             DataIPShortCuts::cAlphaArgs(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                                             1,
                                                                                             DataLoopNode::ObjectIsNotParent);
 
@@ -855,7 +855,7 @@ namespace IceThermalStorage {
                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                             DataIPShortCuts::cAlphaArgs(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                                             1,
                                                                                             DataLoopNode::ObjectIsNotParent);
 
@@ -865,7 +865,7 @@ namespace IceThermalStorage {
                                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                                              DataIPShortCuts::cAlphaArgs(1),
                                                                                              DataLoopNode::NodeFluidType::Water,
-                                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                                              1,
                                                                                              DataLoopNode::ObjectIsNotParent);
 

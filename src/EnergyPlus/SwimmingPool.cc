@@ -320,7 +320,7 @@ namespace EnergyPlus::SwimmingPool {
                                                                             CurrentModuleObject,
                                                                             Alphas(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsNotParent);
             state.dataSwimmingPools->Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state, Alphas(7),
@@ -328,7 +328,7 @@ namespace EnergyPlus::SwimmingPool {
                                                                              CurrentModuleObject,
                                                                              Alphas(1),
                                                                              DataLoopNode::NodeFluidType::Water,
-                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsNotParent);
             if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {

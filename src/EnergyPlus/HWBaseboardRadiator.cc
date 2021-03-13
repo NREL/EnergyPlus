@@ -297,8 +297,8 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeConnectionType_Outlet;
+        using DataLoopNode::NodeConnectionType::Inlet;
+        using DataLoopNode::NodeConnectionType::Outlet;
         using DataLoopNode::ObjectIsNotParent;
         using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
@@ -514,11 +514,11 @@ namespace HWBaseboardRadiator {
 
             // Get inlet node number
             HWBaseboard(BaseboardNum).WaterInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCMO_BBRadiator_Water, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCMO_BBRadiator_Water, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             // Get outlet node number
             HWBaseboard(BaseboardNum).WaterOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCMO_BBRadiator_Water, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCMO_BBRadiator_Water, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, cCMO_BBRadiator_Water, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Hot Water Nodes");
 
             HWBaseboard(BaseboardNum).WaterTempAvg = rNumericArgs(1);

@@ -220,8 +220,8 @@ namespace EnergyPlus::CoolingPanelSimple {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeConnectionType_Outlet;
+        using DataLoopNode::NodeConnectionType::Inlet;
+        using DataLoopNode::NodeConnectionType::Outlet;
         using DataLoopNode::ObjectIsNotParent;
         using DataPlant::TypeOf_CoolingPanel_Simple;
         using NodeInputManager::GetOnlySingleNode;
@@ -319,11 +319,11 @@ namespace EnergyPlus::CoolingPanelSimple {
 
             // Get inlet node number
             ThisCP.WaterInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             // Get outlet node number
             ThisCP.WaterOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, cCMO_CoolingPanel_Simple, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Chilled Water Nodes");
 
             ThisCP.RatedWaterTemp = rNumericArgs(1);

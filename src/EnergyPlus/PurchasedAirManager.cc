@@ -280,7 +280,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                            cCurrentModuleObject,
                                                                            cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                           NodeConnectionType_Outlet,
+                                                                           DataLoopNode::NodeConnectionType::Outlet,
                                                                            1,
                                                                            ObjectIsNotParent);
             UniqueNodeError = false;
@@ -295,7 +295,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                     cCurrentModuleObject,
                                                                                     cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    NodeConnectionType_Inlet,
+                                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                                     1,
                                                                                     ObjectIsNotParent);
                 } else {
@@ -305,7 +305,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                     cCurrentModuleObject,
                                                                                     cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    NodeConnectionType_Outlet,
+                                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                                     1,
                                                                                     ObjectIsNotParent);
                 }
@@ -320,7 +320,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                   cCurrentModuleObject,
                                                                                   cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                  NodeConnectionType_Inlet,
+                                                                                  DataLoopNode::NodeConnectionType::Inlet,
                                                                                   1,
                                                                                   ObjectIsNotParent);
             }
@@ -484,7 +484,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                             cCurrentModuleObject,
                                                                             cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            NodeConnectionType_Outlet,
+                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                             1,
                                                                             ObjectIsNotParent);
                 // Check if OA node is initialized in OutdoorAir:Node or OutdoorAir:Nodelist

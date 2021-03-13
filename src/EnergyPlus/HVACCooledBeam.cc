@@ -329,7 +329,7 @@ namespace HVACCooledBeam {
                                                           CurrentModuleObject,
                                                           Alphas(1),
                                                           DataLoopNode::NodeFluidType::Air,
-                                                          NodeConnectionType_Inlet,
+                                                          DataLoopNode::NodeConnectionType::Inlet,
                                                           1,
                                                           ObjectIsNotParent,
                                                           cAlphaFields(4));
@@ -338,7 +338,7 @@ namespace HVACCooledBeam {
                                                            CurrentModuleObject,
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Air,
-                                                           NodeConnectionType_Outlet,
+                                                           DataLoopNode::NodeConnectionType::Outlet,
                                                            1,
                                                            ObjectIsNotParent,
                                                            cAlphaFields(5));
@@ -347,7 +347,7 @@ namespace HVACCooledBeam {
                                                          CurrentModuleObject,
                                                          Alphas(1),
                                                          DataLoopNode::NodeFluidType::Water,
-                                                         NodeConnectionType_Inlet,
+                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                          2,
                                                          ObjectIsNotParent,
                                                          cAlphaFields(6));
@@ -356,7 +356,7 @@ namespace HVACCooledBeam {
                                                           CurrentModuleObject,
                                                           Alphas(1),
                                                           DataLoopNode::NodeFluidType::Water,
-                                                          NodeConnectionType_Outlet,
+                                                          DataLoopNode::NodeConnectionType::Outlet,
                                                           2,
                                                           ObjectIsNotParent,
                                                           cAlphaFields(7));

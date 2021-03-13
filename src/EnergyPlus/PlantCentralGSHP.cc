@@ -580,7 +580,7 @@ namespace EnergyPlus::PlantCentralGSHP {
                                                     DataIPShortCuts::cCurrentModuleObject,
                                                     DataIPShortCuts::cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType_Inlet,
+                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                     1,
                                                     DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
             state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
@@ -588,7 +588,7 @@ namespace EnergyPlus::PlantCentralGSHP {
                                                                                        DataIPShortCuts::cCurrentModuleObject,
                                                                                        DataIPShortCuts::cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                                        1,
                                                                                        DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
@@ -603,7 +603,7 @@ namespace EnergyPlus::PlantCentralGSHP {
                                                     DataIPShortCuts::cCurrentModuleObject,
                                                     DataIPShortCuts::cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType_Inlet,
+                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                     2,
                                                     DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
             state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
@@ -611,7 +611,7 @@ namespace EnergyPlus::PlantCentralGSHP {
                                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                        DataLoopNode::NodeConnectionType_Outlet,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                                         2,
                                                                                         DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
@@ -626,7 +626,7 @@ namespace EnergyPlus::PlantCentralGSHP {
                                                     DataIPShortCuts::cCurrentModuleObject,
                                                     DataIPShortCuts::cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType_Inlet,
+                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                     3,
                                                     DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
             state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(8),
@@ -634,7 +634,7 @@ namespace EnergyPlus::PlantCentralGSHP {
                                                                                       DataIPShortCuts::cCurrentModuleObject,
                                                                                       DataIPShortCuts::cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                                      DataLoopNode::NodeConnectionType_Outlet,
+                                                                                      DataLoopNode::NodeConnectionType::Outlet,
                                                                                       3,
                                                                                       DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,

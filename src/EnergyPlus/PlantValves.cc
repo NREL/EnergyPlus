@@ -179,21 +179,21 @@ namespace PlantValves {
             state.dataPlantValves->TemperValve(Item).Name = Alphas(1);
             // Get Plant Inlet Node
             state.dataPlantValves->TemperValve(Item).PltInletNodeNum = GetOnlySingleNode(
-                state, Alphas(2), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                state, Alphas(2), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             // Get Plant Outlet Node
             state.dataPlantValves->TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(
-                state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             // Get Stream 2 Source Node
             state.dataPlantValves->TemperValve(Item).PltStream2NodeNum = GetOnlySingleNode(
-                state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             // Get Mixed water Setpoint
             state.dataPlantValves->TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(
-                state, Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_SetPoint, 1, ObjectIsNotParent);
+                state, Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::SetPoint, 1, ObjectIsNotParent);
 
             // Get Pump outlet
             state.dataPlantValves->TemperValve(Item).PltPumpOutletNodeNum = GetOnlySingleNode(
-                state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
 
             // Note most checks on user input are made in second pass thru init routine
 

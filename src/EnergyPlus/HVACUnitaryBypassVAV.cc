@@ -457,7 +457,7 @@ namespace HVACUnitaryBypassVAV {
                                                                             CurrentModuleObject,
                                                                             Alphas(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsParent);
 
@@ -469,7 +469,7 @@ namespace HVACUnitaryBypassVAV {
                                                                              CurrentModuleObject,
                                                                              Alphas(1),
                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsParent);
 
@@ -478,7 +478,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType_Internal,
+                                                                                        DataLoopNode::NodeConnectionType::Internal,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsParent);
 
@@ -488,7 +488,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                               CurrentModuleObject,
                                                                                               Alphas(1),
                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                              DataLoopNode::NodeConnectionType_Internal,
+                                                                                              DataLoopNode::NodeConnectionType::Internal,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsParent);
                 CBVAV(CBVAVNum).PlenumMixerInletAirNode = NodeInputManager::GetOnlySingleNode(state, Alphas(20),
@@ -496,7 +496,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                               CurrentModuleObject,
                                                                                               Alphas(1) + "_PlenumMixerInlet",
                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                              DataLoopNode::NodeConnectionType_Outlet,
+                                                                                              DataLoopNode::NodeConnectionType::Outlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsParent);
             }
@@ -521,7 +521,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType_Internal,
+                                                                                    DataLoopNode::NodeConnectionType::Internal,
                                                                                     1,
                                                                                     DataLoopNode::ObjectIsParent);
 
@@ -530,7 +530,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1) + "_Mixer",
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType_Outlet,
+                                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                                     1,
                                                                                     DataLoopNode::ObjectIsParent);
 
@@ -539,7 +539,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1) + "_Splitter",
                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsParent);
 

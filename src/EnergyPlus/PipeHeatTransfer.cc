@@ -274,7 +274,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get inlet node data
             state.dataPipeHT->PipeHT(Item).InletNode = cAlphaArgs(3);
             state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -284,7 +284,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get outlet node data
             state.dataPipeHT->PipeHT(Item).OutletNode = cAlphaArgs(4);
             state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -393,7 +393,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get inlet node data
             state.dataPipeHT->PipeHT(Item).InletNode = cAlphaArgs(3);
             state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -403,7 +403,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get outlet node data
             state.dataPipeHT->PipeHT(Item).OutletNode = cAlphaArgs(4);
             state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -422,7 +422,7 @@ namespace EnergyPlus::PipeHeatTransfer {
                                                             cCurrentModuleObject,
                                                             cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            NodeConnectionType_OutsideAirReference,
+                                                            DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                             1,
                                                             ObjectIsNotParent);
             if (!lAlphaFieldBlanks(5)) {
@@ -498,7 +498,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get inlet node data
             state.dataPipeHT->PipeHT(Item).InletNode = cAlphaArgs(3);
             state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -508,7 +508,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get outlet node data
             state.dataPipeHT->PipeHT(Item).OutletNode = cAlphaArgs(4);
             state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));

@@ -609,7 +609,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                                                                  "FAN",
                                                                                                  "SZRHtest",
                                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                                 DataLoopNode::NodeConnectionType_Internal,
+                                                                                                 DataLoopNode::NodeConnectionType::Internal,
                                                                                                  1,
                                                                                                  DataLoopNode::ObjectIsNotParent,
                                                                                                  "AHU node");
@@ -618,7 +618,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                                                                 "OA MIXER",
                                                                                                 "SZRHtest",
                                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                                DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                DataLoopNode::NodeConnectionType::Inlet,
                                                                                                 1,
                                                                                                 DataLoopNode::ObjectIsNotParent,
                                                                                                 "AHU node");
@@ -627,7 +627,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                                                                "OA MIXER",
                                                                                                "SZRHtest",
                                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                                               DataLoopNode::NodeConnectionType_Internal,
+                                                                                               DataLoopNode::NodeConnectionType::Internal,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent,
                                                                                                "AHU node");
@@ -642,7 +642,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                                                                   "OAsysinlet",
                                                                                                   "SZRHtest",
                                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                                  DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
                                                                                                   1,
                                                                                                   DataLoopNode::ObjectIsNotParent,
                                                                                                   "AHU node");
@@ -655,7 +655,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                                                                           "FAN",
                                                                                                           "SZRHtest",
                                                                                                           DataLoopNode::NodeFluidType::Air,
-                                                                                                          DataLoopNode::NodeConnectionType_Internal,
+                                                                                                          DataLoopNode::NodeConnectionType::Internal,
                                                                                                           1,
                                                                                                           DataLoopNode::ObjectIsNotParent,
                                                                                                           "AHU node");
@@ -665,7 +665,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                                                                            "FAN",
                                                                                                            "SZRHtest",
                                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                                           DataLoopNode::NodeConnectionType_Internal,
+                                                                                                           DataLoopNode::NodeConnectionType::Internal,
                                                                                                            1,
                                                                                                            DataLoopNode::ObjectIsNotParent,
                                                                                                            "AHU node");
@@ -682,7 +682,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                           "Zone",
                                                           "SZRHspmTest",
                                                           DataLoopNode::NodeFluidType::Air,
-                                                          DataLoopNode::NodeConnectionType_ZoneNode,
+                                                          DataLoopNode::NodeConnectionType::ZoneNode,
                                                           1,
                                                           DataLoopNode::ObjectIsNotParent,
                                                           "Test zone node");
@@ -692,7 +692,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                             "Zone",
                                                             "SZRHspmTest",
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType_ZoneInlet,
+                                                            DataLoopNode::NodeConnectionType::ZoneInlet,
                                                             1,
                                                             DataLoopNode::ObjectIsNotParent,
                                                             "Test zone inlet node");

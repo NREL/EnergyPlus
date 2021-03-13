@@ -345,7 +345,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                      HPEqFitCoolingUC,
                                                                      DataIPShortCuts::cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                     NodeConnectionType_Inlet,
+                                                                     DataLoopNode::NodeConnectionType::Inlet,
                                                                      1,
                                                                      ObjectIsNotParent);
 
@@ -354,7 +354,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                       HPEqFitCoolingUC,
                                                                       DataIPShortCuts::cAlphaArgs(1),
                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                      NodeConnectionType_Outlet,
+                                                                      DataLoopNode::NodeConnectionType::Outlet,
                                                                       1,
                                                                       ObjectIsNotParent);
 
@@ -363,7 +363,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                    HPEqFitCoolingUC,
                                                                    DataIPShortCuts::cAlphaArgs(1),
                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                   NodeConnectionType_Inlet,
+                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                    2,
                                                                    ObjectIsNotParent);
 
@@ -372,7 +372,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                     HPEqFitCoolingUC,
                                                                     DataIPShortCuts::cAlphaArgs(1),
                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                    NodeConnectionType_Outlet,
+                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                     2,
                                                                     ObjectIsNotParent);
 
@@ -504,7 +504,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                      HPEqFitHeatingUC,
                                                                      DataIPShortCuts::cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                     NodeConnectionType_Inlet,
+                                                                     DataLoopNode::NodeConnectionType::Inlet,
                                                                      1,
                                                                      ObjectIsNotParent);
 
@@ -513,7 +513,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                       HPEqFitHeatingUC,
                                                                       DataIPShortCuts::cAlphaArgs(1),
                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                      NodeConnectionType_Outlet,
+                                                                      DataLoopNode::NodeConnectionType::Outlet,
                                                                       1,
                                                                       ObjectIsNotParent);
 
@@ -522,7 +522,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                    HPEqFitHeatingUC,
                                                                    DataIPShortCuts::cAlphaArgs(1),
                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                   NodeConnectionType_Inlet,
+                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                    2,
                                                                    ObjectIsNotParent);
 
@@ -531,7 +531,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                     HPEqFitHeatingUC,
                                                                     DataIPShortCuts::cAlphaArgs(1),
                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                    NodeConnectionType_Outlet,
+                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                     2,
                                                                     ObjectIsNotParent);
 

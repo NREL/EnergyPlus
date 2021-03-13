@@ -337,7 +337,7 @@ namespace DualDuct {
                                                                         CurrentModuleObject,
                                                                         AlphArray(1),
                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                        NodeConnectionType_Outlet,
+                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                         1,
                                                                         ObjectIsNotParent,
                                                                         cAlphaFields(3));
@@ -346,7 +346,7 @@ namespace DualDuct {
                                                                              CurrentModuleObject,
                                                                              AlphArray(1),
                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                             NodeConnectionType_Inlet,
+                                                                             DataLoopNode::NodeConnectionType::Inlet,
                                                                              1,
                                                                              ObjectIsNotParent,
                                                                              cAlphaFields(4));
@@ -355,7 +355,7 @@ namespace DualDuct {
                                                                               CurrentModuleObject,
                                                                               AlphArray(1),
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              NodeConnectionType_Inlet,
+                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                               1,
                                                                               ObjectIsNotParent,
                                                                               cAlphaFields(5));
@@ -480,7 +480,7 @@ namespace DualDuct {
                                                                         CurrentModuleObject,
                                                                         AlphArray(1),
                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                        NodeConnectionType_Outlet,
+                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                         1,
                                                                         ObjectIsNotParent,
                                                                         cAlphaFields(3));
@@ -489,7 +489,7 @@ namespace DualDuct {
                                                                              CurrentModuleObject,
                                                                              AlphArray(1),
                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                             NodeConnectionType_Inlet,
+                                                                             DataLoopNode::NodeConnectionType::Inlet,
                                                                              1,
                                                                              ObjectIsNotParent,
                                                                              cAlphaFields(4));
@@ -498,7 +498,7 @@ namespace DualDuct {
                                                                               CurrentModuleObject,
                                                                               AlphArray(1),
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              NodeConnectionType_Inlet,
+                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                               1,
                                                                               ObjectIsNotParent,
                                                                               cAlphaFields(5));
@@ -643,7 +643,7 @@ namespace DualDuct {
                                                                         CurrentModuleObject,
                                                                         AlphArray(1),
                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                        NodeConnectionType_Outlet,
+                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                         1,
                                                                         ObjectIsNotParent,
                                                                         cAlphaFields(3));
@@ -652,7 +652,7 @@ namespace DualDuct {
                                                                          CurrentModuleObject,
                                                                          AlphArray(1),
                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                         NodeConnectionType_Inlet,
+                                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                                          1,
                                                                          ObjectIsNotParent,
                                                                          cAlphaFields(4));
@@ -663,7 +663,7 @@ namespace DualDuct {
                                                                                     CurrentModuleObject,
                                                                                     AlphArray(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    NodeConnectionType_Inlet,
+                                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                                     1,
                                                                                     ObjectIsNotParent,
                                                                                     cAlphaFields(5));

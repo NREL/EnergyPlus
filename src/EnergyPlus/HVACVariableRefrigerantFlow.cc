@@ -2186,7 +2186,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                          cCurrentModuleObject,
                                                                          state.dataHVACVarRefFlow->VRF(VRFNum).Name,
                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                         DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                         DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                          1,
                                                                          ObjectIsNotParent);
                         if (!CheckOutAirNodeNumber(state, state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum)) {
@@ -2202,7 +2202,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                          cCurrentModuleObject,
                                                                          state.dataHVACVarRefFlow->VRF(VRFNum).Name,
                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                         DataLoopNode::NodeConnectionType_Inlet,
+                                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                                          2,
                                                                          ObjectIsNotParent);
                     } else {
@@ -2217,7 +2217,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                        cCurrentModuleObject,
                                                                        state.dataHVACVarRefFlow->VRF(VRFNum).Name,
                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                        2,
                                                                        ObjectIsNotParent);
                 TestCompSet(state, cCurrentModuleObject, state.dataHVACVarRefFlow->VRF(VRFNum).Name, cAlphaArgs(35), cAlphaArgs(36), "Condenser Water Nodes");
@@ -3261,7 +3261,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                   cCurrentModuleObject,
                                                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                  DataLoopNode::NodeConnectionType_Inlet,
+                                                                  DataLoopNode::NodeConnectionType::Inlet,
                                                                   1,
                                                                   ObjectIsParent);
 
@@ -3271,7 +3271,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                    cCurrentModuleObject,
                                                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::NodeConnectionType_Outlet,
+                                                                   DataLoopNode::NodeConnectionType::Outlet,
                                                                    1,
                                                                    ObjectIsParent);
 

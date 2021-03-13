@@ -219,7 +219,7 @@ namespace EnergyPlus::PondGroundHeatExchanger {
                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                              DataIPShortCuts::cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
-                                                                             DataLoopNode::NodeConnectionType_Inlet,
+                                                                             DataLoopNode::NodeConnectionType::Inlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsNotParent);
             if (state.dataPondGHE->PondGHE(Item).InletNodeNum == 0) {
@@ -235,7 +235,7 @@ namespace EnergyPlus::PondGroundHeatExchanger {
                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                               DataIPShortCuts::cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                              DataLoopNode::NodeConnectionType_Outlet,
+                                                                              DataLoopNode::NodeConnectionType::Outlet,
                                                                               1,
                                                                               DataLoopNode::ObjectIsNotParent);
             if (state.dataPondGHE->PondGHE(Item).OutletNodeNum == 0) {

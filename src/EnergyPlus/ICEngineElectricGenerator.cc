@@ -186,7 +186,7 @@ namespace ICEngineElectricGenerator {
                                                                                                 DataIPShortCuts::cCurrentModuleObject,
                                                                                                 AlphArray(1),
                                                                                                 DataLoopNode::NodeFluidType::Electric,
-                                                                                                DataLoopNode::NodeConnectionType_Electric,
+                                                                                                DataLoopNode::NodeConnectionType::Electric,
                                                                                                 1,
                                                                                                 DataLoopNode::ObjectIsNotParent);
 
@@ -252,7 +252,7 @@ namespace ICEngineElectricGenerator {
                                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                                     AlphArray(1),
                                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                                    DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                                                     1,
                                                                                                     DataLoopNode::ObjectIsNotParent);
                 if (ICEngineGenerator(genNum).HeatRecInletNodeNum == 0) {
@@ -265,7 +265,7 @@ namespace ICEngineElectricGenerator {
                                                                                                      DataIPShortCuts::cCurrentModuleObject,
                                                                                                      AlphArray(1),
                                                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                                                     DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                                      1,
                                                                                                      DataLoopNode::ObjectIsNotParent);
                 if (ICEngineGenerator(genNum).HeatRecOutletNodeNum == 0) {

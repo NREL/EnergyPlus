@@ -308,7 +308,7 @@ namespace EnergyPlus::Boilers {
                                                                                 DataIPShortCuts::cCurrentModuleObject,
                                                                                 DataIPShortCuts::cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                DataLoopNode::NodeConnectionType_Inlet,
+                                                                                DataLoopNode::NodeConnectionType::Inlet,
                                                                                 1,
                                                                                 DataLoopNode::ObjectIsNotParent);
             thisBoiler.BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -317,7 +317,7 @@ namespace EnergyPlus::Boilers {
                                                                                  DataIPShortCuts::cCurrentModuleObject,
                                                                                  DataIPShortCuts::cAlphaArgs(1),
                                                                                  DataLoopNode::NodeFluidType::Water,
-                                                                                 DataLoopNode::NodeConnectionType_Outlet,
+                                                                                 DataLoopNode::NodeConnectionType::Outlet,
                                                                                  1,
                                                                                  DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,

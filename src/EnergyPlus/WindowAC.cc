@@ -330,10 +330,10 @@ namespace WindowAC {
             state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow = Numbers(2);
 
             state.dataWindowAC->WindAC(WindACNum).AirInNode =
-                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
 
             state.dataWindowAC->WindAC(WindACNum).AirOutNode =
-                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
 
             state.dataWindowAC->WindAC(WindACNum).OAMixType = Alphas(5);
             state.dataWindowAC->WindAC(WindACNum).OAMixName = Alphas(6);

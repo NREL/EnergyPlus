@@ -547,19 +547,19 @@ namespace EnergyPlus::HybridUnitaryAirConditioners {
                 // A11, \field Supply Air Node Name
                 // A12, \field Relief Node Name
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode = GetOnlySingleNode(state,
-                    Alphas(9), ErrorsFound, cCurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                    Alphas(9), ErrorsFound, cCurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode = GetOnlySingleNode(state, Alphas(10),
                                                                                                  ErrorsFound,
                                                                                                  cCurrentModuleObject,
                                                                                                  Alphas(1),
                                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                                 NodeConnectionType_OutsideAir,
+                                                                                                 DataLoopNode::NodeConnectionType::OutsideAir,
                                                                                                  1,
                                                                                                  ObjectIsNotParent);
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode = GetOnlySingleNode(state,
-                    Alphas(11), ErrorsFound, cCurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                    Alphas(11), ErrorsFound, cCurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode = GetOnlySingleNode(state,
-                    Alphas(12), ErrorsFound, cCurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent);
+                    Alphas(12), ErrorsFound, cCurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::ReliefAir, 1, ObjectIsNotParent);
                 TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(9), Alphas(11), "Hybrid Evap Air Zone Nodes");
                 TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(10), Alphas(12), "Hybrid Evap Air Zone Secondary Nodes");
 

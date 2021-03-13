@@ -93,8 +93,8 @@ namespace FourPipeBeam {
 
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-        using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeConnectionType_Outlet;
+        using DataLoopNode::NodeConnectionType::Inlet;
+        using DataLoopNode::NodeConnectionType::Outlet;
         using DataLoopNode::ObjectIsNotParent;
         using DataLoopNode::ObjectIsParent;
         using NodeInputManager::GetOnlySingleNode;
@@ -192,7 +192,7 @@ namespace FourPipeBeam {
                                                    cCurrentModuleObject,
                                                    cAlphaArgs(1),
                                                    DataLoopNode::NodeFluidType::Air,
-                                                   NodeConnectionType_Inlet,
+                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                    1,
                                                    ObjectIsNotParent,
                                                    cAlphaFieldNames(5));
@@ -201,7 +201,7 @@ namespace FourPipeBeam {
                                                     cCurrentModuleObject,
                                                     cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    NodeConnectionType_Outlet,
+                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                     1,
                                                     ObjectIsNotParent,
                                                     cAlphaFieldNames(6));
@@ -222,7 +222,7 @@ namespace FourPipeBeam {
                                                       cCurrentModuleObject,
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Water,
-                                                      NodeConnectionType_Inlet,
+                                                      DataLoopNode::NodeConnectionType::Inlet,
                                                       2,
                                                       ObjectIsParent,
                                                       cAlphaFieldNames(7));
@@ -231,7 +231,7 @@ namespace FourPipeBeam {
                                                        cCurrentModuleObject,
                                                        cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Water,
-                                                       NodeConnectionType_Outlet,
+                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                        2,
                                                        ObjectIsParent,
                                                        cAlphaFieldNames(8));
@@ -253,7 +253,7 @@ namespace FourPipeBeam {
                                                       cCurrentModuleObject,
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Water,
-                                                      NodeConnectionType_Inlet,
+                                                      DataLoopNode::NodeConnectionType::Inlet,
                                                       2,
                                                       ObjectIsParent,
                                                       cAlphaFieldNames(9));
@@ -262,7 +262,7 @@ namespace FourPipeBeam {
                                                        cCurrentModuleObject,
                                                        cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Water,
-                                                       NodeConnectionType_Outlet,
+                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                        2,
                                                        ObjectIsParent,
                                                        cAlphaFieldNames(10));

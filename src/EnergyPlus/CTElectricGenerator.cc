@@ -199,7 +199,7 @@ namespace CTElectricGenerator {
                                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                                           AlphArray(1),
                                                                                           DataLoopNode::NodeFluidType::Electric,
-                                                                                          DataLoopNode::NodeConnectionType_Electric,
+                                                                                          DataLoopNode::NodeConnectionType::Electric,
                                                                                           1,
                                                                                           DataLoopNode::ObjectIsNotParent);
 
@@ -267,7 +267,7 @@ namespace CTElectricGenerator {
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               AlphArray(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
                 if (state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum == 0) {
@@ -279,7 +279,7 @@ namespace CTElectricGenerator {
                                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                                AlphArray(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
                 if (state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutletNodeNum == 0) {
@@ -321,7 +321,7 @@ namespace CTElectricGenerator {
                                                                                       DataIPShortCuts::cCurrentModuleObject,
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                      DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                      DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                       1,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataCTElectricGenerator->CTGenerator(genNum).OAInletNode)) {

@@ -290,7 +290,7 @@ namespace EnergyPlus::BranchNodeConnections {
         // 6.  Any given node can only be an inlet once in the list of Non-Parent Node Connections
         // 7.  Any given node can only be an outlet once in the list of Non-Parent Node Connections
         // 8.  non-parent outlet nodes -- must never be an outlet more than once
-        // 9.  nodes of type OutsideAirReference must be registered as NodeConnectionType_OutsideAir
+        // 9.  nodes of type OutsideAirReference must be registered as DataLoopNode::NodeConnectionType::OutsideAir
         // 10. fluid streams cannot have multiple inlet/outlet nodes on same component
         // 11. zone nodes may not be used as anything else except as a setpoint, sensor or actuator node
 
@@ -323,13 +323,13 @@ namespace EnergyPlus::BranchNodeConnections {
 
         //  Check 1 -- check sensor and actuator nodes
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Sensor)) continue;
             IsValid = false;
             for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber != state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Actuator)) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Actuator)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Sensor)) continue;
                 IsValid = true;
             }
             if (!IsValid) {
@@ -342,14 +342,14 @@ namespace EnergyPlus::BranchNodeConnections {
         }
 
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_Actuator)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Actuator)) continue;
             IsValid = false;
             for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber != state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Actuator)) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_OutsideAir)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Actuator)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Sensor)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::OutsideAir)) continue;
                 IsValid = true;
             }
             if (!IsValid) {
@@ -364,17 +364,17 @@ namespace EnergyPlus::BranchNodeConnections {
         // Check 2 -- setpoint nodes
         // Check 2a -- setpoint node must also be an inlet or an outlet (CR8212)
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_SetPoint)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::SetPoint)) continue;
             IsValid = false;
             IsInlet = false;
             IsOutlet = false;
             for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber != state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_SetPoint)) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_OutsideAir)) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Inlet)) IsInlet = true;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Outlet)) IsOutlet = true;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::SetPoint)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::OutsideAir)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet)) IsInlet = true;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet)) IsOutlet = true;
                 IsValid = true;
             }
             if (!IsValid) {
@@ -398,12 +398,12 @@ namespace EnergyPlus::BranchNodeConnections {
 
         // Check 3 -- zone inlet nodes -- must be an outlet somewhere
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_ZoneInlet)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::ZoneInlet)) continue;
             IsValid = false;
             for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber != state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_Outlet)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet)) continue;
                 IsValid = true;
             }
             if (!IsValid) {
@@ -417,12 +417,12 @@ namespace EnergyPlus::BranchNodeConnections {
 
         // Check 4 -- zone exhaust nodes -- must be an inlet somewhere
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_ZoneExhaust)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::ZoneExhaust)) continue;
             IsValid = false;
             for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber != state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_Inlet)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet)) continue;
                 IsValid = true;
             }
             if (!IsValid) {
@@ -436,12 +436,12 @@ namespace EnergyPlus::BranchNodeConnections {
 
         // Check 5 -- return plenum induced air outlet nodes -- must be an inlet somewhere
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_InducedAir)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::InducedAir)) continue;
             IsValid = false;
             for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber != state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_Inlet)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet)) continue;
                 IsValid = true;
             }
             if (!IsValid) {
@@ -458,7 +458,7 @@ namespace EnergyPlus::BranchNodeConnections {
         //    b)  If an InletNode's object is not one of the above types, it is valid if the
         //        same node name appears as an INLET to an AirLoopHVAC, CondenserLoop, or PlantLoop.
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_Inlet)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet)) continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType == "AIRLOOPHVAC" || state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType == "CONDENSERLOOP" ||
                 state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType == "PLANTLOOP")
                 continue;
@@ -467,16 +467,16 @@ namespace EnergyPlus::BranchNodeConnections {
             for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber != state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Outlet) ||
-                    state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_ZoneReturn) ||
-                    state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_ZoneExhaust) ||
-                    state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_InducedAir) ||
-                    state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_ReliefAir) ||
-                    state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_OutsideAir)) {
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet) ||
+                    state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::ZoneReturn) ||
+                    state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::ZoneExhaust) ||
+                    state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::InducedAir) ||
+                    state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::ReliefAir) ||
+                    state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::OutsideAir)) {
                     MatchedAtLeastOne = true;
                     continue;
                 }
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Inlet) &&
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet) &&
                     (state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType == "AIRLOOPHVAC" || state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType == "CONDENSERLOOP" ||
                      state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType == "PLANTLOOP")) {
                     MatchedAtLeastOne = true;
@@ -498,11 +498,11 @@ namespace EnergyPlus::BranchNodeConnections {
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
             // Only non-parent node connections
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectIsParent) continue;
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_Inlet)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet)) continue;
             for (Loop2 = Loop1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectIsParent) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_Inlet)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet)) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber == state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber) {
                     ShowSevereError(state, "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                     "\", The same node appears as a non-parent Inlet node more than once.");
@@ -519,12 +519,12 @@ namespace EnergyPlus::BranchNodeConnections {
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
             // Only non-parent node connections
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectIsParent) continue;
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_Outlet)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet)) continue;
             IsValid = true;
             for (Loop2 = Loop1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectIsParent) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_Outlet)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet)) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber == state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber) {
                     // Skip if one of the
                     ShowSevereError(state, "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
@@ -538,14 +538,14 @@ namespace EnergyPlus::BranchNodeConnections {
             }
         }
 
-        // Check 9 -- nodes of type OutsideAirReference must be registered as NodeConnectionType_OutsideAir
+        // Check 9 -- nodes of type OutsideAirReference must be registered as DataLoopNode::NodeConnectionType::OutsideAir
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_OutsideAirReference)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::OutsideAirReference)) continue;
             IsValid = false;
             for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber != state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_OutsideAir)) continue;
+                if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::OutsideAir)) continue;
                 IsValid = true;
                 break;
             }
@@ -595,15 +595,15 @@ namespace EnergyPlus::BranchNodeConnections {
                 Loop1 = NodeObjects(Object);
                 if (state.dataBranchNodeConnections->NumOfNodeConnections < 2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectIsParent) continue;
-                if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType == ValidConnectionTypes(NodeConnectionType_Inlet))
+                if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
                     ++FluidStreamInletCount(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream);
-                if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType == ValidConnectionTypes(NodeConnectionType_Outlet))
+                if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
                     ++FluidStreamOutletCount(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream);
                 for (Loop2 = Loop1 + 1; Loop2 <= NodeObjects(Object + 1) - 1; ++Loop2) {
                     if (state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectIsParent) continue;
-                    if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Inlet))
+                    if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
                         ++FluidStreamInletCount(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream);
-                    if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Outlet))
+                    if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
                         ++FluidStreamOutletCount(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream);
                 }
                 for (Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2) {
@@ -631,14 +631,14 @@ namespace EnergyPlus::BranchNodeConnections {
 
         // Check 11 - zone nodes may not be used as anything else except as a setpoint, sensor or actuator node
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_ZoneNode)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::ZoneNode)) continue;
             IsValid = true;
             for (Loop2 = Loop1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName == state.dataBranchNodeConnections->NodeConnections(Loop2).NodeName) {
-                    if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
-                    if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Actuator)) continue;
-                    if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_SetPoint)) continue;
+                    if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Sensor)) continue;
+                    if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::Actuator)) continue;
+                    if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(DataLoopNode::NodeConnectionType::SetPoint)) continue;
                     ShowSevereError(state, "Node Connection Error, Node Name=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                     "\", The same zone node appears more than once.");
                     ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Object Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);

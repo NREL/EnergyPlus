@@ -769,7 +769,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                                             DataIPShortCuts::cAlphaArgs(1),
                                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                                                             1,
                                                                                                             DataLoopNode::ObjectIsParent);
 
@@ -778,7 +778,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                                                              DataIPShortCuts::cAlphaArgs(1),
                                                                                                              DataLoopNode::NodeFluidType::Water,
-                                                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                                                              1,
                                                                                                              DataLoopNode::ObjectIsParent);
 
@@ -1222,7 +1222,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                               HPWH.Name,
                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                               2,
                                                                               DataLoopNode::ObjectIsParent);
                 HPWH.InletNodeName1 = hpwhAlpha[4];
@@ -1231,7 +1231,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                HPWH.Name,
                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                                2,
                                                                                DataLoopNode::ObjectIsParent);
                 HPWH.OutletNodeName1 = hpwhAlpha[5];
@@ -1390,7 +1390,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                           HPWH.Name,
                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                          DataLoopNode::NodeConnectionType_Inlet,
+                                                                          DataLoopNode::NodeConnectionType::Inlet,
                                                                           1,
                                                                           DataLoopNode::ObjectIsParent);
                 HPWH.WHUseOutletNode = NodeInputManager::GetOnlySingleNode(state, HPWH.OutletNodeName2,
@@ -1398,7 +1398,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                            HPWH.Name,
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType_Outlet,
+                                                                           DataLoopNode::NodeConnectionType::Outlet,
                                                                            1,
                                                                            DataLoopNode::ObjectIsParent);
             }
@@ -1493,7 +1493,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                               HPWH.Name,
                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                               2,
                                                                               DataLoopNode::ObjectIsParent);
                 HPWH.OutletNodeName1 = "DUMMY CONDENSER OUTLET " + Coil.Name;
@@ -1502,7 +1502,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                HPWH.Name,
                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                                2,
                                                                                DataLoopNode::ObjectIsParent);
             }
@@ -1731,7 +1731,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                  DataIPShortCuts::cCurrentModuleObject + " inlet air mixer",
                                                                                  HPWH.Name,
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType_Outlet,
+                                                                                 DataLoopNode::NodeConnectionType::Outlet,
                                                                                  1,
                                                                                  DataLoopNode::ObjectIsNotParent);
                 } else {
@@ -1754,7 +1754,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                      DataIPShortCuts::cCurrentModuleObject + "-OUTLET AIR SPLITTER",
                                                                                      HPWH.Name,
                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType_Inlet,
+                                                                                     DataLoopNode::NodeConnectionType::Inlet,
                                                                                      1,
                                                                                      DataLoopNode::ObjectIsNotParent);
                 } else {
@@ -1777,7 +1777,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                 DataIPShortCuts::cCurrentModuleObject + "-INLET AIR MIXER",
                                                                                 HPWH.Name,
                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                DataLoopNode::NodeConnectionType_Inlet,
+                                                                                DataLoopNode::NodeConnectionType::Inlet,
                                                                                 1,
                                                                                 DataLoopNode::ObjectIsNotParent);
 
@@ -1786,7 +1786,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                  DataIPShortCuts::cCurrentModuleObject + "-OUTLET AIR SPLITTER",
                                                                                  HPWH.Name,
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType_Outlet,
+                                                                                 DataLoopNode::NodeConnectionType::Outlet,
                                                                                  1,
                                                                                  DataLoopNode::ObjectIsNotParent);
 
@@ -1795,7 +1795,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                           HPWH.Name,
                                                                           DataLoopNode::NodeFluidType::Air,
-                                                                          DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                          DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                           1,
                                                                           DataLoopNode::ObjectIsParent);
                 if (!hpwhAlpha[9 + nAlphaOffset].empty()) {
@@ -1812,7 +1812,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                           HPWH.Name,
                                                                           DataLoopNode::NodeFluidType::Air,
-                                                                          DataLoopNode::NodeConnectionType_ReliefAir,
+                                                                          DataLoopNode::NodeConnectionType::ReliefAir,
                                                                           1,
                                                                           DataLoopNode::ObjectIsParent);
 
@@ -1826,7 +1826,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     HPWH.Name,
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType_Outlet,
+                                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                                     1,
                                                                                     DataLoopNode::ObjectIsParent);
 
@@ -1835,7 +1835,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                      DataIPShortCuts::cCurrentModuleObject,
                                                                                      HPWH.Name,
                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType_Outlet,
+                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                      1,
                                                                                      DataLoopNode::ObjectIsParent);
 
@@ -1846,7 +1846,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                                         HPWH.Name,
                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsParent);
 
@@ -1855,7 +1855,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                          HPWH.Name,
                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsParent);
                     } else { // HPWH is located outdoors
@@ -1864,7 +1864,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                   DataIPShortCuts::cCurrentModuleObject,
                                                                                   HPWH.Name,
                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                  DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                  DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                   1,
                                                                                   DataLoopNode::ObjectIsParent);
                         if (!hpwhAlphaBlank[9 + nAlphaOffset]) {
@@ -1881,7 +1881,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                   DataIPShortCuts::cCurrentModuleObject,
                                                                                   HPWH.Name,
                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                  DataLoopNode::NodeConnectionType_ReliefAir,
+                                                                                  DataLoopNode::NodeConnectionType::ReliefAir,
                                                                                   1,
                                                                                   DataLoopNode::ObjectIsParent);
                     }
@@ -2450,7 +2450,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                         DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     if (!DataIPShortCuts::cAlphaArgs(11).empty()) {
@@ -2562,7 +2562,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                         DataIPShortCuts::cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                         1,
                                                                         DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName1 = DataIPShortCuts::cAlphaArgs(14);
@@ -2571,7 +2571,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                          DataIPShortCuts::cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                          1,
                                                                          DataLoopNode::ObjectIsNotParent);
                 Tank.OutletNodeName1 = DataIPShortCuts::cAlphaArgs(15);
@@ -2598,7 +2598,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                            DataIPShortCuts::cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                            2,
                                                                            DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName2 = DataIPShortCuts::cAlphaArgs(16);
@@ -2607,7 +2607,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                             DataIPShortCuts::cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                             2,
                                                                             DataLoopNode::ObjectIsNotParent);
                 Tank.OutletNodeName2 = DataIPShortCuts::cAlphaArgs(17);
@@ -2928,7 +2928,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::NodeConnectionType_Inlet,
+                                                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     if (!DataIPShortCuts::cAlphaArgs(13).empty()) {
@@ -3099,7 +3099,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                         DataIPShortCuts::cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                         1,
                                                                         DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName1 = DataIPShortCuts::cAlphaArgs(16);
@@ -3108,7 +3108,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                          DataIPShortCuts::cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                          1,
                                                                          DataLoopNode::ObjectIsNotParent);
                 Tank.OutletNodeName1 = DataIPShortCuts::cAlphaArgs(17);
@@ -3135,7 +3135,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                            DataIPShortCuts::cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                            2,
                                                                            DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName2 = DataIPShortCuts::cAlphaArgs(18);
@@ -3144,7 +3144,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                             DataIPShortCuts::cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                             2,
                                                                             DataLoopNode::ObjectIsNotParent);
                 Tank.OutletNodeName2 = DataIPShortCuts::cAlphaArgs(19);
@@ -3340,7 +3340,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                         DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     if (!DataIPShortCuts::lAlphaFieldBlanks(6)) {
@@ -3449,7 +3449,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                         DataIPShortCuts::cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                         1,
                                                                         DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName1 = DataIPShortCuts::cAlphaArgs(7);
@@ -3458,7 +3458,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                          DataIPShortCuts::cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                          1,
                                                                          DataLoopNode::ObjectIsNotParent);
                 Tank.OutletNodeName1 = DataIPShortCuts::cAlphaArgs(8);
@@ -3470,7 +3470,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                            DataIPShortCuts::cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                            2,
                                                                            DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName2 = DataIPShortCuts::cAlphaArgs(10);
@@ -3479,7 +3479,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                             DataIPShortCuts::cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                             2,
                                                                             DataLoopNode::ObjectIsNotParent);
                 Tank.OutletNodeName2 = DataIPShortCuts::cAlphaArgs(11);
@@ -3644,7 +3644,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::NodeConnectionType_Inlet,
+                                                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     if (!DataIPShortCuts::lAlphaFieldBlanks(7)) {
@@ -3763,7 +3763,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                         DataIPShortCuts::cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                         1,
                                                                         DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName1 = DataIPShortCuts::cAlphaArgs(8);
@@ -3772,7 +3772,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                          DataIPShortCuts::cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                          1,
                                                                          DataLoopNode::ObjectIsNotParent);
                 Tank.OutletNodeName1 = DataIPShortCuts::cAlphaArgs(9);
@@ -3784,7 +3784,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                            DataIPShortCuts::cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                            2,
                                                                            DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName2 = DataIPShortCuts::cAlphaArgs(11);
@@ -3793,7 +3793,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                             DataIPShortCuts::cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                             2,
                                                                             DataLoopNode::ObjectIsNotParent);
                 Tank.OutletNodeName2 = DataIPShortCuts::cAlphaArgs(12);
@@ -4109,7 +4109,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                            Tank.Type,
                                                                                            Tank.Name,
                                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                                            2,
                                                                                            DataLoopNode::ObjectIsNotParent);
                                 Tank.InletNodeName2 = HPWH.OutletNodeName1;
@@ -4118,7 +4118,7 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                                             Tank.Type,
                                                                                             Tank.Name,
                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                                             2,
                                                                                             DataLoopNode::ObjectIsNotParent);
                                 Tank.OutletNodeName2 = HPWH.InletNodeName1;

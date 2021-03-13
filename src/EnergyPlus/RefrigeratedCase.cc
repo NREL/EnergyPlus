@@ -2273,7 +2273,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     // Node identification reserved for future use.  Currently exchange energy directly with zone outside any air system
                     // AirChillerSet(SetID)%NodeNumInlet = &
                     //       NodeInputManager::GetOnlySingleNode(state, Alphas(AlphaNum),ErrorsFound,TRIM(CurrentModuleObject), &
-                    //                    AirChillerSet(SetID)%Name,DataLoopNode::NodeFluidType::Air,DataLoopNode::NodeConnectionType_Inlet,1,DataLoopNode::ObjectIsNotParent)
+                    //                    AirChillerSet(SetID)%Name,DataLoopNode::NodeFluidType::Air,DataLoopNode::NodeConnectionType::Inlet,1,DataLoopNode::ObjectIsNotParent)
                 }
 
                 ++AlphaNum;
@@ -2283,7 +2283,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     // Node identification reserved for future use.  Currently exchange energy directly with zone outside any air system
                     // AirChillerSet(SetID)%NodeNumOutlet = &
                     //         NodeInputManager::GetOnlySingleNode(state, Alphas(AlphaNum),ErrorsFound,TRIM(CurrentModuleObject), &
-                    //                      AirChillerSet(SetID)%Name,DataLoopNode::NodeFluidType::Air,DataLoopNode::NodeConnectionType_Outlet,1,DataLoopNode::ObjectIsNotParent)
+                    //                      AirChillerSet(SetID)%Name,DataLoopNode::NodeFluidType::Air,DataLoopNode::NodeConnectionType::Outlet,1,DataLoopNode::ObjectIsNotParent)
                 }
 
                 // An extensible list is used to enter the individual names of each chiller in the set.
@@ -2494,7 +2494,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                     RefrigRack(RackNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, Alphas(7),
@@ -2502,7 +2502,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                          CurrentModuleObject,
                                                                                          Alphas(1),
                                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     // Check node connections
@@ -2636,7 +2636,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                               CurrentModuleObject,
                                                                               Alphas(1),
                                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                                DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                                DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                               1,
                                                                                                 DataLoopNode::ObjectIsParent);
                     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, RefrigRack(RackNum).OutsideAirNodeNum)) {
@@ -2928,7 +2928,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                    CurrentModuleObject,
                                                                                    Alphas(1),
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                    1,
                                                                     DataLoopNode::ObjectIsParent);
                             if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Condenser(CondNum).InletAirNodeNum)) {
@@ -3092,7 +3092,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                CurrentModuleObject,
                                                                                Alphas(1),
                                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                                 DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                                 DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                1,
                                                                                                  DataLoopNode::ObjectIsParent);
                         if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Condenser(CondNum).InletAirNodeNum)) {
@@ -3250,7 +3250,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                        CurrentModuleObject,
                                                                                        Alphas(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType_Inlet,
+                                                                                       DataLoopNode::NodeConnectionType::Inlet,
                                                                                        1,
                                                                                        DataLoopNode::ObjectIsNotParent);
                     Condenser(CondNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, Alphas(3),
@@ -3258,7 +3258,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                        DataLoopNode::NodeConnectionType_Outlet,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                     // Check node connections
@@ -3568,7 +3568,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                  CurrentModuleObject,
                                                                                  Alphas(1),
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                  1,
                                                                     DataLoopNode::ObjectIsParent);
                             if (!OutAirNodeManager::CheckOutAirNodeNumber(state, GasCooler(GCNum).InletAirNodeNum)) {

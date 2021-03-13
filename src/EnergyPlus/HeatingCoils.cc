@@ -453,18 +453,18 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).NominalCapacity = Numbers(2);
             errFlag = false;
             HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
             errFlag = false;
             HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
             HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             // Setup Report variables for the Electric Coils
@@ -563,18 +563,18 @@ namespace HeatingCoils {
 
             errFlag = false;
             HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
             errFlag = false;
             HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
             HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             // Setup Report variables for the Electric Coils
@@ -675,18 +675,18 @@ namespace HeatingCoils {
             coil.NominalCapacity = Numbers(2);
             errFlag = false;
             coil.AirInletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
             errFlag = false;
             coil.AirOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Air Nodes");
 
             errFlag = false;
             coil.TempSetPointNodeNum =
-                GetOnlySingleNode(state, Alphas(6), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(6), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             // parasitic electric load associated with the fuel heating coil
@@ -814,18 +814,18 @@ namespace HeatingCoils {
 
             errFlag = false;
             HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
             errFlag = false;
             HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
             HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             // parasitic electric load associated with the gas heating coil
@@ -974,11 +974,11 @@ namespace HeatingCoils {
 
             errFlag = false;
             HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
             errFlag = false;
             HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -1158,7 +1158,7 @@ namespace HeatingCoils {
 
             errFlag = false;
             HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(state, Alphas(7), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(7), errFlag, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             // parasitic electric load associated with the desuperheater heating coil

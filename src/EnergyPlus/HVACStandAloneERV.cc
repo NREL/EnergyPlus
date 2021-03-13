@@ -464,7 +464,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                                                                                    CurrentModuleObject,
                                                                                    Alphas(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                   NodeConnectionType_Inlet,
+                                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                                    1,
                                                                                    ObjectIsParent);
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode),
@@ -472,7 +472,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    NodeConnectionType_Outlet,
+                                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                                     1,
                                                                                     ObjectIsParent);
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode),
@@ -480,7 +480,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    NodeConnectionType_Inlet,
+                                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                                     2,
                                                                                     ObjectIsParent);
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirOutletNode = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirOutletNode),
@@ -488,7 +488,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                                                                                      CurrentModuleObject,
                                                                                      Alphas(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                     NodeConnectionType_ReliefAir,
+                                                                                     DataLoopNode::NodeConnectionType::ReliefAir,
                                                                                      2,
                                                                                      ObjectIsParent);
 

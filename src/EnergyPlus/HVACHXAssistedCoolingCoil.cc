@@ -535,7 +535,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                              CurrentModuleObject,
                                                                                              HXAssistedCoil(HXAssistedCoilNum).Name,
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             NodeConnectionType_Inlet,
+                                                                                             DataLoopNode::NodeConnectionType::Inlet,
                                                                                              1,
                                                                                              ObjectIsParent);
             CoolingCoilInletNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(SupplyAirOutletNode),
@@ -543,7 +543,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                         CurrentModuleObject,
                                                         HXAssistedCoil(HXAssistedCoilNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        NodeConnectionType_Internal,
+                                                        DataLoopNode::NodeConnectionType::Internal,
                                                         1,
                                                         ObjectIsParent);
             HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(SecondaryAirInletNode),
@@ -551,7 +551,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                            CurrentModuleObject,
                                                                                            HXAssistedCoil(HXAssistedCoilNum).Name,
                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                           NodeConnectionType_Internal,
+                                                                                           DataLoopNode::NodeConnectionType::Internal,
                                                                                            1,
                                                                                            ObjectIsParent);
             HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(SecondaryAirOutletNode),
@@ -559,7 +559,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                               CurrentModuleObject,
                                                                                               HXAssistedCoil(HXAssistedCoilNum).Name,
                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                              NodeConnectionType_Outlet,
+                                                                                              DataLoopNode::NodeConnectionType::Outlet,
                                                                                               1,
                                                                                               ObjectIsParent);
 
@@ -722,7 +722,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                              CurrentModuleObject,
                                                                                              HXAssistedCoil(HXAssistedCoilNum).Name,
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             NodeConnectionType_Inlet,
+                                                                                             DataLoopNode::NodeConnectionType::Inlet,
                                                                                              1,
                                                                                              ObjectIsParent);
             CoolingCoilInletNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(SupplyAirOutletNode),
@@ -730,7 +730,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                         CurrentModuleObject,
                                                         HXAssistedCoil(HXAssistedCoilNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        NodeConnectionType_Internal,
+                                                        DataLoopNode::NodeConnectionType::Internal,
                                                         1,
                                                         ObjectIsParent);
             HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(SecondaryAirInletNode),
@@ -738,7 +738,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                            CurrentModuleObject,
                                                                                            HXAssistedCoil(HXAssistedCoilNum).Name,
                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                           NodeConnectionType_Internal,
+                                                                                           DataLoopNode::NodeConnectionType::Internal,
                                                                                            1,
                                                                                            ObjectIsParent);
             HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(SecondaryAirOutletNode),
@@ -746,7 +746,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                               CurrentModuleObject,
                                                                                               HXAssistedCoil(HXAssistedCoilNum).Name,
                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                              NodeConnectionType_Outlet,
+                                                                                              DataLoopNode::NodeConnectionType::Outlet,
                                                                                               1,
                                                                                               ObjectIsParent);
 

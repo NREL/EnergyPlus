@@ -894,7 +894,7 @@ namespace SystemAvailabilityManager {
                                                                               cCurrentModuleObject,
                                                                               cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::blank,
-                                                                              NodeConnectionType_Sensor,
+                                                                              DataLoopNode::NodeConnectionType::Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
                 MarkNode(state, state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).HotNode, cCurrentModuleObject, cAlphaArgs(1), "Hot Node");
@@ -903,7 +903,7 @@ namespace SystemAvailabilityManager {
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::blank,
-                                                                               NodeConnectionType_Sensor,
+                                                                               DataLoopNode::NodeConnectionType::Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
                 MarkNode(state, state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode, cCurrentModuleObject, cAlphaArgs(1), "Cold Node");
@@ -961,7 +961,7 @@ namespace SystemAvailabilityManager {
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::blank,
-                                                                               NodeConnectionType_Sensor,
+                                                                               DataLoopNode::NodeConnectionType::Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
                 MarkNode(state, state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
@@ -1007,7 +1007,7 @@ namespace SystemAvailabilityManager {
                                                                               cCurrentModuleObject,
                                                                               cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::blank,
-                                                                              NodeConnectionType_Sensor,
+                                                                              DataLoopNode::NodeConnectionType::Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
                 MarkNode(state, state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
@@ -1053,7 +1053,7 @@ namespace SystemAvailabilityManager {
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::blank,
-                                                                               NodeConnectionType_Sensor,
+                                                                               DataLoopNode::NodeConnectionType::Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
                 MarkNode(state, state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
@@ -1110,7 +1110,7 @@ namespace SystemAvailabilityManager {
                                                                               cCurrentModuleObject,
                                                                               cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::blank,
-                                                                              NodeConnectionType_Sensor,
+                                                                              DataLoopNode::NodeConnectionType::Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
                 MarkNode(state, state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");

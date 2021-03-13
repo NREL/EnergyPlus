@@ -74,24 +74,28 @@ namespace DataLoopNode {
         Electric
     };
 
-    constexpr int NumValidConnectionTypes(15);
+    enum class NodeConnectionType
+    {
+        blank,
+        Inlet,
+        Outlet,
+        Internal,
+        ZoneNode,
+        Sensor,
+        Actuator,
+        OutsideAir,
+        ReliefAir,
+        ZoneInlet,
+        ZoneReturn,
+        ZoneExhaust,
+        SetPoint,
+        Electric,
+        OutsideAirReference,
+        InducedAir
+    };
 
-    constexpr int NodeConnectionType_Inlet(1);
-    constexpr int NodeConnectionType_Outlet(2);
-    constexpr int NodeConnectionType_Internal(3);
-    constexpr int NodeConnectionType_ZoneNode(4);
-    constexpr int NodeConnectionType_Sensor(5);
-    constexpr int NodeConnectionType_Actuator(6);
-    constexpr int NodeConnectionType_OutsideAir(7);
-    constexpr int NodeConnectionType_ReliefAir(8);
-    constexpr int NodeConnectionType_ZoneInlet(9);
-    constexpr int NodeConnectionType_ZoneReturn(10);
-    constexpr int NodeConnectionType_ZoneExhaust(11);
-    constexpr int NodeConnectionType_SetPoint(12);
-    constexpr int NodeConnectionType_Electric(13);
-    constexpr int NodeConnectionType_OutsideAirReference(14);
-    constexpr int NodeConnectionType_InducedAir(15);
-        
+    constexpr int NumValidConnectionTypes(15);
+       
     constexpr Real64 SensedLoadFlagValue(-999.0);
     constexpr Real64 SensedNodeFlagValue(-999.0);
     
@@ -123,53 +127,53 @@ namespace DataLoopNode {
         }
     }
 
-    constexpr const char *ValidConnectionTypes(int const intNodeConnectionType)     // Valid Connection Types for Nodes
+    constexpr const char *ValidConnectionTypes(NodeConnectionType const NodeConnectionType) // Valid Connection Types for Nodes
     {
 
-        switch (intNodeConnectionType) {
-        case NodeConnectionType_Inlet:
+        switch (NodeConnectionType) {
+        case NodeConnectionType::Inlet:
             return  "Inlet";
 
-        case NodeConnectionType_Outlet:
+        case NodeConnectionType::Outlet:
             return  "Outlet";
 
-        case NodeConnectionType_Internal:
+        case NodeConnectionType::Internal:
             return  "Internal";
 
-        case NodeConnectionType_ZoneNode:
+        case NodeConnectionType::ZoneNode:
             return  "ZoneNode";
 
-        case NodeConnectionType_Sensor:
+        case NodeConnectionType::Sensor:
             return  "Sensor";
 
-        case NodeConnectionType_Actuator:
+        case NodeConnectionType::Actuator:
             return  "Actuator";
 
-        case NodeConnectionType_OutsideAir:
+        case NodeConnectionType::OutsideAir:
             return  "OutdoorAir";
 
-        case NodeConnectionType_ReliefAir:
+        case NodeConnectionType::ReliefAir:
             return  "ReliefAir";
 
-        case NodeConnectionType_ZoneInlet:
+        case NodeConnectionType::ZoneInlet:
             return  "ZoneInlet";
 
-        case NodeConnectionType_ZoneReturn:
+        case NodeConnectionType::ZoneReturn:
             return  "ZoneReturn";
 
-        case NodeConnectionType_ZoneExhaust:
+        case NodeConnectionType::ZoneExhaust:
             return  "ZoneExhaust";
 
-        case NodeConnectionType_SetPoint:
+        case NodeConnectionType::SetPoint:
             return  "Setpoint";
 
-        case NodeConnectionType_Electric:
+        case NodeConnectionType::Electric:
             return  "Electric";
 
-        case NodeConnectionType_OutsideAirReference:
+        case NodeConnectionType::OutsideAirReference:
             return  "OutsideAirReference";
 
-        case NodeConnectionType_InducedAir:
+        case NodeConnectionType::InducedAir:
             return  "InducedAir";
 
         default:

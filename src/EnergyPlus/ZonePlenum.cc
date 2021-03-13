@@ -338,12 +338,12 @@ namespace EnergyPlus::ZonePlenum {
 
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeName = AlphArray(3);
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(state,
-                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent);
+                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::ZoneNode, 1, ObjectIsNotParent);
             // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
             state.dataHeatBal->Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum;
 
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode = GetOnlySingleNode(state,
-                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             InducedNodeListName = AlphArray(5);
             NodeListError = false;
@@ -355,7 +355,7 @@ namespace EnergyPlus::ZonePlenum {
                         DataLoopNode::NodeFluidType::Air,
                         "AirLoopHVAC:ReturnPlenum",
                         state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName,
-                        NodeConnectionType_InducedAir,
+                        DataLoopNode::NodeConnectionType::InducedAir,
                         1,
                         ObjectIsNotParent,
                         _,
@@ -441,7 +441,7 @@ namespace EnergyPlus::ZonePlenum {
                                                                                       CurrentModuleObject,
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                      NodeConnectionType_Inlet,
+                                                                                      DataLoopNode::NodeConnectionType::Inlet,
                                                                                       1,
                                                                                       ObjectIsNotParent);
             }
@@ -525,12 +525,12 @@ namespace EnergyPlus::ZonePlenum {
 
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeName = AlphArray(3);
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(state,
-                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent);
+                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::ZoneNode, 1, ObjectIsNotParent);
             // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
             state.dataHeatBal->Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
 
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletNode = GetOnlySingleNode(state,
-                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).NumOutletNodes = NumAlphas - 4;
 
@@ -572,7 +572,7 @@ namespace EnergyPlus::ZonePlenum {
                                                                                        CurrentModuleObject,
                                                                                        AlphArray(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                       NodeConnectionType_Outlet,
+                                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                                        1,
                                                                                        ObjectIsNotParent);
             }

@@ -481,7 +481,7 @@ namespace PlantComponentTemperatureSources {
                                                                                       cCurrentModuleObject,
                                                                                       cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                                      DataLoopNode::NodeConnectionType_Inlet,
+                                                                                      DataLoopNode::NodeConnectionType::Inlet,
                                                                                       1,
                                                                                       DataLoopNode::ObjectIsNotParent);
             state.dataPlantCompTempSrc->WaterSource(SourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(3),
@@ -489,7 +489,7 @@ namespace PlantComponentTemperatureSources {
                                                                                        cCurrentModuleObject,
                                                                                        cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                                        1,
                                                                                        DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");

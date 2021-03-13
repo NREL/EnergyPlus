@@ -329,7 +329,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                                                        DataIPShortCuts::cCurrentModuleObject,
                                                                                                        DataIPShortCuts::cAlphaArgs(1),
                                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                                       DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                       DataLoopNode::NodeConnectionType::Inlet,
                                                                                                        1,
                                                                                                        DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
@@ -337,7 +337,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                                                         DataIPShortCuts::cAlphaArgs(1),
                                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                                        DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                                                         1,
                                                                                                         DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
@@ -365,7 +365,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                                                        DataIPShortCuts::cCurrentModuleObject,
                                                                                                        DataIPShortCuts::cAlphaArgs(1),
                                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                                       DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                       DataLoopNode::NodeConnectionType::Inlet,
                                                                                                        2,
                                                                                                        DataLoopNode::ObjectIsNotParent);
             thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(9),
@@ -373,7 +373,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                                                         DataIPShortCuts::cAlphaArgs(1),
                                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                                        DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                                                         2,
                                                                                                         DataLoopNode::ObjectIsNotParent);
 
@@ -507,7 +507,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                                               DataIPShortCuts::cAlphaArgs(1),
                                                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                                                               3,
                                                                                                               DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
@@ -521,7 +521,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                         DataIPShortCuts::cCurrentModuleObject,
                                                         DataIPShortCuts::cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType_Outlet,
+                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                         3,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
@@ -579,7 +579,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                 DataIPShortCuts::cCurrentModuleObject,
                                                                 DataIPShortCuts::cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::NodeConnectionType_Sensor,
+                                                                DataLoopNode::NodeConnectionType::Sensor,
                                                                 1,
                                                                 DataLoopNode::ObjectIsNotParent);
                     } else {

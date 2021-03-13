@@ -5026,7 +5026,7 @@ namespace HeatBalanceManager {
         using namespace DataIPShortCuts;
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
-        using DataLoopNode::NodeConnectionType_Inlet;
+        using DataLoopNode::NodeConnectionType::Inlet;
         using DataLoopNode::ObjectIsParent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -5096,7 +5096,7 @@ namespace HeatBalanceManager {
                                             cCurrentModuleObject,
                                             cAlphaArgs(1),
                                             DataLoopNode::NodeFluidType::Air,
-                                            NodeConnectionType_Inlet,
+                                            DataLoopNode::NodeConnectionType::Inlet,
                                             1,
                                             ObjectIsParent);
                 if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {

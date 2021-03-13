@@ -469,7 +469,7 @@ namespace FanCoilUnits {
                                                               FanCoil(FanCoilNum).UnitType,
                                                               Alphas(1),
                                                               DataLoopNode::NodeFluidType::Air,
-                                                              NodeConnectionType_Inlet,
+                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                               1,
                                                               ObjectIsParent); // air input node
 
@@ -478,7 +478,7 @@ namespace FanCoilUnits {
                                                                FanCoil(FanCoilNum).UnitType,
                                                                Alphas(1),
                                                                DataLoopNode::NodeFluidType::Air,
-                                                               NodeConnectionType_Outlet,
+                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                1,
                                                                ObjectIsParent); // air outlet node
 

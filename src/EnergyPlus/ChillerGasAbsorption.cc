@@ -309,7 +309,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                             cCurrentModuleObject,
                                                                             cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsNotParent);
             thisChiller.ChillSupplyNodeNum = GetOnlySingleNode(state, cAlphaArgs(3),
@@ -317,7 +317,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                             cCurrentModuleObject,
                                                                             cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");
@@ -327,7 +327,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                            cCurrentModuleObject,
                                                                            cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                            3,
                                                                            DataLoopNode::ObjectIsNotParent);
             thisChiller.HeatSupplyNodeNum = GetOnlySingleNode(state, cAlphaArgs(7),
@@ -335,7 +335,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                            cCurrentModuleObject,
                                                                            cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType_Outlet,
+                                                                           DataLoopNode::NodeConnectionType::Outlet,
                                                                            3,
                                                                            DataLoopNode::ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(6), cAlphaArgs(7), "Hot Water Nodes");
@@ -417,7 +417,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                               DataLoopNode::NodeConnectionType_Inlet,
+                                                                               DataLoopNode::NodeConnectionType::Inlet,
                                                                                2,
                                                                                DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondSupplyNodeNum = GetOnlySingleNode(state, cAlphaArgs(5),
@@ -425,7 +425,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                                2,
                                                                                DataLoopNode::ObjectIsNotParent);
                 TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Condenser Water Nodes");
@@ -435,7 +435,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                               DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                               DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                2,
                                                                                DataLoopNode::ObjectIsNotParent);
                 // Condenser outlet node not used for air or evap cooled condenser so ingore cAlphaArgs( 5 )

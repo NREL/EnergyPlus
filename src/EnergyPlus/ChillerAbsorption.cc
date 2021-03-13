@@ -292,7 +292,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               DataIPShortCuts::cAlphaArgs(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
@@ -300,7 +300,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                                DataIPShortCuts::cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
@@ -314,7 +314,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               DataIPShortCuts::cAlphaArgs(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                                               2,
                                                                                               DataLoopNode::ObjectIsNotParent);
             thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
@@ -322,7 +322,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                                DataIPShortCuts::cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                                                2,
                                                                                                DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
@@ -355,7 +355,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                                                            DataIPShortCuts::cAlphaArgs(1),
                                                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                                                            3,
                                                                                                            DataLoopNode::ObjectIsNotParent);
                     thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
@@ -363,7 +363,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                                             DataIPShortCuts::cAlphaArgs(1),
                                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                                                             3,
                                                                                                             DataLoopNode::ObjectIsNotParent);
                     BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
@@ -378,7 +378,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                                                            DataIPShortCuts::cAlphaArgs(1),
                                                                                                            DataLoopNode::NodeFluidType::Steam,
-                                                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                                                            3,
                                                                                                            DataLoopNode::ObjectIsNotParent);
                     thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
@@ -386,7 +386,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                                             DataIPShortCuts::cAlphaArgs(1),
                                                                                                             DataLoopNode::NodeFluidType::Steam,
-                                                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                                                             3,
                                                                                                             DataLoopNode::ObjectIsNotParent);
                     BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,

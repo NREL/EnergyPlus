@@ -402,7 +402,7 @@ namespace EnergyPlus::SingleDuct {
                                                                                            state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                     NodeConnectionType_Outlet,
+                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                      1,
                                                                      ObjectIsNotParent,
                                                                      cAlphaFields(3));
@@ -411,7 +411,7 @@ namespace EnergyPlus::SingleDuct {
                                                                                           state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                     Alphas(1),
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    NodeConnectionType_Inlet,
+                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                     1,
                                                                     ObjectIsNotParent,
                                                                     cAlphaFields(4));
@@ -497,7 +497,7 @@ namespace EnergyPlus::SingleDuct {
                                                                                                  state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                            Alphas(1),
                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                           NodeConnectionType_Outlet,
+                                                                           DataLoopNode::NodeConnectionType::Outlet,
                                                                            1,
                                                                            ObjectIsParent,
                                                                            cAlphaFields(9));
@@ -719,7 +719,7 @@ namespace EnergyPlus::SingleDuct {
                                                                      state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                     NodeConnectionType_Outlet,
+                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                      1,
                                                                      ObjectIsNotParent,
                                                                      cAlphaFields(3));
@@ -728,7 +728,7 @@ namespace EnergyPlus::SingleDuct {
                                                                     state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                     Alphas(1),
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    NodeConnectionType_Inlet,
+                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                     1,
                                                                     ObjectIsNotParent,
                                                                     cAlphaFields(4));
@@ -767,7 +767,7 @@ namespace EnergyPlus::SingleDuct {
                         ErrorsFound = true;
                     }
                     //                GetOnlySingleNode(state, Alphas(5),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-                    //                              DataLoopNode::NodeFluidType::Steam,NodeConnectionType_Actuator,1,ObjectIsParent)
+                    //                              DataLoopNode::NodeFluidType::Steam,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
                 } else {
                     IsNotOK = false;
                     state.dataSingleDuct->sd_airterminal(SysNum).ReheatControlNode = GetCoilWaterInletNode(state, state.dataSingleDuct->sd_airterminal(SysNum).ReheatComp, state.dataSingleDuct->sd_airterminal(SysNum).ReheatName, IsNotOK);
@@ -776,7 +776,7 @@ namespace EnergyPlus::SingleDuct {
                         ErrorsFound = true;
                     }
                     //                GetOnlySingleNode(state, Alphas(5),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
-                    //                              DataLoopNode::NodeFluidType::Water,NodeConnectionType_Actuator,1,ObjectIsParent)
+                    //                              DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
                 }
                 //  END IF
             }
@@ -785,7 +785,7 @@ namespace EnergyPlus::SingleDuct {
                                                                            state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                            Alphas(1),
                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                           NodeConnectionType_Outlet,
+                                                                           DataLoopNode::NodeConnectionType::Outlet,
                                                                            1,
                                                                            ObjectIsParent,
                                                                            cAlphaFields(7));
@@ -957,7 +957,7 @@ namespace EnergyPlus::SingleDuct {
                                                                      state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                     NodeConnectionType_Outlet,
+                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                      1,
                                                                      ObjectIsParent,
                                                                      cAlphaFields(3));
@@ -966,7 +966,7 @@ namespace EnergyPlus::SingleDuct {
                                                                     state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                     Alphas(1),
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    NodeConnectionType_Inlet,
+                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                     1,
                                                                     ObjectIsParent,
                                                                     cAlphaFields(4));
@@ -993,7 +993,7 @@ namespace EnergyPlus::SingleDuct {
                         ErrorsFound = true;
                     }
                     //                 GetOnlySingleNode(state, Alphas(5),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-                    //                               DataLoopNode::NodeFluidType::Steam,NodeConnectionType_Actuator,1,ObjectIsParent)
+                    //                               DataLoopNode::NodeFluidType::Steam,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
                 } else {
                     IsNotOK = false;
                     state.dataSingleDuct->sd_airterminal(SysNum).ReheatControlNode = GetCoilWaterInletNode(state, state.dataSingleDuct->sd_airterminal(SysNum).ReheatComp, state.dataSingleDuct->sd_airterminal(SysNum).ReheatName, IsNotOK);
@@ -1002,7 +1002,7 @@ namespace EnergyPlus::SingleDuct {
                         ErrorsFound = true;
                     }
                     //                 GetOnlySingleNode(state, Alphas(5),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-                    //                               DataLoopNode::NodeFluidType::Water,NodeConnectionType_Actuator,1,ObjectIsParent)
+                    //                               DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
                 }
             }
             state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode = state.dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum;
@@ -1140,7 +1140,7 @@ namespace EnergyPlus::SingleDuct {
                                                                     state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                     Alphas(1),
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    NodeConnectionType_Inlet,
+                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                     1,
                                                                     ObjectIsNotParent,
                                                                     cAlphaFields(3));
@@ -1149,7 +1149,7 @@ namespace EnergyPlus::SingleDuct {
                                                                      state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                     NodeConnectionType_Outlet,
+                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                      1,
                                                                      ObjectIsNotParent,
                                                                      cAlphaFields(4));
@@ -1304,7 +1304,7 @@ namespace EnergyPlus::SingleDuct {
                                                                      state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                     NodeConnectionType_Outlet,
+                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                      1,
                                                                      ObjectIsNotParent,
                                                                      cAlphaFields(3));
@@ -1313,7 +1313,7 @@ namespace EnergyPlus::SingleDuct {
                                                                     state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                     Alphas(1),
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    NodeConnectionType_Inlet,
+                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                     1,
                                                                     ObjectIsNotParent,
                                                                     cAlphaFields(4));
@@ -1515,7 +1515,7 @@ namespace EnergyPlus::SingleDuct {
                                                                      state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                     NodeConnectionType_Outlet,
+                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                      1,
                                                                      ObjectIsNotParent,
                                                                      cAlphaFields(3));
@@ -1524,7 +1524,7 @@ namespace EnergyPlus::SingleDuct {
                                                                     state.dataSingleDuct->sd_airterminal(SysNum).SysType,
                                                                     Alphas(1),
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    NodeConnectionType_Inlet,
+                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                     1,
                                                                     ObjectIsNotParent,
                                                                     cAlphaFields(4));
@@ -1782,7 +1782,7 @@ namespace EnergyPlus::SingleDuct {
                         }
                     }
                     //               GetOnlySingleNode(state, Alphas(6),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-                    //                                DataLoopNode::NodeFluidType::Steam,NodeConnectionType_Actuator,1,ObjectIsParent)
+                    //                                DataLoopNode::NodeFluidType::Steam,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
                 } else {
                     IsNotOK = false;
                     state.dataSingleDuct->sd_airterminal(SysNum).ReheatControlNode = GetCoilWaterInletNode(state, state.dataSingleDuct->sd_airterminal(SysNum).ReheatComp, state.dataSingleDuct->sd_airterminal(SysNum).ReheatName, IsNotOK);
@@ -1803,7 +1803,7 @@ namespace EnergyPlus::SingleDuct {
                         }
                     }
                     //               GetOnlySingleNode(state, Alphas(6),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-                    //                                DataLoopNode::NodeFluidType::Water,NodeConnectionType_Actuator,1,ObjectIsParent)
+                    //                                DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
                 }
             }
             //  A4,     \field Unit supply air outlet node
@@ -1812,7 +1812,7 @@ namespace EnergyPlus::SingleDuct {
             //          \type alpha
             //        sd_airterminal(SysNum)%ReheatAirOutletNode  = &
             //               GetOnlySingleNode(state, Alphas(4),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-            //                            DataLoopNode::NodeFluidType::Air,NodeConnectionType_Outlet,1,ObjectIsParent)
+            //                            DataLoopNode::NodeFluidType::Air,DataLoopNode::NodeConnectionType::Outlet,1,ObjectIsParent)
             AirTermSysOutletNodeName = state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode);
             if (!UtilityRoutines::SameString(Alphas(4), AirTermSysOutletNodeName)) {
                 ShowWarningError(state, RoutineName + "Invalid air terminal object air outlet node name in " + state.dataSingleDuct->sd_airterminal(SysNum).SysType + " = " +
@@ -5444,7 +5444,7 @@ namespace EnergyPlus::SingleDuct {
                                                                        cCurrentModuleObject,
                                                                        cAlphaArgs(1),
                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                       NodeConnectionType_Outlet,
+                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                        1,
                                                                        ObjectIsNotParent,
                                                                        cAlphaFieldNames(4));
@@ -5454,7 +5454,7 @@ namespace EnergyPlus::SingleDuct {
                                                                  cCurrentModuleObject,
                                                                  cAlphaArgs(1),
                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                 NodeConnectionType_Inlet,
+                                                                 DataLoopNode::NodeConnectionType::Inlet,
                                                                  1,
                                                                  ObjectIsNotParent,
                                                                  cAlphaFieldNames(5));
@@ -5463,7 +5463,7 @@ namespace EnergyPlus::SingleDuct {
                                                                  cCurrentModuleObject,
                                                                  cAlphaArgs(1),
                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                 NodeConnectionType_Inlet,
+                                                                 DataLoopNode::NodeConnectionType::Inlet,
                                                                  1,
                                                                  ObjectIsNotParent,
                                                                  cAlphaFieldNames(6));
