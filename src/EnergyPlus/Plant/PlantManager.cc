@@ -2719,9 +2719,9 @@ namespace EnergyPlus::PlantManager {
                         if (loop.OutletNodeFlowrate > DataHVACGlobals::SmallMassFlow) {
                             // Accumulate total time loop is active
                             side.LoopSideInlet_TotalTime += TimeStepSys;
-                            // Determine excessive storage
+                            // Determine excessive storage - if both are moving in the same direction and McpDTdt is larger than MdotCpDeltaT
                             if ((abs(side.LoopSideInlet_MdotCpDeltaT) > DataHVACGlobals::SmallLoad) &&
-                                (abs(side.LoopSideInlet_MdotCpDeltaT) < abs(side.LoopSideInlet_McpDTdt))) {
+                                ((side.LoopSideInlet_McpDTdt / side.LoopSideInlet_MdotCpDeltaT) > 1.1)) {
                                 side.LoopSideInlet_CapExcessStorageTimeReport = TimeStepSys;
                                 side.LoopSideInlet_CapExcessStorageTime += TimeStepSys;
                             } else {
@@ -4246,25 +4246,28 @@ namespace EnergyPlus::PlantManager {
             }
         }
 
-        void CheckOngoingPlantWarnings(EnergyPlusData &state) {
+        void CheckOngoingPlantWarnings(EnergyPlusData &state)
+        {
             int LoopNum;
             for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // Warning if the excess storage time is more than half of the total time
                 if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime >
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
-                    ShowWarningError(state, "Plant Loop: " + state.dataPlnt->PlantLoop(LoopNum).Name +
-                                     " Demand Side is storing excess heat the majority of the time.");
+                    ShowWarningError(state,
+                                     "Plant Loop: " + state.dataPlnt->PlantLoop(LoopNum).Name +
+                                         " Demand Side is storing excess heat the majority of the time.");
                     ShowContinueError(state,
-                                      format("Excesss Storage Time=[{:.2R}], Total Time=[{:.2R}]",
+                                      format("Excesss Storage Time={:.2R}[hr], Total Loop Active Time={:.2R}[hr]",
                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime,
                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime));
                 }
                 if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime >
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TotalTime / 2) {
-                    ShowWarningError(state, "Plant Loop: " + state.dataPlnt->PlantLoop(LoopNum).Name +
-                                     " Supply Side is storing excess heat the majority of the time.");
+                    ShowWarningError(state,
+                                     "Plant Loop: " + state.dataPlnt->PlantLoop(LoopNum).Name +
+                                         " Supply Side is storing excess heat the majority of the time.");
                     ShowContinueError(state,
-                                      format("Excesss Storage Time=[{:.2R}], Total Loop Active Time=[{:.2R}]",
+                                      format("Excesss Storage Time={:.2R}[hr], Total Loop Active Time={:.2R}[hr]",
                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime,
                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime));
                 }
