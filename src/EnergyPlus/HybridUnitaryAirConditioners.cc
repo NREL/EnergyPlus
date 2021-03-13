@@ -96,10 +96,18 @@ namespace EnergyPlus::HybridUnitaryAirConditioners {
             state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
         }
 
+
+        // Obtains and Allocates EvapCooler related parameters from input file
+        //if (state.dataEvapCoolers->GetInputEvapComponentsFlag) { // First time subroutine has been entered
+        //    GetEvapInput(state);
+        //    state.dataEvapCoolers->GetInputEvapComponentsFlag = false;
+        //}
+
+    
         if (CompIndex == 0) {
             CompNum = UtilityRoutines::FindItemInList(CompName, state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner);
             if (CompNum == 0) {
-                ShowFatalError(state, "SimZoneHybridUnitaryAirConditioners: Zone evaporative cooler unit not found.");
+                ShowFatalError(state, "SimZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC not found.");
             }
             CompIndex = CompNum;
         } else {
