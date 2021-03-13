@@ -103,8 +103,6 @@ namespace EnergyPlus::DataPlant {
         // calculate a demand based on mass flow times specific heat times delta T
 
         // Using/Aliasing
-        using DataLoopNode::NodeFluidType::Steam;
-        using DataLoopNode::NodeFluidType::Water;
         using DataPlant::LoopDemandTol;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSpecificHeatGlycol;

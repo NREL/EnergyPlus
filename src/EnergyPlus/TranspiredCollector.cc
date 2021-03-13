@@ -236,7 +236,6 @@ namespace TranspiredCollector {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeConnectionType_Outlet;
         using DataLoopNode::NodeConnectionType_Sensor;
-        using DataLoopNode::NodeFluidType::Air;
         using DataLoopNode::ObjectIsNotParent;
         using DataSurfaces::OtherSideCondModeledExt;
         using DataSurfaces::SurfaceData;

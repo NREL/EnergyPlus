@@ -15644,7 +15644,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempControlType(1) = 4;
-    state->dataLoopNodes->Node(7).FluidType = 1;
+    state->dataLoopNodes->Node(7).FluidType = DataLoopNode::NodeFluidType::Air;
     state->dataLoopNodes->Node(7).Temp = 24.0;                               // 24C db
     state->dataLoopNodes->Node(7).HumRat = 0.01522;                          // 17C wb
     state->dataLoopNodes->Node(7).Enthalpy = state->dataLoopNodes->Node(1).Enthalpy; // www.sugartech.com/psychro/index.php

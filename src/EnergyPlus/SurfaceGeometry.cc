@@ -6757,7 +6757,6 @@ namespace SurfaceGeometry {
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
         using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeFluidType::Air;
         using DataLoopNode::ObjectIsParent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -6903,7 +6902,6 @@ namespace SurfaceGeometry {
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
         using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeFluidType::Air;
         using DataLoopNode::ObjectIsParent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:

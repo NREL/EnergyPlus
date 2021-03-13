@@ -66,7 +66,7 @@ namespace DataPlant {
         // Members
         std::string Name;      // Name of the component list
         std::string FluidName; // Name of the fluid specified for this loop
-        int FluidType;         // Type of fluid in the loop
+        DataLoopNode::NodeFluidType FluidType; // Type of fluid in the loop
         int FluidIndex;        // Index for Fluid in FluidProperties
         int MFErrIndex;        // for recurring mass flow errors
         int MFErrIndex1;       // for recurring mass flow errors

@@ -222,7 +222,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         using BranchNodeConnections::TestCompSet;
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeConnectionType_Outlet;
-        using DataLoopNode::NodeFluidType::Water;
         using DataLoopNode::ObjectIsNotParent;
         using DataPlant::TypeOf_CoolingPanel_Simple;
         using NodeInputManager::GetOnlySingleNode;

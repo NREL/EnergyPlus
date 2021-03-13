@@ -5027,7 +5027,6 @@ namespace HeatBalanceManager {
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeFluidType::Air;
         using DataLoopNode::ObjectIsParent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:

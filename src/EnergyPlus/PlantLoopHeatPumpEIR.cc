@@ -1115,7 +1115,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                                                         DataLoopNode::NodeConnectionType_Outlet,
                                                                                         flowPath1,
                                                                                         DataLoopNode::ObjectIsNotParent);
-                    int condenserNodeType = 0;
+                    DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::blank;
                     int condenserNodeConnectionType_Inlet = 0;
                     int condenserNodeConnectionType_Outlet = 0;
                     if (condenserType == "WATERSOURCE") {

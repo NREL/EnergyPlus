@@ -571,7 +571,8 @@ namespace EnergyPlus::NodeInputManager {
         }
     }
 
-    int AssignNodeNumber(EnergyPlusData &state, std::string const &Name, // Name for assignment
+    int AssignNodeNumber(EnergyPlusData &state,
+                         std::string const &Name,                         // Name for assignment
                          DataLoopNode::NodeFluidType const NodeFluidType, // must be valid
                          bool &ErrorsFound)
     {
@@ -688,7 +689,7 @@ namespace EnergyPlus::NodeInputManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int NumNodes;
 
-        int FluidType;
+        DataLoopNode::NodeFluidType FluidType;
         std::string ConnectionType;
 
         int NumParams;

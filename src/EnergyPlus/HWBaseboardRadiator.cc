@@ -299,7 +299,6 @@ namespace HWBaseboardRadiator {
         using BranchNodeConnections::TestCompSet;
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeConnectionType_Outlet;
-        using DataLoopNode::NodeFluidType::Water;
         using DataLoopNode::ObjectIsNotParent;
         using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
