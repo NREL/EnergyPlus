@@ -1116,18 +1116,18 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                                                         flowPath1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                     DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::blank;
-                    int condenserDataLoopNode::NodeConnectionType::Inlet = 0;
-                    int condenserDataLoopNode::NodeConnectionType::Outlet = 0;
+                    DataLoopNode::NodeConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::blank;
+                    DataLoopNode::NodeConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::blank;
                     if (condenserType == "WATERSOURCE") {
                         thisPLHP.waterSource = true;
                         condenserNodeType = DataLoopNode::NodeFluidType::Water;
-                        condenserDataLoopNode::NodeConnectionType::Inlet = DataLoopNode::NodeConnectionType::Inlet;
-                        condenserDataLoopNode::NodeConnectionType::Outlet = DataLoopNode::NodeConnectionType::Outlet;
+                        condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::Inlet;
+                        condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::Outlet;
                     } else if (condenserType == "AIRSOURCE") {
                         thisPLHP.airSource = true;
                         condenserNodeType = DataLoopNode::NodeFluidType::Air;
-                        condenserDataLoopNode::NodeConnectionType::Inlet = DataLoopNode::NodeConnectionType::OutsideAir;
-                        condenserDataLoopNode::NodeConnectionType::Outlet = DataLoopNode::NodeConnectionType::OutsideAir;
+                        condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::OutsideAir;
+                        condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::OutsideAir;
                     } else {
                         // Again, this should be protected by the input processor
                         ShowErrorMessage(state, "Invalid heat pump condenser type (name=" + thisPLHP.name + // LCOV_EXCL_LINE
@@ -1139,7 +1139,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                                                          cCurrentModuleObject,
                                                                                          thisPLHP.name,
                                                                                          condenserNodeType,
-                                                                                         condenserDataLoopNode::NodeConnectionType::Inlet,
+                                                                                         condenserNodeConnectionType_Inlet,
                                                                                          flowPath2,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state, sourceSideOutletNodeName,
@@ -1147,7 +1147,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                                                           cCurrentModuleObject,
                                                                                           thisPLHP.name,
                                                                                           condenserNodeType,
-                                                                                          condenserDataLoopNode::NodeConnectionType::Outlet,
+                                                                                          condenserNodeConnectionType_Outlet,
                                                                                           flowPath2,
                                                                                           DataLoopNode::ObjectIsNotParent);
                     if (nodeErrorsFound) errorsFound = true;

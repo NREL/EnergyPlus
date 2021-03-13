@@ -233,9 +233,6 @@ namespace TranspiredCollector {
         using DataHeatBalance::Smooth;
         using DataHeatBalance::VeryRough;
         using DataHeatBalance::VerySmooth;
-        using DataLoopNode::NodeConnectionType::Inlet;
-        using DataLoopNode::NodeConnectionType::Outlet;
-        using DataLoopNode::NodeConnectionType::Sensor;
         using DataLoopNode::ObjectIsNotParent;
         using DataSurfaces::OtherSideCondModeledExt;
         using DataSurfaces::SurfaceData;

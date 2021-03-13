@@ -109,9 +109,7 @@ namespace GeneratorFuelSupply {
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using CurveManager::GetCurveIndex;
-        using DataLoopNode::NodeConnectionType::Sensor;
         using DataLoopNode::ObjectIsNotParent;
-
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
 

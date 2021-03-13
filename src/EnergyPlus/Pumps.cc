@@ -106,8 +106,6 @@ namespace EnergyPlus::Pumps {
     using DataHVACGlobals::NumPlantLoops;
     using DataHVACGlobals::SmallWaterVolFlow;
     using DataHVACGlobals::TimeStepSys;
-    using DataLoopNode::NodeConnectionType::Inlet;
-    using DataLoopNode::NodeConnectionType::Outlet;
     using DataLoopNode::ObjectIsNotParent;
 
     // Data

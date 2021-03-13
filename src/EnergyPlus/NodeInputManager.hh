@@ -91,7 +91,7 @@ namespace NodeInputManager {
                      DataLoopNode::NodeFluidType const NodeFluidType, // Fluidtype for checking/setting node FluidType
                      std::string const &NodeObjectType,            // Node Object Type (i.e. "Chiller:Electric")
                      std::string const &NodeObjectName,            // Node Object Name (i.e. "MyChiller")
-                     int const NodeConnectionType,                 // Node Connection Type (see DataLoopNode)
+                     DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
                      int const NodeFluidStream,                    // Which Fluid Stream (1,2,3,...)
                      bool const ObjectIsParent,                    // True/False
                      Optional_bool_const IncrementFluidStream = _, // True/False

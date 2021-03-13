@@ -220,8 +220,6 @@ namespace EnergyPlus::CoolingPanelSimple {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataLoopNode::NodeConnectionType::Inlet;
-        using DataLoopNode::NodeConnectionType::Outlet;
         using DataLoopNode::ObjectIsNotParent;
         using DataPlant::TypeOf_CoolingPanel_Simple;
         using NodeInputManager::GetOnlySingleNode;

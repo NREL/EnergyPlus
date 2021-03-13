@@ -297,8 +297,6 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataLoopNode::NodeConnectionType::Inlet;
-        using DataLoopNode::NodeConnectionType::Outlet;
         using DataLoopNode::ObjectIsNotParent;
         using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;

@@ -106,8 +106,6 @@ namespace SteamBaseboardRadiator {
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
-    using DataLoopNode::NodeConnectionType::Inlet;
-    using DataLoopNode::NodeConnectionType::Outlet;
     using DataLoopNode::ObjectIsNotParent;
     using DataPlant::TypeOf_Baseboard_Rad_Conv_Steam;
     using DataZoneEquipment::CheckZoneEquipmentList;
