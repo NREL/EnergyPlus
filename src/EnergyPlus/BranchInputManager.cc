@@ -1142,7 +1142,7 @@ namespace BranchInputManager {
                             NumNodes,
                             NodeNums,
                             ErrFound,
-                            NodeType_Unknown,
+                            NodeType::blank,
                             CurrentModuleObject,
                             state.dataBranchInputManager->Branch(BCount).Name,
                             ConnectionType,
@@ -1180,7 +1180,7 @@ namespace BranchInputManager {
                             NumNodes,
                             NodeNums,
                             ErrFound,
-                            NodeType_Unknown,
+                            NodeType::blank,
                             CurrentModuleObject,
                             state.dataBranchInputManager->Branch(BCount).Name,
                             ConnectionType,
@@ -2433,7 +2433,7 @@ namespace BranchInputManager {
         int NodeNum;
         int Loop2;
         bool IsAirBranch;
-        int BranchFluidType;
+        NodeType BranchFluidType;
         bool MixedFluidTypesOnBranchList;
         int InitialBranchFluidNode;
         Array1D_int BranchFluidNodes;
@@ -2485,7 +2485,7 @@ namespace BranchInputManager {
                   state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames);
 
             IsAirBranch = false;
-            BranchFluidType = NodeType_Unknown;
+            BranchFluidType = NodeType::blank;
             MixedFluidTypesOnBranchList = false;
             NumNodesOnBranchList = 0;
             FoundBranches.allocate(state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames);
