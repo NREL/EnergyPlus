@@ -66,15 +66,22 @@ struct EnergyPlusData;
 
 namespace WaterCoils {
 
+    enum class iCoilModel
+    {
+        Unassigned,
+        Simple,
+        Cooling,
+        Detailed,
+    };
+
     struct WaterCoilEquipConditions
     {
         // Members
-        std::string Name;                         // Name of the WaterCoil
-        std::string WaterCoilTypeA;               // Type of WaterCoil ie. Heating or Cooling
-        std::string WaterCoilModelA;              // Type of WaterCoil ie. Simple, Detailed, etc.
-        HVACControllers::iCoilType WaterCoilType; // Type of WaterCoil ie. Heating or Cooling
-        int WaterCoilModel;                       // Type of WaterCoil ie. Simple, Detailed, etc.
-        int WaterCoilType_Num;
+        std::string Name;                 // Name of the WaterCoil
+        std::string WaterCoilTypeA;       // Type of WaterCoil ie. Heating or Cooling
+        std::string WaterCoilModelA;      // Type of WaterCoil ie. Simple, Detailed, etc.
+        int WaterCoilType;                // Type of WaterCoil ie. Heating or Cooling
+        iCoilModel WaterCoilModel;        // Type of WaterCoil ie. Simple, Detailed, etc.
         std::string Schedule;             // WaterCoil Operation Schedule
         int SchedPtr;                     // Pointer to the correct schedule
         bool RequestingAutoSize;          // True if this coil has appropriate autosize fields
@@ -184,7 +191,7 @@ namespace WaterCoils {
         int CondensateCollectMode;         // where does water come from
         std::string CondensateCollectName; // name of water source e.g. water storage tank
         int CondensateTankID;              // index "pointer" to Storage TAnk array WaterStorage
-        int CondensateTankSupplyARRID;     // index pointe to supply Vdot array in WaterStorage
+        int CondensateTankSupplyARRID;     // index point to supply Vdot array in WaterStorage
         Real64 CondensateVdot;             // rate of water condensation from air stream [m3/s]
         Real64 CondensateVol;              // amount of water condensed from air stream [m3]
         // end variables for water system interactions
@@ -210,29 +217,29 @@ namespace WaterCoils {
 
         // Default Constructor
         WaterCoilEquipConditions()
-            : WaterCoilType(HVACControllers::iCoilType::Unassigned), WaterCoilModel(0), WaterCoilType_Num(0), SchedPtr(0), RequestingAutoSize(false),
-              InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0), InletAirTemp(0.0), OutletAirTemp(0.0), InletAirHumRat(0.0), OutletAirHumRat(0.0),
-              InletAirEnthalpy(0.0), OutletAirEnthalpy(0.0), TotWaterCoilLoad(0.0), SenWaterCoilLoad(0.0), TotWaterHeatingCoilEnergy(0.0),
-              TotWaterCoolingCoilEnergy(0.0), SenWaterCoolingCoilEnergy(0.0), DesWaterHeatingCoilRate(0.0), TotWaterHeatingCoilRate(0.0),
-              DesWaterCoolingCoilRate(0.0), TotWaterCoolingCoilRate(0.0), SenWaterCoolingCoilRate(0.0), UACoil(0.0), LeavingRelHum(0.0),
-              DesiredOutletTemp(0.0), DesiredOutletHumRat(0.0), InletWaterTemp(0.0), OutletWaterTemp(0.0), InletWaterMassFlowRate(0.0),
-              OutletWaterMassFlowRate(0.0), MaxWaterVolFlowRate(0.0), MaxWaterMassFlowRate(0.0), InletWaterEnthalpy(0.0), OutletWaterEnthalpy(0.0),
-              TubeOutsideSurfArea(0.0), TotTubeInsideArea(0.0), FinSurfArea(0.0), MinAirFlowArea(0.0), CoilDepth(0.0), FinDiam(0.0),
-              FinThickness(0.0), TubeInsideDiam(0.0), TubeOutsideDiam(0.0), TubeThermConductivity(0.0), FinThermConductivity(0.0), FinSpacing(0.0),
-              TubeDepthSpacing(0.0), NumOfTubeRows(0), NumOfTubesPerRow(0), EffectiveFinDiam(0.0), TotCoilOutsideSurfArea(0.0),
-              CoilEffectiveInsideDiam(0.0), GeometryCoef1(0.0), GeometryCoef2(0.0), DryFinEfficncyCoef(5, 0.0), SatEnthlCurveConstCoef(0.0),
-              SatEnthlCurveSlope(0.0), EnthVsTempCurveAppxSlope(0.0), EnthVsTempCurveConst(0.0), MeanWaterTempSaved(0.0), InWaterTempSaved(0.0),
-              OutWaterTempSaved(0.0), SurfAreaWetSaved(0.0), SurfAreaWetFraction(0.0), DesInletWaterTemp(0.0), DesAirVolFlowRate(0.0),
-              DesInletAirTemp(0.0), DesInletAirHumRat(0.0), DesTotWaterCoilLoad(0.0), DesSenWaterCoilLoad(0.0), DesAirMassFlowRate(0.0),
-              UACoilTotal(0.0), UACoilInternal(0.0), UACoilExternal(0.0), UACoilInternalDes(0.0), UACoilExternalDes(0.0), DesOutletAirTemp(0.0),
-              DesOutletAirHumRat(0.0), DesOutletWaterTemp(0.0), HeatExchType(0), CoolingCoilAnalysisMode(0), UACoilInternalPerUnitArea(0.0),
-              UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0), SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0),
-              RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0), LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0),
-              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0),
-              WaterLoopCompNum(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
-              CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),
-              DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
-              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false)
+            : WaterCoilType(0), WaterCoilModel(iCoilModel::Unassigned), SchedPtr(0), RequestingAutoSize(false), InletAirMassFlowRate(0.0),
+              OutletAirMassFlowRate(0.0), InletAirTemp(0.0), OutletAirTemp(0.0), InletAirHumRat(0.0), OutletAirHumRat(0.0), InletAirEnthalpy(0.0),
+              OutletAirEnthalpy(0.0), TotWaterCoilLoad(0.0), SenWaterCoilLoad(0.0), TotWaterHeatingCoilEnergy(0.0), TotWaterCoolingCoilEnergy(0.0),
+              SenWaterCoolingCoilEnergy(0.0), DesWaterHeatingCoilRate(0.0), TotWaterHeatingCoilRate(0.0), DesWaterCoolingCoilRate(0.0),
+              TotWaterCoolingCoilRate(0.0), SenWaterCoolingCoilRate(0.0), UACoil(0.0), LeavingRelHum(0.0), DesiredOutletTemp(0.0),
+              DesiredOutletHumRat(0.0), InletWaterTemp(0.0), OutletWaterTemp(0.0), InletWaterMassFlowRate(0.0), OutletWaterMassFlowRate(0.0),
+              MaxWaterVolFlowRate(0.0), MaxWaterMassFlowRate(0.0), InletWaterEnthalpy(0.0), OutletWaterEnthalpy(0.0), TubeOutsideSurfArea(0.0),
+              TotTubeInsideArea(0.0), FinSurfArea(0.0), MinAirFlowArea(0.0), CoilDepth(0.0), FinDiam(0.0), FinThickness(0.0), TubeInsideDiam(0.0),
+              TubeOutsideDiam(0.0), TubeThermConductivity(0.0), FinThermConductivity(0.0), FinSpacing(0.0), TubeDepthSpacing(0.0), NumOfTubeRows(0),
+              NumOfTubesPerRow(0), EffectiveFinDiam(0.0), TotCoilOutsideSurfArea(0.0), CoilEffectiveInsideDiam(0.0), GeometryCoef1(0.0),
+              GeometryCoef2(0.0), DryFinEfficncyCoef(5, 0.0), SatEnthlCurveConstCoef(0.0), SatEnthlCurveSlope(0.0), EnthVsTempCurveAppxSlope(0.0),
+              EnthVsTempCurveConst(0.0), MeanWaterTempSaved(0.0), InWaterTempSaved(0.0), OutWaterTempSaved(0.0), SurfAreaWetSaved(0.0),
+              SurfAreaWetFraction(0.0), DesInletWaterTemp(0.0), DesAirVolFlowRate(0.0), DesInletAirTemp(0.0), DesInletAirHumRat(0.0),
+              DesTotWaterCoilLoad(0.0), DesSenWaterCoilLoad(0.0), DesAirMassFlowRate(0.0), UACoilTotal(0.0), UACoilInternal(0.0), UACoilExternal(0.0),
+              UACoilInternalDes(0.0), UACoilExternalDes(0.0), DesOutletAirTemp(0.0), DesOutletAirHumRat(0.0), DesOutletWaterTemp(0.0),
+              HeatExchType(0), CoolingCoilAnalysisMode(0), UACoilInternalPerUnitArea(0.0), UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0),
+              SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0), RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0),
+              LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
+              WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0), WaterLoopCompNum(0), CondensateCollectMode(1001), CondensateTankID(0),
+              CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false),
+              FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0),
+              DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""), ControllerIndex(0), reportCoilFinalSizes(true),
+              AirLoopDOASFlag(false)
         {
         }
     };
@@ -462,9 +469,9 @@ namespace WaterCoils {
     );
 
     void CheckActuatorNode(EnergyPlusData &state,
-                           int const ActuatorNodeNum,             // input actuator node number
-                           HVACControllers::iCoilType &iNodeType, // Cooling or Heating or 0
-                           bool &NodeNotFound                     // true if matching water inlet node not found
+                           int const ActuatorNodeNum, // input actuator node number
+                           int &iNodeType,            // Cooling or Heating or 0
+                           bool &NodeNotFound         // true if matching water inlet node not found
     );
 
     void CheckForSensorAndSetPointNode(EnergyPlusData &state,
@@ -545,10 +552,6 @@ struct WaterCoilsData : BaseGlobalStruct
     Real64 const MinWaterMassFlowFrac;
     Real64 const MinAirMassFlow;
 
-    int const CoilModel_Simple;
-    int const CoilModel_Cooling;
-    int const CoilModel_Detailed;
-
     // Parameters for Heat Exchanger Configuration
     int const CounterFlow;
     int const CrossFlow;
@@ -583,11 +586,6 @@ struct WaterCoilsData : BaseGlobalStruct
 
     bool InitWaterCoilOneTimeFlag;
 
-    // coil types in this module
-    int const WaterCoil_SimpleHeating;
-    int const WaterCoil_DetFlatFinCooling;
-    int const WaterCoil_Cooling;
-
     Array1D<WaterCoils::WaterCoilEquipConditions> WaterCoil;
     Array1D<WaterCoils::WaterCoilNumericFieldData> WaterCoilNumericFields;
 
@@ -610,12 +608,10 @@ struct WaterCoilsData : BaseGlobalStruct
 
     // Default Constructor
     WaterCoilsData()
-        : MaxPolynomOrder(4), MaxOrderedPairs(60), PolyConvgTol(1.E-05), MinWaterMassFlowFrac(0.000001), MinAirMassFlow(0.001), CoilModel_Simple(1),
-          CoilModel_Cooling(2), CoilModel_Detailed(3), CounterFlow(1), CrossFlow(2), SimpleAnalysis(1), DetailedAnalysis(2),
-          CondensateDiscarded(1001), CondensateToTank(1002), UAandFlow(1), NomCap(2), DesignCalc(1), SimCalc(2), NumWaterCoils(0),
-          GetWaterCoilsInputFlag(true), WaterCoilControllerCheckOneTimeFlag(true), InitWaterCoilOneTimeFlag(true),
-          WaterCoil_SimpleHeating(DataPlant::TypeOf_CoilWaterSimpleHeating),
-          WaterCoil_DetFlatFinCooling(DataPlant::TypeOf_CoilWaterDetailedFlatCooling), WaterCoil_Cooling(DataPlant::TypeOf_CoilWaterCooling)
+        : MaxPolynomOrder(4), MaxOrderedPairs(60), PolyConvgTol(1.E-05), MinWaterMassFlowFrac(0.000001), MinAirMassFlow(0.001), CounterFlow(1),
+          CrossFlow(2), SimpleAnalysis(1), DetailedAnalysis(2), CondensateDiscarded(1001), CondensateToTank(1002), UAandFlow(1), NomCap(2),
+          DesignCalc(1), SimCalc(2), NumWaterCoils(0), GetWaterCoilsInputFlag(true), WaterCoilControllerCheckOneTimeFlag(true),
+          InitWaterCoilOneTimeFlag(true)
     {
     }
 };

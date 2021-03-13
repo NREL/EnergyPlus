@@ -87,13 +87,6 @@ namespace HVACControllers {
         Flow,
     };
 
-    enum class iCoilType
-    {
-        Unassigned,
-        Cooling,
-        Heating,
-    };
-
     struct SolutionTrackerType
     {
         // Members

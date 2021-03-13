@@ -1672,14 +1672,14 @@ namespace FaultsManager {
                     ErrorsFound = true;
                 } else {
                     // Coil is found: check if the right type
-                    if ( (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_SimpleHeating) ||
-                         (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_Cooling) )
+                    if ( (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterSimpleHeating) ||
+                         (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) )
                     {
                         // Link the Coil with the fault model
                         state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag = true;
                         state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex = jFault_FoulingCoil;
 
-                        state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoiledType = state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num;
+                        state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoiledType = state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
                         state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoilNum = CoilNum;
 
                         SetupOutputVariable(state, "Coil Fouling Factor",
@@ -1691,7 +1691,7 @@ namespace FaultsManager {
 
                         // Coil:Cooling:Water doesn't report UA because it's not variable,
                         // but here, it's useful since we do change it via fouling, so report it
-                        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_Cooling) {
+                        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) {
                             SetupOutputVariable(state, "Cooling Coil Total U Factor Times Area Value",
                                     OutputProcessor::Unit::W_K,
                                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal,
@@ -1745,7 +1745,7 @@ namespace FaultsManager {
                     } else {
                         ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid "
                                        + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) + "\".");
-                        ShowContinueError(state, "Coil was found but it is not one of the supported types (\"Coil:Cooling:Water\" or \"Coil:Heating:Water\").");
+                        ShowContinueError(state, R"(Coil was found but it is not one of the supported types ("Coil:Cooling:Water" or "Coil:Heating:Water").)");
                         ErrorsFound = true;
                     }
                 }

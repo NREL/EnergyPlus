@@ -691,14 +691,14 @@ namespace EnergyPlus::HVACControllers {
 
         // check that actuator nodes are matched by a water coil inlet node
         for (Num = 1; Num <= NumSimpleControllers; ++Num) {
-            iCoilType iNodeType;
+            int iNodeType;
             CheckActuatorNode(state, ControllerProps(Num).ActuatedNode, iNodeType, ActuatorNodeNotFound);
             if (ActuatorNodeNotFound) {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
                 ShowContinueError(state, "...the actuator node must also be a water inlet node of a water coil");
             } else { // Node found, check type and action
-                if (iNodeType == iCoilType::Cooling) {
+                if (iNodeType == DataPlant::TypeOf_CoilWaterCooling) {
                     if (ControllerProps(Num).Action == 0) {
                         ControllerProps(Num).Action = iReverseAction;
                     } else if (ControllerProps(Num).Action == iNormalAction) {
@@ -707,7 +707,7 @@ namespace EnergyPlus::HVACControllers {
                         ShowContinueError(state, "...overriding user input action with Reverse Action.");
                         ControllerProps(Num).Action = iReverseAction;
                     }
-                } else if (iNodeType == iCoilType::Heating) {
+                } else if (iNodeType == DataPlant::TypeOf_CoilWaterSimpleHeating) {
                     if (ControllerProps(Num).Action == 0) {
                         ControllerProps(Num).Action = iNormalAction;
                     } else if (ControllerProps(Num).Action == iReverseAction) {
