@@ -65,12 +65,20 @@ namespace DataLoopNode {
     // Data
     // MODULE PARAMETER DEFINITIONS:
       
-    constexpr int NodeType_Unknown(0);        // 'blank'
     constexpr int NodeType_Air(1);            // 'Air'
     constexpr int NodeType_Water(2);          // 'Water'
     constexpr int NodeType_Steam(3);          // 'Steam'
     constexpr int NodeType_Electric(4);       // 'Electric'
-    
+   
+    enum class NodeFluidType
+    {
+        blank,
+        Air,
+        Water,
+        Steam,
+        Electric
+    };
+
     constexpr int NumValidConnectionTypes(15);
 
     constexpr int NodeConnectionType_Inlet(1);
@@ -97,10 +105,10 @@ namespace DataLoopNode {
     constexpr bool ObjectIsNotParent(false);
     constexpr bool IncrementFluidStreamYes(true);
 
-    constexpr const char *ValidNodeFluidTypes(int const intNodeType)        // Valid Fluid Types for Nodes
+    constexpr const char *ValidNodeFluidTypes(NodeFluidType const NodeFluidType) // Valid Fluid Types for Nodes
     {
-        switch (intNodeType) {
-        case NodeType_Unknown:
+        switch (NodeFluidType) {
+        case NodeFluidType:
             return "blank";
 
         case NodeType_Air:
@@ -178,7 +186,7 @@ namespace DataLoopNode {
     struct NodeData
     {
         // Members
-        int FluidType;                      // must be one of the valid parameters
+        NodeFluidType FluidType;            // must be one of the valid parameters
         int FluidIndex;                     // For Fluid Properties
         Real64 Temp;                        // {C}
         Real64 TempMin;                     // {C}
