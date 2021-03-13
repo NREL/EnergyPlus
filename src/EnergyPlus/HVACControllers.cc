@@ -662,12 +662,19 @@ namespace HVACControllers {
                     ErrorsFound = true;
                 }
                 ControllerProps(Num).SensedNode = GetOnlySingleNode(state,
-                    AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                                                                    AlphArray(5),
+                                                                    ErrorsFound,
+                                                                    CurrentModuleObject,
+                                                                    AlphArray(1),
+                                                                    DataLoopNode::NodeFluidType::blank,
+                                                                    NodeConnectionType_Sensor,
+                                                                    1,
+                                                                    ObjectIsNotParent);
                 ControllerProps(Num).ActuatedNode = GetOnlySingleNode(state, AlphArray(6),
                                                                       ErrorsFound,
                                                                       CurrentModuleObject,
                                                                       AlphArray(1),
-                                                                      NodeType_Unknown,
+                                                                      DataLoopNode::NodeFluidType::blank,
                                                                       NodeConnectionType_Actuator,
                                                                       1,
                                                                       ObjectIsNotParent);

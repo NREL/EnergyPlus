@@ -65,6 +65,7 @@ namespace DataLoopNode {
     // Data
     // MODULE PARAMETER DEFINITIONS:
       
+    constexpr int NodeType_Unknown(0);        // 'blank'
     constexpr int NodeType_Air(1);            // 'Air'
     constexpr int NodeType_Water(2);          // 'Water'
     constexpr int NodeType_Steam(3);          // 'Steam'

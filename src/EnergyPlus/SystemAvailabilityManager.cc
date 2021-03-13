@@ -893,7 +893,7 @@ namespace SystemAvailabilityManager {
                                                                               ErrorsFound,
                                                                               cCurrentModuleObject,
                                                                               cAlphaArgs(1),
-                                                                              NodeType_Unknown,
+                                                                              DataLoopNode::NodeFluidType::blank,
                                                                               NodeConnectionType_Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
@@ -902,7 +902,7 @@ namespace SystemAvailabilityManager {
                                                                                ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
-                                                                               NodeType_Unknown,
+                                                                               DataLoopNode::NodeFluidType::blank,
                                                                                NodeConnectionType_Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
@@ -960,7 +960,7 @@ namespace SystemAvailabilityManager {
                                                                                ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
-                                                                               NodeType_Unknown,
+                                                                               DataLoopNode::NodeFluidType::blank,
                                                                                NodeConnectionType_Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
@@ -1006,7 +1006,7 @@ namespace SystemAvailabilityManager {
                                                                               ErrorsFound,
                                                                               cCurrentModuleObject,
                                                                               cAlphaArgs(1),
-                                                                              NodeType_Unknown,
+                                                                              DataLoopNode::NodeFluidType::blank,
                                                                               NodeConnectionType_Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
@@ -1052,7 +1052,7 @@ namespace SystemAvailabilityManager {
                                                                                ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
-                                                                               NodeType_Unknown,
+                                                                               DataLoopNode::NodeFluidType::blank,
                                                                                NodeConnectionType_Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
@@ -1109,7 +1109,7 @@ namespace SystemAvailabilityManager {
                                                                               ErrorsFound,
                                                                               cCurrentModuleObject,
                                                                               cAlphaArgs(1),
-                                                                              NodeType_Unknown,
+                                                                              DataLoopNode::NodeFluidType::blank,
                                                                               NodeConnectionType_Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
