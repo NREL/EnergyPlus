@@ -387,7 +387,7 @@ struct LoopNodeData : BaseGlobalStruct {
     int NumofMixers = 0;
     Array1D_string NodeID;
     Array1D<DataLoopNode::NodeData> Node; // dim to num nodes in SimHVAC
-    DataLoopNode::NodeData DefaultNodeValues = {0,
+    DataLoopNode::NodeData DefaultNodeValues = {DataLoopNode::NodeFluidType::blank,
                                                 0,
                                                 0.0,
                                                 0.0,
@@ -456,7 +456,7 @@ struct LoopNodeData : BaseGlobalStruct {
         this->NumofMixers = 0;
         this->NodeID.deallocate();
         this->Node.deallocate();
-        this->DefaultNodeValues = DataLoopNode::NodeData(0,
+        this->DefaultNodeValues = DataLoopNode::NodeData(DataLoopNode::NodeFluidType::blank,
                                                          0,
                                                          0.0,
                                                          0.0,
