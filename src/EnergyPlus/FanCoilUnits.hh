@@ -81,25 +81,32 @@ namespace FanCoilUnits {
     // coil type units supported in this module
     constexpr int FanCoilUnit_4Pipe(1);
 
-    constexpr int CCoil_Water(1);
-    constexpr int CCoil_Detailed(2);
-    constexpr int CCoil_HXAssist(3);
+    enum class CCoil
+    {
+        Unassigned,
+        Water,
+        Detailed,
+        HXAssist
+    };
 
-    constexpr int HCoil_Water(1);
-    constexpr int HCoil_Electric(2);
+    enum class HCoil
+    {
+        Unassigned,
+        Water,
+        Electric
+    };
 
-    // capacity control method supported in this module
-    constexpr int CCM_ConsFanVarFlow(1);
-    constexpr int CCM_CycFan(2);
-    constexpr int CCM_VarFanVarFlow(3);
-    constexpr int CCM_VarFanConsFlow(4);
-    constexpr int CCM_MultiSpeedFan(5);
-    constexpr int CCM_ASHRAE(6);
-
-    // look up functions for node numbers
-
-    // Types
-
+    enum class CCM          // capacity control method supported in this module
+    {
+        Unassigned,
+        ConsFanVarFlow,
+        CycFan,
+        VarFanVarFlow,
+        VarFanConsFlow,
+        MultiSpeedFan,
+        ASHRAE
+    };
+ 
     struct FanCoilData
     {
         // Members
@@ -115,7 +122,7 @@ namespace FanCoilUnits {
         // 'CyclingFan' or
         // 'VariableFanVariableFlow'
         int SpeedFanSel; // Speed fan selected
-        int CapCtrlMeth_Num;
+        CCM CapCtrlMeth_Num;
         Real64 PLR;               // Part Load Ratio, fraction of time step fancoil is on
         int MaxIterIndexH;        // Maximum iterations exceeded for heating
         int BadMassFlowLimIndexH; // Bad mass flow limit error index for heating
@@ -146,7 +153,7 @@ namespace FanCoilUnits {
         // 'Coil:Cooling:Water' or
         // 'Coil:Cooling:Water:DetailedGeometry' or
         // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
-        int CCoilType_Num;          // Numeric equivalent for type of cooling coil
+        CCoil CCoilType_Num;          // Numeric equivalent for type of cooling coil
         std::string CCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
         std::string CCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
         int CCoilPlantTypeOfNum;
@@ -160,7 +167,7 @@ namespace FanCoilUnits {
         int HCoilName_Index;
         std::string HCoilType; // type of heating coil:
         // 'Coil:Heating:Water' or
-        int HCoilType_Num; // Numeric equivalent for type of cooling coil
+        HCoil HCoilType_Num; // Numeric equivalent for type of cooling coil
         int HCoilPlantTypeOfNum;
         Real64 MaxHotWaterVolFlow;    // m3/s
         Real64 MinHotWaterVolFlow;    // m3/s
@@ -243,12 +250,12 @@ namespace FanCoilUnits {
         int RegulaFalsiFailedIndex;      // iteration loop warning
 
         FanCoilData() // Default Constructor
-            : UnitType_Num(0), SchedPtr(0), SchedOutAirPtr(0), FanType_Num(0), SpeedFanSel(0), CapCtrlMeth_Num(0), PLR(0.0), MaxIterIndexH(0),
+            : UnitType_Num(0), SchedPtr(0), SchedOutAirPtr(0), FanType_Num(0), SpeedFanSel(0), CapCtrlMeth_Num(CCM::Unassigned), PLR(0.0), MaxIterIndexH(0),
               BadMassFlowLimIndexH(0), MaxIterIndexC(0), BadMassFlowLimIndexC(0), FanAirVolFlow(0.0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0),
               LowSpeedRatio(0.0), MedSpeedRatio(0.0), SpeedFanRatSel(0.0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), AirInNode(0), AirOutNode(0),
-              OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0), FanIndex(0), CCoilName_Index(0), CCoilType_Num(0),
+              OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0), FanIndex(0), CCoilName_Index(0), CCoilType_Num(CCoil::Unassigned),
               CCoilPlantTypeOfNum(0), ControlCompTypeNum(0), CompErrIndex(0), MaxColdWaterVolFlow(0.0), MinColdWaterVolFlow(0.0),
-              MinColdWaterFlow(0.0), ColdControlOffset(0.0), HCoilName_Index(0), HCoilType_Num(0), MaxHotWaterVolFlow(0.0), MinHotWaterVolFlow(0.0),
+              MinColdWaterFlow(0.0), ColdControlOffset(0.0), HCoilName_Index(0), HCoilType_Num(HCoil::Unassigned), MaxHotWaterVolFlow(0.0), MinHotWaterVolFlow(0.0),
               MinHotWaterFlow(0.0), HotControlOffset(0.0), DesignHeatingCapacity(0.0), AvailStatus(0), ATMixerIndex(0), ATMixerType(0),
               ATMixerPriNode(0), ATMixerSecNode(0), HVACSizingIndex(0), SpeedRatio(0.0), FanOpModeSchedPtr(0), FanOpMode(1), ASHRAETempControl(false),
               QUnitOutNoHC(0.0), QUnitOutMaxH(0.0), QUnitOutMaxC(0.0), LimitErrCountH(0), LimitErrCountC(0), ConvgErrCountH(0), ConvgErrCountC(0),
