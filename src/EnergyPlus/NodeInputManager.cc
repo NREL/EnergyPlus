@@ -92,7 +92,7 @@ namespace EnergyPlus::NodeInputManager {
                      DataLoopNode::NodeFluidType NodeFluidType, // Fluidtype for checking/setting node FluidType
                      std::string const &NodeObjectType,        // Node Object Type (i.e. "Chiller:Electric")
                      std::string const &NodeObjectName,        // Node Object Name (i.e. "MyChiller")
-                     int const NodeConnectionType,             // Node Connection Type (see DataLoopNode)
+                     DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
                      int const NodeFluidStream,                // Which Fluid Stream (1,2,3,...)
                      bool const ObjectIsParent,                // True/False
                      Optional_bool_const IncrementFluidStream, // True/False
@@ -173,7 +173,7 @@ namespace EnergyPlus::NodeInputManager {
         // Most calls to this routine use a fixed fluid stream number for all nodes, this is the default
         FluidStreamNum = NodeFluidStream;
         for (Loop = 1; Loop <= NumNodes; ++Loop) {
-            if (NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes) {
+            if (static_cast<int>(NodeConnectionType) >= 1 && static_cast<int>(NodeConnectionType) <= NumValidConnectionTypes) {
                 ConnectionType = DataLoopNode::ValidConnectionTypes(NodeConnectionType);
             } else {
                 ConnectionType = format("{}-unknown", NodeConnectionType);
@@ -663,7 +663,7 @@ namespace EnergyPlus::NodeInputManager {
                           std::string const &NodeObjectType,   // Node Object Type (i.e. "Chiller:Electric")
                           std::string const &NodeObjectName,   // Node Object Name (i.e. "MyChiller")
                           DataLoopNode::NodeFluidType const NodeFluidType,             // Fluidtype for checking/setting node FluidType
-                          int const NodeConnectionType,        // Node Connection Type (see DataLoopNode)
+                          DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
                           int const NodeFluidStream,           // Which Fluid Stream (1,2,3,...)
                           bool const ObjectIsParent,           // True/False
                           Optional_string_const InputFieldName // Input Field Name
@@ -728,7 +728,7 @@ namespace EnergyPlus::NodeInputManager {
             state.dataNodeInputMgr->GetOnlySingleNodeNodeNums(1) = 0;
         }
         if (NumNodes > 0) {
-            if (NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes) {
+            if (static_cast<int>(NodeConnectionType) >= 1 && static_cast<int>(NodeConnectionType) <= NumValidConnectionTypes) {
                 ConnectionType = DataLoopNode::ValidConnectionTypes(NodeConnectionType);
             } else {
                 ConnectionType = format("{}-unknown", NodeConnectionType);

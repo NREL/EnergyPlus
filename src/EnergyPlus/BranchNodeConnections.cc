@@ -252,7 +252,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
         IsValid = false;
         for (Count = 1; Count <= NumValidConnectionTypes; ++Count) {
-            if (ConnectionType != DataLoopNode::ValidConnectionTypes(Count)) continue;
+            if (ConnectionType != DataLoopNode::ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(Count))) continue;
             IsValid = true;
             break;
         }
@@ -1465,7 +1465,7 @@ namespace EnergyPlus::BranchNodeConnections {
         Array1D_string ConnectionTypes(15);
 
         for (int nodetype = 1; nodetype <= NumValidConnectionTypes; ++nodetype) {
-            ConnectionTypes(nodetype) = ValidConnectionTypes(nodetype);
+            ConnectionTypes(nodetype) = ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(nodetype));
         }
 
         if (allocated(NodeConnectType)) NodeConnectType.deallocate();

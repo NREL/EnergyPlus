@@ -1087,7 +1087,7 @@ namespace BranchInputManager {
         int Comp;           // Loop Counter
         bool IsNotOK;       // Flag to verify name
         int NumInComps;     // Number of components actually verified (no SPLITTER or MIXER allowed)
-        int ConnectionType; // Used to pass variable node connection type to GetNodeNums
+        DataLoopNode::NodeConnectionType ConnectionType; // Used to pass variable node connection type to GetNodeNums
         int NumNodes;       // Number of Nodes from NodeInputManager
 
         std::string CurrentModuleObject = "Branch";
