@@ -353,8 +353,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopSide = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopBranchNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Cooling;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_Cooling;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::TypeOf_CoilWaterCooling;
     state->dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
     state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = DataSizing::AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp = DataSizing::AutoSize;
@@ -380,7 +379,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
     state->dataSize->DataWaterLoopNum = 1;
     FluidProperties::NumOfGlycols = 1;
@@ -418,8 +417,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopSide = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopBranchNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Heating;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::TypeOf_CoilWaterSimpleHeating;
     state->dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
     state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = DataSizing::AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp = DataSizing::AutoSize;
@@ -429,7 +427,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat = DataSizing::AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = DataSizing::AutoSize;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
     state->dataSize->DataWaterLoopNum = 2;
     state->dataSize->PlantSizData(2).DeltaT = 5.0;
@@ -4197,8 +4195,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
     state->dataWaterCoils->WaterCoil(1).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     state->dataWaterCoils->WaterCoil(1).Name = "Water Heating Coil";
-    state->dataWaterCoils->WaterCoil(1).WaterCoilType = HVACControllers::iCoilType::Heating;
-    state->dataWaterCoils->WaterCoil(1).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    state->dataWaterCoils->WaterCoil(1).WaterCoilType = DataPlant::TypeOf_CoilWaterSimpleHeating;
     state->dataWaterCoils->WaterCoil(1).DesAirVolFlowRate = 1.0;
     state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate = HotWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).UACoil = 400.0;
@@ -4249,7 +4246,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
 
     thisSys.m_HeatingCoilIndex = 1;
@@ -4339,9 +4336,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
     state->dataWaterCoils->WaterCoil(1).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     state->dataWaterCoils->WaterCoil(1).Name = "Water Cooling Coil";
-    state->dataWaterCoils->WaterCoil(1).WaterCoilType = HVACControllers::iCoilType::Cooling;
-    state->dataWaterCoils->WaterCoil(1).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_Cooling;
-    state->dataWaterCoils->WaterCoil(1).WaterCoilModel = state->dataWaterCoils->CoilModel_Cooling;
+    state->dataWaterCoils->WaterCoil(1).WaterCoilType = DataPlant::TypeOf_CoilWaterCooling;
+    state->dataWaterCoils->WaterCoil(1).WaterCoilModel = WaterCoils::iCoilModel::Cooling;
     state->dataWaterCoils->WaterCoil(1).DesAirVolFlowRate = 1.0;
     state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).CoolingCoilAnalysisMode = state->dataWaterCoils->SimpleAnalysis;
@@ -4403,7 +4399,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
 
     thisSys.m_CoolingCoilIndex = 1;

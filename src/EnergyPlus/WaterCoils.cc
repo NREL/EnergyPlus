@@ -903,7 +903,7 @@ namespace EnergyPlus::WaterCoils {
         Real64 DesHumRatAtWaterInTemp;     // Enthalpy at water inlet temp and entering air HumRat (J/kg)
         Real64 CapacitanceAir;             // Air-side capacity rate(W/C)
         Real64 DesAirTempApparatusDewPt;   // Temperature apparatus dew point at design capacity
-        Real64 DesAirHumRatApparatusDewPt; // Humdity Ratio at apparatus dew point at design capacity
+        Real64 DesAirHumRatApparatusDewPt; // Humidity Ratio at apparatus dew point at design capacity
         Real64 DesBypassFactor;            // ByPass Factor at design condition
         Real64 SlopeTempVsHumRatio;        // Ratio temperature difference to humidity difference
         // between entering and leaving air states
@@ -2062,7 +2062,9 @@ namespace EnergyPlus::WaterCoils {
         auto &OASysEqSizing(state.dataSize->OASysEqSizing);
 
         // cooling coils
-        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling && state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {
+        if (((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) ||
+             (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterDetailedFlatCooling)) &&
+            state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {
             // find the appropriate Plant Sizing object
             PltSizCoolNum = PlantUtilities::MyPlantSizingIndex(state, "chilled water coil",
                                                                state.dataWaterCoils->WaterCoil(CoilNum).Name,
@@ -2071,7 +2073,8 @@ namespace EnergyPlus::WaterCoils {
                                                                LoopErrorsFound);
         }
 
-        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) { // 'Cooling'
+        if (((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) ||
+             (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterDetailedFlatCooling))) { // 'Cooling'
 
             if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                 state.dataSize->DataWaterCoilSizCoolDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
@@ -2926,7 +2929,7 @@ namespace EnergyPlus::WaterCoils {
         // OTHER NOTES:
         // Routine was originally adapted for use in IBLAST by R.D. Taylor in l993.
         // Subsequently rewritten and improved by J.C. Vanderzee in 1994
-        // Revised and further enanced by R.D. Taylor in Jan 1996
+        // Revised and further enhanced by R.D. Taylor in Jan 1996
         // Re-engineered for EnergyPlus by Richard Liesen PhD in 1998
 
         // Using/Aliasing
