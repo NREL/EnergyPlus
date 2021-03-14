@@ -7544,7 +7544,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
 
-    auto &thisFanCoil(FanCoil(1));
+    auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
     auto &thisATMixer(state->dataSingleDuct->SysATMixer(1));
     auto &thisFan(Fan(1));
 
@@ -7669,8 +7669,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     finalZoneSizing.HeatDesHumRat = 0.0075;
 
     // heating mode tests
-    FanCoilUnits::CoolingLoad = false;
-    FanCoilUnits::HeatingLoad = true;
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     auto &zoneSysEnergyDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
     auto &zoneEquipConfig(state->dataZoneEquip->ZoneEquipConfig(1));
@@ -7973,7 +7973,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     GetFanCoilUnits(*state);
     SystemAvailabilityManager::GetSysAvailManagerInputs(*state);
 
-    auto &thisFanCoil(FanCoil(1));
+    auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
     auto &thisATMixer(state->dataSingleDuct->SysATMixer(1));
     auto &thisAvaiManager(state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1));
 
@@ -8100,8 +8100,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     finalZoneSizing.HeatDesHumRat = 0.0075;
 
     // heating mode tests
-    FanCoilUnits::CoolingLoad = false;
-    FanCoilUnits::HeatingLoad = true;
+    state->dataFanCoilUnits->CoolingLoad = false;
+    state->dataFanCoilUnits->HeatingLoad = true;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     auto &zoneSysEnergyDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
     auto &zoneEquipConfig(state->dataZoneEquip->ZoneEquipConfig(1));
