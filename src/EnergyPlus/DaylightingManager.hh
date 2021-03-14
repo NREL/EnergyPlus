@@ -81,10 +81,6 @@ namespace DaylightingManager {
     // A reasonable, conservative crossover is selected but may be refined as more
     //  experience is gained.
     constexpr int octreeCrossover(100); // Octree surface count crossover
-    constexpr int NTH(18);                          // Number of azimuth steps for sky integration
-    constexpr int NPH(8);                           // Number of altitude steps for sky integration
-    constexpr int NPHMAX(10); // Number of sky/ground integration steps in altitude
-    constexpr int NTHMAX(16); // Number of sky/ground integration steps in azimuth
 
     void DayltgAveInteriorReflectance(EnergyPlusData &state, int &ZoneNum); // Zone number
 
@@ -607,53 +603,12 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Array1D<Real64> cos_Theta; // cos( Theta ) table
     Array1D<Real64> sin_Theta; // sin( Theta ) table
 
-    Vector4<Real64> XEDIRSK;         // Illuminance contribution from luminance element, sky-related
-    Vector4<Real64> XAVWLSK;                        // Luminance of window element, sky-related
-    Vector3<Real64> RAYCOS;                         // Unit vector from reference point to sun
-    Array1D<Real64> TransBmBmMult;     // Beam-beam transmittance of isolated blind
-    Array1D<Real64> TransBmBmMultRefl; // As above but for beam reflected from exterior obstruction
-    Vector3<Real64> HP; // Hit coordinates, if ray hits
-    Vector3<Real64> RN; // Hit coordinates, if ray hits
-
-    Real64 CosBldgRotAppGonly = 0.0; // Cosine of the building rotation for appendix G only ( relative north )
-    Real64 SinBldgRotAppGonly = 0.0; // Sine of the building rotation for appendix G only ( relative north )
-    Array1D<Real64> PH;     // Altitude of sky element (radians)
-    Array1D<Real64> TH;     // Azimuth of sky element (radians)
-    Array1D<Real64> SPHCPH; // Sine times cosine of altitude of sky element
-
-    Vector4<Real64> ZSK; // Sky-related and sun-related illuminance on window from sky/ground
-    Vector3<Real64> U;                        // Unit vector in (PH,TH) direction
-    Array2D<Real64> ObTransM; // ObTrans value for each (TH,PH) direction
-    Array2D<Real64> SkyObstructionMult; // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
-    Array2D<Real64> FLFWSK;  // Sky-related downgoing luminous flux
-    Array1D<Real64> FLFWSU;     // Sun-related downgoing luminous flux, excluding entering beam
-    Array1D<Real64> FLFWSUdisk; // Sun-related downgoing luminous flux, due to entering beam
-    Array2D<Real64> FLCWSK;  // Sky-related upgoing luminous flux
-    Array1D<Real64> FLCWSU;     // Sun-related upgoing luminous flux
-    Array1D<Real64> TransMult;     // Transmittance multiplier
-    Vector4<Real64> FFSKTot;
-    Vector4<Real64> WinLumSK; // Sky related window luminance
-    Vector4<Real64> EDirSky; // Sky related direct illuminance
-
     DaylightingManagerData()
     {
         this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
         this->sin_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // sin( Phi ) table
         this->cos_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // cos( Theta ) table
         this->sin_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // sin( Theta ) table
-        this->TransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);     // Beam-beam transmittance of isolated blind
-        this->TransBmBmMultRefl =  Array1D<Real64>(DataSurfaces::MaxSlatAngs); // As above but for beam reflected from exterior obstruction
-        this->PH = Array1D<Real64>(DaylightingManager::NPH);     // Altitude of sky element (radians)
-        this->TH = Array1D<Real64>(DaylightingManager::NTH);     // Azimuth of sky element (radians)
-        this->SPHCPH = Array1D<Real64>(DaylightingManager::NPH); // Sine times cosine of altitude of sky element
-        this->ObTransM = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // ObTrans value for each (TH,PH) direction
-        this->SkyObstructionMult = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
-        this->FLFWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related downgoing luminous flux
-        this->FLFWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
-        this->FLFWSUdisk = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
-        this->FLCWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related upgoing luminous flux
-        this->FLCWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
-        this->TransMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);     // Transmittance multiplier
     }
 
     void clear_state() override
@@ -749,32 +704,13 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->HitPtRefl = 0.0;
         this->HitPtObs = 0.0;
         this->HitPtIntWinDisk = 0.0;
+
         this->AltSteps_last = 0;
         this->AzimSteps_last = 0;
         this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
         this->sin_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2); // sin( Phi ) table
         this->cos_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // cos( Theta ) table
         this->sin_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // sin( Theta ) table
-        this->TransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);     // Beam-beam transmittance of isolated blind
-        this->TransBmBmMultRefl =  Array1D<Real64>(DataSurfaces::MaxSlatAngs); // As above but for beam reflected from exterior obstruction
-        this->HP = 0.0;
-        this->RN = 0.0;
-        this->CosBldgRotAppGonly = 0.0; // Cosine of the building rotation for appendix G only ( relative north )
-        this->SinBldgRotAppGonly = 0.0; // Sine of the building rotation for appendix G
-        this->PH = Array1D<Real64>(DaylightingManager::NPH);     // Altitude of sky element (radians)
-        this->TH = Array1D<Real64>(DaylightingManager::NTH);     // Azimuth of sky element (radians)
-        this->SPHCPH = Array1D<Real64>(DaylightingManager::NPH); // Sine times cosine of altitude of sky element
-        this->ObTransM = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // ObTrans value for each (TH,PH) direction
-        this->SkyObstructionMult = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
-        this->FLFWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related downgoing luminous flux
-        this->FLFWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
-        this->FLFWSUdisk = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
-        this->FLCWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related upgoing luminous flux
-        this->FLCWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
-        this->TransMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);     // Transmittance multiplier
-        this->FFSKTot = 0.0;
-        this->WinLumSK = 0.0;
-        this->EDirSky = 0.0;
     }
 };
 

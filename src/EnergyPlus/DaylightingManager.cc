@@ -3088,12 +3088,13 @@ namespace EnergyPlus::DaylightingManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Vector3<Real64> const RREF(0.0); // Location of a reference point in absolute coordinate system //Autodesk Was used uninitialized:
-        auto & XEDIRSK = state.dataDaylightingManager->XEDIRSK;         // Illuminance contribution from luminance element, sky-related
-        auto & XAVWLSK = state.dataDaylightingManager->XAVWLSK;                        // Luminance of window element, sky-related
-        auto & RAYCOS = state.dataDaylightingManager->RAYCOS;                         // Unit vector from reference point to sun
-        auto & TransBmBmMult = state.dataDaylightingManager->TransBmBmMult;     // Beam-beam transmittance of isolated blind
-        auto & TransBmBmMultRefl = state.dataDaylightingManager->TransBmBmMultRefl; // As above but for beam reflected from exterior obstruction
-        auto & HP = state.dataDaylightingManager->HP; // Hit coordinates, if ray hits
+                                                // Never set here // Made static for performance and const for now until issue addressed
+        static Vector4<Real64> XEDIRSK;         // Illuminance contribution from luminance element, sky-related
+        static Vector4<Real64> XAVWLSK;                        // Luminance of window element, sky-related
+        static Vector3<Real64> RAYCOS;                         // Unit vector from reference point to sun
+        static Array1D<Real64> TransBmBmMult(MaxSlatAngs);     // Beam-beam transmittance of isolated blind
+        static Array1D<Real64> TransBmBmMultRefl(MaxSlatAngs); // As above but for beam reflected from exterior obstruction
+        static Vector3<Real64> HP; // Hit coordinates, if ray hits
         int JB;                                                // Slat angle counter
         Real64 ProfAng;                                        // Solar profile angle on a window (radians)
         Real64 POSFAC;                                         // Position factor for a window element / ref point / view vector combination
@@ -4327,8 +4328,8 @@ namespace EnergyPlus::DaylightingManager {
         Real64 SinBldgRelNorth;                // Sine of Building rotation
         Real64 CosZoneRelNorth;                // Cosine of Zone rotation
         Real64 SinZoneRelNorth;                // Sine of Zone rotation
-        auto & CosBldgRotAppGonly = state.dataDaylightingManager->CosBldgRotAppGonly; // Cosine of the building rotation for appendix G only ( relative north )
-        auto & SinBldgRotAppGonly = state.dataDaylightingManager->SinBldgRotAppGonly; // Sine of the building rotation for appendix G only ( relative north )
+        static Real64 CosBldgRotAppGonly(0.0); // Cosine of the building rotation for appendix G only ( relative north )
+        static Real64 SinBldgRotAppGonly(0.0); // Sine of the building rotation for appendix G only ( relative north )
         Real64 Xb;                             // temp var for transformation calc
         Real64 Yb;                             // temp var for transformation calc
         Real64 Xo;
@@ -5485,16 +5486,18 @@ namespace EnergyPlus::DaylightingManager {
         HISK.dim(4);
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+        int const NTH(18);                          // Number of azimuth steps for sky integration
+        int const NPH(8);                           // Number of altitude steps for sky integration
         Real64 const DTH((2.0 * DataGlobalConstants::Pi) / double(NTH)); // Sky integration azimuth stepsize (radians)
         Real64 const DPH(DataGlobalConstants::PiOvr2 / double(NPH));     // Sky integration altitude stepsize (radians)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IPH;                            // Altitude index for sky integration
         int ITH;                            // Azimuth index for sky integration
-        auto & PH = state.dataDaylightingManager->PH;     // Altitude of sky element (radians)
-        auto & TH = state.dataDaylightingManager->TH;     // Azimuth of sky element (radians)
-        auto & SPHCPH = state.dataDaylightingManager->SPHCPH; // Sine times cosine of altitude of sky element
+        static Array1D<Real64> PH(NPH);     // Altitude of sky element (radians)
+        static Array1D<Real64> TH(NTH);     // Azimuth of sky element (radians)
         int ISky;                           // Sky type index
+        static Array1D<Real64> SPHCPH(NPH); // Sine times cosine of altitude of sky element
 
         // Integrate to obtain illuminance from sky.
         // The contribution in lumens/m2 from a patch of sky at altitude PH and azimuth TH
@@ -5569,7 +5572,7 @@ namespace EnergyPlus::DaylightingManager {
 
         // Local declarations
         SurfaceClass IType;                 // Surface type/class:  mirror surfaces of shading surfaces
-        auto & HP = state.dataDaylightingManager->HP; // Hit coordinates, if ray hits an obstruction
+        static Vector3<Real64> HP; // Hit coordinates, if ray hits an obstruction
         bool hit;                  // True iff a particular obstruction is hit
 
         ObTrans = 1.0;
@@ -5613,7 +5616,7 @@ namespace EnergyPlus::DaylightingManager {
             auto const window_base_p(&window_base);
 
             // Lambda function for the octree to test for surface hit and update transmittance if hit
-            auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans, &HP](SurfaceData const &surface) -> bool {
+            auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
                 if (!surface.ShadowSurfPossibleObstruction) return false; // Do Consider separate octree without filtered surfaces
                 auto const sClass(surface.Class);
                 if ((sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && (&surface != window_base_p)) {
@@ -5667,8 +5670,8 @@ namespace EnergyPlus::DaylightingManager {
 
         // Local declarations
         SurfaceClass IType;                 // Surface type/class
-        auto & HP = state.dataDaylightingManager->HP; // Hit coordinates, if ray hits an obstruction
-        auto & RN = state.dataDaylightingManager->RN; // Unit vector along ray
+        static Vector3<Real64> HP; // Hit coordinates, if ray hits an obstruction
+        static Vector3<Real64> RN; // Unit vector along ray
 
         hit = false;
         RN = (R2 - R1).normalize();         // Make unit vector
@@ -5703,7 +5706,7 @@ namespace EnergyPlus::DaylightingManager {
             auto const window_base_adjacent_p(&window_base_adjacent);
 
             // Lambda function for the octree to test for surface hit
-            auto surfaceHit = [=, &R1, &hit, &HP](SurfaceData const &surface) -> bool {
+            auto surfaceHit = [=, &R1, &hit](SurfaceData const &surface) -> bool {
                 auto const sClass(surface.Class);
                 if ((surface.ShadowingSurf) ||        // Shadowing surface
                     ((surface.SolarEnclIndex == window_Enclosure) && // Surface is in same zone as window
@@ -7124,19 +7127,24 @@ namespace EnergyPlus::DaylightingManager {
         using General::InterpProfAng;
         using General::POLYF;
 
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        int const NPHMAX(10); // Number of sky/ground integration steps in altitude
+        int const NTHMAX(16); // Number of sky/ground integration steps in azimuth
+
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // In the following I,J arrays:
         // I = sky type;
         // J = 1 for bare window, 2 and above for window with shade or blind.
-        auto & FLFWSK= state.dataDaylightingManager->FLFWSK;  // Sky-related downgoing luminous flux
-        auto & FLFWSU= state.dataDaylightingManager->FLFWSU ;     // Sun-related downgoing luminous flux, excluding entering beam
-        auto & FLFWSUdisk= state.dataDaylightingManager->FLFWSUdisk; // Sun-related downgoing luminous flux, due to entering beam
-        auto & FLCWSK= state.dataDaylightingManager->FLCWSK;  // Sky-related upgoing luminous flux
-        auto & FLCWSU= state.dataDaylightingManager->FLCWSU ;     // Sun-related upgoing luminous flux
-        auto & TransMult = state.dataDaylightingManager->TransMult;     // Transmittance multiplier
-        auto & TransBmBmMult = state.dataDaylightingManager->TransBmBmMult; // Isolated blind beam-beam transmittance
+        static Array2D<Real64> FLFWSK(MaxSlatAngs + 1, 4);  // Sky-related downgoing luminous flux
+        static Array1D<Real64> FLFWSU(MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
+        static Array1D<Real64> FLFWSUdisk(MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
+        static Array2D<Real64> FLCWSK(MaxSlatAngs + 1, 4);  // Sky-related upgoing luminous flux
+        static Array1D<Real64> FLCWSU(MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
 
-        int ISky; // Sky type index: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
+        int ISky; // Sky type index: 1=clear, 2=clear turbid,
+        //  3=intermediate, 4=overcast
+        static Array1D<Real64> TransMult(MaxSlatAngs);     // Transmittance multiplier
+        static Array1D<Real64> TransBmBmMult(MaxSlatAngs); // Isolated blind beam-beam transmittance
         Real64 DPH;                                        // Sky/ground element altitude and azimuth increments (radians)
         Real64 DTH;
         int IPH; // Sky/ground element altitude and azimuth indices
@@ -7157,16 +7165,12 @@ namespace EnergyPlus::DaylightingManager {
         Real64 COSB;       // Cosine of angle of incidence of light from sky or ground
         Real64 TVISBR;     // Transmittance of window without shading at COSB
         //  (times light well efficiency, if appropriate)
-        auto & ZSK = state.dataDaylightingManager->ZSK; // Sky-related and sun-related illuminance on window from sky/ground
-        auto & U = state.dataDaylightingManager->U;                        // Unit vector in (PH,TH) direction
-        auto & ObTransM = state.dataDaylightingManager->ObTransM; // ObTrans value for each (TH,PH) direction
-        auto & NearestHitPt = state.dataDaylightingManager->NearestHitPt; // Hit point of ray on nearest obstruction (m)
-        auto & SkyObstructionMult = state.dataDaylightingManager->SkyObstructionMult; // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
-        auto & GroundHitPt = state.dataDaylightingManager->GroundHitPt; // Coordinates of point that ray from window center hits the ground (m)
-        auto & ObsHitPt = state.dataDaylightingManager->ObsHitPt;    // Coordinates of hit point on an obstruction (m)
+        static Vector4<Real64> ZSK; // Sky-related and sun-related illuminance on window from sky/ground
         Real64 ZSU;
         //  element for clear and overcast sky
+        static Vector3<Real64> U;                        // Unit vector in (PH,TH) direction
         Real64 ObTrans;                                  // Product of solar transmittances of obstructions seen by a light ray
+        static Array2D<Real64> ObTransM(NPHMAX, NTHMAX); // ObTrans value for each (TH,PH) direction
         // unused  REAL(r64)         :: HitPointLumFrClearSky     ! Luminance of obstruction from clear sky (cd/m2)
         // unused  REAL(r64)         :: HitPointLumFrOvercSky     ! Luminance of obstruction from overcast sky (cd/m2)
         // unused  REAL(r64)         :: HitPointLumFrSun          ! Luminance of obstruction from sun (cd/m2)
@@ -7216,20 +7220,26 @@ namespace EnergyPlus::DaylightingManager {
         //  obstruction (for unit beam normal illuminance)
         int NearestHitSurfNum;               // Surface number of nearest obstruction
         int NearestHitSurfNumX;              // Surface number to use when obstruction is a shadowing surface
+        static Vector3<Real64> NearestHitPt; // Hit point of ray on nearest obstruction (m)
         Real64 LumAtHitPtFrSun;              // Luminance at hit point on obstruction from solar reflection
         //  for unit beam normal illuminance (cd/m2)
         Real64 SunObstructionMult;                                 // = 1 if sun hits a ground point; otherwise = 0
+        static Array2D<Real64> SkyObstructionMult(NPHMAX, NTHMAX); // Ratio of obstructed to unobstructed sky diffuse at
+        // a ground point for each (TH,PH) direction
         Real64 Alfa; // Direction angles for ray heading towards the ground (radians)
         Real64 Beta;
         Real64 HorDis;                      // Distance between ground hit point and proj'n of window center onto ground (m)
+        static Vector3<Real64> GroundHitPt; // Coordinates of point that ray from window center hits the ground (m)
         int ObsSurfNum;                     // Obstruction surface number
         bool hitObs;                        // True iff obstruction is hit
+        static Vector3<Real64> ObsHitPt;    // Coordinates of hit point on an obstruction (m)
         int ObsConstrNum;                   // Construction number of obstruction
         Real64 ObsVisRefl;                  // Visible reflectance of obstruction
         Real64 SkyReflVisLum;               // Reflected sky luminance at hit point divided by unobstructed sky
         //  diffuse horizontal illuminance [(cd/m2)/lux]
         Real64 dReflObsSky; // Contribution to sky-related illuminance on window due to sky diffuse
         //  reflection from an obstruction
+        static Vector3<Real64> URay; // Unit vector in (Phi,Theta) direction
         Real64 TVisSunRefl;          // Diffuse vis trans of bare window for beam reflection calc
         //  (times light well efficiency, if appropriate)
         Real64 ZSU1refl; // Beam normal illuminance times ZSU1refl = illuminance on window
@@ -8022,8 +8032,8 @@ namespace EnergyPlus::DaylightingManager {
         Real64 BeamObstrMultiplier;         // beam obstruction multiplier in case incoming beam is from the ground
         int ObsSurfNum;                     // Obstruction surface number
         bool hitObs;                        // True iff obstruction is hit
-        auto & ObsHitPt = state.dataDaylightingManager->ObsHitPt;    // Coordinates of hit point on an obstruction (m)
-        auto & GroundHitPt = state.dataDaylightingManager->GroundHitPt; // Coordinates of point that ray from window center hits the ground (m)
+        static Vector3<Real64> ObsHitPt;    // Coordinates of hit point on an obstruction (m)
+        static Vector3<Real64> GroundHitPt; // Coordinates of point that ray from window center hits the ground (m)
 
         int NRefl;          // number of exterior obstructions
         int iReflElem;      // incoming direction blocking surfaces element counter
@@ -8180,7 +8190,7 @@ namespace EnergyPlus::DaylightingManager {
         Real64 FLSUdiskTot;
 
         // Total for first relflected fluxes
-        auto & FFSKTot = state.dataDaylightingManager->FFSKTot;
+        static Vector4<Real64> FFSKTot;
         Real64 FFSUTot;
         Real64 FFSUdiskTot;
 
@@ -8317,9 +8327,9 @@ namespace EnergyPlus::DaylightingManager {
         Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side),
         // due to sun beam
 
-        auto & WinLumSK = state.dataDaylightingManager->WinLumSK; // Sky related window luminance
-        auto & EDirSky = state.dataDaylightingManager->EDirSky; // Sky related direct illuminance
+        static Vector4<Real64> WinLumSK; // Sky related window luminance
         Real64 WinLumSU;                 // Sun related window luminance, excluding entering beam
+        static Vector4<Real64> EDirSky; // Sky related direct illuminance
         Real64 EDirSun;                 // Sun related direct illuminance, excluding entering beam
         int CurCplxFenState;
         int NIncBasis;
