@@ -434,13 +434,13 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
             }
 
             // set node state variables in preparation for fan model.
-            DataLoopNode::Node(fanInletNode).MassFlowRate = this->normalMode.ratedEvapAirFlowRate;
-            DataLoopNode::Node(fanOutletNode).MassFlowRate = this->normalMode.ratedEvapAirFlowRate;
-            DataLoopNode::Node(fanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
-            DataLoopNode::Node(fanInletNode).HumRat = Psychrometrics::PsyWFnTdbTwbPb(state,
+            state.dataLoopNodes->Node(fanInletNode).MassFlowRate = this->normalMode.ratedEvapAirFlowRate;
+            state.dataLoopNodes->Node(fanOutletNode).MassFlowRate = this->normalMode.ratedEvapAirFlowRate;
+            state.dataLoopNodes->Node(fanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
+            state.dataLoopNodes->Node(fanInletNode).HumRat = Psychrometrics::PsyWFnTdbTwbPb(state,
                 CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, state.dataEnvrn->OutBaroPress, RoutineName);
-            DataLoopNode::Node(fanInletNode).Enthalpy =
-                Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, DataLoopNode::Node(fanInletNode).HumRat);
+            state.dataLoopNodes->Node(fanInletNode).Enthalpy =
+                Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, state.dataLoopNodes->Node(fanInletNode).HumRat);
             if (supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                 fanPowerCorrection = HVACFan::fanObjs[supplyFanIndex]->fanPower();
@@ -449,7 +449,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
                 fanPowerCorrection = Fans::GetFanPower(supplyFanIndex);
             }
 
-            fanHeatCorrection = DataLoopNode::Node(fanOutletNode).Enthalpy - DataLoopNode::Node(fanInletNode).Enthalpy;
+            fanHeatCorrection = state.dataLoopNodes->Node(fanOutletNode).Enthalpy - state.dataLoopNodes->Node(fanInletNode).Enthalpy;
 
             NetCoolingCapRated = this->normalMode.ratedGrossTotalCap * totCapTempModFac * totCapFlowModFac - fanHeatCorrection;
         }
@@ -519,7 +519,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
         Real64 heldOutdoorDB =
             state.dataEnvrn->OutDryBulbTemp; // TODO: Ugly, shared, potential race condition, blah. Shouldn't we just get from the condInletNode!?
         if (condInletNodeIndex != 0) {
-            DataLoopNode::Node(condInletNodeIndex).Temp = OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1];
+            state.dataLoopNodes->Node(condInletNodeIndex).Temp = OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1];
         } else {
             state.dataEnvrn->OutDryBulbTemp = OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1];
         }
@@ -590,10 +590,10 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
 
             if (this->unitStatic > 0.0) {
                 FanStaticPressureRise = this->unitStatic + (ExternalStatic * pow_2(AirMassFlowRatio));
-                DataLoopNode::Node(fanInletNode).MassFlowRate = PartLoadAirMassFlowRate;
-                DataLoopNode::Node(fanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
-                DataLoopNode::Node(fanInletNode).HumRat = SupplyAirHumRat;
-                DataLoopNode::Node(fanInletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
+                state.dataLoopNodes->Node(fanInletNode).MassFlowRate = PartLoadAirMassFlowRate;
+                state.dataLoopNodes->Node(fanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
+                state.dataLoopNodes->Node(fanInletNode).HumRat = SupplyAirHumRat;
+                state.dataLoopNodes->Node(fanInletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
 
                 if (supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
                     HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
@@ -603,7 +603,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
                     fanPowerCorrection = Fans::GetFanPower(supplyFanIndex);
                 }
 
-                fanHeatCorrection = DataLoopNode::Node(fanOutletNode).Enthalpy - DataLoopNode::Node(fanInletNode).Enthalpy;
+                fanHeatCorrection = state.dataLoopNodes->Node(fanOutletNode).Enthalpy - state.dataLoopNodes->Node(fanInletNode).Enthalpy;
 
             } else {
                 fanPowerCorrection = DefaultFanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;
@@ -850,12 +850,12 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlus::EnergyPlusData &s
     if (this->unitStatic > 0.0) {
         // modify external static per AHRI 340/360, Table 6, note 1.
         FanStaticPressureRise = this->unitStatic + (FanExternalStaticFull * pow_2(AirMassFlowRatio));
-        DataLoopNode::Node(FanInletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
-        DataLoopNode::Node(FanOutletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
-        DataLoopNode::Node(FanInletNodeNum).Temp = IndoorUnitInletDryBulb;
-        DataLoopNode::Node(FanInletNodeNum).HumRat =
+        state.dataLoopNodes->Node(FanInletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
+        state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
+        state.dataLoopNodes->Node(FanInletNodeNum).Temp = IndoorUnitInletDryBulb;
+        state.dataLoopNodes->Node(FanInletNodeNum).HumRat =
             Psychrometrics::PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, state.dataEnvrn->OutBaroPress, RoutineName);
-        DataLoopNode::Node(FanInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(IndoorUnitInletDryBulb, DataLoopNode::Node(FanInletNodeNum).HumRat);
+        state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(IndoorUnitInletDryBulb, state.dataLoopNodes->Node(FanInletNodeNum).HumRat);
         if (supplyFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
         } else {
@@ -863,7 +863,7 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlus::EnergyPlusData &s
             Fans::SimulateFanComponents(state, "", true, supplyFanIndex, _, true, false, FanStaticPressureRise);
         }
 
-        FanHeatCorrection = DataLoopNode::Node(FanOutletNodeNum).Enthalpy - DataLoopNode::Node(FanInletNodeNum).Enthalpy;
+        FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy;
 
     } else {
 

@@ -192,8 +192,6 @@ namespace EnergyPlus::HVACManager {
         using ZoneTempPredictorCorrector::DetectOscillatingZoneTemp;
         using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
-        using DataSystemVariables::ReportDuringWarmup; // added for FMI
-        using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using DemandManager::ManageDemand;
         using DemandManager::UpdateDemandManagers;
         using EMSManager::ManageEMS;
@@ -202,7 +200,6 @@ namespace EnergyPlus::HVACManager {
         using OutAirNodeManager::SetOutAirNodes;
         using OutputReportTabular::GatherComponentLoadsHVAC;
         using OutputReportTabular::UpdateTabularReports; // added for writing tabular output reports
-        using PlantManager::UpdateNodeThermalHistory;
         using PollutionModule::CalculatePollution;
         using RefrigeratedCase::ManageRefrigeratedCaseRacks;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -416,7 +413,7 @@ namespace EnergyPlus::HVACManager {
             facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
 
             // Update the plant and condenser loop capacitance model temperature history.
-            UpdateNodeThermalHistory();
+            PlantManager::UpdateNodeThermalHistory(state);
 
             if (state.dataOutRptTab->displayHeatEmissionsSummary) {
                 OutputReportTabular::CalcHeatEmissionReport(state);
@@ -449,7 +446,7 @@ namespace EnergyPlus::HVACManager {
                     UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation(state);
-            } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
+            } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && state.dataSysVars->ReportDuringWarmup) {
                 if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
                     state.dataEnvrn->PrintEnvrnStampWarmup = true;
                     state.dataEnvrn->PrintEnvrnStampWarmupPrinted = true;
@@ -488,7 +485,7 @@ namespace EnergyPlus::HVACManager {
                 if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay || state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                     if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
-            } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
+            } else if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface) { // added for FMI
                 if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
                     state.dataEnvrn->PrintEnvrnStampWarmup = true;
                     state.dataEnvrn->PrintEnvrnStampWarmupPrinted = true;
@@ -547,14 +544,14 @@ namespace EnergyPlus::HVACManager {
                 ReportDebug = !state.dataGlobal->WarmupFlag;
             }
             if ((ReportDebug) && (state.dataGlobal->DayOfSim > 0)) { // Report the node data
-                if (size(Node) > 0 && !DebugNamesReported) {
+                if (size(state.dataLoopNodes->Node) > 0 && !DebugNamesReported) {
                     print(state.files.debug, "{}\n", "node #   Name");
-                    for (NodeNum = 1; NodeNum <= isize(Node); ++NodeNum) {
-                        print(state.files.debug, " {:3}     {}\n", NodeNum, NodeID(NodeNum));
+                    for (NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
+                        print(state.files.debug, " {:3}     {}\n", NodeNum, state.dataLoopNodes->NodeID(NodeNum));
                     }
                     DebugNamesReported = true;
                 }
-                if (size(Node) > 0) {
+                if (size(state.dataLoopNodes->Node) > 0) {
                     print(state.files.debug, "\n\n Day of Sim     Hour of Day    Time\n");
                     print(state.files.debug, "{:12}{:12} {:22.15N} \n", state.dataGlobal->DayOfSim, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone);
                     print(state.files.debug,
@@ -562,25 +559,25 @@ namespace EnergyPlus::HVACManager {
                           "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "
                           "Enthal     HumRat Fluid Type");
                 }
-                for (NodeNum = 1; NodeNum <= isize(Node); ++NodeNum) {
+                for (NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
                     static constexpr auto Format_20{
                         " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#8.0F}  {:11.2F}  {:9.5F}  {}\n"};
 
                     print(state.files.debug,
                           Format_20,
                           NodeNum,
-                          Node(NodeNum).Temp,
-                          Node(NodeNum).MassFlowRateMinAvail,
-                          Node(NodeNum).MassFlowRateMaxAvail,
-                          Node(NodeNum).TempSetPoint,
-                          Node(NodeNum).MassFlowRate,
-                          Node(NodeNum).MassFlowRateMin,
-                          Node(NodeNum).MassFlowRateMax,
-                          Node(NodeNum).MassFlowRateSetPoint,
-                          Node(NodeNum).Press,
-                          Node(NodeNum).Enthalpy,
-                          Node(NodeNum).HumRat,
-                          ValidNodeFluidTypes(Node(NodeNum).FluidType));
+                          state.dataLoopNodes->Node(NodeNum).Temp,
+                          state.dataLoopNodes->Node(NodeNum).MassFlowRateMinAvail,
+                          state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail,
+                          state.dataLoopNodes->Node(NodeNum).TempSetPoint,
+                          state.dataLoopNodes->Node(NodeNum).MassFlowRate,
+                          state.dataLoopNodes->Node(NodeNum).MassFlowRateMin,
+                          state.dataLoopNodes->Node(NodeNum).MassFlowRateMax,
+                          state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint,
+                          state.dataLoopNodes->Node(NodeNum).Press,
+                          state.dataLoopNodes->Node(NodeNum).Enthalpy,
+                          state.dataLoopNodes->Node(NodeNum).HumRat,
+                          DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(NodeNum).FluidType));
                 }
             }
         }
@@ -1055,7 +1052,7 @@ namespace EnergyPlus::HVACManager {
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating humidity ratio across iterations with a repeated value of {:.6R}",
-                                                   NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                   state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1)));
                                         break;
                                     }
@@ -1080,7 +1077,7 @@ namespace EnergyPlus::HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically decreasing humidity ratio with a trend "
                                                                          "rate across iterations of {:.6R} [ kg-water/kg-dryair/iteration]",
-                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeHumRat));
                                             }
                                         } else { // check for monotic incrase
@@ -1096,7 +1093,7 @@ namespace EnergyPlus::HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically increasing humidity ratio with a trend "
                                                                          "rate across iterations of {:.6R} [ kg-water/kg-dryair/iteration]",
-                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeHumRat));
                                             }
                                         }
@@ -1110,7 +1107,7 @@ namespace EnergyPlus::HVACManager {
                                     HistoryTrace += format("{:.6R},", state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth));
                                 }
                                 ShowContinueError(state,
-                                    "Node named " + NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
+                                    "Node named " + state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
                                     " humidity ratio [kg-water/kg-dryair] iteration history trace (most recent first): " + HistoryTrace);
                             } // need to report trace
                             // end humidity ratio
@@ -1132,7 +1129,7 @@ namespace EnergyPlus::HVACManager {
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating mass flow rate across iterations with a repeated value of {:.6R}",
-                                                   NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                   state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1)));
                                         break;
                                     }
@@ -1156,7 +1153,7 @@ namespace EnergyPlus::HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically decreasing mass flow rate with a trend "
                                                                          "rate across iterations of {:.6R} [kg/s/iteration]",
-                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeMdot));
                                             }
                                         } else { // check for monotic incrase
@@ -1172,7 +1169,7 @@ namespace EnergyPlus::HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically increasing mass flow rate with a trend "
                                                                          "rate across iterations of {:.6R} [kg/s/iteration]",
-                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeMdot));
                                             }
                                         }
@@ -1185,7 +1182,7 @@ namespace EnergyPlus::HVACManager {
                                 for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                     HistoryTrace += format("{:.6R},", state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth));
                                 }
-                                ShowContinueError(state, "Node named " + NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
+                                ShowContinueError(state, "Node named " + state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
                                                   " mass flow rate [kg/s] iteration history trace (most recent first): " + HistoryTrace);
                             } // need to report trace
                             // end mass flow rate
@@ -1207,7 +1204,7 @@ namespace EnergyPlus::HVACManager {
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating temperatures across iterations with a repeated value of {:.6R}",
-                                                   NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                   state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1)));
                                         break;
                                     }
@@ -1231,7 +1228,7 @@ namespace EnergyPlus::HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically decreasing temperature with a trend rate "
                                                                          "across iterations of {:.4R} [C/iteration]",
-                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeTemps));
                                             }
                                         } else { // check for monotic incrase
@@ -1247,7 +1244,7 @@ namespace EnergyPlus::HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically increasing temperatures with a trend "
                                                                          "rate across iterations of {:.4R} [C/iteration]",
-                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeTemps));
                                             }
                                         }
@@ -1260,7 +1257,7 @@ namespace EnergyPlus::HVACManager {
                                 for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                     HistoryTrace += format("{:.6R},", state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth));
                                 }
-                                ShowContinueError(state, "Node named " + NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
+                                ShowContinueError(state, "Node named " + state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
                                                   " temperature [C] iteration history trace (most recent first): " + HistoryTrace);
                             } // need to report trace
                               // end Temperature checks
@@ -1641,19 +1638,19 @@ namespace EnergyPlus::HVACManager {
         // have a setpoint
         if (!state.dataGlobal->ZoneSizingCalc && !state.dataGlobal->SysSizingCalc) {
             if (MySetPointInit) {
-                if (NumOfNodes > 0) {
-                    for (auto &e : Node) {
+                if (state.dataLoopNodes->NumOfNodes > 0) {
+                    for (auto &e : state.dataLoopNodes->Node) {
                         e.TempSetPoint = SensedNodeFlagValue;
                         e.HumRatSetPoint = SensedNodeFlagValue;
                         e.HumRatMin = SensedNodeFlagValue;
                         e.HumRatMax = SensedNodeFlagValue;
                         e.MassFlowRateSetPoint = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
                     }
-                    DefaultNodeValues.TempSetPoint = SensedNodeFlagValue;
-                    DefaultNodeValues.HumRatSetPoint = SensedNodeFlagValue;
-                    DefaultNodeValues.HumRatMin = SensedNodeFlagValue;
-                    DefaultNodeValues.HumRatMax = SensedNodeFlagValue;
-                    DefaultNodeValues.MassFlowRateSetPoint = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
+                    state.dataLoopNodes->DefaultNodeValues.TempSetPoint = SensedNodeFlagValue;
+                    state.dataLoopNodes->DefaultNodeValues.HumRatSetPoint = SensedNodeFlagValue;
+                    state.dataLoopNodes->DefaultNodeValues.HumRatMin = SensedNodeFlagValue;
+                    state.dataLoopNodes->DefaultNodeValues.HumRatMax = SensedNodeFlagValue;
+                    state.dataLoopNodes->DefaultNodeValues.MassFlowRateSetPoint = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
                 }
                 MySetPointInit = false;
                 DoSetPointTest = true;
@@ -1857,15 +1854,15 @@ namespace EnergyPlus::HVACManager {
                  ++ZonesCooledIndex) { // loop over the zones cooled by this air loop
                 TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
                 // reset the max avail flow rate at the terminal unit cold air inlet to the max
-                Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRateMax;
-                Node(TermInletNode).MassFlowRateMinAvail = Node(TermInletNode).MassFlowRateMin;
+                state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
+                state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMin;
             }
             for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated;
                  ++ZonesHeatedIndex) { // loop over the zones heated by this air loop
                 TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
                 // reset the max avail flow rate at the terminal unit hot air inlet to the max
-                Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRateMax;
-                Node(TermInletNode).MassFlowRateMinAvail = Node(TermInletNode).MassFlowRateMin;
+                state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
+                state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMin;
             }
         }
     }
@@ -1906,37 +1903,37 @@ namespace EnergyPlus::HVACManager {
                     // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                     // node mass flow max avail to what air loop can supply
                     SupplyNode = AirToZoneNodeInfo(AirLoopIndex).AirLoopSupplyNodeNum(SupplyIndex);
-                    if (Node(SupplyNode).MassFlowRate > 0.0) {
+                    if (state.dataLoopNodes->Node(SupplyNode).MassFlowRate > 0.0) {
                         // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) >
+                        if ((state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint - state.dataLoopNodes->Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) >
                             DataConvergParams::HVACFlowRateToler * 0.01) {
-                            FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
+                            FlowRatio = state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
                             for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled; ++ZonesCooledIndex) {
                                 TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
-                                Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRate * FlowRatio;
-                                Node(TermInletNode).MassFlowRateMinAvail =
-                                    min(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
+                                state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
+                                state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
+                                    min(state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail);
                             }
                         }
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) <
+                        if ((state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint - state.dataLoopNodes->Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) <
                             -DataConvergParams::HVACFlowRateToler * 0.01) {
-                            if (Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
+                            if (state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
                                 //               CALL ShowFatalError('ResolveAirLoopFlowLimits: Node MassFlowRateSetPoint = 0.0, Node='//  &
-                                //                                   TRIM(NodeID(SupplyNode))//  &
+                                //                                   TRIM(state.dataLoopNodes->NodeID(SupplyNode))//  &
                                 //                                   ', check for Node Connection Errors in the following messages.')
                                 for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled; ++ZonesCooledIndex) {
                                     TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
-                                    Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRateMax;
-                                    Node(TermInletNode).MassFlowRateMinAvail =
-                                        Node(SupplyNode).MassFlowRate / double(AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled);
+                                    state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
+                                    state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
+                                        state.dataLoopNodes->Node(SupplyNode).MassFlowRate / double(AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled);
                                 }
                             } else {
-                                FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
+                                FlowRatio = state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
                                 for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled; ++ZonesCooledIndex) {
                                     TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
-                                    Node(TermInletNode).MassFlowRateMinAvail = Node(TermInletNode).MassFlowRate * FlowRatio;
-                                    Node(TermInletNode).MassFlowRateMaxAvail =
-                                        max(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
+                                    state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
+                                    state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
+                                        max(state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail);
                                 }
                             }
                         }
@@ -1949,35 +1946,35 @@ namespace EnergyPlus::HVACManager {
                     // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                     // node mass flow max avail to what air loop can supply
                     SupplyNode = AirToZoneNodeInfo(AirLoopIndex).AirLoopSupplyNodeNum(SupplyIndex);
-                    if (Node(SupplyNode).MassFlowRate > 0.0) {
+                    if (state.dataLoopNodes->Node(SupplyNode).MassFlowRate > 0.0) {
                         // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) >
+                        if ((state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint - state.dataLoopNodes->Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) >
                             DataConvergParams::HVACFlowRateToler * 0.01) {
-                            FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
+                            FlowRatio = state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
                             for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
                                 TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
-                                Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRate * FlowRatio;
-                                Node(TermInletNode).MassFlowRateMinAvail =
-                                    min(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
+                                state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
+                                state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
+                                    min(state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail);
                             }
                         }
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) <
+                        if ((state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint - state.dataLoopNodes->Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) <
                             -DataConvergParams::HVACFlowRateToler * 0.01) {
-                            if (Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
+                            if (state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
                                 // ', check for Node Connection Errors in the following messages.')
                                 for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
                                     TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
-                                    Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRateMax;
-                                    Node(TermInletNode).MassFlowRateMinAvail =
-                                        Node(SupplyNode).MassFlowRate / double(AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled);
+                                    state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
+                                    state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
+                                        state.dataLoopNodes->Node(SupplyNode).MassFlowRate / double(AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled);
                                 }
                             } else {
-                                FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
+                                FlowRatio = state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
                                 for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
                                     TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
-                                    Node(TermInletNode).MassFlowRateMinAvail = Node(TermInletNode).MassFlowRate * FlowRatio;
-                                    Node(TermInletNode).MassFlowRateMaxAvail =
-                                        max(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
+                                    state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
+                                    state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
+                                        max(state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail);
                                 }
                             }
                         }
@@ -2038,7 +2035,7 @@ namespace EnergyPlus::HVACManager {
             e.ReqSupplyFrac = 1.0;
     }
 
-    void ResetNodeData()
+    void ResetNodeData(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2050,35 +2047,35 @@ namespace EnergyPlus::HVACManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine resets all node data to "initial" conditions.
 
-        if (NumOfNodes <= 0) return;
+        if (state.dataLoopNodes->NumOfNodes <= 0) return;
 
-        for (auto &e : Node) {
-            e.Temp = DefaultNodeValues.Temp;
-            e.TempMin = DefaultNodeValues.TempMin;
-            e.TempMax = DefaultNodeValues.TempMax;
-            e.TempSetPoint = DefaultNodeValues.TempSetPoint;
-            e.MassFlowRate = DefaultNodeValues.MassFlowRate;
-            e.MassFlowRateMin = DefaultNodeValues.MassFlowRateMin;
-            e.MassFlowRateMax = DefaultNodeValues.MassFlowRateMax;
-            e.MassFlowRateMinAvail = DefaultNodeValues.MassFlowRateMinAvail;
-            e.MassFlowRateMaxAvail = DefaultNodeValues.MassFlowRateMaxAvail;
-            e.MassFlowRateSetPoint = DefaultNodeValues.MassFlowRateSetPoint;
-            e.Quality = DefaultNodeValues.Quality;
-            e.Press = DefaultNodeValues.Press;
-            e.Enthalpy = DefaultNodeValues.Enthalpy;
-            e.HumRat = DefaultNodeValues.HumRat;
-            e.HumRatMin = DefaultNodeValues.HumRatMin;
-            e.HumRatMax = DefaultNodeValues.HumRatMax;
-            e.HumRatSetPoint = DefaultNodeValues.HumRatSetPoint;
-            e.TempSetPointHi = DefaultNodeValues.TempSetPointHi;
-            e.TempSetPointLo = DefaultNodeValues.TempSetPointLo;
+        for (auto &e : state.dataLoopNodes->Node) {
+            e.Temp = state.dataLoopNodes->DefaultNodeValues.Temp;
+            e.TempMin = state.dataLoopNodes->DefaultNodeValues.TempMin;
+            e.TempMax = state.dataLoopNodes->DefaultNodeValues.TempMax;
+            e.TempSetPoint = state.dataLoopNodes->DefaultNodeValues.TempSetPoint;
+            e.MassFlowRate = state.dataLoopNodes->DefaultNodeValues.MassFlowRate;
+            e.MassFlowRateMin = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMin;
+            e.MassFlowRateMax = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMax;
+            e.MassFlowRateMinAvail = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMinAvail;
+            e.MassFlowRateMaxAvail = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMaxAvail;
+            e.MassFlowRateSetPoint = state.dataLoopNodes->DefaultNodeValues.MassFlowRateSetPoint;
+            e.Quality = state.dataLoopNodes->DefaultNodeValues.Quality;
+            e.Press = state.dataLoopNodes->DefaultNodeValues.Press;
+            e.Enthalpy = state.dataLoopNodes->DefaultNodeValues.Enthalpy;
+            e.HumRat = state.dataLoopNodes->DefaultNodeValues.HumRat;
+            e.HumRatMin = state.dataLoopNodes->DefaultNodeValues.HumRatMin;
+            e.HumRatMax = state.dataLoopNodes->DefaultNodeValues.HumRatMax;
+            e.HumRatSetPoint = state.dataLoopNodes->DefaultNodeValues.HumRatSetPoint;
+            e.TempSetPointHi = state.dataLoopNodes->DefaultNodeValues.TempSetPointHi;
+            e.TempSetPointLo = state.dataLoopNodes->DefaultNodeValues.TempSetPointLo;
         }
 
-        if (allocated(MoreNodeInfo)) {
-            for (auto &e : MoreNodeInfo) {
-                e.WetBulbTemp = DefaultNodeValues.Temp;
+        if (allocated(state.dataLoopNodes->MoreNodeInfo)) {
+            for (auto &e : state.dataLoopNodes->MoreNodeInfo) {
+                e.WetBulbTemp = state.dataLoopNodes->DefaultNodeValues.Temp;
                 e.RelHumidity = 0.0;
-                e.ReportEnthalpy = DefaultNodeValues.Enthalpy;
+                e.ReportEnthalpy = state.dataLoopNodes->DefaultNodeValues.Enthalpy;
                 e.VolFlowRateStdRho = 0.0;
                 e.VolFlowRateCrntRho = 0.0;
                 e.Density = 0.0;
@@ -2607,15 +2604,15 @@ namespace EnergyPlus::HVACManager {
             if (!ZoneEquipConfig(ZoneLoop).IsControlled) {
                 for (int j = 1; j <= ZoneEquipConfig(ZoneLoop).NumInletNodes; ++j) {
                     ZnAirRpt(ZoneLoop).SysInletMass +=
-                        Node(ZoneEquipConfig(ZoneLoop).InletNode(j)).MassFlowRate * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                        state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).InletNode(j)).MassFlowRate * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
                 }
                 for (int j = 1; j <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ++j) {
                     ZnAirRpt(ZoneLoop).SysOutletMass +=
-                        Node(ZoneEquipConfig(ZoneLoop).ExhaustNode(j)).MassFlowRate * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                        state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).ExhaustNode(j)).MassFlowRate * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
                 }
                 for (int j = 1; j <= ZoneEquipConfig(ZoneLoop).NumReturnNodes; ++j) {
                     ZnAirRpt(ZoneLoop).SysOutletMass +=
-                        Node(ZoneEquipConfig(ZoneLoop).ReturnNode(j)).MassFlowRate * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                        state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).ReturnNode(j)).MassFlowRate * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
                 }
             }
 
@@ -2779,37 +2776,6 @@ namespace EnergyPlus::HVACManager {
     void UpdateZoneInletConvergenceLog(EnergyPlusData &state)
     {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
         int NodeIndex;
@@ -2822,17 +2788,17 @@ namespace EnergyPlus::HVACManager {
                 NodeNum = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum;
 
                 tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio;
-                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) = Node(NodeNum).HumRat;
+                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) = state.dataLoopNodes->Node(NodeNum).HumRat;
                 state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio({2, DataConvergParams::ConvergLogStackDepth}) =
                     tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
 
                 tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate;
-                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) = Node(NodeNum).MassFlowRate;
+                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) = state.dataLoopNodes->Node(NodeNum).MassFlowRate;
                 state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate({2, DataConvergParams::ConvergLogStackDepth}) =
                     tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
 
                 tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature;
-                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) = Node(NodeNum).Temp;
+                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) = state.dataLoopNodes->Node(NodeNum).Temp;
                 state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature({2, DataConvergParams::ConvergLogStackDepth}) = tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
             }
         }

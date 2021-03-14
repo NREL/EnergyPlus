@@ -214,7 +214,6 @@ namespace GeneratorDynamicsManager {
         using namespace DataGlobalConstants;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataLoopNode::Node;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
 
@@ -279,7 +278,7 @@ namespace GeneratorDynamicsManager {
                 DynaCntrlNum = state.dataCHPElectGen->MicroCHP(GeneratorNum).DynamicsControlID;
                 // OutletCWnode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum)%PlantOutletNodeID
                 InletCWnode = state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID;
-                TcwIn = Node(state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID).Temp;
+                TcwIn = state.dataLoopNodes->Node(state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID).Temp;
                 if (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.InternalFlowControl) {
                     InternalFlowControl = true;
                 }
@@ -314,7 +313,7 @@ namespace GeneratorDynamicsManager {
         if (InternalFlowControl && (SchedVal > 0.0)) {
             TrialMdotcw = FuncDetermineCWMdotForInternalFlowControl(state, GeneratorNum, Pel, TcwIn);
         } else {
-            TrialMdotcw = Node(InletCWnode).MassFlowRate;
+            TrialMdotcw = state.dataLoopNodes->Node(InletCWnode).MassFlowRate;
         }
 
         // determine current operating mode.
@@ -829,7 +828,6 @@ namespace GeneratorDynamicsManager {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataLoopNode::Node;
         using PlantUtilities::SetComponentFlowRate;
 
         // Return value

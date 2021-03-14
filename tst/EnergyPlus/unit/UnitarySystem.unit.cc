@@ -280,7 +280,7 @@ public:
         state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
         state->dataAirLoop->AirLoopControlInfo.allocate(1);
         Psychrometrics::InitializePsychRoutines();
-        DataLoopNode::Node.allocate(30);
+        state->dataLoopNodes->Node.allocate(30);
     }
 
     virtual void TearDown()
@@ -290,7 +290,6 @@ public:
         DataHVACGlobals::NumPrimaryAirSys = 0;
         Psychrometrics::cached_Twb.clear();
         Psychrometrics::cached_Psat.clear();
-        DataLoopNode::Node.clear();
     }
 };
 
@@ -797,21 +796,21 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).MassFlowRate = 1.0;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = 1.0;
-    // DataLoopNode::Node(1).MassFlowRate = thisSys->designMassFlowRate;
-    // DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->designMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 1.0;
+    // state->dataLoopNodes->Node(1).MassFlowRate = thisSys->designMassFlowRate;
+    // state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = thisSys->designMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test COOLING condition
-    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(1).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     // Cooling coil air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRateMax = 1.0; // max at fan outlet so fan won't limit flow
-    // DataLoopNode::Node(3).MassFlowRateMax = thisSys->designMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(3).MassFlowRateMax = 1.0; // max at fan outlet so fan won't limit flow
+    // state->dataLoopNodes->Node(3).MassFlowRateMax = thisSys->designMassFlowRate; // max at fan outlet so fan won't limit flow
     // Cooling coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 17.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 17.0;
 
     // test calling the sim routine
     int AirLoopNum = 0;
@@ -1006,7 +1005,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
     // test #6274 where coil inlet air flow rate was non-zero prior to sizing
     // this simulates another UnitarySystem upstream of this UnitarySystem that ran before this system coil was sized (and placed a non-zero air flow
     // rate on this system's inlet node)
-    DataLoopNode::Node(thisSys->CoolCoilInletNodeNum).MassFlowRate = 0.05;
+    state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).MassFlowRate = 0.05;
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -1033,20 +1032,20 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test COOLING condition
-    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(1).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     // Cooling coil air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
     // Cooling coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 17.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 17.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -1067,9 +1066,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
                       latOut);
 
     // check that cooling coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(3).Temp, DataLoopNode::Node(2).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
@@ -1289,7 +1288,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
     // test #6274 where coil inlet air flow rate was non-zero prior to sizing
     // this simulates another UnitarySystem upstream of this UnitarySystem that ran before this system coil was sized (and placed a non-zero air flow
     // rate on this system's inlet node)
-    DataLoopNode::Node(thisSys->CoolCoilInletNodeNum).MassFlowRate = 0.05;
+    state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).MassFlowRate = 0.05;
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -1316,20 +1315,20 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test COOLING condition
-    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(1).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     // Cooling coil air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
                                                                            // Cooling coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 17.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 17.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -1350,9 +1349,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
                       latOut);
 
     // check that cooling coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(3).Temp, DataLoopNode::Node(2).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
@@ -1530,20 +1529,20 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test HEATING condition
-    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(1).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     // Heating coil air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
                                                                            // Heating coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 25.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 25.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -1564,16 +1563,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(2).Temp, DataLoopNode::Node(3).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
     // no load air flow rate in UnitarySystemPerformance:Multispeed equals 0
     EXPECT_EQ(0.0, thisSys->m_IdleMassFlowRate);
     // make sure control works at speed = 1
     EXPECT_EQ(thisSys->m_HeatingSpeedNum, 1);
 
     // Heating coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 34.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 34.0;
 
     // Heating mode
     thisSys->simulate(*state,
@@ -1590,9 +1589,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(2).Temp, DataLoopNode::Node(3).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
     // make sure control works at speed = 2
     EXPECT_EQ(thisSys->m_HeatingSpeedNum, 2);
 }
@@ -1772,20 +1771,20 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test HEATING condition
-    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(1).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     // Heating coil air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
                                                                            // Heating coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 25.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 25.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -1806,9 +1805,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(2).Temp, DataLoopNode::Node(3).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
     // no load air flow rate in UnitarySystemPerformance:Multispeed equals 0
     EXPECT_EQ(0.0, thisSys->m_IdleMassFlowRate);
     // make sure control works at speed = 1
@@ -1822,7 +1821,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
     EXPECT_EQ(thisSys->m_SensHeatEnergyRate, thisSys->m_SensibleLoadMet);
 
     // Heating coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 34.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 34.0;
 
     thisSys->simulate(*state,
                       thisSys->Name,
@@ -1838,9 +1837,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(2).Temp, DataLoopNode::Node(3).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
     // make sure control works at speed = 2
     EXPECT_EQ(thisSys->m_HeatingSpeedNum, 2);
 }
@@ -2002,20 +2001,20 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoil_Only)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test HEATING condition
-    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(1).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     // Heating coil air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
                                                                            // Heating coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 25.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 25.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -2036,9 +2035,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoil_Only)
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(2).Temp, DataLoopNode::Node(3).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
     // #6282 idle air flow rate for electric heating coils should equal 0
     EXPECT_EQ(0.0, thisSys->m_IdleMassFlowRate);
 }
@@ -2218,20 +2217,20 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test HEATING condition
-    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(1).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     // Heating coil air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
                                                                            // Heating coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 25.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 25.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -2252,9 +2251,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(2).Temp, DataLoopNode::Node(3).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
     // no load air flow rate in UnitarySystemPerformance:Multispeed is blank (DS no load flow ratio defaults to 1) so idle mass flow rate = speed 1
     // heating flow
     EXPECT_EQ(thisSys->m_HeatMassFlowRate[0], thisSys->m_IdleMassFlowRate);
@@ -2262,7 +2261,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan
     EXPECT_EQ(thisSys->m_HeatingSpeedNum, 1);
 
     // Heating coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 34.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 34.0;
 
     // Heating mode
     thisSys->simulate(*state,
@@ -2279,9 +2278,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(2).Temp, DataLoopNode::Node(3).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
     // make sure control works at speed = 2
     EXPECT_EQ(thisSys->m_HeatingSpeedNum, 2);
 }
@@ -2718,21 +2717,21 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test COOLING condition
-    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(1).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     // Cooling coil air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
                                                                            // Cooling coil air outlet node = 4
-    DataLoopNode::Node(4).TempSetPoint = 20.0;
+    state->dataLoopNodes->Node(4).TempSetPoint = 20.0;
     // Heating coil air inlet node = 4
     // Heating coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 16.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 16.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -2753,19 +2752,19 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
                       latOut);
 
     // check that cooling coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(4).Temp, DataLoopNode::Node(4).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(4).TempSetPoint, 0.001);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(3).Temp, DataLoopNode::Node(4).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(4).Temp);
     // heating coil air inlet and outlet nodes are at same temp since the heating coil is off
-    EXPECT_EQ(DataLoopNode::Node(4).MassFlowRate, DataLoopNode::Node(2).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(4).MassFlowRate, state->dataLoopNodes->Node(2).MassFlowRate);
     // expect heating coil outlet air temp to be greater than heating coil outlet air temp set point
-    EXPECT_GT(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint);
+    EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint);
 
     // HEATING mode
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).Temp = 14.0;      // 14C db
-    DataLoopNode::Node(1).HumRat = 0.00693; // 11C wb
-    DataLoopNode::Node(1).Enthalpy = 31598.76;
+    state->dataLoopNodes->Node(1).Temp = 14.0;      // 14C db
+    state->dataLoopNodes->Node(1).HumRat = 0.00693; // 11C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 31598.76;
 
     thisSys->simulate(*state,
                       thisSys->Name,
@@ -2781,10 +2780,10 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
                       latOut);
 
     // cooling coil air inlet node temp is equal to cooling coil air outlet node temp since cooling coil is off
-    EXPECT_EQ(DataLoopNode::Node(3).Temp, DataLoopNode::Node(4).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(4).Temp);
     // check that heating coil outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, 16.0, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, 16.0, 0.001);
 
     // expect design spec data to match inputs
     EXPECT_NEAR(state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[0], 0.1000, 0.00001);
@@ -3113,47 +3112,47 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
                       sensOut,
                       latOut);
 
-    auto unitarySystemAirInletNodeIndex = UtilityRoutines::FindItemInList("ZONE EXHAUST NODE", DataLoopNode::NodeID);                 // was Node 1
-    auto coolingCoilAirInletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", DataLoopNode::NodeID);   // was Node 3
-    auto coolingCoilAirOutletNodeIndex = UtilityRoutines::FindItemInList("WATER HEATING COIL AIR INLET NODE", DataLoopNode::NodeID);  // was Node 6
-    auto heatingCoilAirOutletNodeIndex = UtilityRoutines::FindItemInList("WATER HEATING COIL AIR OUTLET NODE", DataLoopNode::NodeID); // was Node 7
-    auto suppHeatingAirOutletNodeIndex = UtilityRoutines::FindItemInList("ZONE 2 INLET NODE", DataLoopNode::NodeID);                  // was Node 2
-    auto coolingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("CHWINLETNODE", DataLoopNode::NodeID);                      // was Node 10
-    auto heatingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("HWINLETNODE", DataLoopNode::NodeID);                       // was Node 4
-    auto suppHeatingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("SUPPHWINLETNODE", DataLoopNode::NodeID);               // was Node 8
+    auto unitarySystemAirInletNodeIndex = UtilityRoutines::FindItemInList("ZONE EXHAUST NODE", state->dataLoopNodes->NodeID);                 // was Node 1
+    auto coolingCoilAirInletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", state->dataLoopNodes->NodeID);   // was Node 3
+    auto coolingCoilAirOutletNodeIndex = UtilityRoutines::FindItemInList("WATER HEATING COIL AIR INLET NODE", state->dataLoopNodes->NodeID);  // was Node 6
+    auto heatingCoilAirOutletNodeIndex = UtilityRoutines::FindItemInList("WATER HEATING COIL AIR OUTLET NODE", state->dataLoopNodes->NodeID); // was Node 7
+    auto suppHeatingAirOutletNodeIndex = UtilityRoutines::FindItemInList("ZONE 2 INLET NODE", state->dataLoopNodes->NodeID);                  // was Node 2
+    auto coolingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("CHWINLETNODE", state->dataLoopNodes->NodeID);                      // was Node 10
+    auto heatingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("HWINLETNODE", state->dataLoopNodes->NodeID);                       // was Node 4
+    auto suppHeatingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("SUPPHWINLETNODE", state->dataLoopNodes->NodeID);               // was Node 8
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).MassFlowRate = 1.9;
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).MassFlowRateMaxAvail = 1.9; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).MassFlowRate = 1.9;
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).MassFlowRateMaxAvail = 1.9; // max avail at fan inlet so fan won't limit flow
 
     // test COOLING condition
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     // Cooling coil air inlet node = 3
-    DataLoopNode::Node(coolingCoilAirInletNodeIndex).MassFlowRateMax = 1.9; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(coolingCoilAirInletNodeIndex).MassFlowRateMax = 1.9; // max at fan outlet so fan won't limit flow
                                                                             // Cooling coil air outlet node = 6
-    DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint = 20.0;
+    state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).TempSetPoint = 20.0;
     // Heating coil air inlet node = 6
     // Heating coil air outlet node = 7
-    DataLoopNode::Node(heatingCoilAirOutletNodeIndex).TempSetPoint = 16.0;
+    state->dataLoopNodes->Node(heatingCoilAirOutletNodeIndex).TempSetPoint = 16.0;
     // Supp heating coil air inlet node = 7
     // Supp heating coil air outlet node = 2
-    DataLoopNode::Node(suppHeatingAirOutletNodeIndex).TempSetPoint = 18.0;
+    state->dataLoopNodes->Node(suppHeatingAirOutletNodeIndex).TempSetPoint = 18.0;
 
     // Cooling coil water inlet node = 10
-    DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Temp = 6.0;
-    DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Enthalpy = 25321.8; // www.peacesoftware.de/einigewerte/calc_dampf.php5
+    state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).Temp = 6.0;
+    state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).Enthalpy = 25321.8; // www.peacesoftware.de/einigewerte/calc_dampf.php5
 
     // Heating coil water inlet node = 4
-    DataLoopNode::Node(heatingCoilWaterInletNodeIndex).Temp = 60.0;
-    DataLoopNode::Node(heatingCoilWaterInletNodeIndex).Enthalpy = 251221.6; // www.peacesoftware.de/einigewerte/calc_dampf.php5
+    state->dataLoopNodes->Node(heatingCoilWaterInletNodeIndex).Temp = 60.0;
+    state->dataLoopNodes->Node(heatingCoilWaterInletNodeIndex).Enthalpy = 251221.6; // www.peacesoftware.de/einigewerte/calc_dampf.php5
 
     // Supp heating coil water inlet node = 8
-    DataLoopNode::Node(suppHeatingCoilWaterInletNodeIndex).Temp = 60.0;
-    DataLoopNode::Node(suppHeatingCoilWaterInletNodeIndex).Enthalpy = 251221.6; // www.peacesoftware.de/einigewerte/calc_dampf.php5
+    state->dataLoopNodes->Node(suppHeatingCoilWaterInletNodeIndex).Temp = 60.0;
+    state->dataLoopNodes->Node(suppHeatingCoilWaterInletNodeIndex).Enthalpy = 251221.6; // www.peacesoftware.de/einigewerte/calc_dampf.php5
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -3175,60 +3174,60 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
 
     // check that CW coil air outlet node is at set point
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
-    EXPECT_NEAR(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint, 0.01);
+    EXPECT_NEAR(state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).TempSetPoint, 0.01);
     // CW air inlet node temp is greater than CW air outlet node temp
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
-    EXPECT_GT(DataLoopNode::Node(coolingCoilAirInletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(coolingCoilAirInletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).Temp);
     // CW water inlet node flow is greater than 0
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
     // EXPECT_GT( Node( coolingCoilWaterInletNodeIndex ).MassFlowRate, 0.0 );
     // CW water node flow is the same at inlet and outlet
-    EXPECT_NEAR(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(11).MassFlowRate, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(11).MassFlowRate, 0.0001);
     // CW water outlet node temp is greater than CW inlet node temp
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
     // EXPECT_GT( Node( 11 ).Temp, Node( coolingCoilWaterInletNodeIndex ).Temp );
     // HW air inlet and outlet nodes are at same temp
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).MassFlowRate, DataLoopNode::Node(heatingCoilAirOutletNodeIndex).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(heatingCoilAirOutletNodeIndex).MassFlowRate);
     // Supp HW air inlet and outlet nodes are at same temp
-    EXPECT_EQ(DataLoopNode::Node(heatingCoilAirOutletNodeIndex).MassFlowRate, DataLoopNode::Node(suppHeatingAirOutletNodeIndex).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(heatingCoilAirOutletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(suppHeatingAirOutletNodeIndex).MassFlowRate);
     // HW water node flow is 0
-    EXPECT_EQ(DataLoopNode::Node(heatingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(heatingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
     // HW water node flow is the same at inlet and outlet
-    EXPECT_EQ(DataLoopNode::Node(heatingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(5).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(heatingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(5).MassFlowRate);
     // HW water outlet node temp is equal to water inlet node temp
-    EXPECT_EQ(DataLoopNode::Node(heatingCoilWaterInletNodeIndex).Temp, DataLoopNode::Node(5).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(heatingCoilWaterInletNodeIndex).Temp, state->dataLoopNodes->Node(5).Temp);
     // Supp HW water inlet node flow is equal to 0
-    EXPECT_EQ(DataLoopNode::Node(suppHeatingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(suppHeatingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
     // Supp HW water node flow is the same at inlet and outlet
-    EXPECT_EQ(DataLoopNode::Node(suppHeatingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(9).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(suppHeatingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(9).MassFlowRate);
     // Supp HW water outlet node temp is equal to water inlet node temp
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
     // EXPECT_EQ( Node( suppHeatingCoilWaterInletNodeIndex ).Temp, Node( 9 ).Temp );
 
     // if cooling coil meets cooling set point temperature expect cooling coil water flow to be less than max water flow
-    EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
-    EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
-              DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
+              state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
     // expect cooling coil outlet air temp to be less than cooling coil inlet air temp
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
     // EXPECT_LT( Node( coolingCoilAirOutletNodeIndex ).Temp, Node( coolingCoilAirInletNodeIndex ).Temp );
     // expect heating coil outlet air temp to be greater than heating coil outlet air temp set point
-    EXPECT_GT(DataLoopNode::Node(heatingCoilAirOutletNodeIndex).Temp, DataLoopNode::Node(heatingCoilAirOutletNodeIndex).TempSetPoint);
+    EXPECT_GT(state->dataLoopNodes->Node(heatingCoilAirOutletNodeIndex).Temp, state->dataLoopNodes->Node(heatingCoilAirOutletNodeIndex).TempSetPoint);
     // expect supp heating coil outlet air temp to be greater than supp heating coil outlet air temp set point
-    EXPECT_GT(DataLoopNode::Node(suppHeatingAirOutletNodeIndex).Temp, DataLoopNode::Node(suppHeatingAirOutletNodeIndex).TempSetPoint);
+    EXPECT_GT(state->dataLoopNodes->Node(suppHeatingAirOutletNodeIndex).Temp, state->dataLoopNodes->Node(suppHeatingAirOutletNodeIndex).TempSetPoint);
 
     // verify dehumidify set points are not set
-    EXPECT_LT(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax, 0.0);
-    EXPECT_LT(DataLoopNode::Node(thisSys->AirOutNode).HumRatMax, 0.0);
-    EXPECT_GT(DataLoopNode::Node(thisSys->AirOutNode).HumRat, 0.009); // and air outlet HumRat > 0.009 without dehumidification control
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRatMax, 0.0);
+    EXPECT_LT(state->dataLoopNodes->Node(thisSys->AirOutNode).HumRatMax, 0.0);
+    EXPECT_GT(state->dataLoopNodes->Node(thisSys->AirOutNode).HumRat, 0.009); // and air outlet HumRat > 0.009 without dehumidification control
     EXPECT_LT(thisSys->m_CoolingPartLoadFrac, 1.0);
     Real64 sensOnlyPartLoadFrac = thisSys->m_CoolingPartLoadFrac;
-    Real64 sensOnlyOutletAirHumRat = DataLoopNode::Node(thisSys->AirOutNode).HumRat;
+    Real64 sensOnlyOutletAirHumRat = state->dataLoopNodes->Node(thisSys->AirOutNode).HumRat;
 
     // now test that the coil outlet node HumRatMax set point works for the cooling coil
     thisSys->m_DehumidControlType_Num = UnitarySys::DehumCtrlType::CoolReheat;
     thisSys->m_RunOnLatentLoad = true;
-    DataLoopNode::Node(thisSys->AirOutNode).HumRatMax = 0.008;
+    state->dataLoopNodes->Node(thisSys->AirOutNode).HumRatMax = 0.008;
     // COOLING mode
     thisSys->simulate(*state,
                       thisSys->Name,
@@ -3245,18 +3244,18 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
 
     // why doesn't water cooling coil decrease outlet air hum rat when PLR is increased?
     EXPECT_GT(thisSys->m_CoolingPartLoadFrac, sensOnlyPartLoadFrac);
-    EXPECT_LE(DataLoopNode::Node(thisSys->AirOutNode).HumRat, sensOnlyOutletAirHumRat);
+    EXPECT_LE(state->dataLoopNodes->Node(thisSys->AirOutNode).HumRat, sensOnlyOutletAirHumRat);
 
     // reset system to original values
     thisSys->m_DehumidControlType_Num = UnitarySys::DehumCtrlType::None;
     thisSys->m_RunOnLatentLoad = false;
-    DataLoopNode::Node(thisSys->AirOutNode).HumRatMax = DataLoopNode::SensedNodeFlagValue;
+    state->dataLoopNodes->Node(thisSys->AirOutNode).HumRatMax = DataLoopNode::SensedNodeFlagValue;
 
     // HEATING mode
     // Unitary system AIR inlet node = 1
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).Temp = 14.0;      // 14C db
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).HumRat = 0.00693; // 11C wb
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).Enthalpy = 31598.76;
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).Temp = 14.0;      // 14C db
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).HumRat = 0.00693; // 11C wb
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).Enthalpy = 31598.76;
 
     thisSys->simulate(*state,
                       thisSys->Name,
@@ -3272,7 +3271,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
                       latOut);
 
     // CW air inlet node temp is equal to CW air outlet node temp
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilAirInletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(coolingCoilAirInletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).Temp);
     // check that heating coil outlet node is at set point
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
     // EXPECT_NEAR( Node( heatingCoilAirOutletNodeIndex ).Temp, Node( heatingCoilAirOutletNodeIndex ).TempSetPoint, 0.001 );
@@ -3283,16 +3282,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
     // EXPECT_NEAR( Node( suppHeatingAirOutletNodeIndex ).Temp, 18.0, 0.001 );
 
     // CW water inlet node flow is equal to 0
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
     // CW water node flow is the same at inlet and outlet
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(11).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(11).MassFlowRate);
     // CW water outlet node temp is equal to CW inlet node temp
-    EXPECT_EQ(DataLoopNode::Node(11).Temp, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(11).Temp, state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).Temp);
     // HW water node flow is greater than 0
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
     // EXPECT_GT( Node( heatingCoilWaterInletNodeIndex ).MassFlowRate, 0.0 );
     // HW water node flow is the same at inlet and outlet
-    EXPECT_EQ(DataLoopNode::Node(heatingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(5).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(heatingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(5).MassFlowRate);
     // HW water outlet node temp is lower than water inlet node temp
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
     // EXPECT_LT( Node( 5 ).Temp, Node( heatingCoilWaterInletNodeIndex ).Temp );
@@ -3300,14 +3299,14 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
     // EXPECT_GT( Node( suppHeatingCoilWaterInletNodeIndex ).MassFlowRate, 0.0 );
     // HW water node flow is the same at inlet and outlet
-    EXPECT_EQ(DataLoopNode::Node(suppHeatingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(9).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(suppHeatingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(9).MassFlowRate);
     // HW water outlet node temp is lower than water inlet node temp
-    EXPECT_LT(DataLoopNode::Node(9).Temp, DataLoopNode::Node(suppHeatingCoilWaterInletNodeIndex).Temp);
+    EXPECT_LT(state->dataLoopNodes->Node(9).Temp, state->dataLoopNodes->Node(suppHeatingCoilWaterInletNodeIndex).Temp);
 
     // if heating coil meets set point temperature expect heating coil water flow to be less than max water flow
-    EXPECT_LT(DataLoopNode::Node(heatingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(heatingCoilWaterInletNodeIndex).MassFlowRateMax);
-    EXPECT_LT(DataLoopNode::Node(heatingCoilWaterInletNodeIndex).MassFlowRate,
-              DataLoopNode::Node(heatingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
+    EXPECT_LT(state->dataLoopNodes->Node(heatingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(heatingCoilWaterInletNodeIndex).MassFlowRateMax);
+    EXPECT_LT(state->dataLoopNodes->Node(heatingCoilWaterInletNodeIndex).MassFlowRate,
+              state->dataLoopNodes->Node(heatingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
 
     // if supp heating coil meets set point temperature expect supp heating coil water flow to be less than max water flow
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
@@ -3426,11 +3425,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
 
-    auto unitarySystemAirInletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", DataLoopNode::NodeID); // was Node 1
-    auto coolingCoilAirInletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", DataLoopNode::NodeID);   // was Node 3
-    auto coolingCoilAirOutletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR OUTLET NODE", DataLoopNode::NodeID); // was Node 6
-    auto coolingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("CHWINLETNODE", DataLoopNode::NodeID);                      // was Node 10
-    auto coolingCoilWaterOutletNodeIndex = UtilityRoutines::FindItemInList("CHWOUTLETNODE", DataLoopNode::NodeID);                    // was Node 10
+    auto unitarySystemAirInletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", state->dataLoopNodes->NodeID); // was Node 1
+    auto coolingCoilAirInletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", state->dataLoopNodes->NodeID);   // was Node 3
+    auto coolingCoilAirOutletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR OUTLET NODE", state->dataLoopNodes->NodeID); // was Node 6
+    auto coolingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("CHWINLETNODE", state->dataLoopNodes->NodeID);                      // was Node 10
+    auto coolingCoilWaterOutletNodeIndex = UtilityRoutines::FindItemInList("CHWOUTLETNODE", state->dataLoopNodes->NodeID);                    // was Node 10
 
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "WATER COOLING COIL";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
@@ -3470,29 +3469,29 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).MassFlowRate = 1.9;
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).MassFlowRateMaxAvail = 1.9; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).MassFlowRate = 1.9;
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).MassFlowRateMaxAvail = 1.9; // max avail at fan inlet so fan won't limit flow
 
     // test COOLING condition
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).Temp = 24.0;    // 24C db
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).HumRat = 0.013; // 18C dp
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).Enthalpy = 57217.0;
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).Temp = 24.0;    // 24C db
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).HumRat = 0.013; // 18C dp
+    state->dataLoopNodes->Node(unitarySystemAirInletNodeIndex).Enthalpy = 57217.0;
 
     // Cooling coil air inlet node
-    DataLoopNode::Node(coolingCoilAirInletNodeIndex).MassFlowRate = 1.9;
-    DataLoopNode::Node(coolingCoilAirInletNodeIndex).MassFlowRateMax = 1.9; // max at inlet
+    state->dataLoopNodes->Node(coolingCoilAirInletNodeIndex).MassFlowRate = 1.9;
+    state->dataLoopNodes->Node(coolingCoilAirInletNodeIndex).MassFlowRateMax = 1.9; // max at inlet
 
     // Cooling coil water inlet node
-    DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Temp = 6.0;
-    DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Enthalpy = 25321.8; // www.peacesoftware.de/einigewerte/calc_dampf.php5
+    state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).Temp = 6.0;
+    state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).Enthalpy = 25321.8; // www.peacesoftware.de/einigewerte/calc_dampf.php5
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // Case 0 - COOLING mode - no load, sensible or latent
-    DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.02;
-    DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint = 30.0;
+    state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.02;
+    state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).TempSetPoint = 30.0;
     thisSys->simulate(*state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -3507,26 +3506,26 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
                       latOut);
 
     // check that CW coil air outlet node is < setpoint
-    EXPECT_LT(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).TempSetPoint);
     // check that CW coil air outlet node humrat is <= set point
-    EXPECT_LE(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRat, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax);
+    EXPECT_LE(state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRat, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRatMax);
     // CW air inlet node temp equals CW air outlet node temp
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilAirInletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(coolingCoilAirInletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).Temp);
     // CW water inlet node flow is 0
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
     // CW water node flow is the same at inlet and outlet
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterOutletNodeIndex).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(coolingCoilWaterOutletNodeIndex).MassFlowRate);
     // CW water outlet node temp is same as CW inlet node temp
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilWaterOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(coolingCoilWaterOutletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).Temp);
 
     // if cooling coil meets cooling set point temperature expect cooling coil water flow to be less than max water flow
-    EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
-    EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
-              DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
+              state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
 
     // Case 1 - COOLING mode - sensible control only, no extra dehumidification required
-    DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.02;
-    DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint = 20.0;
+    state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.02;
+    state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).TempSetPoint = 20.0;
     thisSys->simulate(*state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -3541,26 +3540,26 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
                       latOut);
 
     // check that CW coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).TempSetPoint, 0.001);
     // check that CW coil air outlet node humrat is >= set point
-    EXPECT_LE(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRat, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax);
+    EXPECT_LE(state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRat, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRatMax);
     // CW air inlet node temp is greater than CW air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(coolingCoilAirInletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(coolingCoilAirInletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).Temp);
     // CW water inlet node flow is greater than 0
-    EXPECT_GT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
+    EXPECT_GT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
     // CW water node flow is the same at inlet and outlet
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterOutletNodeIndex).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(coolingCoilWaterOutletNodeIndex).MassFlowRate);
     // CW water outlet node temp is greater than CW inlet node temp
-    EXPECT_GT(DataLoopNode::Node(coolingCoilWaterOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(coolingCoilWaterOutletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).Temp);
 
     // if cooling coil meets cooling set point temperature expect cooling coil water flow to be less than max water flow
-    EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
-    EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
-              DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
+              state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
 
     // Case 2 - COOLING mode - sensible and latent load, extra dehumidification required
-    DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.009;
-    DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint = 20.0;
+    state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.009;
+    state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).TempSetPoint = 20.0;
     thisSys->simulate(*state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -3575,26 +3574,26 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
                       latOut);
 
     // check that CW coil air outlet node is below set point
-    EXPECT_LT(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).TempSetPoint);
     // check that CW coil air outlet node humrat is at set point
-    EXPECT_NEAR(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRat, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRat, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRatMax, 0.0001);
     // CW air inlet node temp is greater than CW air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(coolingCoilAirInletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(coolingCoilAirInletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).Temp);
     // CW water inlet node flow is greater than 0
-    EXPECT_GT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
+    EXPECT_GT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
     // CW water node flow is the same at inlet and outlet
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterOutletNodeIndex).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(coolingCoilWaterOutletNodeIndex).MassFlowRate);
     // CW water outlet node temp is greater than CW inlet node temp
-    EXPECT_GT(DataLoopNode::Node(coolingCoilWaterOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(coolingCoilWaterOutletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).Temp);
 
     // if cooling coil meets cooling set point temperature expect cooling coil water flow to be less than max water flow
-    EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
-    EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
-              DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
+              state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
 
     // Case 3 - COOLING mode - only latent load
-    DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.009;
-    DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint = 30.0;
+    state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.009;
+    state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).TempSetPoint = 30.0;
     thisSys->simulate(*state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -3609,26 +3608,26 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
                       latOut);
 
     // check that CW coil air outlet node is below set point
-    EXPECT_LT(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).TempSetPoint);
     // check that CW coil air outlet node humrat is at set point
-    EXPECT_NEAR(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRat, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRat, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRatMax, 0.0001);
     // CW air inlet node temp is greater than CW air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(coolingCoilAirInletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(coolingCoilAirInletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).Temp);
     // CW water inlet node flow is greater than 0
-    EXPECT_GT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
+    EXPECT_GT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
     // CW water node flow is the same at inlet and outlet
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterOutletNodeIndex).MassFlowRate);
+    EXPECT_EQ(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(coolingCoilWaterOutletNodeIndex).MassFlowRate);
     // CW water outlet node temp is greater than CW inlet node temp
-    EXPECT_GT(DataLoopNode::Node(coolingCoilWaterOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(coolingCoilWaterOutletNodeIndex).Temp, state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).Temp);
 
     // if cooling coil meets cooling set point temperature expect cooling coil water flow to be less than max water flow
-    EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
-    EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
-              DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate, state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
+    EXPECT_LT(state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
+              state->dataLoopNodes->Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
 
     // Case 4 - COOLING mode - dehumidification set point at air outlet instead of coil outlet
-    DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax = DataLoopNode::SensedNodeFlagValue;
-    DataLoopNode::Node(thisSys->AirOutNode).HumRatMax = 0.009;
+    state->dataLoopNodes->Node(coolingCoilAirOutletNodeIndex).HumRatMax = DataLoopNode::SensedNodeFlagValue;
+    state->dataLoopNodes->Node(thisSys->AirOutNode).HumRatMax = 0.009;
     Real64 partLoadRatio = thisSys->m_CoolingPartLoadFrac;
 
     thisSys->simulate(*state,
@@ -3672,7 +3671,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
 
     thisSys.m_MultiOrVarSpeedHeatCoil = true;
     thisSys.m_MultiOrVarSpeedCoolCoil = true;
-    DataLoopNode::Node.allocate(1);
+    state->dataLoopNodes->Node.allocate(1);
 
     DataHVACGlobals::MSHPMassFlowRateLow = 0.0;
     DataHVACGlobals::MSHPMassFlowRateHigh = 0.0;
@@ -4142,7 +4141,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     thisSys.m_MultiOrVarSpeedHeatCoil = true;
     thisSys.m_MultiOrVarSpeedCoolCoil = true;
-    DataLoopNode::Node.allocate(10);
+    state->dataLoopNodes->Node.allocate(10);
     state->dataWaterCoils->WaterCoil.allocate(1);
 
     thisSys.m_HeatMassFlowRate.resize(4);
@@ -4209,15 +4208,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
 
     state->dataWaterCoils->WaterCoil(1).AirInletNodeNum = 4;
     state->dataWaterCoils->WaterCoil(1).AirOutletNodeNum = 5;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp = 10.0;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy = 18000;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).HumRat =
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp = 10.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy = 18000;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).HumRat =
         Psychrometrics::PsyWFnTdbH(*state,
-                                   DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp,
-                                   DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy);
+                                   state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp,
+                                   state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy);
 
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMax = AirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMax = AirMassFlowRate;
 
     state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
     state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
@@ -4228,11 +4227,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state->dataWaterCoils->WaterCoil(1).InletWaterTemp = 60.0;
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
@@ -4288,7 +4287,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
 
     thisSys.m_MultiOrVarSpeedHeatCoil = true;
     thisSys.m_MultiOrVarSpeedCoolCoil = true;
-    DataLoopNode::Node.allocate(10);
+    state->dataLoopNodes->Node.allocate(10);
     state->dataWaterCoils->WaterCoil.allocate(1);
 
     thisSys.m_HeatMassFlowRate.resize(4);
@@ -4365,14 +4364,14 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
         Psychrometrics::PsyWFnTdbH(*state, state->dataWaterCoils->WaterCoil(1).InletAirTemp, state->dataWaterCoils->WaterCoil(1).InletAirEnthalpy);
     state->dataWaterCoils->WaterCoil(1).InletWaterTemp = 6.0;
     state->dataWaterCoils->WaterCoil(1).InletAirMassFlowRate = AirMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMax = AirMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp = 30.0;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy = 53000;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).HumRat =
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMax = AirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp = 30.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy = 53000;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).HumRat =
         Psychrometrics::PsyWFnTdbH(*state,
-                                   DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp,
-                                   DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy);
+                                   state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp,
+                                   state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy);
 
     state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
     state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
@@ -4382,11 +4381,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum = 7;
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
@@ -4665,12 +4664,12 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     ControlZoneNum = thisSys->NodeNumOfControlledZone;
 
     // set up unitary system inlet condtions
-    DataLoopNode::Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
-    DataLoopNode::Node(InletNode).HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
-    DataLoopNode::Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
+    state->dataLoopNodes->Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat);
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
 
     // initialize other incidentals that are used within the UnitarySystem module during calculations
     state->dataSize->CurZoneEqNum = 1;
@@ -4703,7 +4702,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -4728,15 +4727,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, thisSys->m_SensibleLoadMet, 0.01); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow * thisSys->m_PartLoadFrac); // cycling fan
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow * thisSys->m_PartLoadFrac); // cycling fan
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
     EXPECT_DOUBLE_EQ(thisSys->m_MoistureLoadPredicted, 0.0); // dehumidification control type = none so MoistureLoad reset o 0
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -1000.0; // cooling load
@@ -4752,7 +4751,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
         state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP;
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;        // initialize weather
     state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -4774,15 +4773,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, thisSys->m_SensibleLoadMet, 0.025); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow * thisSys->m_PartLoadFrac); // cycling fan
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow * thisSys->m_PartLoadFrac); // cycling fan
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
 
     // new tests for #5287, need to add an air loop to do this unit test justice
     EXPECT_TRUE(thisSys->m_FanIndex > 0);                                    // ZoneHVAC must contain a fan object to provide flow
@@ -4811,8 +4810,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, thisSys->m_SensibleLoadMet, 0.025); // Watts
     // test simulate function return value for sysOutputRequired
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, sensOut, 0.025); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow * thisSys->m_PartLoadFrac);   // cycling fan
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow * thisSys->m_PartLoadFrac);   // cycling fan
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
 
     // turn on dehumidification control and check that moisture load is < 0
     thisSys->m_DehumidControlType_Num = UnitarySys::DehumCtrlType::CoolReheat;
@@ -5544,14 +5543,14 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     ControlZoneNum = thisSys->NodeNumOfControlledZone;
 
     // set up unitary system inlet condtions
-    DataLoopNode::Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
-    DataLoopNode::Node(InletNode).HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
-    DataLoopNode::Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
+    state->dataLoopNodes->Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat);
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = DataLoopNode::Node(InletNode).Temp; // set zone temperature, used to determine system delivered capacity
-    DataLoopNode::Node(ControlZoneNum).HumRat =
-        DataLoopNode::Node(InletNode).HumRat; // set zone humidity ratio, used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = state->dataLoopNodes->Node(InletNode).Temp; // set zone temperature, used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).HumRat =
+        state->dataLoopNodes->Node(InletNode).HumRat; // set zone humidity ratio, used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;  // initialize weather
     state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -5585,7 +5584,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0; // ContinuousFanSchedule
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
 
     OutputReportPredefined::SetPredefinedTables(*state);
 
@@ -5612,15 +5611,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 0.01); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow);                              // constant fan
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow);                              // constant fan
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -1000.0; // cooling load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -1000.0;
@@ -5633,7 +5632,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;        // initialize weather
     state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -5652,15 +5651,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->m_CoolMassFlowRate[thisSys->m_CoolingSpeedNum]);
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->m_CoolMassFlowRate[thisSys->m_CoolingSpeedNum]);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
@@ -6006,12 +6005,12 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     ControlZoneNum = thisSys->NodeNumOfControlledZone;
 
     // set up unitary system inlet condtions
-    DataLoopNode::Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
-    DataLoopNode::Node(InletNode).HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
-    DataLoopNode::Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
+    state->dataLoopNodes->Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat);
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;        // initialize weather
     state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -6044,7 +6043,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
 
     OutputReportPredefined::SetPredefinedTables(*state);
 
@@ -6071,18 +6070,18 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 0.01); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow * thisSys->m_PartLoadFrac);    // cycling fan
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow * thisSys->m_PartLoadFrac);    // cycling fan
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
 
     // compare fan RTF with fan PLR and global PLF
-    Real64 FanPLR = DataLoopNode::Node(InletNode).MassFlowRate / Fans::Fan(1).MaxAirMassFlowRate;
+    Real64 FanPLR = state->dataLoopNodes->Node(InletNode).MassFlowRate / Fans::Fan(1).MaxAirMassFlowRate;
     Real64 FanRTF = FanPLR / DataHVACGlobals::OnOffFanPartLoadFraction;
     EXPECT_DOUBLE_EQ(FanRTF, FanPLR);
     EXPECT_DOUBLE_EQ(FanRTF, Fans::Fan(1).FanRuntimeFraction);
@@ -6099,7 +6098,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;        // initialize weather
     state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -6118,19 +6117,19 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate,
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate,
                      thisSys->m_CoolMassFlowRate[thisSys->m_CoolingSpeedNum] * thisSys->m_PartLoadFrac); // cycling fan
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
 
     // compare fan RTF with fan PLR and global PLF
-    FanPLR = DataLoopNode::Node(InletNode).MassFlowRate / Fans::Fan(1).MaxAirMassFlowRate;
+    FanPLR = state->dataLoopNodes->Node(InletNode).MassFlowRate / Fans::Fan(1).MaxAirMassFlowRate;
     // blow thru fan resets OnOffFanPartLoadFraction = 1 so other equipment not using PLF are not affected. OnOffFanPartLoadFraction = 1 here.
     // Unitary System also sets OnOffFanPartLoadFraction = 1 (see end of ReportUnitarySystem) so this variable will = 1
     EXPECT_EQ(1.0, DataHVACGlobals::OnOffFanPartLoadFraction);
@@ -6965,20 +6964,20 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ReportingTest)
     // inlet and outlet air conditions were set for heating
     state->dataUnitarySystems->HeatingLoad = true;
     // set up zone equipment inlet node condtions
-    DataLoopNode::Node(InletNode).Temp = 17.57;
-    DataLoopNode::Node(InletNode).HumRat = 0.007;
-    DataLoopNode::Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
-    DataLoopNode::Node(InletNode).MassFlowRate = 0.25;
+    state->dataLoopNodes->Node(InletNode).Temp = 17.57;
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.007;
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat);
+    state->dataLoopNodes->Node(InletNode).MassFlowRate = 0.25;
     // set  zone equipment outlet node conditions
-    DataLoopNode::Node(OutletNode).Temp = 21.1;
-    DataLoopNode::Node(OutletNode).HumRat = 0.007;
-    DataLoopNode::Node(OutletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat);
-    DataLoopNode::Node(OutletNode).MassFlowRate = 0.25;
+    state->dataLoopNodes->Node(OutletNode).Temp = 21.1;
+    state->dataLoopNodes->Node(OutletNode).HumRat = 0.007;
+    state->dataLoopNodes->Node(OutletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat);
+    state->dataLoopNodes->Node(OutletNode).MassFlowRate = 0.25;
     // set zone conditions
-    DataLoopNode::Node(ControlZoneNum).Temp = 23.0;
-    DataLoopNode::Node(ControlZoneNum).HumRat = 0.0070;
-    DataLoopNode::Node(ControlZoneNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(ControlZoneNum).Temp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 23.0;
+    state->dataLoopNodes->Node(ControlZoneNum).HumRat = 0.0070;
+    state->dataLoopNodes->Node(ControlZoneNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ControlZoneNum).Temp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // calculate the "Unitary System Total Cooling/Heating Rate" report variables
     thisSys->reportUnitarySystem(*state, AirLoopNum);
@@ -8118,13 +8117,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     ControlZoneNum = thisSys->NodeNumOfControlledZone;
 
     // set up unitary system inlet condtions
-    DataLoopNode::Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
-    DataLoopNode::Node(InletNode).HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
-    DataLoopNode::Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat);
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate;
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;        // initialize weather
     state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -8157,7 +8156,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * state->dataEnvrn->StdRhoAir;
 
     OutputReportPredefined::SetPredefinedTables(*state);
     // system output should match RemainingOutputRequired = 1000.0 W (heating mode)
@@ -8185,15 +8184,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 0.01); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow * thisSys->m_PartLoadFrac);    // cycling fan
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow * thisSys->m_PartLoadFrac);    // cycling fan
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -1000.0; // cooling load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -1000.0;
@@ -8206,7 +8205,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;        // initialize weather
     state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -8226,15 +8225,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow * thisSys->m_PartLoadFrac);
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow * thisSys->m_PartLoadFrac);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
 
     // water to air HP coils do not have a Minimum OAT for Compressor Operation input field
     // Unitary System mines data from coil objects
@@ -8454,13 +8453,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     ControlZoneNum = thisSys->NodeNumOfControlledZone;
 
     // set up unitary system inlet condtions
-    DataLoopNode::Node(InletNode).Temp = 20.0;    // zone winter dry-bulb temp
-    DataLoopNode::Node(InletNode).HumRat = 0.005; // dry winter condition
-    DataLoopNode::Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(InletNode).Temp = 20.0;    // zone winter dry-bulb temp
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.005; // dry winter condition
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat);
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate;
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;        // initialize weather
     state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -8494,7 +8493,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0; // constant fan
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * state->dataEnvrn->StdRhoAir;
 
     OutputReportPredefined::SetPredefinedTables(*state);
     // call once to initialize some variables (i.e., min air flow rate not correct on first pass)
@@ -8545,16 +8544,16 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 2.0); // Watts (2.0 = 0.001 * load)
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow);               // low speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);     // inlet = outlet flow rate
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow);               // low speed fan flow
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);     // inlet = outlet flow rate
     // these next 2 variables are used to modulate the coil PLR irrespective of the fan PLR - they are non-zero when the model is called and CAN be 0
     // when load exceeds capacity the ASHRAE model is the only model that uses these variables, and flow is determined by Heat/CoolWaterFlowRatio *
     // max other models will show 0 here and in this case water flow will equal max flow * PartLoadRatio
@@ -8562,14 +8561,14 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);     // cooling coil water flow ratio, cooling coil is off
     EXPECT_NEAR(thisSys->FanPartLoadRatio, thisSys->MaxNoCoolHeatAirMassFlow / thisSys->MaxHeatAirMassFlow,
                 0.0001);                                                          // fan PLR at minimum speed
-    EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature does not exceed max limit
+    EXPECT_LT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature does not exceed max limit
 
     // test with 0 water flow rate to ensure divide by 0 does not happen (plant off, size = 0, etc.)
     Real64 saveSystemHeatWaterFlowRate = thisSys->MaxHeatCoilFluidFlow;
     // test that heating coil was operating prior to the next call to simulate
-    EXPECT_GT(DataLoopNode::Node(thisSys->HeatCoilFluidInletNode).MassFlowRate, 0.0);
+    EXPECT_GT(state->dataLoopNodes->Node(thisSys->HeatCoilFluidInletNode).MassFlowRate, 0.0);
     EXPECT_GT(state->dataWaterCoils->WaterCoil(thisSys->m_HeatingCoilIndex).TotWaterHeatingCoilRate, 0.0);
-    EXPECT_LT(DataLoopNode::Node(thisSys->HeatCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->HeatCoilOutletNodeNum).Temp);
+    EXPECT_LT(state->dataLoopNodes->Node(thisSys->HeatCoilInletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->HeatCoilOutletNodeNum).Temp);
     thisSys->MaxHeatCoilFluidFlow = 0.0;
     // use a smaller heat load so fan heat exceeds the load and the SZVAV model will be called
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 800.0;
@@ -8588,9 +8587,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     // test that heating coil was NOT operating due to this specific test
     // the fact that the unit test proceeded to here means the program did not crash
     EXPECT_EQ(1.0, thisSys->m_HeatingPartLoadFrac);                                   // model tried to turn on coil
-    EXPECT_EQ(0.0, DataLoopNode::Node(thisSys->HeatCoilFluidInletNode).MassFlowRate); // these show coil is off
+    EXPECT_EQ(0.0, state->dataLoopNodes->Node(thisSys->HeatCoilFluidInletNode).MassFlowRate); // these show coil is off
     EXPECT_EQ(0.0, state->dataWaterCoils->WaterCoil(thisSys->m_HeatingCoilIndex).TotWaterHeatingCoilRate);
-    EXPECT_EQ(DataLoopNode::Node(thisSys->HeatCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->HeatCoilOutletNodeNum).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->HeatCoilInletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->HeatCoilOutletNodeNum).Temp);
     // reset for next unit tests
     state->dataUnitarySystems->unitarySys[0].MaxHeatCoilFluidFlow = saveSystemHeatWaterFlowRate;
 
@@ -8619,22 +8618,22 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 6.0); // Watts
-    EXPECT_GT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow); // air flow higher than low speed fan flow
-    EXPECT_LT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow);       // air flow lower than high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
+    EXPECT_GT(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow); // air flow higher than low speed fan flow
+    EXPECT_LT(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow);       // air flow lower than high speed fan flow
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0667, 0.0001); // heating coil water flow ratio, heating coil is on
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);    // cooling coil water flow ratio, cooling coil is off
     EXPECT_NEAR(thisSys->FanPartLoadRatio,
                 0.6198,
                 0.0001); // fan PLR above minimum and below maximum speed (0-1 means fraction between no load flow and full flow)
-    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp, 0.02); // outlet temperature modulated to meet max limit
+    EXPECT_NEAR(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp, 0.02); // outlet temperature modulated to meet max limit
 
     // increase heating load again so that upper temperature limit is exceeded to meet load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 10000.0; // heating load
@@ -8661,18 +8660,18 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 10.0); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.2532, 0.001); // heating coil water flow ratio, heating coil is on
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);   // cooling coil water flow ratio, cooling coil is off
     EXPECT_EQ(thisSys->FanPartLoadRatio, 1.0);                   // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
-    EXPECT_GT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature exceeds max limit
+    EXPECT_GT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature exceeds max limit
 
     // increase heating load again to push water flow rate towards max
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 12000.0; // heating load
@@ -8699,23 +8698,23 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_GT(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys); // Watts - system CANNOT meet load
     EXPECT_NEAR(Qsens_sys, 11316.64, 0.1);                                                                          // system maxed out on capacity
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);      // inlet = outlet flow rate
-    EXPECT_EQ(DataLoopNode::Node(thisSys->HeatCoilFluidInletNode).MassFlowRate, thisSys->MaxHeatCoilFluidFlow); // water coil water flow rate at max
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);      // inlet = outlet flow rate
+    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->HeatCoilFluidInletNode).MassFlowRate, thisSys->MaxHeatCoilFluidFlow); // water coil water flow rate at max
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio,
                 0.0,
                 0.0001); // heating coil water flow ratio not set, heating coil is on since function returned when load exceeded capacity
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001); // cooling coil water flow ratio, cooling coil is off
     EXPECT_EQ(thisSys->FanPartLoadRatio, 1.0);                 // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
-    EXPECT_GT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature exceeds max limit
-    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, 25.85, 0.01); // system allowed to exceed max outlet air temp to meet additional load
+    EXPECT_GT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature exceeds max limit
+    EXPECT_NEAR(state->dataLoopNodes->Node(OutletNode).Temp, 25.85, 0.01); // system allowed to exceed max outlet air temp to meet additional load
 
     // COOLING LOAD
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -2000.0; // cooling load
@@ -8729,9 +8728,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputReqToHeatSP;
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // zone summer dry-bulb temp
-    DataLoopNode::Node(InletNode).Temp = 24.0;      // system inlet node dry-bulb temp
-    DataLoopNode::Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 24.0; // zone summer dry-bulb temp
+    state->dataLoopNodes->Node(InletNode).Temp = 24.0;      // system inlet node dry-bulb temp
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat);
     state->dataEnvrn->OutDryBulbTemp = 35.0; // initialize weather
     state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -8752,20 +8751,20 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 3.0); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow);                       // low speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow);                       // low speed fan flow
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);  // heating coil water flow ratio, heating coil is off
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.103, 0.001); // cooling coil water flow ratio, cooling coil is on
     EXPECT_NEAR(thisSys->FanPartLoadRatio, thisSys->MaxNoCoolHeatAirMassFlow / thisSys->MaxCoolAirMassFlow,
                 0.0001);                                                          // fan PLR at minimum speed
-    EXPECT_GT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature is not below min limit
+    EXPECT_GT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature is not below min limit
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -9000.0; // cooling load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputReqToCoolSP = -9000.0;
@@ -8791,27 +8790,27 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 9.0); // Watts
-    EXPECT_GT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow); // air flow higher than low speed fan flow
-    EXPECT_LT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);       // air flow lower than high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
+    EXPECT_GT(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow); // air flow higher than low speed fan flow
+    EXPECT_LT(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);       // air flow lower than high speed fan flow
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                            // heating coil water flow ratio, heating coil is off
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.396, 0.001);                           // cooling coil water flow ratio, cooling coil is on
     EXPECT_NEAR(thisSys->FanPartLoadRatio, 0.5117, 0.0001);                               // fan PLR above minimum speed
-    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp, 0.09); // outlet temperature modulated to meet max limit
+    EXPECT_NEAR(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMinOutletTemp, 0.09); // outlet temperature modulated to meet max limit
 
     // test with 0 water flow rate to ensure divide by 0 does not happen (plant off, size = 0, etc.)
     Real64 saveSystemCoolWaterFlowRate = thisSys->MaxCoolCoilFluidFlow;
     // test that cooling coil was operating prior to the next call to simulate
-    EXPECT_GT(DataLoopNode::Node(thisSys->CoolCoilFluidInletNode).MassFlowRate, 0.0);
+    EXPECT_GT(state->dataLoopNodes->Node(thisSys->CoolCoilFluidInletNode).MassFlowRate, 0.0);
     EXPECT_GT(state->dataWaterCoils->WaterCoil(thisSys->m_CoolingCoilIndex).TotWaterCoolingCoilRate, 0.0);
-    EXPECT_GT(DataLoopNode::Node(thisSys->CoolCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->CoolCoilOutletNodeNum).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp);
     thisSys->MaxCoolCoilFluidFlow = 0.0;
     thisSys->simulate(*state,
                       thisSys->Name,
@@ -8828,9 +8827,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     // test that cooling coil was NOT operating due to this specific test
     // the fact that the unit test proceeded to here means the program did not crash
     EXPECT_EQ(1.0, thisSys->m_CoolingPartLoadFrac);                                   // model tried to turn on coil
-    EXPECT_EQ(0.0, DataLoopNode::Node(thisSys->CoolCoilFluidInletNode).MassFlowRate); // these show coil is off
+    EXPECT_EQ(0.0, state->dataLoopNodes->Node(thisSys->CoolCoilFluidInletNode).MassFlowRate); // these show coil is off
     EXPECT_EQ(0.0, state->dataWaterCoils->WaterCoil(thisSys->m_CoolingCoilIndex).TotWaterCoolingCoilRate);
-    EXPECT_EQ(DataLoopNode::Node(thisSys->CoolCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->CoolCoilOutletNodeNum).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp);
     // reset for next unit tests
     thisSys->MaxCoolCoilFluidFlow = saveSystemCoolWaterFlowRate;
 
@@ -8858,19 +8857,19 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 18.0); // Watts
-    EXPECT_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);                        // air flow at high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
+    EXPECT_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);                        // air flow at high speed fan flow
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                    // heating coil water flow ratio, heating coil is off
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.803, 0.001);                   // cooling coil water flow ratio, cooling coil is on
     EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);                          // fan PLR at maximum speed
-    EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
+    EXPECT_LT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -22000.0; // cooling load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputReqToCoolSP = -22000.0;
@@ -8896,22 +8895,22 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       sensOut,
                       latOut);
 
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+    ZoneTemp = state->dataLoopNodes->Node(ControlZoneNum).Temp;
+    Qsens_sys = state->dataLoopNodes->Node(InletNode).MassFlowRate *
                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+                    state->dataLoopNodes->Node(OutletNode).Temp, state->dataLoopNodes->Node(OutletNode).HumRat, ZoneTemp, state->dataLoopNodes->Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_LT(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys); // Watts - system CANNOT meet load
-    EXPECT_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);                             // air flow at high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);      // inlet = outlet flow rate
-    EXPECT_EQ(DataLoopNode::Node(thisSys->CoolCoilFluidInletNode).MassFlowRate, thisSys->MaxCoolCoilFluidFlow); // water coil water flow rate at max
+    EXPECT_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);                             // air flow at high speed fan flow
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);      // inlet = outlet flow rate
+    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilFluidInletNode).MassFlowRate, thisSys->MaxCoolCoilFluidFlow); // water coil water flow rate at max
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001); // heating coil water flow ratio, heating coil is off
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio,
                 0.0,
                 0.001); // cooling coil water flow ratio not set, cooling coil is on since function returned when load exceeded capacity
     EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);                          // fan PLR at maximum speed
-    EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
+    EXPECT_LT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
@@ -10186,7 +10185,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     });
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
-    DataLoopNode::Node.allocate(10);
+    state->dataLoopNodes->Node.allocate(10);
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
@@ -10242,13 +10241,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     ControlZoneNum = thisSys->NodeNumOfControlledZone;
 
     // set up unitary system inlet condtions
-    DataLoopNode::Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
-    DataLoopNode::Node(InletNode).HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
-    DataLoopNode::Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
+    state->dataLoopNodes->Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
+    state->dataLoopNodes->Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat);
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 24.0;    // set zone temperature during cooling season used to determine system delivered capacity
-    DataLoopNode::Node(ControlZoneNum).HumRat = 0.001; // set zone temperature during cooling season used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 24.0;    // set zone temperature during cooling season used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNum).HumRat = 0.001; // set zone temperature during cooling season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;           // initialize weather
     state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -10266,7 +10265,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
 
     int Iter;
     state->dataEnvrn->StdRhoAir = 1.2;
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
     Iter = 4;
     thisSys->m_CoolVolumeFlowRate[Iter] = thisSys->m_MaxCoolAirVolFlow * state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[Iter - 1];
     thisSys->m_CoolMassFlowRate[Iter] = thisSys->m_CoolVolumeFlowRate[Iter] * state->dataEnvrn->StdRhoAir;
@@ -11983,11 +11982,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
     EXPECT_FALSE(ErrorsFound); // expect no errors
     EXPECT_FALSE(thisSys->ATMixerExists);
     EXPECT_EQ(1, thisSys->ControlZoneNum);
-    EXPECT_EQ(DataLoopNode::NodeID(2), "EAST ZONE UNITARY SYSTEM INLET");
+    EXPECT_EQ(state->dataLoopNodes->NodeID(2), "EAST ZONE UNITARY SYSTEM INLET");
     EXPECT_EQ(2, thisSys->AirInNode);
-    EXPECT_EQ(DataLoopNode::NodeID(3), "EAST ZONE SUPPLY INLET");
+    EXPECT_EQ(state->dataLoopNodes->NodeID(3), "EAST ZONE SUPPLY INLET");
     EXPECT_EQ(3, thisSys->AirOutNode);
-    EXPECT_EQ(DataLoopNode::NodeID(5), "HEATING COIL AIR INLET NODE");
+    EXPECT_EQ(state->dataLoopNodes->NodeID(5), "HEATING COIL AIR INLET NODE");
     EXPECT_EQ(5, thisSys->HeatCoilInletNodeNum);
 }
 
@@ -12541,8 +12540,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_EQ(UnitarySys::DehumCtrlType::None, thisSys->m_DehumidControlType_Num); // checks Dehumidification Control type type
     EXPECT_EQ(UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone), thisSys->ControlZoneNum); // checks zone ID
     EXPECT_EQ(DataGlobalConstants::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                                   // checks availability schedule name
-    EXPECT_EQ("NODE 29", DataLoopNode::NodeID(thisSys->AirInNode));                                          // checks air inlet node name
-    EXPECT_EQ("NODE 30", DataLoopNode::NodeID(thisSys->AirOutNode));                                         // checks air outlet node name
+    EXPECT_EQ("NODE 29", state->dataLoopNodes->NodeID(thisSys->AirInNode));                                          // checks air inlet node name
+    EXPECT_EQ("NODE 30", state->dataLoopNodes->NodeID(thisSys->AirOutNode));                                         // checks air outlet node name
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, thisSys->m_FanType_Num);                                 // checks fan object type "FAN:ONOFF"
     EXPECT_EQ("SUPPLY FAN", thisSys->m_FanName);                                                             // checks fan object name
     EXPECT_EQ(UnitarySys::FanPlace::DrawThru, thisSys->m_FanPlace);                                          // checks fan placement, "DrawThrough"
@@ -12565,7 +12564,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_EQ(0.0000462180155978106, thisSys->m_MaxNoCoolHeatAirVolFlow); // checks Heating Fraction of Autosized Heating Supply Air Flow Rate value
     EXPECT_EQ(30.0, thisSys->DesignMaxOutletTemp);                        // checks Maximum Supply Air Temperature value
     EXPECT_EQ(20.0, thisSys->m_MaxOATSuppHeat); // checks Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation value
-    EXPECT_EQ("SYSTEM OUTDOOR AIR NODE", DataLoopNode::NodeID(thisSys->m_CondenserNodeNum)); // checks condenser air inlet node name
+    EXPECT_EQ("SYSTEM OUTDOOR AIR NODE", state->dataLoopNodes->NodeID(thisSys->m_CondenserNodeNum)); // checks condenser air inlet node name
     EXPECT_EQ(3.0, thisSys->m_MaxONOFFCyclesperHour);                                        // checks Maximum Cycling Rate value
     EXPECT_EQ(120.0, thisSys->m_HPTimeConstant);                                             // checks Heat Pump Time Constant value
     EXPECT_EQ(0.02, thisSys->m_OnCyclePowerFraction);                                        // checks Fraction of On-Cycle Power Use value
@@ -12574,8 +12573,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_EQ(10.0, thisSys->m_AncillaryOffPower);                                           // checks Ancillary Off-Cycle Electric Power value
     EXPECT_EQ(0.005, thisSys->m_DesignHRWaterVolumeFlow);                                    // checks Design Heat Recovery Water Flow Rate value
     EXPECT_EQ(75.0, thisSys->m_MaxHROutletWaterTemp);                                        // checks Maximum Temperature for Heat Recovery value
-    EXPECT_EQ("WATER INLET NODE NAME", DataLoopNode::NodeID(thisSys->m_HeatRecoveryInletNodeNum));   // checks Heat Recovery Water Inlet Node Name ID
-    EXPECT_EQ("WATER OUTLET NODE NAME", DataLoopNode::NodeID(thisSys->m_HeatRecoveryOutletNodeNum)); // checks Heat Recovery Water Outlet Node Name ID
+    EXPECT_EQ("WATER INLET NODE NAME", state->dataLoopNodes->NodeID(thisSys->m_HeatRecoveryInletNodeNum));   // checks Heat Recovery Water Inlet Node Name ID
+    EXPECT_EQ("WATER OUTLET NODE NAME", state->dataLoopNodes->NodeID(thisSys->m_HeatRecoveryOutletNodeNum)); // checks Heat Recovery Water Outlet Node Name ID
     EXPECT_EQ("UNITARYSYSTEMPERFORMANCE:MULTISPEED",
               thisSys->m_DesignSpecMultispeedHPType);                           // checks design_specification_multispeed_object_type value
     EXPECT_EQ("MULTISPEED PERFORMANCE", thisSys->m_DesignSpecMultispeedHPName); // checks design_specification_multispeed_object_name value
@@ -14430,22 +14429,22 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -200.0;
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -200.0 / 2500940.0;
     // test COOLING condition
-    DataLoopNode::Node(1).Temp = 24.0;      // 24C db
-    DataLoopNode::Node(1).HumRat = 0.01522; // 17C wb
-    DataLoopNode::Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(1).Temp, DataLoopNode::Node(1).HumRat);
+    state->dataLoopNodes->Node(1).Temp = 24.0;      // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.01522; // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
-    state->dataHeatBalFanSys->MAT(1) = DataLoopNode::Node(1).Temp;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
+    state->dataHeatBalFanSys->MAT(1) = state->dataLoopNodes->Node(1).Temp;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempControlType(1) = 4;
-    DataLoopNode::Node(8).Temp = 23.822;        // 24C db
-    DataLoopNode::Node(8).HumRat = 0.0145946;   // 17C wb
-    DataLoopNode::Node(8).Enthalpy = 61084.266; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(8).Temp = 23.822;        // 24C db
+    state->dataLoopNodes->Node(8).HumRat = 0.0145946;   // 17C wb
+    state->dataLoopNodes->Node(8).Enthalpy = 61084.266; // www.sugartech.com/psychro/index.php
     Real64 SenOutput;
     Real64 LatOutput;
 
@@ -14476,13 +14475,13 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     // OperatingMode 3 with mode ratio < 1
     thisSys->m_ZoneSequenceCoolingNum = 0;
     thisSys->m_ZoneSequenceHeatingNum = 0;
-    DataLoopNode::Node(1).HumRat = 0.0114544;   // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 53273.99;  // www.sugartech.com/psychro/index.php
-    DataLoopNode::Node(8).Temp = 24.18496;      // 24C db
-    DataLoopNode::Node(8).HumRat = 0.0121542;   // 17C wb
-    DataLoopNode::Node(8).Enthalpy = 55245.434; // www.sugartech.com/psychro/index.php
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
-    state->dataHeatBalFanSys->MAT(1) = DataLoopNode::Node(1).Temp;
+    state->dataLoopNodes->Node(1).HumRat = 0.0114544;   // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 53273.99;  // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(8).Temp = 24.18496;      // 24C db
+    state->dataLoopNodes->Node(8).HumRat = 0.0121542;   // 17C wb
+    state->dataLoopNodes->Node(8).Enthalpy = 55245.434; // www.sugartech.com/psychro/index.php
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
+    state->dataHeatBalFanSys->MAT(1) = state->dataLoopNodes->Node(1).Temp;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -397.162;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -397.162;
@@ -15631,31 +15630,31 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     // Test direct solution
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
-    DataLoopNode::Node.redimension(7);
-    DataLoopNode::Node(1).Temp = 24.0;      // 24C db
-    DataLoopNode::Node(1).HumRat = 0.01522; // 17C wb
-    DataLoopNode::Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(1).Temp, DataLoopNode::Node(1).HumRat);
+    state->dataLoopNodes->Node.redimension(7);
+    state->dataLoopNodes->Node(1).Temp = 24.0;      // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.01522; // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
-    state->dataHeatBalFanSys->MAT(1) = DataLoopNode::Node(1).Temp;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
+    state->dataHeatBalFanSys->MAT(1) = state->dataLoopNodes->Node(1).Temp;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempControlType(1) = 4;
-    DataLoopNode::Node(7).FluidType = 1;
-    DataLoopNode::Node(7).Temp = 24.0;                               // 24C db
-    DataLoopNode::Node(7).HumRat = 0.01522;                          // 17C wb
-    DataLoopNode::Node(7).Enthalpy = DataLoopNode::Node(1).Enthalpy; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(7).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(7).Temp = 24.0;                               // 24C db
+    state->dataLoopNodes->Node(7).HumRat = 0.01522;                          // 17C wb
+    state->dataLoopNodes->Node(7).Enthalpy = state->dataLoopNodes->Node(1).Enthalpy; // www.sugartech.com/psychro/index.php
     thisSys->NodeNumOfControlledZone = 7;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -227.705;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -227.705;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -50.0;
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -0.007806893;
     state->dataEnvrn->StdRhoAir = 1.2043;
-    DataLoopNode::Node(3).MassFlowRateMax = 1.5 * state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(3).MassFlowRateMax = 1.5 * state->dataEnvrn->StdRhoAir;
     int CompIndex = 1;
     bool HeatActive = false;
     bool CoolActive = true;
@@ -15737,16 +15736,14 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTest) {
     DataHVACGlobals::TimeStepSys = 0.25;
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     UnitarySys thisSys;
     thisSys.AirInNode = 1;
     thisSys.AirOutNode = 2;
     thisSys.m_AncillaryOnPower = 100.0;
     thisSys.m_AncillaryOffPower = 50.0;
     thisSys.m_ControlType = UnitarySys::ControlType::Setpoint;
-    EnergyPlusData state;
-    state.dataUnitarySystems = std::unique_ptr<UnitarySystemsData>(new UnitarySystemsData);
-    state.dataUnitarySystems->unitarySys.push_back(thisSys);
+    state->dataUnitarySystems->unitarySys.push_back(thisSys);
     Real64 onElectricEnergy =
             thisSys.m_AncillaryOnPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     Real64 offElectricEnergy =
@@ -15754,9 +15751,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
 
     thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoSpeed;
     thisSys.m_HeatingCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
-    thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
-    state.dataUnitarySystems->CoolingLoad = true;
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.m_LastMode = state->dataUnitarySystems->CoolingMode;
+    state->dataUnitarySystems->CoolingLoad = true;
+    thisSys.reportUnitarySystem(*state, 0);
     // cooling coil is off
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001);
@@ -15764,20 +15761,21 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOffPower, 0.000001);
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
 
+
     // cooling coil is on
     thisSys.m_CoolingCycRatio = 1.0;
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, onElectricEnergy, 0.000001);
     EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);
     EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOnPower, 0.000001);
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
 
-    state.dataUnitarySystems->CoolingLoad = false;
-    state.dataUnitarySystems->HeatingLoad = true;
+    state->dataUnitarySystems->CoolingLoad = false;
+    state->dataUnitarySystems->HeatingLoad = true;
     thisSys.m_CoolingCycRatio = 0.0;
     thisSys.m_HeatingPartLoadFrac = 0.0;
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     // heating coil is off
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001); // last mode is cooling mode
@@ -15786,9 +15784,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
 
     // heating coil is on
-    thisSys.m_LastMode = state.dataUnitarySystems->HeatingMode;
+    thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
     thisSys.m_HeatingPartLoadFrac = 1.0;
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, 0.0, 0.000001);              // last mode is heating mode
     EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, onElectricEnergy, 0.000001); // heating coil is on
@@ -15796,7 +15794,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
 
     thisSys.m_HeatingPartLoadFrac = 0.5; // test PLR other than 0 or 1
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     // average power and energy should be in between on and off values
     Real64 ancillaryAvgPower = (thisSys.m_AncillaryOnPower + thisSys.m_AncillaryOffPower) / 2.0;
     Real64 ancillaryAvgEnergy = (onElectricEnergy + offElectricEnergy) / 2.0;
@@ -15816,11 +15814,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     thisSys.m_AncillaryOffPower = 100.0;
     onElectricEnergy = thisSys.m_AncillaryOnPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     offElectricEnergy = thisSys.m_AncillaryOffPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-    thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
+    thisSys.m_LastMode = state->dataUnitarySystems->CoolingMode;
     thisSys.m_HeatingPartLoadFrac = 0.0;
-    state.dataUnitarySystems->HeatingLoad = false;
-    state.dataUnitarySystems->CoolingLoad = true;
-    thisSys.reportUnitarySystem(state, 0);
+    state->dataUnitarySystems->HeatingLoad = false;
+    state->dataUnitarySystems->CoolingLoad = true;
+    thisSys.reportUnitarySystem(*state, 0);
     // cooling coil is off
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001);
@@ -15830,18 +15828,18 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
 
     // cooling coil is on
     thisSys.m_CoolingCycRatio = 1.0;
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, onElectricEnergy, 0.000001);
     EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);
     EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOnPower, 0.000001);
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
 
-    state.dataUnitarySystems->CoolingLoad = false;
-    state.dataUnitarySystems->HeatingLoad = true;
+    state->dataUnitarySystems->CoolingLoad = false;
+    state->dataUnitarySystems->HeatingLoad = true;
     thisSys.m_CoolingCycRatio = 0.0;
     thisSys.m_HeatingPartLoadFrac = 0.0;
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     // heating coil is off
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001); // last mode is cooling mode
@@ -15850,9 +15848,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
 
     // heating coil is on
-    thisSys.m_LastMode = state.dataUnitarySystems->HeatingMode;
+    thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
     thisSys.m_HeatingPartLoadFrac = 1.0;
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, 0.0, 0.000001);              // last mode is heating mode
     EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, onElectricEnergy, 0.000001); // heating coil is on
@@ -15860,7 +15858,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
 
     thisSys.m_HeatingPartLoadFrac = 0.5; // test PLR other than 0 or 1
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     // average power and energy should be in between on and off values
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, ancillaryAvgPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, 0.0, 0.000001); // last mode is heating mode
@@ -15871,11 +15869,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     // test with non-discrete speed water coils
     // coil runs the entire time step
     thisSys.m_DiscreteSpeedCoolingCoil = false;
-    thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
+    thisSys.m_LastMode = state->dataUnitarySystems->CoolingMode;
     thisSys.m_HeatingPartLoadFrac = 0.0;
-    state.dataUnitarySystems->HeatingLoad = false;
-    state.dataUnitarySystems->CoolingLoad = true;
-    thisSys.reportUnitarySystem(state, 0);
+    state->dataUnitarySystems->HeatingLoad = false;
+    state->dataUnitarySystems->CoolingLoad = true;
+    thisSys.reportUnitarySystem(*state, 0);
     // cooling coil is off
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001);
@@ -15885,18 +15883,18 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
 
     // cooling coil is on
     thisSys.m_CoolingPartLoadFrac = 1.0;
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, onElectricEnergy, 0.000001);
     EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);
     EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOnPower, 0.000001);
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
 
-    state.dataUnitarySystems->CoolingLoad = false;
-    state.dataUnitarySystems->HeatingLoad = true;
+    state->dataUnitarySystems->CoolingLoad = false;
+    state->dataUnitarySystems->HeatingLoad = true;
     thisSys.m_CoolingPartLoadFrac = 0.0;
     thisSys.m_HeatingPartLoadFrac = 0.0;
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     // heating coil is off
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001); // last mode is cooling mode
@@ -15905,9 +15903,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
 
     // heating coil is on
-    thisSys.m_LastMode = state.dataUnitarySystems->HeatingMode;
+    thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
     thisSys.m_HeatingPartLoadFrac = 1.0;
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, 0.0, 0.000001);              // last mode is heating mode
     EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, onElectricEnergy, 0.000001); // heating coil is on
@@ -15915,7 +15913,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
 
     thisSys.m_HeatingPartLoadFrac = 0.5; // test PLR other than 0 or 1
-    thisSys.reportUnitarySystem(state, 0);
+    thisSys.reportUnitarySystem(*state, 0);
     // average power and energy should be in between on and off values
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, ancillaryAvgPower, 0.000001);
     EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, 0.0, 0.000001); // last mode is heating mode
@@ -16239,20 +16237,20 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test HEATING condition
-    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(1).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     // Heating coil air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
     // Heating coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 25.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 25.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -16273,9 +16271,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(2).Temp, DataLoopNode::Node(3).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoilStptNodeTest)
@@ -16435,20 +16433,20 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoilStptNodeTest)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test HEATING condition
-    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(1).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(1).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     // Heating coil air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
     // Heating coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 25.0;
+    state->dataLoopNodes->Node(2).TempSetPoint = 25.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -16469,9 +16467,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoilStptNodeTest)
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(2).Temp, DataLoopNode::Node(3).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
@@ -16703,15 +16701,15 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
     thisSys->AirInNode = 3;
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // indicate zone data is available
-    DataLoopNode::NodeID.allocate(20);
-    DataLoopNode::NodeID(20) = "East Zone Air Node";
+    state->dataLoopNodes->NodeID.allocate(20);
+    state->dataLoopNodes->NodeID(20) = "East Zone Air Node";
     state->dataHeatBal->ZoneIntGain.allocate(1);
     state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
     state->dataHeatBal->RefrigCaseCredit.allocate(1);
     state->dataHeatBal->RefrigCaseCredit(1).SenCaseCreditToZone = 0;
-    DataLoopNode::Node.allocate(20);
-    DataLoopNode::Node(20).Temp = 24.0;      // 24C db
-    DataLoopNode::Node(20).HumRat = 0.00922; // 17C wb
+    state->dataLoopNodes->Node.allocate(20);
+    state->dataLoopNodes->Node(20).Temp = 24.0;      // 24C db
+    state->dataLoopNodes->Node(20).HumRat = 0.00922; // 17C wb
 
     RefrigeratedCase::ManageRefrigeratedCaseRacks(*state);
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
@@ -16749,20 +16747,20 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    DataLoopNode::Node(3).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(3).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(3).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test HEATING condition
-    DataLoopNode::Node(3).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(3).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(3).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(3).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(3).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(3).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     // Heating coil air inlet node = 4
-    DataLoopNode::Node(4).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(4).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
     // Heating coil air outlet node = 5
-    DataLoopNode::Node(5).TempSetPoint = 25.0;
+    state->dataLoopNodes->Node(5).TempSetPoint = 25.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -16783,7 +16781,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(5).Temp, DataLoopNode::Node(5).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(5).Temp, state->dataLoopNodes->Node(5).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(5).Temp, DataLoopNode::Node(4).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(5).Temp, state->dataLoopNodes->Node(4).Temp);
 }

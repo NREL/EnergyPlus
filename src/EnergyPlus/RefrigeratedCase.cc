@@ -2273,7 +2273,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     // Node identification reserved for future use.  Currently exchange energy directly with zone outside any air system
                     // AirChillerSet(SetID)%NodeNumInlet = &
                     //       NodeInputManager::GetOnlySingleNode(state, Alphas(AlphaNum),ErrorsFound,TRIM(CurrentModuleObject), &
-                    //                    AirChillerSet(SetID)%Name,DataLoopNode::NodeType_Air,DataLoopNode::NodeConnectionType_Inlet,1,DataLoopNode::ObjectIsNotParent)
+                    //                    AirChillerSet(SetID)%Name,DataLoopNode::NodeFluidType::Air,DataLoopNode::NodeConnectionType::Inlet,1,DataLoopNode::ObjectIsNotParent)
                 }
 
                 ++AlphaNum;
@@ -2283,7 +2283,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     // Node identification reserved for future use.  Currently exchange energy directly with zone outside any air system
                     // AirChillerSet(SetID)%NodeNumOutlet = &
                     //         NodeInputManager::GetOnlySingleNode(state, Alphas(AlphaNum),ErrorsFound,TRIM(CurrentModuleObject), &
-                    //                      AirChillerSet(SetID)%Name,DataLoopNode::NodeType_Air,DataLoopNode::NodeConnectionType_Outlet,1,DataLoopNode::ObjectIsNotParent)
+                    //                      AirChillerSet(SetID)%Name,DataLoopNode::NodeFluidType::Air,DataLoopNode::NodeConnectionType::Outlet,1,DataLoopNode::ObjectIsNotParent)
                 }
 
                 // An extensible list is used to enter the individual names of each chiller in the set.
@@ -2493,16 +2493,16 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1),
-                                                                                        DataLoopNode::NodeType_Water,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        DataLoopNode::NodeFluidType::Water,
+                                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                     RefrigRack(RackNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, Alphas(7),
                                                                                          ErrorsFound,
                                                                                          CurrentModuleObject,
                                                                                          Alphas(1),
-                                                                                         DataLoopNode::NodeType_Water,
-                                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                                         DataLoopNode::NodeFluidType::Water,
+                                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     // Check node connections
@@ -2635,8 +2635,8 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                               ErrorsFound,
                                                                               CurrentModuleObject,
                                                                               Alphas(1),
-                                                                                                DataLoopNode::NodeType_Air,
-                                                                                                DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                                DataLoopNode::NodeFluidType::Air,
+                                                                                                DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                               1,
                                                                                                 DataLoopNode::ObjectIsParent);
                     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, RefrigRack(RackNum).OutsideAirNodeNum)) {
@@ -2927,8 +2927,8 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                    ErrorsFound,
                                                                                    CurrentModuleObject,
                                                                                    Alphas(1),
-                                                                    DataLoopNode::NodeType_Air,
-                                                                    DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                    1,
                                                                     DataLoopNode::ObjectIsParent);
                             if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Condenser(CondNum).InletAirNodeNum)) {
@@ -3091,8 +3091,8 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                ErrorsFound,
                                                                                CurrentModuleObject,
                                                                                Alphas(1),
-                                                                                                 DataLoopNode::NodeType_Air,
-                                                                                                 DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                                                 DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                1,
                                                                                                  DataLoopNode::ObjectIsParent);
                         if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Condenser(CondNum).InletAirNodeNum)) {
@@ -3249,16 +3249,16 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                        ErrorsFound,
                                                                                        CurrentModuleObject,
                                                                                        Alphas(1),
-                                                                                       DataLoopNode::NodeType_Water,
-                                                                                       DataLoopNode::NodeConnectionType_Inlet,
+                                                                                       DataLoopNode::NodeFluidType::Water,
+                                                                                       DataLoopNode::NodeConnectionType::Inlet,
                                                                                        1,
                                                                                        DataLoopNode::ObjectIsNotParent);
                     Condenser(CondNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, Alphas(3),
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1),
-                                                                                        DataLoopNode::NodeType_Water,
-                                                                                        DataLoopNode::NodeConnectionType_Outlet,
+                                                                                        DataLoopNode::NodeFluidType::Water,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                     // Check node connections
@@ -3567,8 +3567,8 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                  ErrorsFound,
                                                                                  CurrentModuleObject,
                                                                                  Alphas(1),
-                                                                    DataLoopNode::NodeType_Air,
-                                                                    DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                  1,
                                                                     DataLoopNode::ObjectIsParent);
                             if (!OutAirNodeManager::CheckOutAirNodeNumber(state, GasCooler(GCNum).InletAirNodeNum)) {
@@ -9173,7 +9173,8 @@ namespace EnergyPlus::RefrigeratedCase {
                         Condenser(RefCondLoop).MassFlowRateMax = Condenser(RefCondLoop).VolFlowRateMax * rho;
                     }
 
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                        Condenser(RefCondLoop).MassFlowRateMax,
                                        Condenser(RefCondLoop).InletNode,
                                        Condenser(RefCondLoop).OutletNode,
@@ -9197,7 +9198,8 @@ namespace EnergyPlus::RefrigeratedCase {
                         RefrigRack(RefCompRackLoop).MassFlowRateMax = RefrigRack(RefCompRackLoop).VolFlowRateMax * rho;
                     }
 
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                        RefrigRack(RefCompRackLoop).MassFlowRateMax,
                                        RefrigRack(RefCompRackLoop).InletNode,
                                        RefrigRack(RefCompRackLoop).OutletNode,
@@ -9335,12 +9337,12 @@ namespace EnergyPlus::RefrigeratedCase {
         }         // NumWalkIns>0
 
         if (this->HeatRejectionLocation == iLocation::Zone) {
-            COPFTempOutput = CurveManager::CurveValue(state, this->COPFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp);
+            COPFTempOutput = CurveManager::CurveValue(state, this->COPFTempPtr, state.dataLoopNodes->Node(HeatRejectZoneNodeNum).Temp);
             EvapAvail = false;
         } else {
             if (this->OutsideAirNodeNum != 0) {
-                OutDbTemp = DataLoopNode::Node(this->OutsideAirNodeNum).Temp;
-                BPress = DataLoopNode::Node(this->OutsideAirNodeNum).Press;
+                OutDbTemp = state.dataLoopNodes->Node(this->OutsideAirNodeNum).Temp;
+                BPress = state.dataLoopNodes->Node(this->OutsideAirNodeNum).Press;
             } else {
                 OutDbTemp = state.dataEnvrn->OutDryBulbTemp;
                 BPress = state.dataEnvrn->OutBaroPress;
@@ -9362,7 +9364,7 @@ namespace EnergyPlus::RefrigeratedCase {
             if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && EvapAvail) {
                 // determine temps for evap cooling
                 if (this->OutsideAirNodeNum != 0) {
-                    HumRatIn = DataLoopNode::Node(this->OutsideAirNodeNum).HumRat;
+                    HumRatIn = state.dataLoopNodes->Node(this->OutsideAirNodeNum).HumRat;
                 } else {
                     HumRatIn = state.dataEnvrn->OutHumRat;
                 } // outsideairnode
@@ -9372,8 +9374,8 @@ namespace EnergyPlus::RefrigeratedCase {
 
             // Obtain water-cooled condenser inlet/outlet temps
             if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
-                this->InletTemp = DataLoopNode::Node(this->InletNode).Temp;
-                EffectTemp = DataLoopNode::Node(this->InletNode).Temp + 5.0; // includes approach temp
+                this->InletTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
+                EffectTemp = state.dataLoopNodes->Node(this->InletNode).Temp + 5.0; // includes approach temp
                 if (this->InletTemp < this->InletTempMin) {
                     if (this->LowTempWarnIndex == 0) {
                         ShowWarningMessage(state, "Refrigeration:CompressorRack: " + this->Name);
@@ -9410,7 +9412,7 @@ namespace EnergyPlus::RefrigeratedCase {
             if (this->TotCondFTempPtr != 0) {
                 if (this->HeatRejectionLocation == iLocation::Zone) {
                     CondenserFrac =
-                        max(0.0, min(1.0, CurveManager::CurveValue(state, this->TotCondFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp)));
+                        max(0.0, min(1.0, CurveManager::CurveValue(state, this->TotCondFTempPtr, state.dataLoopNodes->Node(HeatRejectZoneNodeNum).Temp)));
                     state.dataRefrigCase->TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
                     state.dataHeatBal->RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += this->CondenserFanPower * CondenserFrac;
                 } else {
@@ -9591,13 +9593,13 @@ namespace EnergyPlus::RefrigeratedCase {
         state.dataRefrigCase->CaseRAFactor = 0.0;
 
         // Zone relative humidity (%)
-        Real64 ZoneRHPercent = Psychrometrics::PsyRhFnTdbWPb(state, DataLoopNode::Node(this->ZoneNodeNum).Temp,
-                                                             DataLoopNode::Node(this->ZoneNodeNum).HumRat,
+        Real64 ZoneRHPercent = Psychrometrics::PsyRhFnTdbWPb(state, state.dataLoopNodes->Node(this->ZoneNodeNum).Temp,
+                                                             state.dataLoopNodes->Node(this->ZoneNodeNum).HumRat,
                                                              state.dataEnvrn->OutBaroPress) *
                                100.0;
 
         // Zone dew point (C)
-        Real64 ZoneDewPoint = Psychrometrics::PsyTdpFnWPb(state, DataLoopNode::Node(this->ZoneNodeNum).HumRat, state.dataEnvrn->OutBaroPress);
+        Real64 ZoneDewPoint = Psychrometrics::PsyTdpFnWPb(state, state.dataLoopNodes->Node(this->ZoneNodeNum).HumRat, state.dataEnvrn->OutBaroPress);
 
         // Display case operating temperature
         Real64 TCase = this->Temperature;
@@ -9680,7 +9682,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 TotalAntiSweat = max(this->MinimumASPower, TotalAntiSweat);
             } else if (SELECT_CASE_var == iASHtrCtrlType::HeatBalance) {
                 if (this->Rcase > 0.0) {
-                    TotalAntiSweat = (((ZoneDewPoint - DataLoopNode::Node(this->ZoneNodeNum).Temp) * this->Height / Rair) +
+                    TotalAntiSweat = (((ZoneDewPoint - state.dataLoopNodes->Node(this->ZoneNodeNum).Temp) * this->Height / Rair) +
                                       ((ZoneDewPoint - TCase) * this->Height / this->Rcase));
                     TotalAntiSweat = min(this->AntiSweatPower, max(this->MinimumASPower, TotalAntiSweat));
                 } else {
@@ -9725,7 +9727,7 @@ namespace EnergyPlus::RefrigeratedCase {
         //  extra insulation, e.g. night covers, or imitating a better insulated walk-in cooler)
 
         // used to look at extra sensible load due to excursions in zone T
-        Real64 ZoneTempFactor = (DataLoopNode::Node(ZoneNodeNum).Temp - TCase) / (this->RatedAmbientTemp - TCase);
+        Real64 ZoneTempFactor = (state.dataLoopNodes->Node(ZoneNodeNum).Temp - TCase) / (this->RatedAmbientTemp - TCase);
         SensibleLoadPrime = this->DesignSensCaseCredit * ZoneTempFactor * CaseCreditFraction;
 
         // Sensible load due to heaters, lighting (W)
@@ -10118,7 +10120,7 @@ namespace EnergyPlus::RefrigeratedCase {
         this->VolFlowRate = this->MassFlowRate / rho;
 
         if (this->MassFlowRate > 0) {
-            this->OutletTemp = state.dataRefrigCase->TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
+            this->OutletTemp = state.dataRefrigCase->TotalCondenserHeat / (this->MassFlowRate * Cp) + state.dataLoopNodes->Node(PlantInletNode).Temp;
         } else {
             this->OutletTemp = this->InletTemp;
             if ((state.dataRefrigCase->TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
@@ -10278,7 +10280,7 @@ namespace EnergyPlus::RefrigeratedCase {
         this->VolFlowRate = this->MassFlowRate / rho;
 
         if (this->MassFlowRate > 0) {
-            this->OutletTemp = state.dataRefrigCase->TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
+            this->OutletTemp = state.dataRefrigCase->TotalCondenserHeat / (this->MassFlowRate * Cp) + state.dataLoopNodes->Node(PlantInletNode).Temp;
         } else {
             this->OutletTemp = this->InletTemp;
             if ((state.dataRefrigCase->TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
@@ -10320,7 +10322,7 @@ namespace EnergyPlus::RefrigeratedCase {
         PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
 
         // Set outlet node variables that are possibly changed
-        DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
     }
 
     void RefrigRackData::UpdateCondenser(EnergyPlusData &state)
@@ -10339,7 +10341,7 @@ namespace EnergyPlus::RefrigeratedCase {
         PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
 
         // Set outlet node variables that are possibly changed
-        DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
         }
 
     void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
@@ -10500,7 +10502,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 //  in the total secondary system loads.
                 System(SysNum).PipeHeatLoad = 0.0;
                 if (System(SysNum).SumUASuctionPiping > MySmallNumber) {
-                    Real64 SuctionPipeZoneTemp = DataLoopNode::Node(System(SysNum).SuctionPipeZoneNodeNum)
+                    Real64 SuctionPipeZoneTemp = state.dataLoopNodes->Node(System(SysNum).SuctionPipeZoneNodeNum)
                                                      .Temp; // Temperature for zone identified as environment for suction pipe heat gains, C
                     System(SysNum).PipeHeatLoad = System(SysNum).SumUASuctionPiping * (SuctionPipeZoneTemp - System(SysNum).TEvapNeeded);
                     // pipe heat load is a positive number (ie. heat absorbed by pipe, so needs to be subtracted
@@ -10616,7 +10618,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                 // 15C is delta T at rating point for evap-cooled condensers
                             } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeWater) {
                                 // define starting estimate at temperature of water exiting condenser
-                                System(SysNum).TCondense = DataLoopNode::Node(Condenser(System(SysNum).CondenserNum(1)).OutletNode).Temp;
+                                System(SysNum).TCondense = state.dataLoopNodes->Node(Condenser(System(SysNum).CondenserNum(1)).OutletNode).Temp;
                             } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeCascade) {
                                 //?Don't need estimate for cascade condenser because it doesn't iterate?
                             }
@@ -10866,7 +10868,7 @@ namespace EnergyPlus::RefrigeratedCase {
             //  gas cooler and compressor loads.
             TransSystem(SysNum).PipeHeatLoadMT = 0.0;
             if (TransSystem(SysNum).SumUASuctionPipingMT > MySmallNumber) {
-                Real64 SuctionPipeZoneTemp = DataLoopNode::Node(TransSystem(SysNum).SuctionPipeZoneNodeNumMT).Temp;
+                Real64 SuctionPipeZoneTemp = state.dataLoopNodes->Node(TransSystem(SysNum).SuctionPipeZoneNodeNumMT).Temp;
                 TransSystem(SysNum).PipeHeatLoadMT =
                     TransSystem(SysNum).SumUASuctionPipingMT * (SuctionPipeZoneTemp - TransSystem(SysNum).TEvapNeededMT);
                 // pipe heat load is a positive number (ie. heat absorbed by pipe, so needs to be subtracted
@@ -10880,7 +10882,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
             TransSystem(SysNum).PipeHeatLoadLT = 0.0;
             if (TransSystem(SysNum).SumUASuctionPipingLT > MySmallNumber) {
-                Real64 SuctionPipeZoneTemp = DataLoopNode::Node(TransSystem(SysNum).SuctionPipeZoneNodeNumLT).Temp;
+                Real64 SuctionPipeZoneTemp = state.dataLoopNodes->Node(TransSystem(SysNum).SuctionPipeZoneNodeNumLT).Temp;
                 TransSystem(SysNum).PipeHeatLoadLT =
                     TransSystem(SysNum).SumUASuctionPipingLT * (SuctionPipeZoneTemp - TransSystem(SysNum).TEvapNeededLT);
                 // pipe heat load is a positive number (ie. heat absorbed by pipe, so needs to be subtracted
@@ -11293,8 +11295,8 @@ namespace EnergyPlus::RefrigeratedCase {
         //   Note, if condensing temperature falls below minimum, get warning and reset but no change in water-side calculations.
         if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
             // Obtain water-cooled condenser inlet/outlet temps
-            condenser.InletTemp = DataLoopNode::Node(condenser.InletNode).Temp;
-            TCondCalc = DataLoopNode::Node(condenser.InletNode).Temp + condenser.RatedApproachT;
+            condenser.InletTemp = state.dataLoopNodes->Node(condenser.InletNode).Temp;
+            TCondCalc = state.dataLoopNodes->Node(condenser.InletNode).Temp + condenser.RatedApproachT;
             if ((condenser.InletTemp < condenser.InletTempMin) || (TCondCalc < this->TCondenseMin)) {
                 this->TCondense = this->TCondenseMin;
                 // condenser.LowTempWarn += 1;
@@ -11322,9 +11324,9 @@ namespace EnergyPlus::RefrigeratedCase {
             //    But evaporative condensers cannot.
             // Provides effective condensing temperature for air-cooled condenser (or evap if evap is scheduled off)
             if (condenser.InletAirNodeNum != 0) {
-                OutDbTemp = DataLoopNode::Node(condenser.InletAirNodeNum).Temp;
-                BPress = DataLoopNode::Node(condenser.InletAirNodeNum).Press;
-                HumRatIn = DataLoopNode::Node(condenser.InletAirNodeNum).HumRat;
+                OutDbTemp = state.dataLoopNodes->Node(condenser.InletAirNodeNum).Temp;
+                BPress = state.dataLoopNodes->Node(condenser.InletAirNodeNum).Press;
+                HumRatIn = state.dataLoopNodes->Node(condenser.InletAirNodeNum).HumRat;
             } else {
                 OutDbTemp = state.dataEnvrn->OutDryBulbTemp;
                 BPress = state.dataEnvrn->OutBaroPress;
@@ -11628,7 +11630,7 @@ namespace EnergyPlus::RefrigeratedCase {
         // See whether gas cooler is at ground level or if other air conditions (ie node) have been specified.
         // Note that air-cooled gas coolers can draw air from, and reject heat to, a conditioned zone.
         if (GasCooler(GasCoolerID).InletAirNodeNum != 0) {
-            OutDbTemp = DataLoopNode::Node(GasCooler(GasCoolerID).InletAirNodeNum).Temp;
+            OutDbTemp = state.dataLoopNodes->Node(GasCooler(GasCoolerID).InletAirNodeNum).Temp;
         } else {
             OutDbTemp = state.dataEnvrn->OutDryBulbTemp;
         }
@@ -12832,7 +12834,7 @@ namespace EnergyPlus::RefrigeratedCase {
                               RefrigCase(CaseID).Name,
                               RefrigCase(CaseID).ZoneName,
                               RefrigCase(CaseID).ZoneNodeNum,
-                              DataLoopNode::NodeID(RefrigCase(CaseID).ZoneNodeNum),
+                              state.dataLoopNodes->NodeID(RefrigCase(CaseID).ZoneNodeNum),
                               RefrigCase(CaseID).RateTotCapPerLength,
                               RefrigCase(CaseID).RatedLHR,
                               RefrigCase(CaseID).Temperature,
@@ -12910,7 +12912,7 @@ namespace EnergyPlus::RefrigeratedCase {
                               RefrigCase(CaseID).Name,
                               RefrigCase(CaseID).ZoneName,
                               RefrigCase(CaseID).ZoneNodeNum,
-                              DataLoopNode::NodeID(RefrigCase(CaseID).ZoneNodeNum),
+                              state.dataLoopNodes->NodeID(RefrigCase(CaseID).ZoneNodeNum),
                               RefrigCase(CaseID).RateTotCapPerLength,
                               RefrigCase(CaseID).RatedLHR,
                               RefrigCase(CaseID).Temperature,
@@ -13100,7 +13102,7 @@ namespace EnergyPlus::RefrigeratedCase {
                               RefrigCase(CaseID).Name,
                               RefrigCase(CaseID).ZoneName,
                               RefrigCase(CaseID).ZoneNodeNum,
-                              DataLoopNode::NodeID(RefrigCase(CaseID).ZoneNodeNum),
+                              state.dataLoopNodes->NodeID(RefrigCase(CaseID).ZoneNodeNum),
                               RefrigCase(CaseID).RateTotCapPerLength,
                               RefrigCase(CaseID).RatedLHR,
                               RefrigCase(CaseID).Temperature,
@@ -13120,7 +13122,7 @@ namespace EnergyPlus::RefrigeratedCase {
                               RefrigCase(CaseID).Name,
                               RefrigCase(CaseID).ZoneName,
                               RefrigCase(CaseID).ZoneNodeNum,
-                              DataLoopNode::NodeID(RefrigCase(CaseID).ZoneNodeNum),
+                              state.dataLoopNodes->NodeID(RefrigCase(CaseID).ZoneNodeNum),
                               RefrigCase(CaseID).RateTotCapPerLength,
                               RefrigCase(CaseID).RatedLHR,
                               RefrigCase(CaseID).Temperature,
@@ -13263,7 +13265,7 @@ namespace EnergyPlus::RefrigeratedCase {
                               RefrigCase(CaseID).Name,
                               RefrigCase(CaseID).ZoneName,
                               RefrigCase(CaseID).ZoneNodeNum,
-                              DataLoopNode::NodeID(RefrigCase(CaseID).ZoneNodeNum),
+                              state.dataLoopNodes->NodeID(RefrigCase(CaseID).ZoneNodeNum),
                               RefrigCase(CaseID).RateTotCapPerLength,
                               RefrigCase(CaseID).RatedLHR,
                               RefrigCase(CaseID).Temperature,
@@ -13328,7 +13330,7 @@ namespace EnergyPlus::RefrigeratedCase {
                           WarehouseCoil(CoilID).Name,
                           WarehouseCoil(CoilID).ZoneName,
                           WarehouseCoil(CoilID).ZoneNodeNum,
-                          DataLoopNode::NodeID(WarehouseCoil(CoilID).ZoneNodeNum),
+                          state.dataLoopNodes->NodeID(WarehouseCoil(CoilID).ZoneNodeNum),
                           WarehouseCoil(CoilID).UnitLoadFactorSens,
                           WarehouseCoil(CoilID).RatedSensibleCap,
                           WarehouseCoil(CoilID).TEvapDesign,
@@ -13433,7 +13435,7 @@ namespace EnergyPlus::RefrigeratedCase {
         for (int ZoneID = 1; ZoneID <= this->NumZones; ++ZoneID) {
             int zoneNum = this->ZoneNum(ZoneID);
             int zoneNodeNum = this->ZoneNodeNum(ZoneID);
-            Real64 ZoneDryBulb = DataLoopNode::Node(zoneNodeNum).Temp; // Dry Bulb Temperature of adjacent zone
+            Real64 ZoneDryBulb = state.dataLoopNodes->Node(zoneNodeNum).Temp; // Dry Bulb Temperature of adjacent zone
             Real64 WalkInLatLoad = -ZoneLatentLoad;                    // Walk in cooler latent load facing particular zone (W)
             Real64 DelTemp = ZoneDryBulb - TWalkIn;                    // Difference between zone and walk in temperatures (C)
             Real64 StockDoorArea = this->AreaStockDr(ZoneID);
@@ -13450,7 +13452,7 @@ namespace EnergyPlus::RefrigeratedCase {
             if (StockDoorArea > 0.0 || GlassDoorArea > 0.0) {
                 // Zone relative humidity fraction (decimal)
                 Real64 ZoneRHFrac = Psychrometrics::PsyRhFnTdbWPb(state,
-                    DataLoopNode::Node(zoneNodeNum).Temp, DataLoopNode::Node(zoneNodeNum).HumRat, state.dataEnvrn->OutBaroPress, RoutineName);
+                    state.dataLoopNodes->Node(zoneNodeNum).Temp, state.dataLoopNodes->Node(zoneNodeNum).HumRat, state.dataEnvrn->OutBaroPress, RoutineName);
                 // Enthalpy of the air in a particular zone (J/kg)
                 Real64 EnthalpyZoneAir = Psychrometrics::PsyHFnTdbRhPb(state, ZoneDryBulb, ZoneRHFrac, state.dataEnvrn->OutBaroPress, RoutineName);
                 Real64 HumRatioZoneAir = Psychrometrics::PsyWFnTdbH(state, ZoneDryBulb, EnthalpyZoneAir, RoutineName);
@@ -13840,7 +13842,7 @@ namespace EnergyPlus::RefrigeratedCase {
         distPipeHeatGain = 0.0;
         if (this->SumUADistPiping > MySmallNumber) {
             int ZoneNodeNum = this->DistPipeZoneNodeNum;
-            DiffTemp = DataLoopNode::Node(ZoneNodeNum).Temp - TPipesReceiver;
+            DiffTemp = state.dataLoopNodes->Node(ZoneNodeNum).Temp - TPipesReceiver;
             distPipeHeatGain = DiffTemp * this->SumUADistPiping;
             // pipe heat load is a positive number (ie. heat absorbed by pipe, so needs to be subtracted
             //     from refrigcasecredit (- for cooling zone, + for heating zone)
@@ -13851,7 +13853,7 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 receiverHeatGain = 0.0;
         if (this->SumUAReceiver > MySmallNumber) {
             int ZoneNodeNum = this->ReceiverZoneNodeNum;
-            DiffTemp = DataLoopNode::Node(ZoneNodeNum).Temp - TPipesReceiver;
+            DiffTemp = state.dataLoopNodes->Node(ZoneNodeNum).Temp - TPipesReceiver;
             receiverHeatGain = DiffTemp * this->SumUAReceiver;
             // receiver heat load is a positive number (ie. heat absorbed by receiver, so needs to be subtracted
             //     from refrigcasecredit (- for cooling zone, + for heating zone)
@@ -14431,8 +14433,8 @@ namespace EnergyPlus::RefrigeratedCase {
                 DryAirMassFlowMax = 0.0;
             } else {
                 SensLoadRequestedGross = SensLoadRequested + HeaterLoad + FanPowerRated;
-                Real64 ZoneMixedAirDryBulb = DataLoopNode::Node(this->ZoneNodeNum).Temp;    // (C)
-                Real64 ZoneMixedAirHumRatio = DataLoopNode::Node(this->ZoneNodeNum).HumRat; // kg water/kg air in the zone mixed air
+                Real64 ZoneMixedAirDryBulb = state.dataLoopNodes->Node(this->ZoneNodeNum).Temp;    // (C)
+                Real64 ZoneMixedAirHumRatio = state.dataLoopNodes->Node(this->ZoneNodeNum).HumRat; // kg water/kg air in the zone mixed air
                 Real64 ZoneMixedAirRHFrac = Psychrometrics::PsyRhFnTdbWPb(state, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, state.dataEnvrn->OutBaroPress, TrackMessage);
                 Real64 ZoneMixedAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(state, ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, state.dataEnvrn->OutBaroPress, TrackMessage);
                 Real64 ZoneMixedAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage);

@@ -134,7 +134,6 @@ namespace TranspiredCollector {
 
         // Using/Aliasing
         using DataHVACGlobals::TempControlTol;
-        using DataLoopNode::Node;
 
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -191,9 +190,9 @@ namespace TranspiredCollector {
             assert(equal_dimensions(InletNode, ControlNode));
             assert(equal_dimensions(InletNode, UTSC_CI.ZoneNode));
             for (int i = InletNode.l(), e = InletNode.u(); i <= e; ++i) {
-                if (Node(InletNode(i)).Temp + TempControlTol < Node(ControlNode(i)).TempSetPoint) ControlLTSet = true;
-                if (Node(InletNode(i)).Temp + TempControlTol < GetCurrentScheduleValue(state, UTSC_CI.FreeHeatSetPointSchedPtr)) ControlLTSchedule = true;
-                if (Node(UTSC_CI.ZoneNode(i)).Temp + TempControlTol < GetCurrentScheduleValue(state, UTSC_CI.FreeHeatSetPointSchedPtr))
+                if (state.dataLoopNodes->Node(InletNode(i)).Temp + TempControlTol < state.dataLoopNodes->Node(ControlNode(i)).TempSetPoint) ControlLTSet = true;
+                if (state.dataLoopNodes->Node(InletNode(i)).Temp + TempControlTol < GetCurrentScheduleValue(state, UTSC_CI.FreeHeatSetPointSchedPtr)) ControlLTSchedule = true;
+                if (state.dataLoopNodes->Node(UTSC_CI.ZoneNode(i)).Temp + TempControlTol < GetCurrentScheduleValue(state, UTSC_CI.FreeHeatSetPointSchedPtr))
                     ZoneLTSchedule = true;
             }
             if (ControlLTSet || (ControlLTSchedule && ZoneLTSchedule))
@@ -234,10 +233,6 @@ namespace TranspiredCollector {
         using DataHeatBalance::Smooth;
         using DataHeatBalance::VeryRough;
         using DataHeatBalance::VerySmooth;
-        using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeConnectionType_Outlet;
-        using DataLoopNode::NodeConnectionType_Sensor;
-        using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsNotParent;
         using DataSurfaces::OtherSideCondModeledExt;
         using DataSurfaces::SurfaceData;
@@ -360,8 +355,8 @@ namespace TranspiredCollector {
                                                                            ErrorsFound,
                                                                            CurrentModuleObject,
                                                                            AlphasSplit(1),
-                                                                           NodeType_Air,
-                                                                           NodeConnectionType_Inlet,
+                                                                           DataLoopNode::NodeFluidType::Air,
+                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                            NumOASys,
                                                                            ObjectIsNotParent);
 
@@ -369,8 +364,8 @@ namespace TranspiredCollector {
                                                                             ErrorsFound,
                                                                             CurrentModuleObject,
                                                                             AlphasSplit(1),
-                                                                            NodeType_Air,
-                                                                            NodeConnectionType_Outlet,
+                                                                            DataLoopNode::NodeFluidType::Air,
+                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                             NumOASys,
                                                                             ObjectIsNotParent);
                         TestCompSet(state, CurrentModuleObject,
@@ -382,8 +377,8 @@ namespace TranspiredCollector {
                                                                              ErrorsFound,
                                                                              CurrentModuleObject,
                                                                              AlphasSplit(1),
-                                                                             NodeType_Air,
-                                                                             NodeConnectionType_Sensor,
+                                                                             DataLoopNode::NodeFluidType::Air,
+                                                                             DataLoopNode::NodeConnectionType::Sensor,
                                                                              1,
                                                                              ObjectIsNotParent);
 
@@ -391,8 +386,8 @@ namespace TranspiredCollector {
                                                                           ErrorsFound,
                                                                           CurrentModuleObject,
                                                                           AlphasSplit(1),
-                                                                          NodeType_Air,
-                                                                          NodeConnectionType_Sensor,
+                                                                          DataLoopNode::NodeFluidType::Air,
+                                                                          DataLoopNode::NodeConnectionType::Sensor,
                                                                           1,
                                                                           ObjectIsNotParent);
 
@@ -432,15 +427,15 @@ namespace TranspiredCollector {
                 state.dataTranspiredCollector->UTSC(Item).ZoneNode(1) = 0;
 
                 state.dataTranspiredCollector->UTSC(Item).InletNode(1) = GetOnlySingleNode(state,
-                    Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                    Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
                 state.dataTranspiredCollector->UTSC(Item).OutletNode(1) = GetOnlySingleNode(state,
-                    Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                    Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Transpired Collector Air Nodes");
 
                 state.dataTranspiredCollector->UTSC(Item).ControlNode(1) = GetOnlySingleNode(state,
-                    Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                    Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
                 state.dataTranspiredCollector->UTSC(Item).ZoneNode(1) = GetOnlySingleNode(state,
-                    Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                    Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
             } // no splitter
 
             state.dataTranspiredCollector->UTSC(Item).FreeHeatSetPointSchedPtr = GetScheduleIndex(state, Alphas(8));
@@ -760,7 +755,8 @@ namespace TranspiredCollector {
                 for (SplitBranch = 1; SplitBranch <= state.dataTranspiredCollector->UTSC(UTSCUnitNum).NumOASysAttached; ++SplitBranch) {
                     ControlNode = state.dataTranspiredCollector->UTSC(UTSCUnitNum).ControlNode(SplitBranch);
                     if (ControlNode > 0) {
-                        if (Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
+                        if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == SensedNodeFlagValue)
+                            {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "Missing temperature setpoint for UTSC " + state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name);
                                 ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
@@ -803,7 +799,9 @@ namespace TranspiredCollector {
         //        UTSC( UTSCNum ).InletMDot = sum( Node( UTSC( UTSCNum ).InletNode ).MassFlowRate ); //Autodesk:F2C++ Array subscript usage:
         // Replaced by below
         state.dataTranspiredCollector->UTSC(UTSCNum).InletMDot =
-            sum_sub(Node, &DataLoopNode::NodeData::MassFlowRate, state.dataTranspiredCollector->UTSC(UTSCNum).InletNode); // Autodesk:F2C++ Functions handle array subscript usage
+            sum_sub(state.dataLoopNodes->Node,
+                    &DataLoopNode::NodeData::MassFlowRate,
+                    state.dataTranspiredCollector->UTSC(UTSCNum).InletNode); // Autodesk:F2C++ Functions handle array subscript usage
         state.dataTranspiredCollector->UTSC(UTSCNum).IsOn = false;                                                        // intialize then turn on if appropriate
         state.dataTranspiredCollector->UTSC(UTSCNum).Tplen = state.dataTranspiredCollector->UTSC(UTSCNum).TplenLast;
         state.dataTranspiredCollector->UTSC(UTSCNum).Tcoll = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast;
@@ -1245,8 +1243,6 @@ namespace TranspiredCollector {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        using DataLoopNode::Node;
-
         int OutletNode;
         int InletNode;
         int thisOSCM;
@@ -1262,17 +1258,18 @@ namespace TranspiredCollector {
             if (state.dataTranspiredCollector->UTSC(UTSCNum).NumOASysAttached == 1) {
                 OutletNode = state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode(1);
                 InletNode = state.dataTranspiredCollector->UTSC(UTSCNum).InletNode(1);
-                Node(OutletNode).MassFlowRate = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutMassFlow;
-                Node(OutletNode).Temp = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp;
-                Node(OutletNode).HumRat = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat;
-                Node(OutletNode).Enthalpy = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutEnth;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutMassFlow;
+                state.dataLoopNodes->Node(OutletNode).Temp = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp;
+                state.dataLoopNodes->Node(OutletNode).HumRat = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat;
+                state.dataLoopNodes->Node(OutletNode).Enthalpy = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutEnth;
             } else if (state.dataTranspiredCollector->UTSC(UTSCNum).NumOASysAttached > 1) {
                 for (thisOASys = 1; thisOASys <= state.dataTranspiredCollector->UTSC(UTSCNum).NumOASysAttached; ++thisOASys) {
-                    Node(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode(thisOASys)).MassFlowRate =
-                        Node(state.dataTranspiredCollector->UTSC(UTSCNum).InletNode(thisOASys)).MassFlowRate; // system gets what it asked for at inlet
-                    Node(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode(thisOASys)).Temp = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp;
-                    Node(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode(thisOASys)).HumRat = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat;
-                    Node(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode(thisOASys)).Enthalpy = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutEnth;
+                    state.dataLoopNodes->Node(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode(thisOASys)).MassFlowRate =
+                        state.dataLoopNodes->Node(state.dataTranspiredCollector->UTSC(UTSCNum).InletNode(thisOASys))
+                            .MassFlowRate; // system gets what it asked for at inlet
+                    state.dataLoopNodes->Node(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode(thisOASys)).Temp = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp;
+                    state.dataLoopNodes->Node(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode(thisOASys)).HumRat = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat;
+                    state.dataLoopNodes->Node(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode(thisOASys)).Enthalpy = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutEnth;
                 }
             }
         } else { // Passive and/or bypassed           Note Array assignments in following
@@ -1285,8 +1282,8 @@ namespace TranspiredCollector {
             auto const &InletNode(state.dataTranspiredCollector->UTSC(UTSCNum).InletNode);
             assert(OutletNode.size() == InletNode.size());
             for (int io = OutletNode.l(), ii = InletNode.l(), eo = OutletNode.u(); io <= eo; ++io, ++ii) {
-                auto &outNode(Node(OutletNode(io)));
-                auto const &inNode(Node(InletNode(ii)));
+                auto &outNode(state.dataLoopNodes->Node(OutletNode(io)));
+                auto const &inNode(state.dataLoopNodes->Node(InletNode(ii)));
                 outNode.MassFlowRate = inNode.MassFlowRate;
                 outNode.Temp = inNode.Temp;
                 outNode.HumRat = inNode.HumRat;
