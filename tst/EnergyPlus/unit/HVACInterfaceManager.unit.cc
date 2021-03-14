@@ -87,9 +87,9 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     // Note LastTempInterfaceTankOutlet ends up getting reset to zero on the first pass
     state->dataPlnt->PlantLoop(1).LoopSide(2).LastTempInterfaceTankOutlet = 80;
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalPumpHeat = 500;
-    DataLoopNode::Node.allocate(state->dataPlnt->TotNumLoops);
-    DataLoopNode::Node(1).Temp = 100;
-    DataLoopNode::Node(1).MassFlowRate = 10;
+    state->dataLoopNodes->Node.allocate(state->dataPlnt->TotNumLoops);
+    state->dataLoopNodes->Node(1).Temp = 100;
+    state->dataLoopNodes->Node(1).MassFlowRate = 10;
     state->dataPlnt->PlantLoop(1).OutletNodeFlowrate = 10;
 
     // LoopSideInlet_MdotCpDeltaT should be < LoopSideInlet_McpDTdt

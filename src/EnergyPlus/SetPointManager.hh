@@ -734,7 +734,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineGroundTempSetPointManager : SPBase
@@ -967,8 +967,6 @@ namespace SetPointManager {
         // Calculation method
         void calculate(EnergyPlusData &state);
     };
-
-    void clear_state();
 
     void ManageSetPoints(EnergyPlusData &state);
 

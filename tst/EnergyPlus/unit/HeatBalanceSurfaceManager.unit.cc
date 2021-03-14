@@ -729,7 +729,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataSurface->Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
@@ -743,14 +743,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
     state->dataHeatBal->TempEffBulkAir.allocate(6);
 
-    DataLoopNode::Node(1).Temp = 20.0;
-    DataLoopNode::Node(2).Temp = 20.0;
-    DataLoopNode::Node(3).Temp = 20.0;
-    DataLoopNode::Node(4).Temp = 20.0;
-    DataLoopNode::Node(1).MassFlowRate = 0.1;
-    DataLoopNode::Node(2).MassFlowRate = 0.1;
-    DataLoopNode::Node(3).MassFlowRate = 0.1;
-    DataLoopNode::Node(4).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(1).Temp = 20.0;
+    state->dataLoopNodes->Node(2).Temp = 20.0;
+    state->dataLoopNodes->Node(3).Temp = 20.0;
+    state->dataLoopNodes->Node(4).Temp = 20.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
     DataHeatBalSurface::TH.allocate(2, 2, 6);
     DataHeatBalSurface::TH(1, 1, 1) = 20;
@@ -784,10 +784,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     EXPECT_EQ(20.0, state->dataHeatBal->TempEffBulkAir(3));
 
     // Supply air flow rate = 0
-    DataLoopNode::Node(1).MassFlowRate = 0.0;
-    DataLoopNode::Node(2).MassFlowRate = 0.0;
-    DataLoopNode::Node(3).MassFlowRate = 0.0;
-    DataLoopNode::Node(4).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.0;
     CalcHeatBalanceInsideSurf(*state);
     EXPECT_EQ(24.0, state->dataHeatBal->TempEffBulkAir(1));
     EXPECT_EQ(23.0, state->dataHeatBal->TempEffBulkAir(2));
@@ -797,7 +797,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataHeatBalFanSys->MAT.deallocate(); // Zone temperature C
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    DataLoopNode::Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
     DataHeatBalSurface::TempSurfInTmp.deallocate();
     state->dataHeatBal->TempEffBulkAir.deallocate();
@@ -1265,7 +1265,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataSurface->Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
@@ -1279,14 +1279,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
     state->dataHeatBal->TempEffBulkAir.allocate(6);
 
-    DataLoopNode::Node(1).Temp = 20.0;
-    DataLoopNode::Node(2).Temp = 20.0;
-    DataLoopNode::Node(3).Temp = 20.0;
-    DataLoopNode::Node(4).Temp = 20.0;
-    DataLoopNode::Node(1).MassFlowRate = 0.1;
-    DataLoopNode::Node(2).MassFlowRate = 0.1;
-    DataLoopNode::Node(3).MassFlowRate = 0.1;
-    DataLoopNode::Node(4).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(1).Temp = 20.0;
+    state->dataLoopNodes->Node(2).Temp = 20.0;
+    state->dataLoopNodes->Node(3).Temp = 20.0;
+    state->dataLoopNodes->Node(4).Temp = 20.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
     DataHeatBalSurface::TH.allocate(2, 2, 6);
     DataHeatBalSurface::TH(1, 1, 1) = 20;
@@ -1327,12 +1327,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     OutAirNodeManager::InitOutAirNodes(*state);
 
     // Test if local nodes data correctly overwritten
-    EXPECT_EQ(25.0, DataLoopNode::Node(1).OutAirDryBulb);
-    EXPECT_EQ(20.0, DataLoopNode::Node(1).OutAirWetBulb);
-    EXPECT_EQ(1.5, DataLoopNode::Node(1).OutAirWindSpeed);
-    EXPECT_EQ(90.0, DataLoopNode::Node(1).OutAirWindDir);
-    EXPECT_DOUBLE_EQ(0.012611481326656135, DataLoopNode::Node(1).HumRat);
-    EXPECT_DOUBLE_EQ(57247.660939392081, DataLoopNode::Node(1).Enthalpy);
+    EXPECT_EQ(25.0, state->dataLoopNodes->Node(1).OutAirDryBulb);
+    EXPECT_EQ(20.0, state->dataLoopNodes->Node(1).OutAirWetBulb);
+    EXPECT_EQ(1.5, state->dataLoopNodes->Node(1).OutAirWindSpeed);
+    EXPECT_EQ(90.0, state->dataLoopNodes->Node(1).OutAirWindDir);
+    EXPECT_DOUBLE_EQ(0.012611481326656135, state->dataLoopNodes->Node(1).HumRat);
+    EXPECT_DOUBLE_EQ(57247.660939392081, state->dataLoopNodes->Node(1).Enthalpy);
 
     InitSurfaceHeatBalance(*state);
 
@@ -1840,7 +1840,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataSurface->Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
@@ -1854,14 +1854,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
     state->dataHeatBal->TempEffBulkAir.allocate(6);
 
-    DataLoopNode::Node(1).Temp = 20.0;
-    DataLoopNode::Node(2).Temp = 20.0;
-    DataLoopNode::Node(3).Temp = 20.0;
-    DataLoopNode::Node(4).Temp = 20.0;
-    DataLoopNode::Node(1).MassFlowRate = 0.1;
-    DataLoopNode::Node(2).MassFlowRate = 0.1;
-    DataLoopNode::Node(3).MassFlowRate = 0.1;
-    DataLoopNode::Node(4).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(1).Temp = 20.0;
+    state->dataLoopNodes->Node(2).Temp = 20.0;
+    state->dataLoopNodes->Node(3).Temp = 20.0;
+    state->dataLoopNodes->Node(4).Temp = 20.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
     DataHeatBalSurface::TH.allocate(2, 2, 6);
     state->dataHeatBal->HConvIn.allocate(6);
@@ -2399,7 +2399,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataSurface->Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
@@ -2413,14 +2413,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
     state->dataHeatBal->TempEffBulkAir.allocate(6);
 
-    DataLoopNode::Node(1).Temp = 20.0;
-    DataLoopNode::Node(2).Temp = 20.0;
-    DataLoopNode::Node(3).Temp = 20.0;
-    DataLoopNode::Node(4).Temp = 20.0;
-    DataLoopNode::Node(1).MassFlowRate = 0.1;
-    DataLoopNode::Node(2).MassFlowRate = 0.1;
-    DataLoopNode::Node(3).MassFlowRate = 0.1;
-    DataLoopNode::Node(4).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(1).Temp = 20.0;
+    state->dataLoopNodes->Node(2).Temp = 20.0;
+    state->dataLoopNodes->Node(3).Temp = 20.0;
+    state->dataLoopNodes->Node(4).Temp = 20.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
     DataHeatBalSurface::TH.allocate(2, 2, 6);
     DataHeatBalSurface::TH(1, 1, 1) = 20;
@@ -2469,7 +2469,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataHeatBalFanSys->MAT.deallocate(); // Zone temperature C
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    DataLoopNode::Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
     DataHeatBalSurface::TempSurfInTmp.deallocate();
     state->dataHeatBal->TempEffBulkAir.deallocate();

@@ -367,7 +367,6 @@ namespace MundtSimMgr {
 
         // Using/Aliasing
         using DataHeatBalSurface::TempSurfIn;
-        using DataLoopNode::Node;
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using Psychrometrics::PsyCpAirFnW;
@@ -419,7 +418,7 @@ namespace MundtSimMgr {
         // supply air flowrate is the same as zone air flowrate
         ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
         ZoneAirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(ZoneNum), PsyWFnTdpPb(state, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataEnvrn->OutBaroPress));
-        ZoneMassFlowRate = Node(ZoneNode).MassFlowRate;
+        ZoneMassFlowRate = state.dataLoopNodes->Node(ZoneNode).MassFlowRate;
         SupplyAirVolumeRate = ZoneMassFlowRate / ZoneAirDensity;
         if (ZoneMassFlowRate <= 0.0001) {
             // system is off
@@ -429,15 +428,15 @@ namespace MundtSimMgr {
             SumSysMCp = 0.0;
             SumSysMCpT = 0.0;
             for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                 CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             }
             // prevent dividing by zero due to zero supply air flow rate
             if (SumSysMCp <= 0.0) {
-                SupplyAirTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(1)).Temp;
+                SupplyAirTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(1)).Temp;
             } else {
                 // a weighted average of the inlet temperatures
                 SupplyAirTemp = SumSysMCpT / SumSysMCp;
@@ -748,7 +747,6 @@ namespace MundtSimMgr {
         //     map data from air domain back to surface domain for each particular zone
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataSurfaces::AdjacentAirTemp;
         using DataSurfaces::ZoneMeanAirTemp;
 
@@ -779,7 +777,7 @@ namespace MundtSimMgr {
                 // ZT(ZoneNum) = TRoomAverage
                 // c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
                 ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
-                Node(ZoneNodeNum).Temp = LineNode(ReturnNodeID, MundtZoneNum).Temp;
+                state.dataLoopNodes->Node(ZoneNodeNum).Temp = LineNode(ReturnNodeID, MundtZoneNum).Temp;
                 // d) Thermostat air temperature -> TempTstatAir(ZoneNum)
                 state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = LineNode(TstatNodeID, MundtZoneNum).Temp;
             } else {
@@ -799,7 +797,7 @@ namespace MundtSimMgr {
                 // c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
                 ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
                 DeltaTemp = LineNode(ReturnNodeID, MundtZoneNum).Temp - LineNode(TstatNodeID, MundtZoneNum).Temp;
-                Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
+                state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
                 // d) Thermostat air temperature -> TempTstatAir(ZoneNum)
                 state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum); // for indirect coupling, control air temp is equal to mean air temp?
             }

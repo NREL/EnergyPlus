@@ -2847,7 +2847,6 @@ namespace RoomAirModelManager {
         // as zero.
 
         // Using/Aliasing
-        using DataLoopNode::NodeID;
         using namespace DataIPShortCuts;
         using Fans::GetFanOutletNode;
 
@@ -2908,7 +2907,7 @@ namespace RoomAirModelManager {
             I = GetFanOutletNode(state, "Fan:OnOff", Alphas(4), errorfound);
             if (errorfound) {
             }
-            SupplyNodeName = NodeID(I); // ?????
+            SupplyNodeName = state.dataLoopNodes->NodeID(I);                           // ?????
             ReturnNodeName = "";        // Zone exhaust node
         } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil) {      // ZoneHVAC : FourPipeFanCoil
             SupplyNodeName = Alphas(6);

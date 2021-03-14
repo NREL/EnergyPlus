@@ -534,43 +534,43 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).OASysExists = true;
-    Node.allocate(8);
+    state->dataLoopNodes->Node.allocate(8);
 
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
 
-    Node(1).MassFlowRate = 0.0; // Zone 1 zone node
-    Node(2).MassFlowRate = 1.0; // Zone 1 inlet node
-    Node(3).MassFlowRate = 2.0; // Zone 1 exhaust node
-    Node(4).MassFlowRate = 9.0; // Zone 1 return node
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.0; // Zone 1 zone node
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0; // Zone 1 inlet node
+    state->dataLoopNodes->Node(3).MassFlowRate = 2.0; // Zone 1 exhaust node
+    state->dataLoopNodes->Node(4).MassFlowRate = 9.0; // Zone 1 return node
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = 2.0;
 
-    Node(5).MassFlowRate = 0.0; // Zone 2 zone node
-    Node(6).MassFlowRate = 2.0; // Zone 2 inlet node
-    Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
-    Node(8).MassFlowRate = 8.0; // Zone 2 return node
+    state->dataLoopNodes->Node(5).MassFlowRate = 0.0; // Zone 2 zone node
+    state->dataLoopNodes->Node(6).MassFlowRate = 2.0; // Zone 2 inlet node
+    state->dataLoopNodes->Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
+    state->dataLoopNodes->Node(8).MassFlowRate = 8.0; // Zone 2 return node
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneExh = 0.0;
-    state->dataAirLoop->AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    state->dataAirLoop->AirLoopFlow(1).OAFlow = state->dataLoopNodes->Node(2).MassFlowRate + state->dataLoopNodes->Node(6).MassFlowRate;
     state->dataAirLoop->AirLoopFlow(1).MaxOutAir = state->dataAirLoop->AirLoopFlow(1).OAFlow;
     state->dataHeatBal->Infiltration(1).MassFlowRate = 0.5;
     state->dataHeatBal->Mixing(1).MixingMassFlowRate = 0.1;
 
     // call zone air mass balance
     CalcZoneMassBalance(*state, false);
-    EXPECT_EQ(Node(4).MassFlowRate, 0.0);         // Zone 1 return node (max(0.0, 1-2)
+    EXPECT_EQ(state->dataLoopNodes->Node(4).MassFlowRate, 0.0);         // Zone 1 return node (max(0.0, 1-2)
     EXPECT_EQ(state->dataHeatBal->Infiltration(1).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
     EXPECT_EQ(state->dataHeatBal->Mixing(1).MixingMassFlowRate, 0.1); // Zone 1 to Zone 2 mixing flow rate (unchanged)
-    EXPECT_EQ(Node(8).MassFlowRate,
+    EXPECT_EQ(state->dataLoopNodes->Node(8).MassFlowRate,
               2.0); // Zone 2 return node (should be 2 now, because this has zone mass conservation active, so return should equal supply)
 
     state->dataHeatBalFanSys->ZoneReOrder.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     NumPrimaryAirSys = 0;
@@ -1263,12 +1263,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     OutAirNodeManager::InitOutAirNodes(*state);
 
     // Test if local nodes data correctly overwritten
-    EXPECT_EQ(25.0, DataLoopNode::Node(1).OutAirDryBulb);
-    EXPECT_EQ(20.0, DataLoopNode::Node(1).OutAirWetBulb);
-    EXPECT_EQ(1.5, DataLoopNode::Node(1).OutAirWindSpeed);
-    EXPECT_EQ(90.0, DataLoopNode::Node(1).OutAirWindDir);
-    EXPECT_DOUBLE_EQ(0.012611481326656135, DataLoopNode::Node(1).HumRat);
-    EXPECT_DOUBLE_EQ(57247.660939392081, DataLoopNode::Node(1).Enthalpy);
+    EXPECT_EQ(25.0, state->dataLoopNodes->Node(1).OutAirDryBulb);
+    EXPECT_EQ(20.0, state->dataLoopNodes->Node(1).OutAirWetBulb);
+    EXPECT_EQ(1.5, state->dataLoopNodes->Node(1).OutAirWindSpeed);
+    EXPECT_EQ(90.0, state->dataLoopNodes->Node(1).OutAirWindDir);
+    EXPECT_DOUBLE_EQ(0.012611481326656135, state->dataLoopNodes->Node(1).HumRat);
+    EXPECT_DOUBLE_EQ(57247.660939392081, state->dataLoopNodes->Node(1).Enthalpy);
 
     InitHeatBalance(*state);
 
@@ -1279,10 +1279,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_EQ(90.0, state->dataHeatBal->Zone(1).WindDir);
 
     // Add a test for #7308 without inputs of schedule names
-    DataLoopNode::Node(1).OutAirDryBulbSchedNum = 0;
-    DataLoopNode::Node(1).OutAirWetBulbSchedNum = 0;
-    DataLoopNode::Node(1).OutAirWindSpeedSchedNum = 0;
-    DataLoopNode::Node(1).OutAirWindDirSchedNum = 0;
+    state->dataLoopNodes->Node(1).OutAirDryBulbSchedNum = 0;
+    state->dataLoopNodes->Node(1).OutAirWetBulbSchedNum = 0;
+    state->dataLoopNodes->Node(1).OutAirWindSpeedSchedNum = 0;
+    state->dataLoopNodes->Node(1).OutAirWindDirSchedNum = 0;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->OutWetBulbTemp = 20.0;
     state->dataEnvrn->WindSpeed = 1.5;

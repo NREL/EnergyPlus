@@ -3979,7 +3979,7 @@ namespace InternalHeatGains {
                     }
                 } else {
                     state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum = GetOnlySingleNode(state,
-                        AlphaName(14), ErrorsFound, CurrentModuleObject, AlphaName(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                        AlphaName(14), ErrorsFound, CurrentModuleObject, AlphaName(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
                 }
 
                 // check supply air node for matches with zone equipment supply air node
@@ -5747,7 +5747,6 @@ namespace InternalHeatGains {
         using CurveManager::CurveValue;
         using DataHVACGlobals::SmallAirVolFlow;
         using DataHVACGlobals::SmallTempDiff;
-        using DataLoopNode::Node;
 
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C
         // From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
@@ -5877,18 +5876,18 @@ namespace InternalHeatGains {
             RecircFrac = 0.0;
             SupplyNodeNum = state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum;
             if (state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                TSupply = Node(SupplyNodeNum).Temp;
-                WSupply = Node(SupplyNodeNum).HumRat;
+                TSupply = state.dataLoopNodes->Node(SupplyNodeNum).Temp;
+                WSupply = state.dataLoopNodes->Node(SupplyNodeNum).HumRat;
                 if (state.dataHeatBal->ZoneITEq(Loop).SupplyApproachTempSch != 0) {
                     TAirIn = TSupply + GetCurrentScheduleValue(state, state.dataHeatBal->ZoneITEq(Loop).SupplyApproachTempSch);
                 } else {
                     TAirIn = TSupply + state.dataHeatBal->ZoneITEq(Loop).SupplyApproachTemp;
                 }
-                WAirIn = Node(SupplyNodeNum).HumRat;
+                WAirIn = state.dataLoopNodes->Node(SupplyNodeNum).HumRat;
             } else {
                 if (AirConnection == ITEInletAdjustedSupply) {
-                    TSupply = Node(SupplyNodeNum).Temp;
-                    WSupply = Node(SupplyNodeNum).HumRat;
+                    TSupply = state.dataLoopNodes->Node(SupplyNodeNum).Temp;
+                    WSupply = state.dataLoopNodes->Node(SupplyNodeNum).HumRat;
                     if (state.dataHeatBal->ZoneITEq(Loop).RecircFLTCurve != 0) {
                         RecircFrac = state.dataHeatBal->ZoneITEq(Loop).DesignRecircFrac * CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).RecircFLTCurve, CPULoadSchedFrac, TSupply);
                     } else {
@@ -5906,7 +5905,7 @@ namespace InternalHeatGains {
                 } else {
                     // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
                     int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
-                    TSupply = Node(ZoneAirInletNode).Temp;
+                    TSupply = state.dataLoopNodes->Node(ZoneAirInletNode).Temp;
                     TAirIn = state.dataHeatBalFanSys->MAT(NZ);
                     WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                 }

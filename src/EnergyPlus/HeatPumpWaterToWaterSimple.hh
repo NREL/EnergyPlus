@@ -199,7 +199,7 @@ namespace HeatPumpWaterToWaterSimple {
 
         void CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 MyLoad); // Operating Load
 
-        void UpdateGSHPRecords();
+        void UpdateGSHPRecords(EnergyPlusData &state);
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
     };

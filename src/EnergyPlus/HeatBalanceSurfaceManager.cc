@@ -347,7 +347,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         using DataDElight::LUX2FC;
         using namespace SolarShading;
         using ConvectionCoefficients::InitInteriorConvectionCoeffs;
-        using DataLoopNode::Node;
         using HeatBalanceIntRadExchange::CalcInteriorRadExchange;
         using HeatBalFiniteDiffManager::InitHeatBalFiniteDiff;
         using InternalHeatGains::ManageInternalHeatGains;
@@ -382,10 +381,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).HasLinkedOutAirNode) {
-                    Surface(SurfNum).OutDryBulbTemp = Node(Surface(SurfNum).LinkedOutAirNode).OutAirDryBulb;
-                    Surface(SurfNum).OutWetBulbTemp = Node(Surface(SurfNum).LinkedOutAirNode).OutAirWetBulb;
-                    Surface(SurfNum).WindSpeed = Node(Surface(SurfNum).LinkedOutAirNode).OutAirWindSpeed;
-                    Surface(SurfNum).WindDir = Node(Surface(SurfNum).LinkedOutAirNode).OutAirWindDir;
+                    Surface(SurfNum).OutDryBulbTemp = state.dataLoopNodes->Node(Surface(SurfNum).LinkedOutAirNode).OutAirDryBulb;
+                    Surface(SurfNum).OutWetBulbTemp = state.dataLoopNodes->Node(Surface(SurfNum).LinkedOutAirNode).OutAirWetBulb;
+                    Surface(SurfNum).WindSpeed = state.dataLoopNodes->Node(Surface(SurfNum).LinkedOutAirNode).OutAirWindSpeed;
+                    Surface(SurfNum).WindDir = state.dataLoopNodes->Node(Surface(SurfNum).LinkedOutAirNode).OutAirWindDir;
                 }
 
                 if (InitSurfaceHeatBalancefirstTime && Surface(SurfNum).HasSurroundingSurfProperties) {
@@ -6234,9 +6233,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     Real64 SumSysMCpT = 0.0;
                     Real64 const CpAir = Psychrometrics::PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                     for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                        Real64 NodeTemp = DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        Real64 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         Real64 MassFlowRate =
-                            DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                            state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         // Real64 CpAir2 = PsyCpAirFnW(ZoneAirHumRat(ZoneNum), NodeTemp);
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -7094,9 +7093,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     Real64 SumSysMCpT = 0.0;
                     Real64 const CpAir = Psychrometrics::PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(zoneNum));
                     for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                        Real64 NodeTemp = DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        Real64 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         Real64 MassFlowRate =
-                            DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                            state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                     }

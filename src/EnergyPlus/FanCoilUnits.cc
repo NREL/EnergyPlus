@@ -396,8 +396,8 @@ namespace FanCoilUnits {
                                                               ErrorsFound,
                                                               FanCoil(FanCoilNum).UnitType,
                                                               Alphas(1),
-                                                              NodeType_Air,
-                                                              NodeConnectionType_Inlet,
+                                                              DataLoopNode::NodeFluidType::Air,
+                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                               1,
                                                               ObjectIsParent); // air input node
 
@@ -405,8 +405,8 @@ namespace FanCoilUnits {
                                                                ErrorsFound,
                                                                FanCoil(FanCoilNum).UnitType,
                                                                Alphas(1),
-                                                               NodeType_Air,
-                                                               NodeConnectionType_Outlet,
+                                                               DataLoopNode::NodeFluidType::Air,
+                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                1,
                                                                ObjectIsParent); // air outlet node
 
@@ -720,7 +720,7 @@ namespace FanCoilUnits {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
                                     "\". Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name.");
                     ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object.");
-                    ShowContinueError(state, "..Fan coil unit air inlet node name = " + NodeID(FanCoil(FanCoilNum).AirInNode));
+                    ShowContinueError(state, "..Fan coil unit air inlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode));
                     ErrorsFound = true;
                 }
                 // check for supply side air terminal mixer
@@ -745,7 +745,7 @@ namespace FanCoilUnits {
                         "\". Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name.");
                     ShowContinueError(state,
                         "..Air terminal mixer secondary inlet node name is specified in AirTerminal:SingleDuct:SupplySideMixer object.");
-                    ShowContinueError(state, "..Fan coil unit air outlet node name = " + NodeID(FanCoil(FanCoilNum).AirOutNode));
+                    ShowContinueError(state, "..Fan coil unit air outlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirOutNode));
                     ErrorsFound = true;
                 }
                 // no air terminal mixer; do the normal connectivity checks
@@ -764,7 +764,7 @@ namespace FanCoilUnits {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
                                     "\". Fan coil unit air inlet node name must be the same as a zone exhaust node name.");
                     ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "..Fan coil unit air inlet node name = " + NodeID(FanCoil(FanCoilNum).AirInNode));
+                    ShowContinueError(state, "..Fan coil unit air inlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode));
                     ErrorsFound = true;
                 }
                 // check that the fan coil outlet node is the same as one of the zone inlet nodes
@@ -783,7 +783,7 @@ namespace FanCoilUnits {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
                                     "\". Fan coil unit air outlet node name must be the same as a zone inlet node name.");
                     ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "..Fan coil unit air outlet node name = " + NodeID(FanCoil(FanCoilNum).AirOutNode));
+                    ShowContinueError(state, "..Fan coil unit air outlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirOutNode));
 
                     ErrorsFound = true;
                 }
@@ -853,7 +853,7 @@ namespace FanCoilUnits {
                               FanCoil(FanCoilNum).Name,
                               FanCoil(FanCoilNum).FanType,
                               FanCoil(FanCoilNum).FanName,
-                              NodeID(FanCoil(FanCoilNum).MixedAirNode),
+                              state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).MixedAirNode),
                               "UNDEFINED");
             } else {
                 SetUpCompSets(state,
@@ -861,7 +861,7 @@ namespace FanCoilUnits {
                               FanCoil(FanCoilNum).Name,
                               FanCoil(FanCoilNum).FanType,
                               FanCoil(FanCoilNum).FanName,
-                              NodeID(FanCoil(FanCoilNum).AirInNode),
+                              state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode),
                               "UNDEFINED");
             }
             // Set up component set for cooling coil
@@ -878,7 +878,7 @@ namespace FanCoilUnits {
                           FanCoil(FanCoilNum).HCoilType,
                           FanCoil(FanCoilNum).HCoilName,
                           "UNDEFINED",
-                          NodeID(FanCoil(FanCoilNum).AirOutNode));
+                          state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirOutNode));
 
             // Set up component set for OA mixer - use OA node and Mixed air node
             if (FanCoil(FanCoilNum).OutsideAirNode > 0) {
@@ -886,8 +886,8 @@ namespace FanCoilUnits {
                               FanCoil(FanCoilNum).Name,
                               FanCoil(FanCoilNum).OAMixType,
                               FanCoil(FanCoilNum).OAMixName,
-                              NodeID(FanCoil(FanCoilNum).OutsideAirNode),
-                              NodeID(FanCoil(FanCoilNum).MixedAirNode));
+                              state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).OutsideAirNode),
+                              state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).MixedAirNode));
             }
         }
 
@@ -1198,7 +1198,7 @@ namespace FanCoilUnits {
 
             // set the node max and min mass flow rates
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
-                InitComponentNodes(FanCoil(FanCoilNum).MinHotWaterFlow,
+                InitComponentNodes(state, FanCoil(FanCoilNum).MinHotWaterFlow,
                                    FanCoil(FanCoilNum).MaxHeatCoilFluidFlow,
                                    FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                    FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
@@ -1208,7 +1208,8 @@ namespace FanCoilUnits {
                                    FanCoil(FanCoilNum).HeatCoilCompNum);
             }
 
-            InitComponentNodes(FanCoil(FanCoilNum).MinColdWaterFlow,
+            InitComponentNodes(state,
+                               FanCoil(FanCoilNum).MinColdWaterFlow,
                                FanCoil(FanCoilNum).MaxCoolCoilFluidFlow,
                                FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
@@ -1222,13 +1223,13 @@ namespace FanCoilUnits {
             //  Node(ColdConNode)%MassFlowRateMin = FanCoil(FanCoilNum)%MinColdWaterFlow
 
             if (FanCoil(FanCoilNum).OutsideAirNode > 0) {
-                Node(OutsideAirNode).MassFlowRateMax = FanCoil(FanCoilNum).OutAirMassFlow;
-                Node(OutsideAirNode).MassFlowRateMin = 0.0;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMax = FanCoil(FanCoilNum).OutAirMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMin = 0.0;
             }
-            Node(OutNode).MassFlowRateMax = FanCoil(FanCoilNum).MaxAirMassFlow;
-            Node(OutNode).MassFlowRateMin = 0.0;
-            Node(InNode).MassFlowRateMax = FanCoil(FanCoilNum).MaxAirMassFlow;
-            Node(InNode).MassFlowRateMin = 0.0;
+            state.dataLoopNodes->Node(OutNode).MassFlowRateMax = FanCoil(FanCoilNum).MaxAirMassFlow;
+            state.dataLoopNodes->Node(OutNode).MassFlowRateMin = 0.0;
+            state.dataLoopNodes->Node(InNode).MassFlowRateMax = FanCoil(FanCoilNum).MaxAirMassFlow;
+            state.dataLoopNodes->Node(InNode).MassFlowRateMin = 0.0;
             state.dataFanCoilUnits->MyEnvrnFlag(FanCoilNum) = false;
         } // end one time inits
 
@@ -1252,30 +1253,30 @@ namespace FanCoilUnits {
         if (((GetCurrentScheduleValue(state, FanCoil(FanCoilNum).SchedPtr) > 0.0 && GetCurrentScheduleValue(state, FanCoil(FanCoilNum).fanAvailSchIndex) > 0.0) ||
              DataHVACGlobals::ZoneCompTurnFansOn) &&
             !DataHVACGlobals::ZoneCompTurnFansOff) {
-            Node(InletNode).MassFlowRate = FanCoil(FanCoilNum).MaxAirMassFlow;
-            Node(InletNode).MassFlowRateMaxAvail = Node(InletNode).MassFlowRate;
-            Node(InletNode).MassFlowRateMinAvail = 0.0;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = FanCoil(FanCoilNum).MaxAirMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = 0.0;
 
             if (OutsideAirNode > 0) {
-                Node(OutsideAirNode).MassFlowRate = FanCoil(FanCoilNum).OutAirMassFlow;
-                Node(OutsideAirNode).MassFlowRateMaxAvail = FanCoil(FanCoilNum).OutAirMassFlow;
-                Node(OutsideAirNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).OutAirMassFlow;
-                Node(AirRelNode).MassFlowRate = FanCoil(FanCoilNum).OutAirMassFlow;
-                Node(AirRelNode).MassFlowRateMaxAvail = FanCoil(FanCoilNum).OutAirMassFlow;
-                Node(AirRelNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).OutAirMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = FanCoil(FanCoilNum).OutAirMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMaxAvail = FanCoil(FanCoilNum).OutAirMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).OutAirMassFlow;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRate = FanCoil(FanCoilNum).OutAirMassFlow;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRateMaxAvail = FanCoil(FanCoilNum).OutAirMassFlow;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).OutAirMassFlow;
             }
 
         } else {
-            Node(InletNode).MassFlowRate = 0.0;
-            Node(InletNode).MassFlowRateMaxAvail = 0.0;
-            Node(InletNode).MassFlowRateMinAvail = 0.0;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = 0.0;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = 0.0;
             if (OutsideAirNode > 0) {
-                Node(OutsideAirNode).MassFlowRate = 0.0;
-                Node(OutsideAirNode).MassFlowRateMaxAvail = 0.0;
-                Node(OutsideAirNode).MassFlowRateMinAvail = 0.0;
-                Node(AirRelNode).MassFlowRate = 0.0;
-                Node(AirRelNode).MassFlowRateMaxAvail = 0.0;
-                Node(AirRelNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMaxAvail = 0.0;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRateMaxAvail = 0.0;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRateMinAvail = 0.0;
             }
         }
     }
@@ -2220,6 +2221,9 @@ namespace FanCoilUnits {
         Real64 HWFlowBypass; // hot water bypassed mass flow rate [kg/s]
         bool ColdFlowLocked; // if true cold water flow is locked
         bool HotFlowLocked;  // if true Hot water flow is locked
+        
+        auto &Node(state.dataLoopNodes->Node);
+        
         // initialize local variables
         UnitOn = true;
         ControlNode = 0;
@@ -3341,32 +3345,32 @@ namespace FanCoilUnits {
 
         // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 10% of flow before iterating
         mdot = MaxWaterFlow * 0.1;
-        Node(WaterControlNode).MassFlowRate = mdot;
+        state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = mdot;
         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
         if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
             MaxWaterFlow = mdot;
             // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 1% of flow before iterating
             mdot *= 0.1;
-            Node(WaterControlNode).MassFlowRate = mdot;
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = mdot;
             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
             if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
                 MaxWaterFlow = mdot;
                 // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.1% of flow before iterating
                 mdot *= 0.1;
-                Node(WaterControlNode).MassFlowRate = mdot;
+                state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = mdot;
                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                 if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
                     MaxWaterFlow = mdot;
                     // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.01% of flow before iterating
                     mdot *= 0.1;
-                    Node(WaterControlNode).MassFlowRate = mdot;
+                    state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = mdot;
                     Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                     if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
                         MaxWaterFlow = mdot;
                         // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.001% of flow before
                         // iterating
                         mdot *= 0.1;
-                        Node(WaterControlNode).MassFlowRate = mdot;
+                        state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = mdot;
                         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                         if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
                             MaxWaterFlow = mdot;
@@ -3418,9 +3422,9 @@ namespace FanCoilUnits {
         PLRMax = 1.0;
         PLR = 1.0;
         if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-            Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
         } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode && FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
-            Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
         }
         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
         if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
@@ -3428,9 +3432,9 @@ namespace FanCoilUnits {
             PLR *= 0.1;
             // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 10% of flow before iterating
             if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-                Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
+                state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
             } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode && FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
-                Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
+                state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
             }
             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
             if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
@@ -3438,9 +3442,9 @@ namespace FanCoilUnits {
                 PLR *= 0.1;
                 // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 1% of flow before iterating
                 if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-                    Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
+                    state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
                 } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode && FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
-                    Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
+                    state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
                 }
                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                 if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
@@ -3448,10 +3452,10 @@ namespace FanCoilUnits {
                     PLR *= 0.1;
                     // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.1% of flow before iterating
                     if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-                        Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
+                        state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
                     } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode &&
                                FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
-                        Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
+                        state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
                     }
                     if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
                         PLRMax = PLR;
@@ -3459,10 +3463,10 @@ namespace FanCoilUnits {
                         // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.01% of flow before
                         // iterating
                         if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-                            Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
+                            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
                         } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode &&
                                    FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
-                            Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
+                            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
                         }
                         if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
                             PLRMax = PLR;
@@ -3527,6 +3531,7 @@ namespace FanCoilUnits {
         Real64 ElecHeaterControl(1.0); // 1 or 0, enables or disables heating coil
         Real64 FanSpeedRatio;          // ratio of actual fan flow to max design fan flow
 
+        auto &Node(state.dataLoopNodes->Node);
         auto &FanCoil(state.dataFanCoilUnits->FanCoil);
 
         // if PLR present in arguments, get its value, else default PLR = 1
@@ -3842,7 +3847,7 @@ namespace FanCoilUnits {
 
         OutletNode = FanCoil(FanCoilNum).AirOutNode;
         InletNode = FanCoil(FanCoilNum).AirInNode;
-        AirMassFlow = Node(InletNode).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
 
         if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || AirMassFlow < SmallMassFlow) UnitOn = false;
 
@@ -3850,10 +3855,10 @@ namespace FanCoilUnits {
         FanCoil(FanCoilNum).SpeedFanRatSel = FanCoil(FanCoilNum).LowSpeedRatio;
         state.dataFanCoilUnits->FanFlowRatio = FanCoil(FanCoilNum).SpeedFanRatSel;
         AirMassFlow = FanCoil(FanCoilNum).LowSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
-        Node(InletNode).MassFlowRate = AirMassFlow;
-        Node(InletNode).MassFlowRateMax = AirMassFlow;
-        Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
-        Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
+        state.dataLoopNodes->Node(InletNode).MassFlowRate = AirMassFlow;
+        state.dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
+        state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
+        state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
 
         if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
             mdot = 0.0;
@@ -4011,20 +4016,20 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).SpeedFanRatSel = FanCoil(FanCoilNum).LowSpeedRatio;
             state.dataFanCoilUnits->FanFlowRatio = FanCoil(FanCoilNum).SpeedFanRatSel;
             AirMassFlow = FanCoil(FanCoilNum).LowSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
-            Node(InletNode).MassFlowRate = AirMassFlow;
-            Node(InletNode).MassFlowRateMax = AirMassFlow;
-            Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
-            Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = AirMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
             Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMax);
             if (std::abs(QUnitOutMax) < std::abs(QZnReq)) {
                 FanCoil(FanCoilNum).SpeedFanSel = 2;
                 FanCoil(FanCoilNum).SpeedFanRatSel = FanCoil(FanCoilNum).MedSpeedRatio;
                 state.dataFanCoilUnits->FanFlowRatio = FanCoil(FanCoilNum).SpeedFanRatSel;
                 AirMassFlow = FanCoil(FanCoilNum).MedSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
-                Node(InletNode).MassFlowRate = AirMassFlow;
-                Node(InletNode).MassFlowRateMax = AirMassFlow;
-                Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
-                Node(InletNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).LowSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).LowSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
                 Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMax);
             }
             if (std::abs(QUnitOutMax) < std::abs(QZnReq)) {
@@ -4032,10 +4037,10 @@ namespace FanCoilUnits {
                 FanCoil(FanCoilNum).SpeedFanRatSel = 1.0;
                 state.dataFanCoilUnits->FanFlowRatio = FanCoil(FanCoilNum).SpeedFanRatSel;
                 AirMassFlow = FanCoil(FanCoilNum).MaxAirMassFlow;
-                Node(InletNode).MassFlowRate = AirMassFlow;
-                Node(InletNode).MassFlowRateMax = AirMassFlow;
-                Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
-                Node(InletNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).MedSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).MedSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
             }
             CalcMultiStage4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
 
@@ -4065,20 +4070,20 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).SpeedFanRatSel = FanCoil(FanCoilNum).LowSpeedRatio;
             state.dataFanCoilUnits->FanFlowRatio = FanCoil(FanCoilNum).SpeedFanRatSel;
             AirMassFlow = FanCoil(FanCoilNum).LowSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
-            Node(InletNode).MassFlowRate = AirMassFlow;
-            Node(InletNode).MassFlowRateMax = AirMassFlow;
-            Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
-            Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = AirMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
             Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMax);
             if (std::abs(QUnitOutMax) < std::abs(QZnReq)) {
                 FanCoil(FanCoilNum).SpeedFanSel = 2;
                 FanCoil(FanCoilNum).SpeedFanRatSel = FanCoil(FanCoilNum).MedSpeedRatio;
                 state.dataFanCoilUnits->FanFlowRatio = FanCoil(FanCoilNum).SpeedFanRatSel;
                 AirMassFlow = FanCoil(FanCoilNum).MedSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
-                Node(InletNode).MassFlowRate = AirMassFlow;
-                Node(InletNode).MassFlowRateMax = AirMassFlow;
-                Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
-                Node(InletNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).LowSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).LowSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
                 Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMax);
             }
             if (std::abs(QUnitOutMax) < std::abs(QZnReq)) {
@@ -4086,10 +4091,10 @@ namespace FanCoilUnits {
                 FanCoil(FanCoilNum).SpeedFanRatSel = 1.0;
                 state.dataFanCoilUnits->FanFlowRatio = FanCoil(FanCoilNum).SpeedFanRatSel;
                 AirMassFlow = FanCoil(FanCoilNum).MaxAirMassFlow;
-                Node(InletNode).MassFlowRate = AirMassFlow;
-                Node(InletNode).MassFlowRateMax = AirMassFlow;
-                Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
-                Node(InletNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).MedSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = FanCoil(FanCoilNum).MedSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
             }
 
             CalcMultiStage4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
@@ -4102,19 +4107,19 @@ namespace FanCoilUnits {
                 FanCoil(FanCoilNum).SpeedFanRatSel = FanCoil(FanCoilNum).LowSpeedRatio;
                 state.dataFanCoilUnits->FanFlowRatio = FanCoil(FanCoilNum).SpeedFanRatSel;
                 AirMassFlow = FanCoil(FanCoilNum).LowSpeedRatio * FanCoil(FanCoilNum).MaxAirMassFlow;
-                Node(InletNode).MassFlowRate = AirMassFlow;
-                Node(InletNode).MassFlowRateMax = AirMassFlow;
-                Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
-                Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
             } else {
                 PartLoadRatio = 0.0;
                 AirMassFlow = 0.0;
-                Node(InletNode).MassFlowRate = AirMassFlow;
-                Node(InletNode).MassFlowRateMax = AirMassFlow;
-                Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
-                Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
-                Node(InletNode).MassFlowRate = 0.0;
-                Node(OutletNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMax = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = AirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
                 FanCoil(FanCoilNum).SpeedFanSel = 0;
                 state.dataFanCoilUnits->FanFlowRatio = 0.0;
             }
@@ -4140,7 +4145,7 @@ namespace FanCoilUnits {
             Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PartLoadRatio, 0.0);
         }
         // output variable
-        Node(OutletNode).MassFlowRate = Node(InletNode).MassFlowRate;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         FanCoil(FanCoilNum).PLR = PartLoadRatio;
         FanCoil(FanCoilNum).SpeedRatio = SpeedRatio;
         PowerMet = QUnitOut;
@@ -4231,6 +4236,8 @@ namespace FanCoilUnits {
 
         OutletNode = FanCoil(FanCoilNum).AirOutNode;
         InletNode = FanCoil(FanCoilNum).AirInNode;
+
+        auto &Node(state.dataLoopNodes->Node);
 
         if (QZnReq < (-1.0 * state.dataFanCoilUnits->Small5WLoad) && state.dataFanCoilUnits->CoolingLoad) {
             ControlOffset = FanCoil(FanCoilNum).ColdControlOffset;
@@ -4896,7 +4903,7 @@ namespace FanCoilUnits {
         WaterControlNode = int(Par(5));
 
         if (WaterControlNode == state.dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-            Node(WaterControlNode).MassFlowRate = PLR * state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
             Calc4PipeFanCoil(state,
                              FanCoilNum,
                              ControlledZoneNum,
@@ -4905,7 +4912,7 @@ namespace FanCoilUnits {
                              PLR); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
         } else if (WaterControlNode == state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode &&
                    state.dataFanCoilUnits->FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
-            Node(WaterControlNode).MassFlowRate = PLR * state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
             Calc4PipeFanCoil(state,
                              FanCoilNum,
                              ControlledZoneNum,
@@ -5040,7 +5047,7 @@ namespace FanCoilUnits {
         ControlledZoneNum = int(Par(3));
         QZnReq = Par(4);
 
-        Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate = HWFlow;
+        state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate = HWFlow;
         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
 
         // Calculate residual based on output magnitude
@@ -5102,7 +5109,7 @@ namespace FanCoilUnits {
         ControlledZoneNum = int(Par(3));
         QZnReq = Par(4);
 
-        Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode).MassFlowRate = CWFlow;
+        state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode).MassFlowRate = CWFlow;
         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
 
         // Calculate residual based on output magnitude
@@ -5179,7 +5186,7 @@ namespace FanCoilUnits {
         if (WaterControlNode == state.dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode ||
             (WaterControlNode == state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode &&
              state.dataFanCoilUnits->FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric)) {
-            Node(WaterControlNode).MassFlowRate = WaterFlow;
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = WaterFlow;
             Calc4PipeFanCoil(state,
                              FanCoilNum,
                              ControlledZoneNum,
@@ -5190,7 +5197,7 @@ namespace FanCoilUnits {
             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0); // needs PLR=1 for electric heating coil
         }
 
-        FCOutletTempOn = Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirOutNode).Temp;
+        FCOutletTempOn = state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirOutNode).Temp;
         // Calculate residual based on output magnitude
         Residuum = (FCOutletTempOn - OutletTemp);
 
@@ -5253,8 +5260,8 @@ namespace FanCoilUnits {
         Real64 maxCoilFluidFlow = Par(10);
         Real64 AirMassFlowRate = Par(12);
         Real64 mDot = PLR * maxCoilFluidFlow;
-        if (WaterControlNode > 0) Node(WaterControlNode).MassFlowRate = mDot;
-        Node(AirInNode).MassFlowRate = AirMassFlowRate;
+        if (WaterControlNode > 0) state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = mDot;
+        state.dataLoopNodes->Node(AirInNode).MassFlowRate = AirMassFlowRate;
 
         if (WaterControlNode == state.dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode ||
             (WaterControlNode == state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode &&
@@ -5333,14 +5340,14 @@ namespace FanCoilUnits {
         Real64 MinWaterFlow = Par(9); // min water flow at low air flow rate of 0 if that calculation failed
 
         // set air flow rate
-        Node(AirInNode).MassFlowRate = state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxAirMassFlow *
+        state.dataLoopNodes->Node(AirInNode).MassFlowRate = state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxAirMassFlow *
             (state.dataFanCoilUnits->FanCoil(FanCoilNum).LowSpeedRatio + (PLR * (1.0 - state.dataFanCoilUnits->FanCoil(FanCoilNum).LowSpeedRatio)));
         // set water flow rate
         if (WaterControlNode == state.dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-            Node(WaterControlNode).MassFlowRate =
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate =
                 MinWaterFlow + (PLR * (state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxCoolCoilFluidFlow - MinWaterFlow));
         } else if (WaterControlNode == state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode) {
-            Node(WaterControlNode).MassFlowRate =
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate =
                 MinWaterFlow + (PLR * (state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxHeatCoilFluidFlow - MinWaterFlow));
         } else {
             // developer error
@@ -5437,12 +5444,12 @@ namespace FanCoilUnits {
         MinAirFlow = Par(7);
 
         // set air flow rate
-        Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRate =
+        state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRate =
             MinAirFlow + (PLR * (state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxAirMassFlow - MinAirFlow));
         // set water flow rate
         if (WaterControlNode == state.dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
             MinWaterFlow = Par(6);
-            Node(WaterControlNode).MassFlowRate =
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate =
                 MinWaterFlow + (PLR * (state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxCoolCoilFluidFlow - MinWaterFlow));
             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
         } else if (WaterControlNode == 0) { // do this before the water coil else if block because 0 = 0
@@ -5450,7 +5457,7 @@ namespace FanCoilUnits {
             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, MinHeaterPLR + (PLR * (1.0 - MinHeaterPLR)));
         } else if (WaterControlNode == state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode) {
             MinWaterFlow = Par(6);
-            Node(WaterControlNode).MassFlowRate =
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate =
                 MinWaterFlow + (PLR * (state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxHeatCoilFluidFlow - MinWaterFlow));
             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
         } else {
@@ -5543,11 +5550,11 @@ namespace FanCoilUnits {
         WaterControlNode = Par(7);
 
         // set air flow rate
-        Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRate =
+        state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRate =
             state.dataFanCoilUnits->FanCoil(FanCoilNum).MaxAirMassFlow *
             (state.dataFanCoilUnits->FanCoil(FanCoilNum).LowSpeedRatio + (PLR * (1.0 - state.dataFanCoilUnits->FanCoil(FanCoilNum).LowSpeedRatio)));
         // set water flow rate
-        Node(WaterControlNode).MassFlowRate = MinWaterFlow + (PLR * (MaxWaterFlow - MinWaterFlow));
+        state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = MinWaterFlow + (PLR * (MaxWaterFlow - MinWaterFlow));
         Calc4PipeFanCoil(state,
                          FanCoilNum,
                          ControlledZoneNum,
@@ -5634,7 +5641,7 @@ namespace FanCoilUnits {
         if (Par(6) == -1.0) {
             MaxAirFlow = Par(5);
             // set air flow rate
-            Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRate = PLR * MaxAirFlow;
+            state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRate = PLR * MaxAirFlow;
         }
         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
 
@@ -5718,10 +5725,10 @@ namespace FanCoilUnits {
         if (Par(6) == -1.0) {
             MaxAirFlow = Par(5);
             // set air flow rate
-            Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRate = max(Par(7), PLR * MaxAirFlow);
+            state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode).MassFlowRate = max(Par(7), PLR * MaxAirFlow);
         }
         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
-        FCOutletTempOn = Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirOutNode).Temp;
+        FCOutletTempOn = state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).AirOutNode).Temp;
 
         // Calculate residual based on output magnitude
         Residuum = (FCOutletTempOn - MaxOutletTemp);

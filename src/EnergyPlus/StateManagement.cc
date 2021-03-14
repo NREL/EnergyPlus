@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
@@ -134,7 +133,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataHeatBalSurface::clear_state();
     DataHVACGlobals::clear_state();
     DataIPShortCuts::clear_state();
-    DataLoopNode::clear_state();
     DataMoistureBalance::clear_state();
     DataMoistureBalanceEMPD::clear_state();
     DataOutputs::clear_state();

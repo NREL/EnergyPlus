@@ -274,7 +274,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get inlet node data
             state.dataPipeHT->PipeHT(Item).InletNode = cAlphaArgs(3);
             state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -284,7 +284,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get outlet node data
             state.dataPipeHT->PipeHT(Item).OutletNode = cAlphaArgs(4);
             state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -393,7 +393,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get inlet node data
             state.dataPipeHT->PipeHT(Item).InletNode = cAlphaArgs(3);
             state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -403,7 +403,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get outlet node data
             state.dataPipeHT->PipeHT(Item).OutletNode = cAlphaArgs(4);
             state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -421,8 +421,8 @@ namespace EnergyPlus::PipeHeatTransfer {
                                                             ErrorsFound,
                                                             cCurrentModuleObject,
                                                             cAlphaArgs(1),
-                                                            NodeType_Air,
-                                                            NodeConnectionType_OutsideAirReference,
+                                                            DataLoopNode::NodeFluidType::Air,
+                                                            DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                             1,
                                                             ObjectIsNotParent);
             if (!lAlphaFieldBlanks(5)) {
@@ -498,7 +498,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get inlet node data
             state.dataPipeHT->PipeHT(Item).InletNode = cAlphaArgs(3);
             state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -508,7 +508,7 @@ namespace EnergyPlus::PipeHeatTransfer {
             // get outlet node data
             state.dataPipeHT->PipeHT(Item).OutletNode = cAlphaArgs(4);
             state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -786,7 +786,6 @@ namespace EnergyPlus::PipeHeatTransfer {
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataLoopNode::Node;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -812,8 +811,8 @@ namespace EnergyPlus::PipeHeatTransfer {
         // some useful module variables
         state.dataPipeHT->nsvInletNodeNum = this->InletNodeNum;
         state.dataPipeHT->nsvOutletNodeNum = this->OutletNodeNum;
-        state.dataPipeHT->nsvMassFlowRate = Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRate;
-        state.dataPipeHT->nsvInletTemp = Node(state.dataPipeHT->nsvInletNodeNum).Temp;
+        state.dataPipeHT->nsvMassFlowRate = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRate;
+        state.dataPipeHT->nsvInletTemp = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Temp;
 
         // get some data only once
         if (this->OneTimeInit) {
@@ -1193,7 +1192,6 @@ namespace EnergyPlus::PipeHeatTransfer {
 
         // Using/Aliasing
         using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
-        using DataLoopNode::Node;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1403,9 +1401,6 @@ namespace EnergyPlus::PipeHeatTransfer {
         // REFERENCES:
         // na
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // INTEGER, INTENT(IN) :: PipeHTNum       ! Index for the surface
 
@@ -1420,28 +1415,28 @@ namespace EnergyPlus::PipeHeatTransfer {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // only outlet node temp should need updating
-        Node(state.dataPipeHT->nsvOutletNodeNum).Temp = state.dataPipeHT->nsvOutletTemp;
+        state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Temp = state.dataPipeHT->nsvOutletTemp;
 
         // pass everything else through
-        Node(state.dataPipeHT->nsvOutletNodeNum).TempMin = Node(state.dataPipeHT->nsvInletNodeNum).TempMin;
-        Node(state.dataPipeHT->nsvOutletNodeNum).TempMax = Node(state.dataPipeHT->nsvInletNodeNum).TempMax;
-        Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRate = Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRate;
-        Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRateMin = Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMin;
-        Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRateMax = Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMax;
-        Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRateMinAvail = Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMinAvail;
-        Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRateMaxAvail = Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMaxAvail;
-        Node(state.dataPipeHT->nsvOutletNodeNum).Quality = Node(state.dataPipeHT->nsvInletNodeNum).Quality;
+        state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).TempMin = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).TempMin;
+        state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).TempMax = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).TempMax;
+        state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRateMin = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMin;
+        state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRateMax = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMax;
+        state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRateMinAvail = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Quality = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Quality;
         // Only pass pressure if we aren't doing a pressure simulation
         switch (state.dataPlnt->PlantLoop(this->LoopNum).PressureSimType) {
         case DataPlant::iPressSimType::NoPressure:
-            Node(state.dataPipeHT->nsvOutletNodeNum).Press = Node(state.dataPipeHT->nsvInletNodeNum).Press;
+            state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Press = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Press;
             break;
         default:
             // Don't do anything
             break;
         }
-        Node(state.dataPipeHT->nsvOutletNodeNum).Enthalpy = Node(state.dataPipeHT->nsvInletNodeNum).Enthalpy;
-        Node(state.dataPipeHT->nsvOutletNodeNum).HumRat = Node(state.dataPipeHT->nsvInletNodeNum).HumRat;
+        state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Enthalpy = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Enthalpy;
+        state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).HumRat = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).HumRat;
     }
 
     //==============================================================================
@@ -1682,7 +1677,6 @@ namespace EnergyPlus::PipeHeatTransfer {
         // p. 369-370 (Eq. 7:55b)
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Return value
@@ -1758,7 +1752,7 @@ namespace EnergyPlus::PipeHeatTransfer {
                 {
                     auto const SELECT_CASE_var1(this->EnvironmentPtr);
                     if (SELECT_CASE_var1 == iEnvrnPtr::OutsideAirEnv) {
-                        AirTemp = Node(this->EnvrAirNodeNum).Temp;
+                        AirTemp = state.dataLoopNodes->Node(this->EnvrAirNodeNum).Temp;
                         AirVel = state.dataEnvrn->WindSpeed;
                     }
                 }
