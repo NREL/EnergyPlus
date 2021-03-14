@@ -5746,8 +5746,8 @@ namespace EnergyPlus::DaylightingManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         SurfaceClass IType;                 // Surface type/class
-        auto & HP = state.dataDaylightingManager->HP; // Hit coordinates, if ray hits an obstruction surface (m)
-        auto & RN = state.dataDaylightingManager->RN; // Unit vector along ray from R1 to R2
+        static Vector3<Real64> HP; // Hit coordinates, if ray hits an obstruction surface (m)
+        static Vector3<Real64> RN; // Unit vector along ray from R1 to R2
 
         hit = false;
         RN = (R2 - R1).normalize();         // Unit vector
@@ -5796,7 +5796,7 @@ namespace EnergyPlus::DaylightingManager {
             auto const window2_base_adjacent_p(&window2_base_adjacent);
 
             // Lambda function for the octree to test for surface hit
-            auto surfaceHit = [=, &R1, &hit, &HP](SurfaceData const &surface) -> bool {
+            auto surfaceHit = [=, &R1, &hit](SurfaceData const &surface) -> bool {
                 auto const sClass(surface.Class);
                 if ((surface.ShadowingSurf) ||         // Shadowing surface
                     ((surface.SolarEnclIndex == window2_Enclosure) && // Surface is in same zone as window
@@ -5865,27 +5865,18 @@ namespace EnergyPlus::DaylightingManager {
         int ISky;   // Sky type index
         int ISky1;  // Sky type index values for averaging two sky types
         int ISky2;
-
-        auto & SetPnt = state.dataDaylightingManager->SetPnt;
-        auto & DFSKHR = state.dataDaylightingManager->DFSKHR;
-        auto & DFSUHR = state.dataDaylightingManager->DFSUHR;
-        auto & BFSKHR = state.dataDaylightingManager->BFSKHR;
-        auto & BFSUHR = state.dataDaylightingManager->BFSUHR;
-        auto & SFSKHR = state.dataDaylightingManager->SFSKHR;
-        auto & SFSUHR = state.dataDaylightingManager->SFSUHR;
-        auto & GLRNDX = state.dataDaylightingManager->GLRNDX;
-        auto & GLRNEW = state.dataDaylightingManager->GLRNEW;
-        auto & HorIllSky = state.dataDaylightingManager->HorIllSky;
-        auto & tmpSWSL1 = state.dataDaylightingManager->tmpSWSL1;
-        auto & tmpSWSL2 = state.dataDaylightingManager->tmpSWSL2;
-        auto & tmpSWFactor = state.dataDaylightingManager->tmpSWFactor;
-        auto & tmpMult = state.dataDaylightingManager->tmpMult;
-        auto & GlareOK = state.dataDaylightingManager->GlareOK;
-        auto & tmpIllumFromWinAtRefPt = state.dataDaylightingManager->tmpIllumFromWinAtRefPt;
-        auto & tmpBackLumFromWinAtRefPt = state.dataDaylightingManager->tmpBackLumFromWinAtRefPt;
-        auto & tmpSourceLumFromWinAtRefPt = state.dataDaylightingManager->tmpSourceLumFromWinAtRefPt;
-        auto & blnCycle = state.dataDaylightingManager->blnCycle;
-
+        static Array1D<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
+        static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (second index),
+        //   bare/shaded window (first index)
+        static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
+        static Array2D<Real64> BFSKHR(2, 4); // Sky background luminance factor for sky type (second index),
+        //   bare/shaded window (first index)
+        static Vector2<Real64> BFSUHR;       // Sun background luminance factor for bare/shaded window
+        static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (second index),
+        //   bare/shaded window (first index)
+        static Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
+        static Array1D<Real64> GLRNDX; // Glare index at reference point
+        static Array1D<Real64> GLRNEW; // New glare index at reference point
         int ISWFLG;                    // Switchable glazing flag: =1 if one or more windows in a zone
         //  has switchable glazing that adjusts visible transmittance to just meet
         //  daylighting setpoint; =0 otherwise.
@@ -5899,6 +5890,7 @@ namespace EnergyPlus::DaylightingManager {
         Real64 VTRAT;                                              // Ratio between switched and unswitched visible transmittance at normal incidence
         Real64 BACL;                                               // Window background (surround) luminance for glare calc (cd/m2)
         Real64 SkyWeight;                                          // Weighting factor used to average two different sky types
+        static Vector4<Real64> HorIllSky;                          // Horizontal illuminance for different sky types
         Real64 HorIllSkyFac;                                       // Ratio between horizontal illuminance from sky horizontal irradiance and
         //   luminous efficacy and horizontal illuminance from averaged sky
         Real64 SlatAng; // Blind slat angle (rad)
@@ -5910,6 +5902,18 @@ namespace EnergyPlus::DaylightingManager {
         Real64 VTNow;    // VT of the time step actual TC window
         Real64 VTMaster; // VT of the base/master TC window
 
+        // Added variables for glare iterations for switchable glazings
+        static Real64 tmpSWSL1(0.0);
+        static Real64 tmpSWSL2(0.0);
+        static Real64 tmpSWFactor(0.0); // new switching factor to meet glare criteria
+        //        static Real64 tmpSWFactor0( 0.0 ); // original switching factor to meet daylight illuminance //Unused Set but never used
+        static Real64 tmpMult(0.0);
+        static bool GlareOK(false);
+        static Array3D<Real64> tmpIllumFromWinAtRefPt;
+        static Array3D<Real64> tmpBackLumFromWinAtRefPt;
+        static Array3D<Real64> tmpSourceLumFromWinAtRefPt;
+
+        static bool blnCycle(false);
         bool breakOuterLoop(false);
         bool continueOuterLoop(false);
 
@@ -6805,7 +6809,7 @@ namespace EnergyPlus::DaylightingManager {
         int PipeNum;                            // TDD pipe object number
         Real64 TDDTransVisDiffNow;              // TDD diffuse visible transmittance at the current hour
         Real64 TDDTransVisDiffPrev;             // TDD diffuse visible transmittance at the previous hour
-        auto & TDDTransVisDiff = state.dataDaylightingManager->TDDTransVisDiff; // Weighted diffuse visible transmittance for each sky type
+        static Vector4<Real64> TDDTransVisDiff; // Weighted diffuse visible transmittance for each sky type
         int ISky;                               // Sky type index
         int ISky1;                              // Sky type index values for averaging two sky types
         int ISky2;
@@ -8426,8 +8430,8 @@ namespace EnergyPlus::DaylightingManager {
         Real64 WinLumSunDisk;        // window luminance from sun disk
         Real64 ELumSunDisk;          // window illuminance from sun disk
         Real64 TransBeam;            // transmittance of the beam for given direction
-        auto & V = state.dataDaylightingManager->V;
-        auto & RWin = state.dataDaylightingManager->RWin;
+        static Vector3<Real64> V;    // temporary vector
+        static Vector3<Real64> RWin; // Window center
         Real64 RayZ;                 // z component of unit vector for outgoing direction
         bool refPointIntersect;
 
@@ -8631,10 +8635,13 @@ namespace EnergyPlus::DaylightingManager {
         Real64 ElevWin;                  // Window elevation: angle between window outward normal and horizontal (radians)
         Real64 AzimWin;                  // Window azimuth (radians)
         Real64 AzimSun;                  // Sun azimuth (radians)
-        auto & WinNorm = state.dataDaylightingManager->WinNorm;
-        auto & SunPrime = state.dataDaylightingManager->SunPrime;
-        auto & WinNormCrossBase = state.dataDaylightingManager->WinNormCrossBase;
+        static Vector3<Real64> WinNorm;  // Window outward normal unit vector
         Real64 ThWin;                    // Azimuth angle of WinNorm
+        static Vector3<Real64> SunPrime; // Projection of sun vector onto plane (perpendicular to
+        //  window plane) determined by WinNorm and vector along
+        //  baseline of window
+        static Vector3<Real64> WinNormCrossBase; // Cross product of WinNorm and vector along window baseline
+        //  INTEGER            :: IComp             ! Vector component index
 
 
         if (HorOrVert == Horizontal) { // Profile angle for horizontal structures
@@ -8689,8 +8696,7 @@ namespace EnergyPlus::DaylightingManager {
         //  = 0 if no obstruction is hit.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto & HitPt = state.dataDaylightingManager->HitPt;
-
+        static Vector3<Real64> HitPt; // Hit point on an obstruction (m)
         bool hit;                     // True iff obstruction is hit
 
         NearestHitSurfNum = 0;
@@ -8727,7 +8733,7 @@ namespace EnergyPlus::DaylightingManager {
             SurfaceData const *nearestHitSurface(nullptr);
 
             // Lambda function for the octree to test for surface hit
-            auto surfaceHit = [=, &state, &RecPt, &RayVec, &hit, &NearestHitDistance_sq, &nearestHitSurface, &NearestHitPt, &HitPt](SurfaceData const &surface) {
+            auto surfaceHit = [=, &state, &RecPt, &RayVec, &hit, &NearestHitDistance_sq, &nearestHitSurface, &NearestHitPt](SurfaceData const &surface) {
                 if (surface.ShadowSurfPossibleObstruction) {
                     // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
                     PierceSurface(surface, RecPt, RayVec, HitPt, hit); // Check if ray pierces surface
@@ -8788,10 +8794,10 @@ namespace EnergyPlus::DaylightingManager {
         //  beam normal illuminance (cd/m2)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto & ReflNorm = state.dataDaylightingManager->ReflNorm;
-        auto & ObsHitPt = state.dataDaylightingManager->ObsHitPt;
+        static Vector3<Real64> ReflNorm; // Unit normal to reflecting surface (m)
         int ObsSurfNum;                  // Obstruction surface number
         bool hitObs;                     // True iff obstruction is hit
+        static Vector3<Real64> ObsHitPt; // Hit point on obstruction (m)
         Real64 CosIncAngAtHitPt;         // Cosine of angle of incidence of sun at HitPt
         Real64 DiffVisRefl;              // Diffuse visible reflectance of ReflSurfNum
 
@@ -8873,26 +8879,24 @@ namespace EnergyPlus::DaylightingManager {
         using General::InterpSlatAng;
         using General::POLYF;
 
+        // Locals
+        static Array1D<Real64> daylight_illum;
+
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NREFPT; // Number of daylighting map reference points
         // INTEGER   :: REFPT1                ! 1st reference point
         int ISky;  // Sky type index
         int ISky1; // Sky type index values for averaging two sky types
         int ISky2;
-        auto & daylight_illum = state.dataDaylightingManager->daylight_illum;
-        auto & DFSKHR = state.dataDaylightingManager->DFSKHR;
-        auto & DFSUHR = state.dataDaylightingManager->DFSUHR;
-        auto & BFSKHR = state.dataDaylightingManager->BFSKHR;
-        auto & BFSUHR = state.dataDaylightingManager->BFSUHR;
-        auto & SFSKHR = state.dataDaylightingManager->SFSKHR;
-        auto & SFSUHR = state.dataDaylightingManager->SFSUHR;
-        auto & HorIllSky = state.dataDaylightingManager->HorIllSky;
-        auto & BACLUM = state.dataDaylightingManager->BACLUM;
-        auto & GLRNDX = state.dataDaylightingManager->GLRNDX;
-        auto & VTDark = state.dataDaylightingManager->VTDark;
-        auto & VTMULT = state.dataDaylightingManager->VTMULT;
-        auto & IConstShaded = state.dataDaylightingManager->IConstShaded;
-
+        static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (first index),
+        //   bare/shaded window (second index)
+        static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
+        static Array2D<Real64> BFSKHR(2, 4); // Sky background luminance factor for sky type (first index),
+        //   bare/shaded window (second index)
+        static Vector2<Real64> BFSUHR;       // Sun background luminance factor for bare/shaded window
+        static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (first index),
+        //   bare/shaded window (second index)
+        static Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
         int IL;                        // Reference point index
         int IWin;                      // Window index
         int IS;                        // IS=1 for unshaded window, =2 for shaded window
@@ -8901,6 +8905,7 @@ namespace EnergyPlus::DaylightingManager {
         //                                   !  daylighting setpoint; =0 otherwise.
         int ICtrl;                        // Window shading control pointer
         Real64 SkyWeight;                 // Weighting factor used to average two different sky types
+        static Vector4<Real64> HorIllSky; // Horizontal illuminance for different sky types
         Real64 HorIllSkyFac;              // Ratio between horizontal illuminance from sky horizontal irradiance and
         //   luminous efficacy and horizontal illuminance from averaged sky
         Real64 SlatAng; // Blind slat angle (rad)
@@ -8909,12 +8914,17 @@ namespace EnergyPlus::DaylightingManager {
         Real64 GTOT;
         Real64 GTOT1;
         Real64 GTOT2;
+        static Array1D<Real64> BACLUM;
+        static Array1D<Real64> GLRNDX;
         int ILB;
         int IConst;
         Real64 VTRatio;
         Real64 VTNow;
         Real64 VTMaster;
 
+        static Real64 VTDark(0.0);  // Visible transmittance (VT) of electrochromic (EC) windows in fully dark state
+        static Real64 VTMULT(1.0);  // VT multiplier for EC windows
+        static int IConstShaded(0); // The shaded window construction for switchable windows
         int MapNum;
         int ILM;
 
@@ -9322,20 +9332,23 @@ namespace EnergyPlus::DaylightingManager {
         int R;
         int IllumOut;
 
-        auto & FirstTimeMaps = state.dataDaylightingManager->FirstTimeMaps;
-        auto & EnvrnPrint = state.dataDaylightingManager->EnvrnPrint;
-        auto & SavedMnDy = state.dataDaylightingManager->SavedMnDy;
-        auto & RefPts = state.dataDaylightingManager->RefPts;
-        auto & XValue = state.dataDaylightingManager->XValue;
-        auto & YValue = state.dataDaylightingManager->YValue;
-        auto & IllumValue = state.dataDaylightingManager->IllumValue;
-
+        static Array1D_bool FirstTimeMaps;
+        static Array1D_bool EnvrnPrint;
+        static Array1D_string SavedMnDy;
+        static Array2D_string RefPts;
         std::string MapNoString;
         int linelen;
+        // BSLLC Start
+        static Array1D<Real64> XValue;
+        static Array1D<Real64> YValue;
+        static Array2D<Real64> IllumValue;
         int SQYear;
         int SQMonth;
         int SQDayOfMonth;
         int IllumIndex;
+        //        static bool CommaDelimited( true ); //Unused Set but never used
+        // BSLLC Finish
+
 
         if (state.dataDaylightingManager->ReportIllumMap_firstTime) {
             state.dataDaylightingManager->ReportIllumMap_firstTime = false;
@@ -10055,19 +10068,18 @@ namespace EnergyPlus::DaylightingManager {
         // one or more exterior windows
         Real64 IntWinSolidAng; // Approximation to solid angle subtended by an interior window
         // from a point a distance SQRT(zone floor area) away.
-        auto & W1 = state.dataDaylightingManager->W1; // Window vertices
-        auto & W2 = state.dataDaylightingManager->W2;
-        auto & W3 = state.dataDaylightingManager->W3;
-        auto & WC = state.dataDaylightingManager->WC;  // Center point of window
-        auto & W21 = state.dataDaylightingManager->W21; // Unit vectors from window vertex 2 to 1 and 2 to 3
-        auto & W23 = state.dataDaylightingManager->W23;
-        auto & RREF = state.dataDaylightingManager->RREF;  // Location of a reference point in absolute coordinate system
-        auto & Ray = state.dataDaylightingManager->Ray;   // Unit vector along ray from reference point to window center
-        auto & REFWC = state.dataDaylightingManager->REFWC; // Vector from reference point to center of window
-        auto & WNORM = state.dataDaylightingManager->WNORM; // Unit vector normal to window (pointing away from room)
-
-        Real64 WW;
+        static Vector3<Real64> W1; // Window vertices
+        static Vector3<Real64> W2;
+        static Vector3<Real64> W3;
+        static Vector3<Real64> WC;  // Center point of window
+        static Vector3<Real64> W21; // Unit vectors from window vertex 2 to 1 and 2 to 3
+        static Vector3<Real64> W23;
         Real64 HW; // Window height and width (m)
+        Real64 WW;
+        static Vector3<Real64> RREF;  // Location of a reference point in absolute coordinate system
+        static Vector3<Real64> Ray;   // Unit vector along ray from reference point to window center
+        static Vector3<Real64> REFWC; // Vector from reference point to center of window
+        static Vector3<Real64> WNORM; // Unit vector normal to window (pointing away from room)
         Real64 DIS;                   // Distance from ref point to window center (m)
         Real64 COSB;                  // Cosine of angle between ray from ref pt to center of window
         //  and window outward normal
@@ -10177,8 +10189,8 @@ namespace EnergyPlus::DaylightingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string cAlphas(1);
-        Array1D<Real64> rNumerics;
+        static Array1D_string cAlphas(1);
+        static Array1D<Real64> rNumerics;
         int NAlphas;
         int NNum;
         int IOStat;

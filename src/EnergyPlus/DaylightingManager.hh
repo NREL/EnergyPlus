@@ -634,46 +634,6 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Vector4<Real64> FFSKTot;
     Vector4<Real64> WinLumSK; // Sky related window luminance
     Vector4<Real64> EDirSky; // Sky related direct illuminance
-    Vector3<Real64> WinNorm;  // Window outward normal unit vector
-    Vector3<Real64> SunPrime; // Projection of sun vector onto plane (perpendicular to window plane) determined by WinNorm and vector along baseline of window
-    Vector3<Real64> WinNormCrossBase; // Cross product of WinNorm and vector along window baseline
-    Vector3<Real64> HitPt; // Hit point on an obstruction (m)
-
-    Array1D<Real64> daylight_illum;
-    Array2D<Real64> DFSKHR; // Sky daylight factor for sky type (first index), bare/shaded window (second index)
-    Array2D<Real64> BFSKHR; // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
-    Array2D<Real64> SFSKHR; // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
-    Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
-    Vector2<Real64> BFSUHR;       // Sun background luminance factor for bare/shaded window
-    Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
-    Vector4<Real64> HorIllSky; // Horizontal illuminance for different sky types
-    Array1D<Real64> BACLUM;
-    Array1D<Real64> GLRNDX;
-    Real64 VTDark = 0.0;  // Visible transmittance (VT) of electrochromic (EC) windows in fully dark state
-    Real64 VTMULT = 1.0;  // VT multiplier for EC windows
-    int IConstShaded = 0; // The shaded window construction for switchable windows
-
-    Array1D_bool FirstTimeMaps;
-    Array1D_bool EnvrnPrint;
-    Array1D_string SavedMnDy;
-    Array2D_string RefPts;
-    Array1D<Real64> XValue;
-    Array1D<Real64> YValue;
-    Array2D<Real64> IllumValue;
-
-    Array1D<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
-    Array1D<Real64> GLRNEW; // New glare index at reference point
-    // Added variables for glare iterations for switchable glazings
-    Real64 tmpSWSL1 = 0.0;
-    Real64 tmpSWSL2 = 0.0;
-    Real64 tmpSWFactor = 0.0; // new switching factor to meet glare criteria
-    Real64 tmpMult = 0.0;
-    bool GlareOK = false;
-    Array3D<Real64> tmpIllumFromWinAtRefPt;
-    Array3D<Real64> tmpBackLumFromWinAtRefPt;
-    Array3D<Real64> tmpSourceLumFromWinAtRefPt;
-    bool blnCycle = false;
-    Vector4<Real64> TDDTransVisDiff; // Weighted diffuse visible transmittance for each sky type
 
     DaylightingManagerData()
     {
@@ -694,9 +654,6 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->FLCWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related upgoing luminous flux
         this->FLCWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
         this->TransMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);     // Transmittance multiplier
-        this->DFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (first index), bare/shaded window (second index)
-        this->BFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
-        this->SFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
     }
 
     void clear_state() override
@@ -818,42 +775,6 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->FFSKTot = 0.0;
         this->WinLumSK = 0.0;
         this->EDirSky = 0.0;
-        this->WinNorm = 0.0;
-        this->SunPrime = 0.0;
-        this->WinNormCrossBase = 0.0;
-        this->HitPt = 0.0;
-        this->daylight_illum.clear();
-        this->DFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (first index), bare/shaded window (second index)
-        this->BFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
-        this->SFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
-        this->DFSUHR = 0.0;       // Sun daylight factor for bare/shaded window
-        this->BFSUHR = 0.0;       // Sun background luminance factor for bare/shaded window
-        this->SFSUHR = 0.0; // Sun source luminance factor for bare/shaded window
-        this->HorIllSky = 0.0; // Horizontal illuminance for different sky types
-        this->BACLUM.clear();
-        this->GLRNDX.clear();
-        this->VTDark = 0.0;  // Visible transmittance (VT) of electrochromic (EC) windows in fully dark state
-        this->VTMULT = 1.0;  // VT multiplier for EC windows
-        this->IConstShaded = 0; // The shaded window construction for switchable windows
-        this->FirstTimeMaps.clear();
-        this->EnvrnPrint.clear();
-        this->SavedMnDy.clear();
-        this->RefPts.clear();
-        this->XValue.clear();
-        this->YValue.clear();
-        this->IllumValue.clear();
-        this->SetPnt.clear();       // Illuminance setpoint at reference points (lux)
-        this->GLRNEW.clear(); // New glare index at reference point
-        this->tmpSWSL1 = 0.0;
-        this->tmpSWSL2 = 0.0;
-        this->tmpSWFactor = 0.0; // new switching factor to meet glare criteria
-        this->tmpMult = 0.0;
-        this->GlareOK = false;
-        this->tmpIllumFromWinAtRefPt.clear();
-        this->tmpBackLumFromWinAtRefPt.clear();
-        this->tmpSourceLumFromWinAtRefPt.clear();
-        this->blnCycle = false;
-        this->TDDTransVisDiff = 0.0;
     }
 };
 
