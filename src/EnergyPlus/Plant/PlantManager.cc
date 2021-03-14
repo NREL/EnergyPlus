@@ -2704,8 +2704,6 @@ namespace EnergyPlus::PlantManager {
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
             //       DATE WRITTEN   Sept 2010
-            //       MODIFIED       na
-            //       RE-ENGINEERED  na
 
             // PURPOSE OF THIS SUBROUTINE:
             // update temperature history for plant capacitance model and other
@@ -2739,6 +2737,26 @@ namespace EnergyPlus::PlantManager {
                 for (auto &e : state.dataLoopNodes->Node) { // MA
                     e.TempLastTimestep = e.Temp;
                     e.EnthalpyLastTimestep = e.Enthalpy;
+                }
+            }
+            if (state.dataPlnt->TotNumLoops > 0 && !state.dataGlobal->WarmupFlag) {
+                for (auto &loop : state.dataPlnt->PlantLoop) {
+                    for (auto &side : loop.LoopSide) {
+                        if (loop.OutletNodeFlowrate > DataHVACGlobals::SmallMassFlow) {
+                            // Accumulate total time loop is active
+                            side.LoopSideInlet_TotalTime += TimeStepSys;
+                            // Determine excessive storage - if both are moving in the same direction and McpDTdt is larger than MdotCpDeltaT
+                            if ((abs(side.LoopSideInlet_MdotCpDeltaT) > DataHVACGlobals::SmallLoad) &&
+                                ((side.LoopSideInlet_McpDTdt / side.LoopSideInlet_MdotCpDeltaT) > 1.1)) {
+                                side.LoopSideInlet_CapExcessStorageTimeReport = TimeStepSys;
+                                side.LoopSideInlet_CapExcessStorageTime += TimeStepSys;
+                            } else {
+                                side.LoopSideInlet_CapExcessStorageTimeReport = 0;
+                            }
+                        } else {
+                            side.LoopSideInlet_CapExcessStorageTimeReport = 0;
+                        }
+                    }
                 }
             }
         }
@@ -4254,19 +4272,30 @@ namespace EnergyPlus::PlantManager {
             }
         }
 
-        void CheckOngoingPlantWarnings(EnergyPlusData &state) {
+        void CheckOngoingPlantWarnings(EnergyPlusData &state)
+        {
             int LoopNum;
             for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // Warning if the excess storage time is more than half of the total time
                 if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime >
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
-                    ShowWarningError(state, "Plant Loop: " + state.dataPlnt->PlantLoop(LoopNum).Name +
-                                     " Demand Side is storing excess heat the majority of the time.");
+                    ShowWarningError(state,
+                                     "Plant Loop: " + state.dataPlnt->PlantLoop(LoopNum).Name +
+                                         " Demand Side is storing excess heat the majority of the time.");
+                    ShowContinueError(state,
+                                      format("Excesss Storage Time={:.2R}[hr], Total Loop Active Time={:.2R}[hr]",
+                                             state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime,
+                                             state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime));
                 }
-                if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime >
-                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
-                    ShowWarningError(state, "Plant Loop: " + state.dataPlnt->PlantLoop(LoopNum).Name +
-                                     " Supply Side is storing excess heat the majority of the time.");
+                if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime >
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TotalTime / 2) {
+                    ShowWarningError(state,
+                                     "Plant Loop: " + state.dataPlnt->PlantLoop(LoopNum).Name +
+                                         " Supply Side is storing excess heat the majority of the time.");
+                    ShowContinueError(state,
+                                      format("Excesss Storage Time={:.2R}[hr], Total Loop Active Time={:.2R}[hr]",
+                                             state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime,
+                                             state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime));
                 }
             }
         }

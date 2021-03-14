@@ -104,7 +104,7 @@ namespace NodeInputManager {
 
     int AssignNodeNumber(EnergyPlusData &state,
                          std::string const &Name, // Name for assignment
-                         int const NodeFluidType, // must be valid
+                         DataLoopNode::NodeFluidType const NodeFluidType, // must be valid
                          bool &ErrorsFound);
 
     int GetOnlySingleNode(EnergyPlusData &state,

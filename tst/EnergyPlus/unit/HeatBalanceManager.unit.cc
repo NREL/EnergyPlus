@@ -725,78 +725,78 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     state->dataGlobal->DayOfSim = 7;
     state->dataHeatBal->MinNumberOfWarmupDays = 25;
     state->dataGlobal->NumOfZones = 1;
-    WarmupConvergenceValues.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->WarmupConvergenceValues.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->TempConvergTol = 0.01;
     state->dataHeatBal->LoadsConvergTol = 0.01;
-    MaxTempPrevDay.allocate(state->dataGlobal->NumOfZones);
-    MaxTempPrevDay(1) = 23.0;
-    MaxTempZone.allocate(state->dataGlobal->NumOfZones);
-    MaxTempZone(1) = 23.0;
-    MinTempPrevDay.allocate(state->dataGlobal->NumOfZones);
-    MinTempPrevDay(1) = 23.0;
-    MinTempZone.allocate(state->dataGlobal->NumOfZones);
-    MinTempZone(1) = 23.0;
-    MaxHeatLoadZone.allocate(state->dataGlobal->NumOfZones);
-    MaxHeatLoadPrevDay.allocate(state->dataGlobal->NumOfZones);
-    WarmupConvergenceValues(1).TestMaxHeatLoadValue = 0.0;
-    MaxCoolLoadZone.allocate(state->dataGlobal->NumOfZones);
-    MaxCoolLoadPrevDay.allocate(state->dataGlobal->NumOfZones);
-    WarmupConvergenceValues(1).TestMaxCoolLoadValue = 0.0;
+    state->dataHeatBalMgr->MaxTempPrevDay.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MaxTempPrevDay(1) = 23.0;
+    state->dataHeatBalMgr->MaxTempZone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MaxTempZone(1) = 23.0;
+    state->dataHeatBalMgr->MinTempPrevDay.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MinTempPrevDay(1) = 23.0;
+    state->dataHeatBalMgr->MinTempZone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MinTempZone(1) = 23.0;
+    state->dataHeatBalMgr->MaxHeatLoadZone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue = 0.0;
+    state->dataHeatBalMgr->MaxCoolLoadZone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue = 0.0;
 
     // Test 1: All Maxs both less than MinLoad (100.0)
-    MaxHeatLoadZone(1) = 50.0;
-    MaxHeatLoadPrevDay(1) = 90.0;
-    MaxCoolLoadZone(1) = 50.0;
-    MaxCoolLoadPrevDay(1) = 90.0;
+    state->dataHeatBalMgr->MaxHeatLoadZone(1) = 50.0;
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay(1) = 90.0;
+    state->dataHeatBalMgr->MaxCoolLoadZone(1) = 50.0;
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay(1) = 90.0;
     CheckWarmupConvergence(*state);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.0, 0.0001);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.0, 0.0001);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(3), 2);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(4), 2);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.0, 0.0001);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.0, 0.0001);
 
     // Test 2: Max Previous Day both less than MinLoad
-    MaxHeatLoadZone(1) = 100.5;
-    MaxHeatLoadPrevDay(1) = 90.0;
-    MaxCoolLoadZone(1) = 100.5;
-    MaxCoolLoadPrevDay(1) = 90.0;
+    state->dataHeatBalMgr->MaxHeatLoadZone(1) = 100.5;
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay(1) = 90.0;
+    state->dataHeatBalMgr->MaxCoolLoadZone(1) = 100.5;
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay(1) = 90.0;
     CheckWarmupConvergence(*state);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(3), 2);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(4), 2);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
 
     // Test 3: Max Current Day both less than MinLoad
-    MaxHeatLoadZone(1) = 90.0;
-    MaxHeatLoadPrevDay(1) = 100.5;
-    MaxCoolLoadZone(1) = 90.0;
-    MaxCoolLoadPrevDay(1) = 100.5;
+    state->dataHeatBalMgr->MaxHeatLoadZone(1) = 90.0;
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay(1) = 100.5;
+    state->dataHeatBalMgr->MaxCoolLoadZone(1) = 90.0;
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay(1) = 100.5;
     CheckWarmupConvergence(*state);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(3), 2);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(4), 2);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
 
     // Test 4: Everything greater than MinLoad (pass convergence test)
-    MaxHeatLoadZone(1) = 201.0;
-    MaxHeatLoadPrevDay(1) = 200.0;
-    MaxCoolLoadZone(1) = 201.0;
-    MaxCoolLoadPrevDay(1) = 200.0;
+    state->dataHeatBalMgr->MaxHeatLoadZone(1) = 201.0;
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay(1) = 200.0;
+    state->dataHeatBalMgr->MaxCoolLoadZone(1) = 201.0;
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay(1) = 200.0;
     CheckWarmupConvergence(*state);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(3), 2);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(4), 2);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
 
     // Test 5: Everything greater than MinLoad (fail convergence test)
-    MaxHeatLoadZone(1) = 210.0;
-    MaxHeatLoadPrevDay(1) = 200.0;
-    MaxCoolLoadZone(1) = 210.0;
-    MaxCoolLoadPrevDay(1) = 200.0;
+    state->dataHeatBalMgr->MaxHeatLoadZone(1) = 210.0;
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay(1) = 200.0;
+    state->dataHeatBalMgr->MaxCoolLoadZone(1) = 210.0;
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay(1) = 200.0;
     CheckWarmupConvergence(*state);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 1);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 1);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.05, 0.005);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.05, 0.005);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(3), 1);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(4), 1);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.05, 0.005);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.05, 0.005);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
