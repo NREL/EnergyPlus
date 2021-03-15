@@ -1817,9 +1817,6 @@ namespace ThermalComfort {
         //     DATE WRITTEN   July 2001
         //     MODIFIED       November 2017 (R Strand): Added fourth power and emissivity to calculation
 
-        // Using/Aliasing
-        using DataHeatBalSurface::TH;
-
         // Return value
         Real64 CalcAngleFactorMRT;
 
@@ -1839,7 +1836,7 @@ namespace ThermalComfort {
         auto &thisAngFacList(state.dataThermalComforts->AngleFactorList(AngleFacNum));
 
         for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-            SurfaceTemp = TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv;
+            SurfaceTemp = state.dataHeatBalSurf->TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv;
             SurfEAF = state.dataConstruction->Construct(state.dataSurface->Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal * thisAngFacList.AngleFactor(SurfNum);
             SurfTempEmissAngleFacSummed += SurfEAF * pow_4(SurfaceTemp);
             SumSurfaceEmissAngleFactor += SurfEAF;
@@ -1861,9 +1858,6 @@ namespace ThermalComfort {
         //          RadTemp (radiant temperature) for use by the thermal comfort routines
         //          that is the average of the surface temperature to be weighted and
         //          the modified zone MRT.
-
-        // Using/Aliasing
-        using DataHeatBalSurface::TH;
 
         // Return value
         Real64 CalcSurfaceWeightedMRT = 0.0;
@@ -1902,20 +1896,20 @@ namespace ThermalComfort {
         for (SurfNum2 = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum2 <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum2) {
             if (SurfNum2 != SurfNum) {
                 SurfaceAE(SurfNum2) = state.dataSurface->Surface(SurfNum2).Area * state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
-                SumAET += SurfaceAE(SurfNum2) * TH(2, 1, SurfNum2);
+                SumAET += SurfaceAE(SurfNum2) * state.dataHeatBalSurf->TH(2, 1, SurfNum2);
                 ZoneAESum(ZoneNum) += SurfaceAE(SurfNum2);
             }
         }
 
         // Now weight the MRT--half comes from the surface used for weighting (SurfNum) and the rest from the adjusted MRT that excludes this surface
         if (ZoneAESum(ZoneNum) > 0.01) {
-            CalcSurfaceWeightedMRT = 0.5 * (TH(2, 1, SurfNum) + (SumAET / ZoneAESum(ZoneNum)));
+            CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->TH(2, 1, SurfNum) + (SumAET / ZoneAESum(ZoneNum)));
         } else {
             if (FirstTimeError) {
                 ShowWarningError(state, "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\"");
                 ShowContinueError(state, "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone.");
                 FirstTimeError = false;
-                CalcSurfaceWeightedMRT = 0.5 * (TH(2, 1, SurfNum) + state.dataHeatBalFanSys->MAT(ZoneNum));
+                CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->TH(2, 1, SurfNum) + state.dataHeatBalFanSys->MAT(ZoneNum));
             }
         }
 
@@ -1987,9 +1981,6 @@ namespace ThermalComfort {
         // within a space.  Future additions might include the effect of direct
         // solar energy on occupants.
 
-        // Using/Aliasing
-        using DataHeatBalSurface::TH;
-
         // Return value
         Real64 CalcRadTemp;
 
@@ -2010,7 +2001,7 @@ namespace ThermalComfort {
                 state.dataThermalComforts->RadTemp = state.dataHeatBal->MRT(state.dataThermalComforts->ZoneNum);
             } else if (SELECT_CASE_var == SurfaceWeighted) {
                 ZoneRadTemp = state.dataHeatBal->MRT(state.dataThermalComforts->ZoneNum);
-                SurfaceTemp = TH(2, 1, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
+                SurfaceTemp = state.dataHeatBalSurf->TH(2, 1, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
                 state.dataThermalComforts->RadTemp = CalcSurfaceWeightedMRT(state, state.dataThermalComforts->ZoneNum, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
             } else if (SELECT_CASE_var == AngleFactor) {
                 state.dataThermalComforts->RadTemp = CalcAngleFactorMRT(state, state.dataHeatBal->People(PeopleListNum).AngleFactorListPtr);
