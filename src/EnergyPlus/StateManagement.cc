@@ -71,7 +71,6 @@
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
-#include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
@@ -111,7 +110,6 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
-#include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
@@ -140,7 +138,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     clearFacilityElectricPowerServiceObject();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeFluidCoolers::clear_state();
-    ExternalInterface::clear_state();
     FaultsManager::clear_state();
     FluidProperties::clear_state();
     Furnaces::clear_state();
@@ -176,6 +173,5 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     clearCoilSelectionReportObj(); // ReportCoilSelection
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelUserTempPattern::clear_state();
-    RuntimeLanguageProcessor::clear_state();
     ScheduleManager::clear_state();
 }
