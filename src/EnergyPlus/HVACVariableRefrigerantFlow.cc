@@ -449,11 +449,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         // set condenser entering air conditions
         if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum != 0) {
-            OutdoorDryBulb = DataLoopNode::Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp;
+            OutdoorDryBulb = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp;
             if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType != DataHVACGlobals::WaterCooled) {
-                OutdoorHumRat = DataLoopNode::Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).HumRat;
-                OutdoorPressure = DataLoopNode::Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Press;
-                OutdoorWetBulb = DataLoopNode::Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).OutAirWetBulb;
+                OutdoorHumRat = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).HumRat;
+                OutdoorPressure = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Press;
+                OutdoorWetBulb = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).OutAirWetBulb;
             } else {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
@@ -1214,8 +1214,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                  state.dataHVACVarRefFlow->VRF(VRFCond).SourceCompNum);
 
             // should be the same as above just entering this function
-            //            VRF( VRFCond ).CondenserInletTemp = DataLoopNode::Node(VRF(VRFCond).CondenserNodeNum).Temp;
-            state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserMassFlow = DataLoopNode::Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).MassFlowRate;
+            //            VRF( VRFCond ).CondenserInletTemp = state.dataLoopNodes->Node(VRF(VRFCond).CondenserNodeNum).Temp;
+            state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserMassFlow = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).MassFlowRate;
 
             CpCond = GetSpecificHeatGlycol(state,
                                            state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
@@ -2185,8 +2185,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                          ErrorsFound,
                                                                          cCurrentModuleObject,
                                                                          state.dataHVACVarRefFlow->VRF(VRFNum).Name,
-                                                                         DataLoopNode::NodeType_Air,
-                                                                         DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                         DataLoopNode::NodeFluidType::Air,
+                                                                         DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                          1,
                                                                          ObjectIsNotParent);
                         if (!CheckOutAirNodeNumber(state, state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum)) {
@@ -2201,8 +2201,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                          ErrorsFound,
                                                                          cCurrentModuleObject,
                                                                          state.dataHVACVarRefFlow->VRF(VRFNum).Name,
-                                                                         DataLoopNode::NodeType_Water,
-                                                                         DataLoopNode::NodeConnectionType_Inlet,
+                                                                         DataLoopNode::NodeFluidType::Water,
+                                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                                          2,
                                                                          ObjectIsNotParent);
                     } else {
@@ -2216,8 +2216,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                        ErrorsFound,
                                                                        cCurrentModuleObject,
                                                                        state.dataHVACVarRefFlow->VRF(VRFNum).Name,
-                                                                       DataLoopNode::NodeType_Water,
-                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                       DataLoopNode::NodeFluidType::Water,
+                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                        2,
                                                                        ObjectIsNotParent);
                 TestCompSet(state, cCurrentModuleObject, state.dataHVACVarRefFlow->VRF(VRFNum).Name, cAlphaArgs(35), cAlphaArgs(36), "Condenser Water Nodes");
@@ -3260,8 +3260,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                   ErrorsFound,
                                                                   cCurrentModuleObject,
                                                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
-                                                                  DataLoopNode::NodeType_Air,
-                                                                  DataLoopNode::NodeConnectionType_Inlet,
+                                                                  DataLoopNode::NodeFluidType::Air,
+                                                                  DataLoopNode::NodeConnectionType::Inlet,
                                                                   1,
                                                                   ObjectIsParent);
 
@@ -3270,8 +3270,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                    ErrorsFound,
                                                                    cCurrentModuleObject,
                                                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
-                                                                   DataLoopNode::NodeType_Air,
-                                                                   DataLoopNode::NodeConnectionType_Outlet,
+                                                                   DataLoopNode::NodeFluidType::Air,
+                                                                   DataLoopNode::NodeConnectionType::Outlet,
                                                                    1,
                                                                    ObjectIsParent);
 
@@ -3449,8 +3449,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                               DataHVACGlobals::cFanTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num),
                               FanName,
-                              DataLoopNode::NodeID(FanInletNodeNum),
-                              DataLoopNode::NodeID(FanOutletNodeNum));
+                              state.dataLoopNodes->NodeID(FanInletNodeNum),
+                              state.dataLoopNodes->NodeID(FanOutletNodeNum));
 
             } else if (lAlphaFieldBlanks(7) || lAlphaFieldBlanks(8)) {
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace = 0; // reset fan placement when fan is not used so as not to call the fan
@@ -4353,8 +4353,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                               DataHVACGlobals::cAllCoilTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DXCoolCoilType_Num),
                               cAlphaArgs(12),
-                              DataLoopNode::NodeID(CCoilInletNodeNum),
-                              DataLoopNode::NodeID(CCoilOutletNodeNum));
+                              state.dataLoopNodes->NodeID(CCoilInletNodeNum),
+                              state.dataLoopNodes->NodeID(CCoilOutletNodeNum));
                 //     set heating coil present flag
                 SetDXCoolingCoilData(state,
                                      state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
@@ -4404,8 +4404,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                               DataHVACGlobals::cAllCoilTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DXHeatCoilType_Num),
                               cAlphaArgs(14),
-                              DataLoopNode::NodeID(HCoilInletNodeNum),
-                              DataLoopNode::NodeID(HCoilOutletNodeNum));
+                              state.dataLoopNodes->NodeID(HCoilInletNodeNum),
+                              state.dataLoopNodes->NodeID(HCoilOutletNodeNum));
                 //     set cooling coil present flag
                 SetDXCoolingCoilData(state,
                                      state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
@@ -4480,8 +4480,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                               DataHVACGlobals::cAllCoilTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType_Num),
                               SuppHeatingCoilName,
-                              DataLoopNode::NodeID(SuppHeatCoilAirInletNode),
-                              DataLoopNode::NodeID(SuppHeatCoilAirOutletNode));
+                              state.dataLoopNodes->NodeID(SuppHeatCoilAirInletNode),
+                              state.dataLoopNodes->NodeID(SuppHeatCoilAirOutletNode));
             }
             // Set up component set for OA mixer - use OA node and Mixed air node
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed)
@@ -4489,8 +4489,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                               "UNDEFINED",
                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName,
-                              DataLoopNode::NodeID(OANodeNums(1)),
-                              DataLoopNode::NodeID(OANodeNums(4)));
+                              state.dataLoopNodes->NodeID(OANodeNums(1)),
+                              state.dataLoopNodes->NodeID(OANodeNums(4)));
 
             // Get AirTerminal mixer data
             GetATMixer(state,
@@ -5264,12 +5264,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         // set condenser inlet temp, used as surrogate for OAT (used to check limits of operation)
         if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
-            OutsideDryBulbTemp = DataLoopNode::Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp;
+            OutsideDryBulbTemp = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp;
         } else {
             if (OutsideAirNode == 0) {
                 OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             } else {
-                OutsideDryBulbTemp = DataLoopNode::Node(OutsideAirNode).Temp;
+                OutsideDryBulbTemp = state.dataLoopNodes->Node(OutsideAirNode).Temp;
             }
         }
 
@@ -5425,9 +5425,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                         "\" Zone terminal unit air inlet node name must be the same as a zone inlet or exhaust node name.");
                                     ShowContinueError(state, "... Zone inlet and exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                                     ShowContinueError(state, "... Zone terminal unit inlet node name  = " +
-                                                      DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum));
+                                                      state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum));
                                     ShowContinueError(state, "... Zone terminal unit outlet node name = " +
-                                                      DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum));
+                                                      state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum));
                                 }
                             }
                             goto EquipList_exit;
@@ -5449,8 +5449,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).isInAirLoop = true;
                                         BranchNodeConnections::TestCompSet(state, cCurrentModuleObject,
                                                                            thisObjectName,
-                                                                           DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum),
-                                                                           DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum),
+                                                                           state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum),
+                                                                           state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum),
                                                                            "Air Nodes");
                                         if (state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum > 0) {
                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneAirNode = state.dataZoneEquip->ZoneEquipConfig(state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum).ZoneNode;
@@ -5512,8 +5512,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                 state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneAirNode = 0;
                                 BranchNodeConnections::TestCompSet(state, cCurrentModuleObject,
                                                                    thisObjectName,
-                                                                   DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum),
-                                                                   DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum),
+                                                                   state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum),
+                                                                   state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum),
                                                                    "Air Nodes");
                                 goto EquipList_exit;
                             }
@@ -5580,7 +5580,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                     } else {
                                         int ZoneInletNodeNum =
                                             state.dataAirLoop->AirToZoneNodeInfo(state.dataHVACVarRefFlow->VRFTU(TUIndex).airLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
-                                        if (DataLoopNode::Node(ZoneInletNodeNum).MassFlowRateMax == -999.0) {
+                                        if (state.dataLoopNodes->Node(ZoneInletNodeNum).MassFlowRateMax == -999.0) {
                                             // the node mass flow rate has not been set
                                             initLoadBasedControlFlowFracFlagReady = false;
                                         }
@@ -5595,7 +5595,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                     } else {
                                         int ZoneInletNodeNum =
                                             state.dataAirLoop->AirToZoneNodeInfo(state.dataHVACVarRefFlow->VRFTU(TUIndex).airLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex);
-                                        if (DataLoopNode::Node(ZoneInletNodeNum).MassFlowRateMax == -999.0) {
+                                        if (state.dataLoopNodes->Node(ZoneInletNodeNum).MassFlowRateMax == -999.0) {
                                             // the node mass flow rate has not been set
                                             initLoadBasedControlFlowFracFlagReady = false;
                                         }
@@ -5608,10 +5608,10 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             for (int ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
                                 int ZoneInletNodeNum =
                                     state.dataAirLoop->AirToZoneNodeInfo(state.dataHVACVarRefFlow->VRFTU(TUIndex).airLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
-                                SumOfMassFlowRateMax += DataLoopNode::Node(ZoneInletNodeNum).MassFlowRateMax;
+                                SumOfMassFlowRateMax += state.dataLoopNodes->Node(ZoneInletNodeNum).MassFlowRateMax;
                                 if (state.dataAirLoop->AirToZoneNodeInfo(state.dataHVACVarRefFlow->VRFTU(TUIndex).airLoopNum).CoolCtrlZoneNums(ZoneInSysIndex) ==
                                     state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum) {
-                                    initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax = DataLoopNode::Node(ZoneInletNodeNum).MassFlowRateMax;
+                                    initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax = state.dataLoopNodes->Node(ZoneInletNodeNum).MassFlowRateMax;
                                 }
                             }
                             if (SumOfMassFlowRateMax != 0.0 && state.dataAirLoop->AirLoopInputsFilled) {
@@ -5680,9 +5680,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).isSetPointControlled && state.dataAirLoop->AirLoopInputsFilled) {
                         bool missingSetPoint = false;
-                        Real64 TUOutNodeSP = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum).TempSetPoint;
-                        Real64 coolCoilOutNodeSP = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode).TempSetPoint;
-                        Real64 heatCoilOutNodeSP = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode).TempSetPoint;
+                        Real64 TUOutNodeSP = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum).TempSetPoint;
+                        Real64 coolCoilOutNodeSP = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode).TempSetPoint;
+                        Real64 heatCoilOutNodeSP = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode).TempSetPoint;
                         // SP can be at outlet of TU or at outlet of coils
                         // if supp heat coil is present, a SP must be at the outlet of the TU
                         if (state.dataHVACVarRefFlow->VRFTU(TUIndex).SuppHeatingCoilPresent) {
@@ -5723,9 +5723,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                 // We disable the check at end (if API), because one of the nodes is enough, so there's an almost certainty
                                 // that it will throw as you're unlikely going to actuate all three nodes
                                 // It's not ideal, but it's better to let slide a bad condition rather than throw false positives...
-                                DataLoopNode::NodeSetpointCheck(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum).needsSetpointChecking = false;
-                                DataLoopNode::NodeSetpointCheck(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode).needsSetpointChecking = false;
-                                DataLoopNode::NodeSetpointCheck(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode).needsSetpointChecking = false;
+                                state.dataLoopNodes->NodeSetpointCheck(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum).needsSetpointChecking = false;
+                                state.dataLoopNodes->NodeSetpointCheck(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode).needsSetpointChecking = false;
+                                state.dataLoopNodes->NodeSetpointCheck(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode).needsSetpointChecking = false;
 
                                 if (SPNotFound && state.dataAirLoop->AirLoopInputsFilled) {
                                     ShowSevereError(state,
@@ -5768,7 +5768,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name +
                                     "\" Zone terminal unit air inlet node name must be the same as a zone exhaust node name.");
                     ShowContinueError(state, "... Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "... Zone terminal unit inlet node name = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum));
+                    ShowContinueError(state, "... Zone terminal unit inlet node name = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum));
                     ErrorsFound = true;
                 }
             }
@@ -5778,8 +5778,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum != OANodeNums(3)) {
                     ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name +
                                     "\" Zone terminal unit air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
-                    ShowContinueError(state, "... Zone terminal unit air inlet node name = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum));
-                    ShowContinueError(state, "... OutdoorAir:Mixer return air node name = " + DataLoopNode::NodeID(OANodeNums(3)));
+                    ShowContinueError(state, "... Zone terminal unit air inlet node name = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum));
+                    ShowContinueError(state, "... OutdoorAir:Mixer return air node name = " + state.dataLoopNodes->NodeID(OANodeNums(3)));
                     ErrorsFound = true;
                 }
             }
@@ -5801,7 +5801,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name +
                                     "\" Zone terminal unit air outlet node name must be the same as a zone inlet node name.");
                     ShowContinueError(state, "... Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "... Zone terminal unit outlet node name = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                    ShowContinueError(state, "... Zone terminal unit outlet node name = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                     ErrorsFound = true;
                 }
             }
@@ -5823,8 +5823,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name + "\" Fan inlet node name must be the same");
                         ShowContinueError(state, "as the outside air mixers mixed air node name when blow through fan is specified and an outside air "
                                           "mixer is present.");
-                        ShowContinueError(state, "... Fan inlet node = " + DataLoopNode::NodeID(FanInletNodeNum));
-                        ShowContinueError(state, "... OA mixers mixed air node = " + DataLoopNode::NodeID(OANodeNums(4)));
+                        ShowContinueError(state, "... Fan inlet node = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                        ShowContinueError(state, "... OA mixers mixed air node = " + state.dataLoopNodes->NodeID(OANodeNums(4)));
                         ErrorsFound = true;
                     }
                 } else if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed &&
@@ -5833,8 +5833,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name + "\" Fan inlet node name must be the same");
                         ShowContinueError(state, "as the terminal unit air inlet node name when blow through fan is specified and an outside air mixer "
                                           "is not present.");
-                        ShowContinueError(state, "... Fan inlet node = " + DataLoopNode::NodeID(FanInletNodeNum));
-                        ShowContinueError(state, "... Terminal unit air inlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum));
+                        ShowContinueError(state, "... Fan inlet node = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                        ShowContinueError(state, "... Terminal unit air inlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum));
                         ErrorsFound = true;
                     }
                 }
@@ -5842,8 +5842,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode != CCoilInletNodeNum) {
                         ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name + "\" Fan outlet node name must be the same");
                         ShowContinueError(state, "as the DX cooling coil air inlet node name when blow through fan is specified.");
-                        ShowContinueError(state, "... Fan outlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode));
-                        ShowContinueError(state, "... DX cooling coil air inlet node = " + DataLoopNode::NodeID(CCoilInletNodeNum));
+                        ShowContinueError(state, "... Fan outlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode));
+                        ShowContinueError(state, "... DX cooling coil air inlet node = " + state.dataLoopNodes->NodeID(CCoilInletNodeNum));
                         ErrorsFound = true;
                     }
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatingCoilPresent && !state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
@@ -5851,8 +5851,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name +
                                             "\" Heating coil outlet node name must be the same");
                             ShowContinueError(state, "as the terminal unit air outlet node name when blow through fan is specified.");
-                            ShowContinueError(state, "... Heating coil outlet node      = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
-                            ShowContinueError(state, "... Terminal Unit air outlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                            ShowContinueError(state, "... Heating coil outlet node      = " + state.dataLoopNodes->NodeID(HCoilOutletNodeNum));
+                            ShowContinueError(state, "... Terminal Unit air outlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                             ErrorsFound = true;
                         }
                     } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
@@ -5861,8 +5861,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                             "\" Supplemental Heating coil outlet node name must be the same");
                             ShowContinueError(state, "as the terminal unit air outlet node name when blow through fan is specified.");
                             ShowContinueError(state, "... Supplemental Heating coil outlet node = " +
-                                              DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode));
-                            ShowContinueError(state, "... Terminal Unit air outlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                                              state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode));
+                            ShowContinueError(state, "... Terminal Unit air outlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                             ErrorsFound = true;
                         }
                     } else {
@@ -5871,8 +5871,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                             "\" Cooling coil outlet node name must be the same");
                             ShowContinueError(state,
                                 "as the terminal unit air outlet node name when blow through fan is specified and no DX heating coil is present.");
-                            ShowContinueError(state, "... Cooling coil outlet node      = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
-                            ShowContinueError(state, "... Terminal Unit air outlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                            ShowContinueError(state, "... Cooling coil outlet node      = " + state.dataLoopNodes->NodeID(CCoilOutletNodeNum));
+                            ShowContinueError(state, "... Terminal Unit air outlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                             ErrorsFound = true;
                         }
                     }
@@ -5881,8 +5881,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name + "\" Fan outlet node name must be the same");
                         ShowContinueError(state,
                             "as the DX heating coil air inlet node name when blow through fan is specified and a DX cooling coil is not present.");
-                        ShowContinueError(state, "... Fan outlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode));
-                        ShowContinueError(state, "... DX heating coil air inlet node = " + DataLoopNode::NodeID(HCoilInletNodeNum));
+                        ShowContinueError(state, "... Fan outlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode));
+                        ShowContinueError(state, "... DX heating coil air inlet node = " + state.dataLoopNodes->NodeID(HCoilInletNodeNum));
                         ErrorsFound = true;
                     }
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
@@ -5891,8 +5891,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                             "\" Supplemental Heating coil outlet node name must be the same");
                             ShowContinueError(state, "as the terminal unit air outlet node name when blow through fan is specified.");
                             ShowContinueError(state, "... Supplemental Heating coil outlet node = " +
-                                              DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode));
-                            ShowContinueError(state, "... Terminal Unit air outlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                                              state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode));
+                            ShowContinueError(state, "... Terminal Unit air outlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                             ErrorsFound = true;
                         }
                     } else {
@@ -5900,8 +5900,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name +
                                             "\" Heating coil outlet node name must be the same");
                             ShowContinueError(state, "as the terminal unit air outlet node name when blow through fan is specified.");
-                            ShowContinueError(state, "... Heating coil outlet node      = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
-                            ShowContinueError(state, "... Terminal Unit air outlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                            ShowContinueError(state, "... Heating coil outlet node      = " + state.dataLoopNodes->NodeID(HCoilOutletNodeNum));
+                            ShowContinueError(state, "... Terminal Unit air outlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                             ErrorsFound = true;
                         }
                     }
@@ -5912,8 +5912,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum != CCoilInletNodeNum) {
                             ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name + "\" Cooling coil inlet node name must be the same");
                             ShowContinueError(state, "as the terminal unit air inlet node name when draw through fan is specified.");
-                            ShowContinueError(state, "... Terminal unit air inlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum));
-                            ShowContinueError(state, "... DX cooling coil air inlet node = " + DataLoopNode::NodeID(CCoilInletNodeNum));
+                            ShowContinueError(state, "... Terminal unit air inlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum));
+                            ShowContinueError(state, "... DX cooling coil air inlet node = " + state.dataLoopNodes->NodeID(CCoilInletNodeNum));
                             ErrorsFound = true;
                         }
                     }
@@ -5921,8 +5921,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         if (FanInletNodeNum != HCoilOutletNodeNum) {
                             ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name + "\" Fan inlet node name must be the same");
                             ShowContinueError(state, "as the DX heating coil air outlet node name when draw through fan is specified.");
-                            ShowContinueError(state, "... Fan inlet node = " + DataLoopNode::NodeID(FanInletNodeNum));
-                            ShowContinueError(state, "... DX heating coil air outlet node = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
+                            ShowContinueError(state, "... Fan inlet node = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                            ShowContinueError(state, "... DX heating coil air outlet node = " + state.dataLoopNodes->NodeID(HCoilOutletNodeNum));
                             ErrorsFound = true;
                         }
                     } else {
@@ -5930,8 +5930,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name + "\" Fan inlet node name must be the same");
                             ShowContinueError(state, "as the DX cooling coil air outlet node name when draw through fan is specified and a DX heating coil "
                                               "is not present.");
-                            ShowContinueError(state, "... Fan inlet node = " + DataLoopNode::NodeID(FanInletNodeNum));
-                            ShowContinueError(state, "... DX cooling coil air outlet node = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
+                            ShowContinueError(state, "... Fan inlet node = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                            ShowContinueError(state, "... DX cooling coil air outlet node = " + state.dataLoopNodes->NodeID(CCoilOutletNodeNum));
                             ErrorsFound = true;
                         }
                     }
@@ -5939,8 +5939,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     if (FanInletNodeNum != HCoilOutletNodeNum) {
                         ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name + "\" Fan inlet node name must be the same");
                         ShowContinueError(state, "as the DX heating coil air outlet node name when draw through fan is specified.");
-                        ShowContinueError(state, "... Fan inlet node = " + DataLoopNode::NodeID(FanInletNodeNum));
-                        ShowContinueError(state, "... DX heating coil air outlet node = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
+                        ShowContinueError(state, "... Fan inlet node = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                        ShowContinueError(state, "... DX heating coil air outlet node = " + state.dataLoopNodes->NodeID(HCoilOutletNodeNum));
                         ErrorsFound = true;
                     }
                 }
@@ -5950,16 +5950,16 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                         "\" Supplemental heating coil air outlet node name must be the same");
                         ShowContinueError(state, "as the terminal unit air outlet node name when draw through fan is specified.");
                         ShowContinueError(state, "... Supplemental heating coil air outlet node = " +
-                                          DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode));
-                        ShowContinueError(state, "... Terminal unit air outlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                                          state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode));
+                        ShowContinueError(state, "... Terminal unit air outlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                         ErrorsFound = true;
                     }
                 } else {
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode != state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
                         ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name + "\" Fan outlet node name must be the same");
                         ShowContinueError(state, "as the terminal unit air outlet node name when draw through fan is specified.");
-                        ShowContinueError(state, "... Fan outlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode));
-                        ShowContinueError(state, "... Terminal unit air outlet node = " + DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                        ShowContinueError(state, "... Fan outlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode));
+                        ShowContinueError(state, "... Terminal unit air outlet node = " + state.dataLoopNodes->NodeID(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                         ErrorsFound = true;
                     }
                 }
@@ -5968,8 +5968,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 if (CCoilOutletNodeNum != HCoilInletNodeNum) {
                     ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name + "\" DX cooling coil air outlet node name must be the same");
                     ShowContinueError(state, " as the DX heating coil air inlet node name.");
-                    ShowContinueError(state, "... DX cooling coil air outlet node = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
-                    ShowContinueError(state, "... DX heating coil air inlet node  = " + DataLoopNode::NodeID(HCoilInletNodeNum));
+                    ShowContinueError(state, "... DX cooling coil air outlet node = " + state.dataLoopNodes->NodeID(CCoilOutletNodeNum));
+                    ShowContinueError(state, "... DX heating coil air inlet node  = " + state.dataLoopNodes->NodeID(HCoilInletNodeNum));
                     ErrorsFound = true;
                 }
             }
@@ -6028,18 +6028,18 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             // set the node max and min mass flow rates
             // outside air mixer is optional, check that node num > 0
             if (OutsideAirNode > 0) {
-                DataLoopNode::Node(OutsideAirNode).MassFlowRateMax = max(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirMassFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow);
-                DataLoopNode::Node(OutsideAirNode).MassFlowRateMin = 0.0;
-                DataLoopNode::Node(OutsideAirNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMax = max(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirMassFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow);
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMin = 0.0;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMinAvail = 0.0;
             }
-            DataLoopNode::Node(OutNode).MassFlowRateMax = max(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow);
-            DataLoopNode::Node(OutNode).MassFlowRateMin = 0.0;
-            DataLoopNode::Node(OutNode).MassFlowRateMinAvail = 0.0;
-            DataLoopNode::Node(InNode).MassFlowRateMax = max(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow);
-            DataLoopNode::Node(InNode).MassFlowRateMin = 0.0;
-            DataLoopNode::Node(InNode).MassFlowRateMinAvail = 0.0;
+            state.dataLoopNodes->Node(OutNode).MassFlowRateMax = max(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow);
+            state.dataLoopNodes->Node(OutNode).MassFlowRateMin = 0.0;
+            state.dataLoopNodes->Node(OutNode).MassFlowRateMinAvail = 0.0;
+            state.dataLoopNodes->Node(InNode).MassFlowRateMax = max(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow);
+            state.dataLoopNodes->Node(InNode).MassFlowRateMin = 0.0;
+            state.dataLoopNodes->Node(InNode).MassFlowRateMinAvail = 0.0;
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRelNodeNum > 0) {
-                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRelNodeNum).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRelNodeNum).MassFlowRateMinAvail = 0.0;
             }
 
             state.dataHVACVarRefFlow->MyEnvrnFlag(VRFTUNum) = false;
@@ -6052,7 +6052,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                        RoutineName);
                 state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow = state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate * rho;
 
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
                                    state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum,
                                    state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum,
@@ -6103,7 +6104,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     }
                 }
                 // init water/steam coils min and max flow rates
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow,
                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
@@ -6540,32 +6542,32 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // initialize terminal unit flow rate
         if (state.dataHVACVarRefFlow->HeatingLoad(VRFCond) || (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
-                DataLoopNode::Node(OutsideAirNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow;
+                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow;
             } else {
-                if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
+                if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
             }
         } else if (state.dataHVACVarRefFlow->CoolingLoad(VRFCond) || (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
-                DataLoopNode::Node(OutsideAirNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirMassFlow;
+                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirMassFlow;
             } else {
-                if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
+                if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
             }
         } else {
             if (state.dataHVACVarRefFlow->LastModeCooling(VRFCond)) {
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-                    DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
-                    DataLoopNode::Node(OutsideAirNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
+                    state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
+                    state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
                 } else {
-                    if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
+                    if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
                 }
             } else if (state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-                    DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoHeatAirMassFlow;
-                    DataLoopNode::Node(OutsideAirNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
+                    state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoHeatAirMassFlow;
+                    state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
                 } else {
-                    if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoHeatAirMassFlow;
+                    if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoHeatAirMassFlow;
                 }
             }
         }
@@ -6574,9 +6576,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             // There is an air terminal mixer
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
                 // set the primary air inlet mass flow rate
-                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRate =
-                    min(DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRateMaxAvail,
-                        DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate);
+                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRate =
+                    min(state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRateMaxAvail,
+                        state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate);
                 // now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already
                 // been set above (it is the "inlet" node flow rate)
                 SimATMixer(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerIndex);
@@ -6648,11 +6650,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                             // system last operated in cooling mode, change air flows and repeat coil off capacity test
                             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-                                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
-                                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow;
+                                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
+                                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow;
                                 SimOAMixer(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
                             } else {
-                                DataLoopNode::Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
+                                state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                             }
 
                             if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
@@ -6698,11 +6700,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) != 0) {
                         if (!state.dataHVACVarRefFlow->LastModeCooling(VRFCond)) {
                             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-                                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
-                                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirMassFlow;
+                                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
+                                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirMassFlow;
                                 SimOAMixer(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
                             } else {
-                                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
+                                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
                             }
 
                             if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
@@ -6732,11 +6734,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) != 0) {
                         if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-                                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
-                                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow;
+                                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
+                                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow;
                                 SimOAMixer(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
                             } else {
-                                DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
+                                state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                             }
 
                             if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
@@ -6780,11 +6782,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) != 0) {
                     if (!state.dataHVACVarRefFlow->LastModeCooling(VRFCond)) {
                         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
-                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirMassFlow;
+                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
+                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirMassFlow;
                             SimOAMixer(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
                         } else {
-                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
+                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
                         }
 
                         if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
@@ -6819,11 +6821,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                         // system last operated in cooling mode, change air flows and repeat coil off capacity test
                         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
-                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow;
+                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
+                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow;
                             SimOAMixer(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
                         } else {
-                            DataLoopNode::Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
+                            state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                         }
 
                         if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
@@ -8330,7 +8332,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                             state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                             RoutineName);
                     this->WaterCondenserDesignMassFlow = this->WaterCondVolFlowRate * rho;
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                                        this->WaterCondenserDesignMassFlow,
                                                        this->CondenserNodeNum,
                                                        this->CondenserOutletNodeNum,
@@ -8387,11 +8390,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (PartLoadRatio ==
                 0.0) { // set coil inlet conditions when coil does not operate. Inlet conditions are set in ControlVRF_FluidTCtrl when PLR=1
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolingCoilPresent) {
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeT = DataLoopNode::Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).Temp;
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeW = DataLoopNode::Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).HumRat;
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeT = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).Temp;
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeW = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).HumRat;
                 } else {
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeT = DataLoopNode::Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).AirInNode).Temp;
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeW = DataLoopNode::Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).AirInNode).HumRat;
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeT = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).AirInNode).Temp;
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeW = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).AirInNode).HumRat;
                 }
             }
             // CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
@@ -8526,14 +8529,14 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // set supplemental heating coil calculation if the condition requires
         if (this->SuppHeatingCoilPresent) {
             if ((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
-                (this->isSetPointControlled && this->suppTempSetPoint > DataLoopNode::Node(this->SuppHeatCoilAirInletNode).Temp)) {
+                (this->isSetPointControlled && this->suppTempSetPoint > state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).Temp)) {
                 Real64 ZoneLoad = 0.0;
                 Real64 LoadToHeatingSP = 0.0;
                 Real64 LoadToCoolingSP = 0.0;
                 if (this->isSetPointControlled) {
-                    Real64 mDot = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).MassFlowRate;
-                    Real64 Tin = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).Temp;
-                    Real64 Win = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).HumRat;
+                    Real64 mDot = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).MassFlowRate;
+                    Real64 Tin = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).Temp;
+                    Real64 Win = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).HumRat;
                     Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(Win);
                     SuppHeatCoilLoad = mDot * CpAirIn * (this->suppTempSetPoint - Tin);
                     this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
@@ -8571,7 +8574,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     PartLoadRatio = 1.0;
                     // the zone set point could be exceeded if set point control is used so protect against that
                     if (this->isSetPointControlled) {
-                        if (DataLoopNode::Node(this->coolCoilAirOutNode).Temp > this->coilTempSetPoint) return;
+                        if (state.dataLoopNodes->Node(this->coolCoilAirOutNode).Temp > this->coilTempSetPoint) return;
                     } else {
                         return;
                     }
@@ -8589,7 +8592,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     PartLoadRatio = 1.0;
                     // the zone set point could be exceeded if set point control is used so protect against that
                     if (this->isSetPointControlled) {
-                        if (DataLoopNode::Node(this->heatCoilAirOutNode).Temp < this->coilTempSetPoint) return;
+                        if (state.dataLoopNodes->Node(this->heatCoilAirOutNode).Temp < this->coilTempSetPoint) return;
                     } else {
                         return;
                     }
@@ -8783,14 +8786,14 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
         SetAverageAirFlow(state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
 
-        AirMassFlow = DataLoopNode::Node(VRFTUInletNodeNum).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(VRFTUInletNodeNum).MassFlowRate;
         if (this->ATMixerExists) {
             // There is an air terminal mixer
             ATMixOutNode = this->ATMixerOutNode;
             if (this->ATMixerType == DataHVACGlobals::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
                 // set the primary air inlet mass flow rate
-                DataLoopNode::Node(this->ATMixerPriNode).MassFlowRate =
-                    min(DataLoopNode::Node(this->ATMixerPriNode).MassFlowRateMaxAvail, DataLoopNode::Node(VRFTUInletNodeNum).MassFlowRate);
+                state.dataLoopNodes->Node(this->ATMixerPriNode).MassFlowRate =
+                    min(state.dataLoopNodes->Node(this->ATMixerPriNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(VRFTUInletNodeNum).MassFlowRate);
                 // now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already
                 // been set above (it is the "inlet" node flow rate)
                 SimATMixer(state, this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
@@ -8898,9 +8901,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         if (this->SuppHeatingCoilPresent) {
             Real64 SuppPLR = this->SuppHeatPartLoadRatio;
             this->CalcVRFSuppHeatingCoil(state, VRFTUNum, FirstHVACIteration, SuppPLR, SuppHeatCoilLoad);
-            if ((DataLoopNode::Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
+            if ((state.dataLoopNodes->Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
                 // adjust the heating load to maximum allowed
-                Real64 MaxHeatCoilLoad = this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->MaxSATFromSuppHeatCoil);
+                Real64 MaxHeatCoilLoad = this->HeatingCoilCapacityLimit(state, this->SuppHeatCoilAirInletNode, this->MaxSATFromSuppHeatCoil);
                 this->CalcVRFSuppHeatingCoil(state, VRFTUNum, FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);
                 SuppHeatCoilLoad = MaxHeatCoilLoad;
             }
@@ -8913,25 +8916,25 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (this->ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 // Air terminal supply side mixer, calculate supply side mixer output
                 SimATMixer(state, this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
-                TempOut = DataLoopNode::Node(ATMixOutNode).Temp;
-                SpecHumOut = DataLoopNode::Node(ATMixOutNode).HumRat;
-                AirMassFlow = DataLoopNode::Node(ATMixOutNode).MassFlowRate;
+                TempOut = state.dataLoopNodes->Node(ATMixOutNode).Temp;
+                SpecHumOut = state.dataLoopNodes->Node(ATMixOutNode).HumRat;
+                AirMassFlow = state.dataLoopNodes->Node(ATMixOutNode).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
-                TempOut = DataLoopNode::Node(VRFTUOutletNodeNum).Temp;
-                SpecHumOut = DataLoopNode::Node(VRFTUOutletNodeNum).HumRat;
+                TempOut = state.dataLoopNodes->Node(VRFTUOutletNodeNum).Temp;
+                SpecHumOut = state.dataLoopNodes->Node(VRFTUOutletNodeNum).HumRat;
             }
-            TempIn = DataLoopNode::Node(ZoneNode).Temp;
-            SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
+            TempIn = state.dataLoopNodes->Node(ZoneNode).Temp;
+            SpecHumIn = state.dataLoopNodes->Node(ZoneNode).HumRat;
         } else {
-            TempOut = DataLoopNode::Node(VRFTUOutletNodeNum).Temp;
-            SpecHumOut = DataLoopNode::Node(VRFTUOutletNodeNum).HumRat;
+            TempOut = state.dataLoopNodes->Node(VRFTUOutletNodeNum).Temp;
+            SpecHumOut = state.dataLoopNodes->Node(VRFTUOutletNodeNum).HumRat;
             if (ZoneNode > 0) {
-                TempIn = DataLoopNode::Node(ZoneNode).Temp;
-                SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
+                TempIn = state.dataLoopNodes->Node(ZoneNode).Temp;
+                SpecHumIn = state.dataLoopNodes->Node(ZoneNode).HumRat;
             } else {
-                TempIn = DataLoopNode::Node(VRFTUInletNodeNum).Temp;
-                SpecHumIn = DataLoopNode::Node(VRFTUInletNodeNum).HumRat;
+                TempIn = state.dataLoopNodes->Node(VRFTUInletNodeNum).Temp;
+                SpecHumIn = state.dataLoopNodes->Node(VRFTUInletNodeNum).HumRat;
             }
         }
         // calculate sensible load met using delta enthalpy
@@ -9055,16 +9058,16 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists) {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 // Air terminal supply side mixer
-                TempOut = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerOutNode).Temp;
-                TempIn = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp;
+                TempOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerOutNode).Temp;
+                TempIn = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp;
             } else {
                 // Air terminal inlet side mixer
-                TempOut = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
-                TempIn = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp;
+                TempOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
+                TempIn = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp;
             }
         } else {
-            TempOut = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
-            TempIn = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp;
+            TempOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
+            TempIn = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp;
         }
         // latent heat vaporization/condensation used in moist air psychometrics
         Real64 const H2OHtOfVap = PsyHgAirFnWTdb(0.0, TempOut);
@@ -9155,11 +9158,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         CondenserOutletNode = state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum;
 
-        DataLoopNode::Node(CondenserOutletNode).Temp = state.dataHVACVarRefFlow->VRF(VRFCond).CondenserSideOutletTemp;
+        state.dataLoopNodes->Node(CondenserOutletNode).Temp = state.dataHVACVarRefFlow->VRF(VRFCond).CondenserSideOutletTemp;
 
-        DataLoopNode::Node(CondenserOutletNode).MassFlowRate = state.dataHVACVarRefFlow->CondenserWaterMassFlowRate;
-        DataLoopNode::Node(CondenserOutletNode).MassFlowRateMaxAvail = DataLoopNode::Node(CondenserOutletNode).MassFlowRateMaxAvail;
-        DataLoopNode::Node(CondenserOutletNode).MassFlowRateMinAvail = DataLoopNode::Node(CondenserOutletNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(CondenserOutletNode).MassFlowRate = state.dataHVACVarRefFlow->CondenserWaterMassFlowRate;
+        state.dataLoopNodes->Node(CondenserOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(CondenserOutletNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(CondenserOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(CondenserOutletNode).MassFlowRateMinAvail;
     }
 
     void isVRFCoilPresent(EnergyPlusData &state, std::string const VRFTUName, bool &CoolCoilPresent, bool &HeatCoilPresent)
@@ -9240,7 +9243,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         }
 
         if (setPointControlled) {
-            Real64 outletNodeT = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
+            Real64 outletNodeT = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
             PLRResidual = (outletNodeT - state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilTempSetPoint);
         } else {
             if (std::abs(QZnReq) < 100.0) QZnReqTemp = sign(100.0, QZnReq);
@@ -9306,13 +9309,13 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
             // so for sure OA system TUs should use inlet node flow rate, don't overwrite inlet node flow rate
             // could there be a reason for air loops to use inlet node flow? Possibly when VAV TUs used?
-            if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InletNode).MassFlowRate = AverageUnitMassFlow;
-            if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
+            if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) state.dataLoopNodes->Node(InletNode).MassFlowRate = AverageUnitMassFlow;
+            if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
             if (OutsideAirNode > 0) {
-                DataLoopNode::Node(OutsideAirNode).MassFlowRate = AverageOAMassFlow;
-                DataLoopNode::Node(OutsideAirNode).MassFlowRateMaxAvail = AverageOAMassFlow;
-                DataLoopNode::Node(AirRelNode).MassFlowRate = AverageOAMassFlow;
-                DataLoopNode::Node(AirRelNode).MassFlowRateMaxAvail = AverageOAMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = AverageOAMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMaxAvail = AverageOAMassFlow;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRate = AverageOAMassFlow;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRateMaxAvail = AverageOAMassFlow;
             }
             if (AverageUnitMassFlow > 0.0) {
                 OnOffAirFlowRatio = state.dataHVACVarRefFlow->CompOnMassFlow / AverageUnitMassFlow;
@@ -9322,10 +9325,10 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         } else { // terminal unit and/or fan is off
 
-            if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InletNode).MassFlowRate = 0.0;
+            if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
             if (OutsideAirNode > 0) {
-                DataLoopNode::Node(OutsideAirNode).MassFlowRate = 0.0;
-                DataLoopNode::Node(AirRelNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRate = 0.0;
             }
             OnOffAirFlowRatio = 0.0;
         }
@@ -9408,7 +9411,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
             if (state.dataHVACVarRefFlow->VRFTU(TUIndex).isSetPointControlled) {
                 // set point temperature may only reside at the TU outlet node
-                Real64 coolCoilTempSetPoint = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum).TempSetPoint;
+                Real64 coolCoilTempSetPoint = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum).TempSetPoint;
                 state.dataHVACVarRefFlow->VRFTU(TUIndex).suppTempSetPoint = coolCoilTempSetPoint;
                 Real64 heatCoilTempSetPoint = coolCoilTempSetPoint;
                 // adjust coil control for fan heat when set point is at outlet node
@@ -9416,20 +9419,20 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 Real64 heatfanDeltaT = 0.0;
                 if (state.dataHVACVarRefFlow->VRFTU(TUIndex).FanPlace == DataHVACGlobals::DrawThru) {
                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).fanOutletNode > 0)
-                        coolfanDeltaT = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).fanOutletNode).Temp - DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).fanInletNode).Temp;
+                        coolfanDeltaT = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).fanOutletNode).Temp - state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).fanInletNode).Temp;
                 }
                 heatfanDeltaT = coolfanDeltaT;
                 // or the set point could be placed at either or both coils, update both if necessary
                 if (state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolingCoilPresent) {
-                    if (DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode).TempSetPoint != DataLoopNode::SensedNodeFlagValue) {
-                        coolCoilTempSetPoint = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode).TempSetPoint;
+                    if (state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode).TempSetPoint != DataLoopNode::SensedNodeFlagValue) {
+                        coolCoilTempSetPoint = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode).TempSetPoint;
                         //// should we adjust for fan heat or not? What if it's a mixed air SP that already adjusts for fan heat?
                         // coolfanDeltaT = 0.0;
                     }
                 }
                 if (state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatingCoilPresent) {
-                    if (DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode).TempSetPoint != DataLoopNode::SensedNodeFlagValue) {
-                        heatCoilTempSetPoint = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode).TempSetPoint;
+                    if (state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode).TempSetPoint != DataLoopNode::SensedNodeFlagValue) {
+                        heatCoilTempSetPoint = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode).TempSetPoint;
                         //// should we adjust for fan heat or not? What if it's a mixed air SP that already adjusts for fan heat?
                         // heatfanDeltaT = 0.0;
                     }
@@ -9441,9 +9444,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         // There is an air terminal mixer
                         if (state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerType == DataHVACGlobals::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
                                                                                                 // set the primary air inlet mass flow rate
-                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerPriNode).MassFlowRate =
-                                min(DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerPriNode).MassFlowRateMaxAvail,
-                                    DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate);
+                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerPriNode).MassFlowRate =
+                                min(state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerPriNode).MassFlowRateMaxAvail,
+                                    state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate);
                             // now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate
                             // has already been set above (it is the "inlet" node flow rate)
                             SingleDuct::SimATMixer(state, state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerIndex);
@@ -9456,15 +9459,15 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
                 // identify a coil inlet temperature
                 if (state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolingCoilPresent) {
-                    state.dataHVACVarRefFlow->VRFTU(TUIndex).coilInNodeT = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirInNode).Temp;
-                    state.dataHVACVarRefFlow->VRFTU(TUIndex).coilInNodeW = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirInNode).HumRat;
+                    state.dataHVACVarRefFlow->VRFTU(TUIndex).coilInNodeT = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirInNode).Temp;
+                    state.dataHVACVarRefFlow->VRFTU(TUIndex).coilInNodeW = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirInNode).HumRat;
                 } else {
-                    state.dataHVACVarRefFlow->VRFTU(TUIndex).coilInNodeT = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirInNode).Temp;
-                    state.dataHVACVarRefFlow->VRFTU(TUIndex).coilInNodeW = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirInNode).HumRat;
+                    state.dataHVACVarRefFlow->VRFTU(TUIndex).coilInNodeT = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirInNode).Temp;
+                    state.dataHVACVarRefFlow->VRFTU(TUIndex).coilInNodeW = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirInNode).HumRat;
                 }
                 Real64 coilInletTemp = state.dataHVACVarRefFlow->VRFTU(TUIndex).coilInNodeT;
                 Real64 coilInletHumRat = state.dataHVACVarRefFlow->VRFTU(TUIndex).coilInNodeW;
-                Real64 coilInletMassFlow = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate;
+                Real64 coilInletMassFlow = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate;
                 state.dataHVACVarRefFlow->VRFTU(TUIndex).coolSPActive = false;
                 state.dataHVACVarRefFlow->VRFTU(TUIndex).heatSPActive = false;
 
@@ -9552,12 +9555,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                     if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                                         // if last mode was cooling, make sure heating flow rate is used
                                         if (state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerUsed) {
-                                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOAMixerRetNodeNum).MassFlowRate =
+                                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOAMixerRetNodeNum).MassFlowRate =
                                                 state.dataHVACVarRefFlow->VRFTU(TUIndex).MaxHeatAirMassFlow;
-                                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatOutAirMassFlow;
+                                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatOutAirMassFlow;
                                             SimOAMixer(state, state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerIndex);
                                         } else {
-                                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(TUIndex).MaxHeatAirMassFlow;
+                                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(TUIndex).MaxHeatAirMassFlow;
                                         }
 
                                         // recalculate using correct flow rate
@@ -9600,12 +9603,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                 if (state.dataHeatBalFanSys->TempControlType(ThisZoneNum) != DataHVACGlobals::SingleHeatingSetPoint && state.dataHeatBalFanSys->TempControlType(ThisZoneNum) != 0) {
                                     if (!state.dataHVACVarRefFlow->LastModeCooling(VRFCond)) {
                                         if (state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerUsed) {
-                                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOAMixerRetNodeNum).MassFlowRate =
+                                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOAMixerRetNodeNum).MassFlowRate =
                                                 state.dataHVACVarRefFlow->VRFTU(TUIndex).MaxCoolAirMassFlow;
-                                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolOutAirMassFlow;
+                                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOAMixerOANodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolOutAirMassFlow;
                                             SimOAMixer(state, state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerIndex);
                                         } else {
-                                            DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(TUIndex).MaxCoolAirMassFlow;
+                                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(TUIndex).MaxCoolAirMassFlow;
                                         }
 
                                         if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
@@ -10214,8 +10217,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         C3Tcond = state.dataDXCoils->DXCoil(HeatCoilNum).C3Tc;
 
         VRFInletNode = this->VRFTUInletNodeNum;
-        T_TU_in = DataLoopNode::Node(VRFInletNode).Temp;
-        W_TU_in = DataLoopNode::Node(VRFInletNode).HumRat;
+        T_TU_in = state.dataLoopNodes->Node(VRFInletNode).Temp;
+        W_TU_in = state.dataLoopNodes->Node(VRFInletNode).HumRat;
         T_coil_in = this->coilInNodeT;
         W_coil_in = this->coilInNodeW;
 
@@ -10511,11 +10514,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         // set condenser entering air conditions (Outdoor air conditions)
         if (this->CondenserNodeNum != 0) {
-            OutdoorDryBulb = DataLoopNode::Node(this->CondenserNodeNum).Temp;
+            OutdoorDryBulb = state.dataLoopNodes->Node(this->CondenserNodeNum).Temp;
             if (this->CondenserType != DataHVACGlobals::WaterCooled) {
-                OutdoorHumRat = DataLoopNode::Node(this->CondenserNodeNum).HumRat;
-                OutdoorPressure = DataLoopNode::Node(this->CondenserNodeNum).Press;
-                OutdoorWetBulb = DataLoopNode::Node(this->CondenserNodeNum).OutAirWetBulb;
+                OutdoorHumRat = state.dataLoopNodes->Node(this->CondenserNodeNum).HumRat;
+                OutdoorPressure = state.dataLoopNodes->Node(this->CondenserNodeNum).Press;
+                OutdoorWetBulb = state.dataLoopNodes->Node(this->CondenserNodeNum).OutAirWetBulb;
             } else {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
@@ -11738,24 +11741,24 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         PartLoadRatio = 1.0;
         this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         if (this->CoolingCoilPresent) {
-            this->coilInNodeT = DataLoopNode::Node(state.dataDXCoils->DXCoil(this->CoolCoilIndex).AirInNode).Temp;
-            this->coilInNodeW = DataLoopNode::Node(state.dataDXCoils->DXCoil(this->CoolCoilIndex).AirInNode).HumRat;
+            this->coilInNodeT = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->CoolCoilIndex).AirInNode).Temp;
+            this->coilInNodeW = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->CoolCoilIndex).AirInNode).HumRat;
         } else {
-            this->coilInNodeT = DataLoopNode::Node(state.dataDXCoils->DXCoil(this->HeatCoilIndex).AirInNode).Temp;
-            this->coilInNodeW = DataLoopNode::Node(state.dataDXCoils->DXCoil(this->HeatCoilIndex).AirInNode).HumRat;
+            this->coilInNodeT = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->HeatCoilIndex).AirInNode).Temp;
+            this->coilInNodeW = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->HeatCoilIndex).AirInNode).HumRat;
         }
 
         // set supplemental heating coil calculation if the condition requires
         if (this->SuppHeatingCoilPresent) {
             if ((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
-                (this->isSetPointControlled && this->suppTempSetPoint > DataLoopNode::Node(this->SuppHeatCoilAirInletNode).Temp)) {
+                (this->isSetPointControlled && this->suppTempSetPoint > state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).Temp)) {
                 Real64 ZoneLoad = 0.0;
                 Real64 LoadToHeatingSP = 0.0;
                 Real64 LoadToCoolingSP = 0.0;
                 if (this->isSetPointControlled) {
-                    Real64 mDot = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).MassFlowRate;
-                    Real64 Tin = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).Temp;
-                    Real64 Win = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).HumRat;
+                    Real64 mDot = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).MassFlowRate;
+                    Real64 Tin = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).Temp;
+                    Real64 Win = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).HumRat;
                     Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(Win);
                     SuppHeatCoilLoad = mDot * CpAirIn * (this->suppTempSetPoint - Tin);
                     this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
@@ -11793,7 +11796,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     PartLoadRatio = 1.0;
                     // the zone set point could be exceeded if set point control is used so protect against that
                     if (this->isSetPointControlled) {
-                        if (DataLoopNode::Node(this->coolCoilAirOutNode).Temp > this->coilTempSetPoint) return;
+                        if (state.dataLoopNodes->Node(this->coolCoilAirOutNode).Temp > this->coilTempSetPoint) return;
                     } else {
                         return;
                     }
@@ -11811,7 +11814,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     PartLoadRatio = 1.0;
                     // the zone set point could be exceeded if set point control is used so protect against that
                     if (this->isSetPointControlled) {
-                        if (DataLoopNode::Node(this->heatCoilAirOutNode).Temp < this->coilTempSetPoint) return;
+                        if (state.dataLoopNodes->Node(this->heatCoilAirOutNode).Temp < this->coilTempSetPoint) return;
                     } else {
                         return;
                     }
@@ -11967,15 +11970,15 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             state.dataHVACVarRefFlow->CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl(state, VRFTUNum, PartLoadRatio, FirstHVACIteration);
         }
         SetAverageAirFlow(state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
-        AirMassFlow = DataLoopNode::Node(VRFTUInletNodeNum).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(VRFTUInletNodeNum).MassFlowRate;
 
         if (this->ATMixerExists) {
             // There is an air terminal mixer
             ATMixOutNode = this->ATMixerOutNode;
             if (this->ATMixerType == DataHVACGlobals::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
                 // set the primary air inlet mass flow rate
-                DataLoopNode::Node(this->ATMixerPriNode).MassFlowRate =
-                    min(DataLoopNode::Node(this->ATMixerPriNode).MassFlowRateMaxAvail, DataLoopNode::Node(VRFTUInletNodeNum).MassFlowRate);
+                state.dataLoopNodes->Node(this->ATMixerPriNode).MassFlowRate =
+                    min(state.dataLoopNodes->Node(this->ATMixerPriNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(VRFTUInletNodeNum).MassFlowRate);
                 // now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already
                 // been set above (it is the "inlet" node flow rate)
                 SimATMixer(state, this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
@@ -12074,9 +12077,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         if (this->SuppHeatingCoilPresent) {
             Real64 SuppPLR = this->SuppHeatPartLoadRatio;
             this->CalcVRFSuppHeatingCoil(state, VRFTUNum, FirstHVACIteration, SuppPLR, SuppHeatCoilLoad);
-            if ((DataLoopNode::Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
+            if ((state.dataLoopNodes->Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
                 // adjust the heating load to maximum allowed
-                Real64 MaxHeatCoilLoad = this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->MaxSATFromSuppHeatCoil);
+                Real64 MaxHeatCoilLoad = this->HeatingCoilCapacityLimit(state, this->SuppHeatCoilAirInletNode, this->MaxSATFromSuppHeatCoil);
                 this->CalcVRFSuppHeatingCoil(state, VRFTUNum, FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);
                 SuppHeatCoilLoad = MaxHeatCoilLoad;
             }
@@ -12089,25 +12092,25 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (this->ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 // Air terminal supply side mixer, calculate supply side mixer output
                 SimATMixer(state, this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
-                TempOut = DataLoopNode::Node(ATMixOutNode).Temp;
-                SpecHumOut = DataLoopNode::Node(ATMixOutNode).HumRat;
-                AirMassFlow = DataLoopNode::Node(ATMixOutNode).MassFlowRate;
+                TempOut = state.dataLoopNodes->Node(ATMixOutNode).Temp;
+                SpecHumOut = state.dataLoopNodes->Node(ATMixOutNode).HumRat;
+                AirMassFlow = state.dataLoopNodes->Node(ATMixOutNode).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
-                TempOut = DataLoopNode::Node(VRFTUOutletNodeNum).Temp;
-                SpecHumOut = DataLoopNode::Node(VRFTUOutletNodeNum).HumRat;
+                TempOut = state.dataLoopNodes->Node(VRFTUOutletNodeNum).Temp;
+                SpecHumOut = state.dataLoopNodes->Node(VRFTUOutletNodeNum).HumRat;
             }
-            TempIn = DataLoopNode::Node(ZoneNode).Temp;
-            SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
+            TempIn = state.dataLoopNodes->Node(ZoneNode).Temp;
+            SpecHumIn = state.dataLoopNodes->Node(ZoneNode).HumRat;
         } else {
-            TempOut = DataLoopNode::Node(VRFTUOutletNodeNum).Temp;
-            SpecHumOut = DataLoopNode::Node(VRFTUOutletNodeNum).HumRat;
+            TempOut = state.dataLoopNodes->Node(VRFTUOutletNodeNum).Temp;
+            SpecHumOut = state.dataLoopNodes->Node(VRFTUOutletNodeNum).HumRat;
             if (ZoneNode > 0) {
-                TempIn = DataLoopNode::Node(ZoneNode).Temp;
-                SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
+                TempIn = state.dataLoopNodes->Node(ZoneNode).Temp;
+                SpecHumIn = state.dataLoopNodes->Node(ZoneNode).HumRat;
             } else {
-                TempIn = DataLoopNode::Node(VRFTUInletNodeNum).Temp;
-                SpecHumIn = DataLoopNode::Node(VRFTUInletNodeNum).HumRat;
+                TempIn = state.dataLoopNodes->Node(VRFTUInletNodeNum).Temp;
+                SpecHumIn = state.dataLoopNodes->Node(VRFTUInletNodeNum).HumRat;
             }
         }
         // calculate sensible load met using delta enthalpy
@@ -12301,15 +12304,15 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
         state.dataHVACVarRefFlow->CompOnMassFlow = FanSpdRatio * state.dataDXCoils->DXCoil(CoilIndex).RatedAirMassFlowRate(Mode);
         SetAverageAirFlow(state, VRFTUNum, PartLoadRatio, temp);
-        Tin = DataLoopNode::Node(VRFInletNode).Temp;
-        Win = DataLoopNode::Node(VRFInletNode).HumRat;
+        Tin = state.dataLoopNodes->Node(VRFInletNode).Temp;
+        Win = state.dataLoopNodes->Node(VRFInletNode).HumRat;
 
         // Simulation the OAMixer if there is any
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
             SimOAMixer(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
             OAMixNode = state.dataMixedAir->OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
-            Tin = DataLoopNode::Node(OAMixNode).Temp;
-            Win = DataLoopNode::Node(OAMixNode).HumRat;
+            Tin = state.dataLoopNodes->Node(OAMixNode).Temp;
+            Win = state.dataLoopNodes->Node(OAMixNode).HumRat;
         }
         // Simulate the blow-through fan if there is any
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
@@ -12330,8 +12333,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                             DataHVACGlobals::ZoneCompTurnFansOn,
                                             DataHVACGlobals::ZoneCompTurnFansOff);
             }
-            Tin = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).Temp;
-            Win = DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).HumRat;
+            Tin = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).Temp;
+            Win = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).HumRat;
         }
 
         // Call the coil control logic to determine the air flow rate to match the given coil load
@@ -14581,7 +14584,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 if (SuppHeatCoilLoad > DataHVACGlobals::SmallLoad) {
                     //     see if HW coil has enough capacity to meet the load
                     Real64 mdot = this->SuppHeatCoilFluidMaxFlow;
-                    DataLoopNode::Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
+                    state.dataLoopNodes->Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
                     //     simulate hot water coil to find the full flow operating capacity
                     WaterCoils::SimulateWaterCoilComponents(
                         state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, QActual, this->OpMode, PartLoadRatio);
@@ -14624,7 +14627,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
                 //     simulate steam heating coil
                 Real64 mdot = this->SuppHeatCoilFluidMaxFlow * PartLoadRatio;
-                DataLoopNode::Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
+                state.dataLoopNodes->Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
                 SteamCoils::SimulateSteamCoilComponents(state,
                                                         this->SuppHeatCoilName,
                                                         FirstHVACIteration,
@@ -14663,11 +14666,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         Real64 SuppHeatCoilLoad = Par[3]; // supplemental heating coil load to be met [W]
         Real64 QActual = 0.0;             // actual heating load deleivered [W]
 
-        // Real64 mdot = min(DataLoopNode::Node(VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode).MassFlowRateMaxAvail,
+        // Real64 mdot = min(state.dataLoopNodes->Node(VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode).MassFlowRateMaxAvail,
         //                  VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac);
 
         Real64 mdot = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac;
-        DataLoopNode::Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
+        state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
         WaterCoils::SimulateWaterCoilComponents(state,
                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -14685,7 +14688,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         return Residuum;
     }
 
-    Real64 VRFTerminalUnitEquipment::HeatingCoilCapacityLimit(
+    Real64 VRFTerminalUnitEquipment::HeatingCoilCapacityLimit(EnergyPlusData &state, 
         Real64 const HeatCoilAirInletNode, // supplemental heating coil air inlet node
         Real64 const HeatCoilMaxSATAllowed // supplemental heating coil maximum supply air temperature allowed [C]
     )
@@ -14700,9 +14703,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Return value
         Real64 HeatCoilCapacityAllowed; // heating coil maximum capacity that can be deleivered at current time [W]
 
-        Real64 MDotAir = DataLoopNode::Node(HeatCoilAirInletNode).MassFlowRate;
-        Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(HeatCoilAirInletNode).HumRat);
-        Real64 HCDeltaT = max(0.0, HeatCoilMaxSATAllowed - DataLoopNode::Node(HeatCoilAirInletNode).Temp);
+        Real64 MDotAir = state.dataLoopNodes->Node(HeatCoilAirInletNode).MassFlowRate;
+        Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(HeatCoilAirInletNode).HumRat);
+        Real64 HCDeltaT = max(0.0, HeatCoilMaxSATAllowed - state.dataLoopNodes->Node(HeatCoilAirInletNode).Temp);
         HeatCoilCapacityAllowed = MDotAir * CpAirIn * HCDeltaT;
 
         return HeatCoilCapacityAllowed;

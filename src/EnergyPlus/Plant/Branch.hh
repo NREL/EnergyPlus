@@ -101,7 +101,7 @@ namespace DataPlant {
             return load;
         }
 
-        Real64 DetermineBranchFlowRequest();
+        Real64 DetermineBranchFlowRequest(EnergyPlusData &state);
     };
 
 } // namespace DataPlant

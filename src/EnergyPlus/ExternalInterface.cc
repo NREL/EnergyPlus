@@ -1977,7 +1977,6 @@ namespace ExternalInterface {
         // This subroutine organizes the data exchange between FMU and EnergyPlus.
 
         // Using/Aliasing
-        using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using EMSManager::ManageEMS;
 
         using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
@@ -2004,7 +2003,6 @@ namespace ExternalInterface {
         if (state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // Data exchange after design days
             if (FirstCallWUp) {
                 // set the report during warmup to true so that variables are also updated during the warmup
-                UpdateDataDuringWarmupExternalInterface = true;
                 hStep = (60.0 * state.dataGlobal->TimeStepZone) * 60.0;
                 tStart = GetCurSimStartTimeSeconds(state);
                 tStop = tStart + 24.0 * 3600.0;
@@ -2128,7 +2126,7 @@ namespace ExternalInterface {
 
             if (FirstCallTStep) {
                 // reset the UpdateDataDuringWarmupExternalInterface to be false.
-                UpdateDataDuringWarmupExternalInterface = false;
+                state.dataSysVars->UpdateDataDuringWarmupExternalInterface = false;
                 // The time is computed in seconds for FMU
                 tStart = GetCurSimStartTimeSeconds(state);
                 tStop = tStart + (state.dataEnvrn->TotalOverallSimDays - state.dataEnvrn->TotDesDays) * 24.0 * 3600.0;

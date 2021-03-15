@@ -205,7 +205,8 @@ namespace DataPlant {
 
         void AdjustPumpFlowRequestByEMSControls(int BranchNum, int CompNum, Real64 &FlowToRequest);
 
-        void PushBranchFlowCharacteristics(int BranchNum,
+        void PushBranchFlowCharacteristics(EnergyPlusData &state,
+                                           int BranchNum,
                                            Real64 ValueToPush,
                                            bool FirstHVACIteration // TRUE if First HVAC iteration of Time step
         );

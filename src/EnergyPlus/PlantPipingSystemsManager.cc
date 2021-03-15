@@ -172,7 +172,7 @@ namespace EnergyPlus {
             thisDomain.PerformIterationLoop(state, this);
 
             // Update outlet nodes, etc.
-            thisDomain.UpdatePipingSystems(this);
+            thisDomain.UpdatePipingSystems(state, this);
         }
 
         void SimulateGroundDomains(EnergyPlusData &state, bool initOnly)
@@ -1552,7 +1552,7 @@ namespace EnergyPlus {
                 thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
                 thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                         DataIPShortCuts::cAlphaArgs(2), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
-                        DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1,
+                        DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1,
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
                     CurIndex = 2;
@@ -1564,7 +1564,7 @@ namespace EnergyPlus {
                 thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
                 thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                         DataIPShortCuts::cAlphaArgs(3), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
-                        DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1,
+                        DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1,
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {
                     CurIndex = 3;
@@ -1669,8 +1669,8 @@ namespace EnergyPlus {
                                                                                ErrorsFound,
                                                                                ObjName_HorizTrench,
                                                                                thisTrenchName,
-                                                                               DataLoopNode::NodeType_Water,
-                                                                               DataLoopNode::NodeConnectionType_Inlet,
+                                                                               DataLoopNode::NodeFluidType::Water,
+                                                                               DataLoopNode::NodeConnectionType::Inlet,
                                                                                1,
                                                                                DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
@@ -1681,8 +1681,8 @@ namespace EnergyPlus {
                                                                                 ErrorsFound,
                                                                                 ObjName_HorizTrench,
                                                                                 thisTrenchName,
-                                                                                DataLoopNode::NodeType_Water,
-                                                                                DataLoopNode::NodeConnectionType_Outlet,
+                                                                                DataLoopNode::NodeFluidType::Water,
+                                                                                DataLoopNode::NodeConnectionType::Outlet,
                                                                                 1,
                                                                                 DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {
@@ -2176,7 +2176,7 @@ namespace EnergyPlus {
 
                 // this seemed to clean up a lot of reverse DD stuff because fluid thermal properties were
                 // being based on the inlet temperature, which wasn't updated until later
-                thisCircuit->CurCircuitInletTemp = DataLoopNode::Node(thisCircuit->InletNodeNum).Temp;
+                thisCircuit->CurCircuitInletTemp = state.dataLoopNodes->Node(thisCircuit->InletNodeNum).Temp;
                 thisCircuit->InletTemperature = thisCircuit->CurCircuitInletTemp;
 
                 this->DoOneTimeInitializations(state, thisCircuit);
@@ -2197,7 +2197,7 @@ namespace EnergyPlus {
             // Get the mass flow and inlet temperature to use for this time step
             int InletNodeNum = thisCircuit->InletNodeNum;
             int OutletNodeNum = thisCircuit->OutletNodeNum;
-            thisCircuit->CurCircuitInletTemp = DataLoopNode::Node(InletNodeNum).Temp;
+            thisCircuit->CurCircuitInletTemp = state.dataLoopNodes->Node(InletNodeNum).Temp;
 
             // request design, set component flow will decide what to give us based on restrictions and flow lock status
             thisCircuit->CurCircuitFlowRate = thisCircuit->DesignMassFlowRate;
@@ -2210,7 +2210,7 @@ namespace EnergyPlus {
                                                  thisCircuit->CompNum);
         }
 
-        void Domain::UpdatePipingSystems(Circuit * thisCircuit) {
+        void Domain::UpdatePipingSystems(EnergyPlusData &state, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2220,7 +2220,7 @@ namespace EnergyPlus {
 
             int OutletNodeNum = thisCircuit->OutletNodeNum;
             auto const &out_cell(thisCircuit->CircuitOutletCell);
-            DataLoopNode::Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y,
+            state.dataLoopNodes->Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y,
                                                                  out_cell.Z).PipeCellData.Fluid.Temperature;
         }
 
