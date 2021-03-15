@@ -224,7 +224,6 @@ set(SRC
     DataViewFactorInformation.cc
     DataViewFactorInformation.hh
     DataWater.hh
-    DataWindowEquivalentLayer.cc
     DataWindowEquivalentLayer.hh
     DataZoneControls.hh
     DataZoneEnergyDemands.hh
