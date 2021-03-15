@@ -1389,7 +1389,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         state.dataHeatBal->SurfQRadThermInAbs.dimension(state.dataSurface->TotSurfaces, 0.0);
         SurfQAdditionalHeatSourceOutside.dimension(state.dataSurface->TotSurfaces, 0.0);
         SurfQAdditionalHeatSourceInside.dimension(state.dataSurface->TotSurfaces, 0.0);
-        SUMH.dimension(state.dataSurface->TotSurfaces, 0);
+        state.dataHeatBalSurf->SUMH.dimension(state.dataSurface->TotSurfaces, 0);
 
         TH.dimension(2, Construction::MaxCTFTerms, state.dataSurface->TotSurfaces, 0.0);
         SurfTempOut.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -4674,7 +4674,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 int l21 = l211 + SurfNum - 1;
                 if ((Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CTF) && (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD))
                     continue;
-                if (SUMH(SurfNum) == 0) { // First time step in a block for a surface, update arrays
+                if (state.dataHeatBalSurf->SUMH(SurfNum) == 0) { // First time step in a block for a surface, update arrays
                     state.dataHeatBalSurfMgr->TempExt1(SurfNum) = TH[l11];
                     state.dataHeatBalSurfMgr->TempInt1(SurfNum) = TempSurfIn(SurfNum);
                     state.dataHeatBalSurfMgr->QExt1(SurfNum) = QH[l11];
@@ -4704,7 +4704,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 int const ConstrNum(surface.Construction);
                 auto const &construct(state.dataConstruction->Construct(ConstrNum));
 
-                ++SUMH(SurfNum);
+                ++state.dataHeatBalSurf->SUMH(SurfNum);
                 state.dataHeatBalSurfMgr->SumTime(SurfNum) = double(SUMH(SurfNum)) * state.dataGlobal->TimeStepZone;
 
                 if (SUMH(SurfNum) == construct.NumHistories) {
@@ -6071,13 +6071,13 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                     "Simulation");
             }
             // Precompute whether CTF temperature limits will be needed
-            DataHeatBalSurface::Zone_has_mixed_HT_models.resize(state.dataGlobal->NumOfZones + 1, false);
+            state.dataHeatBalSurf->Zone_has_mixed_HT_models.resize(state.dataGlobal->NumOfZones + 1, false);
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 auto const &zone(state.dataHeatBal->Zone(iZone));
                 for (int iSurf = zone.HTSurfaceFirst, eSurf = zone.HTSurfaceLast; iSurf <= eSurf; ++iSurf) {
                     auto const alg(Surface(iSurf).HeatTransferAlgorithm);
                     if ((alg == HeatTransferModel_CondFD) || (alg == HeatTransferModel_HAMT) || (alg == HeatTransferModel_Kiva)) {
-                        DataHeatBalSurface::Zone_has_mixed_HT_models[iZone] = true;
+                        state.dataHeatBalSurf->Zone_has_mixed_HT_models[iZone] = true;
                         break;
                     }
                 }
@@ -6431,7 +6431,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             }
                         }
                         // if any mixed heat transfer models in zone, apply limits to CTF result
-                        if (DataHeatBalSurface::Zone_has_mixed_HT_models[ZoneNum])
+                        if (state.dataHeatBalSurf->Zone_has_mixed_HT_models[ZoneNum])
                             TempSurfInTmp(SurfNum) =
                                 max(MinSurfaceTempLimit,
                                     min(MaxSurfaceTempLimit, TempSurfInTmp(SurfNum))); // Limit Check //Tuned Precomputed condition to eliminate loop
@@ -6535,7 +6535,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 }
                             }
                             // if any mixed heat transfer models in zone, apply limits to CTF result
-                            if (DataHeatBalSurface::Zone_has_mixed_HT_models[ZoneNum])
+                            if (state.dataHeatBalSurf->Zone_has_mixed_HT_models[ZoneNum])
                                 TempSurfInTmp(SurfNum) =
                                     max(MinSurfaceTempLimit,
                                         min(MaxSurfaceTempLimit,
@@ -6632,7 +6632,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 SurfOpaqQRadSWInAbs(SurfNum) - CTFConstInPart(SurfNum) - construct.CTFCross(0) * TH11) /
                                 (HMovInsul);
                         // if any mixed heat transfer models in zone, apply limits to CTF result
-                        if (DataHeatBalSurface::Zone_has_mixed_HT_models[ZoneNum])
+                        if (state.dataHeatBalSurf->Zone_has_mixed_HT_models[ZoneNum])
                             TempSurfInTmp(SurfNum) =
                                 max(MinSurfaceTempLimit,
                                     min(MaxSurfaceTempLimit, TempSurfInTmp(SurfNum))); // Limit Check //Tuned Precomputed condition to eliminate loop
