@@ -69,9 +69,9 @@ namespace WaterCoils {
     enum class iCoilModel
     {
         Unassigned,
-        Simple,
-        Cooling,
-        Detailed,
+        HeatingSimple,
+        CoolingSimple,
+        CoolingDetailed,
     };
 
     struct WaterCoilEquipConditions

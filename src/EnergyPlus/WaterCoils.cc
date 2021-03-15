@@ -366,7 +366,7 @@ namespace EnergyPlus::WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::TypeOf_CoilWaterCooling; // 'Heating'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModelA = "SIMPLE";
-            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = iCoilModel::Simple; // 'SIMPLE'
+            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = iCoilModel::HeatingSimple; // 'SIMPLE'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::TypeOf_CoilWaterSimpleHeating;
 
             state.dataWaterCoils->WaterCoil(CoilNum).UACoil = NumArray(1);
@@ -514,7 +514,7 @@ namespace EnergyPlus::WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Cooling";
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::TypeOf_CoilWaterCooling; // 'Cooling'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModelA = "DETAILED FLAT FIN";
-            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = iCoilModel::Detailed; // 'DETAILED FLAT FIN'
+            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = iCoilModel::CoolingDetailed; // 'DETAILED FLAT FIN'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 
             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = NumArray(1);
@@ -696,7 +696,7 @@ namespace EnergyPlus::WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Cooling";
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::TypeOf_CoilWaterCooling; // 'Cooling'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModelA = "Cooling";
-            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = iCoilModel::Cooling; // 'Cooling'
+            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = iCoilModel::CoolingSimple; // 'Cooling'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::TypeOf_CoilWaterCooling;
 
             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = NumArray(1); // Liquid mass flow rate at Design  kg/s
@@ -1140,7 +1140,7 @@ namespace EnergyPlus::WaterCoils {
                                state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum);
 
             // effective fin diameter for detailed flat fin coil
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) { // 'DETAILED FLAT FIN'
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                 state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam = std::sqrt(4.0 * state.dataWaterCoils->WaterCoil(CoilNum).FinDiam * state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth /
                                                                 (DataGlobalConstants::Pi * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow));
 
@@ -1206,7 +1206,7 @@ namespace EnergyPlus::WaterCoils {
             //@@@ DESIGN CONDITION BEGIN HERE @@@
 
             // Check for zero design cooling capacity as specified by coil design inputs
-            if (state.dataWaterCoils->MyCoilDesignFlag(CoilNum) && (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Cooling) &&
+            if (state.dataWaterCoils->MyCoilDesignFlag(CoilNum) && (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingSimple) &&
                 (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) && (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate > 0.0)) {
 
                 DesInletAirEnth = PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat);
@@ -1245,7 +1245,7 @@ namespace EnergyPlus::WaterCoils {
                 }
             }
 
-            if (state.dataWaterCoils->MyCoilDesignFlag(CoilNum) && (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Cooling) &&
+            if (state.dataWaterCoils->MyCoilDesignFlag(CoilNum) && (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingSimple) &&
                 (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) && (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate > 0.0)) { // 'Cooling'
 
                 state.dataWaterCoils->MyCoilDesignFlag(CoilNum) = false;
@@ -1293,7 +1293,7 @@ namespace EnergyPlus::WaterCoils {
                                 state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp = TOutNew;
                                 // update outlet air conditions used for sizing
                                 std::string CompType;
-                                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) {
+                                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) {
                                     CompType = cAllCoilTypes(Coil_CoolingWaterDetailed);
                                 } else {
                                     CompType = cAllCoilTypes(Coil_CoolingWater);
@@ -2091,7 +2091,7 @@ namespace EnergyPlus::WaterCoils {
                 state.dataSize->DataPltSizCoolNum = PltSizCoolNum;
                 state.dataSize->DataWaterLoopNum = state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum;
 
-                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) { // 'DETAILED FLAT FIN'
+                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     CompType = cAllCoilTypes(Coil_CoolingWaterDetailed);       // Coil:Cooling:Water:DetailedGeometry
                 } else {
                     CompType = cAllCoilTypes(Coil_CoolingWater); // Coil:Cooling:Water
@@ -2137,7 +2137,7 @@ namespace EnergyPlus::WaterCoils {
 
                 // calculate pre-sizing data needed for specific functions (e.g., CoolingWaterDesAirInletTempSizing needs HRin and air flow)
                 // these will be calculated again after other parameters are known
-                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) { // 'DETAILED FLAT FIN'
+                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     TempSize = AutoSize;                                       // coil report
                 } else {
                     TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat; // preserve input if entered
@@ -2167,7 +2167,7 @@ namespace EnergyPlus::WaterCoils {
                 }
                 // end pre-sizing data calculations
 
-                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) { // 'DETAILED FLAT FIN'
+                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;       // do not print this sizing request since this coil does not have a design inlet air temp input field (we
                                           // should print this!)
                     TempSize = AutoSize;  // not an input for this model
@@ -2184,7 +2184,7 @@ namespace EnergyPlus::WaterCoils {
                 state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp = sizerCWDesInletAirTemp.size(state, TempSize, ErrorsFound);
                 state.dataSize->DataDesInletAirTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp;
 
-                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) { // 'DETAILED FLAT FIN'
+                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;                                            // no field for detailed water coil, should print to eio anyway
                     TempSize = AutoSize;                                       // coil report
                     SizingString.clear();                                      // doesn't matter
@@ -2199,7 +2199,7 @@ namespace EnergyPlus::WaterCoils {
                 state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = sizerCWDesWaterInTemp.size(state, TempSize, ErrorsFound);
 
                 if (state.dataSize->CurZoneEqNum > 0) { // zone equipment use air inlet humrat to calculate design outlet air temperature
-                    if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) { // 'DETAILED FLAT FIN'
+                    if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                         bPRINT = false;                                            // no field for detailed water coil, should print to eio anyway
                         TempSize = AutoSize;                                       // coil report
                     } else {
@@ -2210,7 +2210,7 @@ namespace EnergyPlus::WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.size(state, TempSize, ErrorsFound);
                 }
 
-                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) { // 'DETAILED FLAT FIN'
+                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;                                            // no field for detailed water coil, should print to eio anyway
                     TempSize = AutoSize;                                       // coil report
                     SizingString.clear();                                      // doesn't matter
@@ -2229,7 +2229,7 @@ namespace EnergyPlus::WaterCoils {
 
                 if (state.dataSize->CurSysNum > 0) { // This call can be deleted at a future time and remove the if ( CurZoneEqNum > 0 ) check above. This will
                                      // change the order of the eio file.
-                    if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) { // 'DETAILED FLAT FIN'
+                    if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                         bPRINT = false;      // no field for detailed water coil, should print this to eio anyway
                         TempSize = AutoSize; // coil report
                     } else {
@@ -2240,7 +2240,7 @@ namespace EnergyPlus::WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.size(state, TempSize, ErrorsFound);
                 }
 
-                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) { // 'DETAILED FLAT FIN'
+                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;                                            // no field for detailed water coil, should print this to eio anyway
                     TempSize = AutoSize;                                       // coil report
                 } else {
@@ -2275,7 +2275,7 @@ namespace EnergyPlus::WaterCoils {
                 state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = sizerCWWaterflow.size(state, TempSize, ErrorsFound);
                 state.dataSize->DataWaterFlowUsedForSizing = state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
 
-                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) { // 'DETAILED FLAT FIN'
+                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false; // do not print this sizing request since this coil does not have a design air flow rate input field (we
                                     // should print this!)
                 } else {
@@ -2297,7 +2297,7 @@ namespace EnergyPlus::WaterCoils {
                     ShowContinueError(state, "The autosize value for max air volume flow rate is zero");
                 }
 
-                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::Detailed) {
+                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) {
 
                     FieldNum = 16; //  N16, \field Number of Tubes per Row
                     bPRINT = true;
