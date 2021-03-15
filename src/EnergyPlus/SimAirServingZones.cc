@@ -2841,7 +2841,7 @@ namespace EnergyPlus::SimAirServingZones {
             for (int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystems(AirLoopNum).NumControllers; ++AirLoopControlNum) {
                 PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum) =
                     HVACControllers::GetControllerIndex(state, PrimaryAirSystems(AirLoopNum).ControllerName(AirLoopControlNum));
-                HVACControllers::ControllerProps(PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum)).AirLoopControllerIndex =
+                state.dataHVACControllers->ControllerProps(PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum)).AirLoopControllerIndex =
                     AirLoopControlNum;
             }
             // When using controllers, size air loop coils so ControllerProps (e.g., Min/Max Actuated) can be set
@@ -3112,7 +3112,7 @@ namespace EnergyPlus::SimAirServingZones {
         // if the controller can be locked out by the economizer operation and the economizer is active, leave the controller inactive
         if (AirLoopCheck) {
             if (AirLoopControlInfo(AirLoopNum).EconoActive) {
-                if (PrimaryAirSystems(AirLoopNum).CanBeLockedOutByEcono(HVACControllers::ControllerProps(ControllerIndex).AirLoopControllerIndex)) {
+                if (PrimaryAirSystems(AirLoopNum).CanBeLockedOutByEcono(state.dataHVACControllers->ControllerProps(ControllerIndex).AirLoopControllerIndex)) {
                     ControllerConvergedFlag = true;
                 }
             }
@@ -3134,7 +3134,7 @@ namespace EnergyPlus::SimAirServingZones {
                               BypassOAController);
 
             if (AirLoopCheck) {
-                PrimaryAirSystems(AirLoopNum).ControlConverged(HVACControllers::ControllerProps(ControllerIndex).AirLoopControllerIndex) =
+                PrimaryAirSystems(AirLoopNum).ControlConverged(state.dataHVACControllers->ControllerProps(ControllerIndex).AirLoopControllerIndex) =
                     ControllerConvergedFlag;
             }
 
@@ -3197,7 +3197,7 @@ namespace EnergyPlus::SimAirServingZones {
 
         // pass convergence of OA system water coils back to SolveAirLoopControllers via PrimaryAirSystem().ControlConverged flag
         if (AirLoopCheck) {
-            PrimaryAirSystems(AirLoopNum).ControlConverged(HVACControllers::ControllerProps(ControllerIndex).AirLoopControllerIndex) =
+            PrimaryAirSystems(AirLoopNum).ControlConverged(state.dataHVACControllers->ControllerProps(ControllerIndex).AirLoopControllerIndex) =
                 ControllerConvergedFlag;
             AirLoopControlInfo(AirLoopNum).ConvergedFlag = AirLoopControlInfo(AirLoopNum).ConvergedFlag && ControllerConvergedFlag;
         }

@@ -213,6 +213,12 @@ struct DemandManagerData : BaseGlobalStruct {
     Array1D<DemandManager::DemandManagerListData> DemandManagerList;
     Array1D<DemandManager::DemandManagerData> DemandMgr;
     std::unordered_map<std::string, std::string> UniqueDemandMgrNames;
+    bool ClearHistory = true;
+    bool BeginDemandSim = true;
+    bool ResimHVAC = true;
+    bool ResimHB = true;
+    bool ResimExt = true;
+    bool firstTime = true;
 
     void clear_state() override
     {
@@ -225,6 +231,12 @@ struct DemandManagerData : BaseGlobalStruct {
         DemandManagerList.deallocate();
         DemandMgr.deallocate();
         UniqueDemandMgrNames.clear();
+        ClearHistory = true;
+        BeginDemandSim = true;
+        ResimHVAC = true;
+        ResimHB = true;
+        ResimExt = true;
+        firstTime = true;
     }
 };
 

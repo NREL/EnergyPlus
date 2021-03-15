@@ -8075,9 +8075,8 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state->dataWaterCoils->NumWaterCoils = 1;
     state->dataWaterCoils->WaterCoil.allocate(state->dataWaterCoils->NumWaterCoils);
     state->dataWaterCoils->WaterCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilType_Heating;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = WaterCoils::iCoilModel::HeatingSimple;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::TypeOf_CoilWaterSimpleHeating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
     state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
@@ -8122,7 +8121,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataWaterCoils->CheckEquipName.dimension(state->dataWaterCoils->NumWaterCoils, true);
 
@@ -11231,7 +11230,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
-    auto &thisFan(Fan(1));
+    auto &thisFan(state->dataFans->Fan(1));
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
     auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
     // run the model
@@ -12964,7 +12963,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
 
     // set pointer to components
-    auto &thisFan(Fan(1));
+    auto &thisFan(state->dataFans->Fan(1));
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
     auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
     // run the model
@@ -15642,7 +15641,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
-    auto &thisFan(Fan(1));
+    auto &thisFan(state->dataFans->Fan(1));
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
     auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
     // run the model

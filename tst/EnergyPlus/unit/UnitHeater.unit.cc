@@ -1322,7 +1322,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
@@ -1341,9 +1341,9 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
 
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).Temp = 16.6;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(*state, 16.6, 0.5, 101325.0, "UnitTest");
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(Fan(1).InletNodeNum).Temp, state->dataLoopNodes->Node(Fan(1).InletNodeNum).HumRat);
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Temp = 16.6;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(*state, 16.6, 0.5, 101325.0, "UnitTest");
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Temp, state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).HumRat);
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
 
     WCWaterInletNode = state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
@@ -1357,7 +1357,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     UHAirOutletNode = state->dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;
 
     SimUnitHeater(*state, state->dataUnitHeaters->UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, state->dataSize->CurZoneEqNum);
-    // SimUnitHeater does not converge on the first call: the unit heater deliveres more than required heating load. But it meets
+    // SimUnitHeater does not converge on the first call: the unit heater delivers more than required heating load. But it meets
     // on the second call (iteration). I suspect it may be an initialization issue related to ControlCompOutput routine
     SimUnitHeater(*state, state->dataUnitHeaters->UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, state->dataSize->CurZoneEqNum);
     // verify the total heat rate deleivered by the unit heater

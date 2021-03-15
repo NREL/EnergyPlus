@@ -5440,7 +5440,7 @@ namespace CondenserLoopTowers {
 
         // PURPOSE OF THIS SUBROUTINE:
         // To verify that the empirical model's independent variables are within the limits used during the
-        // developement of the empirical model.
+        // development of the empirical model.
 
         // METHODOLOGY EMPLOYED:
         // The empirical models used for simulating a variable speed cooling tower are based on a limited data set.

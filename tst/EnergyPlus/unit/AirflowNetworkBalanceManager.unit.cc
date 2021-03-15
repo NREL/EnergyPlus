@@ -20225,28 +20225,28 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneE
     // Create Fans
     Real64 supplyFlowRate = 0.005;
     Real64  exhaustFlowRate = 0.005;
-    Fan.allocate(2);
-    Fan(1).InletNodeNum = 2;
-    Fan(1).OutletNodeNum = 3;
-    Fan(1).FanType_Num = FanType_SimpleOnOff;
-    Fan(1).FanName = "SupplyFan";
-    Fan(1).MaxAirFlowRate = supplyFlowRate;
+    state->dataFans->Fan.allocate(2);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
+    state->dataFans->Fan(1).MaxAirFlowRate = supplyFlowRate;
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
-    BranchNodeConnections::RegisterNodeConnection(*state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
-    Fan(2).InletNodeNum = 4;
-    Fan(2).OutletNodeNum = 5;
-    Fan(2).FanType_Num = FanType_SimpleOnOff;
-    Fan(2).FanName = "ExhaustFan";
-    Fan(2).MaxAirFlowRate = exhaustFlowRate;
+        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
+    state->dataFans->Fan(2).InletNodeNum = 4;
+    state->dataFans->Fan(2).OutletNodeNum = 5;
+    state->dataFans->Fan(2).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(2).FanName = "ExhaustFan";
+    state->dataFans->Fan(2).MaxAirFlowRate = exhaustFlowRate;
     state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 4, state->dataLoopNodes->NodeID(4), "Fan:OnOff", Fan(2).FanName, "Inlet", 1, false, errFlag);
+        *state, 4, state->dataLoopNodes->NodeID(4), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Inlet", 1, false, errFlag);
     state->dataLoopNodes->NodeID(5) = "SupplyExhaustOutletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 5, state->dataLoopNodes->NodeID(5), "Fan:OnOff", Fan(2).FanName, "Outlet", 1, false, errFlag);
+        *state, 5, state->dataLoopNodes->NodeID(5), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Outlet", 1, false, errFlag);
 
     // Create ERV
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
@@ -20257,10 +20257,10 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneE
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = 0.005;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = 0.005;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = 0.005;
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = state->dataFans->Fan(1).FanName;
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).FanName;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
@@ -20365,29 +20365,29 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportZoneERV
     // Create Fans
     Real64 supplyFlowRate = 0.005;
     Real64 exhaustFlowRate = 0.005;
-    Fan.allocate(2);
-    Fan(1).InletNodeNum = 2;
-    Fan(1).OutletNodeNum = 3;
-    Fan(1).FanType_Num = FanType_SimpleOnOff;
-    Fan(1).FanName = "SupplyFan";
-    Fan(1).MaxAirFlowRate = supplyFlowRate;
+    state->dataFans->Fan.allocate(2);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
+    state->dataFans->Fan(1).MaxAirFlowRate = supplyFlowRate;
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
-    Fan(2).InletNodeNum = 4;
-    Fan(2).OutletNodeNum = 5;
-    Fan(2).FanType_Num = FanType_SimpleOnOff;
-    Fan(2).FanName = "ExhaustFan";
-    Fan(2).MaxAirFlowRate = exhaustFlowRate;
+        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
+    state->dataFans->Fan(2).InletNodeNum = 4;
+    state->dataFans->Fan(2).OutletNodeNum = 5;
+    state->dataFans->Fan(2).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(2).FanName = "ExhaustFan";
+    state->dataFans->Fan(2).MaxAirFlowRate = exhaustFlowRate;
     state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 4, state->dataLoopNodes->NodeID(4), "Fan:OnOff", Fan(2).FanName, "Inlet", 1, false, errFlag);
+        *state, 4, state->dataLoopNodes->NodeID(4), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Inlet", 1, false, errFlag);
     state->dataLoopNodes->NodeID(5) = "SupplyExhaustOutletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 5, state->dataLoopNodes->NodeID(5), "Fan:OnOff", Fan(2).FanName, "Outlet", 1, false, errFlag);
+        *state, 5, state->dataLoopNodes->NodeID(5), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Outlet", 1, false, errFlag);
 
     // Create ERV
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
@@ -20398,10 +20398,10 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportZoneERV
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = 0.005;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = 0.005;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = 0.005;
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = state->dataFans->Fan(1).FanName;
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).FanName;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
@@ -20497,29 +20497,29 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportUnbalan
     // Create Fans
     Real64 supplyFlowRate = 0.005;
     Real64 exhaustFlowRate = 0.003;
-    Fan.allocate(2);
-    Fan(1).InletNodeNum = 2;
-    Fan(1).OutletNodeNum = 3;
-    Fan(1).FanType_Num = FanType_SimpleOnOff;
-    Fan(1).FanName = "SupplyFan";
-    Fan(1).MaxAirFlowRate = supplyFlowRate;
+    state->dataFans->Fan.allocate(2);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
+    state->dataFans->Fan(1).MaxAirFlowRate = supplyFlowRate;
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
-    Fan(2).InletNodeNum = 4;
-    Fan(2).OutletNodeNum = 5;
-    Fan(2).FanType_Num = FanType_SimpleOnOff;
-    Fan(2).FanName = "ExhaustFan";
-    Fan(2).MaxAirFlowRate = exhaustFlowRate;
+        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
+    state->dataFans->Fan(2).InletNodeNum = 4;
+    state->dataFans->Fan(2).OutletNodeNum = 5;
+    state->dataFans->Fan(2).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(2).FanName = "ExhaustFan";
+    state->dataFans->Fan(2).MaxAirFlowRate = exhaustFlowRate;
     state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 4, state->dataLoopNodes->NodeID(4), "Fan:OnOff", Fan(2).FanName, "Inlet", 1, false, errFlag);
+        *state, 4, state->dataLoopNodes->NodeID(4), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Inlet", 1, false, errFlag);
     state->dataLoopNodes->NodeID(5) = "SupplyExhaustOutletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 5, state->dataLoopNodes->NodeID(5), "Fan:OnOff", Fan(2).FanName, "Outlet", 1, false, errFlag);
+        *state, 5, state->dataLoopNodes->NodeID(5), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Outlet", 1, false, errFlag);
 
     // Create ERV
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
@@ -20530,10 +20530,10 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportUnbalan
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = 0.005;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = 0.005;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = 0.005;
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = state->dataFans->Fan(1).FanName;
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).FanName;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
@@ -20634,24 +20634,24 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportHPWH)
     AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = false;
 
     // Create Fan
-    Fan.allocate(1);
-    Fan(1).InletNodeNum = 2;
-    Fan(1).OutletNodeNum = 3;
-    Fan(1).FanType_Num = FanType_SimpleOnOff;
-    Fan(1).FanName = "SupplyFan";
+    state->dataFans->Fan.allocate(1);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
+        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
 
     // Create HPWH
     state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
     state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
     state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
     state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTempEnum::TempZone;
-    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = Fan(1).FanName;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = state->dataFans->Fan(1).FanName;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
@@ -20748,24 +20748,24 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWH)
     AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = true;
 
     // Create Fan
-    Fan.allocate(1);
-    Fan(1).InletNodeNum = 2;
-    Fan(1).OutletNodeNum = 3;
-    Fan(1).FanType_Num = FanType_SimpleOnOff;
-    Fan(1).FanName = "SupplyFan";
+    state->dataFans->Fan.allocate(1);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
+        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
 
     // Create HPWH
     state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
     state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
     state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
     state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTempEnum::TempZone;
-    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = Fan(1).FanName;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = state->dataFans->Fan(1).FanName;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
@@ -20855,24 +20855,24 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZon
     AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = true;
 
     // Create Fan
-    Fan.allocate(1);
-    Fan(1).InletNodeNum = 2;
-    Fan(1).OutletNodeNum = 3;
-    Fan(1).FanType_Num = FanType_SimpleOnOff;
-    Fan(1).FanName = "SupplyFan";
+    state->dataFans->Fan.allocate(1);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
     BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
+        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
 
     // Create HPWH
     state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
     state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
     state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
     state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTempEnum::ZoneAndOA;
-    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = Fan(1).FanName;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = state->dataFans->Fan(1).FanName;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 

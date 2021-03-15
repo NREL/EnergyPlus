@@ -6023,7 +6023,6 @@ namespace HeatBalanceManager {
         using NodeInputManager::CalcMoreNodeInfo;
         using OutputReportTabular::UpdateTabularReports;
         using ScheduleManager::ReportScheduleValues;
-        using namespace DataReportingFlags;
 
         ReportScheduleValues(state);
 
@@ -6044,18 +6043,18 @@ namespace HeatBalanceManager {
             }
             if (!state.dataGlobal->BeginDayFlag) state.dataEnvrn->PrintEnvrnStampWarmupPrinted = false;
             if (state.dataEnvrn->PrintEnvrnStampWarmup) {
-                if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
+                if (state.dataReportFlag->PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
                     constexpr const char * EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
                     print(state.files.mtr, "{}\n", EndOfHeaderString);
-                    PrintEndDataDictionary = false;
+                    state.dataReportFlag->PrintEndDataDictionary = false;
                 }
                 if (state.dataGlobal->DoOutputReporting) {
                     constexpr const char * EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
                     print(state.files.eso,
                           EnvironmentStampFormatStr,
                           "1",
-                          "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                          "Warmup {" + state.dataReportFlag->cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                           state.dataEnvrn->Latitude,
                           state.dataEnvrn->Longitude,
                           state.dataEnvrn->TimeZoneNumber,
@@ -6064,7 +6063,7 @@ namespace HeatBalanceManager {
                     print(state.files.mtr,
                           EnvironmentStampFormatStr,
                           "1",
-                          "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                          "Warmup {" + state.dataReportFlag->cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                           state.dataEnvrn->Latitude,
                           state.dataEnvrn->Longitude,
                           state.dataEnvrn->TimeZoneNumber,

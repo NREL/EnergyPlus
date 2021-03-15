@@ -6423,7 +6423,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         }
                         if (surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) {
                             TempSurfInTmp(SurfNum) -=
-                                DataMoistureBalanceEMPD::HeatFluxLatent(SurfNum) * TempDiv; // Conduction term (both partition sides same temp) |
+                                state.dataMstBalEMPD->HeatFluxLatent(SurfNum) * TempDiv; // Conduction term (both partition sides same temp) |
                                                                                             // Conduction term (both partition sides same temp) |
                                                                                             // Convection and damping term
                             if (TempSurfInSat > TempSurfInTmp(SurfNum)) {
@@ -6528,7 +6528,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                                                           // Coefficient for conduction (current time) | Pool and damping term
                             }
                             if (surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) {
-                                TempSurfInTmp(SurfNum) -= DataMoistureBalanceEMPD::HeatFluxLatent(SurfNum) *
+                                TempSurfInTmp(SurfNum) -= state.dataMstBalEMPD->HeatFluxLatent(SurfNum) *
                                                           TempDiv; // Coefficient for conduction (current time) | Convection and damping term
                                 if (TempSurfInSat > TempSurfInTmp(SurfNum)) {
                                     TempSurfInTmp(SurfNum) = TempSurfInSat; // Surface temp cannot be below dew point
@@ -6971,8 +6971,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     // leaving the zone from all of the surfaces and is a rate.  Multiply
                     // by time to get the actual amount affecting the zone volume of air.
 
-                    MoistureBalanceEMPDManager::UpdateMoistureBalanceEMPD(SurfNum);
-                    RhoVaporSurfIn(SurfNum) = DataMoistureBalanceEMPD::RVSurface(SurfNum);
+                    MoistureBalanceEMPDManager::UpdateMoistureBalanceEMPD(state, SurfNum);
+                    RhoVaporSurfIn(SurfNum) = state.dataMstBalEMPD->RVSurface(SurfNum);
                     Real64 const FD_Area_fac(HMassConvInFD(SurfNum) * surface.Area);
                     state.dataHeatBalFanSys->SumHmAW(ZoneNum) += FD_Area_fac * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
                     Real64 const MAT_zone(state.dataHeatBalFanSys->MAT(ZoneNum));

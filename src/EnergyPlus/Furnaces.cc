@@ -5453,7 +5453,7 @@ namespace Furnaces {
             // IF MSHP system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than MSHP flow rates
             if (state.dataFurnaces->Furnace(FurnaceNum).CheckFanFlow) {
                 state.dataFurnaces->CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:VariableSpeed";
-                GetFanVolFlow(state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow);
+                GetFanVolFlow(state, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow);
 
                 if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) // set max fan flow rate to the IHP collection
                 {

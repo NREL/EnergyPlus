@@ -8255,7 +8255,7 @@ namespace EnergyPlus::DXCoils {
         if (Coil.SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             locFanElecPower = HVACFan::fanObjs[Coil.SupplyFanIndex]->fanPower();
         } else {
-            locFanElecPower = Fans::GetFanPower(Coil.SupplyFanIndex);
+            locFanElecPower = Fans::GetFanPower(state, Coil.SupplyFanIndex);
         }
 
         // calculate evaporator total cooling capacity
@@ -13644,7 +13644,7 @@ namespace EnergyPlus::DXCoils {
                 } else {
                     Fans::SimulateFanComponents(
                         state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName, true, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
-                    FanPowerCorrection = Fans::GetFanPower(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
+                    FanPowerCorrection = Fans::GetFanPower(state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                 }
 
                 FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy;
@@ -13786,7 +13786,7 @@ namespace EnergyPlus::DXCoils {
                     } else {
                         Fans::SimulateFanComponents(
                             state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName, true, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
-                        FanPowerCorrection = Fans::GetFanPower(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
+                        FanPowerCorrection = Fans::GetFanPower(state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                     }
 
                     FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy;
@@ -15175,7 +15175,7 @@ namespace EnergyPlus::DXCoils {
                     coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
-                                                                 Fans::Fan(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex).FanName,
+                                                                 state.dataFans->Fan(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex).FanName,
                                                                  DataAirSystems::structArrayLegacyFanModels,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                 }

@@ -495,7 +495,7 @@ namespace HVACMultiSpeedHeatPump {
         MSHeatPump(MSHeatPumpNum).AuxElecPower =
             MSHeatPump(MSHeatPumpNum).AuxOnCyclePower * SaveCompressorPLR + MSHeatPump(MSHeatPumpNum).AuxOffCyclePower * (1.0 - SaveCompressorPLR);
         Real64 locFanElecPower = 0.0;
-        locFanElecPower = Fans::GetFanPower(MSHeatPump(MSHeatPumpNum).FanNum);
+        locFanElecPower = Fans::GetFanPower(state, MSHeatPump(MSHeatPumpNum).FanNum);
         MSHeatPump(MSHeatPumpNum).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower +
                                               DataHVACGlobals::SuppHeatingCoilPower + MSHeatPump(MSHeatPumpNum).AuxElecPower;
     }
@@ -1981,7 +1981,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         if (!state.dataGlobal->SysSizingCalc && MSHeatPump(MSHeatPumpNum).MySizeFlag) {
-            GetFanVolFlow(MSHeatPump(MSHeatPumpNum).FanNum, MSHeatPump(MSHeatPumpNum).FanVolFlow);
+            GetFanVolFlow(state, MSHeatPump(MSHeatPumpNum).FanNum, MSHeatPump(MSHeatPumpNum).FanVolFlow);
             SizeMSHeatPump(state, MSHeatPumpNum);
             MSHeatPump(MSHeatPumpNum).FlowFraction = 1.0;
             MSHeatPump(MSHeatPumpNum).MySizeFlag = false;
@@ -2214,7 +2214,7 @@ namespace HVACMultiSpeedHeatPump {
         // IF MSHP system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than MSHP flow rates
         if (!state.dataGlobal->DoingSizing && MSHeatPump(MSHeatPumpNum).CheckFanFlow) {
             CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed";
-            GetFanVolFlow(MSHeatPump(MSHeatPumpNum).FanNum, MSHeatPump(MSHeatPumpNum).FanVolFlow);
+            GetFanVolFlow(state, MSHeatPump(MSHeatPumpNum).FanNum, MSHeatPump(MSHeatPumpNum).FanVolFlow);
             if (MSHeatPump(MSHeatPumpNum).FanVolFlow != AutoSize) {
                 //     Check fan versus system supply air flow rates
                 if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(NumOfSpeedCooling)) {

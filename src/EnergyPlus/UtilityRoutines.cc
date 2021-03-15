@@ -765,18 +765,13 @@ namespace UtilityRoutines {
         // Use INQUIRE to determine if file is open.
 
         // Using/Aliasing
-        using DataReportingFlags::DebugOutput;
         using DaylightingManager::CloseDFSFile;
         using DaylightingManager::CloseReportIllumMaps;
-
-        //      LOGICAL :: exists, opened
-        //      INTEGER :: UnitNumber
-        //      INTEGER :: ios
 
         CloseReportIllumMaps(state);
         CloseDFSFile(state);
 
-        if (DebugOutput || (state.files.debug.good() && state.files.debug.position() > 0)) {
+        if (state.dataReportFlag->DebugOutput || (state.files.debug.good() && state.files.debug.position() > 0)) {
             state.files.debug.close();
         } else {
             state.files.debug.del();
