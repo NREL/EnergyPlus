@@ -749,13 +749,14 @@ namespace ConvectionCoefficients {
                                                       int ZoneNum               // index of zone for messaging
     );
 
-    Real64 CalcFohannoPolidoriVerticalWall(Real64 DeltaTemp, // [C] temperature difference between surface and air
+    Real64 CalcFohannoPolidoriVerticalWall(EnergyPlusData &state,
+                                           Real64 DeltaTemp, // [C] temperature difference between surface and air
                                            Real64 Height,    // [m] characteristic size, height of zone
                                            Real64 SurfTemp,  // [C] surface temperature
                                            Real64 QdotConv   // [W/m2] heat flux rate for rayleigh #
     );
 
-    Real64 CalcFohannoPolidoriVerticalWall(EnergyPlusData &state,
+    Real64 CallCalcFohannoPolidoriVerticalWall(EnergyPlusData &state,
                                            Real64 DeltaTemp, // [C] temperature difference between surface and air
                                            Real64 Height,    // [m] characteristic size, height of zone
                                            Real64 SurfTemp,  // [C] surface temperature
