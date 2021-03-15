@@ -1967,13 +1967,13 @@ namespace OutdoorAirUnit {
         // OutAirUnit( OAUnitNum ).ElecFanRate = FanElecPower;  //Issue #5524 this would only get the last fan called, not both if there are two
         OutAirUnit(OAUnitNum).ElecFanRate = 0.0;
         if (OutAirUnit(OAUnitNum).SFanType != DataHVACGlobals::FanType_SystemModelObject) {
-            OutAirUnit(OAUnitNum).ElecFanRate += Fans::GetFanPower(OutAirUnit(OAUnitNum).SFan_Index);
+            OutAirUnit(OAUnitNum).ElecFanRate += Fans::GetFanPower(state, OutAirUnit(OAUnitNum).SFan_Index);
         } else {
             OutAirUnit(OAUnitNum).ElecFanRate += HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->fanPower();
         }
         if (OutAirUnit(OAUnitNum).ExtFan) {
             if (OutAirUnit(OAUnitNum).ExtFanType != DataHVACGlobals::FanType_SystemModelObject) {
-                OutAirUnit(OAUnitNum).ElecFanRate += Fans::GetFanPower(OutAirUnit(OAUnitNum).ExtFan_Index);
+                OutAirUnit(OAUnitNum).ElecFanRate += Fans::GetFanPower(state, OutAirUnit(OAUnitNum).ExtFan_Index);
             } else {
                 OutAirUnit(OAUnitNum).ElecFanRate += HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->fanPower();
             }

@@ -446,7 +446,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
                 fanPowerCorrection = HVACFan::fanObjs[supplyFanIndex]->fanPower();
             } else {
                 Fans::SimulateFanComponents(state, supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
-                fanPowerCorrection = Fans::GetFanPower(supplyFanIndex);
+                fanPowerCorrection = Fans::GetFanPower(state, supplyFanIndex);
             }
 
             fanHeatCorrection = state.dataLoopNodes->Node(fanOutletNode).Enthalpy - state.dataLoopNodes->Node(fanInletNode).Enthalpy;
@@ -600,7 +600,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
                     fanPowerCorrection = HVACFan::fanObjs[supplyFanIndex]->fanPower();
                 } else {
                     Fans::SimulateFanComponents(state, supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
-                    fanPowerCorrection = Fans::GetFanPower(supplyFanIndex);
+                    fanPowerCorrection = Fans::GetFanPower(state, supplyFanIndex);
                 }
 
                 fanHeatCorrection = state.dataLoopNodes->Node(fanOutletNode).Enthalpy - state.dataLoopNodes->Node(fanInletNode).Enthalpy;

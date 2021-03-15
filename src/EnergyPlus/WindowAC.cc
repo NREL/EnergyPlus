@@ -409,7 +409,7 @@ namespace WindowAC {
                                                   "\".");
                                 ErrorsFound = true;
                             } else {
-                                GetFanVolFlow(state.dataWindowAC->WindAC(WindACNum).FanIndex, FanVolFlow);
+                                GetFanVolFlow(state, state.dataWindowAC->WindAC(WindACNum).FanIndex, FanVolFlow);
                                 if (FanVolFlow != AutoSize) {
                                     if (FanVolFlow < state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow) {
                                         ShowWarningError(state,
@@ -1220,7 +1220,7 @@ namespace WindowAC {
             state.dataWindowAC->WindAC(WindACNum).TotCoolEnergyRate - state.dataWindowAC->WindAC(WindACNum).SensCoolEnergyRate;
         Real64 locFanElecPower = 0.0;
         if (state.dataWindowAC->WindAC(WindACNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            locFanElecPower = Fans::GetFanPower(state.dataWindowAC->WindAC(WindACNum).FanIndex);
+            locFanElecPower = Fans::GetFanPower(state, state.dataWindowAC->WindAC(WindACNum).FanIndex);
         } else {
             locFanElecPower = HVACFan::fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->fanPower();
         }

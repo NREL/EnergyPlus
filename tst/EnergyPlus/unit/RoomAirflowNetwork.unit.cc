@@ -109,12 +109,12 @@ protected:
         state->dataSurface->Surface.allocate(NumOfSurfaces);
         state->dataHeatBal->HConvIn.allocate(NumOfSurfaces);
         TempSurfInTmp.allocate(NumOfSurfaces);
-        RVSurface.allocate(NumOfSurfaces);
-        RVSurfaceOld.allocate(NumOfSurfaces);
-        RVDeepLayer.allocate(NumOfSurfaces);
-        RVdeepOld.allocate(NumOfSurfaces);
-        RVSurfLayerOld.allocate(NumOfSurfaces);
-        RVSurfLayer.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVSurface.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVSurfaceOld.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVDeepLayer.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVdeepOld.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVSurfLayerOld.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVSurfLayer.allocate(NumOfSurfaces);
         RhoVaporSurfIn.allocate(NumOfSurfaces);
         RhoVaporAirIn.allocate(NumOfSurfaces);
         HMassConvInFD.allocate(NumOfSurfaces);
@@ -265,8 +265,8 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 
     state->dataSurface->Surface(1).HeatTransferAlgorithm = HeatTransferModel_EMPD;
     state->dataSurface->Surface(2).HeatTransferAlgorithm = HeatTransferModel_EMPD;
-    RVSurface(1) = 0.0011;
-    RVSurface(2) = 0.0012;
+    state->dataMstBalEMPD->RVSurface(1) = 0.0011;
+    state->dataMstBalEMPD->RVSurface(2) = 0.0012;
 
     state->dataLoopNodes->NodeID(1) = "Supply";
     state->dataLoopNodes->NodeID(2) = "Return";

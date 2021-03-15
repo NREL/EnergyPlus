@@ -192,19 +192,15 @@ set(SRC
     DataLoopNode.hh
     DataMoistureBalance.cc
     DataMoistureBalance.hh
-    DataMoistureBalanceEMPD.cc
     DataMoistureBalanceEMPD.hh
     DataOutputs.cc
     DataOutputs.hh
     DataPhotovoltaics.cc
     DataPhotovoltaics.hh
-    DataPrecisionGlobals.cc
     DataPrecisionGlobals.hh
-    DataReportingFlags.cc
     DataReportingFlags.hh
     DataRoomAirModel.cc
     DataRoomAirModel.hh
-    DataRootFinder.cc
     DataRootFinder.hh
     DataRuntimeLanguage.cc
     DataRuntimeLanguage.hh

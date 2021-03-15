@@ -1126,15 +1126,8 @@ namespace RoomAirModelAirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // Breakout summation of surface moisture interaction terms
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalSurface::TempSurfInTmp;
-        using DataMoistureBalanceEMPD::RVSurface;
         using HeatBalanceHAMTManager::UpdateHeatBalHAMT;
         using MoistureBalanceEMPDManager::UpdateMoistureBalanceEMPD;
         using Psychrometrics::PsyRhFnTdbRhov;
@@ -1189,8 +1182,8 @@ namespace RoomAirModelAirflowNetwork {
 
             if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
 
-                UpdateMoistureBalanceEMPD(SurfNum);
-                RhoVaporSurfIn(SurfNum) = RVSurface(SurfNum);
+                UpdateMoistureBalanceEMPD(state, SurfNum);
+                RhoVaporSurfIn(SurfNum) = state.dataMstBalEMPD->RVSurface(SurfNum);
 
                 SumHmAW = SumHmAW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
                 SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area *

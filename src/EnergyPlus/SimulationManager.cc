@@ -160,7 +160,6 @@ namespace SimulationManager {
 
     // Using/Aliasing
     using namespace DataSizing;
-    using namespace DataReportingFlags;
     using namespace DataSystemVariables;
     using namespace HeatBalanceManager;
     using namespace WeatherManager;
@@ -277,8 +276,8 @@ namespace SimulationManager {
         state.dataGlobal->BeginSimFlag = true;
         state.dataGlobal->BeginFullSimFlag = false;
         state.dataGlobal->DoOutputReporting = false;
-        DisplayPerfSimulationFlag = false;
-        DoWeatherInitReporting = false;
+        state.dataReportFlag->DisplayPerfSimulationFlag = false;
+        state.dataReportFlag->DoWeatherInitReporting = false;
         state.dataSimulationManager->RunPeriodsInInput =
             (inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || state.dataSysVars->FullAnnualRun);
         state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
@@ -356,7 +355,7 @@ namespace SimulationManager {
         state.dataErrTracking->AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         state.dataGlobal->KickOffSimulation = false;
         state.dataGlobal->WarmupFlag = false;
-        DoWeatherInitReporting = true;
+        state.dataReportFlag->DoWeatherInitReporting = true;
 
         //  Note:  All the inputs have been 'gotten' by the time we get here.
         ErrFound = false;
@@ -478,7 +477,7 @@ namespace SimulationManager {
             state.dataGlobal->WarmupFlag = true;
             state.dataGlobal->DayOfSim = 0;
             state.dataGlobal->DayOfSimChr = "0";
-            NumOfWarmupDays = 0;
+            state.dataReportFlag->NumOfWarmupDays = 0;
             if (state.dataEnvrn->CurrentYearIsLeapYear) {
                 if (state.dataGlobal->NumOfDayInEnvrn <= 366) {
                     state.dataOutputProcessor->isFinalYear = true;
@@ -511,9 +510,9 @@ namespace SimulationManager {
                 state.dataGlobal->EndDayFlag = false;
 
                 if (state.dataGlobal->WarmupFlag) {
-                    ++NumOfWarmupDays;
-                    cWarmupDay = fmt::to_string(NumOfWarmupDays);
-                    DisplayString(state, "Warming up {" + cWarmupDay + '}');
+                    ++state.dataReportFlag->NumOfWarmupDays;
+                    state.dataReportFlag->cWarmupDay = fmt::to_string(state.dataReportFlag->NumOfWarmupDays);
+                    DisplayString(state, "Warming up {" + state.dataReportFlag->cWarmupDay + '}');
                 } else if (state.dataGlobal->DayOfSim == 1) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
@@ -521,15 +520,15 @@ namespace SimulationManager {
                         DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
                     }
                     static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
-                    print(state.files.eio, Format_700, NumOfWarmupDays);
+                    print(state.files.eio, Format_700, state.dataReportFlag->NumOfWarmupDays);
                     ResetAccumulationWhenWarmupComplete(state);
-                } else if (DisplayPerfSimulationFlag) {
+                } else if (state.dataReportFlag->DisplayPerfSimulationFlag) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
                     } else {
                         DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
                     }
-                    DisplayPerfSimulationFlag = false;
+                    state.dataReportFlag->DisplayPerfSimulationFlag = false;
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((state.dataGlobal->DayOfSim > 365) && ((state.dataGlobal->NumOfDayInEnvrn - state.dataGlobal->DayOfSim) == 364) && !state.dataGlobal->WarmupFlag) {
@@ -994,8 +993,8 @@ namespace SimulationManager {
 
         LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / state.dataConvergeParams->MinTimeStepSys);
 
-        DebugOutput = false;
-        EvenDuringWarmup = false;
+        state.dataReportFlag->DebugOutput = false;
+        state.dataReportFlag->EvenDuringWarmup = false;
         CurrentModuleObject = "Output:DebuggingData";
         NumDebugOut = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDebugOut > 1) {
@@ -1004,10 +1003,10 @@ namespace SimulationManager {
         if (NumDebugOut > 0) {
             inputProcessor->getObjectItem(state, CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
             if (NumAlpha >= 1) {
-                DebugOutput = UtilityRoutines::SameString(Alphas(1), "Yes");
+                state.dataReportFlag->DebugOutput = UtilityRoutines::SameString(Alphas(1), "Yes");
             }
             if (NumAlpha >= 2) {
-                EvenDuringWarmup = UtilityRoutines::SameString(Alphas(2), "Yes");
+                state.dataReportFlag->EvenDuringWarmup = UtilityRoutines::SameString(Alphas(2), "Yes");
             }
         }
 
@@ -1058,9 +1057,9 @@ namespace SimulationManager {
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayZoneAirHeatBalanceOffBalance")) {
                                 state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorDetachedShading")) {
-                                MakeMirroredDetachedShading = false;
+                                state.dataReportFlag->MakeMirroredDetachedShading = false;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorAttachedShading")) {
-                                MakeMirroredAttachedShading = false;
+                                state.dataReportFlag->MakeMirroredAttachedShading = false;
                             } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringWarmup")) {
                                 state.dataSysVars->ReportDuringWarmup = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayWeatherMissingDataWarnings")) {

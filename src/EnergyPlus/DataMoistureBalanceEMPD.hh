@@ -61,27 +61,31 @@ namespace DataMoistureBalanceEMPD {
 
     constexpr Real64 Lam(2500000.0); // heat of adsorption for building materials
 
-    // MODULE VARIABLE DECLARATIONS:
-    // Variables that are used in both the Surface Heat Balance and the Moisture Balance
-    extern Array1D<Real64> RVSurfaceOld; // Moisture level at interior surfaces at previous time step
-    extern Array1D<Real64> RVSurface;    // Moisture level at interior surfaces at current interation
-    // and current time step
-    extern Array1D<Real64> HeatFluxLatent; // Moisture flux at interior surfaces [W]
-    extern Array1D<Real64> RVSurfLayerOld;
-    extern Array1D<Real64> RVdeepOld;
-    extern Array1D<Real64> RVSurfLayer;
-    extern Array1D<Real64> RVDeepLayer;
-    extern Array1D<Real64> RVwall;
-
-    void clear_state();
-
 } // namespace DataMoistureBalanceEMPD
 
-struct MoistureBalanceEMPDData : BaseGlobalStruct {
+struct MoistureBalanceEMPDData : BaseGlobalStruct
+{
+
+    // Variables that are used in both the Surface Heat Balance and the Moisture Balance
+    Array1D<Real64> RVSurfaceOld;   // Moisture level at interior surfaces at previous time step
+    Array1D<Real64> RVSurface;      // Moisture level at interior surfaces at current iteration and current time step
+    Array1D<Real64> HeatFluxLatent; // Moisture flux at interior surfaces [W]
+    Array1D<Real64> RVSurfLayerOld;
+    Array1D<Real64> RVdeepOld;
+    Array1D<Real64> RVSurfLayer;
+    Array1D<Real64> RVDeepLayer;
+    Array1D<Real64> RVwall;
 
     void clear_state() override
     {
-
+        this->RVSurfaceOld.deallocate();
+        this->RVSurface.deallocate();
+        this->HeatFluxLatent.deallocate();
+        this->RVSurfLayerOld.deallocate();
+        this->RVdeepOld.deallocate();
+        this->RVSurfLayer.deallocate();
+        this->RVDeepLayer.deallocate();
+        this->RVwall.deallocate();
     }
 };
 

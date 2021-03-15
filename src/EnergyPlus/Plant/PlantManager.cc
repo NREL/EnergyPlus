@@ -2405,7 +2405,6 @@ namespace EnergyPlus::PlantManager {
             // this contains all the initializations
 
             // Using/Aliasing
-            using HVACInterfaceManager::PlantCommonPipe;
             using ScheduleManager::GetCurrentScheduleValue;
 
             // SUBROUTINE PARAMETER DEFINITIONS:
@@ -2656,11 +2655,11 @@ namespace EnergyPlus::PlantManager {
                     }
 
                     // initialize common pipe flows to zero.
-                    if (allocated(PlantCommonPipe)) {
-                        PlantCommonPipe(LoopNum).PriToSecFlow = 0.0;
-                        PlantCommonPipe(LoopNum).SecToPriFlow = 0.0;
-                        PlantCommonPipe(LoopNum).PriCPLegFlow = 0.0;
-                        PlantCommonPipe(LoopNum).SecCPLegFlow = 0.0;
+                    if (allocated(state.dataHVACInterfaceMgr->PlantCommonPipe)) {
+                        state.dataHVACInterfaceMgr->PlantCommonPipe(LoopNum).PriToSecFlow = 0.0;
+                        state.dataHVACInterfaceMgr->PlantCommonPipe(LoopNum).SecToPriFlow = 0.0;
+                        state.dataHVACInterfaceMgr->PlantCommonPipe(LoopNum).PriCPLegFlow = 0.0;
+                        state.dataHVACInterfaceMgr->PlantCommonPipe(LoopNum).SecCPLegFlow = 0.0;
                     }
                 } else { // no secondary loop, so use supply side loop SP on demand side too.
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPoint = LoopSetPointTemp;

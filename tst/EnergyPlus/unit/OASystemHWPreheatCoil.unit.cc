@@ -2045,8 +2045,8 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
                 1.0);
 
     // test that OA sys water coil bypasses normal controller calls before air loop simulation
-    EXPECT_EQ("PREHEAT COIL CONTROLLER", HVACControllers::ControllerProps(1).ControllerName);
-    EXPECT_TRUE(HVACControllers::ControllerProps(1).BypassControllerCalc);
+    EXPECT_EQ("PREHEAT COIL CONTROLLER", state->dataHVACControllers->ControllerProps(1).ControllerName);
+    EXPECT_TRUE(state->dataHVACControllers->ControllerProps(1).BypassControllerCalc);
     // test that water coil knows which controller controls the HW coil
     EXPECT_EQ(state->dataWaterCoils->WaterCoil(1).ControllerIndex, 1);
 }
