@@ -163,20 +163,24 @@ namespace AirflowNetwork {
     };
 
     // EPlus node type
-    extern int const EPlusTypeNum_ZIN; // Zone inlet node
-    extern int const EPlusTypeNum_ZOU; // Zone outlet node
-    extern int const EPlusTypeNum_SPL; // Splitter node
-    extern int const EPlusTypeNum_MIX; // Mixer node
-    extern int const EPlusTypeNum_OAN; // Outside air system node
-    extern int const EPlusTypeNum_EXT; // OA system inlet node
-    extern int const EPlusTypeNum_FIN; // Fan Inlet node
-    extern int const EPlusTypeNum_FOU; // Fan Outlet Node
-    extern int const EPlusTypeNum_COU; // Coil Outlet Node
-    extern int const EPlusTypeNum_HXO; // Heat exchanger Outlet Node
-    extern int const EPlusTypeNum_DIN; // Damper Inlet node
-    extern int const EPlusTypeNum_DOU; // Damper Outlet Node
-    extern int const EPlusTypeNum_SPI; // Splitter inlet Node
-    extern int const EPlusTypeNum_SPO; // Splitter Outlet Node
+    enum class iEPlusNodeType : int
+    {
+        Unassigned = 0,
+        ZIN = 1,  // Zone inlet node
+        ZOU = 2,  // Zone outlet node
+        SPL = 3,  // Splitter node
+        MIX = 4,  // Mixer node
+        OAN = 5,  // Outside air system node
+        EXT = 6,  // OA system inlet node
+        FIN = 7,  // Fan Inlet node
+        FOU = 8,  // Fan Outlet Node
+        COU = 9,  // Coil Outlet Node
+        HXO = 10, // Heat exchanger Outlet Node
+        DIN = 11, // Damper Inlet node
+        DOU = 12, // Damper Outlet Node
+        SPI = 13, // Splitter inlet Node
+        SPO = 14  // Splitter Outlet Node
+    };
 
     extern int const iWPCCntr_Input;
     extern int const iWPCCntr_SurfAvg;
@@ -1288,14 +1292,14 @@ namespace AirflowNetwork {
         int EPlusNodeNum;
         int ExtNodeNum;
         int OutAirNodeNum;
-        int EPlusTypeNum;
+        iEPlusNodeType EPlusTypeNum;
         int RAFNNodeNum; // RoomAir model node number
         int NumOfLinks;  // Number of links for RoomAir model
         int AirLoopNum;  // AirLoop number
 
         // Default Constructor
         AirflowNetworkNodeProp()
-            : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0), EPlusTypeNum(0),
+            : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0), EPlusTypeNum(iEPlusNodeType::Unassigned),
               RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
         {
         }
