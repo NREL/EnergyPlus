@@ -314,11 +314,11 @@ namespace EnergyPlus::MixedAir {
         // SimOutsideAirSys can handle only 1 controller right now.  This must be
         // an Outside Air Controller.  This is because of the lack of iteration
         // and convergence control in the following code.
-        //  DO CtrlNum=1,state.dataAirLoop->OutsideAirSys(OASysNum)%NumControllers
-        //    CtrlName = state.dataAirLoop->OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
+        //  DO CtrlNum=1,OutsideAirSys(OASysNum)%NumControllers
+        //    CtrlName = OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
         //    CALL SimOAController(CtrlName,FirstHVACIteration)
         //  END DO
-        CurOASysNum = OASysNum;
+        state.dataSize->CurOASysNum = OASysNum;
         auto &CurrentOASystem(state.dataAirLoop->OutsideAirSys(OASysNum));
         if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
             SimOAController(state, CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
@@ -339,22 +339,22 @@ namespace EnergyPlus::MixedAir {
                     if (state.dataMixedAir->OAController(OAControllerNum).MixNode != state.dataMixedAir->OAMixer(OAMixerNum).MixNode) {
                         ShowSevereError(state, "The mixed air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
                         ShowContinueError(state, "should be the same node as the mixed air node of OutdoorAir:Mixer=\"" + state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
-                        ShowContinueError(state, "Controller:OutdoorAir mixed air node=\"" + NodeID(state.dataMixedAir->OAController(OAControllerNum).MixNode) + "\".");
-                        ShowContinueError(state, "OutdoorAir:Mixer mixed air node=\"" + NodeID(state.dataMixedAir->OAMixer(OAMixerNum).MixNode) + "\".");
+                        ShowContinueError(state, "Controller:OutdoorAir mixed air node=\"" + state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).MixNode) + "\".");
+                        ShowContinueError(state, "OutdoorAir:Mixer mixed air node=\"" + state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).MixNode) + "\".");
                         FatalErrorFlag = true;
                     }
                     if (state.dataMixedAir->OAController(OAControllerNum).RelNode != state.dataMixedAir->OAMixer(OAMixerNum).RelNode) {
                         ShowSevereError(state, "The relief air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
                         ShowContinueError(state, "should be the same node as the relief air node of OutdoorAir:Mixer=\"" + state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
-                        ShowContinueError(state, "Controller:OutdoorAir relief air node=\"" + NodeID(state.dataMixedAir->OAController(OAControllerNum).RelNode) + "\".");
-                        ShowContinueError(state, "OutdoorAir:Mixer relief air node=\"" + NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RelNode) + "\".");
+                        ShowContinueError(state, "Controller:OutdoorAir relief air node=\"" + state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).RelNode) + "\".");
+                        ShowContinueError(state, "OutdoorAir:Mixer relief air node=\"" + state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RelNode) + "\".");
                         FatalErrorFlag = true;
                     }
                     if (state.dataMixedAir->OAController(OAControllerNum).RetNode != state.dataMixedAir->OAMixer(OAMixerNum).RetNode) {
                         ShowSevereError(state, "The return air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
                         ShowContinueError(state, "should be the same node as the return air node of OutdoorAir:Mixer=\"" + state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
-                        ShowContinueError(state, "Controller:OutdoorAir return air node=\"" + NodeID(state.dataMixedAir->OAController(OAControllerNum).RetNode) + "\".");
-                        ShowContinueError(state, "OutdoorAir:Mixer return air node=\"" + NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RetNode) + "\".");
+                        ShowContinueError(state, "Controller:OutdoorAir return air node=\"" + state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).RetNode) + "\".");
+                        ShowContinueError(state, "OutdoorAir:Mixer return air node=\"" + state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RetNode) + "\".");
                         FatalErrorFlag = true;
                     }
                 }
@@ -363,7 +363,7 @@ namespace EnergyPlus::MixedAir {
             if (FatalErrorFlag) ShowFatalError(state, "Previous severe error(s) cause program termination");
         }
 
-        CurOASysNum = 0;
+        state.dataSize->CurOASysNum = 0;
         if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
         }
@@ -407,7 +407,6 @@ namespace EnergyPlus::MixedAir {
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HeatRecovery::SimHeatRecovery;
         using Humidifiers::SimHumidifier;
-        using HVACControllers::ControllerProps;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
@@ -478,7 +477,7 @@ namespace EnergyPlus::MixedAir {
                                              state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
@@ -495,7 +494,7 @@ namespace EnergyPlus::MixedAir {
                                              state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
@@ -517,7 +516,7 @@ namespace EnergyPlus::MixedAir {
                                              state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == Coil_ElectricHeat) { // 'Coil:Heating:Electric'
@@ -546,7 +545,7 @@ namespace EnergyPlus::MixedAir {
                                              HXAssistedCoil(CompIndex).ControllerIndex,
                                              true);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(HXAssistedCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    state.dataHVACControllers->ControllerProps(HXAssistedCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
@@ -606,7 +605,7 @@ namespace EnergyPlus::MixedAir {
                             // HX's in the OA system can be troublesome given that the OA flow rate is not necessarily proportional to air loop PLR
                             // adding that user input for branch flow rate, HX nominal flow rate, OA system min/max flow rate will not necessarily be
                             // perfectly input, a compromise is used for OA sys HX's as the ratio of flow to max. Issue #4298.
-                            //					AirloopPLR = state.dataAirLoop->AirLoopFlow( AirLoopNum ).FanPLR;
+                            //                    AirloopPLR = AirLoopFlow( AirLoopNum ).FanPLR;
                             AirloopPLR = state.dataMixedAir->OAController(OASysNum).OAMassFlow / state.dataMixedAir->OAController(OASysNum).MaxOAMassFlowRate;
                         } else {
                             AirloopPLR = 1.0;
@@ -791,7 +790,7 @@ namespace EnergyPlus::MixedAir {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE
-        // Input the Outside Air System data and store it in the state.dataAirLoop->OutsideAirSys array.
+        // Input the Outside Air System data and store it in the OutsideAirSys array.
 
         // METHODOLOGY EMPLOYED:
         // Use the Get routines from the InputProcessor module.
@@ -915,7 +914,7 @@ namespace EnergyPlus::MixedAir {
         state.dataAirLoop->NumOASystems = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataAirLoop->OutsideAirSys.allocate(state.dataAirLoop->NumOASystems);
-        OASysEqSizing.allocate(state.dataAirLoop->NumOASystems);
+        state.dataSize->OASysEqSizing.allocate(state.dataAirLoop->NumOASystems);
         state.dataMixedAir->ControllerListUniqueNames.reserve(static_cast<unsigned>(state.dataAirLoop->NumOASystems));
         state.dataMixedAir->MyOneTimeErrorFlag.dimension(state.dataAirLoop->NumOASystems, true);
         state.dataMixedAir->MyOneTimeCheckUnitarySysFlag.dimension(state.dataAirLoop->NumOASystems, true);
@@ -1284,19 +1283,19 @@ namespace EnergyPlus::MixedAir {
 
                 // add applicable faults identifier to avoid string comparison at each time step
                 //  loop through each fault for each OA controller and determine economizer faultys
-                for (i = 1; i <= NumFaultyEconomizer; ++i) {
-                    if (FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
-                    if (UtilityRoutines::SameString(state.dataMixedAir->OAController(OutAirNum).Name, FaultsEconomizer(i).ControllerName)) {
-                        FaultsEconomizer(i).ControllerID = OutAirNum;
+                for (i = 1; i <= state.dataFaultsMgr->NumFaultyEconomizer; ++i) {
+                    if (state.dataFaultsMgr->FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
+                    if (UtilityRoutines::SameString(state.dataMixedAir->OAController(OutAirNum).Name, state.dataFaultsMgr->FaultsEconomizer(i).ControllerName)) {
+                        state.dataFaultsMgr->FaultsEconomizer(i).ControllerID = OutAirNum;
                         ++state.dataMixedAir->OAController(OutAirNum).NumFaultyEconomizer;
                     }
                 }
                 //  loop through each fault for each OA controller to determine faulty counts
                 state.dataMixedAir->OAController(OutAirNum).EconmizerFaultNum.allocate(state.dataMixedAir->OAController(OutAirNum).NumFaultyEconomizer);
                 if (state.dataMixedAir->OAController(OutAirNum).NumFaultyEconomizer > 0) {
-                    for (int j = 0, i = 1; i <= NumFaultyEconomizer; ++i) {
-                        if (FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
-                        if (UtilityRoutines::SameString(state.dataMixedAir->OAController(OutAirNum).Name, FaultsEconomizer(i).ControllerName)) {
+                    for (int j = 0, i = 1; i <= state.dataFaultsMgr->NumFaultyEconomizer; ++i) {
+                        if (state.dataFaultsMgr->FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
+                        if (UtilityRoutines::SameString(state.dataMixedAir->OAController(OutAirNum).Name, state.dataFaultsMgr->FaultsEconomizer(i).ControllerName)) {
                             state.dataMixedAir->OAController(OutAirNum).EconmizerFaultNum(++j) = i;
                         }
                     }
@@ -1458,7 +1457,7 @@ namespace EnergyPlus::MixedAir {
                     //     Getting OA details from design specification OA object
                     if (!lAlphaBlanks((groupNum - 1) * 3 + 6)) {
                         state.dataMixedAir->DesignSpecOAObjName(groupNum) = AlphArray((groupNum - 1) * 3 + 6);
-                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecOAObjName(groupNum), OARequirements);
+                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecOAObjName(groupNum), state.dataSize->OARequirements);
                         state.dataMixedAir->DesignSpecOAObjIndex(groupNum) = ObjIndex;
 
                         if (ObjIndex == 0) {
@@ -1472,7 +1471,7 @@ namespace EnergyPlus::MixedAir {
                     // Get zone air distribution details from design specification Zone Air Distribution object
                     if (!lAlphaBlanks((groupNum - 1) * 3 + 7)) {
                         state.dataMixedAir->DesignSpecZoneADObjName(groupNum) = AlphArray((groupNum - 1) * 3 + 7);
-                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecZoneADObjName(groupNum), ZoneAirDistribution);
+                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecZoneADObjName(groupNum), state.dataSize->ZoneAirDistribution);
                         state.dataMixedAir->DesignSpecZoneADObjIndex(groupNum) = ObjIndex;
 
                         if (ObjIndex == 0) {
@@ -1551,12 +1550,12 @@ namespace EnergyPlus::MixedAir {
                             } else {
                                 if (state.dataGlobal->DoZoneSizing) {
                                     ObjIndex = UtilityRoutines::FindItemInList(
-                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                     if (ObjIndex > 0) {
                                         thisVentilationMechanical.ZoneDesignSpecOAObjName(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
                                         thisVentilationMechanical.ZoneDesignSpecOAObjIndex(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
                                     }
                                 }
                             }
@@ -1568,12 +1567,12 @@ namespace EnergyPlus::MixedAir {
                             } else {
                                 if (state.dataGlobal->DoZoneSizing) {
                                     ObjIndex = UtilityRoutines::FindItemInList(
-                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                     if (ObjIndex > 0) {
                                         thisVentilationMechanical.ZoneDesignSpecADObjName(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
                                         thisVentilationMechanical.ZoneDesignSpecADObjIndex(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
                                     }
                                 }
                             }
@@ -1605,12 +1604,12 @@ namespace EnergyPlus::MixedAir {
                                     } else {
                                         if (state.dataGlobal->DoZoneSizing) {
                                             ObjIndex =
-                                                UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(ZoneNum).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                                UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(ZoneNum).Name, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                             if (ObjIndex > 0) {
                                                 thisVentilationMechanical.ZoneDesignSpecOAObjName(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
                                                 thisVentilationMechanical.ZoneDesignSpecOAObjIndex(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
                                             }
                                         }
                                     }
@@ -1622,12 +1621,12 @@ namespace EnergyPlus::MixedAir {
                                     } else {
                                         if (state.dataGlobal->DoZoneSizing) {
                                             ObjIndex =
-                                                UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(ZoneNum).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                                UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(ZoneNum).Name, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                             if (ObjIndex > 0) {
                                                 thisVentilationMechanical.ZoneDesignSpecADObjName(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
                                                 thisVentilationMechanical.ZoneDesignSpecADObjIndex(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
                                             }
                                         }
                                     }
@@ -1644,7 +1643,7 @@ namespace EnergyPlus::MixedAir {
                 for (int ventMechZoneNum = 1; ventMechZoneNum <= MechVentZoneCount; ++ventMechZoneNum) {
                     int zoneOAReqObjIndex = thisVentilationMechanical.ZoneDesignSpecOAObjIndex(ventMechZoneNum);
                     if (zoneOAReqObjIndex > 0) {
-                        auto const &curOARequirements(OARequirements(zoneOAReqObjIndex));
+                        auto const &curOARequirements(state.dataSize->OARequirements(zoneOAReqObjIndex));
                         thisVentilationMechanical.ZoneOAAreaRate(ventMechZoneNum) = curOARequirements.OAFlowPerArea;
                         thisVentilationMechanical.ZoneOAPeopleRate(ventMechZoneNum) = curOARequirements.OAFlowPerPerson;
                         thisVentilationMechanical.ZoneOAFlowRate(ventMechZoneNum) = curOARequirements.OAFlowPerZone;
@@ -1678,7 +1677,7 @@ namespace EnergyPlus::MixedAir {
                     }
                     int zoneAirDistObjIndex = thisVentilationMechanical.ZoneDesignSpecADObjIndex(ventMechZoneNum);
                     if (zoneAirDistObjIndex > 0) {
-                        auto const &curZoneAirDistribution(ZoneAirDistribution(zoneAirDistObjIndex));
+                        auto const &curZoneAirDistribution(state.dataSize->ZoneAirDistribution(zoneAirDistObjIndex));
                         thisVentilationMechanical.ZoneADEffCooling(ventMechZoneNum) = curZoneAirDistribution.ZoneADEffCooling;
                         thisVentilationMechanical.ZoneADEffHeating(ventMechZoneNum) = curZoneAirDistribution.ZoneADEffHeating;
                         thisVentilationMechanical.ZoneADEffSchPtr(ventMechZoneNum) = curZoneAirDistribution.ZoneADEffSchPtr;
@@ -1977,43 +1976,43 @@ namespace EnergyPlus::MixedAir {
 
                 state.dataMixedAir->OAMixer(OutAirNum).Name = AlphArray(1);
                 state.dataMixedAir->OAMixer(OutAirNum).MixNode = GetOnlySingleNode(state,
-                    AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                    AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
                 //  Set connection type to 'Inlet', because this is not necessarily directly from
                 //  outside air.  Outside Air Inlet Node List will set the connection to outside air
                 state.dataMixedAir->OAMixer(OutAirNum).InletNode = GetOnlySingleNode(state,
-                    AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                    AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
                 state.dataMixedAir->OAMixer(OutAirNum).RelNode = GetOnlySingleNode(state,
-                    AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent);
+                    AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::ReliefAir, 1, ObjectIsNotParent);
                 state.dataMixedAir->OAMixer(OutAirNum).RetNode = GetOnlySingleNode(state,
-                    AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                    AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
                 // Check for dupes in the four nodes.
                 if (state.dataMixedAir->OAMixer(OutAirNum).MixNode == state.dataMixedAir->OAMixer(OutAirNum).InletNode) {
                     ShowSevereError(state, CurrentModuleObject + " = " + state.dataMixedAir->OAMixer(OutAirNum).Name + ' ' + cAlphaFields(3) + " = " +
-                                    NodeID(state.dataMixedAir->OAMixer(OutAirNum).InletNode) + " duplicates the " + cAlphaFields(2) + '.');
+                                    state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OutAirNum).InletNode) + " duplicates the " + cAlphaFields(2) + '.');
                     ErrorsFound = true;
                 } else if (state.dataMixedAir->OAMixer(OutAirNum).MixNode == state.dataMixedAir->OAMixer(OutAirNum).RelNode) {
                     ShowSevereError(state, CurrentModuleObject + " = " + state.dataMixedAir->OAMixer(OutAirNum).Name + ' ' + cAlphaFields(4) + " = " +
-                                    NodeID(state.dataMixedAir->OAMixer(OutAirNum).RelNode) + " duplicates the " + cAlphaFields(2) + '.');
+                                    state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OutAirNum).RelNode) + " duplicates the " + cAlphaFields(2) + '.');
                     ErrorsFound = true;
                 } else if (state.dataMixedAir->OAMixer(OutAirNum).MixNode == state.dataMixedAir->OAMixer(OutAirNum).RetNode) {
                     ShowSevereError(state, CurrentModuleObject + " = " + state.dataMixedAir->OAMixer(OutAirNum).Name + ' ' + cAlphaFields(5) + " = " +
-                                    NodeID(state.dataMixedAir->OAMixer(OutAirNum).RetNode) + " duplicates the " + cAlphaFields(2) + '.');
+                                    state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OutAirNum).RetNode) + " duplicates the " + cAlphaFields(2) + '.');
                     ErrorsFound = true;
                 }
 
                 if (state.dataMixedAir->OAMixer(OutAirNum).InletNode == state.dataMixedAir->OAMixer(OutAirNum).RelNode) {
                     ShowSevereError(state, CurrentModuleObject + " = " + state.dataMixedAir->OAMixer(OutAirNum).Name + ' ' + cAlphaFields(4) + " = " +
-                                    NodeID(state.dataMixedAir->OAMixer(OutAirNum).RelNode) + " duplicates the " + cAlphaFields(3) + '.');
+                                    state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OutAirNum).RelNode) + " duplicates the " + cAlphaFields(3) + '.');
                     ErrorsFound = true;
                 } else if (state.dataMixedAir->OAMixer(OutAirNum).InletNode == state.dataMixedAir->OAMixer(OutAirNum).RetNode) {
                     ShowSevereError(state, CurrentModuleObject + " = " + state.dataMixedAir->OAMixer(OutAirNum).Name + ' ' + cAlphaFields(5) + " = " +
-                                    NodeID(state.dataMixedAir->OAMixer(OutAirNum).RetNode) + " duplicates the " + cAlphaFields(3) + '.');
+                                    state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OutAirNum).RetNode) + " duplicates the " + cAlphaFields(3) + '.');
                     ErrorsFound = true;
                 }
 
                 if (state.dataMixedAir->OAMixer(OutAirNum).RelNode == state.dataMixedAir->OAMixer(OutAirNum).RetNode) {
                     ShowSevereError(state, CurrentModuleObject + " = " + state.dataMixedAir->OAMixer(OutAirNum).Name + ' ' + cAlphaFields(5) + " = " +
-                                    NodeID(state.dataMixedAir->OAMixer(OutAirNum).RetNode) + " duplicates the " + cAlphaFields(4) + '.');
+                                    state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OutAirNum).RetNode) + " duplicates the " + cAlphaFields(4) + '.');
                     ErrorsFound = true;
                 }
 
@@ -2090,9 +2089,9 @@ namespace EnergyPlus::MixedAir {
         state.dataMixedAir->OAController(OutAirNum).MaxOA = NumArray(2);
         state.dataMixedAir->OAController(OutAirNum).MinOA = NumArray(1);
         state.dataMixedAir->OAController(OutAirNum).MixNode = GetOnlySingleNode(state,
-            AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
         state.dataMixedAir->OAController(OutAirNum).OANode = GetOnlySingleNode(state,
-            AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Actuator, 1, ObjectIsNotParent);
+            AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Actuator, 1, ObjectIsNotParent);
         if (!CheckOutAirNodeNumber(state, state.dataMixedAir->OAController(OutAirNum).OANode)) {
             ShowWarningError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\": " + cAlphaFields(5) + "=\"" + AlphArray(5) +
                              "\" is not an OutdoorAir:Node.");
@@ -2185,9 +2184,9 @@ namespace EnergyPlus::MixedAir {
         }
 
         state.dataMixedAir->OAController(OutAirNum).RelNode = GetOnlySingleNode(state,
-            AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Actuator, 1, ObjectIsNotParent);
+            AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Actuator, 1, ObjectIsNotParent);
         state.dataMixedAir->OAController(OutAirNum).RetNode = GetOnlySingleNode(state,
-            AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
         state.dataMixedAir->OAController(OutAirNum).MinOASch = AlphArray(11);
         state.dataMixedAir->OAController(OutAirNum).MinOASchPtr = GetScheduleIndex(state, AlphArray(11));
         if (state.dataMixedAir->OAController(OutAirNum).MinOASchPtr == 0 && (!lAlphaBlanks(11))) {
@@ -2397,7 +2396,7 @@ namespace EnergyPlus::MixedAir {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE
-        // Initialize the state.dataAirLoop->OutsideAirSys data structure
+        // Initialize the OutsideAirSys data structure
 
         // METHODOLOGY EMPLOYED:
 
@@ -2419,11 +2418,11 @@ namespace EnergyPlus::MixedAir {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        //		if ( BeginEnvrnFlag && FirstHVACIteration ) {
-        //		}
+        //        if ( BeginEnvrnFlag && FirstHVACIteration ) {
+        //        }
 
-        //		if ( state.dataGlobal->BeginDayFlag ) {
-        //		}
+        //        if ( BeginDayFlag ) {
+        //        }
 
         if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) return;
 
@@ -2471,8 +2470,8 @@ namespace EnergyPlus::MixedAir {
         Real64 RhoAirStdInit;                          // Standard air density
         Real64 TotalPeopleOAFlow;                      // Total outside air required for PEOPLE objects served by this OA controller
         int MixedAirNode;                              // Controller:OutdoorAir mixed air node
-        int AirLoopZoneInfoZoneNum;                    // Index to state.dataAirLoop->AirLoopZoneInfo structure
-        int NumZone;                                   // Zone number in state.dataAirLoop->AirLoopZoneInfo structure
+        int AirLoopZoneInfoZoneNum;                    // Index to AirLoopZoneInfo structure
+        int NumZone;                                   // Zone number in AirLoopZoneInfo structure
         int PeopleNum;                                 // Index to PEOPLE objects
         int NumMechVentZone;                           // Index to number of zones in VentilationMechanical structure
         int TempMechVentArrayCounter;                  // Temporary array counter
@@ -2512,7 +2511,7 @@ namespace EnergyPlus::MixedAir {
             state.dataMixedAir->InitOAControllerOneTimeFlag = false;
         }
         if (OAControllerMyOneTimeFlag(OAControllerNum)) {
-            // Determine Inlet node index for OAController, not a user input for controller, but is obtained from state.dataAirLoop->OutsideAirSys and OAMixer
+            // Determine Inlet node index for OAController, not a user input for controller, but is obtained from OutsideAirSys and OAMixer
             {
                 auto const SELECT_CASE_var(thisOAController.ControllerType_Num);
 
@@ -2575,12 +2574,12 @@ namespace EnergyPlus::MixedAir {
         if (!state.dataGlobal->SysSizingCalc && state.dataMixedAir->InitOAControllerSetPointCheckFlag(OAControllerNum) && DoSetPointTest && !FirstHVACIteration) {
             MixedAirNode = thisOAController.MixNode;
             if (MixedAirNode > 0) {
-                //      IF (OAController(OAControllerNum)%Econo == 1 .AND. .NOT. state.dataAirLoop->AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
+                //      IF (OAController(OAControllerNum)%Econo == 1 .AND. .NOT. AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
                 if (thisOAController.Econo > iEconoOp::NoEconomizer && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan) {
-                    if (Node(MixedAirNode).TempSetPoint == SensedNodeFlagValue) {
+                    if (state.dataLoopNodes->Node(MixedAirNode).TempSetPoint == SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
-                            ShowSevereError(state, "Node Referenced (by Controller)=" + NodeID(MixedAirNode));
+                            ShowSevereError(state, "Node Referenced (by Controller)=" + state.dataLoopNodes->NodeID(MixedAirNode));
                             ShowContinueError(state,
                                 "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the mixed air node.");
                             SetPointErrorFlag = true;
@@ -2589,7 +2588,7 @@ namespace EnergyPlus::MixedAir {
                             CheckIfNodeSetPointManagedByEMS(state, MixedAirNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                             if (SetPointErrorFlag) {
                                 ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
-                                ShowSevereError(state, "Node Referenced (by Controller)=" + NodeID(MixedAirNode));
+                                ShowSevereError(state, "Node Referenced (by Controller)=" + state.dataLoopNodes->NodeID(MixedAirNode));
                                 ShowContinueError(state, "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the "
                                                   "mixed air node.");
                                 ShowContinueError(state, "Or add EMS Actuator to provide temperature setpoint at this node");
@@ -2669,7 +2668,7 @@ namespace EnergyPlus::MixedAir {
             thisOAController.MinOAMassFlowRate = thisOAController.MinOA * RhoAirStdInit;
             thisOAController.MaxOAMassFlowRate = thisOAController.MaxOA * RhoAirStdInit;
             OAControllerMyEnvrnFlag(OAControllerNum) = false;
-            Node(OANode).MassFlowRateMax = thisOAController.MaxOAMassFlowRate;
+            state.dataLoopNodes->Node(OANode).MassFlowRateMax = thisOAController.MaxOAMassFlowRate;
 
             // predefined reporting
             if (thisOAController.Econo > iEconoOp::NoEconomizer) {
@@ -2935,7 +2934,7 @@ namespace EnergyPlus::MixedAir {
                     }
                     // Check primary air loop name
                     if (AirLoopFound && thisAirLoop > 0) {
-                        airloopName = state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Name; // state.dataAirLoop->OutsideAirSys(OASysIndex)%Name
+                        airloopName = state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Name; // OutsideAirSys(OASysIndex)%Name
                     } else {
                         ShowWarningError(state, "Cannot find the primary air loop for the OA Controller: " + thisOAController.Name);
                         airloopName = "AirLoop not found";
@@ -3070,8 +3069,8 @@ namespace EnergyPlus::MixedAir {
         if (FirstHVACIteration) {
             // Mixed air setpoint. Set by a setpoint manager.
             if (thisOAController.ControllerType_Num == iControllerType::ControllerOutsideAir) {
-                if (Node(thisOAController.MixNode).TempSetPoint > SensedNodeFlagValue) {
-                    thisOAController.MixSetTemp = Node(thisOAController.MixNode).TempSetPoint;
+                if (state.dataLoopNodes->Node(thisOAController.MixNode).TempSetPoint > SensedNodeFlagValue) {
+                    thisOAController.MixSetTemp = state.dataLoopNodes->Node(thisOAController.MixNode).TempSetPoint;
                 } else {
                     thisOAController.MixSetTemp = thisOAController.TempLowLim;
                 }
@@ -3100,8 +3099,8 @@ namespace EnergyPlus::MixedAir {
         // Each iteration
 
         if (thisOAController.ControllerType_Num == iControllerType::ControllerOutsideAir) {
-            // zone exhaust mass flow is saved in state.dataAirLoop->AirLoopFlow%ZoneExhaust
-            // the zone exhaust mass flow that is said to be balanced by simple air flows is saved in state.dataAirLoop->AirLoopFlow%ZoneExhaustBalanced
+            // zone exhaust mass flow is saved in AirLoopFlow%ZoneExhaust
+            // the zone exhaust mass flow that is said to be balanced by simple air flows is saved in AirLoopFlow%ZoneExhaustBalanced
             if (AirLoopNum > 0) {
                 thisOAController.ExhMassFlow = max(0.0, state.dataAirLoop->AirLoopFlow(AirLoopNum).SupFlow - state.dataAirLoop->AirLoopFlow(AirLoopNum).SysRetFlow);
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).ZoneExhMassFlow = thisOAController.ExhMassFlow;
@@ -3109,63 +3108,63 @@ namespace EnergyPlus::MixedAir {
                     // if flow rate has been specified by a manager, set it to the specified value
                     thisOAController.MixMassFlow = state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac * state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
                 } else {
-                    thisOAController.MixMassFlow = Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
+                    thisOAController.MixMassFlow = state.dataLoopNodes->Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
 
                     // The following was commented out after discussion on PR 7382, it can be reopened for discussion anytime
                     // found this equation results in flow that exceeds the design flow rate when there is exhaust flow rate is greater than
                     // the design supply air flow rate. Capped the mixed air flow rate at design supply air flow rate, issue #77379
                     // thisOAController.MixMassFlow = Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
                     // thisOAController.MixMassFlow =
-                    //     min(Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow, state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply);
+                    //     min(Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow, AirLoopFlow(AirLoopNum).DesSupply);
                 }
             } else {
                 thisOAController.ExhMassFlow = 0.0;
-                thisOAController.MixMassFlow = Node(thisOAController.RetNode).MassFlowRate;
+                thisOAController.MixMassFlow = state.dataLoopNodes->Node(thisOAController.RetNode).MassFlowRate;
             }
-            if (Node(thisOAController.MixNode).MassFlowRateMaxAvail <= 0.0) {
+            if (state.dataLoopNodes->Node(thisOAController.MixNode).MassFlowRateMaxAvail <= 0.0) {
                 thisOAController.MixMassFlow = 0.0;
             }
         } else {
             // Mixed and exhaust flow rates are passed through to model CONTROLLER:STAND ALONE ERV in SimOAController
             thisOAController.OAMassFlow = thisOAController.MaxOAMassFlowRate;
             thisOAController.MixMassFlow = thisOAController.MaxOAMassFlowRate;
-            thisOAController.ExhMassFlow = Node(thisOAController.RetNode).MassFlowRate;
+            thisOAController.ExhMassFlow = state.dataLoopNodes->Node(thisOAController.RetNode).MassFlowRate;
         }
         thisOAController.ExhMassFlow = max(thisOAController.ExhMassFlow, 0.0);
 
         // Outside air values
-        thisOAController.OATemp = Node(thisOAController.OANode).Temp;
-        thisOAController.OAEnth = Node(thisOAController.OANode).Enthalpy;
-        thisOAController.OAPress = Node(thisOAController.OANode).Press;
-        thisOAController.OAHumRat = Node(thisOAController.OANode).HumRat;
+        thisOAController.OATemp = state.dataLoopNodes->Node(thisOAController.OANode).Temp;
+        thisOAController.OAEnth = state.dataLoopNodes->Node(thisOAController.OANode).Enthalpy;
+        thisOAController.OAPress = state.dataLoopNodes->Node(thisOAController.OANode).Press;
+        thisOAController.OAHumRat = state.dataLoopNodes->Node(thisOAController.OANode).HumRat;
 
         // Inlet air values (on OA input side)
-        thisOAController.InletTemp = Node(thisOAController.InletNode).Temp;
-        thisOAController.InletEnth = Node(thisOAController.InletNode).Enthalpy;
-        thisOAController.InletPress = Node(thisOAController.InletNode).Press;
-        thisOAController.InletHumRat = Node(thisOAController.InletNode).HumRat;
+        thisOAController.InletTemp = state.dataLoopNodes->Node(thisOAController.InletNode).Temp;
+        thisOAController.InletEnth = state.dataLoopNodes->Node(thisOAController.InletNode).Enthalpy;
+        thisOAController.InletPress = state.dataLoopNodes->Node(thisOAController.InletNode).Press;
+        thisOAController.InletHumRat = state.dataLoopNodes->Node(thisOAController.InletNode).HumRat;
 
         // Return air values
-        thisOAController.RetTemp = Node(thisOAController.RetNode).Temp;
-        thisOAController.RetEnth = Node(thisOAController.RetNode).Enthalpy;
+        thisOAController.RetTemp = state.dataLoopNodes->Node(thisOAController.RetNode).Temp;
+        thisOAController.RetEnth = state.dataLoopNodes->Node(thisOAController.RetNode).Enthalpy;
 
         // Check sensors faults for the air economizer
         iEco = thisOAController.Econo;
-        if (AnyFaultsInModel && (iEco != iEconoOp::NoEconomizer)) {
+        if (state.dataFaultsMgr->AnyFaultsInModel && (iEco != iEconoOp::NoEconomizer)) {
             int j; // index to economizer faults
             for (i = 1; i <= thisOAController.NumFaultyEconomizer; ++i) {
                 j = thisOAController.EconmizerFaultNum(i);
-                if (GetCurrentScheduleValue(state, FaultsEconomizer(j).AvaiSchedPtr) > 0.0) {
+                if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsEconomizer(j).AvaiSchedPtr) > 0.0) {
                     rSchVal = 1.0;
-                    if (FaultsEconomizer(j).SeveritySchedPtr > 0) {
-                        rSchVal = GetCurrentScheduleValue(state, FaultsEconomizer(j).SeveritySchedPtr);
+                    if (state.dataFaultsMgr->FaultsEconomizer(j).SeveritySchedPtr > 0) {
+                        rSchVal = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsEconomizer(j).SeveritySchedPtr);
                     }
                 } else {
                     // no fault
                     continue;
                 }
 
-                rOffset = rSchVal * FaultsEconomizer(j).Offset;
+                rOffset = rSchVal * state.dataFaultsMgr->FaultsEconomizer(j).Offset;
 
                 if (std::abs(rOffset) < 0.000000001) continue;
 
@@ -3175,7 +3174,7 @@ namespace EnergyPlus::MixedAir {
                     if ((SELECT_CASE_var == iEconoOp::FixedDryBulb) || (SELECT_CASE_var == iEconoOp::DifferentialDryBulb) ||
                         (SELECT_CASE_var == iEconoOp::FixedDewPointAndDryBulb) || (SELECT_CASE_var == iEconoOp::ElectronicEnthalpy) ||
                         (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
-                        if (FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir) {
+                        if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir) {
                             // FaultModel:TemperatureSensorOffset:OutdoorAir
                             thisOAController.OATemp += rOffset;
                             thisOAController.InletTemp += rOffset;
@@ -3188,7 +3187,7 @@ namespace EnergyPlus::MixedAir {
                 {
                     auto const SELECT_CASE_var(iEco);
                     if ((SELECT_CASE_var == iEconoOp::FixedDewPointAndDryBulb) || (SELECT_CASE_var == iEconoOp::ElectronicEnthalpy)) {
-                        if (FaultsEconomizer(j).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir) {
+                        if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir) {
                             // FaultModel:HumiditySensorOffset:OutdoorAir
                             thisOAController.OAHumRat += rOffset;
                             thisOAController.InletHumRat += rOffset;
@@ -3202,7 +3201,7 @@ namespace EnergyPlus::MixedAir {
                     auto const SELECT_CASE_var(iEco);
                     if ((SELECT_CASE_var == iEconoOp::FixedEnthalpy) || (SELECT_CASE_var == iEconoOp::ElectronicEnthalpy) ||
                         (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
-                        if (FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir) {
+                        if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir) {
                             // FaultModel:EnthalpySensorOffset:OutdoorAir
                             thisOAController.OAEnth += rOffset;
                             thisOAController.InletEnth += rOffset;
@@ -3215,7 +3214,7 @@ namespace EnergyPlus::MixedAir {
                 {
                     auto const SELECT_CASE_var(iEco);
                     if ((SELECT_CASE_var == iEconoOp::DifferentialDryBulb) || (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
-                        if (FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir) {
+                        if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir) {
                             // FaultModel:TemperatureSensorOffset:ReturnAir
                             thisOAController.RetTemp += rOffset;
                         }
@@ -3227,7 +3226,7 @@ namespace EnergyPlus::MixedAir {
                 {
                     auto const SELECT_CASE_var(iEco);
                     if ((SELECT_CASE_var == iEconoOp::ElectronicEnthalpy) || (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
-                        if (FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir) {
+                        if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir) {
                             // FaultModel:EnthalpySensorOffset:ReturnAir
                             thisOAController.RetEnth += rOffset;
                         }
@@ -3293,19 +3292,19 @@ namespace EnergyPlus::MixedAir {
         // Each iteration
 
         // Return air stream data
-        state.dataMixedAir->OAMixer(OAMixerNum).RetTemp = Node(RetNode).Temp;
-        state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat = Node(RetNode).HumRat;
-        state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy = Node(RetNode).Enthalpy;
-        state.dataMixedAir->OAMixer(OAMixerNum).RetPressure = Node(RetNode).Press;
-        state.dataMixedAir->OAMixer(OAMixerNum).RetMassFlowRate = Node(RetNode).MassFlowRate;
+        state.dataMixedAir->OAMixer(OAMixerNum).RetTemp = state.dataLoopNodes->Node(RetNode).Temp;
+        state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat = state.dataLoopNodes->Node(RetNode).HumRat;
+        state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy = state.dataLoopNodes->Node(RetNode).Enthalpy;
+        state.dataMixedAir->OAMixer(OAMixerNum).RetPressure = state.dataLoopNodes->Node(RetNode).Press;
+        state.dataMixedAir->OAMixer(OAMixerNum).RetMassFlowRate = state.dataLoopNodes->Node(RetNode).MassFlowRate;
         // Outside air stream data
-        state.dataMixedAir->OAMixer(OAMixerNum).OATemp = Node(InletNode).Temp;
-        state.dataMixedAir->OAMixer(OAMixerNum).OAHumRat = Node(InletNode).HumRat;
-        state.dataMixedAir->OAMixer(OAMixerNum).OAEnthalpy = Node(InletNode).Enthalpy;
-        state.dataMixedAir->OAMixer(OAMixerNum).OAPressure = Node(InletNode).Press;
-        state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate = Node(InletNode).MassFlowRate;
+        state.dataMixedAir->OAMixer(OAMixerNum).OATemp = state.dataLoopNodes->Node(InletNode).Temp;
+        state.dataMixedAir->OAMixer(OAMixerNum).OAHumRat = state.dataLoopNodes->Node(InletNode).HumRat;
+        state.dataMixedAir->OAMixer(OAMixerNum).OAEnthalpy = state.dataLoopNodes->Node(InletNode).Enthalpy;
+        state.dataMixedAir->OAMixer(OAMixerNum).OAPressure = state.dataLoopNodes->Node(InletNode).Press;
+        state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         // Relief air data
-        state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate = Node(RelNode).MassFlowRate;
+        state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate = state.dataLoopNodes->Node(RelNode).MassFlowRate;
     }
 
     // End of Initialization Section of the Module
@@ -3389,7 +3388,7 @@ namespace EnergyPlus::MixedAir {
             this->EconomizerStatus = 0;                               // economizer status for reporting
             this->HeatRecoveryBypassStatus = 0;                       // HR bypass status for reporting
             this->HRHeatingCoilActive = 0;                            // resets report variable
-            this->MixedAirTempAtMinOAFlow = Node(this->RetNode).Temp; // track return T
+            this->MixedAirTempAtMinOAFlow = state.dataLoopNodes->Node(this->RetNode).Temp; // track return T
             this->HighHumCtrlStatus = 0;                              // high humdity control status for reporting
             this->OAFractionRpt = 0.0;                                // actual OA fraction for reporting
 
@@ -3483,7 +3482,7 @@ namespace EnergyPlus::MixedAir {
 
         OutAirMinFrac = min(max(OutAirMinFrac, 0.0), 1.0);
 
-        // At this point, OutAirMinFrac is still based on state.dataAirLoop->AirLoopFlow.DesSupply
+        // At this point, OutAirMinFrac is still based on AirLoopFlow.DesSupply
         if (AirLoopNum > 0) {
             auto &curAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
 
@@ -3491,13 +3490,13 @@ namespace EnergyPlus::MixedAir {
 
             // calculate mixed air temp at min OA flow rate
             ReliefMassFlowAtMinOA = max(curAirLoopFlow.MinOutAir - this->ExhMassFlow, 0.0);
-            RecircMassFlowRateAtMinOAFlow = max(Node(this->RetNode).MassFlowRate - ReliefMassFlowAtMinOA, 0.0);
+            RecircMassFlowRateAtMinOAFlow = max(state.dataLoopNodes->Node(this->RetNode).MassFlowRate - ReliefMassFlowAtMinOA, 0.0);
             if ((RecircMassFlowRateAtMinOAFlow + curAirLoopFlow.MinOutAir) > 0.0) {
-                RecircTemp = Node(this->RetNode).Temp;
-                MixedAirTempAtMinOAFlow = (RecircMassFlowRateAtMinOAFlow * RecircTemp + curAirLoopFlow.MinOutAir * Node(this->OANode).Temp) /
+                RecircTemp = state.dataLoopNodes->Node(this->RetNode).Temp;
+                MixedAirTempAtMinOAFlow = (RecircMassFlowRateAtMinOAFlow * RecircTemp + curAirLoopFlow.MinOutAir * state.dataLoopNodes->Node(this->OANode).Temp) /
                                           (RecircMassFlowRateAtMinOAFlow + curAirLoopFlow.MinOutAir);
             } else {
-                MixedAirTempAtMinOAFlow = Node(this->RetNode).Temp;
+                MixedAirTempAtMinOAFlow = state.dataLoopNodes->Node(this->RetNode).Temp;
             }
             this->MixedAirTempAtMinOAFlow = MixedAirTempAtMinOAFlow;
         }
@@ -3763,7 +3762,7 @@ namespace EnergyPlus::MixedAir {
                     OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                     if (OAIndex > 0) {
                         {
-                            auto const SELECT_CASE_var(OARequirements(OAIndex).OAFlowMethod);
+                            auto const SELECT_CASE_var(state.dataSize->OARequirements(OAIndex).OAFlowMethod);
                             if (SELECT_CASE_var == OAFlowPPer) {
                                 ZoneOABZ = ZoneOAPeople;
                             } else if (SELECT_CASE_var == OAFlow) {
@@ -3852,7 +3851,7 @@ namespace EnergyPlus::MixedAir {
                         OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                         if (OAIndex > 0) {
                             {
-                                auto const SELECT_CASE_var(OARequirements(OAIndex).OAFlowMethod);
+                                auto const SELECT_CASE_var(state.dataSize->OARequirements(OAIndex).OAFlowMethod);
                                 if (SELECT_CASE_var == OAFlowPPer) {
                                     ZoneOABZ = ZoneOAPeople;
                                 } else if (SELECT_CASE_var == OAFlow) {
@@ -4117,9 +4116,9 @@ namespace EnergyPlus::MixedAir {
                                 // Assume primary air is always stored at the AirDistUnitCool (cooling deck if dual duct)
                                 PriNode = curZoneEquipConfig.AirDistUnitCool(InNodeIndex).InNode;
                                 if (PriNode > 0) {
-                                    NodeTemp = Node(PriNode).Temp;
-                                    NodeHumRat = Node(PriNode).HumRat;
-                                    MassFlowRate = Node(PriNode).MassFlowRate;
+                                    NodeTemp = state.dataLoopNodes->Node(PriNode).Temp;
+                                    NodeHumRat = state.dataLoopNodes->Node(PriNode).HumRat;
+                                    MassFlowRate = state.dataLoopNodes->Node(PriNode).MassFlowRate;
                                 } else {
                                     MassFlowRate = 0.0;
                                 }
@@ -4129,9 +4128,9 @@ namespace EnergyPlus::MixedAir {
                                 // or InletNode = ZoneEquipConfig(ZoneEquipConfigNum)%AirDistUnitCool(InNodeIndex)%OutNode
                                 InletNode = curZoneEquipConfig.InletNode(InNodeIndex);
                                 if (InletNode > 0) {
-                                    NodeTemp = Node(InletNode).Temp;
-                                    NodeHumRat = Node(InletNode).HumRat; // ZoneAirHumRat(ZoneNum)
-                                    MassFlowRate = Node(InletNode).MassFlowRate;
+                                    NodeTemp = state.dataLoopNodes->Node(InletNode).Temp;
+                                    NodeHumRat = state.dataLoopNodes->Node(InletNode).HumRat; // ZoneAirHumRat(ZoneNum)
+                                    MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
                                 } else {
                                     MassFlowRate = 0.0;
                                 }
@@ -4223,7 +4222,6 @@ namespace EnergyPlus::MixedAir {
                                              bool &HighHumidityOperationFlag,
                                              bool const FirstHVACIteration)
     {
-        using DataLoopNode::Node;
         using General::SolveRoot;
         using SetPointManager::GetCoilFreezingCheckFlag;
         using TempSolveRoot::SolveRoot;
@@ -4255,10 +4253,10 @@ namespace EnergyPlus::MixedAir {
                 // For all system types (even ones that don't set AirLoopEconoLockout) lock out economizer if unfavorable for heating
                 if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CheckHeatRecoveryBypassStatus && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated) {
 
-                    if (this->MixedAirTempAtMinOAFlow <= Node(this->MixNode).TempSetPoint) {
+                    if (this->MixedAirTempAtMinOAFlow <= state.dataLoopNodes->Node(this->MixNode).TempSetPoint) {
                         state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconomizerFlowLocked = true;
-                        // this->OAMassFlow = state.dataAirLoop->AirLoopFlow( AirLoopNum ).MinOutAir;
-                        // state.dataAirLoop->AirLoopFlow( AirLoopNum ).OAFrac = this->OAMassFlow / this->MixMassFlow;
+                        // this->OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
+                        // AirLoopFlow( AirLoopNum ).OAFrac = this->OAMassFlow / this->MixMassFlow;
                         state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoLockout = true;
                         EconomizerOperationFlag = false;
                     } else {
@@ -4389,7 +4387,7 @@ namespace EnergyPlus::MixedAir {
                     //     IF OAController is not allowed to modify air flow during high outdoor humrat condition, then disable modified air flow
                     //     if indoor humrat is less than or equal to outdoor humrat
                     if (!this->ModifyDuringHighOAMoisture &&
-                        (Node(this->NodeNumofHumidistatZone).HumRat - this->OAHumRat) <= DataHVACGlobals::SmallHumRatDiff) {
+                        (state.dataLoopNodes->Node(this->NodeNumofHumidistatZone).HumRat - this->OAHumRat) <= DataHVACGlobals::SmallHumRatDiff) {
                         HighHumidityOperationFlag = false;
                     } else {
                         HighHumidityOperationFlag = true;
@@ -4427,7 +4425,7 @@ namespace EnergyPlus::MixedAir {
                     Par(2) = this->RetNode;
                     Par(3) = this->InletNode;
                     Par(4) = this->MixMassFlow;
-                    SolveRoot(Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par);
+                    SolveRoot(state, Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par);
                     if (SolFla < 0) {
                         OASignal = OutAirSignal;
                     }
@@ -4438,25 +4436,25 @@ namespace EnergyPlus::MixedAir {
 
                     // 1 - check min OA flow result
                     if (this->FixedMin) {
-                        Node(this->OANode).MassFlowRate =
-                            min(max(this->ExhMassFlow, OutAirMinFrac * state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply), Node(this->MixNode).MassFlowRate);
-                        Node(this->RelNode).MassFlowRate = max(Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
+                        state.dataLoopNodes->Node(this->OANode).MassFlowRate =
+                            min(max(this->ExhMassFlow, OutAirMinFrac * state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply), state.dataLoopNodes->Node(this->MixNode).MassFlowRate);
+                        state.dataLoopNodes->Node(this->RelNode).MassFlowRate = max(state.dataLoopNodes->Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
                         // save actual OA flow frac for use as min value for RegulaFalsi call
-                        minOAFrac = max(OutAirMinFrac, Node(this->OANode).MassFlowRate / this->MixMassFlow);
+                        minOAFrac = max(OutAirMinFrac, state.dataLoopNodes->Node(this->OANode).MassFlowRate / this->MixMassFlow);
                     } else {
-                        Node(this->OANode).MassFlowRate = max(this->ExhMassFlow, OutAirMinFrac * Node(this->MixNode).MassFlowRate);
-                        Node(this->RelNode).MassFlowRate = max(Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
+                        state.dataLoopNodes->Node(this->OANode).MassFlowRate = max(this->ExhMassFlow, OutAirMinFrac * state.dataLoopNodes->Node(this->MixNode).MassFlowRate);
+                        state.dataLoopNodes->Node(this->RelNode).MassFlowRate = max(state.dataLoopNodes->Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
                         // save actual OA flow frac for use as min value for RegulaFalsi call
-                        minOAFrac = max(OutAirMinFrac, Node(this->OANode).MassFlowRate / this->MixMassFlow);
+                        minOAFrac = max(OutAirMinFrac, state.dataLoopNodes->Node(this->OANode).MassFlowRate / this->MixMassFlow);
                     }
                     SimOASysComponents(state, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum, FirstHVACIteration, AirLoopNum);
-                    lowFlowResiduum = Node(this->MixNode).TempSetPoint - Node(this->MixNode).Temp;
+                    lowFlowResiduum = state.dataLoopNodes->Node(this->MixNode).TempSetPoint - state.dataLoopNodes->Node(this->MixNode).Temp;
 
                     // 2 - check max OA flow result
-                    Node(this->OANode).MassFlowRate = max(this->ExhMassFlow, Node(this->MixNode).MassFlowRate);
-                    Node(this->RelNode).MassFlowRate = max(Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
+                    state.dataLoopNodes->Node(this->OANode).MassFlowRate = max(this->ExhMassFlow, state.dataLoopNodes->Node(this->MixNode).MassFlowRate);
+                    state.dataLoopNodes->Node(this->RelNode).MassFlowRate = max(state.dataLoopNodes->Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
                     SimOASysComponents(state, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum, FirstHVACIteration, AirLoopNum);
-                    highFlowResiduum = Node(this->MixNode).TempSetPoint - Node(this->MixNode).Temp;
+                    highFlowResiduum = state.dataLoopNodes->Node(this->MixNode).TempSetPoint - state.dataLoopNodes->Node(this->MixNode).Temp;
 
                     // 3 - test to ensure RegulaFalsi can find an answer
                     if ((sign(lowFlowResiduum) == sign(highFlowResiduum))) {
@@ -4484,7 +4482,7 @@ namespace EnergyPlus::MixedAir {
                 Par(2) = this->RetNode;
                 Par(3) = this->InletNode;
                 Par(4) = this->MixMassFlow;
-                SolveRoot(Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par);
+                SolveRoot(state, Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par);
                 if (SolFla < 0) {
                     OASignal = OutAirSignal;
                 }
@@ -4514,7 +4512,7 @@ namespace EnergyPlus::MixedAir {
             // This should not be messing with OutAirMinFrac, freeze protection should only limit economizer operation
             // if (MaximumOAFracBySetPoint < OutAirMinFrac) {
             // OutAirMinFrac = MaximumOAFracBySetPoint;
-            //	if (AirLoopNum > 0) state.dataAirLoop->AirLoopFlow(AirLoopNum).MinOutAir = OutAirMinFrac * this->MixMassFlow;
+            //    if (AirLoopNum > 0) AirLoopFlow(AirLoopNum).MinOutAir = OutAirMinFrac * this->MixMassFlow;
             //}
             OASignal = max(min(MaximumOAFracBySetPoint, OASignal), OutAirMinFrac);
         }
@@ -4699,7 +4697,7 @@ namespace EnergyPlus::MixedAir {
         ErrorsFound = false;
         if (this->MaxOA == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 {
                     auto const SELECT_CASE_var(this->ControllerType_Num);
@@ -4709,17 +4707,17 @@ namespace EnergyPlus::MixedAir {
                         CheckSysSizing(state, CurrentModuleObject, this->Name);
 
                         {
-                            auto const SELECT_CASE_var1(CurDuctType);
+                            auto const SELECT_CASE_var1(state.dataSize->CurDuctType);
                             if (SELECT_CASE_var1 == Main) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else if (SELECT_CASE_var1 == Cooling) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesCoolVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                             } else if (SELECT_CASE_var1 == Heating) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesHeatVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                             } else if (SELECT_CASE_var1 == Other) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             }
                         }
 
@@ -4729,7 +4727,7 @@ namespace EnergyPlus::MixedAir {
                     }
                 }
 
-            } else if (CurZoneEqNum > 0) {
+            } else if (state.dataSize->CurZoneEqNum > 0) {
 
                 {
                     auto const SELECT_CASE_var(this->ControllerType_Num);
@@ -4737,7 +4735,7 @@ namespace EnergyPlus::MixedAir {
                     if (SELECT_CASE_var == iControllerType::ControllerOutsideAir) {
 
                         CheckZoneSizing(state, CurrentModuleObject, this->Name);
-                        this->MaxOA = max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
+                        this->MaxOA = max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
 
                     } else if (SELECT_CASE_var == iControllerType::ControllerStandAloneERV) {
 
@@ -4755,11 +4753,11 @@ namespace EnergyPlus::MixedAir {
 
         if (this->MinOA == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, CurrentModuleObject, this->Name);
-                if (FinalSysSizing(CurSysNum).DesOutAirVolFlow >= SmallAirVolFlow) {
-                    this->MinOA = min(FinalSysSizing(CurSysNum).DesOutAirVolFlow, this->MaxOA);
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow >= SmallAirVolFlow) {
+                    this->MinOA = min(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, this->MaxOA);
                 } else {
                     this->MinOA = 0.0;
                 }
@@ -4785,10 +4783,10 @@ namespace EnergyPlus::MixedAir {
         }
         // If there is an outside air system, loop over components in the OA system; pass the design air flow rate
         // to the coil components that don't have design air flow as an input.
-        if (CurOASysNum > 0) {
-            for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(CurOASysNum).NumComponents; ++CompNum) {
-                CompType = state.dataAirLoop->OutsideAirSys(CurOASysNum).ComponentType(CompNum);
-                CompName = state.dataAirLoop->OutsideAirSys(CurOASysNum).ComponentName(CompNum);
+        if (state.dataSize->CurOASysNum > 0) {
+            for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).NumComponents; ++CompNum) {
+                CompType = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentType(CompNum);
+                CompName = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentName(CompNum);
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
                     UtilityRoutines::SameString(CompType, "COIL:HEATING:WATER") ||
                     UtilityRoutines::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
@@ -4857,29 +4855,29 @@ namespace EnergyPlus::MixedAir {
         if (this->ControllerType_Num == iControllerType::ControllerOutsideAir) {
             // The outside air controller sets the outside air flow rate and the relief air flow rate
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
-                Node(OutAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
-                Node(InletAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
-                Node(OutAirNodeNum).MassFlowRateMaxAvail = this->DemandLimitFlowRate;
+                state.dataLoopNodes->Node(OutAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
+                state.dataLoopNodes->Node(InletAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
+                state.dataLoopNodes->Node(OutAirNodeNum).MassFlowRateMaxAvail = this->DemandLimitFlowRate;
             } else {
-                Node(OutAirNodeNum).MassFlowRate = this->OAMassFlow;
-                Node(InletAirNodeNum).MassFlowRate = this->OAMassFlow;
-                Node(OutAirNodeNum).MassFlowRateMaxAvail = this->OAMassFlow;
+                state.dataLoopNodes->Node(OutAirNodeNum).MassFlowRate = this->OAMassFlow;
+                state.dataLoopNodes->Node(InletAirNodeNum).MassFlowRate = this->OAMassFlow;
+                state.dataLoopNodes->Node(OutAirNodeNum).MassFlowRateMaxAvail = this->OAMassFlow;
             }
-            Node(RelAirNodeNum).MassFlowRate = this->RelMassFlow;
+            state.dataLoopNodes->Node(RelAirNodeNum).MassFlowRate = this->RelMassFlow;
         } else {
             // The ERV controller sets the supply and secondary inlet node information for the Stand Alone ERV
             // Currently, the Stand Alone ERV only has constant air flows (supply and exhaust), and these are
             // already set in HVACStandAloneERV.cc (subroutine init). Therefore, these flow assignments below are
             // currently redundant but may be useful in the future as mass flow rates can vary based on the controller signal.
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
-                Node(OutAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
-                Node(OutAirNodeNum).MassFlowRateMaxAvail = this->DemandLimitFlowRate;
+                state.dataLoopNodes->Node(OutAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
+                state.dataLoopNodes->Node(OutAirNodeNum).MassFlowRateMaxAvail = this->DemandLimitFlowRate;
             } else {
-                Node(OutAirNodeNum).MassFlowRate = this->OAMassFlow;
-                Node(OutAirNodeNum).MassFlowRateMaxAvail = this->OAMassFlow;
+                state.dataLoopNodes->Node(OutAirNodeNum).MassFlowRate = this->OAMassFlow;
+                state.dataLoopNodes->Node(OutAirNodeNum).MassFlowRateMaxAvail = this->OAMassFlow;
             }
-            Node(RetAirNodeNum).MassFlowRate = Node(this->RetNode).MassFlowRate;
-            Node(RetAirNodeNum).MassFlowRateMaxAvail = Node(this->RetNode).MassFlowRate;
+            state.dataLoopNodes->Node(RetAirNodeNum).MassFlowRate = state.dataLoopNodes->Node(this->RetNode).MassFlowRate;
+            state.dataLoopNodes->Node(RetAirNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(this->RetNode).MassFlowRate;
         }
     }
 
@@ -4922,37 +4920,37 @@ namespace EnergyPlus::MixedAir {
         RelNode = state.dataMixedAir->OAMixer(OAMixerNum).RelNode;
         RetNode = state.dataMixedAir->OAMixer(OAMixerNum).RetNode;
         // Move mixed air data to the mixed air node
-        Node(MixNode).MassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
-        Node(MixNode).Temp = state.dataMixedAir->OAMixer(OAMixerNum).MixTemp;
-        Node(MixNode).HumRat = state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat;
-        Node(MixNode).Enthalpy = state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy;
-        Node(MixNode).Press = state.dataMixedAir->OAMixer(OAMixerNum).MixPressure;
-        Node(MixNode).MassFlowRateMaxAvail = state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
+        state.dataLoopNodes->Node(MixNode).MassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
+        state.dataLoopNodes->Node(MixNode).Temp = state.dataMixedAir->OAMixer(OAMixerNum).MixTemp;
+        state.dataLoopNodes->Node(MixNode).HumRat = state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat;
+        state.dataLoopNodes->Node(MixNode).Enthalpy = state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy;
+        state.dataLoopNodes->Node(MixNode).Press = state.dataMixedAir->OAMixer(OAMixerNum).MixPressure;
+        state.dataLoopNodes->Node(MixNode).MassFlowRateMaxAvail = state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
         // Move the relief air data to the relief air node
-        Node(RelNode).MassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate;
-        Node(RelNode).Temp = state.dataMixedAir->OAMixer(OAMixerNum).RelTemp;
-        Node(RelNode).HumRat = state.dataMixedAir->OAMixer(OAMixerNum).RelHumRat;
-        Node(RelNode).Enthalpy = state.dataMixedAir->OAMixer(OAMixerNum).RelEnthalpy;
-        Node(RelNode).Press = state.dataMixedAir->OAMixer(OAMixerNum).RelPressure;
-        Node(RelNode).MassFlowRateMaxAvail = state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate;
+        state.dataLoopNodes->Node(RelNode).MassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate;
+        state.dataLoopNodes->Node(RelNode).Temp = state.dataMixedAir->OAMixer(OAMixerNum).RelTemp;
+        state.dataLoopNodes->Node(RelNode).HumRat = state.dataMixedAir->OAMixer(OAMixerNum).RelHumRat;
+        state.dataLoopNodes->Node(RelNode).Enthalpy = state.dataMixedAir->OAMixer(OAMixerNum).RelEnthalpy;
+        state.dataLoopNodes->Node(RelNode).Press = state.dataMixedAir->OAMixer(OAMixerNum).RelPressure;
+        state.dataLoopNodes->Node(RelNode).MassFlowRateMaxAvail = state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(RelNode).CO2 = Node(RetNode).CO2;
+            state.dataLoopNodes->Node(RelNode).CO2 = state.dataLoopNodes->Node(RetNode).CO2;
             if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
-                Node(MixNode).CO2 = Node(RetNode).CO2;
+                state.dataLoopNodes->Node(MixNode).CO2 = state.dataLoopNodes->Node(RetNode).CO2;
             } else {
-                Node(MixNode).CO2 = ((Node(RetNode).MassFlowRate - Node(RelNode).MassFlowRate) * Node(RetNode).CO2 +
+                state.dataLoopNodes->Node(MixNode).CO2 = ((state.dataLoopNodes->Node(RetNode).MassFlowRate - state.dataLoopNodes->Node(RelNode).MassFlowRate) * state.dataLoopNodes->Node(RetNode).CO2 +
                                      state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate * state.dataContaminantBalance->OutdoorCO2) /
                                     state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
             }
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(RelNode).GenContam = Node(RetNode).GenContam;
+            state.dataLoopNodes->Node(RelNode).GenContam = state.dataLoopNodes->Node(RetNode).GenContam;
             if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
-                Node(MixNode).GenContam = Node(RetNode).GenContam;
+                state.dataLoopNodes->Node(MixNode).GenContam = state.dataLoopNodes->Node(RetNode).GenContam;
             } else {
-                Node(MixNode).GenContam = ((Node(RetNode).MassFlowRate - Node(RelNode).MassFlowRate) * Node(RetNode).GenContam +
+                state.dataLoopNodes->Node(MixNode).GenContam = ((state.dataLoopNodes->Node(RetNode).MassFlowRate - state.dataLoopNodes->Node(RelNode).MassFlowRate) * state.dataLoopNodes->Node(RetNode).GenContam +
                                            state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate * state.dataContaminantBalance->OutdoorGC) /
                                           state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
             }
@@ -4971,7 +4969,8 @@ namespace EnergyPlus::MixedAir {
     // Beginning Utility Section of the Module
     //******************************************************************************
 
-    Real64 MixedAirControlTempResidual(Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+    Real64 MixedAirControlTempResidual(EnergyPlusData &state, 
+                                       Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
                                        Array1D<Real64> const &Par // par(1) = mixed node number
     )
     {
@@ -5035,12 +5034,12 @@ namespace EnergyPlus::MixedAir {
 
         OAMassFlowRate = OASignal * MixMassFlowRate;
         RecircMassFlowRate = max(MixMassFlowRate - OAMassFlowRate, 0.0);
-        RecircEnth = Node(RetNode).Enthalpy;
-        RecircHumRat = Node(RetNode).HumRat;
-        MixEnth = (RecircMassFlowRate * RecircEnth + OAMassFlowRate * Node(OANode).Enthalpy) / MixMassFlowRate;
-        MixHumRat = (RecircMassFlowRate * RecircHumRat + OAMassFlowRate * Node(OANode).HumRat) / MixMassFlowRate;
+        RecircEnth = state.dataLoopNodes->Node(RetNode).Enthalpy;
+        RecircHumRat = state.dataLoopNodes->Node(RetNode).HumRat;
+        MixEnth = (RecircMassFlowRate * RecircEnth + OAMassFlowRate * state.dataLoopNodes->Node(OANode).Enthalpy) / MixMassFlowRate;
+        MixHumRat = (RecircMassFlowRate * RecircHumRat + OAMassFlowRate * state.dataLoopNodes->Node(OANode).HumRat) / MixMassFlowRate;
         MixTemp = PsyTdbFnHW(MixEnth, MixHumRat);
-        Residuum = Node(MixNode).TempSetPoint - MixTemp;
+        Residuum = state.dataLoopNodes->Node(MixNode).TempSetPoint - MixTemp;
 
         return Residuum;
     }
@@ -5114,12 +5113,12 @@ namespace EnergyPlus::MixedAir {
         ExhMassFlow = state.dataAirLoop->AirLoopControlInfo(AirloopNum).ZoneExhMassFlow;
 
         OAMassFlowRate = max(ExhMassFlow, OASignal * MixMassFlowRate);
-        Node(OANode).MassFlowRate = OAMassFlowRate;                          // set OA node mass flow rate
-        Node(RelNode).MassFlowRate = max(OAMassFlowRate - ExhMassFlow, 0.0); // set relief node mass flow rate to maintain mixer continuity calcs
+        state.dataLoopNodes->Node(OANode).MassFlowRate = OAMassFlowRate;                          // set OA node mass flow rate
+        state.dataLoopNodes->Node(RelNode).MassFlowRate = max(OAMassFlowRate - ExhMassFlow, 0.0); // set relief node mass flow rate to maintain mixer continuity calcs
 
         SimOASysComponents(state, OASysNum, FirstHVACIteration, AirloopNum);
 
-        Residuum = Node(MixNode).TempSetPoint - Node(MixNode).Temp;
+        Residuum = state.dataLoopNodes->Node(MixNode).TempSetPoint - state.dataLoopNodes->Node(MixNode).Temp;
 
         return Residuum;
     }

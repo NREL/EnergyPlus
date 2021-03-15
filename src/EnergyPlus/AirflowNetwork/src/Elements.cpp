@@ -967,7 +967,6 @@ namespace AirflowNetwork {
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
         using DataHVACGlobals::NumPrimaryAirSys;
-        using DataLoopNode::Node;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -989,22 +988,22 @@ namespace AirflowNetwork {
         int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
 
         if (FanTypeNum == FanType_SimpleOnOff) {
-            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && Node(InletNode).MassFlowRate == 0.0) {
+            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataLoopNodes->Node(InletNode).MassFlowRate == 0.0) {
                 NF = GenericDuct(0.1, 0.001, LFLAG, PDROP, propN, propM, F, DF);
             } else if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
                        state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate > 0.0) {
                 F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             } else {
-                F[0] = Node(InletNode).MassFlowRate * Ctrl;
+                F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate * Ctrl;
                 if (MultiSpeedHPIndicator == 2) {
                     F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate * state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio +
                            state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate * (1.0 - state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
                 }
             }
         } else if (FanTypeNum == FanType_SimpleConstVolume) {
-            if (Node(InletNode).MassFlowRate > 0.0) {
+            if (state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) {
                 F[0] = FlowRate * Ctrl;
-            } else if (NumPrimaryAirSys > 1 && Node(InletNode).MassFlowRate <= 0.0) {
+            } else if (NumPrimaryAirSys > 1 && state.dataLoopNodes->Node(InletNode).MassFlowRate <= 0.0) {
                 NF = GenericDuct(0.1, 0.001, LFLAG, PDROP, propN, propM, F, DF);
             }
 
@@ -1018,8 +1017,8 @@ namespace AirflowNetwork {
             for (k = 1; k <= NetworkNumOfLinks; ++k) {
                 if (AirflowNetworkLinkageData(k).VAVTermDamper && AirflowNetworkLinkageData(k).AirLoopNum == AirLoopNum) {
                     k1 = AirflowNetworkNodeData(AirflowNetworkLinkageData(k).NodeNums[0]).EPlusNodeNum;
-                    if (Node(k1).MassFlowRate > 0.0) {
-                        SumTermFlow += Node(k1).MassFlowRate;
+                    if (state.dataLoopNodes->Node(k1).MassFlowRate > 0.0) {
+                        SumTermFlow += state.dataLoopNodes->Node(k1).MassFlowRate;
                     }
                 }
                 if (AirflowNetworkCompData(AirflowNetworkLinkageData(k).CompNum).CompTypeNum == CompTypeNum_ELR) {
@@ -2122,8 +2121,8 @@ namespace AirflowNetwork {
         OpenFactor = MultizoneSurfaceData(i).OpenFactor;
         if (OpenFactor > 0.0) {
             Width *= OpenFactor;
-            if (DataSurfaces::Surface(MultizoneSurfaceData(i).SurfNum).Tilt < 90.0) {
-                Height *= DataSurfaces::Surface(MultizoneSurfaceData(i).SurfNum).SinTilt;
+            if (state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).Tilt < 90.0) {
+                Height *= state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SinTilt;
             }
         }
 
@@ -2771,15 +2770,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a terminal unit component
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const C(0.868589);
         Real64 const EPS(0.001);
@@ -2909,7 +2899,7 @@ namespace AirflowNetwork {
         }
         // If damper, setup the airflows from nodal values calculated from terminal
         if (AirflowNetworkLinkageData(i).VAVTermDamper) {
-            F[0] = Node(DamperInletNode).MassFlowRate;
+            F[0] = state.dataLoopNodes->Node(DamperInletNode).MassFlowRate;
             if (VAVTerminalRatio > 0.0) {
                 F[0] *= VAVTerminalRatio;
             }
@@ -3235,7 +3225,6 @@ namespace AirflowNetwork {
 
         // Using/Aliasing
         using DataHVACGlobals::VerySmallMassFlow;
-        using DataLoopNode::Node;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -3256,12 +3245,12 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
 
-        if (Node(InletNode).MassFlowRate > VerySmallMassFlow) {
+        if (state.dataLoopNodes->Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
             if (PressureSetFlag == PressureCtrlExhaust) {
                 F[0] = ExhaustFanMassFlowRate;
             } else {
-                F[0] = Node(InletNode).MassFlowRate;
+                F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             }
             DF[0] = 0.0;
             return 1;
@@ -3364,7 +3353,6 @@ namespace AirflowNetwork {
 
         // Using/Aliasing
         using DataHVACGlobals::VerySmallMassFlow;
-        using DataLoopNode::Node;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -3384,12 +3372,12 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
 
-        if (Node(InletNode).MassFlowRate > VerySmallMassFlow) {
+        if (state.dataLoopNodes->Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
             if (PressureSetFlag == PressureCtrlExhaust) {
                 F[0] = ExhaustFanMassFlowRate;
             } else {
-                F[0] = Node(InletNode).MassFlowRate;
+                F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             }
             DF[0] = 0.0;
             return 1;
@@ -3600,7 +3588,6 @@ namespace AirflowNetwork {
         // Using/Aliasing
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::VerySmallMassFlow;
-        using DataLoopNode::Node;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const CycFanCycComp(1); // fan cycles with compressor operation
@@ -3623,9 +3610,9 @@ namespace AirflowNetwork {
 
         int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
 
-        if (Node(InletNode).MassFlowRate > VerySmallMassFlow) {
+        if (state.dataLoopNodes->Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
-            F[0] = Node(InletNode).MassFlowRate;
+            F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             DF[0] = 0.0;
             if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
                 F[0] = F[0] / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
@@ -3719,7 +3706,6 @@ namespace AirflowNetwork {
 
         // Using/Aliasing
         using DataHVACGlobals::VerySmallMassFlow;
-        using DataLoopNode::Node;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const CycFanCycComp(1); // fan cycles with compressor operation
@@ -3741,13 +3727,13 @@ namespace AirflowNetwork {
 
         int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
 
-        if (Node(OutletNode).MassFlowRate > VerySmallMassFlow) {
+        if (state.dataLoopNodes->Node(OutletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
             DF[0] = 0.0;
             if (PressureSetFlag == PressureCtrlRelief) {
                 F[0] = ReliefMassFlowRate;
             } else {
-                F[0] = Node(OutletNode).MassFlowRate;
+                F[0] = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                 if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
                     F[0] = F[0] / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
                 }

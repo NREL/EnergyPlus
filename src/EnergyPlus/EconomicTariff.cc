@@ -1850,7 +1850,7 @@ namespace EnergyPlus::EconomicTariff {
         econVar(state.dataEconTariff->numEconVar).isArgument = false;
         econVar(state.dataEconTariff->numEconVar).isAssigned = false;
         econVar(state.dataEconTariff->numEconVar).specific = varNotYetDefined;
-        //		econVar( numEconVar ).values = 0.0; //Autodesk Already initialized above
+        //        econVar( numEconVar ).values = 0.0; //Autodesk Already initialized above
         // Autodesk Don't initialize cntMeDependOn
         econVar(state.dataEconTariff->numEconVar).Operator = 0;
         econVar(state.dataEconTariff->numEconVar).firstOperand = 1; // Autodesk Default initialization sets this to 0

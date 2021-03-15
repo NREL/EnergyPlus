@@ -126,7 +126,7 @@ namespace DaylightingManager {
                                                   bool &Rectangle,          // True if window is rectangular
                                                   bool &Triangle,           // True if window is triangular
                                                   Optional_int_const MapNum = _,
-                                                  //		Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
+                                                  //        Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
                                                   Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
 
     void FigureDayltgCoeffsAtPointsForWindowElements(
@@ -173,7 +173,7 @@ namespace DaylightingManager {
         Real64 &TVISIntWin,     // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 &TVISIntWinDisk, // Visible transmittance of int win at COSBIntWin for sun
         Optional_int_const MapNum = _,
-        //		Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
+        //        Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
         Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
 
     void InitializeCFSDaylighting(EnergyPlusData &state,
@@ -209,7 +209,8 @@ namespace DaylightingManager {
                                 DataDaylighting::iCalledFor const CalledFrom,
                                 Optional_int_const MapNum = _);
 
-    void AllocateForCFSRefPointsState(DataBSDFWindow::BSDFRefPoints &StateRefPoint, int const NumOfWinEl, int const NBasis, int const NTrnBasis);
+    void AllocateForCFSRefPointsState(
+        EnergyPlusData &state, DataBSDFWindow::BSDFRefPoints &StateRefPoint, int const NumOfWinEl, int const NBasis, int const NTrnBasis);
 
     void AllocateForCFSRefPointsGeometry(DataBSDFWindow::BSDFRefPointsGeomDescr &RefPointsGeomDescr, int const NumOfWinEl);
 
@@ -226,9 +227,15 @@ namespace DaylightingManager {
                                Real64 const WinElArea);
 
     void CFSRefPointPosFactor(EnergyPlusData &state,
-        Vector3<Real64> const &RefPoint, DataBSDFWindow::BSDFRefPoints &RefPointMap, int const iWin, int const CurFenState, int const NTrnBasis, Real64 const AZVIEW);
+                              Vector3<Real64> const &RefPoint,
+                              DataBSDFWindow::BSDFRefPoints &RefPointMap,
+                              int const iWin,
+                              int const CurFenState,
+                              int const NTrnBasis,
+                              Real64 const AZVIEW);
 
-    Real64 CalcObstrMultiplier(Vector3<Real64> const &GroundHitPt, // Coordinates of point that ray hits ground (m)
+    Real64 CalcObstrMultiplier(EnergyPlusData &state,
+                               Vector3<Real64> const &GroundHitPt, // Coordinates of point that ray hits ground (m)
                                int const AltSteps,                 // Number of steps in altitude angle for solar reflection calc
                                int const AzimSteps                 // Number of steps in azimuth angle of solar reflection calc
     );
@@ -344,13 +351,15 @@ namespace DaylightingManager {
                               Real64 &ObTrans            // Product of solar transmittances of exterior obstructions
     );
 
-    void DayltgHitInteriorObstruction(int const IWin,            // Window index
+    void DayltgHitInteriorObstruction(EnergyPlusData &state,
+                                      int const IWin,            // Window index
                                       Vector3<Real64> const &R1, // Origin of ray (m)
                                       Vector3<Real64> const &R2, // Destination of ray (m)
                                       bool &hit                  // True iff ray hits an obstruction
     );
 
-    void DayltgHitBetWinObstruction(int const IWin1,           // Surface number of origin window
+    void DayltgHitBetWinObstruction(EnergyPlusData &state,
+                                    int const IWin1,           // Surface number of origin window
                                     int const IWin2,           // Surface number of destination window
                                     Vector3<Real64> const &R1, // Origin of ray (on IWin1) (m)
                                     Vector3<Real64> const &R2, // Destination of ray (on IWin2) (m)
@@ -419,13 +428,15 @@ namespace DaylightingManager {
                               Real64 const THSKY, // Azimuth and altitude of sky element (radians)
                               Real64 const PHSKY);
 
-    void ProfileAngle(int const SurfNum,                // Surface number
+    void ProfileAngle(EnergyPlusData &state,
+                      int const SurfNum,                // Surface number
                       Vector3<Real64> const &CosDirSun, // Solar direction cosines
                       int const HorOrVert,              // If HORIZONTAL, calculates ProfileAngHor
                       Real64 &ProfileAng                // Solar profile angle (radians).
     );
 
-    void DayltgClosestObstruction(Vector3<Real64> const &RecPt,  // Point on window from which ray emanates (m)
+    void DayltgClosestObstruction(EnergyPlusData &state,
+                                  Vector3<Real64> const &RecPt,  // Point on window from which ray emanates (m)
                                   Vector3<Real64> const &RayVec, // Unit vector along ray pointing away from window (m)
                                   int &NearestHitSurfNum,        // Surface number of nearest obstruction that is hit by ray;
                                   Vector3<Real64> &NearestHitPt  // Ray's hit point on nearest obstruction (m)
@@ -532,6 +543,74 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Array2D_int MapErrIndex;
     Array2D_int RefErrIndex;
 
+    bool MySunIsUpFlag = false;
+    bool CalcDayltgCoeffsMapPointsMySunIsUpFlag = false;
+
+    // static variables extracted from functions
+    Vector3<Real64> AR;  // Inside surface area sum for floor/wall/ceiling (m2)
+    Vector3<Real64> ARH; // Inside surface area*reflectance sum for floor/wall/ceiling (m2)
+    Vector3<Real64> AP;  // Zone inside surface floor/wall/ceiling area without a selected floor/wall/ceiling (m2)
+    Vector3<Real64> ARHP; // Zone inside surface floor/wall/ceiling area*reflectance without a selected floor/wall/ceiling (m2)
+    Vector3<Real64> W2;     // Second vertex of window
+    Vector3<Real64> W3;     // Third vertex of window
+    Vector3<Real64> W21;    // Vector from window vertex 2 to window vertex 1
+    Vector3<Real64> W23;    // Vector from window vertex 2 to window vertex 3
+    Vector3<Real64> RREF;   // Location of a reference point in absolute coordinate system
+    Vector3<Real64> RREF2;  // Location of virtual reference point in absolute coordinate system
+    Vector3<Real64> RWIN;   // Center of a window element in absolute coordinate system
+    Vector3<Real64> RWIN2;  // Center of a window element for TDD:DOME (if exists) in abs coord sys
+    Vector3<Real64> Ray;    // Unit vector along ray from reference point to window element
+    Vector3<Real64> WNORM2; // Unit vector normal to TDD:DOME (if exists)
+    Vector3<Real64> VIEWVC; // View vector in absolute coordinate system
+    Vector3<Real64> U2;     // Second vertex of window for TDD:DOME (if exists)
+    Vector3<Real64> U21;    // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
+    Vector3<Real64> U23;    // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
+    Vector3<Real64> VIEWVC2; // Virtual view vector in absolute coordinate system
+
+    Vector3<Real64> W1; // First vertex of window (where vertices are numbered
+    Vector3<Real64> WC;    // Center point of window
+    Vector3<Real64> REFWC; // Vector from reference point to center of window
+    Vector3<Real64> WNORM; // Unit vector normal to window (pointing away from room)
+    Vector3<Real64> W2REF; // Vector from window origin to project of ref. pt. on window plane
+    Vector3<Real64> REFD;   // Vector from ref pt to center of win in TDD:DIFFUSER coord sys (if exists)
+    Vector3<Real64> VIEWVD; // Virtual view vector in TDD:DIFFUSER coord sys (if exists)
+    Vector3<Real64> U1;     // First vertex of window for TDD:DOME (if exists)
+    Vector3<Real64> U3;     // Third vertex of window for TDD:DOME (if exists)
+    Vector3<Real64> RayVector;
+
+    Vector3<Real64> HitPtIntWin; // Intersection point on an interior window for ray from ref pt to ext win (m)
+    Vector3<Real64> GroundHitPt; // Coordinates of point that ray hits ground (m)
+    Vector3<Real64> URay;        // Unit vector in (Phi,Theta) direction
+    Vector3<Real64> ObsHitPt;    // Coordinates of hit point on an obstruction (m)
+
+    Vector3<Real64> WNorm; // unit vector from window (point towards outside)
+    Vector3<Real64> RayNorm;    // unit vector along ray from window to reference point
+    Vector3<Real64> InterPoint; // Intersection point
+    Vector3<Real64> RWin; // window element center point (same as centroid)
+    Vector3<Real64> V;    // vector array
+
+    Vector3<Real64> NearestHitPt; // Hit point of ray on nearest obstruction
+    Vector3<Real64> ReflNorm;  // Normal vector to reflecting surface
+    Vector3<Real64> SunVecMir; // Sun ray mirrored in reflecting surface
+    Vector3<Real64> HitPtRefl; // Point that ray hits reflecting surface
+    Vector3<Real64> HitPtObs;  // Hit point on obstruction
+    Vector3<Real64> HitPtIntWinDisk; // Intersection point on an interior window for ray from ref pt to sun (m)
+    
+    int AltSteps_last = 0;
+    Array1D<Real64> cos_Phi; // cos( Phi ) table
+    Array1D<Real64> sin_Phi; // sin( Phi ) table
+    int AzimSteps_last = 0;
+    Array1D<Real64> cos_Theta; // cos( Theta ) table
+    Array1D<Real64> sin_Theta; // sin( Theta ) table
+
+    DaylightingManagerData()
+    {
+        this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
+        this->sin_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // sin( Phi ) table
+        this->cos_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // cos( Theta ) table
+        this->sin_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // sin( Theta ) table
+    }
+
     void clear_state() override
     {
         this->CalcDayltghCoefficients_firstTime = true;
@@ -578,6 +657,60 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->TDDFluxTrans.deallocate();
         this->MapErrIndex.deallocate();
         this->RefErrIndex.deallocate();
+        this->MySunIsUpFlag = false;
+        this->CalcDayltgCoeffsMapPointsMySunIsUpFlag = false;
+        // seems like a reasonable initialization for the Vector variables
+        this->AR = 0.0;
+        this->ARH = 0.0;
+        this->AP = 0.0;
+        this->ARHP = 0.0;
+        this->W2 = 0.0;
+        this->W3 = 0.0;
+        this->W21 = 0.0;
+        this->W23 = 0.0;
+        this->RREF = 0.0;
+        this->RREF2 = 0.0;
+        this->RWIN = 0.0;
+        this->RWIN2 = 0.0;
+        this->Ray = 0.0;
+        this->WNORM2 = 0.0;
+        this->VIEWVC = 0.0;
+        this->U2 = 0.0;
+        this->U21 = 0.0;
+        this->U23 = 0.0;
+        this->VIEWVC2 = 0.0;
+        this->W1 = 0.0;
+        this->WC = 0.0;
+        this->REFWC = 0.0;
+        this->WNORM = 0.0;
+        this->W2REF = 0.0;
+        this->REFD = 0.0;
+        this->VIEWVD = 0.0;
+        this->U1 = 0.0;
+        this->U3 = 0.0;
+        this->RayVector = 0.0;
+        this->HitPtIntWin = 0.0;
+        this->GroundHitPt = 0.0;
+        this->URay = 0.0;
+        this->ObsHitPt = 0.0;
+        this->WNorm = 0.0;
+        this->RayNorm = 0.0;
+        this->InterPoint = 0.0;
+        this->RWin = 0.0;
+        this->V = 0.0;
+        this->NearestHitPt = 0.0;
+        this->ReflNorm = 0.0;
+        this->SunVecMir = 0.0;
+        this->HitPtRefl = 0.0;
+        this->HitPtObs = 0.0;
+        this->HitPtIntWinDisk = 0.0;
+
+        this->AltSteps_last = 0;
+        this->AzimSteps_last = 0;
+        this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
+        this->sin_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2); // sin( Phi ) table
+        this->cos_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // cos( Theta ) table
+        this->sin_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // sin( Theta ) table
     }
 };
 

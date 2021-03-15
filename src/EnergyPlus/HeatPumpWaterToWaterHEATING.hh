@@ -158,7 +158,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
         void calculate(EnergyPlusData &state, Real64 &MyLoad);
 
-        void update();
+        void update(EnergyPlusData &state);
     };
 
     void GetGshpInput(EnergyPlusData &state);

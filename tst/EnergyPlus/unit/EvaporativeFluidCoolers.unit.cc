@@ -120,14 +120,14 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     state->dataEnvrn->OutHumRat = 0.02;
     state->dataEnvrn->OutBaroPress = 101325.;
     state->dataEnvrn->OutWetBulbTemp = 8.0;
-    DataLoopNode::Node.allocate(2);
-    DataLoopNode::Node(thisEFC.WaterInletNodeNum).Temp = 20.0;
-    DataLoopNode::Node(1).Temp = 23.0;
-    DataLoopNode::Node(1).MassFlowRateRequest = 0.05;
-    DataLoopNode::Node(1).MassFlowRateMinAvail = 0.0;
-    DataLoopNode::Node(1).MassFlowRateMin = 0.0;
-    DataLoopNode::Node(1).MassFlowRateMax = 0.05;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = 0.05;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node(thisEFC.WaterInletNodeNum).Temp = 20.0;
+    state->dataLoopNodes->Node(1).Temp = 23.0;
+    state->dataLoopNodes->Node(1).MassFlowRateRequest = 0.05;
+    state->dataLoopNodes->Node(1).MassFlowRateMinAvail = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRateMin = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRateMax = 0.05;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 0.05;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
@@ -142,12 +142,12 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     thisEFC.PerformanceInputMethod_Num = PIM::UFactor;
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantFinalSizesOkayToReport = false;
-    DataSizing::SaveNumPlantComps = 0;
+    state->dataSize->SaveNumPlantComps = 0;
     thisEFC.DesignWaterFlowRate = 0.001;
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    DataSizing::PlantSizData(1).ExitTemp = 20.0;
+    state->dataSize->PlantSizData(1).ExitTemp = 20.0;
 
     // Now set the specific data for the actual test
     MaxLoad = 0.0;

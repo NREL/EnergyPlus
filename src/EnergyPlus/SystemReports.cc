@@ -775,7 +775,7 @@ namespace EnergyPlus::SystemReports {
             } // Controlled Zone Loop
 
             // 4.  Now Load all of the plant supply/demand side connections in a single array with pointers from the
-            //    connection arrays (state.dataAirSystemsData->ZoneCompToPlant, state.dataAirSystemsData->ZoneSubCompToPlant, state.dataAirSystemsData->ZoneSubSubCompToPlant, state.dataAirSystemsData->AirSysCompToPlant, etc.)
+            //    connection arrays (ZoneCompToPlant, ZoneSubCompToPlant, ZoneSubSubCompToPlant, AirSysCompToPlant, etc.)
             if (allocated(state.dataAirSystemsData->ZoneCompToPlant)) {
                 NumZoneConnectComps = isize(state.dataAirSystemsData->ZoneCompToPlant);
             } else {
@@ -3440,6 +3440,8 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->DesDehumidElec = 0.0;
         state.dataSysRpts->SysEvapElec = 0.0;
 
+        auto &Node(state.dataLoopNodes->Node);
+
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             auto const &pas = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
             for (BranchNum = 1; BranchNum <= pas.NumBranches; ++BranchNum) {
@@ -4196,8 +4198,6 @@ namespace EnergyPlus::SystemReports {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataZoneEnergyDemands;
         using namespace DataGlobalConstants;
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRatAvg;
         using FanCoilUnits::GetFanCoilMixedAirNode;
         using FanCoilUnits::GetFanCoilOutAirNode;
         using FanCoilUnits::GetFanCoilReturnAirNode;
@@ -4261,6 +4261,8 @@ namespace EnergyPlus::SystemReports {
         int ActualZoneNum;    // Zone forced Air zone number
         int OutAirNode;       // Zone forced Air unit outdoor air node number
         int thisZoneEquipNum; // loop counter
+
+        auto &Node(state.dataLoopNodes->Node);
 
         //  CALL GetComponentEnergyUse
         if (!state.dataSysRpts->VentReportStructureCreated) return;
@@ -4333,7 +4335,7 @@ namespace EnergyPlus::SystemReports {
             if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {
                 state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) =
                     state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) /
-                    DataSizing::ZoneAirDistribution(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(state, ActualZoneNum);
+                    state.dataSize->ZoneAirDistribution(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(state, ActualZoneNum);
             }
 
 
@@ -4536,11 +4538,11 @@ namespace EnergyPlus::SystemReports {
                         }
 
                     } else if (SELECT_CASE_var == UnitHeater_Num || SELECT_CASE_var == VentilatedSlab_Num ||
-                               //	ZoneHVAC:EvaporativeCoolerUnit ?????
+                               //    ZoneHVAC:EvaporativeCoolerUnit ?????
                                SELECT_CASE_var == ZoneEvaporativeCoolerUnit_Num ||
                                SELECT_CASE_var == AirDistUnit_Num || SELECT_CASE_var == BBWaterConvective_Num ||
                                SELECT_CASE_var == BBElectricConvective_Num || SELECT_CASE_var == HiTempRadiant_Num ||
-                               //	not sure how HeatExchanger:* could be used as zone equipment ?????
+                               //    not sure how HeatExchanger:* could be used as zone equipment ?????
                                SELECT_CASE_var == LoTempRadiant_Num || SELECT_CASE_var == ZoneExhaustFan_Num || SELECT_CASE_var == HeatXchngr_Num ||
                                // HPWaterHeater can be used as zone equipment
                                SELECT_CASE_var == HPWaterHeater_Num || SELECT_CASE_var == BBWater_Num || SELECT_CASE_var == ZoneDXDehumidifier_Num ||
@@ -4605,7 +4607,7 @@ namespace EnergyPlus::SystemReports {
                     if (ADUNum > 0) {
                         int termUnitSizingNum = state.dataDefineEquipment->AirDistUnit(ADUNum).TermUnitSizingNum;
                         if (termUnitSizingNum > 0) {
-                            termUnitOAFrac = DataSizing::TermUnitSizing(termUnitSizingNum).SpecMinOAFrac;
+                            termUnitOAFrac = state.dataSize->TermUnitSizing(termUnitSizingNum).SpecMinOAFrac;
                         }
                     }
                     state.dataSysRpts->SysTargetVentilationFlowVoz(AirLoopNum) +=
@@ -4680,7 +4682,7 @@ namespace EnergyPlus::SystemReports {
             }
 
             // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
-            currentZoneAirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ActualZoneNum), ZoneAirHumRatAvg(ActualZoneNum));
+            currentZoneAirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(ActualZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatAvg(ActualZoneNum));
             if (currentZoneAirDensity > 0.0) state.dataSysRpts->ZoneOAVolFlowCrntRho(CtrlZoneNum) = state.dataSysRpts->ZoneOAMassFlow(CtrlZoneNum) / currentZoneAirDensity;
             state.dataSysRpts->ZoneOAVolCrntRho(CtrlZoneNum) = state.dataSysRpts->ZoneOAVolFlowCrntRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
             if (ZoneVolume > 0.0) state.dataSysRpts->ZoneMechACH(CtrlZoneNum) = (state.dataSysRpts->ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys) / ZoneVolume;
@@ -5083,6 +5085,8 @@ namespace EnergyPlus::SystemReports {
                                          "Node Name>,<AirLoopHVAC Name>");
         static constexpr auto Format_714("! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed "
                                          "Air Outlet Node Name>,<AirLoopHVAC Name>");
+
+        auto &NodeID(state.dataLoopNodes->NodeID);
 
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", Format_706);

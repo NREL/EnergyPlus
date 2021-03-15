@@ -161,7 +161,7 @@ namespace ICEngineElectricGenerator {
 
         void CalcICEngineGenHeatRecovery(EnergyPlusData &state, Real64 EnergyRecovered, Real64 HeatRecMdot, Real64 &HRecRatio);
 
-        void update();
+        void update(EnergyPlusData &state);
 
         void setupOutputVars(EnergyPlusData &state);
 

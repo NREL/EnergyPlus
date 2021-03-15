@@ -96,13 +96,6 @@ namespace EnergyPlus::DemandManager {
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ListNum;
-        static bool firstTime;      // Flag to allow Demand Manager List to simulate at least once
-        static bool ResimExt;       // Flag to resimulate the exterior energy use simulation
-        static bool ResimHB;        // Flag to resimulate the heat balance simulation (including HVAC)
-        static bool ResimHVAC;      // Flag to resimulate the HVAC simulation
-        static bool BeginDemandSim; // TRUE in the first timestep after warmup of a new environment
-        static bool ClearHistory;   // TRUE in the first timestep during warmup of a new environment
-
 
         if (state.dataDemandManager->GetInput && !state.dataGlobal->DoingSizing) {
             GetDemandManagerInput(state);
@@ -113,8 +106,8 @@ namespace EnergyPlus::DemandManager {
         if (state.dataDemandManager->NumDemandManagerList > 0) {
 
             if (state.dataGlobal->WarmupFlag) {
-                BeginDemandSim = true;
-                if (ClearHistory) {
+                state.dataDemandManager->BeginDemandSim = true;
+                if (state.dataDemandManager->ClearHistory) {
                     // Clear historical variables
                     for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
                         state.dataDemandManager->DemandManagerList(ListNum).History = 0.0;
@@ -136,37 +129,37 @@ namespace EnergyPlus::DemandManager {
                         e.RotatedLoadNum = 0;
                     }
                 }
-                ClearHistory = false;
+                state.dataDemandManager->ClearHistory = false;
             }
 
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing) {
 
-                if (BeginDemandSim) {
-                    BeginDemandSim = false;
-                    ClearHistory = true;
+                if (state.dataDemandManager->BeginDemandSim) {
+                    state.dataDemandManager->BeginDemandSim = false;
+                    state.dataDemandManager->ClearHistory = true;
                 }
 
                 state.dataDemandManager->DemandManagerExtIterations = 0;
                 state.dataDemandManager->DemandManagerHBIterations = 0;
                 state.dataDemandManager->DemandManagerHVACIterations = 0;
 
-                firstTime = true;
-                ResimExt = false;
-                ResimHB = false;
-                ResimHVAC = false;
+                state.dataDemandManager->firstTime = true;
+                state.dataDemandManager->ResimExt = false;
+                state.dataDemandManager->ResimHB = false;
+                state.dataDemandManager->ResimHVAC = false;
 
-                while (firstTime || ResimExt || ResimHB || ResimHVAC) {
-                    firstTime = false;
+                while (state.dataDemandManager->firstTime || state.dataDemandManager->ResimExt || state.dataDemandManager->ResimHB || state.dataDemandManager->ResimHVAC) {
+                    state.dataDemandManager->firstTime = false;
 
-                    Resimulate(state, ResimExt, ResimHB, ResimHVAC);
-                    ResimExt = false;
-                    ResimHB = false;
-                    ResimHVAC = false;
+                    Resimulate(state, state.dataDemandManager->ResimExt, state.dataDemandManager->ResimHB, state.dataDemandManager->ResimHVAC);
+                    state.dataDemandManager->ResimExt = false;
+                    state.dataDemandManager->ResimHB = false;
+                    state.dataDemandManager->ResimHVAC = false;
 
                     SurveyDemandManagers(state); // Determines which Demand Managers can reduce demand
 
                     for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
-                        SimulateDemandManagerList(state, ListNum, ResimExt, ResimHB, ResimHVAC);
+                        SimulateDemandManagerList(state, ListNum, state.dataDemandManager->ResimExt, state.dataDemandManager->ResimHB, state.dataDemandManager->ResimHVAC);
                     } // ListNum
 
                     ActivateDemandManagers(state); // Sets limits on loads
@@ -328,7 +321,7 @@ namespace EnergyPlus::DemandManager {
         Array1D_string AlphArray; // Character string data
         Array1D<Real64> NumArray; // Numeric data
         std::string Units;        // String for meter units
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         std::string CurrentModuleObject; // for ease in renaming.
 
 
@@ -591,7 +584,7 @@ namespace EnergyPlus::DemandManager {
         int IOStat;               // IO Status when calling get input subroutine
         Array1D_string AlphArray; // Character string data
         Array1D<Real64> NumArray; // Numeric data
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         std::string CurrentModuleObject; // for ease in renaming.
         int Item;
         int Item1;
@@ -1680,9 +1673,6 @@ namespace EnergyPlus::DemandManager {
         // and new GetInput code.
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ComfortControlType;
-        using DataHeatBalFanSys::ZoneThermostatSetPointHi;
-        using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using MixedAir::OAGetFlowRate;
         using MixedAir::OAGetMinFlowRate;
         using MixedAir::OASetDemandManagerVentilationFlow;
@@ -1734,8 +1724,8 @@ namespace EnergyPlus::DemandManager {
 
             } else if (SELECT_CASE_var == ManagerType::ManagerTypeThermostats) {
                 if (Action == DemandAction::CheckCanReduce) {
-                    if (ZoneThermostatSetPointLo(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) > DemandMgr(MgrNum).LowerLimit ||
-                        ZoneThermostatSetPointHi(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) < DemandMgr(MgrNum).UpperLimit)
+                    if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) > DemandMgr(MgrNum).LowerLimit ||
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) < DemandMgr(MgrNum).UpperLimit)
                         CanReduceDemand = true; // Heating | Cooling
                 } else if (Action == DemandAction::SetLimit) {
                     state.dataZoneCtrls->TempControlledZone(LoadPtr).ManageDemand = true;
@@ -1745,10 +1735,10 @@ namespace EnergyPlus::DemandManager {
                     state.dataZoneCtrls->TempControlledZone(LoadPtr).ManageDemand = false;
                 }
                 if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
-                    if (ComfortControlType(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) > 0) {
+                    if (state.dataHeatBalFanSys->ComfortControlType(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) > 0) {
                         if (Action == DemandAction::CheckCanReduce) {
-                            if (ZoneThermostatSetPointLo(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) > DemandMgr(MgrNum).LowerLimit ||
-                                ZoneThermostatSetPointHi(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) < DemandMgr(MgrNum).UpperLimit)
+                            if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) > DemandMgr(MgrNum).LowerLimit ||
+                                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) < DemandMgr(MgrNum).UpperLimit)
                                 CanReduceDemand = true; // Heating
                         } else if (Action == DemandAction::SetLimit) {
                             state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ManageDemand = true;

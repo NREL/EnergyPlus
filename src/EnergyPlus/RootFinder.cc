@@ -57,9 +57,7 @@
 #include <EnergyPlus/RootFinder.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace RootFinder {
+namespace EnergyPlus::RootFinder {
     // Module containing the derivative-free, root finder routines for smooth,
     // "mostly" monotonic functions in one variable.
     // The algorithm is guaranteed to find the root if:
@@ -167,39 +165,16 @@ namespace RootFinder {
     // "Numerical Recipes in FORTRAN", Chapter 9 "Root Finding and Nonlinear Sets of Equations", pp.340-352
     // Used for formulas, but not for code.
 
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using namespace DataRootFinder;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR THE MODULE
-
-    // For a decreasing function,  MinPoint%Y > MaxPoint%Y
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
-
-    void SetupRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData, // Data used by root finding algorithm
-                         int const SlopeType,                // Either iSlopeIncreasing or iSlopeDecreasing
-                         int const MethodType,               // Any of the iMethod<name> code but iMethodNone
-                         Real64 const TolX,                  // Relative tolerance for X variables
-                         Real64 const ATolX,                 // Absolute tolerance for X variables
-                         Real64 const ATolY                  // Absolute tolerance for Y variables
+    void SetupRootFinder(EnergyPlusData &state,
+                         RootFinderDataType &RootFinderData,       // Data used by root finding algorithm
+                         int const SlopeType,                      // Either iSlopeIncreasing or iSlopeDecreasing
+                         DataRootFinder::iMethod const MethodType, // Any of the iMethod<name> code but iMethodNone
+                         Real64 const TolX,                        // Relative tolerance for X variables
+                         Real64 const ATolX,                       // Absolute tolerance for X variables
+                         Real64 const ATolY                        // Absolute tolerance for Y variables
     )
     {
 
@@ -212,32 +187,6 @@ namespace RootFinder {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine loads the numerical controls for the root finder.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
-
         // Load assumed action for underlying function F(X)
         if (SlopeType != iSlopeIncreasing && SlopeType != iSlopeDecreasing) {
             ShowSevereError(state, "SetupRootFinder: Invalid function slope specification. Valid choices are:");
@@ -248,13 +197,13 @@ namespace RootFinder {
         RootFinderData.Controls.SlopeType = SlopeType;
 
         // Load solution method
-        if (MethodType != iMethodBisection && MethodType != iMethodFalsePosition && MethodType != iMethodSecant && MethodType != iMethodBrent) {
+        if (MethodType != iMethod::Bisection && MethodType != iMethod::FalsePosition && MethodType != iMethod::Secant && MethodType != iMethod::Brent) {
 
             ShowSevereError(state, "SetupRootFinder: Invalid solution method specification. Valid choices are:");
-            ShowContinueError(state, format("SetupRootFinder: iMethodBisection={}", iMethodBisection));
-            ShowContinueError(state, format("SetupRootFinder: iMethodFalsePosition={}", iMethodFalsePosition));
-            ShowContinueError(state, format("SetupRootFinder: iMethodSecant={}", iMethodSecant));
-            ShowContinueError(state, format("SetupRootFinder: iMethodBrent={}", iMethodBrent));
+            ShowContinueError(state, format("SetupRootFinder: iMethodBisection={}", iMethod::Bisection));
+            ShowContinueError(state, format("SetupRootFinder: iMethodFalsePosition={}", iMethod::FalsePosition));
+            ShowContinueError(state, format("SetupRootFinder: iMethodSecant={}", iMethod::Secant));
+            ShowContinueError(state, format("SetupRootFinder: iMethodBrent={}", iMethod::Brent));
             ShowFatalError(state, "SetupRootFinder: Preceding error causes program termination.");
         }
         RootFinderData.Controls.MethodType = MethodType;
@@ -296,32 +245,6 @@ namespace RootFinder {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the data for the root finder.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
-
         // Reset min point
         RootFinderData.MinPoint.X = XMin;
         RootFinderData.MinPoint.Y = 0.0;
@@ -354,7 +277,7 @@ namespace RootFinder {
             e.DefinedFlag = false;
         }
 
-        // Reset increments over successive iterationes
+        // Reset increments over successive iterations
         RootFinderData.Increment.X = 0.0;
         RootFinderData.Increment.Y = 0.0;
         RootFinderData.Increment.DefinedFlag = false;
@@ -362,8 +285,8 @@ namespace RootFinder {
         RootFinderData.XCandidate = 0.0;
 
         // Reset default state
-        RootFinderData.StatusFlag = iStatusNone;
-        RootFinderData.CurrentMethodType = iMethodNone;
+        RootFinderData.StatusFlag = iStatus::None;
+        RootFinderData.CurrentMethodType = iMethod::None;
         RootFinderData.ConvergenceRate = -1.0;
     }
 
@@ -383,31 +306,9 @@ namespace RootFinder {
         // This subroutine initializes the min and max for the root finder before
         // finding a new root.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SavedXCandidate;
         Real64 XMinReset;
-
 
         XMinReset = XMin;
         if (XMin > XMax) {
@@ -498,35 +399,12 @@ namespace RootFinder {
         // - CheckIncrementRoundOff()
         // - CheckBracketRoundOff()
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
-
         // Reset status flag
-        RootFinderData.StatusFlag = iStatusNone;
+        RootFinderData.StatusFlag = iStatus::None;
 
         // Check that MinPoint%X <= X <= MaxPoint%X
         if (!CheckMinMaxRange(RootFinderData, X)) {
-            RootFinderData.StatusFlag = iStatusErrorRange;
+            RootFinderData.StatusFlag = iStatus::ErrorRange;
 
             // Fatal error: No need to continue iterating
             IsDoneFlag = true;
@@ -547,7 +425,7 @@ namespace RootFinder {
 
             // Check that min and max points are distinct
             if (RootFinderData.MinPoint.X == RootFinderData.MaxPoint.X) {
-                RootFinderData.StatusFlag = iStatusOKMin;
+                RootFinderData.StatusFlag = iStatus::OKMin;
                 RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 
                 // Solution found: No need to continue iterating
@@ -557,7 +435,7 @@ namespace RootFinder {
 
             if (RootFinderData.MinPoint.DefinedFlag) {
                 if (CheckMinConstraint(state, RootFinderData)) {
-                    RootFinderData.StatusFlag = iStatusOKMin;
+                    RootFinderData.StatusFlag = iStatus::OKMin;
                     RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 
                     // Solution found: No need to continue iterating
@@ -568,7 +446,7 @@ namespace RootFinder {
 
             // Check singularity condition between min and max points
             if (!CheckNonSingularity(RootFinderData)) {
-                RootFinderData.StatusFlag = iStatusErrorSingular;
+                RootFinderData.StatusFlag = iStatus::ErrorSingular;
 
                 // Fatal error: No need to continue iterating
                 IsDoneFlag = true;
@@ -577,7 +455,7 @@ namespace RootFinder {
 
             // Check slope condition between min and max points
             if (!CheckSlope(state, RootFinderData)) {
-                RootFinderData.StatusFlag = iStatusErrorSlope;
+                RootFinderData.StatusFlag = iStatus::ErrorSlope;
 
                 // Fatal error: No need to continue iterating
                 IsDoneFlag = true;
@@ -593,7 +471,7 @@ namespace RootFinder {
         // in ManagerControllers()
         if (RootFinderData.MinPoint.DefinedFlag) {
             if (CheckMinConstraint(state, RootFinderData)) {
-                RootFinderData.StatusFlag = iStatusOKMin;
+                RootFinderData.StatusFlag = iStatus::OKMin;
                 RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 
                 // Solution found: No need to continue iterating
@@ -609,7 +487,7 @@ namespace RootFinder {
         if (RootFinderData.MaxPoint.DefinedFlag) {
             if (CheckMaxConstraint(state, RootFinderData)) {
 
-                RootFinderData.StatusFlag = iStatusOKMax;
+                RootFinderData.StatusFlag = iStatus::OKMax;
                 RootFinderData.XCandidate = RootFinderData.MaxPoint.X;
 
                 // Solution found: No need to continue iterating
@@ -625,7 +503,7 @@ namespace RootFinder {
         // Check unconstrained convergence after we are sure that the candidate X value lies
         // within the allowed min/max range
         if (CheckRootFinderConvergence(RootFinderData, Y)) {
-            RootFinderData.StatusFlag = iStatusOK;
+            RootFinderData.StatusFlag = iStatus::OK;
             RootFinderData.XCandidate = X;
 
             // Update root finder internal data with current iterate (X,Y)
@@ -641,7 +519,7 @@ namespace RootFinder {
         // - the distance between the lower and upper bounds is smaller than the user-specified
         //   tolerance for the X variables. (USING brackets from previous iteration)
         if (CheckBracketRoundOff(RootFinderData)) {
-            RootFinderData.StatusFlag = iStatusOKRoundOff;
+            RootFinderData.StatusFlag = iStatus::OKRoundOff;
 
             // Solution found: No need to continue iterating
             IsDoneFlag = true;
@@ -660,7 +538,7 @@ namespace RootFinder {
 
         // Check that current iterate is within the current lower and upper points
         if (!CheckLowerUpperBracket(RootFinderData, X)) {
-            RootFinderData.StatusFlag = iStatusErrorBracket;
+            RootFinderData.StatusFlag = iStatus::ErrorBracket;
 
             // Fatal error: No need to continue iterating
             IsDoneFlag = true;
@@ -680,7 +558,7 @@ namespace RootFinder {
         IsDoneFlag = false;
     }
 
-    int CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
+    iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
@@ -695,44 +573,18 @@ namespace RootFinder {
         // This function does not modify the argument RooFinderData.
         // Only used internally for debugging.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
-        int CheckInternalConsistency;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
+        iStatus CheckInternalConsistency;
 
         // Default initialization
-        CheckInternalConsistency = iStatusNone;
+        CheckInternalConsistency = iStatus::None;
 
         // Internal consistency check involving both support points
         if (RootFinderData.LowerPoint.DefinedFlag && RootFinderData.UpperPoint.DefinedFlag) {
 
             // Check that the existing lower and upper points do bracket the root
             if (RootFinderData.LowerPoint.X > RootFinderData.UpperPoint.X) {
-                CheckInternalConsistency = iStatusErrorRange;
+                CheckInternalConsistency = iStatus::ErrorRange;
                 return CheckInternalConsistency;
             }
 
@@ -742,14 +594,14 @@ namespace RootFinder {
                 if (SELECT_CASE_var == iSlopeIncreasing) {
                     // Y-value of lower point must be strictly smaller than Y-value of upper point
                     if (RootFinderData.LowerPoint.Y > RootFinderData.UpperPoint.Y) {
-                        CheckInternalConsistency = iStatusWarningNonMonotonic;
+                        CheckInternalConsistency = iStatus::WarningNonMonotonic;
                         return CheckInternalConsistency;
                     }
 
                 } else if (SELECT_CASE_var == iSlopeDecreasing) {
                     // Y-value of lower point must be strictly larger than Y-value of upper point
                     if (RootFinderData.LowerPoint.Y < RootFinderData.UpperPoint.Y) {
-                        CheckInternalConsistency = iStatusWarningNonMonotonic;
+                        CheckInternalConsistency = iStatus::WarningNonMonotonic;
                         return CheckInternalConsistency;
                     }
 
@@ -766,7 +618,7 @@ namespace RootFinder {
             // Only check if the lower and upper points are distinct!
             if (RootFinderData.UpperPoint.X > RootFinderData.LowerPoint.X) {
                 if (RootFinderData.UpperPoint.Y == RootFinderData.LowerPoint.Y) {
-                    CheckInternalConsistency = iStatusErrorSingular;
+                    CheckInternalConsistency = iStatus::ErrorSingular;
                     return CheckInternalConsistency;
                 }
             }
@@ -778,13 +630,13 @@ namespace RootFinder {
                 auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
                 if (SELECT_CASE_var == iSlopeIncreasing) {
                     if (RootFinderData.MinPoint.Y >= 0.0) {
-                        CheckInternalConsistency = iStatusOKMin;
+                        CheckInternalConsistency = iStatus::OKMin;
                         return CheckInternalConsistency;
                     }
 
                 } else if (SELECT_CASE_var == iSlopeDecreasing) {
                     if (RootFinderData.MinPoint.Y <= 0.0) {
-                        CheckInternalConsistency = iStatusOKMin;
+                        CheckInternalConsistency = iStatus::OKMin;
                         return CheckInternalConsistency;
                     }
 
@@ -804,13 +656,13 @@ namespace RootFinder {
                 auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
                 if (SELECT_CASE_var == iSlopeIncreasing) {
                     if (RootFinderData.MaxPoint.Y <= 0.0) {
-                        CheckInternalConsistency = iStatusOKMax;
+                        CheckInternalConsistency = iStatus::OKMax;
                         return CheckInternalConsistency;
                     }
 
                 } else if (SELECT_CASE_var == iSlopeDecreasing) {
                     if (RootFinderData.MaxPoint.Y >= 0.0) {
-                        CheckInternalConsistency = iStatusOKMax;
+                        CheckInternalConsistency = iStatus::OKMax;
                         return CheckInternalConsistency;
                     }
 
@@ -843,34 +695,8 @@ namespace RootFinder {
         // Returns TRUE if X value is a valid root candidate.
         // Returns FALSE otherwise.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckRootFinderCandidate;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
 
         if (CheckMinMaxRange(RootFinderData, X) && CheckLowerUpperBracket(RootFinderData, X)) {
             CheckRootFinderCandidate = true;
@@ -897,33 +723,8 @@ namespace RootFinder {
         // Returns TRUE if current iterate satisfies min/max constraints.
         // Returns FALSE if current iterate is out-of-range.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckMinMaxRange;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
 
         if (RootFinderData.MinPoint.DefinedFlag) {
             if (X < RootFinderData.MinPoint.X) {
@@ -961,34 +762,8 @@ namespace RootFinder {
         // Returns TRUE if current iterate lies within the lower/upper bracket.
         // Returns FALSE otherwise.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckLowerUpperBracket;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
 
         if (RootFinderData.LowerPoint.DefinedFlag) {
             if (X < RootFinderData.LowerPoint.X) {
@@ -1027,34 +802,8 @@ namespace RootFinder {
         // POSTCONDITION:
         // - RootFinderData is NOT changed by this function.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckSlope;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
 
         // Check that the slope requirement is respected at the min and max points
         // Note that the singularity check takes care of RootFinderData%MinPoint%Y == RootFinderData%MaxPoint%Y
@@ -1108,20 +857,8 @@ namespace RootFinder {
         // POSTCONDITION:
         // - RootFinderData is NOT changed by this function.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckNonSingularity;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
         // Safety factor used to detect a singular residual function between the min and max
@@ -1129,17 +866,9 @@ namespace RootFinder {
         // NOTE: Requesting exactly the same value is obtained by setting SafetyFactor = 0.0
         Real64 const SafetyFactor(0.1);
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 DeltaY; // Difference between min and max Y-values
         Real64 ATolY;  // Absolute tolerance used to detected equal min and max Y-values
-
-
 
         // Added this check based on an absolute tolerance test for y values to avoid incorrectly detecting
         // functions with bad slope due to numerical noise.
@@ -1174,34 +903,8 @@ namespace RootFinder {
         // POSTCONDITION:
         // - RootFinderData is NOT changed by this function.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckMinConstraint;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
 
         {
             auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
@@ -1247,34 +950,8 @@ namespace RootFinder {
         // POSTCONDITION:
         // - RootFinderData is NOT changed by this function.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckMaxConstraint;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
 
         // Check for max constrained convergence with respect to the new iterate (X,Y)
         {
@@ -1319,34 +996,8 @@ namespace RootFinder {
         // This function checks whether the current iterate (X,Y) satisfies the
         // unconstrained convergence criterion or not.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckRootFinderConvergence;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
 
         // Check for unconstrained convergence
         if (std::abs(Y) <= RootFinderData.Controls.ATolY) {
@@ -1371,35 +1022,13 @@ namespace RootFinder {
         // This function checks whether the current lower and upper brackets satisfies
         // the round-off criterion or not.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckBracketRoundOff;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 DeltaUL; // Distance between lower and upper points
         Real64 TypUL;   // Typical value for values lying within lower/upper interval
         Real64 TolUL;   // Tolerance to satisfy for lower-upper distance
-
 
         // Check for round-off error in Lower/Upper interval
         if (RootFinderData.LowerPoint.DefinedFlag && RootFinderData.UpperPoint.DefinedFlag) {
@@ -1439,29 +1068,6 @@ namespace RootFinder {
         // POSTCONDITION:
         // - RootFinderData%MinPoint possibly updated
         // - RootFinderData%MaxPoint possibly updated
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
 
         // Update min support point
         if (X == RootFinderData.MinPoint.X) {
@@ -1503,29 +1109,6 @@ namespace RootFinder {
         //   - iStatusWarningNonMonotonic
         //   - iStatusWarningSingular
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
-
         {
             auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
 
@@ -1539,9 +1122,9 @@ namespace RootFinder {
                     } else {
                         if (X >= RootFinderData.LowerPoint.X) {
                             if (Y == RootFinderData.LowerPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningSingular;
+                                RootFinderData.StatusFlag = iStatus::WarningSingular;
                             } else if (Y < RootFinderData.LowerPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningNonMonotonic;
+                                RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
                             }
                             // Update lower point with current iterate
                             RootFinderData.LowerPoint.X = X;
@@ -1566,9 +1149,9 @@ namespace RootFinder {
                     } else {
                         if (X <= RootFinderData.UpperPoint.X) {
                             if (Y == RootFinderData.UpperPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningSingular;
+                                RootFinderData.StatusFlag = iStatus::WarningSingular;
                             } else if (Y > RootFinderData.UpperPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningNonMonotonic;
+                                RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
                             }
                             // Update upper point with current iterate
                             RootFinderData.UpperPoint.X = X;
@@ -1596,9 +1179,9 @@ namespace RootFinder {
                     } else {
                         if (X >= RootFinderData.LowerPoint.X) {
                             if (Y == RootFinderData.LowerPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningSingular;
+                                RootFinderData.StatusFlag = iStatus::WarningSingular;
                             } else if (Y > RootFinderData.LowerPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningNonMonotonic;
+                                RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
                             }
                             // Update lower point with current iterate
                             RootFinderData.LowerPoint.X = X;
@@ -1623,9 +1206,9 @@ namespace RootFinder {
                     } else {
                         if (X <= RootFinderData.UpperPoint.X) {
                             if (Y == RootFinderData.UpperPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningSingular;
+                                RootFinderData.StatusFlag = iStatus::WarningSingular;
                             } else if (Y < RootFinderData.UpperPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningNonMonotonic;
+                                RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
                             }
                             // Update upper point with current iterate
                             RootFinderData.UpperPoint.X = X;
@@ -1673,28 +1256,8 @@ namespace RootFinder {
         // POSTCONDITION:
         // - RootFinderData%History(:) updated with last 3 best iterates
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumHistory;
-
-
 
         // Update history with best iterates so that:
         //   ABS(History(1)%Y) <= ABS(History(2)%Y) <= ABS(History(3)%Y)
@@ -1762,29 +1325,6 @@ namespace RootFinder {
         // - RootFinderData%Increment updated
         // - RootFinderData%ConvergenceRate updated
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
-
         // Update history with best iterates so that:
         //   ABS(History(1)%Y) <= ABS(History(2)%Y) <= ABS(History(3)%Y)
         // Note that we must update the history before updating the lower/upper points
@@ -1828,35 +1368,11 @@ namespace RootFinder {
         // This subroutine orders the N points in the history array in increasing
         // order of ABS(Y) values.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int I;
         int J;
         Real64 XTemp;
         Real64 YTemp;
-
 
         // Nothing to do if only one point stored in history
         if (N <= 1) {
@@ -1902,28 +1418,8 @@ namespace RootFinder {
         // Once it is bracketed, then we use the specified solution methods (Bisection,
         // False position, Secant and Brent) to compute the next candidate.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Real64 XNext(0.0);
-
-
 
         //----------------------------------------------------------------------------
         // First attempt to bracket root between a lower point and an upper point.
@@ -1931,7 +1427,7 @@ namespace RootFinder {
 
         // Detect the lower bracket
         if (!RootFinderData.LowerPoint.DefinedFlag) {
-            RootFinderData.CurrentMethodType = iMethodBracket;
+            RootFinderData.CurrentMethodType = iMethod::Bracket;
             // If we have 2 points already, try to detect lower point using the Secant formula
             if (BracketRoot(RootFinderData, XNext)) {
                 RootFinderData.XCandidate = XNext;
@@ -1946,7 +1442,7 @@ namespace RootFinder {
 
             // Detect the upper bracket
         } else if (!RootFinderData.UpperPoint.DefinedFlag) {
-            RootFinderData.CurrentMethodType = iMethodBracket;
+            RootFinderData.CurrentMethodType = iMethod::Bracket;
             // If we have 2 points already, try to detect upper point using the Secant formula
             if (BracketRoot(RootFinderData, XNext)) {
                 RootFinderData.XCandidate = XNext;
@@ -1968,11 +1464,11 @@ namespace RootFinder {
         } else {
             {
                 auto const SELECT_CASE_var(RootFinderData.StatusFlag);
-                if (SELECT_CASE_var == iStatusOKRoundOff) {
+                if (SELECT_CASE_var == iStatus::OKRoundOff) {
                     // Should never happen if we exit the root finder upon detecting round-off condition
                     RootFinderData.XCandidate = BisectionMethod(RootFinderData);
 
-                } else if ((SELECT_CASE_var == iStatusWarningSingular) || (SELECT_CASE_var == iStatusWarningNonMonotonic)) {
+                } else if ((SELECT_CASE_var == iStatus::WarningSingular) || (SELECT_CASE_var == iStatus::WarningNonMonotonic)) {
                     // Following local singularity or non-monotonicity warnings we attempt
                     // to recover with the false position method to avoid running into trouble
                     // because the latest iterate did nt produce any improvement compared to
@@ -1985,24 +1481,24 @@ namespace RootFinder {
                     // for the root.
                     {
                         auto const SELECT_CASE_var1(RootFinderData.Controls.MethodType);
-                        if (SELECT_CASE_var1 == iMethodBisection) {
+                        if (SELECT_CASE_var1 == iMethod::Bisection) {
                             // Bisection method (aka interval halving)
                             RootFinderData.XCandidate = BisectionMethod(RootFinderData);
-                        } else if (SELECT_CASE_var1 == iMethodFalsePosition) {
+                        } else if (SELECT_CASE_var1 == iMethod::FalsePosition) {
                             // False position method (aka regula falsi)
                             RootFinderData.XCandidate = FalsePositionMethod(RootFinderData);
-                        } else if (SELECT_CASE_var1 == iMethodSecant) {
+                        } else if (SELECT_CASE_var1 == iMethod::Secant) {
                             // Secant method
                             RootFinderData.XCandidate = SecantMethod(RootFinderData);
-                        } else if (SELECT_CASE_var1 == iMethodBrent) {
+                        } else if (SELECT_CASE_var1 == iMethod::Brent) {
                             // Brent method
                             RootFinderData.XCandidate = BrentMethod(RootFinderData);
                         } else {
                             ShowSevereError(state, "AdvanceRootFinder: Invalid solution method specification. Valid choices are:");
-                            ShowContinueError(state, format("AdvanceRootFinder: iMethodBisection={}", iMethodBisection));
-                            ShowContinueError(state, format("AdvanceRootFinder: iMethodFalsePosition={}", iMethodFalsePosition));
-                            ShowContinueError(state, format("AdvanceRootFinder: iMethodSecant={}", iMethodSecant));
-                            ShowContinueError(state, format("AdvanceRootFinder: iMethodBrent={}", iMethodBrent));
+                            ShowContinueError(state, format("AdvanceRootFinder: iMethodBisection={}", iMethod::Bisection));
+                            ShowContinueError(state, format("AdvanceRootFinder: iMethodFalsePosition={}", iMethod::FalsePosition));
+                            ShowContinueError(state, format("AdvanceRootFinder: iMethodSecant={}", iMethod::Secant));
+                            ShowContinueError(state, format("AdvanceRootFinder: iMethodBrent={}", iMethod::Brent));
                             ShowFatalError(state, "AdvanceRootFinder: Preceding error causes program termination.");
                         }
                     }
@@ -2036,38 +1532,12 @@ namespace RootFinder {
         // - MinPoint%X <= XNext <= MaxPoint%X
         // - LowerPoint%X < XNext < UpperPoint%X
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool BracketRoot;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
-
         // Cannot use Secant method unless there are at least 2 points
         // Also do not use Secant method more than once, i.e. NumHistory==3, in order to avoid
-        // the pathological case whereby the secant method always comes up short of bracketting
+        // the pathological case whereby the secant method always comes up short of bracketing
         // the root because the function slope flattens as we come closer to either min/max point.
         if (RootFinderData.NumHistory != 2) {
             BracketRoot = false;
@@ -2075,7 +1545,7 @@ namespace RootFinder {
         }
 
         // Should not use Secant method if the last 2 points produced a warning
-        if (RootFinderData.StatusFlag == iStatusWarningSingular || RootFinderData.StatusFlag == iStatusWarningNonMonotonic) {
+        if (RootFinderData.StatusFlag == iStatus::WarningSingular || RootFinderData.StatusFlag == iStatus::WarningNonMonotonic) {
             BracketRoot = false;
             return BracketRoot;
         }
@@ -2112,35 +1582,10 @@ namespace RootFinder {
         // - LowerPoint%X < XCandidate < UpperPoint%X
         // - RootFinderData%CurrentMethodType update with current solution method.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 BisectionMethod;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
-        RootFinderData.CurrentMethodType = iMethodBisection;
+        RootFinderData.CurrentMethodType = iMethod::Bisection;
         BisectionMethod = (RootFinderData.LowerPoint.X + RootFinderData.UpperPoint.X) / 2.0;
 
         return BisectionMethod;
@@ -2165,43 +1610,20 @@ namespace RootFinder {
         // - LowerPoint%X < XCandidate < UpperPoint%X
         // - RootFinderData%CurrentMethodType update with current solution method.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 FalsePositionMethod;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 XCandidate;
         Real64 Num;
         Real64 Den;
 
-
-
         Num = RootFinderData.UpperPoint.X - RootFinderData.LowerPoint.X;
         Den = RootFinderData.UpperPoint.Y - RootFinderData.LowerPoint.Y;
 
         if (Den != 0.0) {
             // False position method
-            RootFinderData.CurrentMethodType = iMethodFalsePosition;
+            RootFinderData.CurrentMethodType = iMethod::FalsePosition;
             XCandidate = RootFinderData.LowerPoint.X - RootFinderData.LowerPoint.Y * Num / Den;
 
             // Check that new candidate is within range and brackets
@@ -2238,39 +1660,16 @@ namespace RootFinder {
         // - LowerPoint%X < XCandidate < UpperPoint%X
         // - RootFinderData%CurrentMethodType update with current solution method.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SecantMethod;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 XCandidate;
 
-
-
         // Recover with false position
         if (SecantFormula(RootFinderData, XCandidate)) {
             // Secant method
-            RootFinderData.CurrentMethodType = iMethodSecant;
+            RootFinderData.CurrentMethodType = iMethod::Secant;
 
             // Check that new candidate is within range and brackets
             if (!CheckRootFinderCandidate(RootFinderData, XCandidate)) {
@@ -2306,35 +1705,12 @@ namespace RootFinder {
         // XNext contains the result from applying the Secant formula.
         // If XNext could not be computed then leave XNext unchanged.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool SecantFormula;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 Num;
         Real64 Den;
-
-
 
         Num = RootFinderData.Increment.X;
         Den = RootFinderData.Increment.Y;
@@ -2375,26 +1751,8 @@ namespace RootFinder {
         // The next root estimate is x = B + P/Q whereby B is the current best estimate
         // of the root.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 BrentMethod;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 XCandidate;
@@ -2444,7 +1802,7 @@ namespace RootFinder {
 
                 // Only accept correction if it is small enough (75% of previous increment)
                 if (std::abs(P) <= 0.75 * std::abs(Q * RootFinderData.Increment.X)) {
-                    RootFinderData.CurrentMethodType = iMethodBrent;
+                    RootFinderData.CurrentMethodType = iMethod::Brent;
                     XCandidate = B + P / Q;
 
                     // Check that new candidate is within range and brackets
@@ -2454,7 +1812,7 @@ namespace RootFinder {
                     }
                 } else {
                     // Recover from bad correction with bisection
-                    // Biscetion produced the best numerical performance in testing compared to
+                    // Bisection produced the best numerical performance in testing compared to
                     // - Secant
                     // - False position (very slow recovery)
                     XCandidate = BisectionMethod(RootFinderData);
@@ -2481,39 +1839,6 @@ namespace RootFinder {
         // This subroutine writes the header for the trace file to the specified
         // file unit using CSV formatting.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
-
-        //'MinPoint%DefinedFlag', ',', &
-        //'LowerPoint%DefinedFlag', ',', &
-        //'UpperPoint%DefinedFlag', ',', &
-        //'MaxPoint%DefinedFlag', ',', &
-        //'History(1)%DefinedFlag', ',', &
-        //'History(2)%DefinedFlag', ',', &
-        //'History(3)%DefinedFlag', ',', &
         print(TraceFile,
               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},",
               "Status",
@@ -2552,31 +1877,6 @@ namespace RootFinder {
         // This subroutine writes the current state of the root finder data to the trace file
         // unit using CSV formatting.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
-
         print(TraceFile, "{},{},", RootFinderData.StatusFlag,RootFinderData.CurrentMethodType);
 
         // Only show current point if defined.
@@ -2611,31 +1911,6 @@ namespace RootFinder {
         // unit using CSV formatting.
         // If not defined writes an empty string instead.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // If set to TRUE, ten always show the X value even if not defined
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
-
         if (PointData.DefinedFlag) {
             print(TraceFile, "{:20.10F},{:20.10F},", PointData.X, PointData.Y);
         } else {
@@ -2661,31 +1936,6 @@ namespace RootFinder {
         // This subroutine writes the current min/max range and lower/upper bracket to
         // the standard output file.
         // Used only for debugging.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
 
         print(DebugFile, "Current = ");
         WritePoint(DebugFile, RootFinderData.CurrentPoint, true);
@@ -2718,55 +1968,28 @@ namespace RootFinder {
         //       MODIFIED
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-
-
             auto const SELECT_CASE_var(RootFinderData.StatusFlag);
-            if (SELECT_CASE_var == iStatusOK) {
+            if (SELECT_CASE_var == iStatus::OK) {
                 print(File, "Found unconstrained root");
-            } else if (SELECT_CASE_var == iStatusOKMin) {
+            } else if (SELECT_CASE_var == iStatus::OKMin) {
                 print(File, "Found min constrained root");
-            } else if (SELECT_CASE_var == iStatusOKMax) {
+            } else if (SELECT_CASE_var == iStatus::OKMax) {
                 print(File, "Found max constrained root");
-            } else if (SELECT_CASE_var == iStatusOKRoundOff) {
+            } else if (SELECT_CASE_var == iStatus::OKRoundOff) {
                 print(File, "Detected round-off convergence in bracket");
 
-            } else if (SELECT_CASE_var == iStatusWarningSingular) {
+            } else if (SELECT_CASE_var == iStatus::WarningSingular) {
                 print(File, "Detected singularity warning");
-            } else if (SELECT_CASE_var == iStatusWarningNonMonotonic) {
+            } else if (SELECT_CASE_var == iStatus::WarningNonMonotonic) {
                 print(File, "Detected non-monotonicity warning");
 
-            } else if (SELECT_CASE_var == iStatusErrorRange) {
+            } else if (SELECT_CASE_var == iStatus::ErrorRange) {
                 print(File, "Detected out-of-range error");
-            } else if (SELECT_CASE_var == iStatusErrorBracket) {
+            } else if (SELECT_CASE_var == iStatus::ErrorBracket) {
                 print(File, "Detected bracket error");
-            } else if (SELECT_CASE_var == iStatusErrorSlope) {
+            } else if (SELECT_CASE_var == iStatus::ErrorSlope) {
                 print(File, "Detected slope error");
-            } else if (SELECT_CASE_var == iStatusErrorSingular) {
+            } else if (SELECT_CASE_var == iStatus::ErrorSingular) {
                 print(File, "Detected singularity error");
 
             } else {
@@ -2775,5 +1998,3 @@ namespace RootFinder {
     }
 
 } // namespace RootFinder
-
-} // namespace EnergyPlus

@@ -159,6 +159,8 @@ namespace EnergyPlus::DataZoneEquipment {
         int Loop1;
         int Loop2;
 
+        auto &TermUnitSizing(state.dataSize->TermUnitSizing);
+
         struct EquipListAudit
         {
             // Members
@@ -305,8 +307,8 @@ namespace EnergyPlus::DataZoneEquipment {
                                                                             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
                                                                             CurrentModuleObject,
                                                                             AlphArray(1),
-                                                                            NodeType_Air,
-                                                                            NodeConnectionType_ZoneNode,
+                                                                            DataLoopNode::NodeFluidType::Air,
+                                                                            DataLoopNode::NodeConnectionType::ZoneNode,
                                                                             1,
                                                                             ObjectIsNotParent); // all zone air state variables are
             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == 0) {
@@ -656,10 +658,10 @@ namespace EnergyPlus::DataZoneEquipment {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         "ZoneHVAC:EquipmentConnections",
                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                        NodeConnectionType_ZoneInlet,
+                        DataLoopNode::NodeConnectionType::ZoneInlet,
                         1,
                         ObjectIsNotParent);
 
@@ -702,10 +704,10 @@ namespace EnergyPlus::DataZoneEquipment {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         "ZoneHVAC:EquipmentConnections",
                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                        NodeConnectionType_ZoneExhaust,
+                        DataLoopNode::NodeConnectionType::ZoneExhaust,
                         1,
                         ObjectIsNotParent);
 
@@ -736,10 +738,10 @@ namespace EnergyPlus::DataZoneEquipment {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         "ZoneHVAC:EquipmentConnections",
                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                        NodeConnectionType_ZoneReturn,
+                        DataLoopNode::NodeConnectionType::ZoneReturn,
                         1,
                         ObjectIsNotParent);
 
@@ -779,10 +781,10 @@ namespace EnergyPlus::DataZoneEquipment {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         "ZoneHVAC:EquipmentConnections",
                         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                        NodeConnectionType_Sensor,
+                        DataLoopNode::NodeConnectionType::Sensor,
                         1,
                         ObjectIsNotParent);
 
@@ -805,13 +807,13 @@ namespace EnergyPlus::DataZoneEquipment {
 
         // Allocate TermUnitSizing array and set zone number
         if (locTermUnitSizingCounter > 0) {
-            DataSizing::NumAirTerminalUnits = locTermUnitSizingCounter;
-            DataSizing::TermUnitSizing.allocate(DataSizing::NumAirTerminalUnits);
+            state.dataSize->NumAirTerminalUnits = locTermUnitSizingCounter;
+            TermUnitSizing.allocate(state.dataSize->NumAirTerminalUnits);
             for (int loopZoneNum = 1; loopZoneNum <= state.dataGlobal->NumOfZones; ++loopZoneNum) {
                 {
                     auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(loopZoneNum));
                     for (int loopNodeNum = 1; loopNodeNum <= thisZoneEqConfig.NumInletNodes; ++loopNodeNum) {
-                        DataSizing::TermUnitSizing(thisZoneEqConfig.AirDistUnitCool(loopNodeNum).TermUnitSizingIndex).CtrlZoneNum = loopZoneNum;
+                        TermUnitSizing(thisZoneEqConfig.AirDistUnitCool(loopNodeNum).TermUnitSizingIndex).CtrlZoneNum = loopZoneNum;
                     }
                 }
             }
@@ -881,8 +883,8 @@ namespace EnergyPlus::DataZoneEquipment {
                                                                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
                                                                     CurrentModuleObject,
                                                                     AlphArray(1),
-                                                                    NodeType_Air,
-                                                                    NodeConnectionType_Inlet,
+                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                     1,
                                                                     ObjectIsParent);
 
@@ -948,8 +950,8 @@ namespace EnergyPlus::DataZoneEquipment {
                                                                      state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
                                                                      CurrentModuleObject,
                                                                      AlphArray(1),
-                                                                     NodeType_Air,
-                                                                     NodeConnectionType_Outlet,
+                                                                     DataLoopNode::NodeFluidType::Air,
+                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                      1,
                                                                      ObjectIsParent);
 
@@ -1216,7 +1218,7 @@ namespace EnergyPlus::DataZoneEquipment {
                     } else {
                         for (int nodeCount = 1; nodeCount <= thisZoneEquip.NumReturnNodes; ++nodeCount) {
                             int curNodeNum = thisZoneEquip.ReturnNode(nodeCount);
-                            if (NodeName == DataLoopNode::NodeID(curNodeNum)) {
+                            if (NodeName == state.dataLoopNodes->NodeID(curNodeNum)) {
                                 ReturnAirNodeNumber = curNodeNum;
                             }
                         }
@@ -1259,7 +1261,7 @@ namespace EnergyPlus::DataZoneEquipment {
                 } else {
                     for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneIndex).NumReturnNodes; ++nodeCount) {
                         int curNodeNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneIndex).ReturnNode(nodeCount);
-                        if (NodeName == DataLoopNode::NodeID(curNodeNum)) {
+                        if (NodeName == state.dataLoopNodes->NodeID(curNodeNum)) {
                             ReturnIndex = nodeCount;
                         }
                     }
@@ -1300,7 +1302,6 @@ namespace EnergyPlus::DataZoneEquipment {
         using DataSizing::OAFlowPerArea;
         using DataSizing::OAFlowPPer;
         using DataSizing::OAFlowSum;
-        using DataSizing::OARequirements; // to access DesignSpecification:OutdoorAir inputs
         using DataSizing::ZOAM_IAQP;
         using DataSizing::ZOAM_ProportionalControlDesOcc;
         using DataSizing::ZOAM_ProportionalControlSchOcc;
@@ -1309,6 +1310,7 @@ namespace EnergyPlus::DataZoneEquipment {
         using ScheduleManager::GetScheduleMaxValue;
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &OARequirements(state.dataSize->OARequirements);
 
         // Return value
         Real64 OAVolumeFlowRate; // Return value for calculated outdoor air volume flow rate [m3/s]
@@ -1339,7 +1341,7 @@ namespace EnergyPlus::DataZoneEquipment {
         if (DSOAPtr == 0) return OAVolumeFlowRate;
 
         if (state.dataZoneEquip->CalcDesignSpecificationOutdoorAirOneTimeFlag) {
-            MyEnvrnFlag.allocate(DataSizing::NumOARequirements);
+            MyEnvrnFlag.allocate(state.dataSize->NumOARequirements);
             MyEnvrnFlag = true;
             state.dataZoneEquip->CalcDesignSpecificationOutdoorAirOneTimeFlag = false;
         }

@@ -172,7 +172,7 @@ namespace EnergyPlus {
             thisDomain.PerformIterationLoop(state, this);
 
             // Update outlet nodes, etc.
-            thisDomain.UpdatePipingSystems(this);
+            thisDomain.UpdatePipingSystems(state, this);
         }
 
         void SimulateGroundDomains(EnergyPlusData &state, bool initOnly)
@@ -288,7 +288,7 @@ namespace EnergyPlus {
                         // Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
                         for (auto &z: thisDomain.ZoneCoupledSurfaces) {
                             int ZoneNum = z.Zone;
-                            ZoneTemp += DataHeatBalFanSys::ZTAV(ZoneNum);
+                            ZoneTemp += state.dataHeatBalFanSys->ZTAV(ZoneNum);
                         }
 
                         ZoneTemp = ZoneTemp / thisDomain.ZoneCoupledSurfaces.size();
@@ -705,7 +705,7 @@ namespace EnergyPlus {
                     thisDomain.BasementZone.WallBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
                     thisDomain.BasementZone.WallBoundaryOSCMIndex =
                             UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName,
-                                                            DataSurfaces::OSCM);
+                                                            state.dataSurface->OSCM);
                     if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
@@ -715,7 +715,7 @@ namespace EnergyPlus {
                                                    "Could not match with an Other Side Conditions Model input object.",
                                                    ErrorsFound);
                     } else {
-                        auto const &wallIndexes = GetSurfaceIndecesForOSCM(
+                        auto const &wallIndexes = GetSurfaceIndecesForOSCM(state,
                                 thisDomain.BasementZone.WallBoundaryOSCMIndex);
                         if (wallIndexes.empty()) {
                             IssueSevereInputFieldError(state,
@@ -735,7 +735,7 @@ namespace EnergyPlus {
                     thisDomain.BasementZone.FloorBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
                     thisDomain.BasementZone.FloorBoundaryOSCMIndex =
                             UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName,
-                                                            DataSurfaces::OSCM);
+                                                            state.dataSurface->OSCM);
                     if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
@@ -745,7 +745,7 @@ namespace EnergyPlus {
                                                    "Could not match with an Other Side Conditions Model input object.",
                                                    ErrorsFound);
                     } else {
-                        auto const &floorIndexes = GetSurfaceIndecesForOSCM(
+                        auto const &floorIndexes = GetSurfaceIndecesForOSCM(state,
                                 thisDomain.BasementZone.FloorBoundaryOSCMIndex);
                         if (floorIndexes.empty()) {
                             IssueSevereInputFieldError(state,
@@ -1022,7 +1022,7 @@ namespace EnergyPlus {
                 thisDomain.HasZoneCoupledSlab = true;
 
                 // get boundary condition model names and indices -- error check
-                thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), DataSurfaces::OSCM);
+                thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), state.dataSurface->OSCM);
                 if (thisDomain.ZoneCoupledOSCMIndex <= 0) {
                     IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Slab,
@@ -1033,7 +1033,7 @@ namespace EnergyPlus {
                                                ErrorsFound);
                     ErrorsFound = true;
                 } else {
-                    int const NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(thisDomain.ZoneCoupledOSCMIndex);
+                    int const NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(state, thisDomain.ZoneCoupledOSCMIndex);
                     if (NumSurfacesWithThisOSCM <= 0) {
                         IssueSevereInputFieldError(state,
                                 RoutineName,
@@ -1045,7 +1045,7 @@ namespace EnergyPlus {
                                 ErrorsFound);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.ZoneCoupledSurfaces = GetSurfaceDataForOSCM(thisDomain.ZoneCoupledOSCMIndex);
+                        thisDomain.ZoneCoupledSurfaces = GetSurfaceDataForOSCM(state, thisDomain.ZoneCoupledOSCMIndex);
                     }
                 }
 
@@ -1212,7 +1212,7 @@ namespace EnergyPlus {
                 thisDomain.BasementZone.FloorBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
                 thisDomain.BasementZone.FloorBoundaryOSCMIndex =
                         UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName,
-                                                        DataSurfaces::OSCM);
+                                                        state.dataSurface->OSCM);
                 if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
                     IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Basement,
@@ -1222,7 +1222,7 @@ namespace EnergyPlus {
                                                "Could not match with an Other Side Conditions Model input object.",
                                                ErrorsFound);
                 } else {
-                    auto const &floorIndexes = GetSurfaceIndecesForOSCM(thisDomain.BasementZone.FloorBoundaryOSCMIndex);
+                    auto const &floorIndexes = GetSurfaceIndecesForOSCM(state, thisDomain.BasementZone.FloorBoundaryOSCMIndex);
                     if (floorIndexes.empty()) {
                         IssueSevereInputFieldError(state,
                                 RoutineName,
@@ -1235,7 +1235,7 @@ namespace EnergyPlus {
                     } else {
                         thisDomain.BasementZone.FloorSurfacePointers = floorIndexes;
                         // Create GetSurfaceDataForOSCM function
-                        thisDomain.ZoneCoupledSurfaces = GetSurfaceDataForOSCM(
+                        thisDomain.ZoneCoupledSurfaces = GetSurfaceDataForOSCM(state,
                                 thisDomain.BasementZone.FloorBoundaryOSCMIndex);
                     }
                 }
@@ -1244,7 +1244,7 @@ namespace EnergyPlus {
                 thisDomain.BasementZone.WallBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
                 thisDomain.BasementZone.WallBoundaryOSCMIndex =
                         UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName,
-                                                        DataSurfaces::OSCM);
+                                                        state.dataSurface->OSCM);
                 if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
                     IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Basement,
@@ -1255,7 +1255,7 @@ namespace EnergyPlus {
                                                ErrorsFound);
                     ErrorsFound = true;
                 } else {
-                    auto const &wallIndexes = GetSurfaceIndecesForOSCM(thisDomain.BasementZone.WallBoundaryOSCMIndex);
+                    auto const &wallIndexes = GetSurfaceIndecesForOSCM(state, thisDomain.BasementZone.WallBoundaryOSCMIndex);
                     if (wallIndexes.empty()) {
                         IssueSevereInputFieldError(state,
                                 RoutineName,
@@ -1552,7 +1552,7 @@ namespace EnergyPlus {
                 thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
                 thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                         DataIPShortCuts::cAlphaArgs(2), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
-                        DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1,
+                        DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1,
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
                     CurIndex = 2;
@@ -1564,7 +1564,7 @@ namespace EnergyPlus {
                 thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
                 thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                         DataIPShortCuts::cAlphaArgs(3), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
-                        DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1,
+                        DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1,
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {
                     CurIndex = 3;
@@ -1669,8 +1669,8 @@ namespace EnergyPlus {
                                                                                ErrorsFound,
                                                                                ObjName_HorizTrench,
                                                                                thisTrenchName,
-                                                                               DataLoopNode::NodeType_Water,
-                                                                               DataLoopNode::NodeConnectionType_Inlet,
+                                                                               DataLoopNode::NodeFluidType::Water,
+                                                                               DataLoopNode::NodeConnectionType::Inlet,
                                                                                1,
                                                                                DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
@@ -1681,8 +1681,8 @@ namespace EnergyPlus {
                                                                                 ErrorsFound,
                                                                                 ObjName_HorizTrench,
                                                                                 thisTrenchName,
-                                                                                DataLoopNode::NodeType_Water,
-                                                                                DataLoopNode::NodeConnectionType_Outlet,
+                                                                                DataLoopNode::NodeFluidType::Water,
+                                                                                DataLoopNode::NodeConnectionType::Outlet,
                                                                                 1,
                                                                                 DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {
@@ -2176,7 +2176,7 @@ namespace EnergyPlus {
 
                 // this seemed to clean up a lot of reverse DD stuff because fluid thermal properties were
                 // being based on the inlet temperature, which wasn't updated until later
-                thisCircuit->CurCircuitInletTemp = DataLoopNode::Node(thisCircuit->InletNodeNum).Temp;
+                thisCircuit->CurCircuitInletTemp = state.dataLoopNodes->Node(thisCircuit->InletNodeNum).Temp;
                 thisCircuit->InletTemperature = thisCircuit->CurCircuitInletTemp;
 
                 this->DoOneTimeInitializations(state, thisCircuit);
@@ -2197,7 +2197,7 @@ namespace EnergyPlus {
             // Get the mass flow and inlet temperature to use for this time step
             int InletNodeNum = thisCircuit->InletNodeNum;
             int OutletNodeNum = thisCircuit->OutletNodeNum;
-            thisCircuit->CurCircuitInletTemp = DataLoopNode::Node(InletNodeNum).Temp;
+            thisCircuit->CurCircuitInletTemp = state.dataLoopNodes->Node(InletNodeNum).Temp;
 
             // request design, set component flow will decide what to give us based on restrictions and flow lock status
             thisCircuit->CurCircuitFlowRate = thisCircuit->DesignMassFlowRate;
@@ -2210,7 +2210,7 @@ namespace EnergyPlus {
                                                  thisCircuit->CompNum);
         }
 
-        void Domain::UpdatePipingSystems(Circuit * thisCircuit) {
+        void Domain::UpdatePipingSystems(EnergyPlusData &state, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2220,7 +2220,7 @@ namespace EnergyPlus {
 
             int OutletNodeNum = thisCircuit->OutletNodeNum;
             auto const &out_cell(thisCircuit->CircuitOutletCell);
-            DataLoopNode::Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y,
+            state.dataLoopNodes->Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y,
                                                                  out_cell.Z).PipeCellData.Fluid.Temperature;
         }
 
@@ -2265,7 +2265,7 @@ namespace EnergyPlus {
             ErrorsFound = true;
         }
 
-        int GetSurfaceCountForOSCM(int const OSCMIndex) {
+        int GetSurfaceCountForOSCM(EnergyPlusData &state, int const OSCMIndex) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2274,13 +2274,13 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             int RetVal = 0;
-            for (int SurfCtr = 1; SurfCtr <= isize(DataSurfaces::Surface); ++SurfCtr) {
-                if (DataSurfaces::Surface(SurfCtr).OSCMPtr == OSCMIndex) ++RetVal;
+            for (int SurfCtr = 1; SurfCtr <= isize(state.dataSurface->Surface); ++SurfCtr) {
+                if (state.dataSurface->Surface(SurfCtr).OSCMPtr == OSCMIndex) ++RetVal;
             }
             return RetVal;
         }
 
-        std::vector<int> GetSurfaceIndecesForOSCM(int const OSCMIndex) {
+        std::vector<int> GetSurfaceIndecesForOSCM(EnergyPlusData &state, int const OSCMIndex) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2289,15 +2289,15 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             std::vector<int> retVal;
-            for (int SurfCtr = 1; SurfCtr <= isize(DataSurfaces::Surface); ++SurfCtr) {
-                if (DataSurfaces::Surface(SurfCtr).OSCMPtr == OSCMIndex) {
+            for (int SurfCtr = 1; SurfCtr <= isize(state.dataSurface->Surface); ++SurfCtr) {
+                if (state.dataSurface->Surface(SurfCtr).OSCMPtr == OSCMIndex) {
                     retVal.push_back(SurfCtr);
                 }
             }
             return retVal;
         }
 
-        std::vector<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(int const OSCMIndex) {
+        std::vector<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(EnergyPlusData &state, int const OSCMIndex) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2306,12 +2306,12 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             std::vector<ZoneCoupledSurfaceData> RetVal;
-            for (int SurfCtr = 1; SurfCtr <= isize(DataSurfaces::Surface); ++SurfCtr) {
-                if (DataSurfaces::Surface(SurfCtr).OSCMPtr == OSCMIndex) {
+            for (int SurfCtr = 1; SurfCtr <= isize(state.dataSurface->Surface); ++SurfCtr) {
+                if (state.dataSurface->Surface(SurfCtr).OSCMPtr == OSCMIndex) {
                     ZoneCoupledSurfaceData z;
                     z.IndexInSurfaceArray = SurfCtr;
-                    z.SurfaceArea = DataSurfaces::Surface(SurfCtr).Area;
-                    z.Zone = DataSurfaces::Surface(SurfCtr).Zone;
+                    z.SurfaceArea = state.dataSurface->Surface(SurfCtr).Area;
+                    z.Zone = state.dataSurface->Surface(SurfCtr).Zone;
                     RetVal.push_back(z);
                 }
             }
@@ -4846,18 +4846,18 @@ namespace EnergyPlus {
             // First the wall
             this->BasementWallTemp = this->GetAverageTempByType(state, CellType::BasementWall);
             int OSCMIndex = this->BasementZone.WallBoundaryOSCMIndex;
-            DataSurfaces::OSCM(OSCMIndex).TConv = this->BasementWallTemp;
-            DataSurfaces::OSCM(OSCMIndex).HConv = BigNumber;
-            DataSurfaces::OSCM(OSCMIndex).TRad = this->BasementWallTemp;
-            DataSurfaces::OSCM(OSCMIndex).HRad = 0.0;
+            state.dataSurface->OSCM(OSCMIndex).TConv = this->BasementWallTemp;
+            state.dataSurface->OSCM(OSCMIndex).HConv = BigNumber;
+            state.dataSurface->OSCM(OSCMIndex).TRad = this->BasementWallTemp;
+            state.dataSurface->OSCM(OSCMIndex).HRad = 0.0;
 
             // Then the floor
             this->BasementFloorTemp = this->GetAverageTempByType(state, CellType::BasementFloor);
             OSCMIndex = this->BasementZone.FloorBoundaryOSCMIndex;
-            DataSurfaces::OSCM(OSCMIndex).TConv = this->BasementFloorTemp;
-            DataSurfaces::OSCM(OSCMIndex).HConv = BigNumber;
-            DataSurfaces::OSCM(OSCMIndex).TRad = this->BasementFloorTemp;
-            DataSurfaces::OSCM(OSCMIndex).HRad = 0.0;
+            state.dataSurface->OSCM(OSCMIndex).TConv = this->BasementFloorTemp;
+            state.dataSurface->OSCM(OSCMIndex).HConv = BigNumber;
+            state.dataSurface->OSCM(OSCMIndex).TRad = this->BasementFloorTemp;
+            state.dataSurface->OSCM(OSCMIndex).HRad = 0.0;
         }
 
         Real64 Domain::GetZoneInterfaceHeatFlux() {
@@ -4889,10 +4889,10 @@ namespace EnergyPlus {
 
             this->ZoneCoupledSurfaceTemp = this->GetAverageTempByType(state, CellType::ZoneGroundInterface);
             int OSCMIndex = this->ZoneCoupledOSCMIndex;
-            DataSurfaces::OSCM(OSCMIndex).TConv = this->ZoneCoupledSurfaceTemp;
-            DataSurfaces::OSCM(OSCMIndex).HConv = BigNumber;
-            DataSurfaces::OSCM(OSCMIndex).TRad = this->ZoneCoupledSurfaceTemp;
-            DataSurfaces::OSCM(OSCMIndex).HRad = 0.0;
+            state.dataSurface->OSCM(OSCMIndex).TConv = this->ZoneCoupledSurfaceTemp;
+            state.dataSurface->OSCM(OSCMIndex).HConv = BigNumber;
+            state.dataSurface->OSCM(OSCMIndex).TRad = this->ZoneCoupledSurfaceTemp;
+            state.dataSurface->OSCM(OSCMIndex).HRad = 0.0;
 
             // Reset the interface heat flux after iteration
             this->ResetHeatFluxFlag = true;

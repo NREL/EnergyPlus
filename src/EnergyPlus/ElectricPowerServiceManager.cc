@@ -2120,7 +2120,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         // simulate
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->InitICEngineGenerators(state, runFlag, FirstHVACIteration);
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->CalcICEngineGeneratorModel(state, runFlag, tempLoad);
-        dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->update();
+        dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->update(state);
         electProdRate = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecPowerGenerated;
         electricityProd = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecEnergyGenerated;
         thermProdRate = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->QTotalHeatRecovered;
@@ -2210,7 +2210,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         // simulate
         dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->InitMTGenerators(state, runFlag, tempLoad, FirstHVACIteration);
         dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->CalcMTGeneratorModel(state, runFlag, tempLoad);
-        dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->UpdateMTGeneratorRecords();
+        dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->UpdateMTGeneratorRecords(state);
         electProdRate = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->ElecPowerGenerated;
         electricityProd = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->EnergyGen;
         thermProdRate = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->QHeatRecovered;
@@ -3857,7 +3857,7 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     // Set the temperature the battery sees
     if (zoneNum_ > 0) {
         // If in a zone, use the zone temperature
-        battState.thermal->T_room = DataHeatBalFanSys::ZT(zoneNum_);
+        battState.thermal->T_room = state.dataHeatBalFanSys->ZT(zoneNum_);
     } else {
         // If outside, use outdoor temperature
         battState.thermal->T_room = state.dataEnvrn->OutDryBulbTemp;

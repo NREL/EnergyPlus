@@ -352,8 +352,8 @@ namespace HVACDXSystem {
         if (present(QTotOut)) {
             InletNodeNum = DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum;
             OutletNodeNum = DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
-            AirMassFlow = Node(OutletNodeNum).MassFlowRate;
-            QTotOut = AirMassFlow * (Node(InletNodeNum).Enthalpy - Node(OutletNodeNum).Enthalpy);
+            AirMassFlow = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate;
+            QTotOut = AirMassFlow * (state.dataLoopNodes->Node(InletNodeNum).Enthalpy - state.dataLoopNodes->Node(OutletNodeNum).Enthalpy);
         }
     }
 
@@ -459,14 +459,14 @@ namespace HVACDXSystem {
             }
 
             DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum =
-                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
             DXCoolingSystem(DXCoolSysNum).DXCoolingCoilOutletNodeNum =
-                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             DXCoolingSystem(DXCoolSysNum).DXSystemControlNodeNum =
-                GetOnlySingleNode(state, Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsParent);
             if (DXCoolingSystem(DXCoolSysNum).DXSystemControlNodeNum == 0) {
                 ShowSevereError(state, CurrentModuleObject + ": control node must be input");
                 ShowContinueError(state, "Error occurred in " + cAlphaFields(1) + '=' + Alphas(1));
@@ -811,18 +811,18 @@ namespace HVACDXSystem {
                 ControlNode = DXCoolingSystem(DXSysIndex).DXSystemControlNodeNum;
                 if (ControlNode > 0) {
                     if (AirLoopNum == -1) {                                 // Outdoor Air Unit
-                        Node(ControlNode).TempSetPoint = OAUCoilOutletTemp; // Set the coil outlet temperature
+                        state.dataLoopNodes->Node(ControlNode).TempSetPoint = OAUCoilOutletTemp; // Set the coil outlet temperature
                         if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil) {
                             FrostControlSetPointLimit(state, DXSystemNum,
                                                       DXCoolingSystem(DXSystemNum).DesiredOutletTemp,
-                                                      Node(ControlNode).HumRatMax,
+                                                      state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                                       state.dataEnvrn->OutBaroPress,
                                                       DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                                       1);
                         }
                     } else if (AirLoopNum != -1) { // Not an outdoor air unit
 
-                        if (Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
+                        if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                                 ": Missing temperature setpoint for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
@@ -839,7 +839,7 @@ namespace HVACDXSystem {
                             }
                         }
                         if ((DXCoolingSystem(DXSysIndex).DehumidControlType != DehumidControl_None) &&
-                            (Node(ControlNode).HumRatMax == SensedNodeFlagValue)) {
+                            (state.dataLoopNodes->Node(ControlNode).HumRatMax == SensedNodeFlagValue)) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                                 ": Missing humidity ratio setpoint (HUMRATMAX) for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
@@ -871,7 +871,7 @@ namespace HVACDXSystem {
                     if (SupFanNum > 0) {
                         coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoolingSystem(DXSystemNum).CoolingCoilName,
                                                                      DXCoolingSystem(DXSystemNum).CoolingCoilType,
-                                                                     Fans::Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
+                                                                     state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
                                                                      DataAirSystems::structArrayLegacyFanModels,
                                                                      state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
                     }
@@ -910,7 +910,7 @@ namespace HVACDXSystem {
                 if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) {
                     FrostControlSetPointLimit(state, DXSystemNum,
                                               DXCoolingSystem(DXSystemNum).DesiredOutletTemp,
-                                              Node(ControlNode).HumRatMax,
+                                              state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                               state.dataEnvrn->OutBaroPress,
                                               DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                               1);
@@ -934,48 +934,48 @@ namespace HVACDXSystem {
             } else if (ControlNode == OutNode) {
                 if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) {
                     FrostControlSetPointLimit(state, DXSystemNum,
-                                              Node(ControlNode).TempSetPoint,
-                                              Node(ControlNode).HumRatMax,
+                                              state.dataLoopNodes->Node(ControlNode).TempSetPoint,
+                                              state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                               state.dataEnvrn->OutBaroPress,
                                               DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                               1);
                 }
-                DXCoolingSystem(DXSystemNum).DesiredOutletTemp = Node(ControlNode).TempSetPoint;
+                DXCoolingSystem(DXSystemNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
                 //  If HumRatMax is zero, then there is no request from SetpointManager:SingleZone:Humidity:Maximum
-                if ((DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl_None) && (Node(ControlNode).HumRatMax > 0.0)) {
+                if ((DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl_None) && (state.dataLoopNodes->Node(ControlNode).HumRatMax > 0.0)) {
                     if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnLatentLoad) {
                         FrostControlSetPointLimit(state, DXSystemNum,
-                                                  Node(ControlNode).TempSetPoint,
-                                                  Node(ControlNode).HumRatMax,
+                                                  state.dataLoopNodes->Node(ControlNode).TempSetPoint,
+                                                  state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                                   state.dataEnvrn->OutBaroPress,
                                                   DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                                   2);
                     }
-                    DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = Node(ControlNode).HumRatMax;
+                    DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = state.dataLoopNodes->Node(ControlNode).HumRatMax;
                 } else {
                     DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
                 }
             } else {
                 if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnSensibleLoad) {
                     FrostControlSetPointLimit(state, DXSystemNum,
-                                              Node(ControlNode).TempSetPoint,
-                                              Node(ControlNode).HumRatMax,
+                                              state.dataLoopNodes->Node(ControlNode).TempSetPoint,
+                                              state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                               state.dataEnvrn->OutBaroPress,
                                               DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                               1);
                 }
-                DXCoolingSystem(DXSystemNum).DesiredOutletTemp = Node(ControlNode).TempSetPoint - (Node(ControlNode).Temp - Node(OutNode).Temp);
+                DXCoolingSystem(DXSystemNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint - (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(OutNode).Temp);
                 if (DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl_None) {
                     if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnLatentLoad) {
                         FrostControlSetPointLimit(state, DXSystemNum,
-                                                  Node(ControlNode).TempSetPoint,
-                                                  Node(ControlNode).HumRatMax,
+                                                  state.dataLoopNodes->Node(ControlNode).TempSetPoint,
+                                                  state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                                   state.dataEnvrn->OutBaroPress,
                                                   DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                                   2);
                     }
                     DXCoolingSystem(DXSystemNum).DesiredOutletHumRat =
-                        Node(ControlNode).HumRatMax - (Node(ControlNode).HumRat - Node(OutNode).HumRat);
+                        state.dataLoopNodes->Node(ControlNode).HumRatMax - (state.dataLoopNodes->Node(ControlNode).HumRat - state.dataLoopNodes->Node(OutNode).HumRat);
                 } else {
                     DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
                 }
@@ -1016,7 +1016,6 @@ namespace HVACDXSystem {
         using DXCoils::SimDXCoil;
         using DXCoils::SimDXCoilMultiMode;
         using DXCoils::SimDXCoilMultiSpeed;
-        using FaultsManager::FaultsCoilSATSensor;
 
         using General::SolveRoot;
         using TempSolveRoot::SolveRoot;
@@ -1109,11 +1108,13 @@ namespace HVACDXSystem {
         VSCoilIndex = 0;
         I = 1;
 
+        auto &Node(state.dataLoopNodes->Node);
+
         // If there is a fault of coil SAT Sensor
         if (DXCoolingSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = DXCoolingSystem(DXSystemNum).FaultyCoilSATIndex;
-            DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the DesOutTemp
             DesOutTemp -= DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset;
         }
@@ -3314,7 +3315,7 @@ namespace HVACDXSystem {
             }
         }
 
-        OutletAirTemp = Node(OutletNodeNum).Temp;
+        OutletAirTemp = state.dataLoopNodes->Node(OutletNodeNum).Temp;
         Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;
@@ -3394,7 +3395,7 @@ namespace HVACDXSystem {
             }
         }
 
-        OutletAirHumRat = Node(OutletNodeNum).HumRat;
+        OutletAirHumRat = state.dataLoopNodes->Node(OutletNodeNum).HumRat;
         Residuum = Par(2) - OutletAirHumRat;
 
         return Residuum;
@@ -3440,15 +3441,15 @@ namespace HVACDXSystem {
         Real64 HumRatioSat; // saturation humidity ratio at forst control temperature
         Real64 AirMassFlow; // air masss flow rate through the DX coil
 
-        AirMassFlow = Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).MassFlowRate;
         if (ControlMode == RunOnSensible && AirMassFlow > MinAirMassFlow &&
-            TempSetPoint < Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).Temp) {
+            TempSetPoint < state.dataLoopNodes->Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).Temp) {
             if (TempSetPoint < TfrostControl) {
                 TempSetPoint = TfrostControl;
                 DXCoolingSystem(DXSystemNum).FrostControlStatus = 1;
             }
         } else if (ControlMode == RunOnLatent && AirMassFlow > MinAirMassFlow &&
-                   HumRatSetPoint < Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).HumRat) {
+                   HumRatSetPoint < state.dataLoopNodes->Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).HumRat) {
             HumRatioSat = PsyWFnTdpPb(state, TfrostControl, BaroPress, RoutineName);
             if (HumRatioSat > HumRatSetPoint) {
                 HumRatSetPoint = HumRatioSat;

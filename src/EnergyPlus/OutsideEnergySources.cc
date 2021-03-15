@@ -206,16 +206,16 @@ namespace EnergyPlus::OutsideEnergySources {
                                                                                              ErrorsFound,
                                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                                              DataIPShortCuts::cAlphaArgs(1),
-                                                                                             DataLoopNode::NodeType_Water,
-                                                                                             DataLoopNode::NodeConnectionType_Inlet,
+                                                                                             DataLoopNode::NodeFluidType::Water,
+                                                                                             DataLoopNode::NodeConnectionType::Inlet,
                                                                                              1,
                                                                                              DataLoopNode::ObjectIsNotParent);
             state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                               ErrorsFound,
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               DataIPShortCuts::cAlphaArgs(1),
-                                                                                              DataLoopNode::NodeType_Water,
-                                                                                              DataLoopNode::NodeConnectionType_Outlet,
+                                                                                              DataLoopNode::NodeFluidType::Water,
+                                                                                              DataLoopNode::NodeConnectionType::Outlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
@@ -299,7 +299,7 @@ namespace EnergyPlus::OutsideEnergySources {
             state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MaxOutletTemp =
                 state.dataPlnt->PlantLoop(this->LoopNum).MaxTemp;
             // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
-            PlantUtilities::RegisterPlantCompDesignFlow(this->InletNodeNum, state.dataPlnt->PlantLoop(this->LoopNum).MaxVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->LoopNum).MaxVolFlowRate);
 
             this->OneTimeInitFlag = false;
 
@@ -342,7 +342,8 @@ namespace EnergyPlus::OutsideEnergySources {
         // begin environment inits
         if (state.dataGlobal->BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
             // component model has not design flow rates, using data for overall plant loop
-            PlantUtilities::InitComponentNodes(state.dataPlnt->PlantLoop(this->LoopNum).MinMassFlowRate,
+            PlantUtilities::InitComponentNodes(state,
+                                               state.dataPlnt->PlantLoop(this->LoopNum).MinMassFlowRate,
                                                state.dataPlnt->PlantLoop(this->LoopNum).MaxMassFlowRate,
                                                this->InletNodeNum,
                                                this->OutletNodeNum,
@@ -363,7 +364,7 @@ namespace EnergyPlus::OutsideEnergySources {
         PlantUtilities::SetComponentFlowRate(
             state, TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
-        this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
         this->MassFlowRate = TempPlantMassFlow;
     }
 
@@ -401,7 +402,7 @@ namespace EnergyPlus::OutsideEnergySources {
                                                                      DataGlobalConstants::InitConvTemp,
                                                                      state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                      "SizeDistrict" + typeName);
-            Real64 const NomCapDes = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
+            Real64 const NomCapDes = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = NomCapDes;
@@ -422,7 +423,7 @@ namespace EnergyPlus::OutsideEnergySources {
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NomCapDes));
@@ -499,7 +500,7 @@ namespace EnergyPlus::OutsideEnergySources {
             MyLoad = 0.0;
         }
         int const OutletNode = this->OutletNodeNum;
-        DataLoopNode::Node(OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
         this->EnergyRate = std::abs(MyLoad);
         this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }

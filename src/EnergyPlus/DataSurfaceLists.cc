@@ -69,45 +69,6 @@ namespace EnergyPlus::DataSurfaceLists {
     // This data-only module contains type definitions and variables
     // associated with Radiant System Surface Groups.
 
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    int NumOfSurfaceLists(0);            // Number of surface lists in the user input file
-    int NumOfSurfListVentSlab(0);        // Number of surface lists in the user input file
-    bool SurfaceListInputsFilled(false); // Set to TRUE after first pass through air loop
-
-    // Object Data
-    Array1D<SurfaceListData> SurfList;
-    Array1D<SlabListData> SlabList;
-
-    // Functions
-
-    void clear_state()
-    {
-        NumOfSurfaceLists = 0;
-        NumOfSurfListVentSlab = 0;
-        SurfaceListInputsFilled = false;
-        SurfList.deallocate();
-        SlabList.deallocate();
-    }
-
     void GetSurfaceListsInputs(EnergyPlusData &state)
     {
 
@@ -155,6 +116,11 @@ namespace EnergyPlus::DataSurfaceLists {
         // Obtain all of the user data related to surface lists.  Need to get
         // this before getting the radiant system or ventilated slab data.
 
+        auto &SurfList(state.dataSurfLists->SurfList);
+        auto &SlabList(state.dataSurfLists->SlabList);
+        auto &NumOfSurfaceLists(state.dataSurfLists->NumOfSurfaceLists);
+        auto &NumOfSurfListVentSlab(state.dataSurfLists->NumOfSurfListVentSlab);
+
         ErrorsFound = false;
         NumOfSurfaceLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject1);
         NumOfSurfListVentSlab = inputProcessor->getNumObjectsFound(state, CurrentModuleObject2);
@@ -191,7 +157,7 @@ namespace EnergyPlus::DataSurfaceLists {
                 SurfList(Item).Name = Alphas(1);
                 SurfList(Item).NumOfSurfaces = NumAlphas - 1;
 
-                NameConflict = UtilityRoutines::FindItemInList(SurfList(Item).Name, Surface);
+                NameConflict = UtilityRoutines::FindItemInList(SurfList(Item).Name, state.dataSurface->Surface);
                 if (NameConflict > 0) { // A surface list has the same name as a surface--not allowed
                     ShowSevereError(state, format("{}{}", CurrentModuleObject1, " = " + SurfList(Item).Name + " has the same name as a surface; this is not allowed."));
                     ErrorsFound = true;
@@ -210,18 +176,18 @@ namespace EnergyPlus::DataSurfaceLists {
                 bool showSameZoneWarning = true;
                 for (SurfNum = 1; SurfNum <= SurfList(Item).NumOfSurfaces; ++SurfNum) {
                     SurfList(Item).SurfName(SurfNum) = Alphas(SurfNum + 1);
-                    SurfList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(SurfNum + 1), Surface);
+                    SurfList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(SurfNum + 1), state.dataSurface->Surface);
                     if (SurfList(Item).SurfPtr(SurfNum) == 0) {
                         ShowSevereError(state, cAlphaFields(SurfNum + 1) + " in " + CurrentModuleObject1 +
                                         " statement not found = " + SurfList(Item).SurfName(SurfNum));
                         ErrorsFound = true;
                     } else { // Make sure that all of the surfaces are located in the same zone
-                        Surface(SurfList(Item).SurfPtr(SurfNum)).IsRadSurfOrVentSlabOrPool = true;
+                        state.dataSurface->Surface(SurfList(Item).SurfPtr(SurfNum)).IsRadSurfOrVentSlabOrPool = true;
                         if (SurfNum == 1) {
-                            ZoneForSurface = Surface(SurfList(Item).SurfPtr(SurfNum)).Zone;
+                            ZoneForSurface = state.dataSurface->Surface(SurfList(Item).SurfPtr(SurfNum)).Zone;
                         }
                         if (SurfNum > 1) {
-                            if (ZoneForSurface != Surface(SurfList(Item).SurfPtr(SurfNum)).Zone && showSameZoneWarning) {
+                            if (ZoneForSurface != state.dataSurface->Surface(SurfList(Item).SurfPtr(SurfNum)).Zone && showSameZoneWarning) {
                                 ShowWarningError(state, format("{}{}{}", "Not all surfaces in same zone for ", CurrentModuleObject1, " = " + SurfList(Item).Name));
                                 if (!state.dataGlobal->DisplayExtraWarnings) {
                                     ShowContinueError(state, "If this is intentionally a radiant system with surfaces in more than one thermal zone,");
@@ -290,7 +256,7 @@ namespace EnergyPlus::DataSurfaceLists {
                 SlabList(Item).Name = Alphas(1);
                 SlabList(Item).NumOfSurfaces = ((NumAlphas - 1) / 4);
 
-                NameConflict = UtilityRoutines::FindItemInList(SlabList(Item).Name, Surface);
+                NameConflict = UtilityRoutines::FindItemInList(SlabList(Item).Name, state.dataSurface->Surface);
                 if (NameConflict > 0) { // A surface list has the same name as a surface--not allowed
                     ShowSevereError(state, format("{}{}", CurrentModuleObject2, " = " + SlabList(Item).Name + " has the same name as a slab; this is not allowed."));
                     ErrorsFound = true;
@@ -323,7 +289,7 @@ namespace EnergyPlus::DataSurfaceLists {
                     }
 
                     SlabList(Item).SurfName(SurfNum) = Alphas(AlphaArray + 1);
-                    SlabList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(AlphaArray + 1), Surface);
+                    SlabList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(AlphaArray + 1), state.dataSurface->Surface);
                     if (SlabList(Item).SurfPtr(SurfNum) == 0) {
                         ShowSevereError(state, cAlphaFields(AlphaArray + 1) + " in " + CurrentModuleObject2 +
                                         " statement not found = " + SlabList(Item).SurfName(SurfNum));
@@ -340,7 +306,7 @@ namespace EnergyPlus::DataSurfaceLists {
                             ErrorsFound = true;
                         }
                     }
-                    Surface(SlabList(Item).SurfPtr(SurfNum)).IsRadSurfOrVentSlabOrPool = true;
+                    state.dataSurface->Surface(SlabList(Item).SurfPtr(SurfNum)).IsRadSurfOrVentSlabOrPool = true;
 
                     SlabList(Item).CoreDiameter(SurfNum) = Numbers(NumArray);
                     SlabList(Item).CoreLength(SurfNum) = Numbers(NumArray + 1);
@@ -377,39 +343,15 @@ namespace EnergyPlus::DataSurfaceLists {
         // PURPOSE OF THIS FUNCTION:
         // Acts as a target for outside routines to make sure data is gotten before using.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int NumberOfSurfaceLists;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (!SurfaceListInputsFilled) {
+        if (!state.dataSurfLists->SurfaceListInputsFilled) {
             GetSurfaceListsInputs(state);
-            SurfaceListInputsFilled = true;
+            state.dataSurfLists->SurfaceListInputsFilled = true;
         }
 
-        NumberOfSurfaceLists = NumOfSurfaceLists;
+        NumberOfSurfaceLists = state.dataSurfLists->NumOfSurfaceLists;
         return NumberOfSurfaceLists;
     }
 
@@ -425,39 +367,15 @@ namespace EnergyPlus::DataSurfaceLists {
         // PURPOSE OF THIS FUNCTION:
         // Acts as a target for outside routines to make sure data is gotten before using.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int NumberOfSurfListVentSlab;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (!SurfaceListInputsFilled) {
+        if (!state.dataSurfLists->SurfaceListInputsFilled) {
             GetSurfaceListsInputs(state);
-            SurfaceListInputsFilled = true;
+            state.dataSurfLists->SurfaceListInputsFilled = true;
         }
 
-        NumberOfSurfListVentSlab = NumOfSurfListVentSlab;
+        NumberOfSurfListVentSlab = state.dataSurfLists->NumOfSurfListVentSlab;
 
         return NumberOfSurfListVentSlab;
     }

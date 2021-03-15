@@ -182,7 +182,6 @@ set(SRC
     DataHVACGlobals.cc
     DataHVACGlobals.hh
     DataHVACSystems.hh
-    DataHeatBalFanSys.cc
     DataHeatBalFanSys.hh
     DataHeatBalSurface.cc
     DataHeatBalSurface.hh
@@ -190,23 +189,18 @@ set(SRC
     DataHeatBalance.hh
     DataIPShortCuts.cc
     DataIPShortCuts.hh
-    DataLoopNode.cc
     DataLoopNode.hh
     DataMoistureBalance.cc
     DataMoistureBalance.hh
-    DataMoistureBalanceEMPD.cc
     DataMoistureBalanceEMPD.hh
     DataOutputs.cc
     DataOutputs.hh
     DataPhotovoltaics.cc
     DataPhotovoltaics.hh
-    DataPrecisionGlobals.cc
     DataPrecisionGlobals.hh
-    DataReportingFlags.cc
     DataReportingFlags.hh
     DataRoomAirModel.cc
     DataRoomAirModel.hh
-    DataRootFinder.cc
     DataRootFinder.hh
     DataRuntimeLanguage.cc
     DataRuntimeLanguage.hh

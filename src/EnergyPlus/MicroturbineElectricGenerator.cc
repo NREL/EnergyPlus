@@ -409,8 +409,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                                     ErrorsFound,
                                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
-                                                                                                    DataLoopNode::NodeType_Water,
-                                                                                                    DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                    DataLoopNode::NodeFluidType::Water,
+                                                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                                                     1,
                                                                                                     DataLoopNode::ObjectIsNotParent);
             }
@@ -420,8 +420,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                                      ErrorsFound,
                                                                                                      DataIPShortCuts::cCurrentModuleObject,
                                                                                                      state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
-                                                                                                     DataLoopNode::NodeType_Water,
-                                                                                                     DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                     DataLoopNode::NodeFluidType::Water,
+                                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                                      1,
                                                                                                      DataLoopNode::ObjectIsNotParent);
             }
@@ -620,7 +620,7 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate = state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate;
                 }
 
-                PlantUtilities::RegisterPlantCompDesignFlow(state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum,
+                PlantUtilities::RegisterPlantCompDesignFlow(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum,
                                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate);
 
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxWaterTemp = NumArray(17);
@@ -633,8 +633,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                                           ErrorsFound,
                                                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                                                           AlphArray(1),
-                                                                                                          DataLoopNode::NodeType_Air,
-                                                                                                          DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                          DataLoopNode::NodeFluidType::Air,
+                                                                                                          DataLoopNode::NodeConnectionType::Inlet,
                                                                                                           2,
                                                                                                           DataLoopNode::ObjectIsNotParent);
             }
@@ -653,8 +653,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                                            ErrorsFound,
                                                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                                                            AlphArray(1),
-                                                                                                           DataLoopNode::NodeType_Air,
-                                                                                                           DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                           DataLoopNode::NodeFluidType::Air,
+                                                                                                           DataLoopNode::NodeConnectionType::Outlet,
                                                                                                            2,
                                                                                                            DataLoopNode::ObjectIsNotParent);
             }
@@ -954,7 +954,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             this->DesignHeatRecMassFlowRate = rho * this->RefHeatRecVolFlowRate;
             this->HeatRecMaxMassFlowRate = rho * this->HeatRecMaxVolFlowRate;
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->HeatRecMaxMassFlowRate,
                                                this->HeatRecInletNodeNum,
                                                this->HeatRecOutletNodeNum,
@@ -972,7 +973,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             // set the node max and min mass flow rates
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->HeatRecMaxMassFlowRate,
                                                this->HeatRecInletNodeNum,
                                                this->HeatRecOutletNodeNum,
@@ -981,8 +983,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                this->HRBranchNum,
                                                this->HRCompNum);
 
-            DataLoopNode::Node(this->HeatRecInletNodeNum).Temp = 20.0; // Set the node temperature, assuming freeze control
-            DataLoopNode::Node(this->HeatRecOutletNodeNum).Temp = 20.0;
+            state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp = 20.0; // Set the node temperature, assuming freeze control
+            state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = 20.0;
 
             this->MyEnvrnFlag = false;
         } // end environmental inits
@@ -1003,7 +1005,7 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                 if (this->HeatRecFlowFTempPowCurveNum != 0) {
                     DesiredMassFlowRate =
                         this->DesignHeatRecMassFlowRate *
-                        CurveManager::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, DataLoopNode::Node(this->HeatRecInletNodeNum).Temp, MyLoad);
+                        CurveManager::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp, MyLoad);
                 } else {
                     DesiredMassFlowRate = this->DesignHeatRecMassFlowRate; // Assume modifier = 1 if curve not specified
                 }
@@ -1023,17 +1025,17 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                  this->HRCompNum);
         } else { // not FirstHVACIteration
             if (!RunFlag) {
-                DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate =
-                    min(DataPrecisionGlobals::constant_zero, DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRateMaxAvail);
-                DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate =
-                    max(DataPrecisionGlobals::constant_zero, DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRateMinAvail);
+                state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate =
+                    min(DataPrecisionGlobals::constant_zero, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRateMaxAvail);
+                state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate =
+                    max(DataPrecisionGlobals::constant_zero, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRateMinAvail);
 
             } else if (RunFlag && this->InternalFlowControl) {
                 // assume dispatch power in MyLoad is what gets produced (future, reset during calc routine and iterate)
                 if (this->HeatRecFlowFTempPowCurveNum != 0) {
                     Real64 DesiredMassFlowRate =
                         this->DesignHeatRecMassFlowRate *
-                        CurveManager::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, DataLoopNode::Node(this->HeatRecInletNodeNum).Temp, MyLoad);
+                        CurveManager::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp, MyLoad);
                     PlantUtilities::SetComponentFlowRate(state, DesiredMassFlowRate,
                                                          this->HeatRecInletNodeNum,
                                                          this->HeatRecOutletNodeNum,
@@ -1118,10 +1120,10 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
         Real64 HeatRecCp;     // Specific heat of the heat recovery fluid (J/kg-K)
 
         if (this->HeatRecActive) {
-            HeatRecInTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
+            HeatRecInTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
             HeatRecCp = FluidProperties::GetSpecificHeatGlycol(
                 state, state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName, HeatRecInTemp, state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
-            heatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
+            heatRecMdot = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;
         } else {
             HeatRecInTemp = 0.0;
             HeatRecCp = 0.0;
@@ -1138,14 +1140,14 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             CombustionAirInletW = state.dataEnvrn->OutHumRat;
             CombustionAirInletPress = state.dataEnvrn->OutBaroPress;
         } else { // use inlet node information
-            CombustionAirInletTemp = DataLoopNode::Node(this->CombustionAirInletNodeNum).Temp;
-            CombustionAirInletW = DataLoopNode::Node(this->CombustionAirInletNodeNum).HumRat;
-            CombustionAirInletPress = DataLoopNode::Node(this->CombustionAirInletNodeNum).Press;
-            if (DataLoopNode::Node(this->CombustionAirInletNodeNum).Height > 0.0) {
+            CombustionAirInletTemp = state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).Temp;
+            CombustionAirInletW = state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).HumRat;
+            CombustionAirInletPress = state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).Press;
+            if (state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).Height > 0.0) {
             }
             //     Initialize combustion outlet air conditions to inlet air conditions (all node properties)
             if (this->ExhAirCalcsActive) {
-                DataLoopNode::Node(this->CombustionAirOutletNodeNum) = DataLoopNode::Node(this->CombustionAirInletNodeNum);
+                state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum) = state.dataLoopNodes->Node(this->CombustionAirInletNodeNum);
             }
         }
 
@@ -1745,7 +1747,7 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
         }
     }
 
-    void MTGeneratorSpecs::UpdateMTGeneratorRecords()
+    void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad/D. Shirey
@@ -1757,19 +1759,19 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
         //  Reporting and updating nodes if necessary.
 
         if (this->HeatRecActive) {
-            DataLoopNode::Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
+            state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
         }
 
         if (this->ExhAirCalcsActive) {
-            DataLoopNode::Node(this->CombustionAirOutletNodeNum).MassFlowRate = this->ExhaustAirMassFlowRate;
-            DataLoopNode::Node(this->CombustionAirInletNodeNum).MassFlowRate = this->ExhaustAirMassFlowRate;
+            state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum).MassFlowRate = this->ExhaustAirMassFlowRate;
+            state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).MassFlowRate = this->ExhaustAirMassFlowRate;
 
-            DataLoopNode::Node(this->CombustionAirOutletNodeNum).Temp = this->ExhaustAirTemperature;
-            DataLoopNode::Node(this->CombustionAirOutletNodeNum).HumRat = this->ExhaustAirHumRat;
-            DataLoopNode::Node(this->CombustionAirOutletNodeNum).MassFlowRateMaxAvail =
-                DataLoopNode::Node(this->CombustionAirInletNodeNum).MassFlowRateMaxAvail;
-            DataLoopNode::Node(this->CombustionAirOutletNodeNum).MassFlowRateMinAvail =
-                DataLoopNode::Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
+            state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum).Temp = this->ExhaustAirTemperature;
+            state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum).HumRat = this->ExhaustAirHumRat;
+            state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum).MassFlowRateMaxAvail =
+                state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).MassFlowRateMaxAvail;
+            state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum).MassFlowRateMinAvail =
+                state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
         }
 
         this->EnergyGen = this->ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;

@@ -114,41 +114,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyTdbFnHW;
 
-    // Data
-    std::unordered_set<std::string> UniqueZoneNames;
-    std::unordered_map<std::string, std::string> UniqueInfiltrationNames;
-    // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
-
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of this should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool ManageAirHeatBalanceGetInputFlag(true);
-    } // namespace
-    //         Subroutine Specifications for the Heat Balance Module
-    // Driver Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-    // Reporting routines for module
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
-    void clear_state()
-    {
-        ManageAirHeatBalanceGetInputFlag = true;
-        UniqueZoneNames.clear();
-        UniqueInfiltrationNames.clear();
-    }
-
     void ManageAirHeatBalance(EnergyPlusData &state)
     {
 
@@ -164,34 +129,10 @@ namespace EnergyPlus::HeatBalanceAirManager {
         // at the time step level.  This driver manages the calls to all of
         // the other drivers and simulation algorithms.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         // Obtains and Allocates heat balance related parameters from input file
-        if (ManageAirHeatBalanceGetInputFlag) {
+        if (state.dataHeatBalAirMgr->ManageAirHeatBalanceGetInputFlag) {
             GetAirHeatBalanceInput(state);
-            ManageAirHeatBalanceGetInputFlag = false;
+            state.dataHeatBalAirMgr->ManageAirHeatBalanceGetInputFlag = false;
         }
 
         InitAirHeatBalance(state); // Initialize all heat balance related parameters
@@ -202,9 +143,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
 
         ReportZoneMeanAirTemp(state);
     }
-
-    // Get Input Section of the Module
-    //******************************************************************************
 
     void GetAirHeatBalanceInput(EnergyPlusData &state)
     {
@@ -221,29 +159,8 @@ namespace EnergyPlus::HeatBalanceAirManager {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);
-
-
 
         GetAirFlowFlag(state, ErrorsFound);
 
@@ -275,11 +192,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
         // Using/Aliasing
         using ScheduleManager::GetScheduleIndex;
 
-        // Formats
-
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         state.dataHeatBal->AirFlowFlag = UseSimpleAirFlow;
 
         GetSimpleAirModelInputs(state, ErrorsFound);
@@ -300,19 +212,10 @@ namespace EnergyPlus::HeatBalanceAirManager {
         // PURPOSE OF THIS SUBROUTINE :
         // This subroutine sets the zone mass conservation flag to true.
 
-        // Using/Aliasing
-        using DataHeatBalFanSys::MixingMassFlowZone;
-        using DataHeatBalFanSys::ZoneMassBalanceFlag;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS :
-        int Loop;
-
-        // flow
-
         if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance && state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) {
-            for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
-                ZoneMassBalanceFlag(state.dataHeatBal->Mixing(Loop).ZonePtr) = true;
-                ZoneMassBalanceFlag(state.dataHeatBal->Mixing(Loop).FromZone) = true;
+            for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
+                state.dataHeatBalFanSys->ZoneMassBalanceFlag(state.dataHeatBal->Mixing(Loop).ZonePtr) = true;
+                state.dataHeatBalFanSys->ZoneMassBalanceFlag(state.dataHeatBal->Mixing(Loop).FromZone) = true;
             }
         }
     }
@@ -346,7 +249,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
 
         // Using/Aliasing
         using General::CheckCreatedZoneItemName;
-
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::GetScheduleMinValue;
@@ -416,8 +318,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
         static constexpr auto Format_720(" {} Airflow Stats Nominal, {},{},{},{:.2R},{:.1R},");
         static constexpr auto Format_721("! <{} Airflow Stats Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {{m2}}, # Zone Occupants,{}\n");
         static constexpr auto Format_722(" {}, {}\n");
-
-
 
         RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
 
@@ -617,7 +517,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                 "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             }
-            GlobalNames::IntraObjUniquenessCheck(state, cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), UniqueZoneNames, IsNotOK);
+            GlobalNames::IntraObjUniquenessCheck(state, cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), state.dataHeatBalAirMgr->UniqueZoneNames, IsNotOK);
             if (IsNotOK) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", a duplicated object " + cAlphaFieldNames(2) +
                                 "=\"" + cAlphaArgs(2) + "\" is found.");
@@ -832,7 +732,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
         state.dataHeatBal->TotInfiltration = state.dataHeatBal->TotDesignFlowInfiltration + state.dataHeatBal->TotShermGrimsInfiltration + state.dataHeatBal->TotAIM2Infiltration;
 
         state.dataHeatBal->Infiltration.allocate(state.dataHeatBal->TotInfiltration);
-        UniqueInfiltrationNames.reserve(static_cast<unsigned>(state.dataHeatBal->TotInfiltration));
+        state.dataHeatBalAirMgr->UniqueInfiltrationNames.reserve(static_cast<unsigned>(state.dataHeatBal->TotInfiltration));
 
         if (state.dataHeatBal->TotDesignFlowInfiltration > 0) {
             Loop = 0;
@@ -1063,7 +963,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             ++InfiltCount;
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataHeatBalAirMgr->UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             state.dataHeatBal->Infiltration(InfiltCount).Name = cAlphaArgs(1);
             state.dataHeatBal->Infiltration(InfiltCount).ModelType = InfiltrationShermanGrimsrud;
             state.dataHeatBal->Infiltration(InfiltCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
@@ -1126,7 +1026,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             ++InfiltCount;
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataHeatBalAirMgr->UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             state.dataHeatBal->Infiltration(InfiltCount).Name = cAlphaArgs(1);
             state.dataHeatBal->Infiltration(InfiltCount).ModelType = InfiltrationAIM2;
             state.dataHeatBal->Infiltration(InfiltCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
@@ -1498,7 +1398,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                             state.dataHeatBal->Ventilation(Loop).FanType = ExhaustVentilation;
                         } else if (SELECT_CASE_var == "INTAKE") {
                             state.dataHeatBal->Ventilation(Loop).FanType = IntakeVentilation;
-                        } else if ((SELECT_CASE_var == "NATURAL") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var == BlankString)) {
+                        } else if ((SELECT_CASE_var == "NATURAL") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var == std::string())) {
                             state.dataHeatBal->Ventilation(Loop).FanType = NaturalVentilation;
                         } else if (SELECT_CASE_var == "BALANCED") {
                             state.dataHeatBal->Ventilation(Loop).FanType = BalancedVentilation;
@@ -2829,19 +2729,19 @@ namespace EnergyPlus::HeatBalanceAirManager {
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (!state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone && !state.dataHeatBal->MassConservation(ZoneNum).IsSourceAndReceivingZone) {
                 Loop += 1;
-                ZoneReOrder(Loop) = ZoneNum;
+                state.dataHeatBalFanSys->ZoneReOrder(Loop) = ZoneNum;
             }
         }
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataHeatBal->MassConservation(ZoneNum).IsSourceAndReceivingZone) {
                 Loop += 1;
-                ZoneReOrder(Loop) = ZoneNum;
+                state.dataHeatBalFanSys->ZoneReOrder(Loop) = ZoneNum;
             }
         }
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone) {
                 Loop += 1;
-                ZoneReOrder(Loop) = ZoneNum;
+                state.dataHeatBalFanSys->ZoneReOrder(Loop) = ZoneNum;
             }
         }
         cCurrentModuleObject = "ZoneCrossMixing";
@@ -3932,9 +3832,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
         //           'Electric Load {W/m2}, Gas Load {W/m2}, Other Load {W/m2}, Hot Water Eq {W/m2}, Outdoor Controlled Baseboard Heat')
     }
 
-    //*****************************************************************************************
-    // This subroutine was moved from 'RoomAirManager' Module
-
     void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if errors found during this input routine
     {
 
@@ -3947,9 +3844,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         //     Get room air model parameters for all zones at once
-
-        // METHODOLOGY EMPLOYED:
-        //     Use input processer to get input from idf file
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
@@ -4109,7 +4003,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
             if (NumOfAirModels == 0) {
                 state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = "MIXING AIR MODEL FOR " + state.dataHeatBal->Zone(ZoneNum).Name;
                 state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
-            } else if (state.dataRoomAirMod->AirModel(ZoneNum).ZoneName == BlankString) {
+            } else if (state.dataRoomAirMod->AirModel(ZoneNum).ZoneName == std::string()) {
                 // no 'select air model' object for this zone so the mixing model is used for this zone
                 state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = "MIXING AIR MODEL FOR " + state.dataHeatBal->Zone(ZoneNum).Name;
                 state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
@@ -4150,12 +4044,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
         }
     }
 
-    // END of Get Input subroutines for the HBAir Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
     void InitAirHeatBalance(EnergyPlusData &state)
     {
 
@@ -4166,9 +4054,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for  initializations within the
         // air heat balance.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the status flags to trigger events.
 
         // Do the Begin Day initializations
         if (state.dataGlobal->BeginDayFlag) {
@@ -4193,28 +4078,8 @@ namespace EnergyPlus::HeatBalanceAirManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine sets up the mixing and cross mixing flows
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // local loop index
@@ -4289,12 +4154,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
         }
     }
 
-    // END Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
     void CalcHeatBalanceAir(EnergyPlusData &state)
     {
 
@@ -4307,29 +4166,8 @@ namespace EnergyPlus::HeatBalanceAirManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the air component of the heat balance.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using HVACManager::ManageHVAC;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if(state.dataGlobal->externalHVACManager) {
           if (!state.dataGlobal->externalHVACManagerInitialized) {
@@ -4341,9 +4179,9 @@ namespace EnergyPlus::HeatBalanceAirManager {
         }
 
         // Do Final Temperature Calculations for Heat Balance before next Time step
-        SumHmAW = 0.0;
-        SumHmARa = 0.0;
-        SumHmARaW = 0.0;
+        state.dataHeatBalFanSys->SumHmAW = 0.0;
+        state.dataHeatBalFanSys->SumHmARa = 0.0;
+        state.dataHeatBalFanSys->SumHmARaW = 0.0;
     }
 
     // END Algorithm Section of the Module
@@ -4382,9 +4220,9 @@ namespace EnergyPlus::HeatBalanceAirManager {
             // The mean air temperature is actually ZTAV which is the average
             // temperature of the air temperatures at the system time step for the
             // entire zone time step.
-            state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirTemp = ZTAV(ZoneLoop);
-            state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat = ZoneAirHumRatAvg(ZoneLoop);
-            state.dataHeatBal->ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (ZTAV(ZoneLoop) + state.dataHeatBal->MRT(ZoneLoop));
+            state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirTemp = state.dataHeatBalFanSys->ZTAV(ZoneLoop);
+            state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneLoop);
+            state.dataHeatBal->ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (state.dataHeatBalFanSys->ZTAV(ZoneLoop) + state.dataHeatBal->MRT(ZoneLoop));
             state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirDewPointTemp = PsyTdpFnWPb(state, state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat, state.dataEnvrn->OutBaroPress);
 
             // if operative temperature control is being used, then radiative fraction/weighting
@@ -4400,7 +4238,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                         } else {
                             thisMRTFraction = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
                         }
-                        state.dataHeatBal->ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV(ZoneLoop) + thisMRTFraction * state.dataHeatBal->MRT(ZoneLoop);
+                        state.dataHeatBal->ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * state.dataHeatBalFanSys->ZTAV(ZoneLoop) + thisMRTFraction * state.dataHeatBal->MRT(ZoneLoop);
                     }
                 }
             }

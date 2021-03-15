@@ -638,7 +638,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     int const OutletNode = state->dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum;
     int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
     int const ZoneAirNodeNum = thisZoneEquip.ZoneNode;
-    Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
 
     // design maximum air mass flow rate
     Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
@@ -649,22 +649,23 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     EXPECT_EQ(0.2, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
 
     // set air inlet node properties
-    Node(InletNode).Temp = 15.0;
-    Node(InletNode).HumRat = 0.005;
-    Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat);
+    state->dataLoopNodes->Node(InletNode).Temp = 15.0;
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.005;
+    state->dataLoopNodes->Node(InletNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat);
     // set inlet mass flow rate to zero
-    Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
 
     // set zone air node properties
-    Node(ZoneAirNodeNum).Temp = 20.0;
-    Node(ZoneAirNodeNum).HumRat = 0.005;
-    Node(ZoneAirNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(ZoneAirNodeNum).Temp, Node(ZoneAirNodeNum).HumRat);
+    state->dataLoopNodes->Node(ZoneAirNodeNum).Temp = 20.0;
+    state->dataLoopNodes->Node(ZoneAirNodeNum).HumRat = 0.005;
+    state->dataLoopNodes->Node(ZoneAirNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ZoneAirNodeNum).Temp, state->dataLoopNodes->Node(ZoneAirNodeNum).HumRat);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
-    TempControlType.allocate(1);
-    TempControlType(1) = 4;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
 
     // calc min air mass flow rate for Normal Damper Heating Action
     Real64 expectedMassFlowAirReheatMin = 0.2 * MassFlowRateMaxAvail;
@@ -675,8 +676,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     SimulateSingleDuct(*state, thisAirDistUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDistUnit.EquipIndex(1));
     // check min, actual and max air mass flow rates during reheat with Normal Action
     EXPECT_EQ(expectedMassFlowAirReheatMin, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
-    EXPECT_EQ(expectedMassFlowAirReheatMin, Node(InletNode).MassFlowRate);
-    EXPECT_EQ(expectedMassFlowAirReheatMin, Node(OutletNode).MassFlowRate);
+    EXPECT_EQ(expectedMassFlowAirReheatMin, state->dataLoopNodes->Node(InletNode).MassFlowRate);
+    EXPECT_EQ(expectedMassFlowAirReheatMin, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax);
 }
 
@@ -1016,7 +1017,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -1028,8 +1029,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1051,8 +1052,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     // test with heating load and turndown fraction schedule value set 1.0
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 1; //
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration);
@@ -1075,8 +1076,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     // test with heating load and turndown fraction schedule value set 0.5
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 2;
     SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.30 * 0.5; // min flow rate at 0.5 turndown fraction
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration);
@@ -1221,7 +1222,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -1233,8 +1234,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+     state->dataHeatBalFanSys->TempControlType.allocate(1);
+     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1256,8 +1257,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     // test with heating load and turndown fraction schedule value set 1.0
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 1; //
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration);
@@ -1280,8 +1281,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     // test with heating load and turndown fraction schedule value set 0.5
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 2;
     SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.10 * 0.5; // min flow rate at 0.5 turndown fraction
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration);
@@ -1393,7 +1394,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -1405,8 +1406,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+     state->dataHeatBalFanSys->TempControlType.allocate(1);
+     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1428,8 +1429,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     // test with heating load and turndown fraction schedule value set 1.0
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 1; //
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration);
@@ -1452,8 +1453,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     // test with heating load and turndown fraction schedule value set 0.5
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 2;
     SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.20 * 0.5; // min flow rate at 0.5 turndown fraction
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration);
@@ -1576,7 +1577,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -1588,8 +1589,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+     state->dataHeatBalFanSys->TempControlType.allocate(1);
+     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1614,8 +1615,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.05;
     Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 0.0;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1635,8 +1636,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     thisAirTerminal.ZoneMinAirFracDes = 0.10; // modified user input
     SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.10;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 0.0;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     thisAirTerminal.InitSys(*state, FirstHVACIteration);
@@ -1721,7 +1722,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -1733,8 +1734,8 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+     state->dataHeatBalFanSys->TempControlType.allocate(1);
+     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1754,12 +1755,14 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     int InletNodeNum = thisHeatCoolAT.InletNodeNum;
     state->dataZoneEquip->ZoneEquipConfig(thisHeatCoolAT.ActualZoneNum).InletNodeAirLoopNum(thisHeatCoolAT.CtrlZoneInNodeIndex) = 1;
     // set heating zone and AT unit inlet conditions
-    DataLoopNode::Node(ZoneNodeNum).Temp = 20.0;
-    DataLoopNode::Node(ZoneNodeNum).HumRat = 0.005;
-    DataLoopNode::Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
-    DataLoopNode::Node(InletNodeNum).Temp = 5.0;
-    DataLoopNode::Node(InletNodeNum).HumRat = 0.006;
-    DataLoopNode::Node(InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat);
+    state->dataLoopNodes->Node(ZoneNodeNum).Temp = 20.0;
+    state->dataLoopNodes->Node(ZoneNodeNum).HumRat = 0.005;
+    state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ZoneNodeNum).Temp, state->dataLoopNodes->Node(ZoneNodeNum).HumRat);
+    state->dataLoopNodes->Node(InletNodeNum).Temp = 5.0;
+    state->dataLoopNodes->Node(InletNodeNum).HumRat = 0.006;
+    state->dataLoopNodes->Node(InletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNodeNum).Temp, state->dataLoopNodes->Node(InletNodeNum).HumRat);
     // calculate mass flow rates
     Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.2;
     Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 1.0;
@@ -1771,8 +1774,8 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
 
     // test 1: heating load at minimum supply air flow rate
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     thisHeatCoolAT.InitSys(*state, FirstHVACIteration);
@@ -1787,18 +1790,20 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     EXPECT_EQ(expect_OutdoorAirFlowRate, thisHeatCoolAT.OutdoorAirFlowRate);
 
     // test 2: cooling load at maximum supply air flow rate
-    DataLoopNode::Node(ZoneNodeNum).Temp = 24.0;
-    DataLoopNode::Node(ZoneNodeNum).HumRat = 0.0080;
-    DataLoopNode::Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
-    DataLoopNode::Node(InletNodeNum).Temp = 16.0;
-    DataLoopNode::Node(InletNodeNum).HumRat = 0.0075;
-    DataLoopNode::Node(InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat);
+    state->dataLoopNodes->Node(ZoneNodeNum).Temp = 24.0;
+    state->dataLoopNodes->Node(ZoneNodeNum).HumRat = 0.0080;
+    state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ZoneNodeNum).Temp, state->dataLoopNodes->Node(ZoneNodeNum).HumRat);
+    state->dataLoopNodes->Node(InletNodeNum).Temp = 16.0;
+    state->dataLoopNodes->Node(InletNodeNum).HumRat = 0.0075;
+    state->dataLoopNodes->Node(InletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNodeNum).Temp, state->dataLoopNodes->Node(InletNodeNum).HumRat);
 
     thisHeatCoolAT.ZoneMinAirFracDes = 0.20;
     SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * thisHeatCoolAT.ZoneMinAirFracDes * 1.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -12000.0;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     thisHeatCoolAT.InitSys(*state, FirstHVACIteration);
