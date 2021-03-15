@@ -70,10 +70,10 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     Real64 ExpectedOAMassFlowRate;
     Real64 UnitVentNum;
 
-    DataLoopNode::clear_state();
+    state->dataLoopNodes->clear_state();
     state->dataUnitVentilators->clear_state();
 
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataUnitVentilators->UnitVent.allocate(1);
 
     state->dataUnitVentilators->UnitVent(1).ATMixerExists = false;
@@ -82,10 +82,10 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     state->dataUnitVentilators->UnitVent(1).OAMixerOutNode = 2;
     state->dataUnitVentilators->UnitVent(1).ATMixerOutNode = 3;
     state->dataUnitVentilators->UnitVent(1).AirInNode = 4;
-    DataLoopNode::Node(1).Enthalpy = 0.0;
-    DataLoopNode::Node(2).Enthalpy = 0.0;
-    DataLoopNode::Node(3).Enthalpy = 0.0;
-    DataLoopNode::Node(4).Enthalpy = 0.0;
+    state->dataLoopNodes->Node(1).Enthalpy = 0.0;
+    state->dataLoopNodes->Node(2).Enthalpy = 0.0;
+    state->dataLoopNodes->Node(3).Enthalpy = 0.0;
+    state->dataLoopNodes->Node(4).Enthalpy = 0.0;
 
     // Test 1: Tinlet <= Toutdoor
     UnitVentNum = 1;
@@ -152,10 +152,10 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     MassFlowRate = 1.234;
     state->dataUnitVentilators->QZnReq = 15678.9-12.34;
     state->dataEnvrn->OutHumRat = 0.010;
-    DataLoopNode::Node(1).Enthalpy = 11.0;
-    DataLoopNode::Node(2).Enthalpy = 1.0;
-    DataLoopNode::Node(3).Enthalpy = 0.0;
-    DataLoopNode::Node(4).Enthalpy = 0.0;
+    state->dataLoopNodes->Node(1).Enthalpy = 11.0;
+    state->dataLoopNodes->Node(2).Enthalpy = 1.0;
+    state->dataLoopNodes->Node(3).Enthalpy = 0.0;
+    state->dataLoopNodes->Node(4).Enthalpy = 0.0;
 
     OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(*state, UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 1.02133;
@@ -170,10 +170,10 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     MassFlowRate = 1.234;
     state->dataUnitVentilators->QZnReq = 15678.9-12.34;
     state->dataEnvrn->OutHumRat = 0.010;
-    DataLoopNode::Node(1).Enthalpy = 11.0;
-    DataLoopNode::Node(2).Enthalpy = 0.0;
-    DataLoopNode::Node(3).Enthalpy = 1.0;
-    DataLoopNode::Node(4).Enthalpy = 0.0;
+    state->dataLoopNodes->Node(1).Enthalpy = 11.0;
+    state->dataLoopNodes->Node(2).Enthalpy = 0.0;
+    state->dataLoopNodes->Node(3).Enthalpy = 1.0;
+    state->dataLoopNodes->Node(4).Enthalpy = 0.0;
     state->dataUnitVentilators->UnitVent(1).ATMixerExists = true;
     state->dataUnitVentilators->UnitVent(1).ATMixerType = DataHVACGlobals::ATMixer_InletSide;
 
@@ -190,10 +190,10 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     MassFlowRate = 1.234;
     state->dataUnitVentilators->QZnReq = 15678.9-12.34;
     state->dataEnvrn->OutHumRat = 0.010;
-    DataLoopNode::Node(1).Enthalpy = 11.0;
-    DataLoopNode::Node(2).Enthalpy = 0.0;
-    DataLoopNode::Node(3).Enthalpy = 0.0;
-    DataLoopNode::Node(4).Enthalpy = 1.0;
+    state->dataLoopNodes->Node(1).Enthalpy = 11.0;
+    state->dataLoopNodes->Node(2).Enthalpy = 0.0;
+    state->dataLoopNodes->Node(3).Enthalpy = 0.0;
+    state->dataLoopNodes->Node(4).Enthalpy = 1.0;
     state->dataUnitVentilators->UnitVent(1).ATMixerExists = true;
     state->dataUnitVentilators->UnitVent(1).ATMixerType = DataHVACGlobals::ATMixer_SupplySide;
 
@@ -218,11 +218,11 @@ TEST_F(EnergyPlusFixture, UnitVentilatorCalcMdotCCoilCycFanTest)
     state->dataUnitVentilators->UnitVent.allocate(UnitVentNum);
     state->dataUnitVentilators->UnitVent(UnitVentNum).FanOutletNode = 1;
     state->dataUnitVentilators->UnitVent(UnitVentNum).AirInNode = 2;
-    DataLoopNode::Node.allocate(2);
-    DataLoopNode::Node(2).HumRat = 0.006;
-    DataLoopNode::Node(2).Temp = 23.0;
-    DataLoopNode::Node(1).Temp = 23.0;
-    DataLoopNode::Node(1).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node(2).HumRat = 0.006;
+    state->dataLoopNodes->Node(2).Temp = 23.0;
+    state->dataLoopNodes->Node(1).Temp = 23.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
 
     // Test 1: QZnReq is greater than zero (heating) so mdot should be zero after the call
     state->dataUnitVentilators->UnitVent(1).MaxColdWaterFlow = 0.1234;

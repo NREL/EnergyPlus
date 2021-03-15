@@ -918,7 +918,7 @@ namespace PlantPipingSystemsManager {
 
         void InitPipingSystems(EnergyPlusData &state, Circuit * thisCircuit);
 
-        void UpdatePipingSystems(Circuit * thisCircuit);
+        void UpdatePipingSystems(EnergyPlusData &state, Circuit * thisCircuit);
 
         void SetupZoneCoupledOutputVariables(EnergyPlusData &state);
 

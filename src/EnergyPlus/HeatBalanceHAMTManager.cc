@@ -123,56 +123,6 @@ namespace HeatBalanceHAMTManager {
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    int const ittermax(150); // Maximum Number of itterations
-    int const adjmax(6);     // Maximum Number of Adjacent Cells
-
-    Real64 const wdensity(1000.0); // Density of water kg.m-3
-    Real64 const wspech(4180.0);   // Specific Heat Capacity of Water J.kg-1.K-1 (at 20C)
-    Real64 const whv(2489000.0);   // Evaporation enthalpy of water J.kg-1
-    Real64 const convt(0.002);     // Temperature convergence limit
-    Real64 const qvplim(100000.0); // Maximum latent heat W
-    Real64 const rhmax(1.01);      // Maximum RH value
-
-    // MODULE VARIABLE DECLARATIONS:
-    Array1D_int firstcell;
-    Array1D_int lastcell;
-    Array1D_int Extcell;
-    Array1D_int ExtRadcell;
-    Array1D_int ExtConcell;
-    Array1D_int ExtSkycell;
-    Array1D_int ExtGrncell;
-    Array1D_int Intcell;
-    Array1D_int IntConcell;
-
-    Array1D<Real64> watertot;
-    Array1D<Real64> surfrh;
-    Array1D<Real64> surfextrh;
-    Array1D<Real64> surftemp;
-    Array1D<Real64> surfexttemp;
-    Array1D<Real64> surfvp;
-
-    Array1D<Real64> extvtc;   // External Surface vapor transfer coefficient
-    Array1D<Real64> intvtc;   // Internal Surface Vapor Transfer Coefficient
-    Array1D_bool extvtcflag;  // External Surface vapor transfer coefficient flag
-    Array1D_bool intvtcflag;  // Internal Surface Vapor Transfer Coefficient flag
-    Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
-
-    Real64 deltat(0.0); // time step in seconds
-
-    int TotCellsMax(0); // Maximum number of cells per material
-
-    bool latswitch(false);  // latent heat switch,
-    bool rainswitch(false); // rain switch,
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceHAMTManager:
-
-    // Object Data
-    Array1D<subcell> cells;
-
-    // Functions
-
     void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
     {
 
@@ -185,29 +135,7 @@ namespace HeatBalanceHAMTManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Manages the Heat and Moisture Transfer calculations.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         static bool OneTimeFlag(true);
 
         if (OneTimeFlag) {
@@ -269,7 +197,7 @@ namespace HeatBalanceHAMTManager {
         int red;
         int mu;
         int tc;
-        // unused1208    INTEGER :: sid
+
         int HAMTitems;
         int item;
         int ii;
@@ -280,37 +208,37 @@ namespace HeatBalanceHAMTManager {
         bool isoerrrise;
         bool ErrorsFound;
 
-        watertot.allocate(state.dataSurface->TotSurfaces);
-        surfrh.allocate(state.dataSurface->TotSurfaces);
-        surfextrh.allocate(state.dataSurface->TotSurfaces);
-        surftemp.allocate(state.dataSurface->TotSurfaces);
-        surfexttemp.allocate(state.dataSurface->TotSurfaces);
-        surfvp.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->watertot.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->surfrh.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->surfextrh.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->surftemp.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->surfexttemp.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->surfvp.allocate(state.dataSurface->TotSurfaces);
 
-        firstcell.allocate(state.dataSurface->TotSurfaces);
-        lastcell.allocate(state.dataSurface->TotSurfaces);
-        Extcell.allocate(state.dataSurface->TotSurfaces);
-        ExtRadcell.allocate(state.dataSurface->TotSurfaces);
-        ExtConcell.allocate(state.dataSurface->TotSurfaces);
-        ExtSkycell.allocate(state.dataSurface->TotSurfaces);
-        ExtGrncell.allocate(state.dataSurface->TotSurfaces);
-        Intcell.allocate(state.dataSurface->TotSurfaces);
-        IntConcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->firstcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->lastcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->Extcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->ExtRadcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->ExtConcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->ExtSkycell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->ExtGrncell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->Intcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->IntConcell.allocate(state.dataSurface->TotSurfaces);
 
-        extvtc.allocate(state.dataSurface->TotSurfaces);
-        intvtc.allocate(state.dataSurface->TotSurfaces);
-        extvtcflag.allocate(state.dataSurface->TotSurfaces);
-        intvtcflag.allocate(state.dataSurface->TotSurfaces);
-        MyEnvrnFlag.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->extvtc.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->intvtc.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->extvtcflag.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->intvtcflag.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->MyEnvrnFlag.allocate(state.dataSurface->TotSurfaces);
 
-        extvtc = -1.0;
-        intvtc = -1.0;
-        extvtcflag = false;
-        intvtcflag = false;
-        MyEnvrnFlag = true;
+        state.dataHeatBalHAMTMgr->extvtc = -1.0;
+        state.dataHeatBalHAMTMgr->intvtc = -1.0;
+        state.dataHeatBalHAMTMgr->extvtcflag = false;
+        state.dataHeatBalHAMTMgr->intvtcflag = false;
+        state.dataHeatBalHAMTMgr->MyEnvrnFlag = true;
 
-        latswitch = true;
-        rainswitch = true;
+        state.dataHeatBalHAMTMgr->latswitch = true;
+        state.dataHeatBalHAMTMgr->rainswitch = true;
 
         MaxAlphas = 0;
         MaxNums = 0;
@@ -662,13 +590,13 @@ namespace HeatBalanceHAMTManager {
             }
 
             if (AlphaArray(2) == "YES") {
-                extvtcflag(vtcsid) = true;
-                extvtc(vtcsid) = NumArray(1);
+                state.dataHeatBalHAMTMgr->extvtcflag(vtcsid) = true;
+                state.dataHeatBalHAMTMgr->extvtc(vtcsid) = NumArray(1);
             }
 
             if (AlphaArray(3) == "YES") {
-                intvtcflag(vtcsid) = true;
-                intvtc(vtcsid) = NumArray(2);
+                state.dataHeatBalHAMTMgr->intvtcflag(vtcsid) = true;
+                state.dataHeatBalHAMTMgr->intvtc(vtcsid) = NumArray(2);
             }
         }
 
@@ -692,35 +620,15 @@ namespace HeatBalanceHAMTManager {
         //       MODIFIED       B. Griffith, Aug 2012 for surface-specific algorithms
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-
         using General::ScanForReports;
 
         // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const adjdist(0.00005); // Allowable distance between two cells, also used as limit on cell length
         static std::string const RoutineName("InitCombinedHeatAndMoistureFiniteElement: ");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int ii;
         int cid;
         int cid1;
@@ -742,11 +650,13 @@ namespace HeatBalanceHAMTManager {
         Real64 waterd; // water density
         bool DoReport;
 
-        deltat = state.dataGlobal->TimeStepZone * 3600.0;
+        auto &cells(state.dataHeatBalHAMTMgr->cells);
+
+        state.dataHeatBalHAMTMgr->deltat = state.dataGlobal->TimeStepZone * 3600.0;
 
         // Check the materials information and work out how many cells are required.
         errorCount = 0;
-        TotCellsMax = 0;
+        state.dataHeatBalHAMTMgr->TotCellsMax = 0;
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
             if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
@@ -825,9 +735,9 @@ namespace HeatBalanceHAMTManager {
                         break;
                     }
                 }
-                TotCellsMax += state.dataMaterial->Material(matid).divs;
+                state.dataHeatBalHAMTMgr->TotCellsMax += state.dataMaterial->Material(matid).divs;
             }
-            TotCellsMax += 7;
+            state.dataHeatBalHAMTMgr->TotCellsMax += 7;
         }
 
         if (errorCount > 0) {
@@ -835,7 +745,7 @@ namespace HeatBalanceHAMTManager {
         }
 
         // Make the cells and initialize
-        cells.allocate(TotCellsMax);
+        cells.allocate(state.dataHeatBalHAMTMgr->TotCellsMax);
         for (auto &e : cells) {
             e.adjs = -1;
             e.adjsl = -1;
@@ -852,8 +762,8 @@ namespace HeatBalanceHAMTManager {
             runor = -0.02;
             // Air Convection Cell
             ++cid;
-            firstcell(sid) = cid;
-            ExtConcell(sid) = cid;
+            state.dataHeatBalHAMTMgr->firstcell(sid) = cid;
+            state.dataHeatBalHAMTMgr->ExtConcell(sid) = cid;
             cells(cid).rh = 0.0;
             cells(cid).sid = sid;
             cells(cid).length(1) = 0.01;
@@ -861,7 +771,7 @@ namespace HeatBalanceHAMTManager {
 
             // Air Radiation Cell
             ++cid;
-            ExtRadcell(sid) = cid;
+            state.dataHeatBalHAMTMgr->ExtRadcell(sid) = cid;
             cells(cid).rh = 0.0;
             cells(cid).sid = sid;
             cells(cid).length(1) = 0.01;
@@ -869,7 +779,7 @@ namespace HeatBalanceHAMTManager {
 
             // Sky Cell
             ++cid;
-            ExtSkycell(sid) = cid;
+            state.dataHeatBalHAMTMgr->ExtSkycell(sid) = cid;
             cells(cid).rh = 0.0;
             cells(cid).sid = sid;
             cells(cid).length(1) = 0.01;
@@ -877,7 +787,7 @@ namespace HeatBalanceHAMTManager {
 
             // Ground Cell
             ++cid;
-            ExtGrncell(sid) = cid;
+            state.dataHeatBalHAMTMgr->ExtGrncell(sid) = cid;
             cells(cid).rh = 0.0;
             cells(cid).sid = sid;
             cells(cid).length(1) = 0.01;
@@ -886,7 +796,7 @@ namespace HeatBalanceHAMTManager {
 
             // External Virtual Cell
             ++cid;
-            Extcell(sid) = cid;
+            state.dataHeatBalHAMTMgr->Extcell(sid) = cid;
             cells(cid).rh = 0.0;
             cells(cid).sid = sid;
             cells(cid).length(1) = 0.01;
@@ -929,7 +839,7 @@ namespace HeatBalanceHAMTManager {
 
             // Interior Virtual Cell
             ++cid;
-            Intcell(sid) = cid;
+            state.dataHeatBalHAMTMgr->Intcell(sid) = cid;
             cells(cid).sid = sid;
             cells(cid).rh = 0.0;
             cells(cid).length(1) = 0.01;
@@ -938,8 +848,8 @@ namespace HeatBalanceHAMTManager {
 
             // Air Convection Cell
             ++cid;
-            lastcell(sid) = cid;
-            IntConcell(sid) = cid;
+            state.dataHeatBalHAMTMgr->lastcell(sid) = cid;
+            state.dataHeatBalHAMTMgr->IntConcell(sid) = cid;
             cells(cid).rh = 0.0;
             cells(cid).sid = sid;
             cells(cid).length(1) = 0.01;
@@ -947,8 +857,8 @@ namespace HeatBalanceHAMTManager {
         }
 
         // Find adjacent cells.
-        for (cid1 = 1; cid1 <= TotCellsMax; ++cid1) {
-            for (cid2 = 1; cid2 <= TotCellsMax; ++cid2) {
+        for (cid1 = 1; cid1 <= state.dataHeatBalHAMTMgr->TotCellsMax; ++cid1) {
+            for (cid2 = 1; cid2 <= state.dataHeatBalHAMTMgr->TotCellsMax; ++cid2) {
                 if ((cid1 != cid2) && (cells(cid1).sid == cells(cid2).sid)) {
                     high1 = cells(cid1).origin(1) + cells(cid1).length(1) / 2.0;
                     low2 = cells(cid2).origin(1) - cells(cid2).length(1) / 2.0;
@@ -989,42 +899,43 @@ namespace HeatBalanceHAMTManager {
             if (!state.dataSurface->Surface(sid).HeatTransSurf) continue;
             if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
             if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
-            cells(Extcell(sid)).origin(1) += cells(Extcell(sid)).length(1) / 2.0;
-            cells(Intcell(sid)).origin(1) -= cells(Intcell(sid)).length(1) / 2.0;
-            cells(Extcell(sid)).volume = 0.0;
-            cells(Intcell(sid)).volume = 0.0;
-            watertot(sid) = 0.0;
-            surfrh(sid) = 0.0;
-            surfextrh(sid) = 0.0;
-            surftemp(sid) = 0.0;
-            surfexttemp(sid) = 0.0;
-            surfvp(sid) = 0.0;
+            cells(state.dataHeatBalHAMTMgr->Extcell(sid)).origin(1) += cells(state.dataHeatBalHAMTMgr->Extcell(sid)).length(1) / 2.0;
+            cells(state.dataHeatBalHAMTMgr->Intcell(sid)).origin(1) -= cells(state.dataHeatBalHAMTMgr->Intcell(sid)).length(1) / 2.0;
+            cells(state.dataHeatBalHAMTMgr->Extcell(sid)).volume = 0.0;
+            cells(state.dataHeatBalHAMTMgr->Intcell(sid)).volume = 0.0;
+            state.dataHeatBalHAMTMgr->watertot(sid) = 0.0;
+            state.dataHeatBalHAMTMgr->surfrh(sid) = 0.0;
+            state.dataHeatBalHAMTMgr->surfextrh(sid) = 0.0;
+            state.dataHeatBalHAMTMgr->surftemp(sid) = 0.0;
+            state.dataHeatBalHAMTMgr->surfexttemp(sid) = 0.0;
+            state.dataHeatBalHAMTMgr->surfvp(sid) = 0.0;
             SetupOutputVariable(state,
-                "HAMT Surface Average Water Content Ratio", OutputProcessor::Unit::kg_kg, watertot(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
-            SetupOutputVariable(state, "HAMT Surface Inside Face Temperature", OutputProcessor::Unit::C, surftemp(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
+                "HAMT Surface Average Water Content Ratio", OutputProcessor::Unit::kg_kg, state.dataHeatBalHAMTMgr->watertot(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
+            SetupOutputVariable(state, "HAMT Surface Inside Face Temperature", OutputProcessor::Unit::C, state.dataHeatBalHAMTMgr->surftemp(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
-                "HAMT Surface Inside Face Relative Humidity", OutputProcessor::Unit::Perc, surfrh(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
+                "HAMT Surface Inside Face Relative Humidity", OutputProcessor::Unit::Perc, state.dataHeatBalHAMTMgr->surfrh(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
-                "HAMT Surface Inside Face Vapor Pressure", OutputProcessor::Unit::Pa, surfvp(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
+                "HAMT Surface Inside Face Vapor Pressure", OutputProcessor::Unit::Pa, state.dataHeatBalHAMTMgr->surfvp(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
-                "HAMT Surface Outside Face Temperature", OutputProcessor::Unit::C, surfexttemp(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
+                "HAMT Surface Outside Face Temperature", OutputProcessor::Unit::C, state.dataHeatBalHAMTMgr->surfexttemp(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
-                "HAMT Surface Outside Face Relative Humidity", OutputProcessor::Unit::Perc, surfextrh(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
+                "HAMT Surface Outside Face Relative Humidity", OutputProcessor::Unit::Perc, state.dataHeatBalHAMTMgr->surfextrh(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
 
             // write cell origins to initialization output file
             conid = state.dataSurface->Surface(sid).Construction;
             print(state.files.eio, "HAMT cells, {},{}", state.dataSurface->Surface(sid).Name, state.dataConstruction->Construct(conid).Name);
-            for (int concell = 1, concell_end = Intcell(sid) - Extcell(sid) + 1; concell <= concell_end; ++concell) {
+            for (int concell = 1, concell_end = state.dataHeatBalHAMTMgr->Intcell(sid) - state.dataHeatBalHAMTMgr->Extcell(sid) + 1; concell <= concell_end; ++concell) {
                 print(state.files.eio, ",{:4}", concell);
             }
             print(state.files.eio, "\n");
             print(state.files.eio, "HAMT origins,{},{}", state.dataSurface->Surface(sid).Name, state.dataConstruction->Construct(conid).Name);
-            for (int cellid = Extcell(sid); cellid <= Intcell(sid); ++cellid) {
+            for (int cellid = state.dataHeatBalHAMTMgr->Extcell(sid); cellid <= state.dataHeatBalHAMTMgr->Intcell(sid); ++cellid) {
                 print(state.files.eio, ",{:10.7F}", cells(cellid).origin(1));
             }
             print(state.files.eio, "\n");
 
-            for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
+            for (int cellid = state.dataHeatBalHAMTMgr->Extcell(sid), concell = 1; cellid <= state.dataHeatBalHAMTMgr->Intcell(sid);
+                 ++cellid, ++concell) {
                 SetupOutputVariable(state,
                                     format("HAMT Surface Temperature Cell {}", concell),
                                     OutputProcessor::Unit::C,
@@ -1033,7 +944,8 @@ namespace HeatBalanceHAMTManager {
                                     "State",
                                     state.dataSurface->Surface(sid).Name);
             }
-            for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
+            for (int cellid = state.dataHeatBalHAMTMgr->Extcell(sid), concell = 1; cellid <= state.dataHeatBalHAMTMgr->Intcell(sid);
+                 ++cellid, ++concell) {
                 SetupOutputVariable(state,
                                     format("HAMT Surface Water Content Cell {}", concell),
                                     OutputProcessor::Unit::kg_kg,
@@ -1042,7 +954,8 @@ namespace HeatBalanceHAMTManager {
                                     "State",
                                     state.dataSurface->Surface(sid).Name);
             }
-            for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
+            for (int cellid = state.dataHeatBalHAMTMgr->Extcell(sid), concell = 1; cellid <= state.dataHeatBalHAMTMgr->Intcell(sid);
+                 ++cellid, ++concell) {
                 SetupOutputVariable(state,
                                     format("HAMT Surface Relative Humidity Cell {}", concell),
                                     OutputProcessor::Unit::Perc,
@@ -1078,12 +991,6 @@ namespace HeatBalanceHAMTManager {
         // PURPOSE OF THIS SUBROUTINE:
         // To calculate the heat and moisture transfer through the surface
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalSurface::SurfQAdditionalHeatSourceInside;
         using DataSurfaces::OtherSideCondModeledExt;
@@ -1094,12 +1001,6 @@ namespace HeatBalanceHAMTManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const HAMTExt("HAMT-Ext");
         static std::string const HAMTInt("HAMT-Int");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TempSurfInP;
@@ -1139,7 +1040,11 @@ namespace HeatBalanceHAMTManager {
         static int qvpErrReport(0);
         Real64 denominator;
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(sid)) {
+        auto &cells(state.dataHeatBalHAMTMgr->cells);
+        auto &Extcell(state.dataHeatBalHAMTMgr->Extcell);
+        auto &Intcell(state.dataHeatBalHAMTMgr->Intcell);
+
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataHeatBalHAMTMgr->MyEnvrnFlag(sid)) {
             cells(Extcell(sid)).rh = 0.0;
             cells(Extcell(sid)).rhp1 = 0.0;
             cells(Extcell(sid)).rhp2 = 0.0;
@@ -1167,44 +1072,44 @@ namespace HeatBalanceHAMTManager {
                 cells(cid).rhp1 = state.dataMaterial->Material(matid).irh;
                 cells(cid).rhp2 = state.dataMaterial->Material(matid).irh;
             }
-            MyEnvrnFlag(sid) = false;
+            state.dataHeatBalHAMTMgr->MyEnvrnFlag(sid) = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(sid) = true;
+            state.dataHeatBalHAMTMgr->MyEnvrnFlag(sid) = true;
         }
 
         // Set all the boundary values
-        cells(ExtRadcell(sid)).temp = TempOutsideAirFD(sid);
-        cells(ExtConcell(sid)).temp = TempOutsideAirFD(sid);
+        cells(state.dataHeatBalHAMTMgr->ExtRadcell(sid)).temp = TempOutsideAirFD(sid);
+        cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).temp = TempOutsideAirFD(sid);
         if (state.dataSurface->Surface(sid).ExtBoundCond == OtherSideCondModeledExt) {
             // CR8046 switch modeled rad temp for sky temp.
-            cells(ExtSkycell(sid)).temp = state.dataSurface->OSCM(state.dataSurface->Surface(sid).OSCMPtr).TRad;
+            cells(state.dataHeatBalHAMTMgr->ExtSkycell(sid)).temp = state.dataSurface->OSCM(state.dataSurface->Surface(sid).OSCMPtr).TRad;
             cells(Extcell(sid)).Qadds = 0.0; // eliminate incident shortwave on underlying surface
         } else {
-            cells(ExtSkycell(sid)).temp = state.dataEnvrn->SkyTemp;
+            cells(state.dataHeatBalHAMTMgr->ExtSkycell(sid)).temp = state.dataEnvrn->SkyTemp;
 
             cells(Extcell(sid)).Qadds = state.dataSurface->Surface(sid).Area * SurfOpaqQRadSWOutAbs(sid);
         }
 
-        cells(ExtGrncell(sid)).temp = TempOutsideAirFD(sid);
+        cells(state.dataHeatBalHAMTMgr->ExtGrncell(sid)).temp = TempOutsideAirFD(sid);
         RhoOut = RhoVaporAirOut(sid);
 
         // Special case when the surface is an internal mass
         if (state.dataSurface->Surface(sid).ExtBoundCond == sid) {
-            cells(ExtConcell(sid)).temp = state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone);
+            cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).temp = state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone);
             RhoOut = RhoVaporAirIn(sid);
         }
 
         RhoIn = RhoVaporAirIn(sid);
 
-        cells(ExtRadcell(sid)).htc = HAirFD(sid);
-        cells(ExtConcell(sid)).htc = HConvExtFD(sid);
-        cells(ExtSkycell(sid)).htc = HSkyFD(sid);
-        cells(ExtGrncell(sid)).htc = HGrndFD(sid);
+        cells(state.dataHeatBalHAMTMgr->ExtRadcell(sid)).htc = HAirFD(sid);
+        cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).htc = HConvExtFD(sid);
+        cells(state.dataHeatBalHAMTMgr->ExtSkycell(sid)).htc = HSkyFD(sid);
+        cells(state.dataHeatBalHAMTMgr->ExtGrncell(sid)).htc = HGrndFD(sid);
 
-        cells(IntConcell(sid)).temp = state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone);
+        cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).temp = state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone);
 
-        cells(IntConcell(sid)).htc = HConvInFD(sid);
+        cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).htc = HConvInFD(sid);
 
         cells(Intcell(sid)).Qadds =
             state.dataSurface->Surface(sid).Area * (SurfOpaqQRadSWInAbs(sid) + SurfNetLWRadToSurf(sid) + state.dataHeatBalFanSys->QHTRadSysSurf(sid) + state.dataHeatBalFanSys->QCoolingPanelSurf(sid) + state.dataHeatBalFanSys->QHWBaseboardSurf(sid) +
@@ -1212,47 +1117,51 @@ namespace HeatBalanceHAMTManager {
         // Check, Is this per unit area or for the whole wall.
         //    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)
 
-        cells(ExtConcell(sid)).rh = PsyRhFnTdbRhov(state, cells(ExtConcell(sid)).temp, RhoOut, HAMTExt);
-        cells(IntConcell(sid)).rh = PsyRhFnTdbRhov(state, cells(IntConcell(sid)).temp, RhoIn, HAMTInt);
+        cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).rh =
+            PsyRhFnTdbRhov(state, cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).temp, RhoOut, HAMTExt);
+        cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh =
+            PsyRhFnTdbRhov(state, cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).temp, RhoIn, HAMTInt);
 
-        if (cells(ExtConcell(sid)).rh > rhmax) {
-            cells(ExtConcell(sid)).rh = rhmax;
+        if (cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).rh > rhmax) {
+            cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).rh = rhmax;
         }
-        if (cells(IntConcell(sid)).rh > rhmax) {
-            cells(IntConcell(sid)).rh = rhmax;
+        if (cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh > rhmax) {
+            cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh = rhmax;
         }
 
         // PDB August 2009 Start! Correction for when no vapour transfer coefficient have been defined.
-        if (extvtcflag(sid)) {
-            cells(ExtConcell(sid)).vtc = extvtc(sid);
+        if (state.dataHeatBalHAMTMgr->extvtcflag(sid)) {
+            cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).vtc = state.dataHeatBalHAMTMgr->extvtc(sid);
         } else {
-            if (cells(ExtConcell(sid)).rh > 0) {
-                cells(ExtConcell(sid)).vtc = HMassConvExtFD(sid) * RhoOut / (PsyPsatFnTemp(state, TempOutsideAirFD(sid)) * cells(ExtConcell(sid)).rh);
+            if (cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).rh > 0) {
+                cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).vtc =
+                    HMassConvExtFD(sid) * RhoOut /
+                    (PsyPsatFnTemp(state, TempOutsideAirFD(sid)) * cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).rh);
             } else {
-                cells(ExtConcell(sid)).vtc = 10000.0;
+                cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).vtc = 10000.0;
             }
         }
 
-        if (intvtcflag(sid)) {
-            cells(IntConcell(sid)).vtc = intvtc(sid);
-            HMassConvInFD(sid) = cells(IntConcell(sid)).vtc * PsyPsatFnTemp(state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone)) * cells(IntConcell(sid)).rh / RhoIn;
+        if (state.dataHeatBalHAMTMgr->intvtcflag(sid)) {
+            cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc = state.dataHeatBalHAMTMgr->intvtc(sid);
+            HMassConvInFD(sid) = cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc * PsyPsatFnTemp(state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone)) * cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh / RhoIn;
         } else {
-            if (cells(IntConcell(sid)).rh > 0) {
-                cells(IntConcell(sid)).vtc = HMassConvInFD(sid) * RhoIn / (PsyPsatFnTemp(state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone)) * cells(IntConcell(sid)).rh);
+            if (cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh > 0) {
+                cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc = HMassConvInFD(sid) * RhoIn / (PsyPsatFnTemp(state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone)) * cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh);
             } else {
-                cells(IntConcell(sid)).vtc = 10000.0;
+                cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc = 10000.0;
             }
         }
         // PDB August 2009 End
 
         // Initialise
-        for (cid = firstcell(sid); cid <= Extcell(sid) - 1; ++cid) {
+        for (cid = state.dataHeatBalHAMTMgr->firstcell(sid); cid <= Extcell(sid) - 1; ++cid) {
             cells(cid).tempp1 = cells(cid).temp;
             cells(cid).tempp2 = cells(cid).temp;
             cells(cid).rhp1 = cells(cid).rh;
             cells(cid).rhp2 = cells(cid).rh;
         }
-        for (cid = Intcell(sid) + 1; cid <= lastcell(sid); ++cid) {
+        for (cid = Intcell(sid) + 1; cid <= state.dataHeatBalHAMTMgr->lastcell(sid); ++cid) {
             cells(cid).tempp1 = cells(cid).temp;
             cells(cid).tempp2 = cells(cid).temp;
             cells(cid).rhp1 = cells(cid).rh;
@@ -1264,7 +1173,7 @@ namespace HeatBalanceHAMTManager {
             ++itter;
             // Update Moisture values
 
-            for (cid = firstcell(sid); cid <= lastcell(sid); ++cid) {
+            for (cid = state.dataHeatBalHAMTMgr->firstcell(sid); cid <= state.dataHeatBalHAMTMgr->lastcell(sid); ++cid) {
                 matid = cells(cid).matid;
                 cells(cid).vp = RHtoVP(state, cells(cid).rh, cells(cid).temp);
                 cells(cid).vpp1 = RHtoVP(state, cells(cid).rhp1, cells(cid).tempp1);
@@ -1272,7 +1181,7 @@ namespace HeatBalanceHAMTManager {
                 if (matid > 0) {
                     interp(
                         state.dataMaterial->Material(matid).niso, state.dataMaterial->Material(matid).isorh, state.dataMaterial->Material(matid).isodata, cells(cid).rhp1, cells(cid).water, cells(cid).dwdphi);
-                    if (state.dataEnvrn->IsRain && rainswitch) {
+                    if (state.dataEnvrn->IsRain && state.dataHeatBalHAMTMgr->rainswitch) {
                         interp(state.dataMaterial->Material(matid).nsuc, state.dataMaterial->Material(matid).sucwater, state.dataMaterial->Material(matid).sucdata, cells(cid).water, cells(cid).dw);
                     } else {
                         interp(state.dataMaterial->Material(matid).nred, state.dataMaterial->Material(matid).redwater, state.dataMaterial->Material(matid).reddata, cells(cid).water, cells(cid).dw);
@@ -1338,7 +1247,7 @@ namespace HeatBalanceHAMTManager {
 
                 // calculate the latent heat if wanted and check for divergence
                 qvp = 0.0;
-                if ((cells(cid).matid > 0) && (latswitch)) {
+                if ((cells(cid).matid > 0) && (state.dataHeatBalHAMTMgr->latswitch)) {
                     qvp = vpdiff * whv;
                 }
                 if (std::abs(qvp) > qvplim) {
@@ -1354,7 +1263,8 @@ namespace HeatBalanceHAMTManager {
                 }
 
                 // Calculate the temperature for the next time step
-                cells(cid).tempp1 = (torsum + qvp + cells(cid).Qadds + (tcap * cells(cid).temp / deltat)) / (oorsum + (tcap / deltat));
+                cells(cid).tempp1 = (torsum + qvp + cells(cid).Qadds + (tcap * cells(cid).temp / state.dataHeatBalHAMTMgr->deltat)) /
+                                    (oorsum + (tcap / state.dataHeatBalHAMTMgr->deltat));
             }
 
             // Check for silly temperatures
@@ -1466,9 +1376,9 @@ namespace HeatBalanceHAMTManager {
                 }
 
                 // Calculate the RH for the next time step
-                denominator = (phioosum + vpoosum * cells(cid).vpsat + wcap / deltat);
+                denominator = (phioosum + vpoosum * cells(cid).vpsat + wcap / state.dataHeatBalHAMTMgr->deltat);
                 if (denominator != 0.0) {
-                    cells(cid).rhp1 = (phiorsum + vporsum + (wcap * cells(cid).rh) / deltat) / denominator;
+                    cells(cid).rhp1 = (phiorsum + vporsum + (wcap * cells(cid).rh) / state.dataHeatBalHAMTMgr->deltat) / denominator;
                 } else {
                     ShowSevereError(state, "CalcHeatBalHAMT: demoninator in calculating RH is zero.  Check material properties for accuracy.");
                     ShowContinueError(state, "...Problem occurs in Material=\"" + state.dataMaterial->Material(cells(cid).matid).Name + "\".");
@@ -1493,7 +1403,7 @@ namespace HeatBalanceHAMTManager {
             if (itter > ittermax) {
                 break;
             }
-            for (cid = firstcell(sid); cid <= lastcell(sid); ++cid) {
+            for (cid = state.dataHeatBalHAMTMgr->firstcell(sid); cid <= state.dataHeatBalHAMTMgr->lastcell(sid); ++cid) {
                 cells(cid).tempp2 = cells(cid).tempp1;
                 cells(cid).rhp2 = cells(cid).rhp1;
             }
@@ -1521,27 +1431,6 @@ namespace HeatBalanceHAMTManager {
         // ready for the next itteration.
         // Fill all the report variables
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int cid;
         Real64 watermass;
@@ -1552,26 +1441,29 @@ namespace HeatBalanceHAMTManager {
         // Update Temperatures and RHs. Calculate report variables
         matmass = 0.0;
         watermass = 0.0;
-        for (cid = firstcell(sid); cid <= lastcell(sid); ++cid) {
+        for (cid = state.dataHeatBalHAMTMgr->firstcell(sid); cid <= state.dataHeatBalHAMTMgr->lastcell(sid); ++cid) {
             // fix HAMT values for this surface
-            cells(cid).temp = cells(cid).tempp1;
-            cells(cid).rh = cells(cid).rhp1;
-            cells(cid).rhp = cells(cid).rh * 100.0;
-            if (cells(cid).density > 0.0) {
-                cells(cid).wreport = cells(cid).water / cells(cid).density;
-                watermass += (cells(cid).water * cells(cid).volume);
-                matmass += (cells(cid).density * cells(cid).volume);
+            state.dataHeatBalHAMTMgr->cells(cid).temp = state.dataHeatBalHAMTMgr->cells(cid).tempp1;
+            state.dataHeatBalHAMTMgr->cells(cid).rh = state.dataHeatBalHAMTMgr->cells(cid).rhp1;
+            state.dataHeatBalHAMTMgr->cells(cid).rhp = state.dataHeatBalHAMTMgr->cells(cid).rh * 100.0;
+            if (state.dataHeatBalHAMTMgr->cells(cid).density > 0.0) {
+                state.dataHeatBalHAMTMgr->cells(cid).wreport =
+                    state.dataHeatBalHAMTMgr->cells(cid).water / state.dataHeatBalHAMTMgr->cells(cid).density;
+                watermass += (state.dataHeatBalHAMTMgr->cells(cid).water * state.dataHeatBalHAMTMgr->cells(cid).volume);
+                matmass += (state.dataHeatBalHAMTMgr->cells(cid).density * state.dataHeatBalHAMTMgr->cells(cid).volume);
             }
         }
 
-        watertot(sid) = 0.0;
-        if (matmass > 0) watertot(sid) = watermass / matmass;
+        state.dataHeatBalHAMTMgr->watertot(sid) = 0.0;
+        if (matmass > 0) state.dataHeatBalHAMTMgr->watertot(sid) = watermass / matmass;
 
-        surfrh(sid) = 100.0 * cells(Intcell(sid)).rh;
-        surfextrh(sid) = 100.0 * cells(Extcell(sid)).rh;
-        surftemp(sid) = cells(Intcell(sid)).temp;
-        surfexttemp(sid) = cells(Extcell(sid)).temp;
-        surfvp(sid) = RHtoVP(state, cells(Intcell(sid)).rh, cells(Intcell(sid)).temp);
+        state.dataHeatBalHAMTMgr->surfrh(sid) = 100.0 * state.dataHeatBalHAMTMgr->cells(state.dataHeatBalHAMTMgr->Intcell(sid)).rh;
+        state.dataHeatBalHAMTMgr->surfextrh(sid) = 100.0 * state.dataHeatBalHAMTMgr->cells(state.dataHeatBalHAMTMgr->Extcell(sid)).rh;
+        state.dataHeatBalHAMTMgr->surftemp(sid) = state.dataHeatBalHAMTMgr->cells(state.dataHeatBalHAMTMgr->Intcell(sid)).temp;
+        state.dataHeatBalHAMTMgr->surfexttemp(sid) = state.dataHeatBalHAMTMgr->cells(state.dataHeatBalHAMTMgr->Extcell(sid)).temp;
+        state.dataHeatBalHAMTMgr->surfvp(sid) = RHtoVP(state,
+                                                       state.dataHeatBalHAMTMgr->cells(state.dataHeatBalHAMTMgr->Intcell(sid)).rh,
+                                                       state.dataHeatBalHAMTMgr->cells(state.dataHeatBalHAMTMgr->Intcell(sid)).temp);
     }
 
     void interp(int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad)
@@ -1589,30 +1481,12 @@ namespace HeatBalanceHAMTManager {
         // METHODOLOGY EMPLOYED:
         // Simple search
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(xx, ndata);
         EP_SIZE_CHECK(yy, ndata);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Real64 xxlow;
         Real64 xxhigh;
         Real64 yylow;
@@ -1660,32 +1534,10 @@ namespace HeatBalanceHAMTManager {
         // PURPOSE OF THIS FUNCTION:
         // Convert Relative Humidity and Temperature to Vapor Pressure
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 RHtoVP;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
         Real64 VPSat;
 
         VPSat = PsyPsatFnTemp(state, Temperature);
@@ -1707,33 +1559,13 @@ namespace HeatBalanceHAMTManager {
         // To calculate the Water Vapor Diffusion Coefficient in air
         // using the temperature and ambient atmospheric pressor
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         // K?zel, H.M. (1995) Simultaneous Heat and Moisture Transport in Building Components.
         // One- and two-dimensional calculation using simple parameters. IRB Verlag 1995
 
-        // USE STATEMENTS:
-        // na
 
         // Return value
         Real64 WVDC;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         WVDC = (2.e-7 * std::pow(Temperature + DataGlobalConstants::KelvinConv, 0.81)) / ambp;
 

@@ -153,7 +153,6 @@ namespace EnergyPlus::PlantPressureSystem {
         // On FirstHVAC, updates the demand inlet node pressure
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataPlant::DemandSide;
         using DataPlant::SupplySide;
 
@@ -311,8 +310,8 @@ namespace EnergyPlus::PlantPressureSystem {
                     auto const &branch(loop_side.Branch(BranchNum));
                     for (int CompNum = 1, CompNum_end = isize(branch.Comp); CompNum <= CompNum_end; ++CompNum) {
                         auto const &component(branch.Comp(CompNum));
-                        Node(component.NodeNumIn).Press = state.dataEnvrn->StdBaroPress;
-                        Node(component.NodeNumOut).Press = state.dataEnvrn->StdBaroPress;
+                        state.dataLoopNodes->Node(component.NodeNumIn).Press = state.dataEnvrn->StdBaroPress;
+                        state.dataLoopNodes->Node(component.NodeNumOut).Press = state.dataEnvrn->StdBaroPress;
                     }
                 }
             }
@@ -363,7 +362,6 @@ namespace EnergyPlus::PlantPressureSystem {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::PressureCurveValue;
-        using DataLoopNode::Node;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetViscosityGlycol;
 
@@ -396,8 +394,8 @@ namespace EnergyPlus::PlantPressureSystem {
         PressureCurveIndex = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureCurveIndex;
 
         // Get nodal conditions
-        NodeMassFlow = Node(InletNodeNum).MassFlowRate;
-        NodeTemperature = Node(InletNodeNum).Temp;
+        NodeMassFlow = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
+        NodeTemperature = state.dataLoopNodes->Node(InletNodeNum).Temp;
         NodeDensity = GetDensityGlycol(state, std::string(), NodeTemperature, FluidIndex, RoutineName);
         NodeViscosity = GetViscosityGlycol(state, std::string(), NodeTemperature, FluidIndex, RoutineName);
 
@@ -456,7 +454,6 @@ namespace EnergyPlus::PlantPressureSystem {
         // The pressure difference from reference to pump is the new required pump head.
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataPlant::DemandSide;
         using DataPlant::SupplySide;
 
@@ -509,7 +506,7 @@ namespace EnergyPlus::PlantPressureSystem {
                 //*******************!
 
                 //***MIXER SIMULATION***!
-                MixerPressure = Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn).Press;
+                MixerPressure = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn).Press;
                 PassPressureAcrossMixer(state, LoopNum, LoopSideNum, MixerPressure, NumBranches);
                 //**********************!
 
@@ -528,7 +525,7 @@ namespace EnergyPlus::PlantPressureSystem {
                         LoopNum, LoopSideNum, BranchNum, ParallelBranchPressureDrops(ParallelBranchCounter), FoundAPumpOnBranch);
                     // Store the branch inlet pressure so we can pass it properly across the splitter
                     ParallelBranchInletPressures(ParallelBranchCounter) =
-                        Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn).Press;
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn).Press;
                 }
 
                 // Now take max inlet pressure to pass across splitter and max branch pressure for bookkeeping
@@ -643,7 +640,6 @@ namespace EnergyPlus::PlantPressureSystem {
         // Update PlantLoop(:)%LoopSide(:)%Branch(:)%PressureDrop Variable
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataPlant::DemandSide;
         using DataPlant::SupplySide;
 
@@ -686,8 +682,8 @@ namespace EnergyPlus::PlantPressureSystem {
 
         // Otherwise update the inlet node of the last component on the branch with this corrected pressure
         // This essentially sets all the pressure drop on the branch to be accounted for on the last component
-        Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumIn).Press =
-            Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumOut).Press + BranchPressureDrop;
+        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumIn).Press =
+            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumOut).Press + BranchPressureDrop;
 
         // Then Smear any internal nodes with this new node pressure by working backward through
         // all but the last component, and passing node pressure upstream
@@ -701,8 +697,8 @@ namespace EnergyPlus::PlantPressureSystem {
                 }
 
                 // Otherwise just pass pressure upstream and move on
-                Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumIn).Press =
-                    Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumOut).Press;
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumIn).Press =
+                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumOut).Press;
             }
         }
     }
@@ -724,14 +720,11 @@ namespace EnergyPlus::PlantPressureSystem {
         // Note that this is extremely simple, but is set to it's own routine to allow for clarity
         //  when possible expansion occurs during further development
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BranchNum;
 
         for (BranchNum = 2; BranchNum <= NumBranchesOnLoopSide - 1; ++BranchNum) {
-            Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut).Press = MixerPressure;
+            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut).Press = MixerPressure;
         }
     }
 
@@ -752,13 +745,10 @@ namespace EnergyPlus::PlantPressureSystem {
         // Note that this is extremely simple, but is set to it's own routine to allow for clarity
         //  when possible expansion occurs during further development
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const InletBranchNum(1);
 
-        Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(InletBranchNum).NodeNumOut).Press = SplitterInletPressure;
+        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(InletBranchNum).NodeNumOut).Press = SplitterInletPressure;
     }
 
     //=================================================================================================!
@@ -781,7 +771,6 @@ namespace EnergyPlus::PlantPressureSystem {
         //  when possible expansion occurs during further development
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataPlant::DemandSide;
         using DataPlant::SupplySide;
 
@@ -792,7 +781,7 @@ namespace EnergyPlus::PlantPressureSystem {
         DemandInletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn;
         SupplyOutletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumOut;
 
-        Node(SupplyOutletNodeNum).Press = Node(DemandInletNodeNum).Press;
+        state.dataLoopNodes->Node(SupplyOutletNodeNum).Press = state.dataLoopNodes->Node(DemandInletNodeNum).Press;
     }
 
     Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
@@ -826,7 +815,6 @@ namespace EnergyPlus::PlantPressureSystem {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataLoopNode::Node;
         using DataPlant::SupplySide;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetViscosityGlycol;
@@ -866,7 +854,7 @@ namespace EnergyPlus::PlantPressureSystem {
         SystemPressureDrop = LoopEffectiveK * pow_2(SystemMassFlow);
 
         // Read data off the node data structure
-        NodeTemperature = Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn).Temp;
+        NodeTemperature = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn).Temp;
         NodeDensity = GetDensityGlycol(state, std::string(), NodeTemperature, FluidIndex, RoutineName);
 
         // Store the passed in (requested, design) flow to the local value for performing iterations

@@ -74,7 +74,8 @@ namespace EnergyPlus::PlantUtilities {
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    void InitComponentNodes(Real64 const MinCompMdot,
+    void InitComponentNodes(EnergyPlusData &state,
+                            Real64 const MinCompMdot,
                             Real64 const MaxCompMdot,
                             int const InletNode,                    // component's inlet node index in node structure
                             int const OutletNode,                   // component's outlet node index in node structure
@@ -100,8 +101,6 @@ namespace EnergyPlus::PlantUtilities {
         //  reset inlet node if more restrictive
 
         // Using/Aliasing
-        using DataLoopNode::Node;
-        using DataLoopNode::NodeID;
         using DataPlant::DemandOpSchemeType;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -115,15 +114,15 @@ namespace EnergyPlus::PlantUtilities {
         if (tmpMaxCompMdot < 0.0) tmpMaxCompMdot = 0.0;
 
         // reset outlet node
-        Node(OutletNode).MassFlowRate = 0.0;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
 
-        Node(InletNode).MassFlowRateMin = tmpMinCompMdot;
-        Node(InletNode).MassFlowRateMinAvail = tmpMinCompMdot;
-        Node(InletNode).MassFlowRateMax = tmpMaxCompMdot;
-        Node(InletNode).MassFlowRateMaxAvail = tmpMaxCompMdot;
+        state.dataLoopNodes->Node(InletNode).MassFlowRateMin = tmpMinCompMdot;
+        state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = tmpMinCompMdot;
+        state.dataLoopNodes->Node(InletNode).MassFlowRateMax = tmpMaxCompMdot;
+        state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = tmpMaxCompMdot;
         // reset inlet node, but only change from inlet setting if set and more restrictive
-        Node(InletNode).MassFlowRate = 0.0;
-        Node(InletNode).MassFlowRateRequest = 0.0;
+        state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+        state.dataLoopNodes->Node(InletNode).MassFlowRateRequest = 0.0;
     }
 
     void SetComponentFlowRate(EnergyPlusData &state, Real64 &CompFlow,      // [kg/s]
@@ -147,7 +146,7 @@ namespace EnergyPlus::PlantUtilities {
 
         if (LoopNum == 0) {                 // protect from hard crash below
             if (InletNode > 0) {
-                ShowSevereError(state, "SetComponentFlowRate: trapped plant loop index = 0, check component with inlet node named=" + DataLoopNode::NodeID(InletNode));
+                ShowSevereError(state, "SetComponentFlowRate: trapped plant loop index = 0, check component with inlet node named=" + state.dataLoopNodes->NodeID(InletNode));
             } else {
                 ShowSevereError(state, "SetComponentFlowRate: trapped plant loop node id = 0");
             }
@@ -156,34 +155,34 @@ namespace EnergyPlus::PlantUtilities {
             // ShowFatalError(state, "Preceding loop index error causes program termination");
         }
 
-        Real64 const MdotOldRequest = DataLoopNode::Node(InletNode).MassFlowRateRequest;
+        Real64 const MdotOldRequest = state.dataLoopNodes->Node(InletNode).MassFlowRateRequest;
         auto &loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum));
         auto &comp(loop_side.Branch(BranchIndex).Comp(CompIndex));
 
         if (comp.CurOpSchemeType == DataPlant::DemandOpSchemeType) {
             // store flow request on inlet node
-            DataLoopNode::Node(InletNode).MassFlowRateRequest = CompFlow;
-            DataLoopNode::Node(OutletNode).MassFlowRateMinAvail = max(DataLoopNode::Node(InletNode).MassFlowRateMinAvail, DataLoopNode::Node(InletNode).MassFlowRateMin);
-            DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail = min(DataLoopNode::Node(InletNode).MassFlowRateMaxAvail, DataLoopNode::Node(InletNode).MassFlowRateMax);
+            state.dataLoopNodes->Node(InletNode).MassFlowRateRequest = CompFlow;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = max(state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail, state.dataLoopNodes->Node(InletNode).MassFlowRateMin);
+            state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = min(state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(InletNode).MassFlowRateMax);
             // virtual 2-way valve (was tried but it clamps down demand side component's flow options so they can't find proper solutions)
         } else {
             // lodge the original request for all types
-            DataLoopNode::Node(InletNode).MassFlowRateRequest = CompFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateRequest = CompFlow;
         }
 
         // Update Min/Max Avail
 
-        DataLoopNode::Node(OutletNode).MassFlowRateMinAvail = max(DataLoopNode::Node(InletNode).MassFlowRateMinAvail, DataLoopNode::Node(InletNode).MassFlowRateMin);
-        if (DataLoopNode::Node(InletNode).MassFlowRateMax >= 0.0) {
-            DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail = min(DataLoopNode::Node(InletNode).MassFlowRateMaxAvail, DataLoopNode::Node(InletNode).MassFlowRateMax);
+        state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = max(state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail, state.dataLoopNodes->Node(InletNode).MassFlowRateMin);
+        if (state.dataLoopNodes->Node(InletNode).MassFlowRateMax >= 0.0) {
+            state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = min(state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(InletNode).MassFlowRateMax);
         } else {
             if (!state.dataGlobal->SysSizingCalc && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 // throw error for developers, need to change a component model to set hardware limits on inlet
-                if (!DataLoopNode::Node(InletNode).plantNodeErrorMsgIssued) {
+                if (!state.dataLoopNodes->Node(InletNode).plantNodeErrorMsgIssued) {
                     ShowSevereError(state, "SetComponentFlowRate: check component model implementation for component with inlet node named=" +
-                                            DataLoopNode::NodeID(InletNode));
-                    ShowContinueError(state, format("Inlet node MassFlowRatMax = {:.8R}", DataLoopNode::Node(InletNode).MassFlowRateMax));
-                    DataLoopNode::Node(InletNode).plantNodeErrorMsgIssued = true;
+                                            state.dataLoopNodes->NodeID(InletNode));
+                    ShowContinueError(state, format("Inlet node MassFlowRatMax = {:.8R}", state.dataLoopNodes->Node(InletNode).MassFlowRateMax));
+                    state.dataLoopNodes->Node(InletNode).plantNodeErrorMsgIssued = true;
                 }
             }
         }
@@ -191,15 +190,15 @@ namespace EnergyPlus::PlantUtilities {
         // Set loop flow rate
         if (loop_side.FlowLock == DataPlant::iFlowLock::Unlocked) {
             if (state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
-                DataLoopNode::Node(OutletNode).MassFlowRate = CompFlow;
-                DataLoopNode::Node(InletNode).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRate = CompFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
             } else { // bound the flow by Min/Max available and hardware limits
                 if (comp.FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     // determine highest flow request for all the components on the branch
                     Real64 SeriesBranchHighFlowRequest = 0.0;
-                    Real64 SeriesBranchHardwareMaxLim = DataLoopNode::Node(InletNode).MassFlowRateMax;
+                    Real64 SeriesBranchHardwareMaxLim = state.dataLoopNodes->Node(InletNode).MassFlowRateMax;
                     Real64 SeriesBranchHardwareMinLim = 0.0;
-                    Real64 SeriesBranchMaxAvail = DataLoopNode::Node(InletNode).MassFlowRateMaxAvail;
+                    Real64 SeriesBranchMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
                     Real64 SeriesBranchMinAvail = 0.0;
 
                     // inserting EMS On/Off Supervisory control here to series branch constraint and assuming EMS should shut off flow completely
@@ -209,7 +208,7 @@ namespace EnergyPlus::PlantUtilities {
                     for (int CompNum = 1; CompNum <= loop_side.Branch(BranchIndex).TotalComponents; ++CompNum) {
                         auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));
                         int const CompInletNodeNum = thisComp.NodeNumIn;
-                        auto &thisInletNode(DataLoopNode::Node(CompInletNodeNum));
+                        auto &thisInletNode(state.dataLoopNodes->Node(CompInletNodeNum));
                         SeriesBranchHighFlowRequest = max(thisInletNode.MassFlowRateRequest, SeriesBranchHighFlowRequest);
                         SeriesBranchHardwareMaxLim = min(thisInletNode.MassFlowRateMax, SeriesBranchHardwareMaxLim);
                         SeriesBranchHardwareMinLim = max(thisInletNode.MassFlowRateMin, SeriesBranchHardwareMinLim);
@@ -233,21 +232,21 @@ namespace EnergyPlus::PlantUtilities {
                     CompFlow = min(CompFlow, SeriesBranchMaxAvail);
 
                     if (CompFlow < DataBranchAirLoopPlant::MassFlowTolerance) CompFlow = 0.0;
-                    DataLoopNode::Node(OutletNode).MassFlowRate = CompFlow;
-                    DataLoopNode::Node(InletNode).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
+                    state.dataLoopNodes->Node(OutletNode).MassFlowRate = CompFlow;
+                    state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                     for (int CompNum = 1; CompNum <= loop_side.Branch(BranchIndex).TotalComponents; ++CompNum) {
                         auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));
                         int const CompInletNodeNum = thisComp.NodeNumIn;
                         int const CompOutletNodeNum = thisComp.NodeNumOut;
-                        DataLoopNode::Node(CompInletNodeNum).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
-                        DataLoopNode::Node(CompOutletNodeNum).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
+                        state.dataLoopNodes->Node(CompInletNodeNum).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
+                        state.dataLoopNodes->Node(CompOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                     }
 
                 } else { // not series active
-                    DataLoopNode::Node(OutletNode).MassFlowRate = max(DataLoopNode::Node(OutletNode).MassFlowRateMinAvail, CompFlow);
-                    DataLoopNode::Node(OutletNode).MassFlowRate = max(DataLoopNode::Node(InletNode).MassFlowRateMin, DataLoopNode::Node(OutletNode).MassFlowRate);
-                    DataLoopNode::Node(OutletNode).MassFlowRate = min(DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail, DataLoopNode::Node(OutletNode).MassFlowRate);
-                    DataLoopNode::Node(OutletNode).MassFlowRate = min(DataLoopNode::Node(InletNode).MassFlowRateMax, DataLoopNode::Node(OutletNode).MassFlowRate);
+                    state.dataLoopNodes->Node(OutletNode).MassFlowRate = max(state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail, CompFlow);
+                    state.dataLoopNodes->Node(OutletNode).MassFlowRate = max(state.dataLoopNodes->Node(InletNode).MassFlowRateMin, state.dataLoopNodes->Node(OutletNode).MassFlowRate);
+                    state.dataLoopNodes->Node(OutletNode).MassFlowRate = min(state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(OutletNode).MassFlowRate);
+                    state.dataLoopNodes->Node(OutletNode).MassFlowRate = min(state.dataLoopNodes->Node(InletNode).MassFlowRateMax, state.dataLoopNodes->Node(OutletNode).MassFlowRate);
 
                     // inserting EMS On/Off Supervisory control here to override min constraint assuming EMS should shut off flow completely
                     // action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent)
@@ -260,24 +259,24 @@ namespace EnergyPlus::PlantUtilities {
                     }
 
                     if (EMSLoadOverride) { // actuate EMS controlled components to 0 if On/Off Supervisory control is active off
-                        DataLoopNode::Node(OutletNode).MassFlowRate = 0.0;
+                        state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
                     }
 
-                    if (DataLoopNode::Node(OutletNode).MassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) DataLoopNode::Node(OutletNode).MassFlowRate = 0.0;
-                    CompFlow = DataLoopNode::Node(OutletNode).MassFlowRate;
-                    DataLoopNode::Node(InletNode).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
+                    if (state.dataLoopNodes->Node(OutletNode).MassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
+                    CompFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
+                    state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                 }
             }
         } else if (loop_side.FlowLock == DataPlant::iFlowLock::Locked) {
-            DataLoopNode::Node(OutletNode).MassFlowRate = DataLoopNode::Node(InletNode).MassFlowRate;
-            CompFlow = DataLoopNode::Node(OutletNode).MassFlowRate;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+            CompFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
         } else {
             ShowFatalError(state, "SetComponentFlowRate: Flow lock out of range"); // DEBUG error...should never get here LCOV_EXCL_LINE
         }
 
         if (comp.CurOpSchemeType == DataPlant::DemandOpSchemeType) {
             if ((MdotOldRequest > 0.0) && (CompFlow > 0.0)) { // sure that not coming back from a no flow reset
-                if (std::abs(MdotOldRequest - DataLoopNode::Node(InletNode).MassFlowRateRequest) > DataBranchAirLoopPlant::MassFlowTolerance) { // demand comp changed its flow request
+                if (std::abs(MdotOldRequest - state.dataLoopNodes->Node(InletNode).MassFlowRateRequest) > DataBranchAirLoopPlant::MassFlowTolerance) { // demand comp changed its flow request
                     loop_side.SimLoopSideNeeded = true;
                 }
             }
@@ -308,7 +307,7 @@ namespace EnergyPlus::PlantUtilities {
         // METHODOLOGY EMPLOYED:
         // Set flow on node and branch while honoring constraints on actuated node
 
-        auto &a_node(DataLoopNode::Node(ActuatedNode));
+        auto &a_node(state.dataLoopNodes->Node(ActuatedNode));
         if (LoopNum == 0 || LoopSideNum == 0) {
             // early in simulation before plant loops are setup and found
             a_node.MassFlowRate = CompFlow;
@@ -361,9 +360,9 @@ namespace EnergyPlus::PlantUtilities {
                         if (ActuatedNode == comp.NodeNumIn) {
                             //            ! found controller set to inlet of a component.  now set that component's outlet
                             int const NodeNum = comp.NodeNumOut;
-                            DataLoopNode::Node(NodeNum).MassFlowRateMinAvail = max(a_node.MassFlowRateMinAvail, a_node.MassFlowRateMin);
-                            DataLoopNode::Node(NodeNum).MassFlowRateMaxAvail = min(a_node.MassFlowRateMaxAvail, a_node.MassFlowRateMax);
-                            DataLoopNode::Node(NodeNum).MassFlowRate = a_node.MassFlowRate;
+                            state.dataLoopNodes->Node(NodeNum).MassFlowRateMinAvail = max(a_node.MassFlowRateMinAvail, a_node.MassFlowRateMin);
+                            state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail = min(a_node.MassFlowRateMaxAvail, a_node.MassFlowRateMax);
+                            state.dataLoopNodes->Node(NodeNum).MassFlowRate = a_node.MassFlowRate;
                         }
                     }
                 }
@@ -391,11 +390,11 @@ namespace EnergyPlus::PlantUtilities {
             for (int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum) {
                 auto const &comp(branch.Comp(CompNum));
                 int NodeNum = comp.NodeNumIn;
-                DataLoopNode::Node(NodeNum).MassFlowRate = a_node_MasFlowRate;
-                DataLoopNode::Node(NodeNum).MassFlowRateRequest = a_node_MasFlowRateRequest;
+                state.dataLoopNodes->Node(NodeNum).MassFlowRate = a_node_MasFlowRate;
+                state.dataLoopNodes->Node(NodeNum).MassFlowRateRequest = a_node_MasFlowRateRequest;
                 NodeNum = comp.NodeNumOut;
-                DataLoopNode::Node(NodeNum).MassFlowRate = a_node_MasFlowRate;
-                DataLoopNode::Node(NodeNum).MassFlowRateRequest = a_node_MasFlowRateRequest;
+                state.dataLoopNodes->Node(NodeNum).MassFlowRate = a_node_MasFlowRate;
+                state.dataLoopNodes->Node(NodeNum).MassFlowRateRequest = a_node_MasFlowRateRequest;
             }
         }
     }
@@ -493,9 +492,9 @@ namespace EnergyPlus::PlantUtilities {
                     for (int OutletNum = 1; OutletNum <= NumSplitterOutlets; ++OutletNum) {
                         int const BranchNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.BranchNumOut(OutletNum);
                         int const LastNodeOnBranch = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).NodeNumOut;
-                        SumOutletFlow += DataLoopNode::Node(LastNodeOnBranch).MassFlowRate;
+                        SumOutletFlow += state.dataLoopNodes->Node(LastNodeOnBranch).MassFlowRate;
                     }
-                    Real64 const AbsDifference = std::abs(DataLoopNode::Node(SplitterInletNode).MassFlowRate - SumOutletFlow);
+                    Real64 const AbsDifference = std::abs(state.dataLoopNodes->Node(SplitterInletNode).MassFlowRate - SumOutletFlow);
                     if (AbsDifference > DataPlant::CriteriaDelta_MassFlowRate) {
                         return true;
                     }
@@ -522,7 +521,6 @@ namespace EnergyPlus::PlantUtilities {
         // compare flow rate of splitter inlet to flow rate of mixer outlet
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataPlant::CriteriaDelta_MassFlowRate;
         using DataPlant::DemandSide;
         using DataPlant::SupplySide;
@@ -544,16 +542,16 @@ namespace EnergyPlus::PlantUtilities {
                 // Find splitter inlet node number
                 SplitterInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
 
-                AbsDifference = std::abs(Node(SplitterInletNode).MassFlowRate - Node(MixerOutletNode).MassFlowRate);
+                AbsDifference = std::abs(state.dataLoopNodes->Node(SplitterInletNode).MassFlowRate - state.dataLoopNodes->Node(MixerOutletNode).MassFlowRate);
                 if (AbsDifference > DataBranchAirLoopPlant::MassFlowTolerance) {
                     if (state.dataPlnt->PlantLoop(LoopNum).MFErrIndex1 == 0) {
                         ShowSevereMessage(state, "Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow ");
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, "PlantLoop name= " + state.dataPlnt->PlantLoop(LoopNum).Name);
                         ShowContinueError(state, "Plant Connector:Mixer name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name);
-                        ShowContinueError(state, format("Mixer outlet mass flow rate= {:.6R} {{kg/s}}", Node(MixerOutletNode).MassFlowRate));
+                        ShowContinueError(state, format("Mixer outlet mass flow rate= {:.6R} {{kg/s}}", state.dataLoopNodes->Node(MixerOutletNode).MassFlowRate));
                         ShowContinueError(state, "Plant Connector:Splitter name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name);
-                        ShowContinueError(state, format("Splitter inlet mass flow rate= {:.6R} {{kg/s}}", Node(SplitterInletNode).MassFlowRate));
+                        ShowContinueError(state, format("Splitter inlet mass flow rate= {:.6R} {{kg/s}}", state.dataLoopNodes->Node(SplitterInletNode).MassFlowRate));
                         ShowContinueError(state, format("Difference in two mass flow rates= {:.6R} {{kg/s}}", AbsDifference));
                     }
                     ShowRecurringSevereErrorAtEnd(state, "Plant Flows (Loop=" + state.dataPlnt->PlantLoop(LoopNum).Name +
@@ -569,9 +567,9 @@ namespace EnergyPlus::PlantUtilities {
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, "PlantLoop name= " + state.dataPlnt->PlantLoop(LoopNum).Name);
                         ShowContinueError(state, "Plant Connector:Mixer name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name);
-                        ShowContinueError(state, format("Mixer outlet mass flow rate= {:.6R} {{kg/s}}", Node(MixerOutletNode).MassFlowRate));
+                        ShowContinueError(state, format("Mixer outlet mass flow rate= {:.6R} {{kg/s}}", state.dataLoopNodes->Node(MixerOutletNode).MassFlowRate));
                         ShowContinueError(state, "Plant Connector:Splitter name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name);
-                        ShowContinueError(state, format("Splitter inlet mass flow rate= {:.6R} {{kg/s}}", Node(SplitterInletNode).MassFlowRate));
+                        ShowContinueError(state, format("Splitter inlet mass flow rate= {:.6R} {{kg/s}}", state.dataLoopNodes->Node(SplitterInletNode).MassFlowRate));
                         ShowContinueError(state, format("Difference in two mass flow rates= {:.6R} {{kg/s}}", AbsDifference));
                         ShowFatalError(state, "CheckPlantMixerSplitterConsistency: Simulation terminated because of problems in plant flow resolver");
                     }
@@ -586,11 +584,11 @@ namespace EnergyPlus::PlantUtilities {
                 for (OutletNum = 1; OutletNum <= NumSplitterOutlets; ++OutletNum) {
                     BranchNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.BranchNumOut(OutletNum);
                     LastNodeOnBranch = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut;
-                    SumOutletFlow += Node(LastNodeOnBranch).MassFlowRate;
+                    SumOutletFlow += state.dataLoopNodes->Node(LastNodeOnBranch).MassFlowRate;
                     //  FirstNodeOnBranch= PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%NodeNumIn
                     //  SumInletFlow = SumInletFlow + Node(FirstNodeOnBranch)%MassFlowRate
                 }
-                AbsDifference = std::abs(Node(SplitterInletNode).MassFlowRate - SumOutletFlow);
+                AbsDifference = std::abs(state.dataLoopNodes->Node(SplitterInletNode).MassFlowRate - SumOutletFlow);
                 if (AbsDifference > CriteriaDelta_MassFlowRate) {
                     if (state.dataPlnt->PlantLoop(LoopNum).MFErrIndex2 == 0) {
                         ShowSevereMessage(state, "Plant flows do not resolve -- splitter inlet flow does not match branch outlet flows");
@@ -599,7 +597,7 @@ namespace EnergyPlus::PlantUtilities {
                         ShowContinueError(state, "Plant Connector:Mixer name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name);
                         ShowContinueError(state, format("Sum of Branch outlet mass flow rates= {:.6R} {{kg/s}}", SumOutletFlow));
                         ShowContinueError(state, "Plant Connector:Splitter name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name);
-                        ShowContinueError(state, format("Splitter inlet mass flow rate= {:.6R} {{kg/s}}", Node(SplitterInletNode).MassFlowRate));
+                        ShowContinueError(state, format("Splitter inlet mass flow rate= {:.6R} {{kg/s}}", state.dataLoopNodes->Node(SplitterInletNode).MassFlowRate));
                         ShowContinueError(state, format("Difference in two mass flow rates= {:.6R} {{kg/s}}", AbsDifference));
                     }
                     ShowRecurringSevereErrorAtEnd(state, "Plant Flows (Loop=" + state.dataPlnt->PlantLoop(LoopNum).Name +
@@ -637,8 +635,6 @@ namespace EnergyPlus::PlantUtilities {
         // na
 
         // Using/Aliasing
-        using DataLoopNode::Node;
-        using DataLoopNode::NodeID;
         using DataPlant::DemandSide;
         using DataPlant::SupplySide;
 
@@ -671,28 +667,28 @@ namespace EnergyPlus::PlantUtilities {
         Real64 LoopSupplySideDispatchedCapacity;
 
         makefatalerror = false;
-        if (Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp > (state.dataPlnt->PlantLoop(LoopNum).MaxTemp + OverShootOffset)) {
+        if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp > (state.dataPlnt->PlantLoop(LoopNum).MaxTemp + OverShootOffset)) {
 
             // first stage, throw recurring warning that plant loop is getting out of control
             ShowRecurringWarningErrorAtEnd(state, "Plant loop exceeding upper temperature limit, PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name + "\"",
                                            state.dataPlnt->PlantLoop(LoopNum).MaxTempErrIndex,
-                                           Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
+                                           state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
 
-            if (Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp > (state.dataPlnt->PlantLoop(LoopNum).MaxTemp + FatalOverShootOffset)) {
+            if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp > (state.dataPlnt->PlantLoop(LoopNum).MaxTemp + FatalOverShootOffset)) {
                 hotcold = "hot";
                 makefatalerror = true;
             }
         }
 
-        if (Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp < (state.dataPlnt->PlantLoop(LoopNum).MinTemp - UnderShootOffset)) {
+        if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp < (state.dataPlnt->PlantLoop(LoopNum).MinTemp - UnderShootOffset)) {
 
             // first stage, throw recurring warning that plant loop is getting out of control
             ShowRecurringWarningErrorAtEnd(state, "Plant loop falling below lower temperature limit, PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name + "\"",
                                            state.dataPlnt->PlantLoop(LoopNum).MinTempErrIndex,
                                            _,
-                                           Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
+                                           state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
 
-            if (Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp < (state.dataPlnt->PlantLoop(LoopNum).MinTemp - FatalUnderShootOffset)) {
+            if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp < (state.dataPlnt->PlantLoop(LoopNum).MinTemp - FatalUnderShootOffset)) {
                 hotcold = "cold";
                 makefatalerror = true;
             }
@@ -710,7 +706,7 @@ namespace EnergyPlus::PlantUtilities {
             }
             ShowContinueError(state, "PlantLoop Name (" + DemandSupply + "Side)= " + state.dataPlnt->PlantLoop(LoopNum).Name);
             ShowContinueError(state,
-                              format("PlantLoop Setpoint Temperature={:.1R} {{C}}", Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint));
+                              format("PlantLoop Setpoint Temperature={:.1R} {{C}}", state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint));
             if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).InletNodeSetPt) {
                 ShowContinueError(state, "PlantLoop Inlet Node (SupplySide) has a Setpoint.");
             } else {
@@ -734,13 +730,13 @@ namespace EnergyPlus::PlantUtilities {
             ShowContinueError(state,
                               format("PlantLoop Outlet Node ({}Side) \"{}\" has temperature={:.1R} {{C}}",
                                      DemandSupply,
-                                     NodeID(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut),
-                                     Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp));
+                                     state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut),
+                                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp));
             ShowContinueError(state,
                               format("PlantLoop Inlet Node ({}Side) \"{}\" has temperature={:.1R} {{C}}",
                                      DemandSupply,
-                                     NodeID(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn),
-                                     Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn).Temp));
+                                     state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn),
+                                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn).Temp));
             ShowContinueError(state, format("PlantLoop Minimum Temperature={:.1R} {{C}}", state.dataPlnt->PlantLoop(LoopNum).MinTemp));
             ShowContinueError(state, format("PlantLoop Maximum Temperature={:.1R} {{C}}", state.dataPlnt->PlantLoop(LoopNum).MaxTemp));
             ShowContinueError(state,
@@ -750,8 +746,8 @@ namespace EnergyPlus::PlantUtilities {
             ShowContinueError(state,
                               format("PlantLoop Node ({}Side) \"{}\" has mass flow rate ={:.1R} {{kg/s}}",
                                      DemandSupply,
-                                     NodeID(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut),
-                                     Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).MassFlowRate));
+                                     state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut),
+                                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).MassFlowRate));
             ShowContinueError(state, format("PlantLoop PumpHeat (SupplySide)={:.1R} {{W}}", state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TotalPumpHeat));
             ShowContinueError(state, format("PlantLoop PumpHeat (DemandSide)={:.1R} {{W}}", state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TotalPumpHeat));
             ShowContinueError(state, format("PlantLoop Cooling Demand={:.1R} {{W}}", state.dataPlnt->PlantLoop(LoopNum).CoolingDemand));
@@ -973,7 +969,6 @@ namespace EnergyPlus::PlantUtilities {
         // update outlet conditions if needed or possible
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -987,17 +982,17 @@ namespace EnergyPlus::PlantUtilities {
         Real64 Cp;
 
         // check if any conditions have changed
-        if (Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
 
-        if (Node(OutletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
 
-        if (Node(InletNodeNum).Temp != ModelInletTemp) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(InletNodeNum).Temp != ModelInletTemp) DidAnythingChange = true;
 
-        if (Node(OutletNodeNum).Temp != ModelOutletTemp) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(OutletNodeNum).Temp != ModelOutletTemp) DidAnythingChange = true;
 
         // could also check heat rate agains McDeltaT from node data
 
-        if ((Node(InletNodeNum).MassFlowRate == 0.0) && (ModelCondenserHeatRate > 0.0)) {
+        if ((state.dataLoopNodes->Node(InletNodeNum).MassFlowRate == 0.0) && (ModelCondenserHeatRate > 0.0)) {
 
             // TODO also send a request that condenser loop be made available, interlock message infrastructure??
 
@@ -1006,10 +1001,10 @@ namespace EnergyPlus::PlantUtilities {
 
         if (DidAnythingChange || FirstHVACIteration) {
             // use current mass flow rate and inlet temp from Node and recalculate outlet temp
-            if (Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+            if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // update node outlet conditions
                 Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, ModelInletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
-                Node(OutletNodeNum).Temp = Node(InletNodeNum).Temp + ModelCondenserHeatRate / (Node(InletNodeNum).MassFlowRate * Cp);
+                state.dataLoopNodes->Node(OutletNodeNum).Temp = state.dataLoopNodes->Node(InletNodeNum).Temp + ModelCondenserHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
             }
 
             // set sim flag for this loop
@@ -1059,7 +1054,6 @@ namespace EnergyPlus::PlantUtilities {
         // update outlet conditions if needed or possible
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1073,17 +1067,17 @@ namespace EnergyPlus::PlantUtilities {
         Real64 Cp;                            // local fluid specific heat
 
         // check if any conditions have changed
-        if (Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
 
-        if (Node(OutletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
 
-        if (Node(InletNodeNum).Temp != ModelInletTemp) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(InletNodeNum).Temp != ModelInletTemp) DidAnythingChange = true;
 
-        if (Node(OutletNodeNum).Temp != ModelOutletTemp) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(OutletNodeNum).Temp != ModelOutletTemp) DidAnythingChange = true;
 
         // could also check heat rate against McDeltaT from node data
 
-        if ((Node(InletNodeNum).MassFlowRate == 0.0) && (ModelRecoveryHeatRate > 0.0)) {
+        if ((state.dataLoopNodes->Node(InletNodeNum).MassFlowRate == 0.0) && (ModelRecoveryHeatRate > 0.0)) {
             // no flow but trying to move heat to this loop problem!
 
             DidAnythingChange = true;
@@ -1091,10 +1085,10 @@ namespace EnergyPlus::PlantUtilities {
 
         if (DidAnythingChange || FirstHVACIteration) {
             // use current mass flow rate and inlet temp from Node and recalculate outlet temp
-            if (Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+            if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // update node outlet conditions
                 Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, ModelInletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
-                Node(OutletNodeNum).Temp = Node(InletNodeNum).Temp + ModelRecoveryHeatRate / (Node(InletNodeNum).MassFlowRate * Cp);
+                state.dataLoopNodes->Node(OutletNodeNum).Temp = state.dataLoopNodes->Node(InletNodeNum).Temp + ModelRecoveryHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
             }
 
             // set sim flag for this loop
@@ -1122,7 +1116,7 @@ namespace EnergyPlus::PlantUtilities {
                                                      [[maybe_unused]] int const TypeOfNum,      // Component's type index
                                                      int const InletNodeNum,                    // Component's inlet node pointer
                                                      [[maybe_unused]] int const OutletNodeNum,  // Component's outlet node pointer
-                                                     [[maybe_unused]] int const HeatSourceType, // Type of fluid in Generator loop
+                                                     [[maybe_unused]] DataLoopNode::NodeFluidType const HeatSourceType, // Type of fluid in Generator loop
                                                      Real64 const ModelGeneratorHeatRate,       // model's generator heat rate (W)
                                                      Real64 const ModelMassFlowRate,            // model's generator mass flow rate (kg/s)
                                                      bool const FirstHVACIteration)
@@ -1142,9 +1136,6 @@ namespace EnergyPlus::PlantUtilities {
         // check if anything changed or doesn't agree and set simulation flags.
         // update outlet conditions if needed or possible
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool DidAnythingChange(false); // set to true if conditions changed
         int OtherLoopNum;                     // local loop pointer for remote connected loop
@@ -1152,9 +1143,9 @@ namespace EnergyPlus::PlantUtilities {
         int ConnectLoopNum;                   // local do loop counter
 
         // check if any conditions have changed
-        if (Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
 
-        if ((Node(InletNodeNum).MassFlowRate == 0.0) && (ModelGeneratorHeatRate > 0.0)) {
+        if ((state.dataLoopNodes->Node(InletNodeNum).MassFlowRate == 0.0) && (ModelGeneratorHeatRate > 0.0)) {
 
             //  TODO also send a request that generator loop be made available, interlock message infrastructure??
 
@@ -1409,29 +1400,26 @@ namespace EnergyPlus::PlantUtilities {
         // Copy over state variables but not setpoints
         // derived from adiabatic Pipes
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Node(OutletNodeNum).FluidType = Node(InletNodeNum).FluidType;
+        state.dataLoopNodes->Node(OutletNodeNum).FluidType = state.dataLoopNodes->Node(InletNodeNum).FluidType;
 
-        Node(OutletNodeNum).Temp = Node(InletNodeNum).Temp;
-        Node(OutletNodeNum).MassFlowRate = Node(InletNodeNum).MassFlowRate;
-        Node(OutletNodeNum).Quality = Node(InletNodeNum).Quality;
-        Node(OutletNodeNum).Enthalpy = Node(InletNodeNum).Enthalpy; // should have routines that keep this current with temp?
+        state.dataLoopNodes->Node(OutletNodeNum).Temp = state.dataLoopNodes->Node(InletNodeNum).Temp;
+        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(OutletNodeNum).Quality = state.dataLoopNodes->Node(InletNodeNum).Quality;
+        state.dataLoopNodes->Node(OutletNodeNum).Enthalpy = state.dataLoopNodes->Node(InletNodeNum).Enthalpy; // should have routines that keep this current with temp?
 
-        Node(OutletNodeNum).TempMin = Node(InletNodeNum).TempMin;
-        Node(OutletNodeNum).TempMax = Node(InletNodeNum).TempMax;
-        Node(OutletNodeNum).MassFlowRateMinAvail = max(Node(InletNodeNum).MassFlowRateMin, Node(InletNodeNum).MassFlowRateMinAvail);
-        Node(OutletNodeNum).MassFlowRateMaxAvail = min(Node(InletNodeNum).MassFlowRateMax, Node(InletNodeNum).MassFlowRateMaxAvail);
+        state.dataLoopNodes->Node(OutletNodeNum).TempMin = state.dataLoopNodes->Node(InletNodeNum).TempMin;
+        state.dataLoopNodes->Node(OutletNodeNum).TempMax = state.dataLoopNodes->Node(InletNodeNum).TempMax;
+        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMinAvail = max(state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMin, state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMinAvail);
+        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMaxAvail = min(state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMax, state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail);
 
-        Node(OutletNodeNum).HumRat = Node(InletNodeNum).HumRat; // air only?
+        state.dataLoopNodes->Node(OutletNodeNum).HumRat = state.dataLoopNodes->Node(InletNodeNum).HumRat; // air only?
 
         // Only pass pressure if we aren't doing a pressure simulation
         if (present(LoopNum)) {
             switch (state.dataPlnt->PlantLoop(LoopNum).PressureSimType) {
             case DataPlant::iPressSimType::NoPressure:
-                Node(OutletNodeNum).Press = Node(InletNodeNum).Press;
+                state.dataLoopNodes->Node(OutletNodeNum).Press = state.dataLoopNodes->Node(InletNodeNum).Press;
             default:
                 // Don't do anything
                 break;
@@ -1439,7 +1427,7 @@ namespace EnergyPlus::PlantUtilities {
         }
     }
 
-    Real64 BoundValueToNodeMinMaxAvail(Real64 const ValueToBound, int const NodeNumToBoundWith)
+    Real64 BoundValueToNodeMinMaxAvail(EnergyPlusData &state, Real64 const ValueToBound, int const NodeNumToBoundWith)
     {
 
         // FUNCTION INFORMATION:
@@ -1454,20 +1442,17 @@ namespace EnergyPlus::PlantUtilities {
         // METHODOLOGY EMPLOYED:
         // Bound up to min avail, down to max avail
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
         // Return value
         Real64 BoundedValue;
 
         BoundedValue = ValueToBound;
-        BoundedValue = max(BoundedValue, Node(NodeNumToBoundWith).MassFlowRateMinAvail);
-        BoundedValue = min(BoundedValue, Node(NodeNumToBoundWith).MassFlowRateMaxAvail);
+        BoundedValue = max(BoundedValue, state.dataLoopNodes->Node(NodeNumToBoundWith).MassFlowRateMinAvail);
+        BoundedValue = min(BoundedValue, state.dataLoopNodes->Node(NodeNumToBoundWith).MassFlowRateMaxAvail);
 
         return BoundedValue;
     }
 
-    void TightenNodeMinMaxAvails(int const NodeNum, Real64 const NewMinAvail, Real64 const NewMaxAvail)
+    void TightenNodeMinMaxAvails(EnergyPlusData &state, int const NodeNum, Real64 const NewMinAvail, Real64 const NewMaxAvail)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1484,21 +1469,18 @@ namespace EnergyPlus::PlantUtilities {
         // Pull down node max avail to new max avail if it doesn't violate any other node conditions
         // Assumes that current min/max avails are already honoring hardware min/max values, so they aren't checked here
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 OldMinAvail;
         Real64 OldMaxAvail;
 
-        OldMinAvail = Node(NodeNum).MassFlowRateMinAvail;
-        OldMaxAvail = Node(NodeNum).MassFlowRateMaxAvail;
+        OldMinAvail = state.dataLoopNodes->Node(NodeNum).MassFlowRateMinAvail;
+        OldMaxAvail = state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail;
 
         // If the new min avail is higher than previous, and it isn't higher than the max avail, update MIN AVAIL
-        if ((NewMinAvail > OldMinAvail) && (NewMinAvail <= OldMaxAvail)) Node(NodeNum).MassFlowRateMinAvail = NewMinAvail;
+        if ((NewMinAvail > OldMinAvail) && (NewMinAvail <= OldMaxAvail)) state.dataLoopNodes->Node(NodeNum).MassFlowRateMinAvail = NewMinAvail;
 
         // If the new max avail is lower than previous, and it isn't lower than the min avail, update MAX AVAIL
-        if ((NewMaxAvail < OldMaxAvail) && (NewMaxAvail >= OldMinAvail)) Node(NodeNum).MassFlowRateMaxAvail = NewMaxAvail;
+        if ((NewMaxAvail < OldMaxAvail) && (NewMaxAvail >= OldMinAvail)) state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail = NewMaxAvail;
     }
 
     Real64 BoundValueToWithinTwoValues(Real64 const ValueToBound, Real64 const LowerBound, Real64 const UpperBound)
@@ -1515,9 +1497,6 @@ namespace EnergyPlus::PlantUtilities {
 
         // METHODOLOGY EMPLOYED:
         // Bound up to min and down to max
-
-        // Using/Aliasing
-        using DataLoopNode::Node;
 
         // Return value
         Real64 BoundedValue;
@@ -1590,12 +1569,12 @@ namespace EnergyPlus::PlantUtilities {
                 }
 
                 int InletNodeNum = loop_side.NodeNumIn;
-                Real64 InletNodeTemp = DataLoopNode::Node(InletNodeNum).Temp;
-                Real64 InletNodeMdot = DataLoopNode::Node(InletNodeNum).MassFlowRate;
+                Real64 InletNodeTemp = state.dataLoopNodes->Node(InletNodeNum).Temp;
+                Real64 InletNodeMdot = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
 
                 int OutletNodeNum = loop_side.NodeNumOut;
-                Real64 OutletNodeTemp = DataLoopNode::Node(OutletNodeNum).Temp;
-                Real64 OutletNodeMdot = DataLoopNode::Node(OutletNodeNum).MassFlowRate;
+                Real64 OutletNodeTemp = state.dataLoopNodes->Node(OutletNodeNum).Temp;
+                Real64 OutletNodeMdot = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate;
 
                 rshift1(loop_side.InletNode.TemperatureHistory, InletNodeTemp);
                 rshift1(loop_side.InletNode.MassFlowRateHistory, InletNodeMdot);
@@ -1716,7 +1695,7 @@ namespace EnergyPlus::PlantUtilities {
                 }
                 if (present(InletNodeNumber)) {
                     if (FoundCompName) {
-                        ShowContinueError(state, "Looking for matching inlet Node=\"" + DataLoopNode::NodeID(InletNodeNumber) + "\".");
+                        ShowContinueError(state, "Looking for matching inlet Node=\"" + state.dataLoopNodes->NodeID(InletNodeNumber) + "\".");
                     }
                 }
                 if (present(SingleLoopSearch)) {
@@ -1806,7 +1785,7 @@ namespace EnergyPlus::PlantUtilities {
 
         if (!FoundNode) {
             ShowSevereError(state, "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops");
-            ShowContinueError(state, "Node Name=\"" + DataLoopNode::NodeID(NodeNum) + "\"");
+            ShowContinueError(state, "Node Name=\"" + state.dataLoopNodes->NodeID(NodeNum) + "\"");
             if (!state.dataGlobal->DoingSizing) {
                 ShowContinueError(state, "called by " + CallerName);
             } else {
