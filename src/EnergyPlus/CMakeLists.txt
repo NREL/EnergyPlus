@@ -183,7 +183,6 @@ set(SRC
     DataHVACGlobals.hh
     DataHVACSystems.hh
     DataHeatBalFanSys.hh
-    DataHeatBalSurface.cc
     DataHeatBalSurface.hh
     DataHeatBalance.cc
     DataHeatBalance.hh

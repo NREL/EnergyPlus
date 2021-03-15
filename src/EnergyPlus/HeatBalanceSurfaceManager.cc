@@ -4705,7 +4705,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 auto const &construct(state.dataConstruction->Construct(ConstrNum));
 
                 ++state.dataHeatBalSurf->SUMH(SurfNum);
-                state.dataHeatBalSurfMgr->SumTime(SurfNum) = double(SUMH(SurfNum)) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBalSurfMgr->SumTime(SurfNum) = double(state.dataHeatBalSurf->SUMH(SurfNum)) * state.dataGlobal->TimeStepZone;
 
                 if (SUMH(SurfNum) == construct.NumHistories) {
 
