@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
@@ -73,7 +72,6 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/ExternalInterface.hh>
-#include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
@@ -129,7 +127,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataHeatBalSurface::clear_state();
     DataHVACGlobals::clear_state();
     DataIPShortCuts::clear_state();
-    DataLoopNode::clear_state();
     DataMoistureBalance::clear_state();
     DataOutputs::clear_state();
     DataPhotovoltaics::clear_state();
@@ -144,7 +141,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     ElectricBaseboardRadiator::clear_state();
     EvaporativeFluidCoolers::clear_state();
     ExternalInterface::clear_state();
-    FanCoilUnits::clear_state();
     FaultsManager::clear_state();
     FluidProperties::clear_state();
     Furnaces::clear_state();

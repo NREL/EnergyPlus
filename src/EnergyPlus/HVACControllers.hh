@@ -316,7 +316,7 @@ namespace HVACControllers {
     void TraceIterationStamp(
         EnergyPlusData &state, InputOutputFile &TraceFile, bool FirstHVACIteration, int AirLoopPass, bool AirLoopConverged, int AirLoopNumCalls);
 
-    void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int ControlNum);
+    void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int const ControlNum);
 
     void SetupIndividualControllerTracer(EnergyPlusData &state, int ControlNum);
 

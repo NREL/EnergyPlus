@@ -238,9 +238,9 @@ namespace ChillerExhaustAbsorption {
 
         void calcHeater(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void updateCoolRecords(Real64 MyLoad, bool RunFlag);
+        void updateCoolRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
 
-        void updateHeatRecords(Real64 MyLoad, bool RunFlag);
+        void updateHeatRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
     void GetExhaustAbsorberInput(EnergyPlusData &state);

@@ -499,7 +499,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataHeatBal->TempEffBulkAir.allocate(3);
     DataHeatBalSurface::TempSurfInTmp.allocate(3);
 
@@ -526,14 +526,14 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBal->TempEffBulkAir(surfNum2) = 10.0;
     state->dataHeatBal->TempEffBulkAir(surfNum3) = 10.0;
 
-    DataLoopNode::Node(1).Temp = 20.0;
-    DataLoopNode::Node(2).Temp = 20.0;
-    DataLoopNode::Node(3).Temp = 20.0;
-    DataLoopNode::Node(4).Temp = 20.0;
-    DataLoopNode::Node(1).MassFlowRate = 0.1;
-    DataLoopNode::Node(2).MassFlowRate = 0.1;
-    DataLoopNode::Node(3).MassFlowRate = 0.1;
-    DataLoopNode::Node(4).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(1).Temp = 20.0;
+    state->dataLoopNodes->Node(2).Temp = 20.0;
+    state->dataLoopNodes->Node(3).Temp = 20.0;
+    state->dataLoopNodes->Node(4).Temp = 20.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
     state->dataHeatBal->HConvIn.allocate(3);
     state->dataHeatBal->HConvIn(surfNum1) = 0.5;
@@ -602,20 +602,20 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     EXPECT_NEAR(20.0, state->dataHeatBal->TempEffBulkAir(surfNum2), 0.0001);
     // Calculate temperature based on zone temperature with supply flow rate = 0
-    DataLoopNode::Node(1).MassFlowRate = 0.0;
-    DataLoopNode::Node(2).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     EXPECT_NEAR(25.0, state->dataHeatBal->TempEffBulkAir(surfNum2), 0.0001);
 
     // Adjacent surface
-    DataLoopNode::Node(1).MassFlowRate = 0.1;
-    DataLoopNode::Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
     state->dataSurface->Surface(1).ExtBoundCond = 2;
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     EXPECT_NEAR(20.0, state->dataHeatBal->TempEffBulkAir(surfNum2), 0.0001);
 
-    DataLoopNode::Node(1).MassFlowRate = 0.0;
-    DataLoopNode::Node(2).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
     state->dataSurface->Surface(1).ExtBoundCond = 2;
     state->dataSurface->Surface(2).ExtBoundCond = 1;
     state->dataSurface->Surface(1).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
@@ -2726,7 +2726,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataHeatBal->TempEffBulkAir.allocate(3);
     DataHeatBalSurface::TempSurfInTmp.allocate(3);
 
@@ -2753,14 +2753,14 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBal->TempEffBulkAir(surfNum2) = 10.0;
     state->dataHeatBal->TempEffBulkAir(surfNum3) = 10.0;
 
-    DataLoopNode::Node(1).Temp = 20.0;
-    DataLoopNode::Node(2).Temp = 20.0;
-    DataLoopNode::Node(3).Temp = 20.0;
-    DataLoopNode::Node(4).Temp = 20.0;
-    DataLoopNode::Node(1).MassFlowRate = 0.1;
-    DataLoopNode::Node(2).MassFlowRate = 0.1;
-    DataLoopNode::Node(3).MassFlowRate = 0.1;
-    DataLoopNode::Node(4).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(1).Temp = 20.0;
+    state->dataLoopNodes->Node(2).Temp = 20.0;
+    state->dataLoopNodes->Node(3).Temp = 20.0;
+    state->dataLoopNodes->Node(4).Temp = 20.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
     state->dataHeatBal->HConvIn.allocate(3);
     state->dataHeatBal->HConvIn(surfNum1) = 0.5;

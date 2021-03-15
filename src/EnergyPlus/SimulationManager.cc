@@ -488,7 +488,7 @@ namespace SimulationManager {
                 }
             }
 
-            HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
+            HVACManager::ResetNodeData(state); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
             ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
@@ -2109,16 +2109,13 @@ namespace SimulationManager {
 
         // Using/Aliasing
         using namespace DataBranchNodeConnections;
-        using DataLoopNode::NodeID;
-        using DataLoopNode::NumOfNodes;
-
 
         // Formats
         static constexpr auto Format_702("! <#{0} Node Connections>,<Number of {0} Node Connections>\n");
         static constexpr auto Format_703(
             "! <{} Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>\n");
 
-        state.dataBranchNodeConnections->NonConnectedNodes.dimension(NumOfNodes, true);
+        state.dataBranchNodeConnections->NonConnectedNodes.dimension(state.dataLoopNodes->NumOfNodes, true);
 
         int NumNonParents = 0;
         for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
@@ -2197,7 +2194,7 @@ namespace SimulationManager {
         }
 
         int NumNonConnected = 0;
-        for (int Loop = 1; Loop <= NumOfNodes; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataLoopNodes->NumOfNodes; ++Loop) {
             if (state.dataBranchNodeConnections->NonConnectedNodes(Loop)) ++NumNonConnected;
         }
 
@@ -2207,9 +2204,9 @@ namespace SimulationManager {
             print(state.files.bnd, Format_705, NumNonConnected);
             static constexpr auto Format_706("! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>");
             print(state.files.bnd, "{}\n", Format_706);
-            for (int Loop = 1; Loop <= NumOfNodes; ++Loop) {
+            for (int Loop = 1; Loop <= state.dataLoopNodes->NumOfNodes; ++Loop) {
                 if (!state.dataBranchNodeConnections->NonConnectedNodes(Loop)) continue;
-                print(state.files.bnd, " NonConnected Node,{},{}\n", Loop, NodeID(Loop));
+                print(state.files.bnd, " NonConnected Node,{},{}\n", Loop, state.dataLoopNodes->NodeID(Loop));
             }
         }
 
@@ -2234,8 +2231,6 @@ namespace SimulationManager {
         // Using/Aliasing
         using namespace DataAirLoop;
         using namespace DataBranchNodeConnections;
-        using DataLoopNode::NodeID;
-        using DataLoopNode::NumOfNodes;
         using namespace DataHVACGlobals;
         using namespace DataPlant;
         using namespace DataZoneEquipment;
@@ -2262,7 +2257,10 @@ namespace SimulationManager {
             print(state.files.bnd, "{}\n", "! <Outdoor Air Node>,<NodeNumber>,<Node Name>");
         }
         for (int Count = 1; Count <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++Count) {
-            print(state.files.bnd, " Outdoor Air Node,{},{}\n", state.dataOutAirNodeMgr->OutsideAirNodeList(Count), NodeID(state.dataOutAirNodeMgr->OutsideAirNodeList(Count)));
+            print(state.files.bnd,
+                  " Outdoor Air Node,{},{}\n",
+                  state.dataOutAirNodeMgr->OutsideAirNodeList(Count),
+                  state.dataLoopNodes->NodeID(state.dataOutAirNodeMgr->OutsideAirNodeList(Count)));
         }
         // Component Sets
         print(state.files.bnd, "{}\n", "! ===============================================================");
@@ -2656,19 +2654,19 @@ namespace SimulationManager {
                       state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
                       state.dataZoneEquip->ZoneEquipConfig(Count).EquipListName,
                       state.dataZoneEquip->ZoneEquipConfig(Count).ControlListName,
-                      NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ZoneNode),
+                      state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ZoneNode),
                       state.dataZoneEquip->ZoneEquipConfig(Count).NumInletNodes,
                       state.dataZoneEquip->ZoneEquipConfig(Count).NumExhaustNodes,
                       state.dataZoneEquip->ZoneEquipConfig(Count).NumReturnNodes);
                 for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumInletNodes; ++Count1) {
-                    auto ChrName = NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
+                    auto ChrName = state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
                     if (ChrName == "Undefined") ChrName = "N/A";
                     print(state.files.bnd,
                           "   Controlled Zone Inlet,{},{},{},{},{}\n",
                           Count1,
                           state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
-                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).InletNode(Count1)),
-                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNode),
+                          state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).InletNode(Count1)),
+                          state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNode),
                           ChrName);
                 }
                 for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumExhaustNodes; ++Count1) {
@@ -2676,14 +2674,14 @@ namespace SimulationManager {
                           "   Controlled Zone Exhaust,{},{},{}\n",
                           Count1,
                           state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
-                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ExhaustNode(Count1)));
+                          state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ExhaustNode(Count1)));
                 }
                 for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumReturnNodes; ++Count1) {
                     print(state.files.bnd,
                           "   Controlled Zone Return,{},{},{}\n",
                           Count1,
                           state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
-                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ReturnNode(Count1)));
+                          state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ReturnNode(Count1)));
                 }
             }
 

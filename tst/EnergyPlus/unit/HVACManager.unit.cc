@@ -253,8 +253,8 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataFans->Fan(1).OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataFans->Fan(1).OutletAirTemp, 0.0005);
     state->dataFans->Fan(1).InletNodeNum = 1;
 
-    DataLoopNode::Node.allocate(1);
-    DataLoopNode::Node(1).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node.allocate(1);
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
 
     // Call HVACManager
     ReportAirHeatBalance(*state);

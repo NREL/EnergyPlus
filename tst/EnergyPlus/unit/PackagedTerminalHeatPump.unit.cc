@@ -824,10 +824,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     PrimaryAirMassFlowRate = 0.20;
 
     // set zoneNode air condition
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
     state->dataPTHP->HeatingLoad = false;
     state->dataPTHP->CoolingLoad = false;
@@ -847,30 +847,30 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // initialize mass flow rates
-    Node(state->dataPTHP->PTUnit(1).AirInNode).MassFlowRate = HVACInletMassFlowRate;
-    Node(state->dataPTHP->PTUnit(1).OutsideAirNode).MassFlowRate = PrimaryAirMassFlowRate;
-    Node(state->dataPTHP->PTUnit(1).OutsideAirNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(1).AirInNode).MassFlowRate = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(1).OutsideAirNode).MassFlowRate = PrimaryAirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(1).OutsideAirNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
     state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
     state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
     state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).HumRat = state->dataEnvrn->OutHumRat;
-    Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
-    Node(state->dataPTHP->PTUnit(1).AirInNode).Temp = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
-    Node(state->dataPTHP->PTUnit(1).AirInNode).HumRat = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
-    Node(state->dataPTHP->PTUnit(1).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(1).AirInNode).Temp = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(1).AirInNode).HumRat = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(1).AirInNode).Enthalpy = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
     state->dataSize->SysSizingRunDone = true;
@@ -1170,10 +1170,10 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     //		PrimaryAirMassFlowRate = 0.20;
 
     // set zoneNode air condition
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
     state->dataPTHP->HeatingLoad = false;
     state->dataPTHP->CoolingLoad = false;
@@ -1193,30 +1193,30 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // initialize mass flow rates
-    //		Node( PTUnit( 1 ).AirInNode ).MassFlowRate = HVACInletMassFlowRate;
-    //		Node( PTUnit( 1 ).OutsideAirNode ).MassFlowRate = PrimaryAirMassFlowRate;
-    //		Node( PTUnit( 1 ).OutsideAirNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+    //		state->dataLoopNodes->Node( PTUnit( 1 ).AirInNode ).MassFlowRate = HVACInletMassFlowRate;
+    //		state->dataLoopNodes->Node( PTUnit( 1 ).OutsideAirNode ).MassFlowRate = PrimaryAirMassFlowRate;
+    //		state->dataLoopNodes->Node( PTUnit( 1 ).OutsideAirNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
     state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
     state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
     state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).HumRat = state->dataEnvrn->OutHumRat;
-    Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
-    Node(state->dataPTHP->PTUnit(1).AirInNode).Temp = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
-    Node(state->dataPTHP->PTUnit(1).AirInNode).HumRat = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
-    Node(state->dataPTHP->PTUnit(1).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(1).AirInNode).Temp = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(1).AirInNode).HumRat = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
+    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(1).AirInNode).Enthalpy = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
     state->dataSize->SysSizingRunDone = true;
@@ -1270,13 +1270,13 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0; // set heating load to non-zero value below lower boundary load
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
-    ASSERT_NEAR(Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow, 0.001);
+    ASSERT_NEAR(state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(state->dataPTHP->PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0; // set heating load to just below lower boundary load
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
-    ASSERT_NEAR(Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow, 0.001);
+    ASSERT_NEAR(state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(state->dataPTHP->PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp);
 
     // loads above the lower bounday load should operate above the minimum air flow rate
@@ -1284,7 +1284,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_NEAR(state->dataPTHP->PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp, 0.1);
-    ASSERT_GT(Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow);
+    ASSERT_GT(state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow);
 
     // Boundary load for this system in Region 1 at maximum air flow rate is 2995.2 W (upper boundary load of Region 1)
     // system should operate below the maximum air flow rate at loads less than 2995.2 W
@@ -1292,8 +1292,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_NEAR(state->dataPTHP->PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp, 0.1);
-    ASSERT_GT(Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow);
-    ASSERT_LT(Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow);
+    ASSERT_GT(state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow);
+    ASSERT_LT(state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow);
 
     // Boundary load for this system in Region 1 at maximum air flow rate is 2995.2 W
     // system should operate at maximum air flow rate for loads greater than 2995.2 W
@@ -1302,7 +1302,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_GT(HeatingCoils::HeatingCoil(1).OutletAirTemp, state->dataPTHP->PTUnit(PTUnitNum).DesignMaxOutletTemp);
-    ASSERT_NEAR(Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow, 0.0001);
+    ASSERT_NEAR(state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate, state->dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow, 0.0001);
 }
 
 } // namespace EnergyPlus

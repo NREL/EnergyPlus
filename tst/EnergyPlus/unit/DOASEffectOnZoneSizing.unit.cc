@@ -142,7 +142,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
 TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
 {
 
-    Node.allocate(10);
+    state->dataLoopNodes->Node.allocate(10);
     state->dataSize->ZoneEqSizing.allocate(2);
     state->dataHeatBal->Zone.allocate(2);
     state->dataSize->CalcZoneSizing.allocate(1, 2);
@@ -226,10 +226,10 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASControlStrategy = 3;
     state->dataEnvrn->OutDryBulbTemp = 28.;
     state->dataEnvrn->OutHumRat = 0.017;
-    Node(4).Temp = 22;
-    Node(4).HumRat = 0.008;
-    Node(9).Temp = 22.5;
-    Node(9).HumRat = 0.0085;
+    state->dataLoopNodes->Node(4).Temp = 22;
+    state->dataLoopNodes->Node(4).HumRat = 0.008;
+    state->dataLoopNodes->Node(9).Temp = 22.5;
+    state->dataLoopNodes->Node(9).HumRat = 0.0085;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).ZnCoolDgnSAMethod = 1;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).ZnCoolDgnSAMethod = 2;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).ZnHeatDgnSAMethod = 1;
@@ -251,30 +251,30 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
     state->dataHeatBalFanSys->ZoneMassBalanceFlag(1) = false;
     state->dataHeatBalFanSys->ZoneMassBalanceFlag(2) = false;
-    Node(1).MassFlowRateMin = 0.0;
-    Node(1).MassFlowRateMinAvail = 0.0;
-    Node(1).MassFlowRateMaxAvail = 0.0;
-    Node(1).MassFlowRateMax = 0.0;
-    Node(2).MassFlowRateMin = 0.0;
-    Node(2).MassFlowRateMinAvail = 0.0;
-    Node(2).MassFlowRateMaxAvail = 0.0;
-    Node(2).MassFlowRateMax = 0.0;
-    Node(3).MassFlowRateMin = 0.0;
-    Node(3).MassFlowRateMinAvail = 0.0;
-    Node(3).MassFlowRateMaxAvail = 0.0;
-    Node(3).MassFlowRateMax = 0.0;
-    Node(6).MassFlowRateMin = 0.0;
-    Node(6).MassFlowRateMinAvail = 0.0;
-    Node(6).MassFlowRateMaxAvail = 0.0;
-    Node(6).MassFlowRateMax = 0.0;
-    Node(7).MassFlowRateMin = 0.0;
-    Node(7).MassFlowRateMinAvail = 0.0;
-    Node(7).MassFlowRateMaxAvail = 0.0;
-    Node(7).MassFlowRateMax = 0.0;
-    Node(8).MassFlowRateMin = 0.0;
-    Node(8).MassFlowRateMinAvail = 0.0;
-    Node(8).MassFlowRateMaxAvail = 0.0;
-    Node(8).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRateMin = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRateMinAvail = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(2).MassFlowRateMin = 0.0;
+    state->dataLoopNodes->Node(2).MassFlowRateMinAvail = 0.0;
+    state->dataLoopNodes->Node(2).MassFlowRateMaxAvail = 0.0;
+    state->dataLoopNodes->Node(2).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(3).MassFlowRateMin = 0.0;
+    state->dataLoopNodes->Node(3).MassFlowRateMinAvail = 0.0;
+    state->dataLoopNodes->Node(3).MassFlowRateMaxAvail = 0.0;
+    state->dataLoopNodes->Node(3).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(6).MassFlowRateMin = 0.0;
+    state->dataLoopNodes->Node(6).MassFlowRateMinAvail = 0.0;
+    state->dataLoopNodes->Node(6).MassFlowRateMaxAvail = 0.0;
+    state->dataLoopNodes->Node(6).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(7).MassFlowRateMin = 0.0;
+    state->dataLoopNodes->Node(7).MassFlowRateMinAvail = 0.0;
+    state->dataLoopNodes->Node(7).MassFlowRateMaxAvail = 0.0;
+    state->dataLoopNodes->Node(7).MassFlowRateMax = 0.0;
+    state->dataLoopNodes->Node(8).MassFlowRateMin = 0.0;
+    state->dataLoopNodes->Node(8).MassFlowRateMinAvail = 0.0;
+    state->dataLoopNodes->Node(8).MassFlowRateMaxAvail = 0.0;
+    state->dataLoopNodes->Node(8).MassFlowRateMax = 0.0;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = 0.0;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
     state->dataZoneEquip->ZoneEquipConfig(1).PlenumMassFlow = 0.0;
@@ -315,7 +315,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     EXPECT_NEAR(1444.767, state->dataSize->CalcZoneSizing(1, 2).CoolLoad, .001);
     EXPECT_NEAR(.127528, state->dataSize->CalcZoneSizing(1, 2).CoolMassFlow, .000001);
 
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->CalcZoneSizing.deallocate();
