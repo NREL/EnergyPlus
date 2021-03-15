@@ -677,17 +677,17 @@ namespace LowTempRadiantSystem {
 
             thisRadSys.SurfListName = Alphas(5);
             SurfListNum = 0;
-            if (NumOfSurfaceLists > 0) SurfListNum = UtilityRoutines::FindItemInList(thisRadSys.SurfListName, SurfList);
+            if (state.dataSurfLists->NumOfSurfaceLists > 0) SurfListNum = UtilityRoutines::FindItemInList(thisRadSys.SurfListName, state.dataSurfLists->SurfList);
             if (SurfListNum > 0) { // Found a valid surface list
-                thisRadSys.NumOfSurfaces = SurfList(SurfListNum).NumOfSurfaces;
+                thisRadSys.NumOfSurfaces = state.dataSurfLists->SurfList(SurfListNum).NumOfSurfaces;
                 thisRadSys.SurfacePtr.allocate(thisRadSys.NumOfSurfaces);
                 thisRadSys.SurfaceName.allocate(thisRadSys.NumOfSurfaces);
                 thisRadSys.SurfaceFrac.allocate(thisRadSys.NumOfSurfaces);
                 thisRadSys.NumCircuits.allocate(thisRadSys.NumOfSurfaces);
-                for (SurfNum = 1; SurfNum <= SurfList(SurfListNum).NumOfSurfaces; ++SurfNum) {
-                    thisRadSys.SurfacePtr(SurfNum) = SurfList(SurfListNum).SurfPtr(SurfNum);
-                    thisRadSys.SurfaceName(SurfNum) = SurfList(SurfListNum).SurfName(SurfNum);
-                    thisRadSys.SurfaceFrac(SurfNum) = SurfList(SurfListNum).SurfFlowFrac(SurfNum);
+                for (SurfNum = 1; SurfNum <= state.dataSurfLists->SurfList(SurfListNum).NumOfSurfaces; ++SurfNum) {
+                    thisRadSys.SurfacePtr(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfPtr(SurfNum);
+                    thisRadSys.SurfaceName(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfName(SurfNum);
+                    thisRadSys.SurfaceFrac(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     if (thisRadSys.SurfacePtr(SurfNum) > 0) {
                         Surface(thisRadSys.SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
                     }
@@ -753,10 +753,10 @@ namespace LowTempRadiantSystem {
             thisRadSys.WaterVolFlowMaxHeat = Numbers(3);
 
             thisRadSys.HotWaterInNode = GetOnlySingleNode(state,
-                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             thisRadSys.HotWaterOutNode = GetOnlySingleNode(state,
-                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "Hot Water Nodes");
@@ -799,10 +799,10 @@ namespace LowTempRadiantSystem {
             thisRadSys.WaterVolFlowMaxCool = Numbers(5);
 
             thisRadSys.ColdWaterInNode = GetOnlySingleNode(state,
-                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
 
             thisRadSys.ColdWaterOutNode = GetOnlySingleNode(state,
-                Alphas(9), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                Alphas(9), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
 
             if ((!lAlphaBlanks(8)) || (!lAlphaBlanks(9))) {
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(8), Alphas(9), "Chilled Water Nodes");
@@ -948,18 +948,18 @@ namespace LowTempRadiantSystem {
 
             thisCFloSys.SurfListName = Alphas(5);
             SurfListNum = 0;
-            if (NumOfSurfaceLists > 0) SurfListNum = UtilityRoutines::FindItemInList(thisCFloSys.SurfListName, SurfList);
+            if (state.dataSurfLists->NumOfSurfaceLists > 0) SurfListNum = UtilityRoutines::FindItemInList(thisCFloSys.SurfListName, state.dataSurfLists->SurfList);
             if (SurfListNum > 0) { // Found a valid surface list
-                thisCFloSys.NumOfSurfaces = SurfList(SurfListNum).NumOfSurfaces;
+                thisCFloSys.NumOfSurfaces = state.dataSurfLists->SurfList(SurfListNum).NumOfSurfaces;
                 thisCFloSys.SurfacePtr.allocate(thisCFloSys.NumOfSurfaces);
                 thisCFloSys.SurfaceName.allocate(thisCFloSys.NumOfSurfaces);
                 thisCFloSys.SurfaceFrac.allocate(thisCFloSys.NumOfSurfaces);
                 thisCFloSys.NumCircuits.allocate(thisCFloSys.NumOfSurfaces);
                 MaxCloNumOfSurfaces = max(MaxCloNumOfSurfaces, thisCFloSys.NumOfSurfaces);
-                for (SurfNum = 1; SurfNum <= SurfList(SurfListNum).NumOfSurfaces; ++SurfNum) {
-                    thisCFloSys.SurfacePtr(SurfNum) = SurfList(SurfListNum).SurfPtr(SurfNum);
-                    thisCFloSys.SurfaceName(SurfNum) = SurfList(SurfListNum).SurfName(SurfNum);
-                    thisCFloSys.SurfaceFrac(SurfNum) = SurfList(SurfListNum).SurfFlowFrac(SurfNum);
+                for (SurfNum = 1; SurfNum <= state.dataSurfLists->SurfList(SurfListNum).NumOfSurfaces; ++SurfNum) {
+                    thisCFloSys.SurfacePtr(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfPtr(SurfNum);
+                    thisCFloSys.SurfaceName(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfName(SurfNum);
+                    thisCFloSys.SurfaceFrac(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     thisCFloSys.NumCircuits(SurfNum) = 0.0;
                     if (thisCFloSys.SurfacePtr(SurfNum) != 0) {
                         Surface(thisCFloSys.SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
@@ -1011,10 +1011,10 @@ namespace LowTempRadiantSystem {
 
             // Heating user input data
             thisCFloSys.HotWaterInNode = GetOnlySingleNode(state,
-                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             thisCFloSys.HotWaterOutNode = GetOnlySingleNode(state,
-                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             if ((!lAlphaBlanks(7)) || (!lAlphaBlanks(8))) {
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(7), Alphas(8), "Hot Water Nodes");
@@ -1054,10 +1054,10 @@ namespace LowTempRadiantSystem {
 
             // Cooling user input data
             thisCFloSys.ColdWaterInNode = GetOnlySingleNode(state,
-                Alphas(13), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                Alphas(13), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
 
             thisCFloSys.ColdWaterOutNode = GetOnlySingleNode(state,
-                Alphas(14), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                Alphas(14), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
 
             if ((!lAlphaBlanks(13)) || (!lAlphaBlanks(14))) {
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(13), Alphas(14), "Chilled Water Nodes");
@@ -1164,16 +1164,16 @@ namespace LowTempRadiantSystem {
 
             thisElecSys.SurfListName = Alphas(4);
             SurfListNum = 0;
-            if (NumOfSurfaceLists > 0) SurfListNum = UtilityRoutines::FindItemInList(thisElecSys.SurfListName, SurfList);
+            if (state.dataSurfLists->NumOfSurfaceLists > 0) SurfListNum = UtilityRoutines::FindItemInList(thisElecSys.SurfListName, state.dataSurfLists->SurfList);
             if (SurfListNum > 0) { // Found a valid surface list
-                thisElecSys.NumOfSurfaces = SurfList(SurfListNum).NumOfSurfaces;
+                thisElecSys.NumOfSurfaces = state.dataSurfLists->SurfList(SurfListNum).NumOfSurfaces;
                 thisElecSys.SurfacePtr.allocate(thisElecSys.NumOfSurfaces);
                 thisElecSys.SurfaceName.allocate(thisElecSys.NumOfSurfaces);
                 thisElecSys.SurfaceFrac.allocate(thisElecSys.NumOfSurfaces);
-                for (SurfNum = 1; SurfNum <= SurfList(SurfListNum).NumOfSurfaces; ++SurfNum) {
-                    thisElecSys.SurfacePtr(SurfNum) = SurfList(SurfListNum).SurfPtr(SurfNum);
-                    thisElecSys.SurfaceName(SurfNum) = SurfList(SurfListNum).SurfName(SurfNum);
-                    thisElecSys.SurfaceFrac(SurfNum) = SurfList(SurfListNum).SurfFlowFrac(SurfNum);
+                for (SurfNum = 1; SurfNum <= state.dataSurfLists->SurfList(SurfListNum).NumOfSurfaces; ++SurfNum) {
+                    thisElecSys.SurfacePtr(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfPtr(SurfNum);
+                    thisElecSys.SurfaceName(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfName(SurfNum);
+                    thisElecSys.SurfaceFrac(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                 }
             } else { // User entered a single surface name rather than a surface list
                 thisElecSys.NumOfSurfaces = 1;
@@ -2047,7 +2047,8 @@ namespace LowTempRadiantSystem {
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                            RoutineName);
                     state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxHeat = rho * state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxHeat;
-                    InitComponentNodes(0.0,
+                    InitComponentNodes(state,
+                                       0.0,
                                        state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxHeat,
                                        state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode,
                                        state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterOutNode,
@@ -2063,7 +2064,8 @@ namespace LowTempRadiantSystem {
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                            RoutineName);
                     state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxCool = rho * state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxCool;
-                    InitComponentNodes(0.0,
+                    InitComponentNodes(state,
+                                       0.0,
                                        state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxCool,
                                        state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode,
                                        state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterOutNode,
@@ -2088,7 +2090,8 @@ namespace LowTempRadiantSystem {
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                            RoutineName);
                     state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate = rho * state.dataLowTempRadSys->CFloRadSys(RadSysNum).WaterVolFlowMax;
-                    InitComponentNodes(0.0,
+                    InitComponentNodes(state,
+                                       0.0,
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate,
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode,
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterOutNode,
@@ -2104,7 +2107,8 @@ namespace LowTempRadiantSystem {
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                            RoutineName);
                     state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate = rho * state.dataLowTempRadSys->CFloRadSys(RadSysNum).WaterVolFlowMax;
-                    InitComponentNodes(0.0,
+                    InitComponentNodes(state,
+                                       0.0,
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate,
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode,
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterOutNode,
@@ -2166,7 +2170,8 @@ namespace LowTempRadiantSystem {
 
                 if (!state.dataLowTempRadSys->MyPlantScanFlagHydr(RadSysNum)) {
                     if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode > 0) {
-                        InitComponentNodes(0.0,
+                        InitComponentNodes(state,
+                                           0.0,
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxHeat,
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode,
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterOutNode,
@@ -2176,7 +2181,8 @@ namespace LowTempRadiantSystem {
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWCompNum);
                     }
                     if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode > 0) {
-                        InitComponentNodes(0.0,
+                        InitComponentNodes(state,
+                                           0.0,
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxCool,
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode,
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterOutNode,
@@ -2209,7 +2215,8 @@ namespace LowTempRadiantSystem {
 
                 if (!state.dataLowTempRadSys->MyPlantScanFlagCFlo(RadSysNum)) {
                     if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode > 0) {
-                        InitComponentNodes(0.0,
+                        InitComponentNodes(state,
+                                           0.0,
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate,
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode,
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterOutNode,
@@ -2219,7 +2226,8 @@ namespace LowTempRadiantSystem {
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWCompNum);
                     }
                     if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode > 0) {
-                        InitComponentNodes(0.0,
+                        InitComponentNodes(state,
+                                           0.0,
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate,
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode,
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterOutNode,
@@ -3477,7 +3485,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataHeatBalSurface::TH;
-        using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_CondFD;
         using DataSurfaces::HeatTransferModel_CTF;
         using PlantUtilities::SetComponentFlowRate;
@@ -3540,9 +3547,9 @@ namespace LowTempRadiantSystem {
             }
         }
         ZoneNum = this->ZonePtr;
-        SysWaterMassFlow = Node(WaterNodeIn).MassFlowRate;
-        WaterMassFlow = Node(WaterNodeIn).MassFlowRate / double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier);
-        WaterTempIn = Node(WaterNodeIn).Temp;
+        SysWaterMassFlow = state.dataLoopNodes->Node(WaterNodeIn).MassFlowRate;
+        WaterMassFlow = state.dataLoopNodes->Node(WaterNodeIn).MassFlowRate / double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier);
+        WaterTempIn = state.dataLoopNodes->Node(WaterNodeIn).Temp;
 
         if (WaterMassFlow <= 0.0) {
             // No flow or below minimum allowed so there is no heat source/sink
@@ -3978,7 +3985,6 @@ namespace LowTempRadiantSystem {
         // Using/Aliasing
         using DataHeatBalance::ZoneData;
         using DataHVACGlobals::SmallLoad;
-        using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -4012,6 +4018,7 @@ namespace LowTempRadiantSystem {
 
         ConstantFlowRadDesignData ConstantFlowDesignDataObject{state.dataLowTempRadSys->CflowRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
         auto &Surface(state.dataSurface->Surface);
+        auto &Node(state.dataLoopNodes->Node);
 
         // initialize local variables
         ZoneNum = this->ZonePtr;
@@ -4482,7 +4489,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataHeatBalSurface::TH;
-        using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_CondFD;
         using DataSurfaces::HeatTransferModel_CTF;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -4734,7 +4740,7 @@ namespace LowTempRadiantSystem {
                             SumFlowFracOneMinusCm += (this->SurfaceFrac(RadSurfNum2) * (1.0 - state.dataLowTempRadSys->Cmj(RadSurfNum2)));
                         }
 
-                        LoopTerm = (this->WaterInjectionRate / this->WaterMassFlowRate) * Node(MainLoopNodeIn).Temp +
+                        LoopTerm = (this->WaterInjectionRate / this->WaterMassFlowRate) * state.dataLoopNodes->Node(MainLoopNodeIn).Temp +
                                    (this->PumpHeattoFluid / (this->WaterMassFlowRate * Cp));
 
                         RecircTerm = (this->WaterRecircRate / this->WaterMassFlowRate) * SumFlowFracCkCm;
@@ -5133,7 +5139,6 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
@@ -5148,6 +5153,7 @@ namespace LowTempRadiantSystem {
         int waterOutletNode;  // Node number for the water side outlet of the radiant system
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Node(state.dataLoopNodes->Node);
 
         // For a hydronic system, calculate the water side outlet conditions and set the
         // appropriate conditions on the correct HVAC node.
@@ -5213,7 +5219,6 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
@@ -5237,20 +5242,20 @@ namespace LowTempRadiantSystem {
             if (this->OperatingMode == HeatingMode) {
 
                 // Leave the inlet and outlet flow alone (if high enough) and perform a bypass if more flow than needed
-                if (Node(waterInletNode).MassFlowRate <= this->WaterInjectionRate) {
+                if (state.dataLoopNodes->Node(waterInletNode).MassFlowRate <= this->WaterInjectionRate) {
                     // Note that the water injection rate has already been restricted to the maximum available flow
-                    Node(waterOutletNode).Temp = this->WaterOutletTemp;
+                    state.dataLoopNodes->Node(waterOutletNode).Temp = this->WaterOutletTemp;
                 } else {
                     // Loop is providing more flow than needed so perform a local bypass and
                     // mix the flows to obtain the proper outlet temperature.  In this case,
                     // the mass flow rates on the loop are left alone and the outlet temperature
                     // is calculated from a simple steady-steady, steady-flow energy balance.
-                    bypassMassFlow = Node(waterInletNode).MassFlowRate - this->WaterInjectionRate;
-                    Node(waterOutletNode).Temp = ((bypassMassFlow * Node(waterInletNode).Temp) + (this->WaterInjectionRate * this->WaterOutletTemp)) /
-                                                 (Node(waterOutletNode).MassFlowRate);
+                    bypassMassFlow = state.dataLoopNodes->Node(waterInletNode).MassFlowRate - this->WaterInjectionRate;
+                    state.dataLoopNodes->Node(waterOutletNode).Temp = ((bypassMassFlow * state.dataLoopNodes->Node(waterInletNode).Temp) + (this->WaterInjectionRate * this->WaterOutletTemp)) /
+                                                 (state.dataLoopNodes->Node(waterOutletNode).MassFlowRate);
                 }
             }
-            this->checkForOutOfRangeTemperatureResult(state, Node(waterOutletNode).Temp, Node(waterInletNode).Temp);
+            this->checkForOutOfRangeTemperatureResult(state, state.dataLoopNodes->Node(waterOutletNode).Temp, state.dataLoopNodes->Node(waterInletNode).Temp);
         }
 
         if (this->CoolingSystem) {
@@ -5261,21 +5266,21 @@ namespace LowTempRadiantSystem {
 
             if (this->OperatingMode == CoolingMode) {
 
-                if (Node(waterInletNode).MassFlowRate <= this->WaterInjectionRate) {
+                if (state.dataLoopNodes->Node(waterInletNode).MassFlowRate <= this->WaterInjectionRate) {
                     // Note that the water injection rate has already been restricted to the maximum available flow
 
-                    Node(waterOutletNode).Temp = this->WaterOutletTemp;
+                    state.dataLoopNodes->Node(waterOutletNode).Temp = this->WaterOutletTemp;
                 } else {
                     // Loop is providing more flow than needed so perform a local bypass and
                     // mix the flows to obtain the proper outlet temperature.  In this case,
                     // the mass flow rates on the loop are left alone and the outlet temperature
                     // is calculated from a simple steady-steady, steady-flow energy balance.
-                    bypassMassFlow = Node(waterInletNode).MassFlowRate - this->WaterInjectionRate;
-                    Node(waterOutletNode).Temp = ((bypassMassFlow * Node(waterInletNode).Temp) + (this->WaterInjectionRate * this->WaterOutletTemp)) /
-                                                 (Node(waterOutletNode).MassFlowRate);
+                    bypassMassFlow = state.dataLoopNodes->Node(waterInletNode).MassFlowRate - this->WaterInjectionRate;
+                    state.dataLoopNodes->Node(waterOutletNode).Temp = ((bypassMassFlow * state.dataLoopNodes->Node(waterInletNode).Temp) + (this->WaterInjectionRate * this->WaterOutletTemp)) /
+                                                 (state.dataLoopNodes->Node(waterOutletNode).MassFlowRate);
                 }
 
-                this->checkForOutOfRangeTemperatureResult(state, Node(waterOutletNode).Temp, Node(waterInletNode).Temp);
+                this->checkForOutOfRangeTemperatureResult(state, state.dataLoopNodes->Node(waterOutletNode).Temp, state.dataLoopNodes->Node(waterInletNode).Temp);
             }
         }
     }
@@ -5745,7 +5750,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-        using DataLoopNode::Node;
 
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 
@@ -5759,15 +5763,15 @@ namespace LowTempRadiantSystem {
         this->CoolPower = 0.0;
 
         if (this->OperatingMode == HeatingMode) {
-            this->WaterInletTemp = Node(this->HotWaterInNode).Temp;
-            this->WaterOutletTemp = Node(this->HotWaterOutNode).Temp;
-            this->WaterMassFlowRate = Node(this->HotWaterInNode).MassFlowRate;
+            this->WaterInletTemp = state.dataLoopNodes->Node(this->HotWaterInNode).Temp;
+            this->WaterOutletTemp = state.dataLoopNodes->Node(this->HotWaterOutNode).Temp;
+            this->WaterMassFlowRate = state.dataLoopNodes->Node(this->HotWaterInNode).MassFlowRate;
             this->HeatPower = totalRadSysPower;
 
         } else if (this->OperatingMode == CoolingMode) {
-            this->WaterInletTemp = Node(this->ColdWaterInNode).Temp;
-            this->WaterOutletTemp = Node(this->ColdWaterOutNode).Temp;
-            this->WaterMassFlowRate = Node(this->ColdWaterInNode).MassFlowRate;
+            this->WaterInletTemp = state.dataLoopNodes->Node(this->ColdWaterInNode).Temp;
+            this->WaterOutletTemp = state.dataLoopNodes->Node(this->ColdWaterOutNode).Temp;
+            this->WaterMassFlowRate = state.dataLoopNodes->Node(this->ColdWaterInNode).MassFlowRate;
             this->CoolPower = -totalRadSysPower;
 
         } else { // Not Operating: Leave temperatures at previous values
@@ -5792,7 +5796,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-        using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
 
         auto constexpr routineName("ReportConstantFlowSystem");
@@ -5817,7 +5820,7 @@ namespace LowTempRadiantSystem {
 
         if (this->OperatingMode == HeatingMode) {
             cpFluid = GetSpecificHeatGlycol(
-                state, state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName, Node(this->HotWaterInNode).Temp, state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex, routineName);
+                state, state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName, state.dataLoopNodes->Node(this->HotWaterInNode).Temp, state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex, routineName);
 
             this->HeatPower = totalRadSysPower;
             if (this->PumpMassFlowRate > 0.0) {
@@ -5828,7 +5831,7 @@ namespace LowTempRadiantSystem {
 
         } else if (this->OperatingMode == CoolingMode) {
             cpFluid = GetSpecificHeatGlycol(
-                state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName, Node(this->ColdWaterInNode).Temp, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex, routineName);
+                state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName, state.dataLoopNodes->Node(this->ColdWaterInNode).Temp, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex, routineName);
 
             this->CoolPower = -totalRadSysPower;
             this->PumpInletTemp = this->WaterInletTemp - (this->PumpHeattoFluid / (this->PumpMassFlowRate * cpFluid));

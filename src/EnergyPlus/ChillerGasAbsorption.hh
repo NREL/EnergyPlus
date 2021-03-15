@@ -228,11 +228,13 @@ namespace ChillerGasAbsorption {
 
         void calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void updateCoolRecords(Real64 MyLoad, // current load
+        void updateCoolRecords(EnergyPlusData &state,
+                               Real64 MyLoad, // current load
                                bool RunFlag   // TRUE if Absorber operating
         );
 
-        void updateHeatRecords(Real64 MyLoad, // current load
+        void updateHeatRecords(EnergyPlusData &state,
+                               Real64 MyLoad, // current load
                                bool RunFlag   // TRUE if Absorber operating
         );
     };

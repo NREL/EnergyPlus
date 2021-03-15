@@ -68,7 +68,6 @@
 using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace DataHVACGlobals;
-using DataLoopNode::Node;
 using Psychrometrics::InitializePsychRoutines;
 using Psychrometrics::PsyHFnTdbW;
 using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -154,7 +153,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate = 0.0;
 
     state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
-    Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZT(1) = 10.0;
@@ -165,7 +164,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
 
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataDXCoils->DXCoil(DXCoilNum).AirInNode = 2;
-    Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
     InitializePsychRoutines();
 
     CalcSecondaryDXCoils(*state, DXCoilNum);
@@ -198,7 +197,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
 
     // cleanup
     state->dataDXCoils->DXCoil.deallocate();
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
 }
 TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
 {
@@ -225,7 +224,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate = 0.0;
 
     state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
-    Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZT(1) = 10.0;
@@ -246,7 +245,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
 
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataDXCoils->DXCoil(DXCoilNum).AirInNode = 2;
-    Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
     InitializePsychRoutines();
 
     CalcSecondaryDXCoils(*state, DXCoilNum);
@@ -259,5 +258,5 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilSHRFT.deallocate();
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilSHRFF.deallocate();
     state->dataDXCoils->DXCoil.deallocate();
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
 }
