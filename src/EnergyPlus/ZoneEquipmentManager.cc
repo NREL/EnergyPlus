@@ -3987,14 +3987,10 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 Node(ZoneNode).MassFlowRateMin = TotInletAirMassFlowRateMin;
                 Node(ZoneNode).MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
 
-                if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) {
-                    // do not include adjusted for "balanced" exhaust flow
-                    StdTotalReturnMassFlow = TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate - TotExhaustAirMassFlowRate;
-                } else {
-                    // Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhaust flow
-                    StdTotalReturnMassFlow = TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate -
-                        (TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig( ZoneNum ).ZoneExhBalanced);
-                }
+                // Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhaust flow
+                StdTotalReturnMassFlow = TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate -
+                    (TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExhBalanced);
+
                 if (!state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
                     if (StdTotalReturnMassFlow < 0.0) {
                         state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ExcessZoneExh = -StdTotalReturnMassFlow;
