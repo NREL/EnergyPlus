@@ -1647,7 +1647,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
     EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
-    EXPECT_EQ(DataHeatBalSurface::MaxSurfaceTempLimit, 205.2);
+    EXPECT_EQ(state->dataHeatBalSurf->MaxSurfaceTempLimit, 205.2);
     EXPECT_EQ(state->dataHeatBal->LowHConvLimit, 0.004);
     EXPECT_EQ(state->dataHeatBal->HighHConvLimit, 200.6);
 }
@@ -1896,14 +1896,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
 
     state->dataHeatBal->SurfWinFenLaySurfTempFront.dimension(10, state->dataSurface->TotSurfaces, 0.0);
     state->dataHeatBal->SurfWinFenLaySurfTempBack.dimension(10, state->dataSurface->TotSurfaces, 0.0);
-    DataHeatBalSurface::TH.dimension(2, Construction::MaxCTFTerms, state->dataSurface->TotSurfaces, 0.0);
+    state->dataHeatBalSurf->TH.dimension(2, Construction::MaxCTFTerms, state->dataSurface->TotSurfaces, 0.0);
 
-    DataHeatBalSurface::TH(1,1,1) = 21.0;
-    DataHeatBalSurface::TH(1,1,2) = 22.0;
-    DataHeatBalSurface::TH(1,1,3) = 23.0;
-    DataHeatBalSurface::TH(2,1,1) = 34.0;
-    DataHeatBalSurface::TH(2,1,2) = 35.0;
-    DataHeatBalSurface::TH(2,1,3) = 36.0;
+    state->dataHeatBalSurf->TH(1,1,1) = 21.0;
+    state->dataHeatBalSurf->TH(1,1,2) = 22.0;
+    state->dataHeatBalSurf->TH(1,1,3) = 23.0;
+    state->dataHeatBalSurf->TH(2,1,1) = 34.0;
+    state->dataHeatBalSurf->TH(2,1,2) = 35.0;
+    state->dataHeatBalSurf->TH(2,1,3) = 36.0;
 
     Real64 ZeroResult = 0.0;
 
@@ -1914,8 +1914,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(1,1),ZeroResult,0.0001);
 
     // Second surface is a window so these should be set
-    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(1,2),DataHeatBalSurface::TH(1,1,2),0.0001);
-    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(SurfsForRegWindow,2),DataHeatBalSurface::TH(2,1,2),0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(1, 2), state->dataHeatBalSurf->TH(1, 1, 2), 0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(SurfsForRegWindow, 2), state->dataHeatBalSurf->TH(2, 1, 2), 0.0001);
 
     // Third surface is a window but is also a BSDF (complex window) so these should NOT be set
     EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(1,3),ZeroResult,0.0001);
