@@ -610,7 +610,6 @@ namespace UtilityRoutines {
         using BranchNodeConnections::CheckNodeConnections;
         using BranchNodeConnections::TestCompSetInletOutletNodes;
         using ExternalInterface::CloseSocket;
-        using ExternalInterface::NumExternalInterfaces;
 
         using NodeInputManager::CheckMarkedNodes;
         using NodeInputManager::SetupNodeVarsForReporting;
@@ -740,7 +739,7 @@ namespace UtilityRoutines {
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
         // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
         // indicating that E+ terminated with an error.
-        if (NumExternalInterfaces > 0) CloseSocket(-1);
+        if (state.dataExternalInterface->NumExternalInterfaces > 0) CloseSocket(state, -1);
 
         if (state.dataGlobal->eplusRunningViaAPI) {
             state.files.flushAll();
@@ -800,8 +799,6 @@ namespace UtilityRoutines {
         using namespace DataTimings;
         using namespace DataErrorTracking;
         using ExternalInterface::CloseSocket;
-        using ExternalInterface::haveExternalInterfaceBCVTB;
-        using ExternalInterface::NumExternalInterfaces;
 
         using SolarShading::ReportSurfaceErrors;
 
@@ -889,7 +886,7 @@ namespace UtilityRoutines {
         std::cerr << "EnergyPlus Completed Successfully." << std::endl;
         // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
         // indicating that E+ finished its simulation
-        if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
+        if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
 
         if (state.dataGlobal->eplusRunningViaAPI) {
             state.files.flushAll();
