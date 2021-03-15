@@ -352,16 +352,16 @@ namespace SolarCollectors {
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeType_Water,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        DataLoopNode::NodeFluidType::Water,
+                                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                          ErrorsFound,
                                                                                          CurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeType_Water,
-                                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                                         DataLoopNode::NodeFluidType::Water,
+                                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
 
@@ -607,16 +607,16 @@ namespace SolarCollectors {
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeType_Water,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        DataLoopNode::NodeFluidType::Water,
+                                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
                                                                                          ErrorsFound,
                                                                                          CurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeType_Water,
-                                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                                         DataLoopNode::NodeFluidType::Water,
+                                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
 
@@ -812,7 +812,8 @@ namespace SolarCollectors {
                 this->MassFlowRateMax = BigNumber;
             }
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->MassFlowRateMax,
                                                this->InletNode,
                                                this->OutletNode,
@@ -888,7 +889,7 @@ namespace SolarCollectors {
             this->SetDiffRadFlag = false;
         }
 
-        this->InletTemp = DataLoopNode::Node(this->InletNode).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
 
         this->MassFlowRate = this->MassFlowRateMax;
 
@@ -1969,10 +1970,10 @@ namespace SolarCollectors {
 
         PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
         // Set outlet node variables that are possibly changed
-        DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
             state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, this->OutletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
-        DataLoopNode::Node(this->OutletNode).Enthalpy = Cp * DataLoopNode::Node(this->OutletNode).Temp;
+        state.dataLoopNodes->Node(this->OutletNode).Enthalpy = Cp * state.dataLoopNodes->Node(this->OutletNode).Temp;
     }
 
     void CollectorData::report()

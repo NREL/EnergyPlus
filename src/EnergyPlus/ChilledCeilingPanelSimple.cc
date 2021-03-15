@@ -121,7 +121,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Existing code for hot water baseboard models (radiant-convective variety)
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataPlant::TypeOf_CoolingPanel_Simple;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -177,8 +176,8 @@ namespace EnergyPlus::CoolingPanelSimple {
                 MaxWaterFlow = ThisCP.WaterMassFlowRateMax;
                 MinWaterFlow = 0.0;
             } else {
-                MaxWaterFlow = Node(ThisCP.WaterInletNode).MassFlowRateMaxAvail;
-                MinWaterFlow = Node(ThisCP.WaterInletNode).MassFlowRateMinAvail;
+                MaxWaterFlow = state.dataLoopNodes->Node(ThisCP.WaterInletNode).MassFlowRateMaxAvail;
+                MinWaterFlow = state.dataLoopNodes->Node(ThisCP.WaterInletNode).MassFlowRateMinAvail;
             }
 
             {
@@ -221,9 +220,6 @@ namespace EnergyPlus::CoolingPanelSimple {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeConnectionType_Outlet;
-        using DataLoopNode::NodeType_Water;
         using DataLoopNode::ObjectIsNotParent;
         using DataPlant::TypeOf_CoolingPanel_Simple;
         using NodeInputManager::GetOnlySingleNode;
@@ -321,11 +317,11 @@ namespace EnergyPlus::CoolingPanelSimple {
 
             // Get inlet node number
             ThisCP.WaterInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             // Get outlet node number
             ThisCP.WaterOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, cCMO_CoolingPanel_Simple, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Chilled Water Nodes");
 
             ThisCP.RatedWaterTemp = rNumericArgs(1);
@@ -708,7 +704,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -753,7 +748,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         }
 
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
-        auto &ThisInNode(Node(ThisCP.WaterInletNode));
+        auto &ThisInNode(state.dataLoopNodes->Node(ThisCP.WaterInletNode));
 
         if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
@@ -790,7 +785,8 @@ namespace EnergyPlus::CoolingPanelSimple {
                     rho = GetDensityGlycol(
                         state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::CWInitConvTemp, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                     ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
-                    InitComponentNodes(0.0,
+                    InitComponentNodes(state,
+                                       0.0,
                                        ThisCP.WaterMassFlowRateMax,
                                        ThisCP.WaterInletNode,
                                        ThisCP.WaterOutletNode,
@@ -810,7 +806,8 @@ namespace EnergyPlus::CoolingPanelSimple {
 
             ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                ThisCP.WaterMassFlowRateMax,
                                ThisCP.WaterInletNode,
                                ThisCP.WaterOutletNode,
@@ -1155,7 +1152,6 @@ namespace EnergyPlus::CoolingPanelSimple {
 
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
-        using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using PlantUtilities::SetComponentFlowRate;
@@ -1302,12 +1298,12 @@ namespace EnergyPlus::CoolingPanelSimple {
                 if (MCpEpsAct <= MCpEpsLow) {
                     MCpEpsAct = MCpEpsLow;
                     waterMassFlowRate = 0.0;
-                    Node(this->WaterInletNode).MassFlowRate = 0.0;
+                    state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = 0.0;
                     CoolingPanelOn = false;
                 } else if (MCpEpsAct >= MCpEpsHigh) {
                     MCpEpsAct = MCpEpsHigh;
                     waterMassFlowRate = waterMassFlowRateMax;
-                    Node(this->WaterInletNode).MassFlowRate = waterMassFlowRateMax;
+                    state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = waterMassFlowRateMax;
                 } else {
                     for (iter = 1; iter <= Maxiter; ++iter) {
                         FracGuess = (MCpEpsAct - MCpEpsLow) / (MCpEpsHigh - MCpEpsLow);
@@ -1322,7 +1318,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                         }
                         if (((MCpEpsAct - MCpEpsGuess) / MCpEpsAct) <= IterTol) {
                             waterMassFlowRate = MdotGuess;
-                            Node(this->WaterInletNode).MassFlowRate = waterMassFlowRate;
+                            state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = waterMassFlowRate;
                             break;
                         }
                     }
@@ -1468,7 +1464,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataLoopNode::Node;
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1491,8 +1486,8 @@ namespace EnergyPlus::CoolingPanelSimple {
         WaterInletNode = ThisCP.WaterInletNode;
         WaterOutletNode = ThisCP.WaterOutletNode;
 
-        auto &ThisInNode(Node(WaterInletNode));
-        auto &ThisOutNode(Node(WaterOutletNode));
+        auto &ThisInNode(state.dataLoopNodes->Node(WaterInletNode));
+        auto &ThisOutNode(state.dataLoopNodes->Node(WaterOutletNode));
 
         // Set the outlet water nodes for the panel
         SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);

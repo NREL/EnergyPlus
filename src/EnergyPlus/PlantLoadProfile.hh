@@ -119,7 +119,7 @@ namespace PlantLoadProfile {
 
         void InitPlantProfile(EnergyPlusData &state);
 
-        void UpdatePlantProfile() const;
+        void UpdatePlantProfile(EnergyPlusData &state) const;
 
         void ReportPlantProfile();
     };

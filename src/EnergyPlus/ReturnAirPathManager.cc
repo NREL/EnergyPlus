@@ -148,7 +148,7 @@ namespace ReturnAirPathManager {
                 state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents = nint((NumAlphas - 2.0) / 2.0);
 
                 state.dataZoneEquip->ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(state,
-                    cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                    cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
 
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType = "";
