@@ -219,7 +219,6 @@ set(SRC
     DataSystemVariables.hh
     DataTimings.cc
     DataTimings.hh
-    DataUCSDSharedData.cc
     DataUCSDSharedData.hh
     DataVectorTypes.hh
     DataViewFactorInformation.cc

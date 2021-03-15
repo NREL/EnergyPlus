@@ -1779,7 +1779,6 @@ namespace RoomAirModelManager {
         // na
 
         // Using/Aliasing
-        using namespace DataUCSDSharedData;
         using namespace DataEnvironment;
         using namespace DataHeatBalFanSys;
         using namespace DataSurfaces;
@@ -1818,24 +1817,24 @@ namespace RoomAirModelManager {
 
             state.dataRoomAirModelMgr->MyEnvrnFlag.allocate(state.dataGlobal->NumOfZones);
 
-            APos_Wall.allocate(state.dataSurface->TotSurfaces);
-            APos_Floor.allocate(state.dataSurface->TotSurfaces);
-            APos_Ceiling.allocate(state.dataSurface->TotSurfaces);
-            PosZ_Wall.allocate(state.dataGlobal->NumOfZones * 2);
-            PosZ_Floor.allocate(state.dataGlobal->NumOfZones * 2);
-            PosZ_Ceiling.allocate(state.dataGlobal->NumOfZones * 2);
-            APos_Window.allocate(state.dataSurface->TotSurfaces);
-            APos_Door.allocate(state.dataSurface->TotSurfaces);
-            APos_Internal.allocate(state.dataSurface->TotSurfaces);
-            PosZ_Window.allocate(state.dataGlobal->NumOfZones * 2);
-            PosZ_Door.allocate(state.dataGlobal->NumOfZones * 2);
-            PosZ_Internal.allocate(state.dataGlobal->NumOfZones * 2);
-            HCeiling.allocate(state.dataSurface->TotSurfaces);
-            HWall.allocate(state.dataSurface->TotSurfaces);
-            HFloor.allocate(state.dataSurface->TotSurfaces);
-            HInternal.allocate(state.dataSurface->TotSurfaces);
-            HWindow.allocate(state.dataSurface->TotSurfaces);
-            HDoor.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->APos_Wall.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->APos_Floor.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->APos_Ceiling.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->PosZ_Wall.allocate(state.dataGlobal->NumOfZones * 2);
+            state.dataUCSDShared->PosZ_Floor.allocate(state.dataGlobal->NumOfZones * 2);
+            state.dataUCSDShared->PosZ_Ceiling.allocate(state.dataGlobal->NumOfZones * 2);
+            state.dataUCSDShared->APos_Window.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->APos_Door.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->APos_Internal.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->PosZ_Window.allocate(state.dataGlobal->NumOfZones * 2);
+            state.dataUCSDShared->PosZ_Door.allocate(state.dataGlobal->NumOfZones * 2);
+            state.dataUCSDShared->PosZ_Internal.allocate(state.dataGlobal->NumOfZones * 2);
+            state.dataUCSDShared->HCeiling.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->HWall.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->HFloor.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->HInternal.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->HWindow.allocate(state.dataSurface->TotSurfaces);
+            state.dataUCSDShared->HDoor.allocate(state.dataSurface->TotSurfaces);
 
             AuxSurf.allocate(state.dataGlobal->NumOfZones);
 
@@ -1843,24 +1842,24 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->ZoneCeilingHeight = 0.0;
 
             // Arrays initializations
-            APos_Wall = 0;
-            APos_Floor = 0;
-            APos_Ceiling = 0;
-            PosZ_Wall = 0;
-            PosZ_Floor = 0;
-            PosZ_Ceiling = 0;
-            APos_Window = 0;
-            APos_Door = 0;
-            APos_Internal = 0;
-            PosZ_Window = 0;
-            PosZ_Door = 0;
-            PosZ_Internal = 0;
-            HCeiling = 0.0;
-            HWall = 0.0;
-            HFloor = 0.0;
-            HInternal = 0.0;
-            HWindow = 0.0;
-            HDoor = 0.0;
+            state.dataUCSDShared->APos_Wall = 0;
+            state.dataUCSDShared->APos_Floor = 0;
+            state.dataUCSDShared->APos_Ceiling = 0;
+            state.dataUCSDShared->PosZ_Wall = 0;
+            state.dataUCSDShared->PosZ_Floor = 0;
+            state.dataUCSDShared->PosZ_Ceiling = 0;
+            state.dataUCSDShared->APos_Window = 0;
+            state.dataUCSDShared->APos_Door = 0;
+            state.dataUCSDShared->APos_Internal = 0;
+            state.dataUCSDShared->PosZ_Window = 0;
+            state.dataUCSDShared->PosZ_Door = 0;
+            state.dataUCSDShared->PosZ_Internal = 0;
+            state.dataUCSDShared->HCeiling = 0.0;
+            state.dataUCSDShared->HWall = 0.0;
+            state.dataUCSDShared->HFloor = 0.0;
+            state.dataUCSDShared->HInternal = 0.0;
+            state.dataUCSDShared->HWindow = 0.0;
+            state.dataUCSDShared->HDoor = 0.0;
 
             // Put the surface and zone information in Apos and PosZ arrays
             for (ZNum = 1; ZNum <= state.dataGlobal->NumOfZones; ++ZNum) {
@@ -1906,22 +1905,22 @@ namespace RoomAirModelManager {
                     // Put the reference to this surface in the appropriate array
                     if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Floor) {
                         ++state.dataRoomAirModelMgr->contFloor;
-                        APos_Floor(state.dataRoomAirModelMgr->contFloor) = SurfNum;
+                        state.dataUCSDShared->APos_Floor(state.dataRoomAirModelMgr->contFloor) = SurfNum;
                     } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Wall) {
                         ++state.dataRoomAirModelMgr->contWall;
-                        APos_Wall(state.dataRoomAirModelMgr->contWall) = SurfNum;
+                        state.dataUCSDShared->APos_Wall(state.dataRoomAirModelMgr->contWall) = SurfNum;
                     } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
                         ++state.dataRoomAirModelMgr->contWindow;
-                        APos_Window(state.dataRoomAirModelMgr->contWindow) = SurfNum;
+                        state.dataUCSDShared->APos_Window(state.dataRoomAirModelMgr->contWindow) = SurfNum;
                     } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::IntMass) {
                         ++state.dataRoomAirModelMgr->contInternal;
-                        APos_Internal(state.dataRoomAirModelMgr->contInternal) = SurfNum;
+                        state.dataUCSDShared->APos_Internal(state.dataRoomAirModelMgr->contInternal) = SurfNum;
                     } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Door) {
                         ++state.dataRoomAirModelMgr->contDoor;
-                        APos_Door(state.dataRoomAirModelMgr->contDoor) = SurfNum;
+                        state.dataUCSDShared->APos_Door(state.dataRoomAirModelMgr->contDoor) = SurfNum;
                     } else {
                         ++state.dataRoomAirModelMgr->contCeiling;
-                        APos_Ceiling(state.dataRoomAirModelMgr->contCeiling) = SurfNum;
+                        state.dataUCSDShared->APos_Ceiling(state.dataRoomAirModelMgr->contCeiling) = SurfNum;
                     }
                 } // Surfaces
 
@@ -1933,18 +1932,18 @@ namespace RoomAirModelManager {
                 state.dataRoomAirModelMgr->contInternalLast = state.dataRoomAirModelMgr->contInternal;
                 // PosZ_Wall (... + 1) has the Begin Wall reference in Apos_Wall for the ZNum
                 // PosZ_Wall (... + 2) has the End Wall reference in Apos_Wall for the ZNum
-                PosZ_Wall((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contWallBegin;
-                PosZ_Wall((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contWallLast;
-                PosZ_Floor((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contFloorBegin;
-                PosZ_Floor((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contFloorLast;
-                PosZ_Ceiling((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contCeilingBegin;
-                PosZ_Ceiling((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contCeilingLast;
-                PosZ_Window((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contWindowBegin;
-                PosZ_Window((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contWindowLast;
-                PosZ_Door((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contDoorBegin;
-                PosZ_Door((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contDoorLast;
-                PosZ_Internal((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contInternalBegin;
-                PosZ_Internal((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contInternalLast;
+                state.dataUCSDShared->PosZ_Wall((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contWallBegin;
+                state.dataUCSDShared->PosZ_Wall((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contWallLast;
+                state.dataUCSDShared->PosZ_Floor((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contFloorBegin;
+                state.dataUCSDShared->PosZ_Floor((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contFloorLast;
+                state.dataUCSDShared->PosZ_Ceiling((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contCeilingBegin;
+                state.dataUCSDShared->PosZ_Ceiling((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contCeilingLast;
+                state.dataUCSDShared->PosZ_Window((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contWindowBegin;
+                state.dataUCSDShared->PosZ_Window((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contWindowLast;
+                state.dataUCSDShared->PosZ_Door((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contDoorBegin;
+                state.dataUCSDShared->PosZ_Door((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contDoorLast;
+                state.dataUCSDShared->PosZ_Internal((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->contInternalBegin;
+                state.dataUCSDShared->PosZ_Internal((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->contInternalLast;
                 // Save the highest and lowest height for this zone
                 state.dataRoomAirMod->ZoneCeilingHeight((ZNum - 1) * 2 + 1) = state.dataRoomAirModelMgr->Z1ofZone;
                 state.dataRoomAirMod->ZoneCeilingHeight((ZNum - 1) * 2 + 2) = state.dataRoomAirModelMgr->Z2ofZone;
@@ -2242,12 +2241,12 @@ namespace RoomAirModelManager {
                 state.dataRoomAirMod->ZTFloor = 23.0;
                 state.dataRoomAirMod->HeightTransition = 0.0;
                 state.dataRoomAirMod->Phi = 0.0;
-                HCeiling = 0.0;
-                HWall = 0.0;
-                HFloor = 0.0;
-                HInternal = 0.0;
-                HWindow = 0.0;
-                HDoor = 0.0;
+                state.dataUCSDShared->HCeiling = 0.0;
+                state.dataUCSDShared->HWall = 0.0;
+                state.dataUCSDShared->HFloor = 0.0;
+                state.dataUCSDShared->HInternal = 0.0;
+                state.dataUCSDShared->HWindow = 0.0;
+                state.dataUCSDShared->HDoor = 0.0;
             }
 
             if (any(state.dataRoomAirMod->IsZoneDV)) {
@@ -2553,12 +2552,12 @@ namespace RoomAirModelManager {
                 state.dataRoomAirMod->ZoneCVisMixing = 0.0;
                 state.dataRoomAirMod->Rfr = 10.0;
                 state.dataRoomAirMod->ZoneCVhasREC = 1.0;
-                HCeiling = 0.0;
-                HWall = 0.0;
-                HFloor = 0.0;
-                HInternal = 0.0;
-                HWindow = 0.0;
-                HDoor = 0.0;
+                state.dataUCSDShared->HCeiling = 0.0;
+                state.dataUCSDShared->HWall = 0.0;
+                state.dataUCSDShared->HFloor = 0.0;
+                state.dataUCSDShared->HInternal = 0.0;
+                state.dataUCSDShared->HWindow = 0.0;
+                state.dataUCSDShared->HDoor = 0.0;
 
                 for (state.dataRoomAirModelMgr->Loop = 1; state.dataRoomAirModelMgr->Loop <= state.dataGlobal->NumOfZones;
                      ++state.dataRoomAirModelMgr->Loop) {
@@ -2723,12 +2722,12 @@ namespace RoomAirModelManager {
                 state.dataRoomAirMod->ZTFloor(ZoneNum) = 23.0;
                 state.dataRoomAirMod->HeightTransition(ZoneNum) = 0.0;
                 state.dataRoomAirMod->Phi(ZoneNum) = 0.0;
-                HCeiling = 0.0;
-                HWall = 0.0;
-                HFloor = 0.0;
-                HInternal = 0.0;
-                HWindow = 0.0;
-                HDoor = 0.0;
+                state.dataUCSDShared->HCeiling = 0.0;
+                state.dataUCSDShared->HWall = 0.0;
+                state.dataUCSDShared->HFloor = 0.0;
+                state.dataUCSDShared->HInternal = 0.0;
+                state.dataUCSDShared->HWindow = 0.0;
+                state.dataUCSDShared->HDoor = 0.0;
             }
 
             if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
@@ -2764,12 +2763,12 @@ namespace RoomAirModelManager {
                 state.dataRoomAirMod->ZoneCVisMixing(ZoneNum) = 0.0;
                 state.dataRoomAirMod->Rfr(ZoneNum) = 10.0;
                 state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 1.0;
-                HCeiling = 0.0;
-                HWall = 0.0;
-                HFloor = 0.0;
-                HInternal = 0.0;
-                HWindow = 0.0;
-                HDoor = 0.0;
+                state.dataUCSDShared->HCeiling = 0.0;
+                state.dataUCSDShared->HWall = 0.0;
+                state.dataUCSDShared->HFloor = 0.0;
+                state.dataUCSDShared->HInternal = 0.0;
+                state.dataUCSDShared->HWindow = 0.0;
+                state.dataUCSDShared->HDoor = 0.0;
             }
 
             state.dataRoomAirModelMgr->MyEnvrnFlag(ZoneNum) = false;

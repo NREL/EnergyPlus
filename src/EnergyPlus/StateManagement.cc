@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
@@ -130,7 +129,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataPhotovoltaics::clear_state();
     DataStringGlobals::clear_state();
     DataSystemVariables::clear_state();
-    DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
     DesiccantDehumidifiers::clear_state();
     DisplacementVentMgr::clear_state();
