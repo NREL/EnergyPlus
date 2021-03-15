@@ -127,11 +127,11 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
 
     AirflowNetwork::AirflowNetworkCompData.allocate(3);
     AirflowNetwork::AirflowNetworkCompData(1).TypeNum = 1;
-    AirflowNetwork::AirflowNetworkCompData(1).CompTypeNum = 1;
+    AirflowNetwork::AirflowNetworkCompData(1).CompTypeNum = AirflowNetwork::iComponentTypeNum::DOP;
     AirflowNetwork::AirflowNetworkCompData(2).TypeNum = 1;
-    AirflowNetwork::AirflowNetworkCompData(2).CompTypeNum = 3;
+    AirflowNetwork::AirflowNetworkCompData(2).CompTypeNum = AirflowNetwork::iComponentTypeNum::SCR;
     AirflowNetwork::AirflowNetworkCompData(3).TypeNum = 2;
-    AirflowNetwork::AirflowNetworkCompData(3).CompTypeNum = 2;
+    AirflowNetwork::AirflowNetworkCompData(3).CompTypeNum = AirflowNetwork::iComponentTypeNum::SOP;
 
     state->dataRoomAirMod->SurfParametersCVDV.allocate(2);
     state->dataRoomAirMod->SurfParametersCVDV(1).Width = 22.715219999999999;

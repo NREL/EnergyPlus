@@ -76,15 +76,6 @@ namespace AirflowNetwork {
 
     // MODULE PARAMETER DEFINITIONS:
 
-    // EPlus component Type
-    int const EPlusTypeNum_SCN(1); // Supply connection
-    int const EPlusTypeNum_RCN(2); // Return connection
-    int const EPlusTypeNum_RHT(3); // Reheat terminal
-    int const EPlusTypeNum_FAN(4); // Fan
-    int const EPlusTypeNum_COI(5); // Heating or cooling coil
-    int const EPlusTypeNum_HEX(6); // Heat exchanger
-    int const EPlusTypeNum_RVD(7); // Reheat VAV terminal damper
-
     // EPlus node type
     int const EPlusTypeNum_ZIN(1);  // Zone inlet node
     int const EPlusTypeNum_ZOU(2);  // Zone outlet node

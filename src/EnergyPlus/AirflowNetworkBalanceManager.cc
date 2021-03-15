@@ -4018,7 +4018,7 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).EPlusCompName = "";
             AirflowNetworkCompData(i).EPlusType = "";
             AirflowNetworkCompData(i).CompNum = i;
-            AirflowNetworkCompData(i).EPlusTypeNum = EPlusTypeNum_FAN;
+            AirflowNetworkCompData(i).EPlusTypeNum = iEPlusComponentType::FAN;
         }
 
         j += state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs;
@@ -4032,7 +4032,7 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).EPlusCompName = "";
             AirflowNetworkCompData(i).EPlusType = "";
             AirflowNetworkCompData(i).CompNum = i;
-            AirflowNetworkCompData(i).EPlusTypeNum = EPlusTypeNum_FAN;
+            AirflowNetworkCompData(i).EPlusTypeNum = iEPlusComponentType::FAN;
         }
 
         j += state.dataAirflowNetworkBalanceManager->DisSysNumOfDetFans;
@@ -4059,7 +4059,7 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).EPlusCompName = "";
             AirflowNetworkCompData(i).EPlusType = "";
             AirflowNetworkCompData(i).CompNum = i;
-            AirflowNetworkCompData(i).EPlusTypeNum = EPlusTypeNum_COI;
+            AirflowNetworkCompData(i).EPlusTypeNum = iEPlusComponentType::COI;
         }
 
         j += state.dataAirflowNetworkBalanceManager->DisSysNumOfCoils;
@@ -4073,7 +4073,7 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).EPlusCompName = "";
             AirflowNetworkCompData(i).EPlusType = "";
             AirflowNetworkCompData(i).CompNum = i;
-            AirflowNetworkCompData(i).EPlusTypeNum = EPlusTypeNum_RHT;
+            AirflowNetworkCompData(i).EPlusTypeNum = iEPlusComponentType::RHT;
         }
 
         j += state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits;
@@ -4087,7 +4087,7 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).EPlusCompName = "";
             AirflowNetworkCompData(i).EPlusType = "";
             AirflowNetworkCompData(i).CompNum = i;
-            AirflowNetworkCompData(i).EPlusTypeNum = EPlusTypeNum_HEX;
+            AirflowNetworkCompData(i).EPlusTypeNum = iEPlusComponentType::HEX;
         }
 
         j += state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs;
@@ -6991,7 +6991,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
             // Check reheat unit or coil
-            if (AirflowNetworkCompData(CompNum).EPlusTypeNum == EPlusTypeNum_RHT && (!AirflowNetworkLinkageData(i).VAVTermDamper)) {
+            if (AirflowNetworkCompData(CompNum).EPlusTypeNum == iEPlusComponentType::RHT && (!AirflowNetworkLinkageData(i).VAVTermDamper)) {
                 NF = 0;
                 NT = 0;
                 if (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusNodeNum > 0) {
@@ -7025,21 +7025,21 @@ namespace AirflowNetworkBalanceManager {
             for (j = 1; j <= AirflowNetworkNumOfLinks; ++j) {
                 if (AirflowNetworkLinkageData(j).NodeNums[0] == i || AirflowNetworkLinkageData(j).NodeNums[1] == i) {
                     CompNum = AirflowNetworkLinkageData(j).CompNum;
-                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == EPlusTypeNum_RHT && (!AirflowNetworkLinkageData(j).VAVTermDamper)) {
+                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == iEPlusComponentType::RHT && (!AirflowNetworkLinkageData(j).VAVTermDamper)) {
                         found = true;
                         break;
                     }
                     // Overwrite fan outlet node
-                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == EPlusTypeNum_FAN && AirflowNetworkLinkageData(j).NodeNums[1] == i) {
+                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == iEPlusComponentType::FAN && AirflowNetworkLinkageData(j).NodeNums[1] == i) {
                         found = false;
                         break;
                     }
                     // Overwrite return connection outlet
-                    if (AirflowNetworkLinkageData(j).ConnectionFlag == EPlusTypeNum_RCN) { // Modified on 9/2/09
+                    if (AirflowNetworkLinkageData(j).ConnectionFlag == iEPlusComponentType::RCN) { // Modified on 9/2/09
                         found = true;
                         break;
                     }
-                    if (AirflowNetworkLinkageData(j).ConnectionFlag == EPlusTypeNum_SCN &&
+                    if (AirflowNetworkLinkageData(j).ConnectionFlag == iEPlusComponentType::SCN &&
                         AirflowNetworkLinkageData(j).NodeNums[1] == i) { // Modified on 9/2/09
                         found = true;
                         break;
@@ -7285,7 +7285,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
             // Check reheat unit
-            if (AirflowNetworkCompData(CompNum).EPlusTypeNum == EPlusTypeNum_RHT && (!AirflowNetworkLinkageData(i).VAVTermDamper)) {
+            if (AirflowNetworkCompData(CompNum).EPlusTypeNum == iEPlusComponentType::RHT && (!AirflowNetworkLinkageData(i).VAVTermDamper)) {
                 NF = 0;
                 NT = 0;
                 if (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusNodeNum > 0) {
@@ -7318,21 +7318,21 @@ namespace AirflowNetworkBalanceManager {
             for (j = 1; j <= AirflowNetworkNumOfLinks; ++j) {
                 if (AirflowNetworkLinkageData(j).NodeNums[0] == i || AirflowNetworkLinkageData(j).NodeNums[1] == i) {
                     CompNum = AirflowNetworkLinkageData(j).CompNum;
-                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == EPlusTypeNum_RHT && (!AirflowNetworkLinkageData(j).VAVTermDamper)) {
+                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == iEPlusComponentType::RHT && (!AirflowNetworkLinkageData(j).VAVTermDamper)) {
                         found = true;
                         break;
                     }
                     // Overwrite fan outlet node
-                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == EPlusTypeNum_FAN && AirflowNetworkLinkageData(j).NodeNums[1] == i) {
+                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == iEPlusComponentType::FAN && AirflowNetworkLinkageData(j).NodeNums[1] == i) {
                         found = false;
                         break;
                     }
                     // Overwrite return connection outlet
-                    if (AirflowNetworkLinkageData(j).ConnectionFlag == EPlusTypeNum_RCN) { // Modified on 9/2/09
+                    if (AirflowNetworkLinkageData(j).ConnectionFlag == iEPlusComponentType::RCN) { // Modified on 9/2/09
                         found = true;
                         break;
                     }
-                    if (AirflowNetworkLinkageData(j).ConnectionFlag == EPlusTypeNum_SCN &&
+                    if (AirflowNetworkLinkageData(j).ConnectionFlag == iEPlusComponentType::SCN &&
                         AirflowNetworkLinkageData(j).NodeNums[1] == i) { // Modified on 9/2/09
                         found = true;
                         break;
@@ -7535,21 +7535,21 @@ namespace AirflowNetworkBalanceManager {
             for (j = 1; j <= AirflowNetworkNumOfLinks; ++j) {
                 if (AirflowNetworkLinkageData(j).NodeNums[0] == i || AirflowNetworkLinkageData(j).NodeNums[1] == i) {
                     CompNum = AirflowNetworkLinkageData(j).CompNum;
-                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == EPlusTypeNum_RHT && (!AirflowNetworkLinkageData(j).VAVTermDamper)) {
+                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == iEPlusComponentType::RHT && (!AirflowNetworkLinkageData(j).VAVTermDamper)) {
                         found = true;
                         break;
                     }
                     // Overwrite fan outlet node
-                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == EPlusTypeNum_FAN && AirflowNetworkLinkageData(j).NodeNums[1] == i) {
+                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == iEPlusComponentType::FAN && AirflowNetworkLinkageData(j).NodeNums[1] == i) {
                         found = false;
                         break;
                     }
                     // Overwrite return connection outlet
-                    if (AirflowNetworkLinkageData(j).ConnectionFlag == EPlusTypeNum_RCN) { // Modified on 9/2/09
+                    if (AirflowNetworkLinkageData(j).ConnectionFlag == iEPlusComponentType::RCN) { // Modified on 9/2/09
                         found = true;
                         break;
                     }
-                    if (AirflowNetworkLinkageData(j).ConnectionFlag == EPlusTypeNum_SCN &&
+                    if (AirflowNetworkLinkageData(j).ConnectionFlag == iEPlusComponentType::SCN &&
                         AirflowNetworkLinkageData(j).NodeNums[1] == i) { // Modified on 9/2/09
                         found = true;
                         break;
@@ -7745,21 +7745,21 @@ namespace AirflowNetworkBalanceManager {
             for (j = 1; j <= AirflowNetworkNumOfLinks; ++j) {
                 if (AirflowNetworkLinkageData(j).NodeNums[0] == i || AirflowNetworkLinkageData(j).NodeNums[1] == i) {
                     CompNum = AirflowNetworkLinkageData(j).CompNum;
-                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == EPlusTypeNum_RHT && (!AirflowNetworkLinkageData(j).VAVTermDamper)) {
+                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == iEPlusComponentType::RHT && (!AirflowNetworkLinkageData(j).VAVTermDamper)) {
                         found = true;
                         break;
                     }
                     // Overwrite fan outlet node
-                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == EPlusTypeNum_FAN && AirflowNetworkLinkageData(j).NodeNums[1] == i) {
+                    if (AirflowNetworkCompData(CompNum).EPlusTypeNum == iEPlusComponentType::FAN && AirflowNetworkLinkageData(j).NodeNums[1] == i) {
                         found = false;
                         break;
                     }
                     // Overwrite return connection outlet
-                    if (AirflowNetworkLinkageData(j).ConnectionFlag == EPlusTypeNum_RCN) { // Modified on 9/2/09
+                    if (AirflowNetworkLinkageData(j).ConnectionFlag == iEPlusComponentType::RCN) { // Modified on 9/2/09
                         found = true;
                         break;
                     }
-                    if (AirflowNetworkLinkageData(j).ConnectionFlag == EPlusTypeNum_SCN &&
+                    if (AirflowNetworkLinkageData(j).ConnectionFlag == iEPlusComponentType::SCN &&
                         AirflowNetworkLinkageData(j).NodeNums[1] == i) { // Modified on 9/2/09
                         found = true;
                         break;
@@ -8930,7 +8930,7 @@ namespace AirflowNetworkBalanceManager {
                             Node3 = Node2;
                         }
                         if (AirflowNetworkNodeData(Node2).EPlusTypeNum == EPlusTypeNum_ZIN) {
-                            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == 0) continue;
+                            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == iEPlusComponentType::Unassigned) continue;
                         }
                         NodeMass = Node(AirflowNetworkNodeData(Node3).EPlusNodeNum).MassFlowRate;
                         AFNMass = AirflowNetworkLinkSimu(i).FLOW;
@@ -9762,7 +9762,7 @@ namespace AirflowNetworkBalanceManager {
                 ErrorsFound = true;
             }
             // Set AirLoopNum to fans and coils
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == EPlusTypeNum_FAN) {
+            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == iEPlusComponentType::FAN) {
                 n = DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanIndex;
                 DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).AirLoopNum =
                     AirflowNetworkLinkageData(i).AirLoopNum;
@@ -9773,7 +9773,7 @@ namespace AirflowNetworkBalanceManager {
                     SetFanAirLoopNumber(n, AirflowNetworkLinkageData(i).AirLoopNum);
                 }
             }
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == EPlusTypeNum_COI) {
+            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == iEPlusComponentType::COI) {
                 DisSysCompCoilData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).AirLoopNum =
                     AirflowNetworkLinkageData(i).AirLoopNum;
             }
@@ -9985,10 +9985,10 @@ namespace AirflowNetworkBalanceManager {
             }
             for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
                 if (AirflowNetworkLinkageData(i).NodeNums[0] == R1 && AirflowNetworkLinkageData(i).NodeNums[1] == R2) {
-                    AirflowNetworkLinkageData(i).ConnectionFlag = EPlusTypeNum_RCN;
+                    AirflowNetworkLinkageData(i).ConnectionFlag = iEPlusComponentType::RCN;
                 }
                 if (AirflowNetworkLinkageData(i).NodeNums[0] == S1 && AirflowNetworkLinkageData(i).NodeNums[1] == S2) {
-                    AirflowNetworkLinkageData(i).ConnectionFlag = EPlusTypeNum_SCN;
+                    AirflowNetworkLinkageData(i).ConnectionFlag = iEPlusComponentType::SCN;
                 }
             }
         }
@@ -10001,10 +10001,10 @@ namespace AirflowNetworkBalanceManager {
                     AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusTypeNum = EPlusTypeNum_FIN;
                 AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusTypeNum = EPlusTypeNum_FOU;
             }
-            if (AirflowNetworkCompData(j).EPlusTypeNum == EPlusTypeNum_COI) {
+            if (AirflowNetworkCompData(j).EPlusTypeNum == iEPlusComponentType::COI) {
                 AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusTypeNum = EPlusTypeNum_COU;
             }
-            if (AirflowNetworkCompData(j).EPlusTypeNum == EPlusTypeNum_HEX) {
+            if (AirflowNetworkCompData(j).EPlusTypeNum == iEPlusComponentType::HEX) {
                 AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusTypeNum = EPlusTypeNum_HXO;
             }
             if (AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::TMU) {

@@ -149,15 +149,18 @@ namespace AirflowNetwork {
         REL      // Distribution system relief air
     };
 
-
     // EPlus component Type
-    extern int const EPlusTypeNum_SCN; // Supply connection
-    extern int const EPlusTypeNum_RCN; // Return connection
-    extern int const EPlusTypeNum_RHT; // Reheat terminal
-    extern int const EPlusTypeNum_FAN; // Fan
-    extern int const EPlusTypeNum_COI; // Heating or cooling coil
-    extern int const EPlusTypeNum_HEX; // Heat exchanger
-    extern int const EPlusTypeNum_RVD; // Reheat VAV terminal damper
+    enum class iEPlusComponentType : int
+    {
+        Unassigned = 0,
+        SCN = 1, // Supply connection
+        RCN = 2, // Return connection
+        RHT = 3, // Reheat terminal
+        FAN = 4, // Fan
+        COI = 5, // Heating or cooling coil
+        HEX = 6, // Heat exchanger
+        RVD = 7  // Reheat VAV terminal damper
+    };
 
     // EPlus node type
     extern int const EPlusTypeNum_ZIN; // Zone inlet node
@@ -1308,10 +1311,10 @@ namespace AirflowNetwork {
         std::string EPlusName;     // Provide a unique element name
         std::string EPlusCompName; // Provide EPlus component name or Other
         std::string EPlusType;     // Provide EPlus type, such as terminal reheat, coil, etc. 9/30/03 or Other
-        int EPlusTypeNum;          // Provide EPlus component type
+        iEPlusComponentType EPlusTypeNum;          // Provide EPlus component type
 
         // Default Constructor
-        AirflowNetworkCompProp() : CompTypeNum(iComponentTypeNum::Unassigned), TypeNum(0), CompNum(0), EPlusTypeNum(0)
+        AirflowNetworkCompProp() : CompTypeNum(iComponentTypeNum::Unassigned), TypeNum(0), CompNum(0), EPlusTypeNum(iEPlusComponentType::Unassigned)
         {
         }
     };
@@ -1322,14 +1325,14 @@ namespace AirflowNetwork {
         std::string ZoneName; // Name of zone
         int ZoneNum;          // Zone Number
         int DetOpenNum;       // Large Opening number
-        int ConnectionFlag;   // Return and supply connection flag
+        iEPlusComponentType ConnectionFlag;   // Return and supply connection flag
         bool VAVTermDamper;   // True if this component is a damper for a VAV terminal
         int LinkageViewFactorObjectNum;
         int AirLoopNum; // Airloop number
 
         // Default Constructor
         AirflowNetworkLinkageProp()
-            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(0), VAVTermDamper(false), LinkageViewFactorObjectNum(0),
+            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Unassigned), VAVTermDamper(false), LinkageViewFactorObjectNum(0),
               AirLoopNum(0)
         {
         }
