@@ -1086,7 +1086,8 @@ namespace EnergyPlus::WaterCoils {
             DesCpAir(CoilNum) = PsyCpAirFnW(0.0);
             DesUARangeCheck(CoilNum) = (-1568.6 * state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat + 20.157);
 
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) { // 'Cooling'
+            if ((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) ||
+                (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterDetailedFlatCooling)) { // 'Cooling'
                 Node(WaterInletNode).Temp = 5.0;
 
                 Cp = GetSpecificHeatGlycol(state,
@@ -3425,7 +3426,7 @@ namespace EnergyPlus::WaterCoils {
                     WetDryInterfcAirEnthl = 0.0;
                     OutletAirEnthalpy = InletAirEnthalpy - MoistAirSpecificHeat * (TempAirIn - AirWetDryInterfcTemp);
                 }
-                //        total cooling = change in air enmthalpy across coil
+                //        total cooling = change in air enthalpy across coil
                 TotWaterCoilLoad = AirMassFlow * (InletAirEnthalpy - OutletAirEnthalpy);
                 //        conservation of energy on water stream gives water outlet
                 //        temperature
