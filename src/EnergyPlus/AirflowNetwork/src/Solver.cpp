@@ -177,7 +177,7 @@ namespace AirflowNetwork {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
-        int j;
+        iComponentTypeNum j;
         int n;
 
         // Formats
@@ -217,7 +217,7 @@ namespace AirflowNetwork {
         n = 0;
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             j = AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum;
-            if (j == CompTypeNum_DOP) {
+            if (j == iComponentTypeNum::DOP) {
                 ++n;
             }
         }
@@ -543,7 +543,7 @@ namespace AirflowNetwork {
             //if (LIST >= 1) {
             //    gio::write(outputFile, Format_901) << "Flow: " << i << n << m << AirflowNetworkLinkSimu(i).DP << AFLOW(i) << AFLOW2(i);
             //}
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_HOP) {
+            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::HOP) {
                 SUMAF(n) = SUMAF(n) - AFLOW(i);
                 SUMAF(m) += AFLOW(i);
             } else {
@@ -565,7 +565,7 @@ namespace AirflowNetwork {
                 AirflowNetworkLinkSimu(i).FLOW = 0.0;
                 AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
             }
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_HOP) {
+            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::HOP) {
                 if (AFLOW(i) > 0.0) {
                     AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
                     AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
@@ -580,7 +580,7 @@ namespace AirflowNetwork {
                     AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
                 }
             }
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SOP && AFLOW2(i) != 0.0) {
+            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SOP && AFLOW2(i) != 0.0) {
                 if (AFLOW(i) >= 0.0) {
                     AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
                     AirflowNetworkLinkSimu(i).FLOW2 = std::abs(AFLOW2(i));
@@ -906,7 +906,7 @@ namespace AirflowNetwork {
             AirflowNetworkLinkSimu(i).DP = DP;
             AFLOW(i) = F[0];
             AFLOW2(i) = 0.0;
-            if (AirflowNetworkCompData(j).CompTypeNum == CompTypeNum_DOP) {
+            if (AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::DOP) {
                 AFLOW2(i) = F[1];
             }
             //if (LIST >= 3) ObjexxFCL::gio::write(outputFile, Format_901) << " NRi:" << i << n << M << AirflowNetworkLinkSimu(i).DP << F[0] << DF[0];
@@ -1996,7 +1996,7 @@ namespace AirflowNetwork {
         int To;
         int Fromz;
         int Toz;
-        int Ltyp;
+        iComponentTypeNum Ltyp;
         int i;
         int ll;
         int j;
@@ -2041,7 +2041,7 @@ namespace AirflowNetwork {
             }
 
             Ltyp = AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum;
-            if (Ltyp == CompTypeNum_DOP) {
+            if (Ltyp == iComponentTypeNum::DOP) {
                 ActLh = MultizoneSurfaceData(i).Height;
                 ActLOwnh = ActLh * 1.0;
             } else {
@@ -2222,7 +2222,7 @@ namespace AirflowNetwork {
             DpP = -psz(Pref, RhoLd(2), 0.0, 0.0, -H, G);
             DpL(i, 2) = (DpF(1) - DpT(1) + DpP);
 
-            if (Ltyp == CompTypeNum_DOP) {
+            if (Ltyp == iComponentTypeNum::DOP) {
                 Pprof = OpenNum * (NrInt + 2);
                 PresProfile(i, Pprof, G, DpF, DpT, BetaStF, BetaStT, RhoStF, RhoStT, From, To, ActLh, Hfl(i));
                 ++OpenNum;

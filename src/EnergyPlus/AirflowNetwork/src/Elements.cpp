@@ -75,26 +75,6 @@ namespace AirflowNetwork {
     // all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    int const CompTypeNum_DOP(1);  // Detailed large opening component
-    int const CompTypeNum_SOP(2);  // Simple opening component
-    int const CompTypeNum_SCR(3);  // Surface crack component
-    int const CompTypeNum_SEL(4);  // Surface effective leakage ratio component
-    int const CompTypeNum_PLR(5);  // Distribution system crack component
-    int const CompTypeNum_DWC(6);  // Distribution system duct component
-    int const CompTypeNum_CVF(7);  // Distribution system constant volume fan component
-    int const CompTypeNum_FAN(8);  // Distribution system detailed fan component
-    int const CompTypeNum_MRR(9);  // Distribution system multiple curve fit power law resistant flow component
-    int const CompTypeNum_DMP(10); // Distribution system damper component
-    int const CompTypeNum_ELR(11); // Distribution system effective leakage ratio component
-    int const CompTypeNum_CPD(12); // Distribution system constant pressure drop component
-    int const CompTypeNum_COI(13); // Distribution system coil component
-    int const CompTypeNum_TMU(14); // Distribution system terminal unit component
-    int const CompTypeNum_EXF(15); // Zone exhaust fan
-    int const CompTypeNum_HEX(16); // Distribution system heat exchanger
-    int const CompTypeNum_HOP(17); // Horizontal opening component
-    int const CompTypeNum_RVD(18); // Reheat VAV terminal damper
-    int const CompTypeNum_OAF(19); // Distribution system OA
-    int const CompTypeNum_REL(20); // Distribution system relief air
 
     // EPlus component Type
     int const EPlusTypeNum_SCN(1); // Supply connection
@@ -1022,7 +1002,7 @@ namespace AirflowNetwork {
                         SumTermFlow += Node(k1).MassFlowRate;
                     }
                 }
-                if (AirflowNetworkCompData(AirflowNetworkLinkageData(k).CompNum).CompTypeNum == CompTypeNum_ELR) {
+                if (AirflowNetworkCompData(AirflowNetworkLinkageData(k).CompNum).CompTypeNum == iComponentTypeNum::ELR) {
                     // Calculate supply leak sensible losses
                     Node1 = AirflowNetworkLinkageData(k).NodeNums[0];
                     Node2 = AirflowNetworkLinkageData(k).NodeNums[1];

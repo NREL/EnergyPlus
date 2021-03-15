@@ -99,26 +99,30 @@ namespace AirflowNetwork {
     // all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const CompTypeNum_DOP; // Detailed large opening component
-    extern int const CompTypeNum_SOP; // Simple opening component
-    extern int const CompTypeNum_SCR; // Surface crack component
-    extern int const CompTypeNum_SEL; // Surface effective leakage ratio component
-    extern int const CompTypeNum_PLR; // Distribution system crack component
-    extern int const CompTypeNum_DWC; // Distribution system duct component
-    extern int const CompTypeNum_CVF; // Distribution system constant volume fan component
-    extern int const CompTypeNum_FAN; // Distribution system detailed fan component
-    extern int const CompTypeNum_MRR; // Distribution system multiple curve fit power law resistant flow component
-    extern int const CompTypeNum_DMP; // Distribution system damper component
-    extern int const CompTypeNum_ELR; // Distribution system effective leakage ratio component
-    extern int const CompTypeNum_CPD; // Distribution system constant pressure drop component
-    extern int const CompTypeNum_COI; // Distribution system coil component
-    extern int const CompTypeNum_TMU; // Distribution system terminal unit component
-    extern int const CompTypeNum_EXF; // Zone exhaust fan
-    extern int const CompTypeNum_HEX; // Distribution system heat exchanger
-    extern int const CompTypeNum_HOP; // Horizontal opening component
-    extern int const CompTypeNum_RVD; // Reheat VAV terminal damper
-    extern int const CompTypeNum_OAF; // Distribution system OA
-    extern int const CompTypeNum_REL; // Distribution system relief air
+    enum class iComponentTypeNum : int
+    {
+        Unassigned = 0,
+        DOP = 1,  // Detailed large opening component
+        SOP = 2,  // Simple opening component
+        SCR = 3,  // Surface crack component
+        SEL = 4,  // Surface effective leakage ratio component
+        PLR = 5,  // Distribution system crack component
+        DWC = 6,  // Distribution system duct component
+        CVF = 7,  // Distribution system constant volume fan component
+        FAN = 8,  // Distribution system detailed fan component
+        MRR = 9,  // Distribution system multiple curve fit power law resistant flow component
+        DMP = 10, // Distribution system damper component
+        ELR = 11, // Distribution system effective leakage ratio component
+        CPD = 12, // Distribution system constant pressure drop component
+        COI = 13, // Distribution system coil component
+        TMU = 14, // Distribution system terminal unit component
+        EXF = 15, // Zone exhaust fan
+        HEX = 16, // Distribution system heat exchanger
+        HOP = 17, // Horizontal opening component
+        RVD = 18, // Reheat VAV terminal damper
+        OAF = 19, // Distribution system OA
+        REL = 20  // Distribution system relief air
+    };
 
 
     enum class ComponentType
@@ -1298,7 +1302,7 @@ namespace AirflowNetwork {
     {
         // Members
         std::string Name;          // Provide a unique element name
-        int CompTypeNum;           // Provide numeric equivalent for AirflowNetworkCompType
+        iComponentTypeNum CompTypeNum;           // Provide numeric equivalent for AirflowNetworkCompType
         int TypeNum;               // Component number under same component type
         int CompNum;               // General component number
         std::string EPlusName;     // Provide a unique element name
@@ -1307,7 +1311,7 @@ namespace AirflowNetwork {
         int EPlusTypeNum;          // Provide EPlus component type
 
         // Default Constructor
-        AirflowNetworkCompProp() : CompTypeNum(0), TypeNum(0), CompNum(0), EPlusTypeNum(0)
+        AirflowNetworkCompProp() : CompTypeNum(iComponentTypeNum::Unassigned), TypeNum(0), CompNum(0), EPlusTypeNum(0)
         {
         }
     };
