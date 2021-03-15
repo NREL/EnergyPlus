@@ -171,7 +171,6 @@ set(SRC
     DataDefineEquip.hh
     DataEnvironment.cc
     DataEnvironment.hh
-    DataErrorTracking.cc
     DataErrorTracking.hh
     DataGenerators.hh
     DataGlobalConstants.cc
