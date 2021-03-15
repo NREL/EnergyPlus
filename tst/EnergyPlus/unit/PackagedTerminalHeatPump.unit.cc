@@ -534,8 +534,8 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     SizeFan(*state, 1);
     // the fan vol flow rate should equal the max of cooling and heating coil flow rates
     Real64 maxCoilAirFlow = max(state->dataVariableSpeedCoils->VarSpeedCoil( 1 ).RatedAirVolFlowRate, state->dataVariableSpeedCoils->VarSpeedCoil( 2 ).RatedAirVolFlowRate);
-    EXPECT_EQ(Fan(1).MaxAirFlowRate, maxCoilAirFlow);
-    EXPECT_EQ(Fan(1).MaxAirFlowRate, max(state->dataPTHP->PTUnit(1).MaxCoolAirVolFlow, state->dataPTHP->PTUnit(1).MaxHeatAirVolFlow));
+    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, maxCoilAirFlow);
+    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, max(state->dataPTHP->PTUnit(1).MaxCoolAirVolFlow, state->dataPTHP->PTUnit(1).MaxHeatAirVolFlow));
 
     // Initialize the packaged terminal heat pump
     Real64 OnOffAirFlowRatio(1.0); // ratio of compressor ON airflow to average airflow over timestep
@@ -565,8 +565,8 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_TRUE(state->dataSize->ZoneEqSizing(1).HeatingAirFlow);
     EXPECT_EQ(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, state->dataPTHP->PTUnit(1).MaxCoolAirVolFlow);
     EXPECT_EQ(state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow, state->dataPTHP->PTUnit(1).MaxHeatAirVolFlow);
-    EXPECT_EQ(Fan(1).MaxAirFlowRate, state->dataSize->ZoneEqSizing(1).AirVolFlow);
-    EXPECT_EQ(Fan(1).MaxAirFlowRate, max(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow));
+    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataSize->ZoneEqSizing(1).AirVolFlow);
+    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, max(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow));
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
@@ -852,11 +852,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     state->dataLoopNodes->Node(state->dataPTHP->PTUnit(1).OutsideAirNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -1198,11 +1198,11 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     //		state->dataLoopNodes->Node( PTUnit( 1 ).OutsideAirNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;

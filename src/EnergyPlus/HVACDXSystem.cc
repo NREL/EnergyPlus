@@ -871,7 +871,7 @@ namespace HVACDXSystem {
                     if (SupFanNum > 0) {
                         coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoolingSystem(DXSystemNum).CoolingCoilName,
                                                                      DXCoolingSystem(DXSystemNum).CoolingCoilType,
-                                                                     Fans::Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
+                                                                     state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
                                                                      DataAirSystems::structArrayLegacyFanModels,
                                                                      state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
                     }

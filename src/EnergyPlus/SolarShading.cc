@@ -131,7 +131,6 @@ namespace EnergyPlus::SolarShading {
     using namespace DataShadowingCombinations;
     using DaylightingManager::ProfileAngle;
     using namespace SolarReflectionManager;
-    using namespace DataReportingFlags;
     using namespace DataVectorTypes;
     using namespace WindowManager;
     using namespace FenestrationCommon;
@@ -8050,7 +8049,7 @@ namespace EnergyPlus::SolarShading {
                     } else {
                         DisplayString(state, "Updating Shadowing Calculations, Start Date=" + state.dataEnvrn->CurMnDy);
                     }
-                    DisplayPerfSimulationFlag = true;
+                    state.dataReportFlag->DisplayPerfSimulationFlag = true;
                 }
 
                 PerDayOfYear = state.dataEnvrn->DayOfYear;
@@ -8072,7 +8071,7 @@ namespace EnergyPlus::SolarShading {
                 AvgCosSolarDeclin = std::sqrt(1.0 - pow_2(AvgSinSolarDeclin));
                 // trigger display of progress in the simulation every two weeks
                 if (!state.dataGlobal->WarmupFlag && state.dataGlobal->BeginDayFlag && (state.dataGlobal->DayOfSim % 14 == 0)) {
-                    DisplayPerfSimulationFlag = true;
+                    state.dataReportFlag->DisplayPerfSimulationFlag = true;
                 }
             }
 

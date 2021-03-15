@@ -2345,7 +2345,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempElecRadSurfaceGroupTest)
     EXPECT_EQ(state->dataLowTempRadSys->ElecRadSys(1).ZoneName, "WEST ZONE");
     EXPECT_EQ(state->dataLowTempRadSys->ElecRadSys(1).SurfListName, "WEST ZONE SURFACE GROUP");
     // the 2nd surface list group holds data for 1st elec rad sys (#5958)
-    EXPECT_EQ(DataSurfaceLists::SurfList(2).Name, "WEST ZONE SURFACE GROUP");
+    EXPECT_EQ(state->dataSurfLists->SurfList(2).Name, "WEST ZONE SURFACE GROUP");
     EXPECT_EQ(state->dataLowTempRadSys->ElecRadSys(1).NumOfSurfaces, 2);
     // surface ptr's are not set correctly when elec rad sys "index" (e.g., state->dataLowTempRadSys->ElecRadSys(N)) is not the same as surface group "index"
     // #5958 fixes this issue

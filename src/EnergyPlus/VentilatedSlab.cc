@@ -337,9 +337,9 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->VentSlab(Item).SurfListName = cAlphaArgs(4);
             SurfListNum = 0;
             //    IF (NumOfSlabLists > 0) SurfListNum = UtilityRoutines::FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
-            if (NumOfSurfListVentSlab > 0) SurfListNum = UtilityRoutines::FindItemInList(state.dataVentilatedSlab->VentSlab(Item).SurfListName, SlabList);
+            if (state.dataSurfLists->NumOfSurfListVentSlab > 0) SurfListNum = UtilityRoutines::FindItemInList(state.dataVentilatedSlab->VentSlab(Item).SurfListName, state.dataSurfLists->SlabList);
             if (SurfListNum > 0) { // Found a valid surface list
-                state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces = SlabList(SurfListNum).NumOfSurfaces;
+                state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces = state.dataSurfLists->SlabList(SurfListNum).NumOfSurfaces;
                 state.dataVentilatedSlab->VentSlab(Item).ZName.allocate(state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces);
                 state.dataVentilatedSlab->VentSlab(Item).ZPtr.allocate(state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces);
                 state.dataVentilatedSlab->VentSlab(Item).SurfaceName.allocate(state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces);
@@ -351,16 +351,16 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).SlabOut.allocate(state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces);
 
                 state.dataVentilatedSlab->MaxCloNumOfSurfaces = max(state.dataVentilatedSlab->MaxCloNumOfSurfaces, state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces);
-                for (SurfNum = 1; SurfNum <= SlabList(SurfListNum).NumOfSurfaces; ++SurfNum) {
-                    state.dataVentilatedSlab->VentSlab(Item).ZName(SurfNum) = SlabList(SurfListNum).ZoneName(SurfNum);
-                    state.dataVentilatedSlab->VentSlab(Item).ZPtr(SurfNum) = SlabList(SurfListNum).ZonePtr(SurfNum);
-                    state.dataVentilatedSlab->VentSlab(Item).SurfaceName(SurfNum) = SlabList(SurfListNum).SurfName(SurfNum);
-                    state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum) = SlabList(SurfListNum).SurfPtr(SurfNum);
-                    state.dataVentilatedSlab->VentSlab(Item).CDiameter(SurfNum) = SlabList(SurfListNum).CoreDiameter(SurfNum);
-                    state.dataVentilatedSlab->VentSlab(Item).CLength(SurfNum) = SlabList(SurfListNum).CoreLength(SurfNum);
-                    state.dataVentilatedSlab->VentSlab(Item).CNumbers(SurfNum) = SlabList(SurfListNum).CoreNumbers(SurfNum);
-                    state.dataVentilatedSlab->VentSlab(Item).SlabIn(SurfNum) = SlabList(SurfListNum).SlabInNodeName(SurfNum);
-                    state.dataVentilatedSlab->VentSlab(Item).SlabOut(SurfNum) = SlabList(SurfListNum).SlabOutNodeName(SurfNum);
+                for (SurfNum = 1; SurfNum <= state.dataSurfLists->SlabList(SurfListNum).NumOfSurfaces; ++SurfNum) {
+                    state.dataVentilatedSlab->VentSlab(Item).ZName(SurfNum) = state.dataSurfLists->SlabList(SurfListNum).ZoneName(SurfNum);
+                    state.dataVentilatedSlab->VentSlab(Item).ZPtr(SurfNum) = state.dataSurfLists->SlabList(SurfListNum).ZonePtr(SurfNum);
+                    state.dataVentilatedSlab->VentSlab(Item).SurfaceName(SurfNum) = state.dataSurfLists->SlabList(SurfListNum).SurfName(SurfNum);
+                    state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum) = state.dataSurfLists->SlabList(SurfListNum).SurfPtr(SurfNum);
+                    state.dataVentilatedSlab->VentSlab(Item).CDiameter(SurfNum) = state.dataSurfLists->SlabList(SurfListNum).CoreDiameter(SurfNum);
+                    state.dataVentilatedSlab->VentSlab(Item).CLength(SurfNum) = state.dataSurfLists->SlabList(SurfListNum).CoreLength(SurfNum);
+                    state.dataVentilatedSlab->VentSlab(Item).CNumbers(SurfNum) = state.dataSurfLists->SlabList(SurfListNum).CoreNumbers(SurfNum);
+                    state.dataVentilatedSlab->VentSlab(Item).SlabIn(SurfNum) = state.dataSurfLists->SlabList(SurfListNum).SlabInNodeName(SurfNum);
+                    state.dataVentilatedSlab->VentSlab(Item).SlabOut(SurfNum) = state.dataSurfLists->SlabList(SurfListNum).SlabOutNodeName(SurfNum);
                     if (state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum) != 0) {
                         state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
                     }
@@ -3154,7 +3154,7 @@ namespace VentilatedSlab {
         if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             locFanElecPower = HVACFan::fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->fanPower();
         } else {
-            locFanElecPower = Fans::GetFanPower(state.dataVentilatedSlab->VentSlab(Item).Fan_Index);
+            locFanElecPower = Fans::GetFanPower(state, state.dataVentilatedSlab->VentSlab(Item).Fan_Index);
         }
         if ((AirMassFlow <= 0.0) && (locFanElecPower > 0.0)) {
             state.dataLoopNodes->Node(MixoutNode).MassFlowRate = 0.0;
@@ -3332,7 +3332,7 @@ namespace VentilatedSlab {
         if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataVentilatedSlab->VentSlab(Item).ElecFanPower = HVACFan::fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->fanPower();
         } else {
-            state.dataVentilatedSlab->VentSlab(Item).ElecFanPower = Fans::GetFanPower(state.dataVentilatedSlab->VentSlab(Item).Fan_Index);
+            state.dataVentilatedSlab->VentSlab(Item).ElecFanPower = Fans::GetFanPower(state, state.dataVentilatedSlab->VentSlab(Item).Fan_Index);
         }
         state.dataVentilatedSlab->VentSlab(Item).AirMassFlowRate = AirMassFlow;
 

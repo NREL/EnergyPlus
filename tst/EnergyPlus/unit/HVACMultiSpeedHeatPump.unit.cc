@@ -1334,8 +1334,8 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     state->dataLoopNodes->Node(16).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(16).Temp, state->dataLoopNodes->Node(16).HumRat);
     state->dataLoopNodes->Node(24).MassFlowRateMax = state->dataLoopNodes->Node(16).MassFlowRateMaxAvail;
 
-    Fans::Fan(2).MaxAirMassFlowRate = state->dataLoopNodes->Node(16).MassFlowRateMaxAvail;
-    Fans::Fan(2).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataFans->Fan(2).MaxAirMassFlowRate = state->dataLoopNodes->Node(16).MassFlowRateMaxAvail;
+    state->dataFans->Fan(2).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(1) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
     state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(2) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(2) * state->dataEnvrn->StdRhoAir;
     state->dataDXCoils->DXCoil(2).MSRatedCBF(1) = 0.2;

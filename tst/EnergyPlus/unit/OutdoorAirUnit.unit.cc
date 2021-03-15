@@ -335,7 +335,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // enable the VRF condenser
     state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0; // enable the terminal unit
     state->dataScheduleMgr->Schedule(3).CurrentValue = 1.0; // turn on fan
-    int EAFanInletNode = Fans::Fan(2).InletNodeNum;
+    int EAFanInletNode = state->dataFans->Fan(2).InletNodeNum;
     state->dataLoopNodes->Node(EAFanInletNode).MassFlowRate = 0.60215437; // zone exhaust flow rate
     state->dataLoopNodes->Node(EAFanInletNode).MassFlowRateMaxAvail = 0.60215437; // exhaust fan will not turn on unless max avail is set
 
@@ -349,8 +349,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     EXPECT_DOUBLE_EQ(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA * state->dataEnvrn->StdRhoAir, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).ExtAirMassFlow);
 
     // test that both fans are included in OA unit fan power report
-    Real64 SAFanPower = Fans::Fan(1).FanPower;
-    Real64 EAFanPower = Fans::Fan(2).FanPower;
+    Real64 SAFanPower = state->dataFans->Fan(1).FanPower;
+    Real64 EAFanPower = state->dataFans->Fan(2).FanPower;
     EXPECT_DOUBLE_EQ(SAFanPower, 75.0);
     EXPECT_DOUBLE_EQ(EAFanPower, 75.0);
     EXPECT_DOUBLE_EQ(SAFanPower + EAFanPower, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).ElecFanRate);
