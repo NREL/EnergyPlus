@@ -3553,7 +3553,7 @@ namespace EvaporativeCoolers {
                         GetFanInletNode(state, ZoneEvapUnit(UnitLoop).FanObjectClassName, ZoneEvapUnit(UnitLoop).FanName, errFlag);
                     ZoneEvapUnit(UnitLoop).FanOutletNodeNum =
                         GetFanOutletNode(state, ZoneEvapUnit(UnitLoop).FanObjectClassName, ZoneEvapUnit(UnitLoop).FanName, errFlag);
-                    GetFanVolFlow(ZoneEvapUnit(UnitLoop).FanIndex, FanVolFlow);
+                    GetFanVolFlow(state, ZoneEvapUnit(UnitLoop).FanIndex, FanVolFlow);
                     ZoneEvapUnit(UnitLoop).ActualFanVolFlowRate = FanVolFlow;
                     // Get the fan's availability schedule
                     ZoneEvapUnit(UnitLoop).FanAvailSchedPtr =
@@ -3927,7 +3927,7 @@ namespace EvaporativeCoolers {
                 ZoneEvapUnit(UnitNum).MyFan = false;
             } else {
                 if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    GetFanVolFlow(ZoneEvapUnit(UnitNum).FanIndex, ZoneEvapUnit(UnitNum).ActualFanVolFlowRate);
+                    GetFanVolFlow(state, ZoneEvapUnit(UnitNum).FanIndex, ZoneEvapUnit(UnitNum).ActualFanVolFlowRate);
                 } else {
                     ZoneEvapUnit(UnitNum).ActualFanVolFlowRate = HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->designAirVolFlowRate;
                 }

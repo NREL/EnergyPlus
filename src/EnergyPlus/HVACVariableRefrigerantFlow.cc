@@ -3369,8 +3369,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             ShowContinueError(state, "...occurs in " + cCurrentModuleObject + " = " + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
                         } else {
-                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanInletNode = Fans::Fan(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex).InletNodeNum;
-                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode = Fans::Fan(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex).OutletNodeNum;
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanInletNode = state.dataFans->Fan(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex).InletNodeNum;
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode = state.dataFans->Fan(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex).OutletNodeNum;
                         }
 
                         // Set the Design Fan Volume Flow Rate
@@ -3544,7 +3544,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                 } else {
                                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex > 0) {
                                         state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).RatedAirVolFlowRate(1) =
-                                            EnergyPlus::Fans::Fan(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex).MaxAirFlowRate;
+                                            state.dataFans->Fan(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex).MaxAirFlowRate;
                                     } else {
                                         state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
                                     }
@@ -3815,7 +3815,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                 } else {
                                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex > 0) {
                                         state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).RatedAirVolFlowRate(1) =
-                                            EnergyPlus::Fans::Fan(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex).MaxAirFlowRate;
+                                            state.dataFans->Fan(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex).MaxAirFlowRate;
                                     } else {
                                         state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
                                     }
@@ -6329,7 +6329,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate = HVACFan::fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->designAirVolFlowRate;
                         } else {
-                            GetFanVolFlow(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate);
+                            GetFanVolFlow(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate);
                         }
                     }
                 } else {
@@ -8894,7 +8894,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             this->FanPower = HVACFan::fanObjs[this->FanIndex]->fanPower();
         } else {
-            this->FanPower = Fans::GetFanPower(this->FanIndex);
+            this->FanPower = Fans::GetFanPower(state, this->FanIndex);
         }
 
         // run supplemental heating coil
@@ -12070,7 +12070,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             this->FanPower = HVACFan::fanObjs[this->FanIndex]->fanPower();
         } else {
-            this->FanPower = Fans::GetFanPower(this->FanIndex);
+            this->FanPower = Fans::GetFanPower(state, this->FanIndex);
         }
 
         // run supplemental heating coil
@@ -12244,7 +12244,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         //         OA mixer simulation, which leads to different coil inlet conditions. So, there is a coupling issue here.
 
         using DXCoils::ControlVRFIUCoil;
-        using Fans::Fan;
         using Fans::SimulateFanComponents;
         using MixedAir::SimOAMixer;
         using Psychrometrics::PsyHFnTdbW;

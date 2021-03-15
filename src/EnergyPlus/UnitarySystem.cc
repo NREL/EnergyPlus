@@ -1429,7 +1429,7 @@ namespace UnitarySystems {
         // Object Data, points to specific array
         DataSizing::ZoneEqSizingData &EqSizing(*select_EqSizing);
 
-        // can't hurt to initialize these going in, problably redundant
+        // can't hurt to initialize these going in, probably redundant
         EqSizing.AirFlow = false;
         EqSizing.CoolingAirFlow = false;
         EqSizing.HeatingAirFlow = false;
@@ -13999,7 +13999,7 @@ namespace UnitarySystems {
         if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             locFanElecPower = HVACFan::fanObjs[this->m_FanIndex]->fanPower();
         } else {
-            locFanElecPower = Fans::GetFanPower(this->m_FanIndex);
+            locFanElecPower = Fans::GetFanPower(state, this->m_FanIndex);
         }
 
         Real64 elecCoolingPower = 0.0;

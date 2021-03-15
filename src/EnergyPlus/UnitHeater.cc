@@ -363,7 +363,7 @@ namespace UnitHeater {
                     if (errFlag) {
                         ErrorsFound = true;
                     } else {
-                        GetFanVolFlow(state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index, FanVolFlow);
+                        GetFanVolFlow(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index, FanVolFlow);
 
                         if (FanVolFlow != AutoSize && state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow != AutoSize &&
                             FanVolFlow < state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow) {
@@ -1643,7 +1643,7 @@ namespace UnitHeater {
         // Report variables...
         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower = max(0.0, QUnitOut);
         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower = Fans::GetFanPower(state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
+            state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower = Fans::GetFanPower(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
         } else {
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower = HVACFan::fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->fanPower();
         }

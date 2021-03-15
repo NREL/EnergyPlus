@@ -648,11 +648,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -979,11 +979,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -1393,11 +1393,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -1806,11 +1806,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -2487,11 +2487,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -3163,11 +3163,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -4915,11 +4915,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -6667,11 +6667,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -6908,11 +6908,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     state->dataLoopNodes->Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
     state->dataLoopNodes->Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
@@ -7145,11 +7145,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     state->dataLoopNodes->Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // primary air condition at outside air condition
     state->dataLoopNodes->Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
@@ -7546,7 +7546,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
 
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
     auto &thisATMixer(state->dataSingleDuct->SysATMixer(1));
-    auto &thisFan(Fan(1));
+    auto &thisFan(state->dataFans->Fan(1));
 
     // get input test for terminal air single duct mixer on inlet side of PTAC
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
@@ -7596,7 +7596,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     CWLoop.FluidIndex = 1;
     CWLoop.FluidName = "WATER";
     CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
     auto &CWLoopSizingData(state->dataSize->PlantSizData(2));
@@ -7613,7 +7613,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     HWLoop.FluidIndex = 1;
     HWLoop.FluidName = "WATER";
     HWLoop.LoopSide(1).Branch(1).Comp(1).Name = HWCoil.Name;
-    HWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    HWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
     HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = HWCoil.WaterInletNodeNum;
     HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWCoil.WaterOutletNodeNum;
     auto &HWLoopSizingData(state->dataSize->PlantSizData(1));
@@ -8027,7 +8027,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     CWLoop.FluidIndex = 1;
     CWLoop.FluidName = "WATER";
     CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
     auto &CWLoopSizingData(state->dataSize->PlantSizData(2));
@@ -8044,7 +8044,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     HWLoop.FluidIndex = 1;
     HWLoop.FluidName = "WATER";
     HWLoop.LoopSide(1).Branch(1).Comp(1).Name = HWCoil.Name;
-    HWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    HWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
     HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = HWCoil.WaterInletNodeNum;
     HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWCoil.WaterOutletNodeNum;
     auto &HWLoopSizingData(state->dataSize->PlantSizData(1));
