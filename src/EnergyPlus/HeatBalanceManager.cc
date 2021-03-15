@@ -171,34 +171,6 @@ namespace HeatBalanceManager {
         bool ReportWarmupConvergenceFirstWarmupWrite(true);
     } // namespace
 
-    // Real Variables for the Heat Balance Simulation
-    // Variables used to determine warmup convergence
-    Array1D<Real64> MaxCoolLoadPrevDay; // Max cooling load from the previous day
-    Array1D<Real64> MaxCoolLoadZone;    // Maximum zone cooling load from the current day
-    Array1D<Real64> MaxHeatLoadPrevDay; // Max heating load from the previous day
-    Array1D<Real64> MaxHeatLoadZone;    // Maximum zone heating load from the current day
-    Array1D<Real64> MaxTempPrevDay;     // Max temperature from the previous day
-    Array1D<Real64> MaxTempZone;        // Maximum zone temperature from the current day
-    Array1D<Real64> MinTempPrevDay;     // Min temperature from the previous day
-    Array1D<Real64> MinTempZone;        // Minimum zone temperature from the current day
-
-    // Variables used to report difference in temperature and load from the last two warmup days
-    Array1D<Real64> WarmupTempDiff;     // Temperature difference between the last two warmup days
-    Array1D<Real64> WarmupLoadDiff;     // Zone load differences between the last two warmup days
-    Array1D<Real64> TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
-    Array1D<Real64> LoadZoneSecPrevDay; // Zone load from the second last warmup day
-    Array1D<Real64> TempZonePrevDay;    // Zone air temperature from the previous day
-    Array1D<Real64> LoadZonePrevDay;    // Zone load from the previuos day
-    Array1D<Real64> TempZone;           // Zone air temperature from the current warmup day
-    Array1D<Real64> LoadZone;           // Zone load from the current warmup day
-
-    Array2D<Real64> TempZoneRpt;       // Zone air temperature to report (average over all warmup days)
-    Array1D<Real64> TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
-    Array2D<Real64> LoadZoneRpt;       // Zone load to report (average over all warmup days)
-    Array1D<Real64> LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
-    Array2D<Real64> MaxLoadZoneRpt;    // Maximum zone load for reporting calcs
-    int CountWarmupDayPoints;          // Count of warmup timesteps (to achieve warmup)
-
     std::string CurrentModuleObject; // to assist in getting input
 
     // Subroutine Specifications for the Heat Balance Module
@@ -213,7 +185,6 @@ namespace HeatBalanceManager {
     // Reporting routines for module
 
     // Object Data
-    Array1D<WarmupConvergence> WarmupConvergenceValues;
     std::unordered_map<std::string, std::string> UniqueMaterialNames;
     std::unordered_map<std::string, std::string> UniqueConstructNames;
 
@@ -227,30 +198,7 @@ namespace HeatBalanceManager {
     void clear_state()
     {
         ManageHeatBalanceGetInputFlag = true;
-        MaxCoolLoadPrevDay.deallocate();
-        MaxCoolLoadZone.deallocate();
-        MaxHeatLoadPrevDay.deallocate();
-        MaxHeatLoadZone.deallocate();
-        MaxTempPrevDay.deallocate();
-        MaxTempZone.deallocate();
-        MinTempPrevDay.deallocate();
-        MinTempZone.deallocate();
-        WarmupTempDiff.deallocate();
-        WarmupLoadDiff.deallocate();
-        TempZoneSecPrevDay.deallocate();
-        LoadZoneSecPrevDay.deallocate();
-        TempZonePrevDay.deallocate();
-        LoadZonePrevDay.deallocate();
-        TempZone.deallocate();
-        LoadZone.deallocate();
-        TempZoneRpt.deallocate();
-        TempZoneRptStdDev.deallocate();
-        LoadZoneRpt.deallocate();
-        LoadZoneRptStdDev.deallocate();
-        MaxLoadZoneRpt.deallocate();
-        CountWarmupDayPoints = int();
         CurrentModuleObject = std::string();
-        WarmupConvergenceValues.deallocate();
         UniqueMaterialNames.clear();
         UniqueConstructNames.clear();
         surfaceOctree = SurfaceOctreeCube();
@@ -477,13 +425,13 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const NumConstrObjects(6);
-        static Array1D_string const ConstrObjects(NumConstrObjects,
-                                                  {"Pipe:Indoor",
-                                                   "Pipe:Outdoor",
-                                                   "Pipe:Underground",
-                                                   "GroundHeatExchanger:Surface",
-                                                   "DaylightingDevice:Tubular",
-                                                   "EnergyManagementSystem:ConstructionIndexVariable"});
+        Array1D_string const ConstrObjects(NumConstrObjects,
+                                           {"Pipe:Indoor",
+                                            "Pipe:Outdoor",
+                                            "Pipe:Underground",
+                                            "GroundHeatExchanger:Surface",
+                                            "DaylightingDevice:Tubular",
+                                            "EnergyManagementSystem:ConstructionIndexVariable"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Unused;
@@ -664,7 +612,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetProjectControlData: ");
+        constexpr const char * RoutineName("GetProjectControlData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -832,7 +780,7 @@ namespace HeatBalanceManager {
             }
 
         } else {
-            ShowSevereError(state, RoutineName + " A " + CurrentModuleObject + " Object must be entered.");
+            ShowSevereError(state, format("{} A {} Object must be entered.", RoutineName, CurrentModuleObject));
             ErrorsFound = true;
             state.dataHeatBal->BuildingName = "NOT ENTERED";
             AlphaName(2) = "NOT ENTERED";
@@ -841,8 +789,8 @@ namespace HeatBalanceManager {
             state.dataHeatBal->MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
         }
 
-        static constexpr auto Format_720(" Building Information,{},{:.3R},{},{:.5R},{:.5R},{},{},{}\n");
-        static constexpr auto Format_721("! <Building Information>, Building Name,North Axis {{deg}},Terrain,  Loads Convergence Tolerance "
+        constexpr const char * Format_720(" Building Information,{},{:.3R},{},{:.5R},{:.5R},{},{},{}\n");
+        constexpr const char * Format_721("! <Building Information>, Building Name,North Axis {{deg}},Terrain,  Loads Convergence Tolerance "
                                          "Value,Temperature Convergence Tolerance Value,  Solar Distribution,Maximum Number of Warmup Days,Minimum "
                                          "Number of Warmup Days\n");
         // Write Building Information to the initialization output file
@@ -918,7 +866,7 @@ namespace HeatBalanceManager {
             state.dataHeatBal->DefaultInsideConvectionAlgo = ASHRAETARP;
             AlphaName(1) = "TARP";
         }
-        static constexpr auto Format_722("! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | "
+        constexpr const char * Format_722("! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | "
                                          "AdaptiveConvectionAlgorithm}}\nInside Convection Algorithm,{}\n");
         print(state.files.eio, Format_722, AlphaName(1));
 
@@ -975,7 +923,7 @@ namespace HeatBalanceManager {
             AlphaName(1) = "DOE-2";
         }
 
-        static constexpr auto Format_723("! <Outside Convection Algorithm>, Algorithm {{SimpleCombined | TARP | MoWitt | DOE-2 | "
+        constexpr const char * Format_723("! <Outside Convection Algorithm>, Algorithm {{SimpleCombined | TARP | MoWitt | DOE-2 | "
                                          "AdaptiveConvectionAlgorithm}}\nOutside Convection Algorithm,{}\n");
         print(state.files.eio, Format_723, AlphaName(1));
 
@@ -1073,7 +1021,7 @@ namespace HeatBalanceManager {
         // algorithm input checks now deferred until surface properties are read in,
         //  moved to SurfaceGeometry.cc routine GetSurfaceHeatTransferAlgorithmOverrides
 
-        static constexpr auto Format_724("! <Sky Radiance Distribution>, Value {{Anisotropic}}\nSky Radiance Distribution,Anisotropic\n");
+        constexpr const char * Format_724("! <Sky Radiance Distribution>, Value {{Anisotropic}}\nSky Radiance Distribution,Anisotropic\n");
         print(state.files.eio, Format_724);
 
         CurrentModuleObject = "Compliance:Building";
@@ -1144,10 +1092,10 @@ namespace HeatBalanceManager {
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        static constexpr auto Format_726(
+        constexpr const char * Format_726(
             "! <Zone Air Solution Algorithm>, Value {{ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}}\n");
         print(state.files.eio, Format_726);
-        static constexpr auto Format_727(" Zone Air Solution Algorithm, {}\n");
+        constexpr const char * Format_727(" Zone Air Solution Algorithm, {}\n");
         print(state.files.eio, Format_727, AlphaName(1));
 
         // A new object is added by L. Gu, 06/10
@@ -1233,18 +1181,18 @@ namespace HeatBalanceManager {
 
         WindowManager::initWindowModel(state);
 
-        static constexpr auto Format_728("! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
+        constexpr const char * Format_728("! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
         print(state.files.eio, Format_728);
-        static constexpr auto Format_730(" Zone Air Carbon Dioxide Balance Simulation, {},{}\n");
+        constexpr const char * Format_730(" Zone Air Carbon Dioxide Balance Simulation, {},{}\n");
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants && state.dataContaminantBalance->Contaminant.CO2Simulation) {
             print(state.files.eio, Format_730, "Yes", AlphaName(1));
         } else {
             print(state.files.eio, Format_730, "No", "N/A");
         }
 
-        static constexpr auto Format_729(
+        constexpr const char * Format_729(
             "! <Zone Air Generic Contaminant Balance Simulation>, Simulation {{Yes/No}}, Generic Contaminant Concentration\n");
-        static constexpr auto Format_731(" Zone Air Generic Contaminant Balance Simulation, {},{}\n");
+        constexpr const char * Format_731(" Zone Air Generic Contaminant Balance Simulation, {},{}\n");
         print(state.files.eio, Format_729);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             print(state.files.eio, Format_731, "Yes", AlphaName(3));
@@ -1356,10 +1304,10 @@ namespace HeatBalanceManager {
             state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
         }
 
-        static constexpr auto Format_732(
+        constexpr const char * Format_732(
             "! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing and Return {{AdjustMixingOnly | AdjustReturnOnly | AdjustMixingThenReturn | AdjustReturnThenMixing | None}}, Adjust Zone Infiltration "
             "{{AddInfiltration | AdjustInfiltration | None}}, Infiltration Zones {{MixingSourceZonesOnly | AllZones}}\n");
-        static constexpr auto Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{}\n");
+        constexpr const char * Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{}\n");
 
         print(state.files.eio, Format_732);
         if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
@@ -1417,9 +1365,9 @@ namespace HeatBalanceManager {
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        static constexpr auto Format_734(
+        constexpr const char * Format_734(
             "! <HVACSystemRootFindingAlgorithm>, Value {{RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}}\n");
-        static constexpr auto Format_735(" HVACSystemRootFindingAlgorithm, {}\n");
+        constexpr const char * Format_735(" HVACSystemRootFindingAlgorithm, {}\n");
         print(state.files.eio, Format_734);
         print(state.files.eio, Format_735, HVACSystemRootFinding.Algorithm);
     }
@@ -1447,7 +1395,7 @@ namespace HeatBalanceManager {
         Array1D<Real64> NumArray(3); // Numeric data
 
         // Formats
-        static constexpr auto Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
+        constexpr const char * Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
 
 
         CurrentModuleObject = "Site:HeightVariation";
@@ -1562,8 +1510,8 @@ namespace HeatBalanceManager {
         Real64 maxLamValue;       // maximum value of wavelength
 
         // Added TH 1/9/2009 to read the thermochromic glazings
-        static int iTC(0);
-        static int iMat(0);
+        int iTC(0);
+        int iMat(0);
 
         // Added TH 7/27/2009 for constructions defined with F or C factor method
         int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
@@ -3966,8 +3914,8 @@ namespace HeatBalanceManager {
             print(state.files.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
 
             // Formats
-            static constexpr auto Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
-            static constexpr auto Format_702(" Material:Air,{},{:.4R}\n");
+            constexpr const char * Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
+            constexpr const char * Format_702(" Material:Air,{},{:.4R}\n");
 
             for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
 
@@ -4057,7 +4005,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetWindowGlassSpectralData: ");
+        constexpr const char * RoutineName("GetWindowGlassSpectralData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -4785,7 +4733,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneData: ");
+        constexpr const char * RoutineName("GetZoneData: ");
         //  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -5026,12 +4974,10 @@ namespace HeatBalanceManager {
         using namespace DataIPShortCuts;
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
-        using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneLocalEnvData: ");
+        constexpr const char * RoutineName("GetZoneLocalEnvData: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlpha;
@@ -5096,8 +5042,8 @@ namespace HeatBalanceManager {
                                             ErrorsFound,
                                             cCurrentModuleObject,
                                             cAlphaArgs(1),
-                                            NodeType_Air,
-                                            NodeConnectionType_Inlet,
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::NodeConnectionType::Inlet,
                                             1,
                                             ObjectIsParent);
                 if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
@@ -5163,7 +5109,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ProcessZoneData: ");
+        constexpr const char * RoutineName("ProcessZoneData: ");
         //  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -5316,7 +5262,6 @@ namespace HeatBalanceManager {
         // Using/Aliasing
         using namespace WindowManager;
         using namespace SolarShading;
-        using DataLoopNode::Node;
         using DaylightingDevices::InitDaylightingDevices;
         using OutAirNodeManager::SetOutAirNodes;
         //  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
@@ -5343,27 +5288,26 @@ namespace HeatBalanceManager {
         }
 
         if (state.dataGlobal->BeginEnvrnFlag) {
-
-            MaxHeatLoadPrevDay = 0.0;
-            MaxCoolLoadPrevDay = 0.0;
-            MaxTempPrevDay = 0.0;
-            MinTempPrevDay = 0.0;
-            MaxHeatLoadZone = -9999.0;
-            MaxCoolLoadZone = -9999.0;
-            MaxTempZone = -9999.0;
-            MinTempZone = 1000.0;
-            TempZone = -9999.0;
-            LoadZone = -9999.0;
-            TempZonePrevDay = 1000.0;
-            LoadZonePrevDay = -9999.0;
-            TempZoneSecPrevDay = 1000.0;
-            TempZoneSecPrevDay = -9999.0;
-            WarmupTempDiff = 0.0;
-            WarmupLoadDiff = 0.0;
-            TempZoneRpt = 0.0;
-            LoadZoneRpt = 0.0;
-            MaxLoadZoneRpt = 0.0;
-            CountWarmupDayPoints = 0;
+            state.dataHeatBalMgr->MaxHeatLoadPrevDay = 0.0;
+            state.dataHeatBalMgr->MaxCoolLoadPrevDay = 0.0;
+            state.dataHeatBalMgr->MaxTempPrevDay = 0.0;
+            state.dataHeatBalMgr->MinTempPrevDay = 0.0;
+            state.dataHeatBalMgr->MaxHeatLoadZone = -9999.0;
+            state.dataHeatBalMgr->MaxCoolLoadZone = -9999.0;
+            state.dataHeatBalMgr->MaxTempZone = -9999.0;
+            state.dataHeatBalMgr->MinTempZone = 1000.0;
+            state.dataHeatBalMgr->TempZone = -9999.0;
+            state.dataHeatBalMgr->LoadZone = -9999.0;
+            state.dataHeatBalMgr->TempZonePrevDay = 1000.0;
+            state.dataHeatBalMgr->LoadZonePrevDay = -9999.0;
+            state.dataHeatBalMgr->TempZoneSecPrevDay = 1000.0;
+            state.dataHeatBalMgr->TempZoneSecPrevDay = -9999.0;
+            state.dataHeatBalMgr->WarmupTempDiff = 0.0;
+            state.dataHeatBalMgr->WarmupLoadDiff = 0.0;
+            state.dataHeatBalMgr->TempZoneRpt = 0.0;
+            state.dataHeatBalMgr->LoadZoneRpt = 0.0;
+            state.dataHeatBalMgr->MaxLoadZoneRpt = 0.0;
+            state.dataHeatBalMgr->CountWarmupDayPoints = 0;
 
             for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
                 state.dataSurface->SurfaceWindow(SurfNum).ThetaFace = 296.15;
@@ -5397,10 +5341,10 @@ namespace HeatBalanceManager {
         if (state.dataGlobal->BeginDayFlag) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (state.dataGlobal->DayOfSim == 1) {
-                    MaxHeatLoadZone = -9999.0;
-                    MaxCoolLoadZone = -9999.0;
-                    MaxTempZone = -9999.0;
-                    MinTempZone = 1000.0;
+                    state.dataHeatBalMgr->MaxHeatLoadZone = -9999.0;
+                    state.dataHeatBalMgr->MaxCoolLoadZone = -9999.0;
+                    state.dataHeatBalMgr->MaxTempZone = -9999.0;
+                    state.dataHeatBalMgr->MinTempZone = 1000.0;
                 }
             }
             if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
@@ -5416,7 +5360,7 @@ namespace HeatBalanceManager {
             state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && state.dataSysVars->ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                    static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
+                    constexpr const char * ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                     if (TS == state.dataGlobal->NumOfTimeStepInHour) {
                         print(state.files.shade, ShdFracFmt1, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, iHour, 0);
                     } else {
@@ -5428,7 +5372,7 @@ namespace HeatBalanceManager {
                               (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
                     }
                     for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                        static constexpr auto ShdFracFmt2("{:10.8F},");
+                        constexpr const char * ShdFracFmt2("{:10.8F},");
                         print(state.files.shade, ShdFracFmt2, state.dataHeatBal->SunlitFrac(TS, iHour, SurfNum));
                     }
                     print(state.files.shade, "\n");
@@ -5451,25 +5395,25 @@ namespace HeatBalanceManager {
             SetOutAirNodes(state);
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (state.dataHeatBal->Zone(ZoneNum).HasLinkedOutAirNode) {
-                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
-                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
+                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulb;
+                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulb;
                     }
-                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum > 0) {
-                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
+                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulb;
+                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulb;
                     }
-                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum > 0) {
-                        state.dataHeatBal->Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
+                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).WindSpeed = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeed;
+                        state.dataHeatBal->Zone(ZoneNum).WindSpeed = state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeed;
                     }
-                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum > 0) {
-                        state.dataHeatBal->Zone(ZoneNum).WindDir = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).WindDir = GetCurrentScheduleValue(state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).WindDir = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDir;
+                        state.dataHeatBal->Zone(ZoneNum).WindDir = state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDir;
                     }
                 }
             }
@@ -5619,28 +5563,28 @@ namespace HeatBalanceManager {
             state.dataContaminantBalance->ZoneAirGCTemp.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorGC);
             state.dataContaminantBalance->ZoneAirGCAvg.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorGC);
         }
-        MaxTempPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MinTempPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MaxHeatLoadPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MaxCoolLoadPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MaxHeatLoadZone.dimension(state.dataGlobal->NumOfZones, -9999.0);
-        MaxCoolLoadZone.dimension(state.dataGlobal->NumOfZones, -9999.0);
-        MaxTempZone.dimension(state.dataGlobal->NumOfZones, -9999.0);
-        MinTempZone.dimension(state.dataGlobal->NumOfZones, 1000.0);
-        TempZonePrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
-        LoadZonePrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
-        TempZoneSecPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
-        LoadZoneSecPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
-        WarmupTempDiff.dimension(state.dataGlobal->NumOfZones, 0.0);
-        WarmupLoadDiff.dimension(state.dataGlobal->NumOfZones, 0.0);
-        TempZone.dimension(state.dataGlobal->NumOfZones, 0.0);
-        LoadZone.dimension(state.dataGlobal->NumOfZones, 0.0);
-        TempZoneRpt.dimension(state.dataGlobal->NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
-        LoadZoneRpt.dimension(state.dataGlobal->NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
-        MaxLoadZoneRpt.dimension(state.dataGlobal->NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
-        WarmupConvergenceValues.allocate(state.dataGlobal->NumOfZones);
-        TempZoneRptStdDev.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        LoadZoneRptStdDev.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+        state.dataHeatBalMgr->MaxTempPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->MinTempPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->MaxHeatLoadPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->MaxCoolLoadPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->MaxHeatLoadZone.dimension(state.dataGlobal->NumOfZones, -9999.0);
+        state.dataHeatBalMgr->MaxCoolLoadZone.dimension(state.dataGlobal->NumOfZones, -9999.0);
+        state.dataHeatBalMgr->MaxTempZone.dimension(state.dataGlobal->NumOfZones, -9999.0);
+        state.dataHeatBalMgr->MinTempZone.dimension(state.dataGlobal->NumOfZones, 1000.0);
+        state.dataHeatBalMgr->TempZonePrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->LoadZonePrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->TempZoneSecPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->LoadZoneSecPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->WarmupTempDiff.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->WarmupLoadDiff.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->TempZone.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->LoadZone.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalMgr->TempZoneRpt.dimension(state.dataGlobal->NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
+        state.dataHeatBalMgr->LoadZoneRpt.dimension(state.dataGlobal->NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
+        state.dataHeatBalMgr->MaxLoadZoneRpt.dimension(state.dataGlobal->NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
+        state.dataHeatBalMgr->WarmupConvergenceValues.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalMgr->TempZoneRptStdDev.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+        state.dataHeatBalMgr->LoadZoneRptStdDev.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         // MassConservation.allocate( NumOfZones );
 
         state.dataHeatBalFanSys->ZoneHeatIndex.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -5660,7 +5604,7 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZoneLowSETHours.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
 
-        CountWarmupDayPoints = 0;
+        state.dataHeatBalMgr->CountWarmupDayPoints = 0;
     }
 
     // End Initialization Section of the Module
@@ -5692,52 +5636,52 @@ namespace HeatBalanceManager {
 
         // Record Maxs & Mins for individual zone
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (state.dataHeatBalFanSys->ZTAV(ZoneNum) > MaxTempZone(ZoneNum)) {
-                MaxTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+            if (state.dataHeatBalFanSys->ZTAV(ZoneNum) > state.dataHeatBalMgr->MaxTempZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             }
-            if (state.dataHeatBalFanSys->ZTAV(ZoneNum) < MinTempZone(ZoneNum)) {
-                MinTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+            if (state.dataHeatBalFanSys->ZTAV(ZoneNum) < state.dataHeatBalMgr->MinTempZone(ZoneNum)) {
+                state.dataHeatBalMgr->MinTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             }
-            if (state.dataHeatBal->SNLoadHeatRate(ZoneNum) > MaxHeatLoadZone(ZoneNum)) {
-                MaxHeatLoadZone(ZoneNum) = state.dataHeatBal->SNLoadHeatRate(ZoneNum);
+            if (state.dataHeatBal->SNLoadHeatRate(ZoneNum) > state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = state.dataHeatBal->SNLoadHeatRate(ZoneNum);
             }
-            if (state.dataHeatBal->SNLoadCoolRate(ZoneNum) > MaxCoolLoadZone(ZoneNum)) {
-                MaxCoolLoadZone(ZoneNum) = state.dataHeatBal->SNLoadCoolRate(ZoneNum);
+            if (state.dataHeatBal->SNLoadCoolRate(ZoneNum) > state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = state.dataHeatBal->SNLoadCoolRate(ZoneNum);
             }
 
             // Record temperature and load for individual zone
-            TempZoneSecPrevDay(ZoneNum) = TempZonePrevDay(ZoneNum);
-            LoadZoneSecPrevDay(ZoneNum) = LoadZonePrevDay(ZoneNum);
-            TempZonePrevDay(ZoneNum) = TempZone(ZoneNum);
-            LoadZonePrevDay(ZoneNum) = LoadZone(ZoneNum);
-            TempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
-            LoadZone(ZoneNum) = max(state.dataHeatBal->SNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->SNLoadCoolRate(ZoneNum)));
+            state.dataHeatBalMgr->TempZoneSecPrevDay(ZoneNum) = state.dataHeatBalMgr->TempZonePrevDay(ZoneNum);
+            state.dataHeatBalMgr->LoadZoneSecPrevDay(ZoneNum) = state.dataHeatBalMgr->LoadZonePrevDay(ZoneNum);
+            state.dataHeatBalMgr->TempZonePrevDay(ZoneNum) = state.dataHeatBalMgr->TempZone(ZoneNum);
+            state.dataHeatBalMgr->LoadZonePrevDay(ZoneNum) = state.dataHeatBalMgr->LoadZone(ZoneNum);
+            state.dataHeatBalMgr->TempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+            state.dataHeatBalMgr->LoadZone(ZoneNum) = max(state.dataHeatBal->SNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->SNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days
             if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim == 1 && !state.dataGlobal->DoingSizing) {
-                WarmupTempDiff(ZoneNum) = std::abs(TempZoneSecPrevDay(ZoneNum) - TempZonePrevDay(ZoneNum));
-                WarmupLoadDiff(ZoneNum) = std::abs(LoadZoneSecPrevDay(ZoneNum) - LoadZonePrevDay(ZoneNum));
-                if (ZoneNum == 1) ++CountWarmupDayPoints;
-                TempZoneRpt(ZoneNum, CountWarmupDayPoints) = WarmupTempDiff(ZoneNum);
-                LoadZoneRpt(ZoneNum, CountWarmupDayPoints) = WarmupLoadDiff(ZoneNum);
-                MaxLoadZoneRpt(ZoneNum, CountWarmupDayPoints) = LoadZone(ZoneNum);
+                state.dataHeatBalMgr->WarmupTempDiff(ZoneNum) = std::abs(state.dataHeatBalMgr->TempZoneSecPrevDay(ZoneNum) - state.dataHeatBalMgr->TempZonePrevDay(ZoneNum));
+                state.dataHeatBalMgr->WarmupLoadDiff(ZoneNum) = std::abs(state.dataHeatBalMgr->LoadZoneSecPrevDay(ZoneNum) - state.dataHeatBalMgr->LoadZonePrevDay(ZoneNum));
+                if (ZoneNum == 1) ++state.dataHeatBalMgr->CountWarmupDayPoints;
+                state.dataHeatBalMgr->TempZoneRpt(ZoneNum, state.dataHeatBalMgr->CountWarmupDayPoints) = state.dataHeatBalMgr->WarmupTempDiff(ZoneNum);
+                state.dataHeatBalMgr->LoadZoneRpt(ZoneNum, state.dataHeatBalMgr->CountWarmupDayPoints) = state.dataHeatBalMgr->WarmupLoadDiff(ZoneNum);
+                state.dataHeatBalMgr->MaxLoadZoneRpt(ZoneNum, state.dataHeatBalMgr->CountWarmupDayPoints) = state.dataHeatBalMgr->LoadZone(ZoneNum);
 
                 if (state.dataSysVars->ReportDetailedWarmupConvergence) { // only do this detailed thing when requested by user is on
                     // Write Warmup Convergence Information to the initialization output file
                     if (FirstWarmupWrite) {
-                        static constexpr auto Format_732{"! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature "
+                        constexpr const char * Format_732{"! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature "
                                                          "Difference {{deltaC}},Warmup Load Difference {{W}}\n"};
                         print(state.files.eio, Format_732);
                         FirstWarmupWrite = false;
                     }
-                    static constexpr auto Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
+                    constexpr const char * Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
                     print(state.files.eio,
                           Format_731,
                           state.dataHeatBal->Zone(ZoneNum).Name,
                           state.dataGlobal->TimeStep,
                           state.dataGlobal->HourOfDay,
-                          WarmupTempDiff(ZoneNum),
-                          WarmupLoadDiff(ZoneNum));
+                          state.dataHeatBalMgr->WarmupTempDiff(ZoneNum),
+                          state.dataHeatBalMgr->WarmupLoadDiff(ZoneNum));
                 }
             }
         }
@@ -5801,55 +5745,55 @@ namespace HeatBalanceManager {
         } else {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
-                WarmupConvergenceValues(ZoneNum).TestMaxTempValue = std::abs(MaxTempPrevDay(ZoneNum) - MaxTempZone(ZoneNum));
-                WarmupConvergenceValues(ZoneNum).TestMinTempValue = std::abs(MinTempPrevDay(ZoneNum) - MinTempZone(ZoneNum));
-                if (WarmupConvergenceValues(ZoneNum).TestMaxTempValue <= state.dataHeatBal->TempConvergTol) {
-                    WarmupConvergenceValues(ZoneNum).PassFlag(1) = 2;
+                state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxTempValue = std::abs(state.dataHeatBalMgr->MaxTempPrevDay(ZoneNum) - state.dataHeatBalMgr->MaxTempZone(ZoneNum));
+                state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMinTempValue = std::abs(state.dataHeatBalMgr->MinTempPrevDay(ZoneNum) - state.dataHeatBalMgr->MinTempZone(ZoneNum));
+                if (state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxTempValue <= state.dataHeatBal->TempConvergTol) {
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(1) = 2;
                 } else {
                     ConvergenceChecksFailed = true;
-                    WarmupConvergenceValues(ZoneNum).PassFlag(1) = 1;
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(1) = 1;
                 }
 
-                if (WarmupConvergenceValues(ZoneNum).TestMinTempValue <= state.dataHeatBal->TempConvergTol) {
-                    WarmupConvergenceValues(ZoneNum).PassFlag(2) = 2;
+                if (state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMinTempValue <= state.dataHeatBal->TempConvergTol) {
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(2) = 2;
                 } else {
                     ConvergenceChecksFailed = true;
-                    WarmupConvergenceValues(ZoneNum).PassFlag(2) = 1;
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(2) = 1;
                 }
 
-                if (MaxHeatLoadZone(ZoneNum) > 1.0e-4) { // make sure load big enough to divide
-                    MaxHeatLoadZone(ZoneNum) = std::abs(max(MaxHeatLoadZone(ZoneNum), MinLoad));
-                    MaxHeatLoadPrevDay(ZoneNum) = std::abs(max(MaxHeatLoadPrevDay(ZoneNum), MinLoad));
-                    WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue =
-                        std::abs((MaxHeatLoadZone(ZoneNum) - MaxHeatLoadPrevDay(ZoneNum)) / MaxHeatLoadZone(ZoneNum));
-                    if (WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue <= state.dataHeatBal->LoadsConvergTol) {
-                        WarmupConvergenceValues(ZoneNum).PassFlag(3) = 2;
+                if (state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) > 1.0e-4) { // make sure load big enough to divide
+                    state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = std::abs(max(state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum), MinLoad));
+                    state.dataHeatBalMgr->MaxHeatLoadPrevDay(ZoneNum) = std::abs(max(state.dataHeatBalMgr->MaxHeatLoadPrevDay(ZoneNum), MinLoad));
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue =
+                        std::abs((state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) - state.dataHeatBalMgr->MaxHeatLoadPrevDay(ZoneNum)) / state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum));
+                    if (state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue <= state.dataHeatBal->LoadsConvergTol) {
+                        state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(3) = 2;
                     } else {
                         ConvergenceChecksFailed = true;
-                        WarmupConvergenceValues(ZoneNum).PassFlag(3) = 1;
+                        state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(3) = 1;
                     }
                 } else {
-                    WarmupConvergenceValues(ZoneNum).PassFlag(3) = 2;
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(3) = 2;
                 }
 
-                if (MaxCoolLoadZone(ZoneNum) > 1.0e-4) {
-                    MaxCoolLoadZone(ZoneNum) = std::abs(max(MaxCoolLoadZone(ZoneNum), MinLoad));
-                    MaxCoolLoadPrevDay(ZoneNum) = std::abs(max(MaxCoolLoadPrevDay(ZoneNum), MinLoad));
-                    WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue =
-                        std::abs((MaxCoolLoadZone(ZoneNum) - MaxCoolLoadPrevDay(ZoneNum)) / MaxCoolLoadZone(ZoneNum));
-                    if (WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue <= state.dataHeatBal->LoadsConvergTol) {
-                        WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
+                if (state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) > 1.0e-4) {
+                    state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = std::abs(max(state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum), MinLoad));
+                    state.dataHeatBalMgr->MaxCoolLoadPrevDay(ZoneNum) = std::abs(max(state.dataHeatBalMgr->MaxCoolLoadPrevDay(ZoneNum), MinLoad));
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue =
+                        std::abs((state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) - state.dataHeatBalMgr->MaxCoolLoadPrevDay(ZoneNum)) / state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum));
+                    if (state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue <= state.dataHeatBal->LoadsConvergTol) {
+                        state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
                     } else {
                         ConvergenceChecksFailed = true;
-                        WarmupConvergenceValues(ZoneNum).PassFlag(4) = 1;
+                        state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(4) = 1;
                     }
                 } else {
-                    WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
                 }
 
                 if (state.dataGlobal->DayOfSim >= state.dataHeatBal->MaxNumberOfWarmupDays && state.dataGlobal->WarmupFlag) {
                     // Check convergence for individual zone
-                    if (sum(WarmupConvergenceValues(ZoneNum).PassFlag) != 8) { // pass=2 * 4 values for convergence
+                    if (sum(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag) != 8) { // pass=2 * 4 values for convergence
                         ShowSevereError(state,
                                         format("CheckWarmupConvergence: Loads Initialization, Zone=\"{}\" did not converge after {} warmup days.",
                                                state.dataHeatBal->Zone(ZoneNum).Name,
@@ -5869,38 +5813,38 @@ namespace HeatBalanceManager {
 
                         ShowContinueError(state,
                                           format("..Max Temp Comparison = {:.2R} vs Temperature Convergence Tolerance={:.2R} - {} Convergence",
-                                                 WarmupConvergenceValues(ZoneNum).TestMaxTempValue,
+                                                 state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxTempValue,
                                                  state.dataHeatBal->TempConvergTol,
-                                                 PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(1))));
+                                                 PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(1))));
                         ShowContinueError(state,
                                           format("..Min Temp Comparison = {:.2R} vs Temperature Convergence Tolerance={:.2R} - {} Convergence",
-                                                 WarmupConvergenceValues(ZoneNum).TestMinTempValue,
+                                                 state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMinTempValue,
                                                  state.dataHeatBal->TempConvergTol,
-                                                 PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(2))));
+                                                 PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(2))));
                         ShowContinueError(state,
                                           format("..Max Heat Load Comparison = {:.4R} vs Loads Convergence Tolerance={:.2R} - {} Convergence",
-                                                 WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue,
+                                                 state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue,
                                                  state.dataHeatBal->LoadsConvergTol,
-                                                 PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(3))));
+                                                 PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(3))));
                         ShowContinueError(state,
                                           format("..Max Cool Load Comparison = {:.4R} vs Loads Convergence Tolerance={:.2R} - {} Convergence",
-                                                 WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue,
+                                                 state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue,
                                                  state.dataHeatBal->LoadsConvergTol,
-                                                 PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(4))));
+                                                 PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(4))));
                     }
                 }
 
                 // Transfer current daily max and min loads and temperatures to the
                 // variables containing the last day's values
-                MaxHeatLoadPrevDay(ZoneNum) = MaxHeatLoadZone(ZoneNum);
-                MaxCoolLoadPrevDay(ZoneNum) = MaxCoolLoadZone(ZoneNum);
-                MaxTempPrevDay(ZoneNum) = MaxTempZone(ZoneNum);
-                MinTempPrevDay(ZoneNum) = MinTempZone(ZoneNum);
+                state.dataHeatBalMgr->MaxHeatLoadPrevDay(ZoneNum) = state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum);
+                state.dataHeatBalMgr->MaxCoolLoadPrevDay(ZoneNum) = state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum);
+                state.dataHeatBalMgr->MaxTempPrevDay(ZoneNum) = state.dataHeatBalMgr->MaxTempZone(ZoneNum);
+                state.dataHeatBalMgr->MinTempPrevDay(ZoneNum) = state.dataHeatBalMgr->MinTempZone(ZoneNum);
 
-                MaxHeatLoadZone(ZoneNum) = -9999.0;
-                MaxCoolLoadZone(ZoneNum) = -9999.0;
-                MaxTempZone(ZoneNum) = -9999.0;
-                MinTempZone(ZoneNum) = 1000.0;
+                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = -9999.0;
+                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = -9999.0;
+                state.dataHeatBalMgr->MaxTempZone(ZoneNum) = -9999.0;
+                state.dataHeatBalMgr->MinTempZone(ZoneNum) = 1000.0;
             }
 
             // Limit the number of warmup days, regardless of the number of zones
@@ -5975,7 +5919,7 @@ namespace HeatBalanceManager {
         int Num; // loop control
 
         // Formats
-        static constexpr auto Format_730("! <Warmup Convergence Information>,Zone Name,Environment Type/Name,Average Warmup Temperature Difference "
+        constexpr const char * Format_730("! <Warmup Convergence Information>,Zone Name,Environment Type/Name,Average Warmup Temperature Difference "
                                          "{{deltaC}},Std Dev Warmup Temperature Difference {{deltaC}},Max Temperature Pass/Fail Convergence,Min "
                                          "Temperature Pass/Fail Convergence,Average Warmup Load Difference {{W}},Std Dev Warmup Load Difference "
                                          "{{W}},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence\n");
@@ -5987,8 +5931,8 @@ namespace HeatBalanceManager {
                 ReportWarmupConvergenceFirstWarmupWrite = false;
             }
 
-            TempZoneRptStdDev = 0.0;
-            LoadZoneRptStdDev = 0.0;
+            state.dataHeatBalMgr->TempZoneRptStdDev = 0.0;
+            state.dataHeatBalMgr->LoadZoneRptStdDev = 0.0;
 
             if (state.dataEnvrn->RunPeriodEnvironment) {
                 EnvHeader = "RunPeriod:";
@@ -5997,37 +5941,37 @@ namespace HeatBalanceManager {
             }
 
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                AverageZoneTemp = sum(TempZoneRpt(ZoneNum, {1, CountWarmupDayPoints})) / double(CountWarmupDayPoints);
-                for (Num = 1; Num <= CountWarmupDayPoints; ++Num) {
-                    if (MaxLoadZoneRpt(ZoneNum, Num) > 1.e-4) {
-                        LoadZoneRpt(ZoneNum, Num) /= MaxLoadZoneRpt(ZoneNum, Num);
+                AverageZoneTemp = sum(state.dataHeatBalMgr->TempZoneRpt(ZoneNum, {1, state.dataHeatBalMgr->CountWarmupDayPoints})) / double(state.dataHeatBalMgr->CountWarmupDayPoints);
+                for (Num = 1; Num <= state.dataHeatBalMgr->CountWarmupDayPoints; ++Num) {
+                    if (state.dataHeatBalMgr->MaxLoadZoneRpt(ZoneNum, Num) > 1.e-4) {
+                        state.dataHeatBalMgr->LoadZoneRpt(ZoneNum, Num) /= state.dataHeatBalMgr->MaxLoadZoneRpt(ZoneNum, Num);
                     } else {
-                        LoadZoneRpt(ZoneNum, Num) = 0.0;
+                        state.dataHeatBalMgr->LoadZoneRpt(ZoneNum, Num) = 0.0;
                     }
                 }
-                AverageZoneLoad = sum(LoadZoneRpt(ZoneNum, {1, CountWarmupDayPoints})) / double(CountWarmupDayPoints);
+                AverageZoneLoad = sum(state.dataHeatBalMgr->LoadZoneRpt(ZoneNum, {1, state.dataHeatBalMgr->CountWarmupDayPoints})) / double(state.dataHeatBalMgr->CountWarmupDayPoints);
                 StdDevZoneTemp = 0.0;
                 StdDevZoneLoad = 0.0;
-                for (Num = 1; Num <= CountWarmupDayPoints; ++Num) {
-                    TempZoneRptStdDev(Num) = pow_2(TempZoneRpt(ZoneNum, Num) - AverageZoneTemp);
-                    LoadZoneRptStdDev(Num) = pow_2(LoadZoneRpt(ZoneNum, Num) - AverageZoneLoad);
+                for (Num = 1; Num <= state.dataHeatBalMgr->CountWarmupDayPoints; ++Num) {
+                    state.dataHeatBalMgr->TempZoneRptStdDev(Num) = pow_2(state.dataHeatBalMgr->TempZoneRpt(ZoneNum, Num) - AverageZoneTemp);
+                    state.dataHeatBalMgr->LoadZoneRptStdDev(Num) = pow_2(state.dataHeatBalMgr->LoadZoneRpt(ZoneNum, Num) - AverageZoneLoad);
                 }
-                StdDevZoneTemp = std::sqrt(sum(TempZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
-                StdDevZoneLoad = std::sqrt(sum(LoadZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
+                StdDevZoneTemp = std::sqrt(sum(state.dataHeatBalMgr->TempZoneRptStdDev({1, state.dataHeatBalMgr->CountWarmupDayPoints})) / double(state.dataHeatBalMgr->CountWarmupDayPoints));
+                StdDevZoneLoad = std::sqrt(sum(state.dataHeatBalMgr->LoadZoneRptStdDev({1, state.dataHeatBalMgr->CountWarmupDayPoints})) / double(state.dataHeatBalMgr->CountWarmupDayPoints));
 
-                static constexpr auto Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
+                constexpr const char * Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
                 print(state.files.eio,
                       Format_731,
                       state.dataHeatBal->Zone(ZoneNum).Name,
                       EnvHeader + ' ' + state.dataEnvrn->EnvironmentName,
                       AverageZoneTemp,
                       StdDevZoneTemp,
-                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(1)),
-                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(2)),
+                      PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(1)),
+                      PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(2)),
                       AverageZoneLoad,
                       StdDevZoneLoad,
-                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(3)),
-                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(4)));
+                      PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(3)),
+                      PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(4)));
             }
         }
     }
@@ -6101,13 +6045,13 @@ namespace HeatBalanceManager {
             if (!state.dataGlobal->BeginDayFlag) state.dataEnvrn->PrintEnvrnStampWarmupPrinted = false;
             if (state.dataEnvrn->PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
-                    static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
+                    constexpr const char * EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
                     print(state.files.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (state.dataGlobal->DoOutputReporting) {
-                    static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+                    constexpr const char * EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
                     print(state.files.eso,
                           EnvironmentStampFormatStr,
                           "1",
@@ -6339,7 +6283,7 @@ namespace HeatBalanceManager {
         using General::POLYF; // POLYF       ! Polynomial in cosine of angle of incidence
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const NumName(5, {"1", "2", "3", "4", "5"});
+        Array1D_string const NumName(5, {"1", "2", "3", "4", "5"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FileLineCount;            // counter for number of lines read (used in some error messages)
@@ -7633,7 +7577,7 @@ namespace HeatBalanceManager {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetScheduledSurfaceGains: ");
+        constexpr const char * RoutineName("GetScheduledSurfaceGains: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumArgs;
@@ -7984,10 +7928,10 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int Loop;
-        static int iTC(0);
-        static int iMat(0);
-        static int NumNewConst(0);
-        static int iTCG(0);
+        int iTC(0);
+        int iMat(0);
+        int NumNewConst(0);
+        int iTCG(0);
 
         NumNewConst = 0;
         for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
@@ -8068,19 +8012,19 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 Riw(0.0);            // thermal resistance of interior film coefficient under winter conditions (m2-K/W)
-        static Real64 Row(0.0);            // theraml resistance of exterior film coefficient under winter conditions (m2-K/W)
-        static Real64 Rlw(0.0);            // thermal resistance of block model layer (m2-K/W)
-        static Real64 Ris(0.0);            // thermal resistance of interior film coefficient under summer conditions (m2-K/W)
-        static Real64 Ros(0.0);            // theraml resistance of exterior film coefficient under summer conditions (m2-K/W)
-        static Real64 InflowFraction(0.0); // inward flowing fraction for SHGC, intermediate value non dimensional
-        static Real64 SolarAbsorb(0.0);    // solar aborptance
+        Real64 Riw(0.0);            // thermal resistance of interior film coefficient under winter conditions (m2-K/W)
+        Real64 Row(0.0);            // theraml resistance of exterior film coefficient under winter conditions (m2-K/W)
+        Real64 Rlw(0.0);            // thermal resistance of block model layer (m2-K/W)
+        Real64 Ris(0.0);            // thermal resistance of interior film coefficient under summer conditions (m2-K/W)
+        Real64 Ros(0.0);            // theraml resistance of exterior film coefficient under summer conditions (m2-K/W)
+        Real64 InflowFraction(0.0); // inward flowing fraction for SHGC, intermediate value non dimensional
+        Real64 SolarAbsorb(0.0);    // solar aborptance
         bool ErrorsFound(false);
-        static Real64 TsolLowSide(0.0);      // intermediate solar transmission for interpolating
-        static Real64 TsolHiSide(0.0);       // intermediate solar transmission for interpolating
-        static Real64 DeltaSHGCandTsol(0.0); // intermediate difference
-        static Real64 RLowSide(0.0);
-        static Real64 RHiSide(0.0);
+        Real64 TsolLowSide(0.0);      // intermediate solar transmission for interpolating
+        Real64 TsolHiSide(0.0);       // intermediate solar transmission for interpolating
+        Real64 DeltaSHGCandTsol(0.0); // intermediate difference
+        Real64 RLowSide(0.0);
+        Real64 RHiSide(0.0);
 
         // first fill out defaults
         state.dataMaterial->Material(MaterNum).GlassSpectralDataPtr = 0;
@@ -8258,7 +8202,7 @@ namespace HeatBalanceManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS
-        static std::string const RoutineName("SetupComplexFenestrationMaterialInput: ");
+        constexpr const char * RoutineName("SetupComplexFenestrationMaterialInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string MaterialNames(5);   // Number of Material Alpha names defined
@@ -8674,7 +8618,7 @@ namespace HeatBalanceManager {
         using namespace DataBSDFWindow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SetupComlexFenestrationStateInput: ");
+        constexpr const char * RoutineName("SetupComlexFenestrationStateInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // The following moved to DataBSDFWindow module:

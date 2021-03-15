@@ -2077,16 +2077,17 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
 
     SimulationManager::ManageSimulation(*state); // run the design days
 
-    int returnFanNode = UtilityRoutines::FindItemInList("VSD RETURN FAN OUTLET TO MIXING BOX NODE", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int returnFanNode =
+        UtilityRoutines::FindItemInList("VSD RETURN FAN OUTLET TO MIXING BOX NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_GT(returnFanNode, 0);
-    int supplyOutletNode = UtilityRoutines::FindItemInList("SUPPLY SIDE OUTLET NODE", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int supplyOutletNode = UtilityRoutines::FindItemInList("SUPPLY SIDE OUTLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_GT(returnFanNode, 0);
     EXPECT_GT(supplyOutletNode, 0);
 
-    EXPECT_EQ(0, DataLoopNode::Node(returnFanNode).MassFlowRateMin);
-    EXPECT_EQ(0, DataLoopNode::Node(supplyOutletNode).MassFlowRateMin);
-    EXPECT_EQ(0, DataLoopNode::Node(returnFanNode).MassFlowRate);
-    EXPECT_EQ(0, DataLoopNode::Node(supplyOutletNode).MassFlowRate);
+    EXPECT_EQ(0, state->dataLoopNodes->Node(returnFanNode).MassFlowRateMin);
+    EXPECT_EQ(0, state->dataLoopNodes->Node(supplyOutletNode).MassFlowRateMin);
+    EXPECT_EQ(0, state->dataLoopNodes->Node(returnFanNode).MassFlowRate);
+    EXPECT_EQ(0, state->dataLoopNodes->Node(supplyOutletNode).MassFlowRate);
 }
 
 } // namespace EnergyPlus

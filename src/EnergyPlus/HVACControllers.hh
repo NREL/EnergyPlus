@@ -413,7 +413,7 @@ namespace HVACControllers {
                              bool const AirLoopConverged,
                              int const AirLoopNumCalls);
 
-    void TraceAirLoopController(InputOutputFile &TraceFile, int const ControlNum);
+    void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int const ControlNum);
 
     void SetupIndividualControllerTracer(EnergyPlusData &state, int const ControlNum);
 

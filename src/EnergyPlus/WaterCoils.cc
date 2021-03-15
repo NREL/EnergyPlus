@@ -375,13 +375,13 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).UACoilVariable = state.dataWaterCoils->WaterCoil(CoilNum).UACoil;
             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = NumArray(2);
             state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = GetOnlySingleNode(state,
-                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
             state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
-                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
             state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
-                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
-                AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             {
                 auto const SELECT_CASE_var(AlphArray(7));
@@ -565,13 +565,13 @@ namespace WaterCoils {
                 state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp = false;
             }
             state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = GetOnlySingleNode(state,
-                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
             state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
-                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
             state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
-                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
-                AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             // A7 ; \field Name of Water Storage Tank for Condensate Collection
             state.dataWaterCoils->WaterCoil(CoilNum).CondensateCollectName = AlphArray(7);
@@ -723,13 +723,13 @@ namespace WaterCoils {
             }
 
             state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = GetOnlySingleNode(state,
-                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
             state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
-                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
             state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
-                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
-                AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             {
                 auto const SELECT_CASE_var(AlphArray(7));
@@ -972,7 +972,7 @@ namespace WaterCoils {
         static Real64 EnthCorrFrac(0.0); // enthalpy correction factor
         static Real64 TempCorrFrac(0.0); // temperature correction factor
 
-
+        auto &Node(state.dataLoopNodes->Node);
 
         if (state.dataWaterCoils->InitWaterCoilOneTimeFlag) {
             // initialize the environment and sizing flags
@@ -1130,7 +1130,8 @@ namespace WaterCoils {
 
             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate = rho * state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate,
                                state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum,
                                state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum,
@@ -4676,26 +4677,26 @@ namespace WaterCoils {
         WaterOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;
 
         // Set the outlet air nodes of the WaterCoil
-        Node(AirOutletNode).MassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirMassFlowRate;
-        Node(AirOutletNode).Temp = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp;
-        Node(AirOutletNode).HumRat = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirHumRat;
-        Node(AirOutletNode).Enthalpy = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirEnthalpy;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirMassFlowRate;
+        state.dataLoopNodes->Node(AirOutletNode).Temp = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(AirOutletNode).HumRat = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(AirOutletNode).Enthalpy = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirEnthalpy;
 
-        Node(WaterOutletNode).Temp = state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterTemp;
-        Node(WaterOutletNode).Enthalpy = state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterEnthalpy;
+        state.dataLoopNodes->Node(WaterOutletNode).Temp = state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterTemp;
+        state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterEnthalpy;
 
         // Set the outlet nodes for properties that just pass through & not used
-        Node(AirOutletNode).Quality = Node(AirInletNode).Quality;
-        Node(AirOutletNode).Press = Node(AirInletNode).Press;
-        Node(AirOutletNode).MassFlowRateMin = Node(AirInletNode).MassFlowRateMin;
-        Node(AirOutletNode).MassFlowRateMax = Node(AirInletNode).MassFlowRateMax;
-        Node(AirOutletNode).MassFlowRateMinAvail = Node(AirInletNode).MassFlowRateMinAvail;
-        Node(AirOutletNode).MassFlowRateMaxAvail = Node(AirInletNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
+        state.dataLoopNodes->Node(AirOutletNode).Press = state.dataLoopNodes->Node(AirInletNode).Press;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail;
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
+            state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
+            state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
         }
     }
 
@@ -6096,7 +6097,7 @@ namespace WaterCoils {
                     auto const SELECT_CASE_var(ControlledVar);
                     if (SELECT_CASE_var == iTemperature) {
                         CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
-                        DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
+                        state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
@@ -6108,7 +6109,7 @@ namespace WaterCoils {
                         }
                     } else if (SELECT_CASE_var == iHumidityRatio) {
                         CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
-                        DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
+                        state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
@@ -6120,7 +6121,7 @@ namespace WaterCoils {
                         }
                     } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) {
                         CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
-                        DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
+                        state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
@@ -6132,7 +6133,7 @@ namespace WaterCoils {
                         }
                         EMSSetPointErrorFlag = false;
                         CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
-                        DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
+                        state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
@@ -6465,7 +6466,6 @@ namespace WaterCoils {
         // Using/Aliasing
         using DataHVACGlobals::SimAirLoopsFlag;
         using DataHVACGlobals::SimZoneEquipmentFlag;
-        using DataLoopNode::Node;
         using DataPlant::ccSimPlantEquipTypes;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -6520,16 +6520,16 @@ namespace WaterCoils {
         InletNodeNum = state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
         OutletNodeNum = state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;
 
-        if (Node(InletNodeNum).Temp != state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(InletNodeNum).Temp != state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp) DidAnythingChange = true;
 
-        if (Node(OutletNodeNum).Temp != state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterTemp) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(OutletNodeNum).Temp != state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterTemp) DidAnythingChange = true;
 
-        if (Node(InletNodeNum).MassFlowRate != state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterMassFlowRate) {
+        if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate != state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterMassFlowRate) {
             DidAnythingChange = true;
-            Node(OutletNodeNum).MassFlowRate = Node(InletNodeNum).MassFlowRate; // make sure flows are consistent
+            state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate; // make sure flows are consistent
         }
 
-        if (Node(OutletNodeNum).MassFlowRate != state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterMassFlowRate) DidAnythingChange = true;
+        if (state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate != state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterMassFlowRate) DidAnythingChange = true;
 
         if (DidAnythingChange) {
             // set sim flag for this loop

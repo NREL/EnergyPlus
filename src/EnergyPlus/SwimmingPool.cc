@@ -319,16 +319,16 @@ namespace EnergyPlus::SwimmingPool {
                                                                             ErrorsFound,
                                                                             CurrentModuleObject,
                                                                             Alphas(1),
-                                                                            DataLoopNode::NodeType_Water,
-                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                            DataLoopNode::NodeFluidType::Water,
+                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsNotParent);
             state.dataSwimmingPools->Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state, Alphas(7),
                                                                              ErrorsFound,
                                                                              CurrentModuleObject,
                                                                              Alphas(1),
-                                                                             DataLoopNode::NodeType_Water,
-                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                             DataLoopNode::NodeFluidType::Water,
+                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsNotParent);
             if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
@@ -531,7 +531,7 @@ namespace EnergyPlus::SwimmingPool {
         Real64 mdot = 0.0;
         PlantUtilities::SetComponentFlowRate(state,
             mdot, this->WaterInletNode, this->WaterOutletNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchNum, this->HWCompNum);
-        this->WaterInletTemp = DataLoopNode::Node(this->WaterInletNode).Temp;
+        this->WaterInletTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
 
         // get the schedule values for different scheduled parameters
         if (this->ActivityFactorSchedPtr > 0) {
@@ -727,7 +727,8 @@ namespace EnergyPlus::SwimmingPool {
 
         if (!this->MyPlantScanFlagPool) {
             if (this->WaterInletNode > 0) {
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->WaterMassFlowRateMax,
                                                    this->WaterInletNode,
                                                    this->WaterOutletNode,
@@ -825,7 +826,7 @@ namespace EnergyPlus::SwimmingPool {
         Real64 TInSurf =
             this->CurSetPtTemp; // Setpoint temperature for pool which is also the goal temperature and also the inside surface face temperature
         Real64 Tmuw = this->CurMakeupWaterTemp;                                // Inlet makeup water temperature
-        Real64 TLoopInletTemp = DataLoopNode::Node(this->WaterInletNode).Temp; // Inlet water temperature from the plant loop
+        Real64 TLoopInletTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp; // Inlet water temperature from the plant loop
         this->WaterInletTemp = TLoopInletTemp;
 
         // Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
@@ -911,8 +912,8 @@ namespace EnergyPlus::SwimmingPool {
 
         PlantUtilities::SafeCopyPlantNode(state, this->WaterInletNode, this->WaterOutletNode);
 
-        Real64 WaterMassFlow = DataLoopNode::Node(this->WaterInletNode).MassFlowRate; // water mass flow rate
-        if (WaterMassFlow > 0.0) DataLoopNode::Node(this->WaterOutletNode).Temp = this->PoolWaterTemp;
+        Real64 WaterMassFlow = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate; // water mass flow rate
+        if (WaterMassFlow > 0.0) state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->PoolWaterTemp;
     }
 
     void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRUE. if the swimming pool "runs" this zone time step

@@ -73,7 +73,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
 {
     DataHVACGlobals::NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
 
     bool CompLoadFlag(false);
     int AirLoopNum(1);
@@ -108,8 +108,8 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).CurMeterReading = 100.0;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("NaturalGas");
 
-    DataLoopNode::Node(1).MassFlowRate = 1.0;
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
 
     state->dataSysRpts->SysHumidNaturalGas.allocate(1);
     state->dataSysRpts->SysHCCompNaturalGas.allocate(1);
