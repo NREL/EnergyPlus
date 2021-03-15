@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     state->dataFans->NumFans = 2;
-    Fan.allocate(state->dataFans->NumFans);
+    state->dataFans->Fan.allocate(state->dataFans->NumFans);
     state->dataFaultsMgr->FaultsFouledAirFilters.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
@@ -114,18 +114,18 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Inputs:
     FanNum = 1;
-    Fan(FanNum).FanName = "Fan_1";
-    Fan(FanNum).FanType = "Fan:VariableVolume";
-    Fan(FanNum).MaxAirFlowRate = 18.194;
-    Fan(FanNum).DeltaPress = 1017.59;
+    state->dataFans->Fan(FanNum).FanName = "Fan_1";
+    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
+    state->dataFans->Fan(FanNum).DeltaPress = 1017.59;
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_1";
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
 
     FanNum = 2;
-    Fan(FanNum).FanName = "Fan_2";
-    Fan(FanNum).FanType = "Fan:VariableVolume";
-    Fan(FanNum).MaxAirFlowRate = 18.194;
-    Fan(FanNum).DeltaPress = 1017.59 * 1.2;
+    state->dataFans->Fan(FanNum).FanName = "Fan_2";
+    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
+    state->dataFans->Fan(FanNum).DeltaPress = 1017.59 * 1.2;
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_2";
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
 
@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Clean up
     state->dataCurveManager->PerfCurve.deallocate();
-    Fan.deallocate();
+    state->dataFans->Fan.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve_AutosizedFan)
@@ -231,7 +231,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
     int FanNum = 1;
     EXPECT_NO_THROW(Fans::SizeFan(*state, FanNum));
-    EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
+    EXPECT_DOUBLE_EQ(0.114, state->dataFans->Fan(FanNum).MaxAirFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve_NonAutosizedFan)
@@ -320,7 +320,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
     int FanNum = 1;
     EXPECT_ANY_THROW(Fans::SizeFan(*state, FanNum));
-    EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
+    EXPECT_DOUBLE_EQ(0.114, state->dataFans->Fan(FanNum).MaxAirFlowRate);
     std::string const error_string = delimited_string({
         "   ** Severe  ** FaultModel:Fouling:AirFilter = \"FAN CV FOULING AIR FILTER\"",
         "   **   ~~~   ** Invalid Fan Curve Name = \"FOULED FAN CURVE\" does not cover ",
@@ -350,7 +350,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     state->dataFans->NumFans = 1;
-    Fan.allocate(state->dataFans->NumFans);
+    state->dataFans->Fan.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
@@ -368,20 +368,20 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
 
     // Inputs: fans
     FanNum = 1;
-    Fan(FanNum).FanName = "Fan_1";
-    Fan(FanNum).FanType = "Fan:VariableVolume";
-    Fan(FanNum).MaxAirFlowRate = 18.194;
-    Fan(FanNum).DeltaPress = 1017.59;
+    state->dataFans->Fan(FanNum).FanName = "Fan_1";
+    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
+    state->dataFans->Fan(FanNum).DeltaPress = 1017.59;
 
     // Run and Check
     FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(*state,
-        Fan(FanNum).FanName, Fan(FanNum).MaxAirFlowRate, Fan(FanNum).DeltaPress, FanFaultyDeltaPressInc * Fan(FanNum).DeltaPress, CurveNum);
+        state->dataFans->Fan(FanNum).FanName, state->dataFans->Fan(FanNum).MaxAirFlowRate, state->dataFans->Fan(FanNum).DeltaPress, FanFaultyDeltaPressInc * state->dataFans->Fan(FanNum).DeltaPress, CurveNum);
 
     EXPECT_NEAR(3.845, FanDesignFlowRateDec, 0.005);
 
     // Clean up
     state->dataCurveManager->PerfCurve.deallocate();
-    Fan.deallocate();
+    state->dataFans->Fan.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
@@ -467,8 +467,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
     // Check
     EXPECT_EQ(2.0, state->dataFaultsMgr->FaultsCoilSATSensor(1).Offset);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFaultsMgr->FaultsCoilSATSensor(1).CoilType);
-    EXPECT_TRUE(HVACControllers::ControllerProps(1).FaultyCoilSATFlag);
-    EXPECT_EQ(1, HVACControllers::ControllerProps(1).FaultyCoilSATIndex);
+    EXPECT_TRUE(state->dataHVACControllers->ControllerProps(1).FaultyCoilSATFlag);
+    EXPECT_EQ(1, state->dataHVACControllers->ControllerProps(1).FaultyCoilSATIndex);
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultChillerSWTSensor_CalFaultChillerSWT)
@@ -908,10 +908,10 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         int FaultIndex = 1;
         EXPECT_EQ("AHU HW HEATING COIL", state->dataWaterCoils->WaterCoil(CoilNum).Name);
         EXPECT_NEAR(6.64, state->dataWaterCoils->WaterCoil(CoilNum).UACoil, 0.0001);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_SimpleHeating, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num);
+        EXPECT_EQ(DataPlant::TypeOf_CoilWaterSimpleHeating, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
 
         EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_SimpleHeating, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_EQ(DataPlant::TypeOf_CoilWaterSimpleHeating, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
@@ -936,10 +936,10 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         int CoilNum = 2;
         int FaultIndex = 2;
         EXPECT_EQ("AHU CHW COOLING COIL", state->dataWaterCoils->WaterCoil(CoilNum).Name);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_Cooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num);
+        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
 
         EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_Cooling, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
@@ -969,7 +969,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     {
         int CoilNum = 3;
         EXPECT_EQ("AHU CHW COIL WITH NO FAULT", state->dataWaterCoils->WaterCoil(CoilNum).Name);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_Cooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num);
+        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
 
         EXPECT_FALSE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(0, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);

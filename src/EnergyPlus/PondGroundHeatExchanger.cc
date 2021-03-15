@@ -218,8 +218,8 @@ namespace EnergyPlus::PondGroundHeatExchanger {
                                                                              ErrorsFound,
                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                              DataIPShortCuts::cAlphaArgs(1),
-                                                                             DataLoopNode::NodeType_Water,
-                                                                             DataLoopNode::NodeConnectionType_Inlet,
+                                                                             DataLoopNode::NodeFluidType::Water,
+                                                                             DataLoopNode::NodeConnectionType::Inlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsNotParent);
             if (state.dataPondGHE->PondGHE(Item).InletNodeNum == 0) {
@@ -234,8 +234,8 @@ namespace EnergyPlus::PondGroundHeatExchanger {
                                                                               ErrorsFound,
                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                               DataIPShortCuts::cAlphaArgs(1),
-                                                                              DataLoopNode::NodeType_Water,
-                                                                              DataLoopNode::NodeConnectionType_Outlet,
+                                                                              DataLoopNode::NodeFluidType::Water,
+                                                                              DataLoopNode::NodeConnectionType::Outlet,
                                                                               1,
                                                                               DataLoopNode::ObjectIsNotParent);
             if (state.dataPondGHE->PondGHE(Item).OutletNodeNum == 0) {
@@ -424,7 +424,8 @@ namespace EnergyPlus::PondGroundHeatExchanger {
                                                                RoutineName);
             this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
             this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; // assume 10C delta T?
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->DesignMassFlowRate,
                                                this->InletNodeNum,
                                                this->OutletNodeNum,
@@ -445,7 +446,7 @@ namespace EnergyPlus::PondGroundHeatExchanger {
             this->firstTimeThrough = true;
         }
 
-        this->InletTemp = DataLoopNode::Node(InletNodeNum).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(InletNodeNum).Temp;
         this->PondTemp = this->BulkTemperature;
 
         // Hypothetical design flow rate
@@ -456,7 +457,7 @@ namespace EnergyPlus::PondGroundHeatExchanger {
             DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         // get the current flow rate - module variable
-        this->MassFlowRate = DataLoopNode::Node(InletNodeNum).MassFlowRate;
+        this->MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
     }
 
     void PondGroundHeatExchangerData::CalcPondGroundHeatExchanger(EnergyPlusData &state)
@@ -865,8 +866,8 @@ namespace EnergyPlus::PondGroundHeatExchanger {
         }
 
         // update node
-        DataLoopNode::Node(this->OutletNodeNum).Temp = this->OutletTemp;
-        DataLoopNode::Node(this->OutletNodeNum).MassFlowRate = this->MassFlowRate;
+        state.dataLoopNodes->Node(this->OutletNodeNum).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNodeNum).MassFlowRate = this->MassFlowRate;
 
         // update heat transfer rate
         // compute pond heat transfer
