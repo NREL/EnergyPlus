@@ -108,7 +108,7 @@ protected:
         state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataSurface->Surface.allocate(NumOfSurfaces);
         state->dataHeatBal->HConvIn.allocate(NumOfSurfaces);
-        TempSurfInTmp.allocate(NumOfSurfaces);
+        state->dataHeatBalSurf->TempSurfInTmp.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVSurface.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVSurfaceOld.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVDeepLayer.allocate(NumOfSurfaces);
@@ -280,8 +280,8 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBalFanSys->MAT(1) = 20.0;
     state->dataHeatBal->HConvIn(1) = 1.0;
     state->dataHeatBal->HConvIn(2) = 1.0;
-    TempSurfInTmp(1) = 25.0;
-    TempSurfInTmp(2) = 30.0;
+    state->dataHeatBalSurf->TempSurfInTmp(1) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(2) = 30.0;
     RhoVaporAirIn(1) = PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
     RhoVaporAirIn(2) = PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
     HMassConvInFD(1) = state->dataHeatBal->HConvIn(1) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *

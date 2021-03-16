@@ -100,21 +100,7 @@ namespace HeatBalFiniteDiffManager {
     using namespace DataMoistureBalance;
     using DataHeatBalance::Air;
     using DataHeatBalance::RegularMaterial;
-    using DataHeatBalSurface::MaxSurfaceTempLimit;
     using DataHeatBalSurface::MinSurfaceTempLimit;
-    using DataHeatBalSurface::SurfNetLWRadToSurf;
-    using DataHeatBalSurface::SurfOpaqInsFaceConduction;
-    using DataHeatBalSurface::SurfOpaqInsFaceConductionFlux;
-    using DataHeatBalSurface::SurfOpaqOutsideFaceConduction;
-    using DataHeatBalSurface::SurfOpaqOutsideFaceConductionFlux;
-    using DataHeatBalSurface::QdotRadNetSurfInRep;
-    using DataHeatBalSurface::QdotRadOutRepPerArea;
-    using DataHeatBalSurface::QRadNetSurfInReport;
-    using DataHeatBalSurface::SurfOpaqQRadSWInAbs;
-    using DataHeatBalSurface::SurfOpaqQRadSWOutAbs;
-    using DataHeatBalSurface::SurfQRadSWOutMvIns;
-    using DataHeatBalSurface::TempSource;
-    using DataHeatBalSurface::TempUserLoc;
     using DataSurfaces::Ground;
     using DataSurfaces::HeatTransferModel_CondFD;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
@@ -634,8 +620,8 @@ namespace HeatBalFiniteDiffManager {
         // And then initialize
         QHeatInFlux = 0.0;
         QHeatOutFlux = 0.0;
-        SurfOpaqInsFaceConductionFlux = 0.0;
-        SurfOpaqOutsideFaceConductionFlux = 0.0;
+        state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux = 0.0;
+        state.dataHeatBalSurf->SurfOpaqOutsideFaceConductionFlux = 0.0;
 
         // Setup Output Variables
 
@@ -1456,9 +1442,6 @@ namespace HeatBalFiniteDiffManager {
         //       RE-ENGINEERED  Curtis Pedersen 2006
 
         // Using/Aliasing
-        using DataHeatBalSurface::QdotRadOutRep;
-        using DataHeatBalSurface::QdotRadOutRepPerArea;
-        using DataHeatBalSurface::QRadOutReport;
         using DataSurfaces::HeatTransferModel_CondFD;
         using DataSurfaces::OtherSideCondModeledExt;
 
@@ -1473,8 +1456,8 @@ namespace HeatBalFiniteDiffManager {
             Tsky = state.dataSurface->OSCM(surface.OSCMPtr).TRad;
             QRadSWOutFD = 0.0; // eliminate incident shortwave on underlying surface
         } else {               // Set the external conditions to local variables
-            QRadSWOutFD = SurfOpaqQRadSWOutAbs(Surf);
-            QRadSWOutMvInsulFD = SurfQRadSWOutMvIns(Surf);
+            QRadSWOutFD = state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(Surf);
+            QRadSWOutMvInsulFD = state.dataHeatBalSurf->SurfQRadSWOutMvIns(Surf);
             Tsky = state.dataEnvrn->SkyTemp;
         }
 
@@ -1545,10 +1528,11 @@ namespace HeatBalFiniteDiffManager {
                 SurfaceFD(Surf).CpDelXRhoS2(i) = surfaceFDEBC.CpDelXRhoS1(TotNodesPlusOne); // Save this for computing node flux values
             }
 
-            Real64 const QNetSurfFromOutside(SurfOpaqInsFaceConductionFlux(surface_ExtBoundCond)); // filled in InteriorBCEqns
+            Real64 const QNetSurfFromOutside(state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(surface_ExtBoundCond)); // filled in InteriorBCEqns
             //    QFluxOutsideToOutSurf(Surf)       = QnetSurfFromOutside
-            SurfOpaqOutsideFaceConductionFlux(Surf) = -QNetSurfFromOutside;
-            SurfOpaqOutsideFaceConduction(Surf) = surface.Area * SurfOpaqOutsideFaceConductionFlux(Surf);
+            state.dataHeatBalSurf->SurfOpaqOutsideFaceConductionFlux(Surf) = -QNetSurfFromOutside;
+            state.dataHeatBalSurf->SurfOpaqOutsideFaceConduction(Surf) =
+                surface.Area * state.dataHeatBalSurf->SurfOpaqOutsideFaceConductionFlux(Surf);
             QHeatOutFlux(Surf) = QNetSurfFromOutside;
 
         } else if (surface_ExtBoundCond <= 0) { // regular outside conditions
@@ -1689,8 +1673,8 @@ namespace HeatBalFiniteDiffManager {
                 // Limit clipping
                 if (TDT_i < MinSurfaceTempLimit) {
                     TDT_i = MinSurfaceTempLimit;
-                } else if (TDT_i > MaxSurfaceTempLimit) {
-                    TDT_i = MaxSurfaceTempLimit;
+                } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
+                    TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
                 }
 
                 TDT(i) = TDT_i;
@@ -1704,13 +1688,14 @@ namespace HeatBalFiniteDiffManager {
             Real64 const QNetSurfFromOutside(QRadSWOutFD + (hgnd * (-TDT_i + Tgnd) + (hconvo + hrad) * Toa_TDT_i + hsky * (-TDT_i + Tsky)));
 
             // Same sign convention as CTFs
-            SurfOpaqOutsideFaceConductionFlux(Surf) = -QNetSurfFromOutside;
-            SurfOpaqOutsideFaceConduction(Surf) = surface.Area * SurfOpaqOutsideFaceConductionFlux(Surf);
+            state.dataHeatBalSurf->SurfOpaqOutsideFaceConductionFlux(Surf) = -QNetSurfFromOutside;
+            state.dataHeatBalSurf->SurfOpaqOutsideFaceConduction(Surf) =
+                surface.Area * state.dataHeatBalSurf->SurfOpaqOutsideFaceConductionFlux(Surf);
 
             // Report all outside BC heat fluxes
-            QdotRadOutRepPerArea(Surf) = -(hgnd * (TDT_i - Tgnd) + hrad * (-Toa_TDT_i) + hsky * (TDT_i - Tsky));
-            QdotRadOutRep(Surf) = surface.Area * QdotRadOutRepPerArea(Surf);
-            QRadOutReport(Surf) = QdotRadOutRep(Surf) * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBalSurf->QdotRadOutRepPerArea(Surf) = -(hgnd * (TDT_i - Tgnd) + hrad * (-Toa_TDT_i) + hsky * (TDT_i - Tsky));
+            state.dataHeatBalSurf->QdotRadOutRep(Surf) = surface.Area * state.dataHeatBalSurf->QdotRadOutRepPerArea(Surf);
+            state.dataHeatBalSurf->QRadOutReport(Surf) = state.dataHeatBalSurf->QdotRadOutRep(Surf) * state.dataGlobal->TimeStepZoneSec;
 
         } // regular BC part of the ground and Rain check
     }
@@ -1821,8 +1806,8 @@ namespace HeatBalFiniteDiffManager {
         // Limit clipping
         if (TDT_i < MinSurfaceTempLimit) {
             TDT_i = MinSurfaceTempLimit;
-        } else if (TDT_i > MaxSurfaceTempLimit) {
-            TDT_i = MaxSurfaceTempLimit;
+        } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
+            TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
         }
 
         TDT(i) = TDT_i;
@@ -1989,8 +1974,8 @@ namespace HeatBalFiniteDiffManager {
                     // Limit clipping
                     if (TDT_i < MinSurfaceTempLimit) {
                         TDT_i = MinSurfaceTempLimit;
-                    } else if (TDT_i > MaxSurfaceTempLimit) {
-                        TDT_i = MaxSurfaceTempLimit;
+                    } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
+                        TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
                     }
                     SurfaceFD(Surf).CpDelXRhoS1(i) = 0.0;                         //  - rlayer has no capacitance, so this is zero
                     SurfaceFD(Surf).CpDelXRhoS2(i) = (Cp2 * Delx2 * RhoS2) / 2.0; // Save this for computing node flux values
@@ -2052,8 +2037,8 @@ namespace HeatBalFiniteDiffManager {
                     // Limit clipping
                     if (TDT_i < MinSurfaceTempLimit) {
                         TDT_i = MinSurfaceTempLimit;
-                    } else if (TDT_i > MaxSurfaceTempLimit) {
-                        TDT_i = MaxSurfaceTempLimit;
+                    } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
+                        TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
                     }
                     SurfaceFD(Surf).CpDelXRhoS1(i) = (Cp1 * Delx1 * RhoS1) / 2.0; // Save this for computing node flux values
                     SurfaceFD(Surf).CpDelXRhoS2(i) = 0.0;                         //  - rlayer has no capacitance, so this is zero
@@ -2156,21 +2141,21 @@ namespace HeatBalFiniteDiffManager {
                     // Limit clipping
                     if (TDT_i < MinSurfaceTempLimit) {
                         TDT_i = MinSurfaceTempLimit;
-                    } else if (TDT_i > MaxSurfaceTempLimit) {
-                        TDT_i = MaxSurfaceTempLimit;
+                    } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
+                        TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
                     }
                     SurfaceFD(Surf).CpDelXRhoS1(i) = (Cp1 * Delx1 * RhoS1) / 2.0; // Save this for computing node flux values
                     SurfaceFD(Surf).CpDelXRhoS2(i) = (Cp2 * Delx2 * RhoS2) / 2.0; // Save this for computing node flux values
 
                     if (construct.SourceSinkPresent && (Lay == construct.SourceAfterLayer)) {
                         state.dataHeatBalFanSys->TCondFDSourceNode(Surf) = TDT_i; // Transfer node temp to Radiant System
-                        TempSource(Surf) = TDT_i;        // Transfer node temp to DataHeatBalSurface module
+                        state.dataHeatBalSurf->TempSource(Surf) = TDT_i;          // Transfer node temp to DataHeatBalSurface module
                         SurfaceFD(Surf).QSource = QSSFlux;
                         SurfaceFD(Surf).SourceNodeNum = i;
                     }
 
                     if (construct.SourceSinkPresent && (Lay == construct.TempAfterLayer)) {
-                        TempUserLoc(Surf) = TDT_i; // Transfer node temp to DataHeatBalSurface module
+                        state.dataHeatBalSurf->TempUserLoc(Surf) = TDT_i; // Transfer node temp to DataHeatBalSurface module
                     }
 
                 } // End of R-layer and Regular check
@@ -2217,8 +2202,9 @@ namespace HeatBalFiniteDiffManager {
         int const ConstrNum(surface.Construction);
 
         // Set the internal conditions to local variables
-        Real64 const NetLWRadToSurfFD(SurfNetLWRadToSurf(Surf)); // Net interior long wavelength radiation to surface from other surfaces
-        Real64 const QRadSWInFD(SurfOpaqQRadSWInAbs(Surf));          // Short wave radiation absorbed on inside of opaque surface
+        Real64 const NetLWRadToSurfFD(
+            state.dataHeatBalSurf->SurfNetLWRadToSurf(Surf)); // Net interior long wavelength radiation to surface from other surfaces
+        Real64 const QRadSWInFD(state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(Surf)); // Short wave radiation absorbed on inside of opaque surface
         Real64 const QHtRadSysSurfFD(
                 state.dataHeatBalFanSys->QHTRadSysSurf(Surf)); // Current radiant heat flux at a surface due to the presence of high temperature radiant heaters
         Real64 const QHWBaseboardSurfFD(
@@ -2345,8 +2331,8 @@ namespace HeatBalFiniteDiffManager {
               // Limit clipping
             if (TDT_i < MinSurfaceTempLimit) {
                 TDT_i = MinSurfaceTempLimit;
-            } else if (TDT_i > MaxSurfaceTempLimit) {
-                TDT_i = MaxSurfaceTempLimit;
+            } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
+                TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
             }
 
             TDT(i) = TDT_i;
@@ -2355,9 +2341,9 @@ namespace HeatBalFiniteDiffManager {
 
         Real64 const QNetSurfInside(-(QFac + hconvi * (-TDT_i + Tia)));
         //  Pass inside conduction Flux [W/m2] to DataHeatBalanceSurface array
-        SurfOpaqInsFaceConductionFlux(Surf) = QNetSurfInside;
+        state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(Surf) = QNetSurfInside;
         //  QFluxZoneToInSurf(Surf) = QNetSurfInside
-        SurfOpaqInsFaceConduction(Surf) = QNetSurfInside * surface.Area; // for reporting as in CTF, PT
+        state.dataHeatBalSurf->SurfOpaqInsFaceConduction(Surf) = QNetSurfInside * surface.Area; // for reporting as in CTF, PT
     }
 
     void CheckFDSurfaceTempLimits(EnergyPlusData &state,
@@ -2511,7 +2497,7 @@ namespace HeatBalFiniteDiffManager {
         // so the arrays are all allocated to Totodes+1
 
         // Heat flux at the inside face node (TotNodes+1)
-        surfaceFD.QDreport(TotNodes + 1) = SurfOpaqInsFaceConductionFlux(Surf);
+        surfaceFD.QDreport(TotNodes + 1) = state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(Surf);
 
         // Heat flux for remaining nodes.
         for (node = TotNodes; node >= 1; --node) {

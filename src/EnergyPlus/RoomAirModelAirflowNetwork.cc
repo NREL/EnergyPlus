@@ -1072,7 +1072,7 @@ namespace RoomAirModelAirflowNetwork {
             } // End of check if window
 
             HA = HA + state.dataHeatBal->HConvIn(SurfNum) * Area;
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
 
             if (state.dataSurface->Surface(SurfNum).TAirRef == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature(which is to be solved for in CorrectZoneAirTemp).
@@ -1127,7 +1127,7 @@ namespace RoomAirModelAirflowNetwork {
         // Breakout summation of surface moisture interaction terms
 
         // Using/Aliasing
-        using DataHeatBalSurface::TempSurfInTmp;
+
         using HeatBalanceHAMTManager::UpdateHeatBalHAMT;
         using MoistureBalanceEMPDManager::UpdateMoistureBalanceEMPD;
         using Psychrometrics::PsyRhFnTdbRhov;
@@ -1173,7 +1173,10 @@ namespace RoomAirModelAirflowNetwork {
                 RhoAirZone = PsyRhoAirFnPbTdbW(state,
                     state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(SurfNum).Zone), PsyRhFnTdbRhov(state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
 
-                Wsurf = PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum), PsyRhFnTdbRhov(state, TempSurfInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"), state.dataEnvrn->OutBaroPress);
+                Wsurf = PsyWFnTdbRhPb(state,
+                                      state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
+                                      PsyRhFnTdbRhov(state, state.dataHeatBalSurf->TempSurfInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"),
+                                      state.dataEnvrn->OutBaroPress);
 
                 SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoAirZone;
 
@@ -1188,9 +1191,10 @@ namespace RoomAirModelAirflowNetwork {
                 SumHmAW = SumHmAW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
                 SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area *
                                           PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
-                                                            TempSurfInTmp(SurfNum),
-                                                            PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum),
-                                                                          PsyRhFnTdbRhovLBnd0C(state, TempSurfInTmp(SurfNum), RhoVaporAirIn(SurfNum)),
+                                                            state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
+                                                            PsyWFnTdbRhPb(state,
+                                                                          state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
+                                                 PsyRhFnTdbRhovLBnd0C(state, state.dataHeatBalSurf->TempSurfInTmp(SurfNum), RhoVaporAirIn(SurfNum)),
                                                                           state.dataEnvrn->OutBaroPress));
                 SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoVaporSurfIn(SurfNum);
             }
