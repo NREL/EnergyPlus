@@ -133,7 +133,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     int ZoneNum = 1;
     int NodeNum;
     for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-        Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
     }
 
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 0;
@@ -141,25 +141,25 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     // Test here - if zone equipment exhausts slightly more than it supplies, there should be no unbalanced exhaust flow warning
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
 
     // Add excess balanced zone exhaust from exhaust fan, still no warning
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.5;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
 
     // Add excess unbalanced zone exhaust from exhaust fan, now there should be warning
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
     CalcZoneMassBalance(*state, false);
     EXPECT_TRUE(has_err_output());
 
@@ -519,7 +519,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
 
     int ZoneNum = 1;
     for (int NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-        Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
     }
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(1) = 2; // Intentionally not in 1,2,3 order
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(2) = 3;
@@ -540,8 +540,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(3);
@@ -557,38 +557,38 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     state->dataGlobal->isPulseZoneSizing = false;
 
     // Case 1 - send zero, expect zero back
-    Node(inletNode1).MassFlowRate = 0.0;
-    Node(inletNode2).MassFlowRate = 0.0;
-    Node(inletNode3).MassFlowRate = 0.0;
-    Node(returnNode1).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
-    Node(returnNode2).MassFlowRate = 0.32;
-    Node(returnNode3).MassFlowRate = 0.45;
+    state->dataLoopNodes->Node(inletNode1).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(inletNode2).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(inletNode3).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(returnNode1).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
+    state->dataLoopNodes->Node(returnNode2).MassFlowRate = 0.32;
+    state->dataLoopNodes->Node(returnNode3).MassFlowRate = 0.45;
 
     Real64 StdTotalReturnMassFlow = 0.0;
     Real64 FinalTotalReturnMassFlow = 0.0;
 
     CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 0.0);
-    EXPECT_EQ(Node(returnNode1).MassFlowRate, 0.0);
-    EXPECT_EQ(Node(returnNode2).MassFlowRate, 0.0);
-    EXPECT_EQ(Node(returnNode3).MassFlowRate, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode1).MassFlowRate, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode2).MassFlowRate, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode3).MassFlowRate, 0.0);
 
     // Case 2 - send zero, expect sum of inlet flow back
-    Node(inletNode2).MassFlowRate = 2.0;
-    Node(inletNode1).MassFlowRate = 1.0;
-    Node(inletNode3).MassFlowRate = 3.0;
-    Node(returnNode1).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
-    Node(returnNode2).MassFlowRate = 0.32;
-    Node(returnNode3).MassFlowRate = 0.45;
+    state->dataLoopNodes->Node(inletNode2).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(inletNode1).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(inletNode3).MassFlowRate = 3.0;
+    state->dataLoopNodes->Node(returnNode1).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
+    state->dataLoopNodes->Node(returnNode2).MassFlowRate = 0.32;
+    state->dataLoopNodes->Node(returnNode3).MassFlowRate = 0.45;
 
     StdTotalReturnMassFlow = 0.0;
     FinalTotalReturnMassFlow = 0.0;
 
     CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 6.0);
-    EXPECT_EQ(Node(returnNode1).MassFlowRate, 2.0);
-    EXPECT_EQ(Node(returnNode2).MassFlowRate, 1.0);
-    EXPECT_EQ(Node(returnNode3).MassFlowRate, 3.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode1).MassFlowRate, 2.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode2).MassFlowRate, 1.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode3).MassFlowRate, 3.0);
 
     // Deallocate everything - should all be taken care of in clear_states
 }
@@ -653,7 +653,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     int ZoneNum = 1;
     int NodeNum;
     for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-        Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
     }
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
@@ -667,27 +667,27 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
 
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 0.0;
 
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     // Set return node basis node flows to zero, return flow should be zero
     for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnFlowBasisNodes; ++NodeNum) {
-        Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(NodeNum)).MassFlowRate = 0.0;
+        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(NodeNum)).MassFlowRate = 0.0;
     }
     CalcZoneMassBalance(*state, false);
-    EXPECT_EQ(Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate,0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate,0.0);
 
     // Set return node basis node flows to non-zero values, return flow should be the sum
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(1)).MassFlowRate = 0.05;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(2)).MassFlowRate = 0.10;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(3)).MassFlowRate = 0.20;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(1)).MassFlowRate = 0.05;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(2)).MassFlowRate = 0.10;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(3)).MassFlowRate = 0.20;
     CalcZoneMassBalance(*state, false);
-    EXPECT_NEAR(Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate, 0.35, 0.00001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate, 0.35, 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
@@ -753,7 +753,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
 
     int ZoneNum = 1;
     for (int NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-        Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
     }
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(1) = 2; // Intentionally not in 1,2,3 order
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(2) = 3;
@@ -774,8 +774,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(3);
@@ -794,61 +794,61 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     state->dataGlobal->isPulseZoneSizing = false;
 
     // Case 1 - send zero, expect zero back
-    Node(inletNode1).MassFlowRate = 0.0;
-    Node(inletNode2).MassFlowRate = 0.0;
-    Node(inletNode3).MassFlowRate = 0.0;
-    Node(returnNode1).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
-    Node(returnNode2).MassFlowRate = 0.32;
-    Node(returnNode3).MassFlowRate = 0.45;
+    state->dataLoopNodes->Node(inletNode1).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(inletNode2).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(inletNode3).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(returnNode1).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
+    state->dataLoopNodes->Node(returnNode2).MassFlowRate = 0.32;
+    state->dataLoopNodes->Node(returnNode3).MassFlowRate = 0.45;
 
     Real64 StdTotalReturnMassFlow = 0.0;
     Real64 FinalTotalReturnMassFlow = 0.0;
 
     CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 0.0);
-    EXPECT_EQ(Node(returnNode1).MassFlowRate, 0.0);
-    EXPECT_EQ(Node(returnNode2).MassFlowRate, 0.0);
-    EXPECT_EQ(Node(returnNode3).MassFlowRate, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode1).MassFlowRate, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode2).MassFlowRate, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode3).MassFlowRate, 0.0);
 
     // Case 2 - send sum of inlet flow back, except system 2 back at 0.9
-    Node(inletNode2).MassFlowRate = 2.0;
-    Node(inletNode1).MassFlowRate = 1.0;
-    Node(inletNode3).MassFlowRate = 3.0;
-    Node(returnNode1).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
-    Node(returnNode2).MassFlowRate = 0.32;
-    Node(returnNode3).MassFlowRate = 0.45;
+    state->dataLoopNodes->Node(inletNode2).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(inletNode1).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(inletNode3).MassFlowRate = 3.0;
+    state->dataLoopNodes->Node(returnNode1).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
+    state->dataLoopNodes->Node(returnNode2).MassFlowRate = 0.32;
+    state->dataLoopNodes->Node(returnNode3).MassFlowRate = 0.45;
 
     StdTotalReturnMassFlow = 6.0;
     FinalTotalReturnMassFlow = 0.0;
 
     CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 5.9);
-    EXPECT_EQ(Node(returnNode1).MassFlowRate, 2.0);
-    EXPECT_EQ(Node(returnNode2).MassFlowRate, 0.9);
-    EXPECT_EQ(Node(returnNode3).MassFlowRate, 3.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode1).MassFlowRate, 2.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode2).MassFlowRate, 0.9);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode3).MassFlowRate, 3.0);
 
     // Case 3 - add exhaust flow, but set system 2 MaxOutAir to zero, expect sum of inlet flow back
-    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
     state->dataAirSystemsData->PrimaryAirSystems(2).OASysExists = true;
     state->dataAirLoop->AirLoopFlow(2).DesReturnFrac = 0.9;
     state->dataAirLoop->AirLoopFlow(2).MaxOutAir = 0.0;
     state->dataAirLoop->AirLoopFlow(2).OAFlow = 0.0;
 
-    Node(inletNode2).MassFlowRate = 2.0;
-    Node(inletNode1).MassFlowRate = 1.0;
-    Node(inletNode3).MassFlowRate = 3.0;
-    Node(returnNode1).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
-    Node(returnNode2).MassFlowRate = 0.32;
-    Node(returnNode3).MassFlowRate = 0.45;
+    state->dataLoopNodes->Node(inletNode2).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(inletNode1).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(inletNode3).MassFlowRate = 3.0;
+    state->dataLoopNodes->Node(returnNode1).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
+    state->dataLoopNodes->Node(returnNode2).MassFlowRate = 0.32;
+    state->dataLoopNodes->Node(returnNode3).MassFlowRate = 0.45;
 
     StdTotalReturnMassFlow = 6.0;
     FinalTotalReturnMassFlow = 0.0;
 
     CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 6.0);
-    EXPECT_EQ(Node(returnNode1).MassFlowRate, 2.0);
-    EXPECT_EQ(Node(returnNode2).MassFlowRate, 1.0);
-    EXPECT_EQ(Node(returnNode3).MassFlowRate, 3.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode1).MassFlowRate, 2.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode2).MassFlowRate, 1.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(returnNode3).MassFlowRate, 3.0);
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
@@ -1358,7 +1358,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 2;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 3;
-    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
@@ -1366,7 +1366,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
     EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 2);
-    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
@@ -1576,7 +1576,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 2;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 3;
-    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
@@ -1584,7 +1584,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
     EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 2);
-    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
@@ -1894,7 +1894,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 1;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 2;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(4) = 2;
-    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
@@ -1902,7 +1902,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
     EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 1);
-    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
@@ -2125,7 +2125,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 1;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 2;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(4) = 2;
-    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
@@ -2133,7 +2133,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
     EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 1);
-    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
@@ -3073,10 +3073,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
     // set airloop number to zero
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 0;
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 0;
@@ -3085,15 +3085,15 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     // set supply air flow rates for SZone and RZone
     for (ZoneNum = 1; ZoneNum <= state->dataGlobal->NumOfZones; ++ZoneNum) {
         for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-            Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+            state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
         }
     }
     // set exhaust nodes to zero and exhaust fan node flow to zero for source zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(2)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(2)).MassFlowRate = 0.0;
     // set zone exhaust nodes to zero and exhaust fan node flow to 1.0 for receiving zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
     ;
     InitAirHeatBalance(*state);
     CalcAirFlowSimple(*state);
@@ -3117,8 +3117,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     ;
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
     // set zone exhaust nodes to zero and exhaust fan node flow to 2.0 for receiving zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 2.0;
 
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
@@ -3141,8 +3141,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     ;
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
     // set zone exhaust nodes to zero and exhaust fan node flow to 3.0 for receiving zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
     ;
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
@@ -3317,10 +3317,10 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
 
     // set number of airloops
     DataHVACGlobals::NumPrimaryAirSys = 2;
@@ -3341,15 +3341,15 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     // set supply air flow rates for source (SZone) and receiving (RZone) zones
     for (ZoneNum = 1; ZoneNum <= state->dataGlobal->NumOfZones; ++ZoneNum) {
         for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-            Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+            state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
         }
     }
     // set exhaust nodes to zero and exhaust fan node flow to zero for source zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(2)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(2)).MassFlowRate = 0.0;
     // set zone exhaust nodes to zero and exhaust fan node flow to 1.0 for receiving zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
     ;
 
     InitAirHeatBalance(*state);
@@ -3376,8 +3376,8 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     ;
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 2.0
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 2.0;
 
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
@@ -3403,8 +3403,8 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 3.0
     // double zone mixing flow rate to trigger infiltration air flow in the source zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
     state->dataHeatBal->Mixing(1).DesiredAirFlowRate = 1.0;
     state->dataHeatBal->Mixing(1).DesiredAirFlowRateSaved = 1.0;
     ;
@@ -3582,10 +3582,10 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
 
     // set number of airloops
     DataHVACGlobals::NumPrimaryAirSys = 2;
@@ -3606,15 +3606,15 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     // set supply air flow rates for source (SZone) and receiving (RZone) zones
     for (ZoneNum = 1; ZoneNum <= state->dataGlobal->NumOfZones; ++ZoneNum) {
         for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-            Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+            state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
         }
     }
     // set exhaust nodes to zero and exhaust fan node flow to zero for source zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(2)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(2)).MassFlowRate = 0.0;
     // set zone exhaust nodes to zero and exhaust fan node flow to 1.0 for receiving zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
     ;
     InitAirHeatBalance(*state);
     CalcAirFlowSimple(*state);
@@ -3641,8 +3641,8 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     ;
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 2.0
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 2.0;
 
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
@@ -3669,8 +3669,8 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 3.0
     // double zone mixing flow rate to trigger infiltration air flow in the source zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
     state->dataHeatBal->Mixing(1).DesiredAirFlowRate = 1.0;
     state->dataHeatBal->Mixing(1).DesiredAirFlowRateSaved = 1.0;
     ;
@@ -3849,10 +3849,10 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
 
     // set number of airloops
     DataHVACGlobals::NumPrimaryAirSys = 2;
@@ -3874,15 +3874,15 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     // set supply air flow rates for source (SZone) and receiving (RZone) zones
     for (ZoneNum = 1; ZoneNum <= state->dataGlobal->NumOfZones; ++ZoneNum) {
         for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-            Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+            state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
         }
     }
     // set exhaust nodes to zero and exhaust fan node flow to zero for source zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(2)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(2)).MassFlowRate = 0.0;
     // set zone exhaust nodes to zero and exhaust fan node flow to 1.0 for receiving zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
     ;
     InitAirHeatBalance(*state);
     CalcAirFlowSimple(*state);
@@ -3909,8 +3909,8 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     ;
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 2.0
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 2.0;
 
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
@@ -3937,8 +3937,8 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 3.0
     // double zone mixing flow rate to trigger infiltration air flow in the source zone
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
     state->dataHeatBal->Mixing(1).DesiredAirFlowRate = 1.0;
     state->dataHeatBal->Mixing(1).DesiredAirFlowRateSaved = 1.0;
 

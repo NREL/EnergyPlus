@@ -228,7 +228,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using DataHVACGlobals::NoAction;
         using DataHVACGlobals::NumOfSizingTypes;
         using DataHVACGlobals::ZoneComp;
-        using DataLoopNode::Node;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNodeNum;
@@ -244,6 +243,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         int ZoneEquipCount;
 
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+        auto &Node(state.dataLoopNodes->Node);
 
         if (state.dataZoneEquipmentManager->InitZoneEquipmentOneTimeFlag) {
             state.dataZoneEquipmentManager->InitZoneEquipmentOneTimeFlag = false;
@@ -421,7 +421,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallTempDiff;
-        using DataLoopNode::Node;
 
         // Parameters
         static std::string const RoutineName("SizeZoneEquipment");
@@ -451,6 +450,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
         Real64 TotDOASSysOutputProvided(0.0); // total DOAS load on the zone [W]
         Real64 HR90H;                         // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
         Real64 HR90L;                         // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+
+        auto &Node(state.dataLoopNodes->Node);
 
         if (state.dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag) {
             SetUpZoneSizingArrays(state);
@@ -3834,7 +3835,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // METHODOLOGY EMPLOYED:
         // Mass continuity equation.
 
-        using DataLoopNode::Node;
         using namespace DataRoomAirModel; // UCSD
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::SmallMassFlow;
@@ -3875,6 +3875,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         BuildingZoneReturnFlow = 0.0;
         BuildingZoneReturnFlowOld = 0.0;
 
+        auto &Node(state.dataLoopNodes->Node);
 
         // Total loop supply and recirc flows (these have been zeroed earlier in InitZoneEquipment
         for (int airDistUnit = 1; airDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++airDistUnit) {
@@ -4211,7 +4212,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
             if (retNode > 0) {
                 Real64 returnNodeMassFlow = 0.0;
-                auto &retNodeData(DataLoopNode::Node(retNode));
+                auto &retNodeData(state.dataLoopNodes->Node(retNode));
 
                 int inletNum = thisZoneEquip.ReturnNodeInletNum(returnNum); // which inlet node matches this return node (same airloop)
                 int ADUNum = 0;
@@ -4231,16 +4232,16 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         maxMinNodeNum = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                     } else if (inletNum > 0) {
                         // If not connected to an ADU, then use the inlet node flow
-                        inletMassFlow = DataLoopNode::Node(thisZoneEquip.InletNode(inletNum)).MassFlowRate;
+                        inletMassFlow = state.dataLoopNodes->Node(thisZoneEquip.InletNode(inletNum)).MassFlowRate;
                         maxMinNodeNum = thisZoneEquip.InletNode(inletNum);
                     }
                     if (maxMinNodeNum > 0) {
-                        auto const &maxMinNodeData(DataLoopNode::Node(maxMinNodeNum));
+                        auto const &maxMinNodeData(state.dataLoopNodes->Node(maxMinNodeNum));
                         retNodeData.MassFlowRateMax = maxMinNodeData.MassFlowRateMax;
                         retNodeData.MassFlowRateMin = maxMinNodeData.MassFlowRateMin;
                         retNodeData.MassFlowRateMaxAvail = maxMinNodeData.MassFlowRateMaxAvail;
                     } else {
-                        auto const &zoneNodeData(DataLoopNode::Node(thisZoneEquip.ZoneNode));
+                        auto const &zoneNodeData(state.dataLoopNodes->Node(thisZoneEquip.ZoneNode));
                         retNodeData.MassFlowRateMax = zoneNodeData.MassFlowRateMax;
                         retNodeData.MassFlowRateMin = zoneNodeData.MassFlowRateMin;
                         retNodeData.MassFlowRateMaxAvail = zoneNodeData.MassFlowRateMaxAvail;
@@ -4276,7 +4277,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                             // Set base return air flow rate for node 1 using basis node flow rates
                             Real64 basisNodesMassFlow = 0.0;
                             for (int nodeNum = 1; nodeNum <= thisZoneEquip.NumReturnFlowBasisNodes; ++nodeNum) {
-                                basisNodesMassFlow += DataLoopNode::Node(thisZoneEquip.ReturnFlowBasisNode(nodeNum)).MassFlowRate;
+                                basisNodesMassFlow += state.dataLoopNodes->Node(thisZoneEquip.ReturnFlowBasisNode(nodeNum)).MassFlowRate;
                             }
                             returnNodeMassFlow = max(0.0, (basisNodesMassFlow * returnSchedFrac));
                             thisZoneEquip.FixedReturnFlow(returnNum) = true;
@@ -4304,12 +4305,13 @@ namespace EnergyPlus::ZoneEquipmentManager {
             Real64 returnNodeMassFlow = 0.0;
             for (int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
                 int retNode = thisZoneEquip.ReturnNode(returnNum);
+                Real64 curReturnFlow = state.dataLoopNodes->Node(retNode).MassFlowRate;
                 if (retNode > 0) {
                     if (numRetNodes == 1) {
                         returnNodeMassFlow = ExpTotalReturnMassFlow;
                     } else { // multiple return nodes
                         if (ExpTotalReturnMassFlow > 0.0) {
-                            Real64 returnAdjFactor = DataLoopNode::Node(retNode).MassFlowRate / ExpTotalReturnMassFlow;
+                            Real64 returnAdjFactor = state.dataLoopNodes->Node(retNode).MassFlowRate / ExpTotalReturnMassFlow;
                             returnNodeMassFlow = returnAdjFactor * ExpTotalReturnMassFlow;
                         } else {
                             returnNodeMassFlow = 0.0;
@@ -4325,14 +4327,14 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     if (retNode > 0) {
                         if (numRetNodes == 1) {
                             // set it to expected return flows
-                            DataLoopNode::Node(retNode).MassFlowRate = ExpTotalReturnMassFlow;
+                            state.dataLoopNodes->Node(retNode).MassFlowRate = ExpTotalReturnMassFlow;
                             FinalTotalReturnMassFlow = ExpTotalReturnMassFlow;
                         } else { // multiple return nodes, adjust nodes flow
                             Real64 newReturnFlow = 0.0;
                             Real64 returnAdjFactor = ExpTotalReturnMassFlow / zoneTotReturnFlow;
-                            Real64 curReturnFlow = DataLoopNode::Node(retNode).MassFlowRate;
+                            Real64 curReturnFlow = state.dataLoopNodes->Node(retNode).MassFlowRate;
                             newReturnFlow = curReturnFlow * returnAdjFactor;
-                            DataLoopNode::Node(retNode).MassFlowRate = newReturnFlow;
+                            state.dataLoopNodes->Node(retNode).MassFlowRate = newReturnFlow;
                             FinalTotalReturnMassFlow += newReturnFlow;
                         }
                     }
@@ -4348,12 +4350,12 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 Real64 returnAdjFactor = (1 - ((totReturnFlow - ExpTotalReturnMassFlow) / totVarReturnFlow)); // Return flow adjustment factor
                 for (int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
                     int retNode = thisZoneEquip.ReturnNode(returnNum);
-                    Real64 curReturnFlow = DataLoopNode::Node(retNode).MassFlowRate;
+                    Real64 curReturnFlow = state.dataLoopNodes->Node(retNode).MassFlowRate;
                     if (retNode > 0) {
                         if (!thisZoneEquip.FixedReturnFlow(returnNum)) {
                             newReturnFlow = curReturnFlow * returnAdjFactor;
                             FinalTotalReturnMassFlow += newReturnFlow;
-                            DataLoopNode::Node(retNode).MassFlowRate = newReturnFlow;
+                            state.dataLoopNodes->Node(retNode).MassFlowRate = newReturnFlow;
                         } else {
                             FinalTotalReturnMassFlow += curReturnFlow;
                         }
@@ -4443,7 +4445,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // Using/Aliasing
         using DataHVACGlobals::RetTempMax;
         using DataHVACGlobals::RetTempMin;
-        using DataLoopNode::Node;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using InternalHeatGains::SumAllReturnAirLatentGains;
@@ -4488,7 +4489,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 // to the Zone Return Node.  If there is no system flow then the heat is added back to the zone in the
                 // Correct step through the SysDepZoneLoads variable.
 
-                MassFlowRA = Node(ReturnNode).MassFlowRate / ZoneMult;
+                MassFlowRA = state.dataLoopNodes->Node(ReturnNode).MassFlowRate / ZoneMult;
 
                 // user defined room air model may feed temp that differs from zone node
                 if (allocated(state.dataRoomAirMod->AirPatternZoneInfo)) {
@@ -4496,11 +4497,11 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         TempZoneAir = state.dataRoomAirMod->AirPatternZoneInfo(ActualZoneNum).Tleaving;
                         TempRetAir = TempZoneAir;
                     } else {
-                        TempZoneAir = Node(ZoneNode).Temp;
+                        TempZoneAir = state.dataLoopNodes->Node(ZoneNode).Temp;
                         TempRetAir = TempZoneAir;
                     }
                 } else {
-                    TempZoneAir = Node(ZoneNode).Temp;
+                    TempZoneAir = state.dataLoopNodes->Node(ZoneNode).Temp;
                     TempRetAir = TempZoneAir;
                 }
 
@@ -4512,7 +4513,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     for (SurfNum = state.dataHeatBal->Zone(ActualZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ActualZoneNum).HTSurfaceLast; ++SurfNum) {
                         if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                             state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                            FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
+                            FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum), state.dataLoopNodes->Node(ZoneNode).HumRat) *
                                 state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
                             WinGapFlowToRA += FlowThisTS;
                             WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
@@ -4524,7 +4525,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 // cases the heat to return air is treated as a zone heat gain and dealt with in CalcZoneSums in
                 // MODULE ZoneTempPredictorCorrector.
                 if (!state.dataHeatBal->Zone(ActualZoneNum).NoHeatToReturnAir) {
-                    CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
+                    CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
                     if (MassFlowRA > 0.0) {
                         if (WinGapFlowToRA > 0.0) {
                             // Add heat-to-return from window gap airflow
@@ -4540,59 +4541,59 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         // Add heat-to-return from lights
                         TempRetAir += QRetAir / (MassFlowRA * CpAir);
                         if (TempRetAir > RetTempMax) {
-                            Node(ReturnNode).Temp = RetTempMax;
+                            state.dataLoopNodes->Node(ReturnNode).Temp = RetTempMax;
                             if (!state.dataGlobal->ZoneSizingCalc) {
                                 state.dataHeatBalFanSys->SysDepZoneLoads(ActualZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMax);
                             }
                         } else if (TempRetAir < RetTempMin) {
-                            Node(ReturnNode).Temp = RetTempMin;
+                            state.dataLoopNodes->Node(ReturnNode).Temp = RetTempMin;
                             if (!state.dataGlobal->ZoneSizingCalc) {
                                 state.dataHeatBalFanSys->SysDepZoneLoads(ActualZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
                             }
                         } else {
-                            Node(ReturnNode).Temp = TempRetAir;
+                            state.dataLoopNodes->Node(ReturnNode).Temp = TempRetAir;
                         }
                     } else { // No return air flow
                         // Assign all heat-to-return from window gap airflow to zone air
                         if (WinGapFlowToRA > 0.0) state.dataHeatBalFanSys->SysDepZoneLoads(ActualZoneNum) += WinGapFlowToRA * CpAir * (WinGapTtoRA - TempZoneAir);
                         // Assign all heat-to-return from lights to zone air
                         if (QRetAir > 0.0) state.dataHeatBalFanSys->SysDepZoneLoads(ActualZoneNum) += QRetAir;
-                        Node(ReturnNode).Temp = Node(ZoneNode).Temp;
+                        state.dataLoopNodes->Node(ReturnNode).Temp = state.dataLoopNodes->Node(ZoneNode).Temp;
                     }
                 } else {
                     // update the return air node for zonal and central on/off systems
-                    Node(ReturnNode).Temp = Node(ZoneNode).Temp;
+                    state.dataLoopNodes->Node(ReturnNode).Temp = state.dataLoopNodes->Node(ZoneNode).Temp;
                 }
 
                 // Update the rest of the Return Air Node conditions, if the return air system exists!
-                Node(ReturnNode).Press = Node(ZoneNode).Press;
+                state.dataLoopNodes->Node(ReturnNode).Press = state.dataLoopNodes->Node(ZoneNode).Press;
 
                 // Include impact of under case returns for refrigerated display case when updating the return air node humidity
                 if (!state.dataHeatBal->Zone(ActualZoneNum).NoHeatToReturnAir) {
                     if (MassFlowRA > 0) {
                         SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
-                        H2OHtOfVap = PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ReturnNode).Temp);
-                        Node(ReturnNode).HumRat = Node(ZoneNode).HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
+                        H2OHtOfVap = PsyHgAirFnWTdb(state.dataLoopNodes->Node(ZoneNode).HumRat, state.dataLoopNodes->Node(ReturnNode).Temp);
+                        state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
                     } else {
                         // If no mass flow rate exists, include the latent HVAC case credit with the latent Zone case credit
-                        Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
+                        state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
                         state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToHVAC;
                         // shouldn't the HVAC term be zeroed out then?
                         SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
                         state.dataHeatBalFanSys->ZoneLatentGain(ActualZoneNum) += SumRetAirLatentGainRate;
                     }
                 } else {
-                    Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
+                    state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
                     state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
                     SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
                     state.dataHeatBalFanSys->ZoneLatentGain(ActualZoneNum) += SumRetAirLatentGainRate;
                 }
 
-                Node(ReturnNode).Enthalpy = PsyHFnTdbW(Node(ReturnNode).Temp, Node(ReturnNode).HumRat);
+                state.dataLoopNodes->Node(ReturnNode).Enthalpy = PsyHFnTdbW(state.dataLoopNodes->Node(ReturnNode).Temp, state.dataLoopNodes->Node(ReturnNode).HumRat);
 
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) Node(ReturnNode).CO2 = Node(ZoneNode).CO2;
-                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) Node(ReturnNode).GenContam = Node(ZoneNode).GenContam;
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataLoopNodes->Node(ReturnNode).CO2 = state.dataLoopNodes->Node(ZoneNode).CO2;
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) state.dataLoopNodes->Node(ReturnNode).GenContam = state.dataLoopNodes->Node(ZoneNode).GenContam;
 
             } // End of check for a return air node, which implies a return air system.
 
@@ -4839,8 +4840,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
             WindSpeedExt = state.dataHeatBal->Zone(NZ).WindSpeed;
             WindDirExt = state.dataHeatBal->Zone(NZ).WindDir;
             if (state.dataHeatBal->Zone(NZ).HasLinkedOutAirNode) {
-                HumRatExt = Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).HumRat;
-                EnthalpyExt = Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).Enthalpy;
+                HumRatExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).HumRat;
+                EnthalpyExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).Enthalpy;
             } else {
                 HumRatExt = state.dataEnvrn->OutHumRat;
                 EnthalpyExt = state.dataEnvrn->OutEnthalpy;
@@ -5469,7 +5470,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
             // Use air node information linked to the zone if defined
 
             if (state.dataHeatBal->Zone(NZ).HasLinkedOutAirNode) {
-                HumRatExt = Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).HumRat;
+                HumRatExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).HumRat;
             } else {
                 HumRatExt = state.dataEnvrn->OutHumRat;
             }
@@ -5589,7 +5590,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 if (!state.dataHeatBal->ZoneAirBalance(j).OneTimeFlag) GetStandAloneERVNodes(state, j);
                 if (state.dataHeatBal->ZoneAirBalance(j).NumOfERVs > 0) {
                     for (I = 1; I <= state.dataHeatBal->ZoneAirBalance(j).NumOfERVs; ++I) {
-                        MassFlowDiff = Node(state.dataHeatBal->ZoneAirBalance(j).ERVExhaustNode(I)).MassFlowRate - Node(state.dataHeatBal->ZoneAirBalance(j).ERVInletNode(I)).MassFlowRate;
+                        MassFlowDiff = state.dataLoopNodes->Node(state.dataHeatBal->ZoneAirBalance(j).ERVExhaustNode(I)).MassFlowRate - state.dataLoopNodes->Node(state.dataHeatBal->ZoneAirBalance(j).ERVInletNode(I)).MassFlowRate;
                         if (MassFlowDiff > 0.0) {
                             state.dataHeatBal->ZoneAirBalance(j).ERVMassFlowRate += MassFlowDiff;
                         }

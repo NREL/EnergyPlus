@@ -113,24 +113,24 @@ namespace EnergyPlus::Construction {
         //  Urbana-Champaign, 1995.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const PhysPropLimit(1.0e-6); // Physical properties limit.
+        constexpr Real64 PhysPropLimit(1.0e-6); // Physical properties limit.
         // This is more or less the traditional value from BLAST.
 
-        Real64 const RValueLowLimit(1.0e-3); // Physical properties limit for R-value only layers
+        constexpr Real64 RValueLowLimit(1.0e-3); // Physical properties limit for R-value only layers
         // This value was based on trial and error related to CR 7791 where a
         // user had entered a "no insulation" layer with an R-value of 1.0E-05.
         // Some trial and error established this as a potential value though
         // there is no guarantee that this is a good value.
 
-        int const MinNodes(6); // Minimum number of state space nodes
+        constexpr int MinNodes(6); // Minimum number of state space nodes
         // per layer.  This value was chosen based on experience with IBLAST.
 
-        Real64 const MaxAllowedCTFSumError(0.01); // Allow a 1 percent
+        constexpr Real64 MaxAllowedCTFSumError(0.01); // Allow a 1 percent
         // difference between the CTF series summations.  If the difference is
         // greater than this, then the coefficients will not yield a valid steady
         // state solution.
 
-        Real64 const MaxAllowedTimeStep(4.0); // Sets the maximum allowed time step
+        constexpr Real64 MaxAllowedTimeStep(4.0); // Sets the maximum allowed time step
         // for CTF calculations to be 4 hours.  This is done in response to some
         // rare situations where odd or faulty input will cause the routine to
         // go off and get some huge time step (in excess of 20 hours).  This value
@@ -1100,7 +1100,7 @@ namespace EnergyPlus::Construction {
         //  Calculation Code in BEST", BSO internal document,
         //  May/June 1996.
 
-        Real64 const DPLimit(1.0e-20);
+        constexpr Real64 DPLimit(1.0e-20);
         // This argument is nice, but not sure it's accurate -- LKL Nov 1999.
         // Parameter set to the significant figures limit of double
         // precision variables plus a safety factor.- The argument for setting this parameter to 1E-20 involves the
@@ -1576,7 +1576,7 @@ namespace EnergyPlus::Construction {
         // dissertation.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const ConvrgLim(1.0e-13); // Convergence limit (ratio) for cutting off the calculation of further
+        constexpr Real64 ConvrgLim(1.0e-13); // Convergence limit (ratio) for cutting off the calculation of further
         // CTFs.  This value was found to give suitable accuracy in IBLAST.
 
         Real64 avg;     // Intermediate calculation variable (average)
