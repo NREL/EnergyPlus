@@ -2699,6 +2699,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     bool const ZoneEquipment = true;
     Real64 sensOut = 0.0;
     Real64 latOut = 0.0;
+    
+    // this setup is a continuous fan cycling coil op mode 
+    thisSys->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
 
     thisSys->simulate(*state,
                       thisSys->Name,
