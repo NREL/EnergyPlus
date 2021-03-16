@@ -4568,11 +4568,12 @@ namespace EnergyPlus::ConvectionCoefficients {
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FohannoPolidoriVerticalWall) {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
-                        return CalcFohannoPolidoriVerticalWall(state, Tsurf - Tamb,
+                    Real64 QdotConvection = -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum);
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
                                                                Surface(SurfNum).IntConvZoneWallHeight,
                                                                Tsurf - DataGlobalConstants::KelvinConv, // Kiva already uses Kelvin, but algorithm expects C
-                                                               -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum));
+                                                               QdotConvection);
                     };
                 } else {
                     tmpHc = CallCalcFohannoPolidoriVerticalWall(state,
@@ -7305,8 +7306,7 @@ namespace EnergyPlus::ConvectionCoefficients {
         }
     }
 
-    Real64 CalcFohannoPolidoriVerticalWall(EnergyPlusData &state,
-                                           Real64 const DeltaTemp, // [C] temperature difference between surface and air
+    Real64 CalcFohannoPolidoriVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
                                            Real64 const Height,    // [m] characteristic size, height of zone
                                            Real64 const SurfTemp,  // [C] surface temperature
                                            Real64 const QdotConv   // [W/m2] heat flux rate for rayleigh #
@@ -7359,7 +7359,7 @@ namespace EnergyPlus::ConvectionCoefficients {
     {
 
         if (Height > 0.0) {
-            return CalcFohannoPolidoriVerticalWall(state, DeltaTemp, Height, SurfTemp, QdotConv);
+            return CalcFohannoPolidoriVerticalWall(DeltaTemp, Height, SurfTemp, QdotConv);
         } else {
             // bad value for Height, but we have little info to identify calling culprit
             if (state.dataConvectionCoefficient->CalcFohannoPolidoriVerticalWallErrorIDX == 0) {
