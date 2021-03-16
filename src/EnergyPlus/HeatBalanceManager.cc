@@ -995,12 +995,12 @@ namespace HeatBalanceManager {
             }
 
             if (NumNumber > 0) {
-                MaxSurfaceTempLimit = BuildingNumbers(1);
-                MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
-                if (MaxSurfaceTempLimit < MinSurfaceTempLimit) {
-                } else if (MaxSurfaceTempLimit < 0.0) {
-                    MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
-                    MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
+                state.dataHeatBalSurf->MaxSurfaceTempLimit = BuildingNumbers(1);
+                state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal = state.dataHeatBalSurf->MaxSurfaceTempLimit * 2.5;
+                if (state.dataHeatBalSurf->MaxSurfaceTempLimit < MinSurfaceTempLimit) {
+                } else if (state.dataHeatBalSurf->MaxSurfaceTempLimit < 0.0) {
+                    state.dataHeatBalSurf->MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
+                    state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal = state.dataHeatBalSurf->MaxSurfaceTempLimit * 2.5;
                 }
             }
 
@@ -1014,8 +1014,8 @@ namespace HeatBalanceManager {
         } else {
             state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
             state.dataHeatBal->AnyCTF = true;
-            MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
-            MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
+            state.dataHeatBalSurf->MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
+            state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal = state.dataHeatBalSurf->MaxSurfaceTempLimit * 2.5;
         }
 
         // algorithm input checks now deferred until surface properties are read in,
@@ -5986,8 +5986,9 @@ namespace HeatBalanceManager {
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
-                    state.dataHeatBal->SurfWinFenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
-                    state.dataHeatBal->SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempFront(1, SurfNum) = state.dataHeatBalSurf->TH(1, 1, SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) =
+                        state.dataHeatBalSurf->TH(2, 1, SurfNum);
                 }
             }
         }

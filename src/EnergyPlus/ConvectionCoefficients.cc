@@ -4310,8 +4310,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         //  - also updates the reference air temperature type for use in the surface heat balance calcs
 
         // Using/Aliasing
-        using DataHeatBalSurface::QdotConvInRepPerArea;
-        using DataHeatBalSurface::TH;
 
         auto &Zone(state.dataHeatBal->Zone);
         auto &Surface(state.dataSurface->Surface);
@@ -4319,7 +4317,7 @@ namespace EnergyPlus::ConvectionCoefficients {
         Real64 tmpHc = 0.0;
 
         int const ZoneNum = Surface(SurfNum).Zone;
-        Real64 &Tsurface = TH(2, 1, SurfNum);
+        Real64 &Tsurface = state.dataHeatBalSurf->TH(2, 1, SurfNum);
         Real64 &Tzone = state.dataHeatBalFanSys->MAT(ZoneNum);
 
         auto &HnFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in;
@@ -4570,15 +4568,20 @@ namespace EnergyPlus::ConvectionCoefficients {
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FohannoPolidoriVerticalWall) {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    Real64 QdotConvection = -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum);
                     HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                         return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
                                                                Surface(SurfNum).IntConvZoneWallHeight,
                                                                Tsurf - DataGlobalConstants::KelvinConv, // Kiva already uses Kelvin, but algorithm expects C
-                                                               -QdotConvInRepPerArea(SurfNum));
+                                                               QdotConvection);
                     };
                 } else {
-                    tmpHc = CalcFohannoPolidoriVerticalWall(state,
-                        (Tsurface - Tzone), Surface(SurfNum).IntConvZoneWallHeight, Tsurface, -QdotConvInRepPerArea(SurfNum), SurfNum);
+                    tmpHc = CallCalcFohannoPolidoriVerticalWall(state,
+                                                                (Tsurface - Tzone),
+                                                                Surface(SurfNum).IntConvZoneWallHeight,
+                                                                Tsurface,
+                                                                -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum),
+                                                                SurfNum);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KaradagChilledCeiling) {
@@ -4652,10 +4655,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         // METHODOLOGY EMPLOYED:
         // separated out long case statement for selecting models.
 
-        // Using/Aliasing
-        using DataHeatBalSurface::QdotConvOutRepPerArea;
-        using DataHeatBalSurface::TH;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Hf(0.0); // the forced, or wind driven portion of film coefficient
         Real64 Hn(0.0); // the natural, or bouyancy driven portion of film coefficient
@@ -4669,6 +4668,8 @@ namespace EnergyPlus::ConvectionCoefficients {
         Kiva::ConvectionAlgorithm HnFn(KIVA_CONST_CONV(0.0));
 
         auto &Surface(state.dataSurface->Surface);
+        auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->QdotConvOutRepPerArea);
+        auto &TH(state.dataHeatBalSurf->TH);
 
         // first call Hn models
         {
@@ -4712,7 +4713,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                     // Not compatible with Kiva (Exterior surfaces in Kiva are not currently reported. Also need to add cell-level convection.)
                     ShowFatalError(state, "Fohanno Polidori convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
-                Hn = CalcFohannoPolidoriVerticalWall(state, (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
+                Hn = CallCalcFohannoPolidoriVerticalWall(state, (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
                                                      Surface(SurfNum).OutConvFaceHeight,
                                                      TH(1, 1, SurfNum),
                                                      -QdotConvOutRepPerArea(SurfNum),
@@ -4956,9 +4957,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         // METHODOLOGY EMPLOYED:
         // Decide surface classification based on wind and bouyancy, class, orientation
 
-        // Using/Aliasing
-        using DataHeatBalSurface::TH;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DeltaTemp(0.0);
         Real64 surfWindDir;
@@ -4974,7 +4972,7 @@ namespace EnergyPlus::ConvectionCoefficients {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 DeltaTemp = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - Surface(SurfNum).OutDryBulbTemp;
             } else {
-                DeltaTemp = TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp;
+                DeltaTemp = state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp;
             }
 
             if (DeltaTemp < 0.0) {
@@ -5072,7 +5070,6 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         // Using/Aliasing
         using namespace DataZoneEquipment;
-        using DataHeatBalSurface::TH;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
 
@@ -5104,6 +5101,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         auto &Zone(state.dataHeatBal->Zone);
         auto &Surface(state.dataSurface->Surface);
+        auto &TH(state.dataHeatBalSurf->TH);
 
         EquipOnCount = 0;
         ZoneNum = Surface(SurfNum).Zone;
@@ -6069,7 +6067,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         // Using/Aliasing
         using namespace DataZoneEquipment;
         using CurveManager::CurveValue;
-        using DataHeatBalSurface::TH;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
 
@@ -6135,7 +6132,7 @@ namespace EnergyPlus::ConvectionCoefficients {
         Real64 HcFnTempDiff(0.0), HcFnTempDiffDivHeight(0.0), HcFnACH(0.0), HcFnACHDivPerimLength(0.0);
         Kiva::ConvectionAlgorithm HcFnTempDiffFn(KIVA_CONST_CONV(0.0)), HcFnTempDiffDivHeightFn(KIVA_CONST_CONV(0.0));
         if (UserCurve.HcFnTempDiffCurveNum > 0) {
-            HcFnTempDiff = CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(TH(2, 1, SurfNum) - tmpAirTemp));
+            HcFnTempDiff = CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(state.dataHeatBalSurf->TH(2, 1, SurfNum) - tmpAirTemp));
             HcFnTempDiffFn = [&](double Tsurf, double Tamb, double, double, double) -> double {
                 return CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(Tsurf - Tamb));
             };
@@ -6143,7 +6140,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         if (UserCurve.HcFnTempDiffDivHeightCurveNum > 0) {
             HcFnTempDiffDivHeight = CurveValue(state, UserCurve.HcFnTempDiffDivHeightCurveNum,
-                                               (std::abs(TH(2, 1, SurfNum) - tmpAirTemp) / Surface(SurfNum).IntConvZoneWallHeight));
+                           (std::abs(state.dataHeatBalSurf->TH(2, 1, SurfNum) - tmpAirTemp) / Surface(SurfNum).IntConvZoneWallHeight));
             HcFnTempDiffDivHeightFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CurveValue(state, UserCurve.HcFnTempDiffDivHeightCurveNum, std::abs(Tsurf - Tamb) / Surface(SurfNum).IntConvZoneWallHeight);
             };
@@ -6187,7 +6184,6 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHeatBalSurface::TH;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 windVel;
@@ -6229,7 +6225,8 @@ namespace EnergyPlus::ConvectionCoefficients {
         }
 
         if (UserCurve.HnFnTempDiffCurveNum > 0) {
-            HnFnTempDiff = CurveValue(state, UserCurve.HnFnTempDiffCurveNum, std::abs(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp));
+            HnFnTempDiff = CurveValue(
+                state, UserCurve.HnFnTempDiffCurveNum, std::abs(state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp));
             HnFnTempDiffFn = [&](double Tsurf, double Tamb, double, double, double) -> double {
                 return CurveValue(state, UserCurve.HnFnTempDiffCurveNum, std::abs(Tsurf - Tamb));
             };
@@ -6239,7 +6236,7 @@ namespace EnergyPlus::ConvectionCoefficients {
             if (Surface(SurfNum).OutConvFaceHeight > 0.0) {
                 HnFnTempDiffDivHeight =
                     CurveValue(state, UserCurve.HnFnTempDiffDivHeightCurveNum,
-                               ((std::abs(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp)) / Surface(SurfNum).OutConvFaceHeight));
+                    ((std::abs(state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp)) / Surface(SurfNum).OutConvFaceHeight));
                 HnFnTempDiffDivHeightFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                     return CurveValue(state, UserCurve.HnFnTempDiffDivHeightCurveNum, ((std::abs(Tsurf - Tamb)) / Surface(SurfNum).OutConvFaceHeight));
                 };
@@ -7352,12 +7349,12 @@ namespace EnergyPlus::ConvectionCoefficients {
         }
     }
 
-    Real64 CalcFohannoPolidoriVerticalWall(EnergyPlusData &state,
-                                           Real64 const DeltaTemp, // [C] temperature difference between surface and air
-                                           Real64 const Height,    // [m] characteristic size, height of zone
-                                           Real64 const SurfTemp,  // [C] surface temperature
-                                           Real64 const QdotConv,  // [W/m2] heat flux rate for rayleigh #
-                                           int const SurfNum       // for messages
+    Real64 CallCalcFohannoPolidoriVerticalWall(EnergyPlusData &state,
+                                               Real64 const DeltaTemp, // [C] temperature difference between surface and air
+                                               Real64 const Height,    // [m] characteristic size, height of zone
+                                               Real64 const SurfTemp,  // [C] surface temperature
+                                               Real64 const QdotConv,  // [W/m2] heat flux rate for rayleigh #
+                                               int const SurfNum       // for messages
     )
     {
 
