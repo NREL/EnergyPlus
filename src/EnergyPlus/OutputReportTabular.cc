@@ -4245,7 +4245,6 @@ namespace EnergyPlus::OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using DataHeatBalSurface::SumSurfaceHeatEmission;
         using DataHVACGlobals::TimeStepSys;
 
         state.dataHeatBal->SysTotalHVACReliefHeatLoss = 0;
@@ -4256,7 +4255,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Only gather zone report at zone time steps
         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
-            state.dataHeatBal->BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * DataGlobalConstants::convertJtoGJ;
+            state.dataHeatBal->BuildingPreDefRep.emiEnvelopConv += state.dataHeatBalSurf->SumSurfaceHeatEmission * DataGlobalConstants::convertJtoGJ;
             return;
         }
 

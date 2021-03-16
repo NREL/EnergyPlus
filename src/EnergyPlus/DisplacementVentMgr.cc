@@ -134,33 +134,6 @@ namespace EnergyPlus::DisplacementVentMgr {
         // PURPOSE OF THIS SUBROUTINE:
         //   manage the UCSD Displacement Ventilation model
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using DataHeatBalSurface::TempSurfIn;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-
-
         // initialize Displacement Ventilation model
         InitUCSDDV(state, ZoneNum);
 
@@ -276,6 +249,8 @@ namespace EnergyPlus::DisplacementVentMgr {
         Real64 LayH;     // Height of the Occupied/Mixed subzone interface
         Real64 LayFrac;  // Fraction height of the Occupied/Mixed subzone interface
         int SurfNum;     // Surface number
+
+        auto &TempSurfIn(state.dataHeatBalSurf->TempSurfIn);
 
         HAT_MX = 0.0;
         HAT_OC = 0.0;

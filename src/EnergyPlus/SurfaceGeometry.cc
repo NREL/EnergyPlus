@@ -7006,7 +7006,6 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataHeatBalSurface::MaxSurfaceTempLimit;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CountHTAlgoObjectsSingleSurf;
@@ -7498,31 +7497,56 @@ namespace SurfaceGeometry {
         if (state.dataHeatBal->AnyCTF) {
             const auto AlgoName = "CTF - ConductionTransferFunction";
             ++numberOfHeatTransferAlgosUsed;
-            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit);
+            print(state.files.eio,
+                  Format_725,
+                  AlgoName,
+                  state.dataHeatBalSurf->MaxSurfaceTempLimit,
+                  state.dataHeatBal->LowHConvLimit,
+                  state.dataHeatBal->HighHConvLimit);
         }
         if (state.dataHeatBal->AnyEMPD) {
             state.dataHeatBal->AllCTF = false;
             const auto AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
             ++numberOfHeatTransferAlgosUsed;
-            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit);
+            print(state.files.eio,
+                  Format_725,
+                  AlgoName,
+                  state.dataHeatBalSurf->MaxSurfaceTempLimit,
+                  state.dataHeatBal->LowHConvLimit,
+                  state.dataHeatBal->HighHConvLimit);
         }
         if (state.dataHeatBal->AnyCondFD) {
             state.dataHeatBal->AllCTF = false;
             const auto AlgoName = "CondFD - ConductionFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
-            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit);
+            print(state.files.eio,
+                  Format_725,
+                  AlgoName,
+                  state.dataHeatBalSurf->MaxSurfaceTempLimit,
+                  state.dataHeatBal->LowHConvLimit,
+                  state.dataHeatBal->HighHConvLimit);
         }
         if (state.dataHeatBal->AnyHAMT) {
             state.dataHeatBal->AllCTF = false;
             const auto AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
             ++numberOfHeatTransferAlgosUsed;
-            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit);
+            print(state.files.eio,
+                  Format_725,
+                  AlgoName,
+                  state.dataHeatBalSurf->MaxSurfaceTempLimit,
+                  state.dataHeatBal->LowHConvLimit,
+                  state.dataHeatBal->HighHConvLimit);
         }
         if (state.dataHeatBal->AnyKiva) {
             state.dataHeatBal->AllCTF = false;
             const auto AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
-            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit);
+            print(state.files.eio,
+                  Format_725,
+                  AlgoName,
+                  state.dataHeatBalSurf->MaxSurfaceTempLimit,
+                  state.dataHeatBal->LowHConvLimit,
+                  state.dataHeatBal->HighHConvLimit);
         }
 
         // Check HeatTransferAlgorithm for interior surfaces
