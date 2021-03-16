@@ -1633,9 +1633,6 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         // This solves for the required outdoor airflow to achieve the desired
         // contaminant setpoint in the Zone
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
         using ScheduleManager::GetCurrentScheduleValue;
 
         static std::string const RoutineName("PredictZoneContaminants");
@@ -1663,8 +1660,12 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             if (ShortenTimeStepSys) {
 
                 if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) { // roll back result for zone air node,
-                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).CO2 = state.dataContaminantBalance->CO2ZoneTimeMinus1(ZoneNum);
-                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).GenContam = state.dataContaminantBalance->GCZoneTimeMinus1(ZoneNum);
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation)
+                        state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).CO2 =
+                            state.dataContaminantBalance->CO2ZoneTimeMinus1(ZoneNum);
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
+                        state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).GenContam =
+                            state.dataContaminantBalance->GCZoneTimeMinus1(ZoneNum);
                 }
 
                 if (NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
@@ -2265,10 +2266,6 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         // Routine FinalZnCalcs - FINAL ZONE CALCULATIONS, authored by Dale Herron
         // for BLAST.
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
-
         static std::string const RoutineName("CorrectZoneContaminants");
 
         int NodeNum;
@@ -2296,6 +2293,8 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         int ADUInNode;
         int ADUOutNode;
         int ZoneNum;
+
+        auto &Node(state.dataLoopNodes->Node);
 
         // Update zone CO2
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {

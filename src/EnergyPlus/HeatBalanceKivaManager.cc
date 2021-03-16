@@ -369,7 +369,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
         bcs->diffuseHorizontalFlux = state.dataEnvrn->DifSolarRad;
         bcs->skyEmissivity = pow4(state.dataEnvrn->SkyTempKelvin) / pow4(bcs->outdoorTemp);
 
-        bcs->slabAbsRadiation = DataHeatBalSurface::SurfOpaqQRadSWInAbs(floorSurface) + // solar
+        bcs->slabAbsRadiation = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(floorSurface) + // solar
                                state.dataHeatBal->SurfQRadThermInAbs(floorSurface) + // internal gains
                                                                                      state.dataHeatBalFanSys->QHTRadSysSurf(floorSurface) + state.dataHeatBalFanSys->QHWBaseboardSurf(floorSurface) +
                 state.dataHeatBalFanSys->QCoolingPanelSurf(floorSurface) + state.dataHeatBalFanSys->QSteamBaseboardSurf(floorSurface) +
@@ -388,7 +388,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
         Real64 TARadTotal = 0.0;
         Real64 TAConvTotal = 0.0;
         for (auto &wl : wallSurfaces) {
-            Real64 Q = DataHeatBalSurface::SurfOpaqQRadSWInAbs(wl) + // solar
+            Real64 Q = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(wl) + // solar
                        state.dataHeatBal->SurfQRadThermInAbs(wl) + // internal gains
                        state.dataHeatBalFanSys->QHTRadSysSurf(wl) + state.dataHeatBalFanSys->QHWBaseboardSurf(floorSurface) +
                        state.dataHeatBalFanSys->QCoolingPanelSurf(wl) + state.dataHeatBalFanSys->QSteamBaseboardSurf(floorSurface) +
@@ -471,7 +471,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
             // Use headers to know how to read data to memory (e.g., number of periods, number of intervals)
             int endcol = LineResult.data.size();
             if (endcol > 0) {
-                if (int(LineResult.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
+                if (int(LineResult.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
                     ShowSevereError(state, "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.");
                     ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                     ShowFatalError(state, "Program terminates due to previous condition.");

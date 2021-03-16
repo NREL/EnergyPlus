@@ -85,7 +85,7 @@ namespace AirLoopHVACDOAS {
         ~AirLoopMixer() = default; // destructor
 
         static void getAirLoopMixer(EnergyPlusData &state);
-        void CalcAirLoopMixer();
+        void CalcAirLoopMixer(EnergyPlusData &state);
     };
 
     struct AirLoopSplitter
@@ -107,7 +107,7 @@ namespace AirLoopHVACDOAS {
         ~AirLoopSplitter() = default; // destructor
 
         static void getAirLoopSplitter(EnergyPlusData &state);
-        void CalcAirLoopSplitter(Real64 Temp, Real64 Humrat);
+        void CalcAirLoopSplitter(EnergyPlusData &state, Real64 Temp, Real64 Humrat);
     };
 
     struct AirLoopDOAS

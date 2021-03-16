@@ -169,8 +169,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
@@ -183,8 +183,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 2;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
@@ -199,8 +199,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
@@ -213,8 +213,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 2;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
@@ -341,8 +341,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
@@ -355,8 +355,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 2;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
@@ -371,8 +371,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
@@ -385,8 +385,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
-    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
-    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMinMassFlow;
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlow;
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 2;
     FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).InitSys(*state, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
@@ -2497,7 +2497,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
-    DataLoopNode::Node.allocate(3);
+    state->dataLoopNodes->Node.allocate(3);
     state->dataSize->OARequirements.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
@@ -2518,9 +2518,9 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataSize->OARequirements(1).OAFlowPerZone = 0.1;
     state->dataSize->OARequirements(1).OAFlowPerPerson = 0.1;
 
-    DataLoopNode::Node(2).Press = 101325.0;
-    DataLoopNode::Node(2).Temp = 23.0;
-    DataLoopNode::Node(2).HumRat = 0.001;
+    state->dataLoopNodes->Node(2).Press = 101325.0;
+    state->dataLoopNodes->Node(2).Temp = 23.0;
+    state->dataLoopNodes->Node(2).HumRat = 0.001;
 
     state->dataHeatBal->ZoneIntGain(1).NOFOCC = 5.0;
 
@@ -2532,17 +2532,17 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     // Current occupancy
     state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = 1;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 0.72, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, 0.72, 0.0001);
     // Design occupancy
     state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = 2;
     state->dataHeatBal->Zone(1).TotOccupants = 10;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 1.32, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, 1.32, 0.0001);
 
     state->dataSingleDuct->SysATMixer.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
-    DataLoopNode::Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataSize->OARequirements.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
@@ -2560,7 +2560,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
-    DataLoopNode::Node.allocate(3);
+    state->dataLoopNodes->Node.allocate(3);
     state->dataSize->OARequirements.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
@@ -2586,9 +2586,9 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataSize->OARequirements(1).OAFlowPerArea = 0.0;
     state->dataSize->OARequirements(1).OAFlowACH = 0.0;
 
-    DataLoopNode::Node(2).Press = 101325.0;
-    DataLoopNode::Node(2).Temp = 23.0;
-    DataLoopNode::Node(2).HumRat = 0.001;
+    state->dataLoopNodes->Node(2).Press = 101325.0;
+    state->dataLoopNodes->Node(2).Temp = 23.0;
+    state->dataLoopNodes->Node(2).HumRat = 0.001;
 
     state->dataHeatBal->ZoneIntGain(1).NOFOCC = 5.0;
 
@@ -2602,30 +2602,30 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 
     // InletSideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
     state->dataSingleDuct->SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_InletSide;
-    DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
 
     // InletSideMixer, Mixed air outlet mass flow < OA requirement, expect primary flow to equal mixed air flow
-    DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 0.10;
+    state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 0.10;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.10, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.10, 0.0001);
 
     // SupplySideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
     state->dataSingleDuct->SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_SupplySide;
-    DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
 
     // SupplySideMixer, Mixed air outlet mass flow < OA requirement, expect primary flow to equal OA requirement
-    DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 0.10;
+    state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 0.10;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
-    EXPECT_NEAR(DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
     state->dataSingleDuct->SysATMixer.deallocate();
 
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
-    DataLoopNode::Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataSize->OARequirements.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();

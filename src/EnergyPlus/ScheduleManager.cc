@@ -188,7 +188,6 @@ namespace ScheduleManager {
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
         using DataSystemVariables::CheckForActualFileName;
-        using DataSystemVariables::iUnicode_end;
         using General::ProcessDateString;
 
         // Locals
@@ -509,7 +508,7 @@ namespace ScheduleManager {
             auto LineIn = SchdFile.readLine();
             const auto endLine = len(LineIn.data);
             if (endLine > 0) {
-                if (int(LineIn.data[endLine - 1]) == iUnicode_end) {
+                if (int(LineIn.data[endLine - 1]) == state.dataSysVars->iUnicode_end) {
                     SchdFile.close();
                     ShowSevereError(state, format("{}:\"{}\" appears to be a Unicode or binary file.", RoutineName, ShadingSunlitFracFileName));
                     ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
@@ -1821,10 +1820,9 @@ namespace ScheduleManager {
                 auto LineIn = SchdFile.readLine();
                 const auto endLine = len(LineIn.data);
                 if (endLine > 0) {
-                    if (int(LineIn.data[endLine - 1]) == iUnicode_end) {
-                        ShowSevereError(state,
-                                        RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
-                                            " appears to be a Unicode or binary file.");
+                    if (int(LineIn.data[endLine - 1]) == state.dataSysVars->iUnicode_end) {
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
+                                        " appears to be a Unicode or binary file.");
                         ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                         ShowFatalError(state, "Program terminates due to previous condition.");
                     }

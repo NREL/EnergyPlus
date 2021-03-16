@@ -546,7 +546,6 @@ namespace WindowComplexManager {
         // Refactoring from Klems code
 
         using namespace Vectors;
-        using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         static Vector SunDir(0.0, 0.0, 1.0); // unit vector pointing toward sun (world CS)
         static Vector Posit(0.0, 0.0, 1.0);  // vector location of current ground point
@@ -563,7 +562,7 @@ namespace WindowComplexManager {
         auto &complexWindowGeom(complexWindow.Geom(iState));
         auto &surfaceWindowState(state.dataSurface->SurfaceWindow(iSurf).ComplexFen.State(iState));
 
-        if (!DetailedSolarTimestepIntegration) {
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
             std::size_t lHT(0);  // Linear index for ( Hour, TS )
             std::size_t lHTI(0); // Linear index for ( Hour, TS, I )
             for (int Hour = 1; Hour <= 24; ++Hour) {
@@ -2418,7 +2417,6 @@ namespace WindowComplexManager {
 
         using namespace DataBSDFWindow;
         using DataHeatBalance::GasCoeffsAir;
-        using DataLoopNode::Node;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -2766,8 +2764,9 @@ namespace WindowComplexManager {
                     SumSysMCp = 0.0;
                     SumSysMCpT = 0.0;
                     for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                        NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                        MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                        NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        MassFlowRate =
+                            state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -2811,8 +2810,9 @@ namespace WindowComplexManager {
                         SumSysMCp = 0.0;
                         SumSysMCpT = 0.0;
                         for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                            NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                            MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                            NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                            MassFlowRate =
+                                state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                             CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNumAdj));
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;

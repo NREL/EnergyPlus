@@ -3219,9 +3219,6 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         //     the type of system being simulated.
         // 3.  Calculate zone energy requirements
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
         using RoomAirModelAirflowNetwork::LoadPredictionRoomAirModelAirflowNetwork;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -3451,10 +3448,10 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 // timestep has just shifted from full zone timestep to a new shorter system timestep
                 // throw away last updates in corrector and rewind for resimulating smaller timestep
                 if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) { // roll back result for zone air node,
-                    Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp = state.dataHeatBalFanSys->XMAT(ZoneNum);
+                    state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp = state.dataHeatBalFanSys->XMAT(ZoneNum);
                     state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataHeatBalFanSys->XMAT(ZoneNum);
-                    Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).HumRat = state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum);
-                    Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Enthalpy = PsyHFnTdbW(state.dataHeatBalFanSys->XMAT(ZoneNum), state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum));
+                    state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).HumRat = state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum);
+                    state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Enthalpy = PsyHFnTdbW(state.dataHeatBalFanSys->XMAT(ZoneNum), state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum));
                 }
 
                 if (NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
@@ -3905,23 +3902,23 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             }
 
             // Apply offset for faulty therostats
-            if ((NumFaultyThermostat > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
+            if ((state.dataFaultsMgr->NumFaultyThermostat > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
 
                 //  loop through the FaultsThermostatOffset objects to find the one for the zone
-                for (int iFault = 1; iFault <= NumFaultyThermostat; ++iFault) {
+                for (int iFault = 1; iFault <= state.dataFaultsMgr->NumFaultyThermostat; ++iFault) {
 
-                    if (UtilityRoutines::SameString(state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).Name, FaultsThermostatOffset(iFault).FaultyThermostatName)) {
+                    if (UtilityRoutines::SameString(state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).Name, state.dataFaultsMgr->FaultsThermostatOffset(iFault).FaultyThermostatName)) {
 
                         // Check fault availability schedules
-                        if (GetCurrentScheduleValue(state, FaultsThermostatOffset(iFault).AvaiSchedPtr) > 0.0) {
+                        if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).AvaiSchedPtr) > 0.0) {
 
                             // Check fault severity schedules to update the reference thermostat offset
                             double rSchVal = 1.0;
                             double offsetUpdated;
-                            if (FaultsThermostatOffset(iFault).SeveritySchedPtr >= 0) {
-                                rSchVal = GetCurrentScheduleValue(state, FaultsThermostatOffset(iFault).SeveritySchedPtr);
+                            if (state.dataFaultsMgr->FaultsThermostatOffset(iFault).SeveritySchedPtr >= 0) {
+                                rSchVal = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).SeveritySchedPtr);
                             }
-                            offsetUpdated = rSchVal * FaultsThermostatOffset(iFault).Offset;
+                            offsetUpdated = rSchVal * state.dataFaultsMgr->FaultsThermostatOffset(iFault).Offset;
 
                             // Positive offset means the sensor reading is higher than the actual value
                             state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) -= offsetUpdated;
@@ -3951,9 +3948,6 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the predicted system load for a time step.
-
-        // Using/Aliasing
-        using DataLoopNode::Node;
 
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -4099,7 +4093,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 } else if (LoadToHeatingSetPoint <= 0.0 && LoadToCoolingSetPoint >= 0.0) { // deadband includes zero loads
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
                     if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
-                        ZoneSetPoint = Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp;
+                        ZoneSetPoint = state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp;
                         ZoneSetPoint = max(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
                         ZoneSetPoint = min(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
                     }
@@ -4178,7 +4172,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     // this turns out to cause instabilities sometimes? that lead to setpoint errors if predictor is off.
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
                     if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
-                        ZoneSetPoint = Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp;
+                        ZoneSetPoint = state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp;
                         ZoneSetPoint = max(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
                         ZoneSetPoint = min(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
                     }
@@ -4208,7 +4202,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     LoadToCoolingSetPoint = 0.0;
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
                     if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
-                        ZoneSetPoint = Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp;
+                        ZoneSetPoint = state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp;
                         ZoneSetPoint = max(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
                         ZoneSetPoint = min(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
                     }
@@ -4260,7 +4254,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
         // If the ZoneNodeNum has been set for a Controlled Zone, then the zone setpoint is placed on the node.
         if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
-            Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).TempSetPoint = ZoneSetPoint;
+            state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).TempSetPoint = ZoneSetPoint;
         }
 
         if (ZoneSetPoint > state.dataZoneTempPredictorCorrector->ZoneSetPointLast(ZoneNum)) {
@@ -4391,15 +4385,15 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             }
 
             // Apply offsets for faulty humidistats
-            if ((NumFaultyHumidistat > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
+            if ((state.dataFaultsMgr->NumFaultyHumidistat > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
 
                 //  loop through the FaultsHumidistatOffset objects to find the one for the zone
-                for (int iFault = 1; iFault <= NumFaultyHumidistat; ++iFault) {
+                for (int iFault = 1; iFault <= state.dataFaultsMgr->NumFaultyHumidistat; ++iFault) {
 
                     if (UtilityRoutines::SameString(state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).ControlName,
-                                                    FaultsHumidistatOffset(iFault).FaultyHumidistatName)) {
+                                                    state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyHumidistatName)) {
 
-                        if (UtilityRoutines::SameString(FaultsHumidistatOffset(iFault).FaultyHumidistatType, "ThermostatOffsetDependent")) {
+                        if (UtilityRoutines::SameString(state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyHumidistatType, "ThermostatOffsetDependent")) {
                             // For Humidistat Offset Type I: ThermostatOffsetDependent
 
                             bool IsThermostatFound = false;
@@ -4410,24 +4404,24 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             double faultZoneWDehumidifyingSetPoint;
 
                             // Get the offset value of the corresponding thermostat fault object
-                            if (NumFaultyThermostat > 0) {
+                            if (state.dataFaultsMgr->NumFaultyThermostat > 0) {
 
                                 //  loop through the FaultsThermostatOffset objects to find the one causes the Humidistat Offset
-                                for (int iFaultThermo = 1; iFaultThermo <= NumFaultyThermostat; ++iFaultThermo) {
+                                for (int iFaultThermo = 1; iFaultThermo <= state.dataFaultsMgr->NumFaultyThermostat; ++iFaultThermo) {
 
-                                    if (UtilityRoutines::SameString(FaultsHumidistatOffset(iFault).FaultyThermostatName,
-                                                                    FaultsThermostatOffset(iFaultThermo).Name)) {
+                                    if (UtilityRoutines::SameString(state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyThermostatName,
+                                                                    state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).Name)) {
                                         IsThermostatFound = true;
 
                                         // Check fault availability schedules
-                                        if (GetCurrentScheduleValue(state, FaultsThermostatOffset(iFaultThermo).AvaiSchedPtr) > 0.0) {
+                                        if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).AvaiSchedPtr) > 0.0) {
 
                                             // Check fault severity schedules to update the reference thermostat offset
                                             double rSchVal = 1.0;
-                                            if (FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr >= 0) {
-                                                rSchVal = GetCurrentScheduleValue(state, FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr);
+                                            if (state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr >= 0) {
+                                                rSchVal = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr);
                                             }
-                                            offsetThermostat = rSchVal * FaultsThermostatOffset(iFaultThermo).Offset;
+                                            offsetThermostat = rSchVal * state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).Offset;
                                         }
 
                                         // Stop searching the FaultsThermostatOffset object for the Humidistat Offset
@@ -4438,9 +4432,10 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
                             // The FaultsThermostatOffset specified in the FaultHumidistatOffset is not found
                             if (!IsThermostatFound) {
-                                ShowSevereError(state, "FaultModel:HumidistatOffset = \"" + FaultsHumidistatOffset(iFault).Name +
-                                                "\" invalid Reference Humidistat Offset Name = \"" +
-                                                FaultsHumidistatOffset(iFault).FaultyThermostatName + "\" not found.");
+                                ShowSevereError(state,
+                                                "FaultModel:HumidistatOffset = \"" + state.dataFaultsMgr->FaultsHumidistatOffset(iFault).Name +
+                                                    "\" invalid Reference Humidistat Offset Name = \"" +
+                                                    state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyThermostatName + "\" not found.");
                                 ShowFatalError(state, "Errors getting FaultModel input data.  Preceding condition(s) cause termination.");
                             }
 
@@ -4469,15 +4464,15 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             // For Humidistat Offset Type II: ThermostatOffsetIndependent
 
                             // Check fault availability schedules
-                            if (GetCurrentScheduleValue(state, FaultsHumidistatOffset(iFault).AvaiSchedPtr) > 0.0) {
+                            if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).AvaiSchedPtr) > 0.0) {
 
                                 // Check fault severity schedules to update the reference humidistat offset
                                 double rSchVal = 1.0;
                                 double offsetUpdated;
-                                if (FaultsHumidistatOffset(iFault).SeveritySchedPtr >= 0) {
-                                    rSchVal = GetCurrentScheduleValue(state, FaultsHumidistatOffset(iFault).SeveritySchedPtr);
+                                if (state.dataFaultsMgr->FaultsHumidistatOffset(iFault).SeveritySchedPtr >= 0) {
+                                    rSchVal = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).SeveritySchedPtr);
                                 }
-                                offsetUpdated = rSchVal * FaultsHumidistatOffset(iFault).Offset;
+                                offsetUpdated = rSchVal * state.dataFaultsMgr->FaultsHumidistatOffset(iFault).Offset;
 
                                 // Positive offset means the sensor reading is higher than the actual value
                                 ZoneRHHumidifyingSetPoint -= offsetUpdated;
@@ -4703,7 +4698,6 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // This subroutine updates the zone air temperature and modifies the system
         // time step.
 
-        using DataLoopNode::Node;
         using RoomAirModelManager::ManageAirModel;
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -4919,7 +4913,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 // calculate load correction factor
                 if ((state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mixing) || (!state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel)) {
                     // Fully mixed
-                    Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->ZT(ZoneNum);
+                    state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->ZT(ZoneNum);
                     state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
                     state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0;
                 } else if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
@@ -4927,7 +4921,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     if (SumSysMCp > SmallMassFlow) {
                         TempSupplyAir = SumSysMCpT / SumSysMCp; // Non-negligible flow, calculate supply air temperature
                         if (std::abs(TempSupplyAir - state.dataHeatBalFanSys->ZT(ZoneNum)) > state.dataHeatBal->TempConvergTol) {
-                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - state.dataHeatBalFanSys->ZT(ZoneNum));
+                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - state.dataLoopNodes->Node(ZoneNodeNum).Temp) / (TempSupplyAir - state.dataHeatBalFanSys->ZT(ZoneNum));
                             // constrain value to something reasonable
                             state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = max(-3.0, state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum));
                             state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = min(3.0, state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum));
@@ -4944,7 +4938,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     if (SumSysMCp > SmallMassFlow) {
                         TempSupplyAir = SumSysMCpT / SumSysMCp; // Non-negligible flow, calculate supply air temperature
                         if (std::abs(TempSupplyAir - state.dataHeatBalFanSys->ZT(ZoneNum)) > state.dataHeatBal->TempConvergTol) {
-                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - state.dataHeatBalFanSys->ZT(ZoneNum));
+                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - state.dataLoopNodes->Node(ZoneNodeNum).Temp) / (TempSupplyAir - state.dataHeatBalFanSys->ZT(ZoneNum));
                             // constrain value
                             state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = max(-3.0, state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum));
                             state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = min(3.0, state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum));
@@ -4959,11 +4953,11 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 } else if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     // Zone node used in the RoomAirflowNetwork model
                     state.dataHeatBalFanSys->ZT(ZoneNum) = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID).AirTemp;
-                    Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->ZT(ZoneNum);
+                    state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->ZT(ZoneNum);
                     state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
                     state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0;
                 } else {
-                    Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->ZT(ZoneNum);
+                    state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->ZT(ZoneNum);
                     state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
                     state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0;
                 }
@@ -4973,7 +4967,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 ZoneEnthalpyIn = SumSysMCpT;
 
                 // SNLOAD is the single zone load, without Zone Multiplier or Zone List Multiplier
-                SNLoad = ZoneEnthalpyIn - (Node(ZoneNodeNum).MassFlowRate / ZoneMult) * CpAir * Node(ZoneNodeNum).Temp +
+                SNLoad = ZoneEnthalpyIn - (state.dataLoopNodes->Node(ZoneNodeNum).MassFlowRate / ZoneMult) * CpAir * state.dataLoopNodes->Node(ZoneNodeNum).Temp +
                         state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
 
             } else {
@@ -5372,7 +5366,6 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // for BLAST.
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_EMPD;
         using DataSurfaces::HeatTransferModel_HAMT;
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
@@ -5423,10 +5416,10 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             // Calculate moisture flow rate into each zone
             for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
 
-                MoistureMassFlowRate += (Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
-                                         Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat) /
+                MoistureMassFlowRate += (state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
+                                         state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat) /
                                         ZoneMult;
-                ZoneMassFlowRate += Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
+                ZoneMassFlowRate += state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
             } // NodeNum
 
             // Do the calculations for the plenum zone
@@ -5434,22 +5427,22 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             ZoneRetPlenumNum = state.dataHeatBal->Zone(ZoneNum).PlenumCondNum;
             for (NodeNum = 1; NodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
 
-                MoistureMassFlowRate += (Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate *
-                                         Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).HumRat) /
+                MoistureMassFlowRate += (state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate *
+                                         state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).HumRat) /
                                         ZoneMult;
-                ZoneMassFlowRate += Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
+                ZoneMassFlowRate += state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
             } // NodeNum
             // add in the leak flow
             for (ADUListIndex = 1; ADUListIndex <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
                 ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                 if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
                     ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
-                    MoistureMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).HumRat) / ZoneMult;
+                    MoistureMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk * state.dataLoopNodes->Node(ADUInNode).HumRat) / ZoneMult;
                     ZoneMassFlowRate += state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk / ZoneMult;
                 }
                 if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
                     ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
-                    MoistureMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).HumRat) / ZoneMult;
+                    MoistureMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk * state.dataLoopNodes->Node(ADUOutNode).HumRat) / ZoneMult;
                     ZoneMassFlowRate += state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk / ZoneMult;
                 }
             }
@@ -5457,9 +5450,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         } else if (ZoneSupPlenumAirFlag) {
             ZoneSupPlenumNum = state.dataHeatBal->Zone(ZoneNum).PlenumCondNum;
             MoistureMassFlowRate +=
-                (Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate * Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).HumRat) /
+                (state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate * state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).HumRat) /
                 ZoneMult;
-            ZoneMassFlowRate += Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate / ZoneMult;
+            ZoneMassFlowRate += state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate / ZoneMult;
         }
 
         // Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
@@ -5556,8 +5549,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
         ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
         if (ZoneNodeNum > 0) {
-            Node(ZoneNodeNum).HumRat = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
-            Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(state.dataHeatBalFanSys->ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum));
+            state.dataLoopNodes->Node(ZoneNodeNum).HumRat = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
+            state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(state.dataHeatBalFanSys->ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum));
         }
     }
 
@@ -6088,7 +6081,6 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         using namespace DataSurfaces;
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
-        using DataLoopNode::Node;
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         //using ZonePlenum::ZoneRetPlenCond;
@@ -6166,7 +6158,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     // Get node conditions
                     //  this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
                     //  how can we tell?  predict step must be lagged ?  correct step, systems have run.
-                    auto const &node(Node(zec.InletNode(NodeNum)));
+                    auto const &node(state.dataLoopNodes->Node(zec.InletNode(NodeNum)));
                     NodeTemp = node.Temp;
                     MassFlowRate = node.MassFlowRate;
                     CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
@@ -6182,7 +6174,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 Real64 const air_hum_rat(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
                     // Get node conditions
-                    auto const &node(Node(zrpc.InletNode(NodeNum)));
+                    auto const &node(state.dataLoopNodes->Node(zrpc.InletNode(NodeNum)));
                     NodeTemp = node.Temp;
                     MassFlowRate = node.MassFlowRate;
                     CpAir = PsyCpAirFnW(air_hum_rat);
@@ -6198,7 +6190,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                     if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
                         ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
-                        NodeTemp = Node(ADUInNode).Temp;
+                        NodeTemp = state.dataLoopNodes->Node(ADUInNode).Temp;
                         MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk;
                         CpAir = PsyCpAirFnW(air_hum_rat);
                         Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
@@ -6207,7 +6199,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     }
                     if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
                         ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
-                        NodeTemp = Node(ADUOutNode).Temp;
+                        NodeTemp = state.dataLoopNodes->Node(ADUOutNode).Temp;
                         MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
                         CpAir = PsyCpAirFnW(air_hum_rat);
                         Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
@@ -6219,8 +6211,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             } else if (ZoneSupPlenumAirFlag) {
                 ZoneSupPlenumNum = state.dataHeatBal->Zone(ZoneNum).PlenumCondNum;
                 // Get node conditions
-                NodeTemp = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
-                MassFlowRate = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
+                NodeTemp = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
+                MassFlowRate = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
                 CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
 
                 SumSysMCp += MassFlowRate * CpAir;
@@ -6293,7 +6285,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             } // End of check if window
 
             HA += state.dataHeatBal->HConvIn(SurfNum) * Area;
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
 
             // determine reference air temperature for this surface
             {
@@ -6373,7 +6365,6 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         using namespace DataSurfaces;
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
-        using DataLoopNode::Node;
 
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
@@ -6466,15 +6457,15 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             ZoneEquipConfigNum = state.dataHeatBal->Zone(ZoneNum).ZoneEqNum;
             for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                 // Get node conditions
-                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                 CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), QSensRate);
                 SumMCpDTsystem += QSensRate;
 
                 ADUNum = state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNodeADUNum(NodeNum);
                 if (ADUNum > 0) {
-                    NodeTemp = Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).Temp;
-                    MassFlowRate = Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).MassFlowRate;
+                    NodeTemp = state.dataLoopNodes->Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).Temp;
+                    MassFlowRate = state.dataLoopNodes->Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).MassFlowRate;
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), ADUHeatAddRate);
                     state.dataDefineEquipment->AirDistUnit(ADUNum).HeatRate = max(0.0, ADUHeatAddRate);
                     state.dataDefineEquipment->AirDistUnit(ADUNum).CoolRate = std::abs(min(0.0, ADUHeatAddRate));
@@ -6488,8 +6479,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             ZoneRetPlenumNum = state.dataHeatBal->Zone(ZoneNum).PlenumCondNum;
             for (NodeNum = 1; NodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
                 // Get node conditions
-                NodeTemp = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
+                NodeTemp = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
                 CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), QSensRate);
                 SumMCpDTsystem += QSensRate;
 
@@ -6499,14 +6490,14 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                 if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
                     ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
-                    NodeTemp = Node(ADUInNode).Temp;
+                    NodeTemp = state.dataLoopNodes->Node(ADUInNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk;
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), QSensRate);
                     SumMCpDTsystem += QSensRate;
                 }
                 if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
                     ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
-                    NodeTemp = Node(ADUOutNode).Temp;
+                    NodeTemp = state.dataLoopNodes->Node(ADUOutNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), QSensRate);
                     SumMCpDTsystem += QSensRate;
@@ -6516,8 +6507,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         } else if (ZoneSupPlenumAirFlag) {
             ZoneSupPlenumNum = state.dataHeatBal->Zone(ZoneNum).PlenumCondNum;
             // Get node conditions
-            NodeTemp = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
-            MassFlowRate = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
+            NodeTemp = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
+            MassFlowRate = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
             CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), QSensRate);
             SumMCpDTsystem += QSensRate;
         }
@@ -6546,8 +6537,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     // determine supply air temperature as a weighted average of the inlet temperatures.
                     for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                         // Get node conditions
-                        NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                        MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                        NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
 
                         SumSysMCp += MassFlowRate * CpAir;
@@ -6611,7 +6602,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
             } // End of check if window
 
-            SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * Area * (TempSurfInTmp(SurfNum) - RefAirTemp);
+            SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * Area * (state.dataHeatBalSurf->TempSurfInTmp(SurfNum) - RefAirTemp);
 
             // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
             if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {

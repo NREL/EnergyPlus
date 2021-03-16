@@ -1040,8 +1040,8 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 20.0;
     WaterThermalTanks::SimHeatPumpWaterHeater(*state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
-    EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
-    EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));
+    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
+    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));
 }
 
 TEST_F(EnergyPlusFixture, WaterThermalTank_CalcTempIntegral)
@@ -1412,8 +1412,8 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
     state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
-    DataLoopNode::Node(3).Temp = 30.0;
-    DataLoopNode::Node(3).HumRat = 0.01;
+    state->dataLoopNodes->Node(3).Temp = 30.0;
+    state->dataLoopNodes->Node(3).HumRat = 0.01;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool FirstHVACIteration(true);
@@ -1429,7 +1429,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     state->dataGlobal->WarmupFlag = false;
     Tank.initialize(*state, FirstHVACIteration); // read set point schedules on second pass when WarmupFlag is false.
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 60 C, tank should remain at 60 C and HP should be off.
     EXPECT_NEAR(60.0, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
@@ -1446,7 +1446,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     Tank.SavedMode = state->dataWaterThermalTanks->heatMode;
     Tank.initialize(*state, FirstHVACIteration);
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 50 C, tank should heat up and HP should be on.
     EXPECT_NEAR(57.2028862, Tank.TankTemp, 0.0000001); // final tank temperature
     EXPECT_NEAR(1.0, HeatPump.HeatingPLR, 0.0000001);          // HP operating at full capacity
@@ -1460,7 +1460,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     HeatPump.SaveMode = state->dataWaterThermalTanks->heatMode;
     Tank.SavedMode = state->dataWaterThermalTanks->heatMode;
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 56 C, tank should heat up to 60 C (within convergence tolerance) and HP should cycle.
     EXPECT_NEAR(60.0011328, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.5548081, HeatPump.HeatingPLR, 0.0000001);
@@ -1476,7 +1476,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     Tank.UseMassFlowRate = 0.02;
     Tank.UseInletTemp = 90.0;
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 56 C, tank should heat up > 60 C since use nodes add heat to tank and HP should be off and floating.
     EXPECT_NEAR(61.96991668, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
@@ -1493,7 +1493,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     Tank.UseMassFlowRate = 0.02;
     Tank.UseInletTemp = 90.0;
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 56 C, tank should heat up > 60 C since use nodes add heat to tank and HP should be off and floating.
     EXPECT_NEAR(61.96991668, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
@@ -1511,7 +1511,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     Tank.UseMassFlowRate = 0.0;
     Tank.UseInletTemp = 90.0;
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 56 C, tank should remain at 56 C since use nodes are not adding heat to tank and HP set point temp was reduced
     EXPECT_NEAR(56.0, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
@@ -2174,7 +2174,6 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 {
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
-    using DataLoopNode::Node;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2416,7 +2415,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     // FirsttimeThroughFlag attribute supposed to set as false after first run
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
     // Advanced to next time step (0 => 1)
-    EXPECT_EQ(Node(Desuperheater.WaterInletNode).Temp, 50);
+    EXPECT_EQ(state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp, 50);
     EXPECT_EQ(Tank.SavedTankTemp, 50);
     // No loss no source, Tank temperature supposed to be 50
     EXPECT_EQ(Tank.TankTemp, 50);
@@ -2427,7 +2426,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
     Tank.CalcDesuperheaterWaterHeater(*state, FirstHVAC);
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
-    EXPECT_EQ(Node(Desuperheater.WaterInletNode).Temp, 50);
+    EXPECT_EQ(state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp, 50);
     // Saved temperature not supposed to change
     EXPECT_EQ(Tank.SavedTankTemp, 50);
     // The source side inlet temperature calculated based on saved temperatures
@@ -2444,7 +2443,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     EXPECT_TRUE(Desuperheater.FirstTimeThroughFlag);
     // Saved temperature not supposed to change
     EXPECT_EQ(Tank.SavedTankTemp, 50);
-    EXPECT_EQ(Node(Desuperheater.WaterInletNode).Temp, 50);
+    EXPECT_EQ(state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp, 50);
     EXPECT_GT(Tank.SourceInletTemp, 50);
     EXPECT_GT(Tank.TankTemp, 50);
 }
@@ -2453,7 +2452,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 {
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
-    using DataLoopNode::Node;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2593,7 +2591,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "  100,                  ! Maximum Value of z",
         "  0.,                   ! Minimum Curve Output",
         "  38.;                  ! Maximum Curve Output",
-        
+
         "Curve:QuadLinear,",
         "  TotCoolCapCurve,      ! Curve Name",
         "  -3.9160645386,        ! CoefficientC1",
@@ -2611,7 +2609,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "  100,                  ! Maximum Value of z",
         "  0.,                   ! Minimum Curve Output",
         "  38.;                  ! Maximum Curve Output",
-        
+
         "Curve:QuadLinear,",
         "  CoolPowCurve,         ! Curve Name",
         "  -6.2337364523,        ! CoefficientC1",
@@ -2668,12 +2666,12 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).Name, "GSHP_COIL1");
     EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).SourceType, "Coil:Cooling:WaterToAirHeatPump:EquationFit");
     // Air node
-    Node(5).MassFlowRate = 0.005;
-    Node(5).Temp = 28.0;
-    Node(5).HumRat = 0.2;
+    state->dataLoopNodes->Node(5).MassFlowRate = 0.005;
+    state->dataLoopNodes->Node(5).Temp = 28.0;
+    state->dataLoopNodes->Node(5).HumRat = 0.2;
     // Water node
-    Node(3).Temp = 15.0;
-    Node(3).MassFlowRate = 0.05;
+    state->dataLoopNodes->Node(3).Temp = 15.0;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.05;
     // Plant loop must be initialized
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
     state->dataPlnt->PlantLoop.allocate(LoopNum);
@@ -2717,7 +2715,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Tank.TimeElapsed = 0.0;
     Desuperheater.SetPointTemp = 60.0;
     Desuperheater.Mode = 1;
-    Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
+    state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
 
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
@@ -2742,7 +2740,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Tank.SavedTankTemp = 39.0;
     Tank.SavedSourceOutletTemp = 39.0;
     Tank.SourceMassFlowRate = 0.003;
-    Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
+    state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).PartLoadRatio = 0.8;
     Tank.initialize(*state, false);
@@ -2760,7 +2758,6 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 {
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
-    using DataLoopNode::Node;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -3096,7 +3093,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Tank.UseInletTemp = 10.0;
     Tank.UseMassFlowRate = 0.00001;
     Tank.SourceOutletTemp = 45.0;
-    Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
+    state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
     Tank.SourceMassFlowRate = 0.003;
     Tank.TimeElapsed = 0.0;
     Desuperheater.SetPointTemp = 50.0;
@@ -3120,7 +3117,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Tank.SavedTankTemp = 61.0;
     Tank.SavedSourceOutletTemp = 61.0;
     Desuperheater.SaveMode = 0;
-    Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
+    state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
     Tank.SourceMassFlowRate = 0.003;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, 1, 1);
     Tank.CalcDesuperheaterWaterHeater(*state, false);
@@ -3226,8 +3223,8 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 
     // Set the available max flow rates for tank and node
     Tank.PlantSourceMassFlowRateMax = Tank.SourceDesignVolFlowRate * rho;
-    DataLoopNode::Node(1).MassFlowRateMax = Tank.PlantSourceMassFlowRateMax;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = Tank.PlantSourceMassFlowRateMax;
+    state->dataLoopNodes->Node(1).MassFlowRateMax = Tank.PlantSourceMassFlowRateMax;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = Tank.PlantSourceMassFlowRateMax;
 
     NeedsHeatOrCool = Tank.SourceHeatNeed(*state, 70.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
     EXPECT_FALSE(NeedsHeatOrCool);
@@ -3446,7 +3443,6 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 {
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
-    using DataLoopNode::Node;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -4458,8 +4454,8 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
         state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
-        DataLoopNode::Node(3).Temp = 30.0;
-        DataLoopNode::Node(3).HumRat = 0.01;
+        state->dataLoopNodes->Node(3).Temp = 30.0;
+        state->dataLoopNodes->Node(3).HumRat = 0.01;
         state->dataEnvrn->OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);
@@ -4482,8 +4478,8 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
         state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
-        DataLoopNode::Node(3).Temp = 30.0;
-        DataLoopNode::Node(3).HumRat = 0.01;
+        state->dataLoopNodes->Node(3).Temp = 30.0;
+        state->dataLoopNodes->Node(3).HumRat = 0.01;
         state->dataEnvrn->OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);

@@ -421,9 +421,9 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     // The ideal loads air system has a non-zero mass flow rate
     EXPECT_GT(PurchAir(1).SupplyAirMassFlowRate, 0.0);
     // The ideal loads air system mass flow rate is equal to all nodes attached to this system
-    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, Node(PurchAir(1).ZoneSupplyAirNodeNum).MassFlowRate);
-    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, Node(PurchAir(1).ZoneExhaustAirNodeNum).MassFlowRate);
-    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, Node(PurchAir(1).PlenumExhaustAirNodeNum).MassFlowRate);
+    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, state->dataLoopNodes->Node(PurchAir(1).ZoneSupplyAirNodeNum).MassFlowRate);
+    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, state->dataLoopNodes->Node(PurchAir(1).ZoneExhaustAirNodeNum).MassFlowRate);
+    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, state->dataLoopNodes->Node(PurchAir(1).PlenumExhaustAirNodeNum).MassFlowRate);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
@@ -521,8 +521,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     auto & PurchAir(state->dataPurchasedAirMgr->PurchAir);
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
     // Ideal loads air system found the plenum it is attached to
-    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, Node(PurchAir(1).ZoneSupplyAirNodeNum).MassFlowRate);
-    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, Node(PurchAir(1).ZoneExhaustAirNodeNum).MassFlowRate);
+    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, state->dataLoopNodes->Node(PurchAir(1).ZoneSupplyAirNodeNum).MassFlowRate);
+    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, state->dataLoopNodes->Node(PurchAir(1).ZoneExhaustAirNodeNum).MassFlowRate);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
@@ -647,21 +647,21 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
 
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
     // Expecting SupplyTemp to be the same as Zone supply temp
-    EXPECT_EQ(PurchAir(1).SupplyTemp, Node(PurchAir(1).ZoneSupplyAirNodeNum).Temp);
-    EXPECT_EQ(PurchAir(1).SupplyHumRat, Node(PurchAir(1).ZoneSupplyAirNodeNum).HumRat);
+    EXPECT_EQ(PurchAir(1).SupplyTemp, state->dataLoopNodes->Node(PurchAir(1).ZoneSupplyAirNodeNum).Temp);
+    EXPECT_EQ(PurchAir(1).SupplyHumRat, state->dataLoopNodes->Node(PurchAir(1).ZoneSupplyAirNodeNum).HumRat);
 
     // Test for intermediate variables, MixedAirTemp, MixedAirHumRat
-    Node(PurchAir(1).ZoneRecircAirNodeNum).Temp = 24;
-    Node(PurchAir(1).ZoneRecircAirNodeNum).HumRat = 0.00929;
-    Node(PurchAir(1).ZoneRecircAirNodeNum).Enthalpy =  Psychrometrics::PsyHFnTdbW(
-                                                                    Node(PurchAir(1).ZoneRecircAirNodeNum).Temp,
-                                                                    Node(PurchAir(1).ZoneRecircAirNodeNum).HumRat
+    state->dataLoopNodes->Node(PurchAir(1).ZoneRecircAirNodeNum).Temp = 24;
+    state->dataLoopNodes->Node(PurchAir(1).ZoneRecircAirNodeNum).HumRat = 0.00929;
+    state->dataLoopNodes->Node(PurchAir(1).ZoneRecircAirNodeNum).Enthalpy =  Psychrometrics::PsyHFnTdbW(
+                                                                    state->dataLoopNodes->Node(PurchAir(1).ZoneRecircAirNodeNum).Temp,
+                                                                    state->dataLoopNodes->Node(PurchAir(1).ZoneRecircAirNodeNum).HumRat
                                                                     );
-    Node(PurchAir(1).OutdoorAirNodeNum).Temp = 3;
-    Node(PurchAir(1).OutdoorAirNodeNum).HumRat = 0.004586;
-    Node(PurchAir(1).OutdoorAirNodeNum).Enthalpy =  Psychrometrics::PsyHFnTdbW(
-                                                                    Node(PurchAir(1).OutdoorAirNodeNum).Temp,
-                                                                    Node(PurchAir(1).OutdoorAirNodeNum).HumRat
+    state->dataLoopNodes->Node(PurchAir(1).OutdoorAirNodeNum).Temp = 3;
+    state->dataLoopNodes->Node(PurchAir(1).OutdoorAirNodeNum).HumRat = 0.004586;
+    state->dataLoopNodes->Node(PurchAir(1).OutdoorAirNodeNum).Enthalpy =  Psychrometrics::PsyHFnTdbW(
+                                                                    state->dataLoopNodes->Node(PurchAir(1).OutdoorAirNodeNum).Temp,
+                                                                    state->dataLoopNodes->Node(PurchAir(1).OutdoorAirNodeNum).HumRat
                                                                     );
     PurchAir(1).MixedAirTemp = 0;
     PurchAir(1).MixedAirHumRat = 0;
@@ -832,8 +832,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
 
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideMdotOn = true;
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyTempOn = true;
-    DataLoopNode::Node(2).Temp = 25.0;
-    DataLoopNode::Node(2).HumRat = 0.001;
+    state->dataLoopNodes->Node(2).Temp = 25.0;
+    state->dataLoopNodes->Node(2).HumRat = 0.001;
 
     InitPurchasedAir(*state, 1, FirstHVACIteration, 1, 1);
     Real64 SysOutputProvided;
@@ -1093,8 +1093,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyTempOn = true;
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyHumRatOn = true;
 
-    DataLoopNode::Node(2).Temp = 25.0;
-    DataLoopNode::Node(2).HumRat = 0.001;
+    state->dataLoopNodes->Node(2).Temp = 25.0;
+    state->dataLoopNodes->Node(2).HumRat = 0.001;
 
     InitPurchasedAir(*state, 1, FirstHVACIteration, 1, 1);
     Real64 SysOutputProvided;
@@ -1112,9 +1112,9 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyTemp, 18.0);
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyHumRat, 0.01);
 
-    EXPECT_EQ(EnergyPlus::DataLoopNode::Node(1).Enthalpy, 43431.131);
-    EXPECT_EQ(EnergyPlus::DataLoopNode::Node(1).HumRat, 0.01);
-    EXPECT_EQ(EnergyPlus::DataLoopNode::Node(1).Temp, 18.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(1).Enthalpy, 43431.131);
+    EXPECT_EQ(state->dataLoopNodes->Node(1).HumRat, 0.01);
+    EXPECT_EQ(state->dataLoopNodes->Node(1).Temp, 18.0);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
@@ -1266,8 +1266,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyTempOn = true;
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyHumRatOn = true;
 
-    DataLoopNode::Node(2).Temp = 25.0;
-    DataLoopNode::Node(2).HumRat = 0.001;
+    state->dataLoopNodes->Node(2).Temp = 25.0;
+    state->dataLoopNodes->Node(2).HumRat = 0.001;
 
     InitPurchasedAir(*state, 1, FirstHVACIteration, 1, 1);
     Real64 SysOutputProvided;
@@ -1288,7 +1288,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyTemp, 18.0);
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyHumRat, 0.01);
 
-    EXPECT_EQ(EnergyPlus::DataLoopNode::Node(1).Enthalpy, 0.0);
-    EXPECT_EQ(EnergyPlus::DataLoopNode::Node(1).HumRat, 0.0);
-    EXPECT_EQ(EnergyPlus::DataLoopNode::Node(1).Temp, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(1).Enthalpy, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(1).HumRat, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(1).Temp, 0.0);
 }
