@@ -66,39 +66,9 @@ namespace HeatBalanceManager {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    extern Array1D_string const PassFail;
-
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-
-    // Real Variables for the Heat Balance Simulation
-    // Variables used to determine warmup convergence
-    extern Array1D<Real64> MaxCoolLoadPrevDay; // Max cooling load from the previous day
-    extern Array1D<Real64> MaxCoolLoadZone;    // Maximum zone cooling load from the current day
-    extern Array1D<Real64> MaxHeatLoadPrevDay; // Max heating load from the previous day
-    extern Array1D<Real64> MaxHeatLoadZone;    // Maximum zone heating load from the current day
-    extern Array1D<Real64> MaxTempPrevDay;     // Max temperature from the previous day
-    extern Array1D<Real64> MaxTempZone;        // Maximum zone temperature from the current day
-    extern Array1D<Real64> MinTempPrevDay;     // Min temperature from the previous day
-    extern Array1D<Real64> MinTempZone;        // Minimum zone temperature from the current day
-
-    // Variables used to report difference in temperature and load from the last two warmup days
-    extern Array1D<Real64> WarmupTempDiff;     // Temperature difference between the last two warmup days
-    extern Array1D<Real64> WarmupLoadDiff;     // Zone load differences between the last two warmup days
-    extern Array1D<Real64> TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
-    extern Array1D<Real64> LoadZoneSecPrevDay; // Zone load from the second last warmup day
-    extern Array1D<Real64> TempZonePrevDay;    // Zone air temperature from the previous day
-    extern Array1D<Real64> LoadZonePrevDay;    // Zone load from the previuos day
-    extern Array1D<Real64> TempZone;           // Zone air temperature from the current warmup day
-    extern Array1D<Real64> LoadZone;           // Zone load from the current warmup day
-
-    extern Array2D<Real64> TempZoneRpt;       // Zone air temperature to report (average over all warmup days)
-    extern Array1D<Real64> TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
-    extern Array2D<Real64> LoadZoneRpt;       // Zone load to report (average over all warmup days)
-    extern Array1D<Real64> LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
-    extern Array2D<Real64> MaxLoadZoneRpt;    // Maximum zone load for reporting calcs
-    extern int CountWarmupDayPoints;          // Count of warmup timesteps (to achieve warmup)
 
     extern std::string CurrentModuleObject; // to assist in getting input
 
@@ -136,7 +106,6 @@ namespace HeatBalanceManager {
     };
 
     // Object Data
-    extern Array1D<WarmupConvergence> WarmupConvergenceValues;
 
     // Functions
 
@@ -273,9 +242,65 @@ namespace HeatBalanceManager {
 
 struct HeatBalanceMgrData : BaseGlobalStruct {
 
+
+    // Real Variables for the Heat Balance Simulation
+    // Variables used to determine warmup convergence
+    Array1D<Real64> MaxCoolLoadPrevDay; // Max cooling load from the previous day
+    Array1D<Real64> MaxCoolLoadZone;    // Maximum zone cooling load from the current day
+    Array1D<Real64> MaxHeatLoadPrevDay; // Max heating load from the previous day
+    Array1D<Real64> MaxHeatLoadZone;    // Maximum zone heating load from the current day
+    Array1D<Real64> MaxTempPrevDay;     // Max temperature from the previous day
+    Array1D<Real64> MaxTempZone;        // Maximum zone temperature from the current day
+    Array1D<Real64> MinTempPrevDay;     // Min temperature from the previous day
+    Array1D<Real64> MinTempZone;        // Minimum zone temperature from the current day
+
+    // Variables used to report difference in temperature and load from the last two warmup days
+    Array1D<Real64> WarmupTempDiff;     // Temperature difference between the last two warmup days
+    Array1D<Real64> WarmupLoadDiff;     // Zone load differences between the last two warmup days
+    Array1D<Real64> TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
+    Array1D<Real64> LoadZoneSecPrevDay; // Zone load from the second last warmup day
+    Array1D<Real64> TempZonePrevDay;    // Zone air temperature from the previous day
+    Array1D<Real64> LoadZonePrevDay;    // Zone load from the previuos day
+    Array1D<Real64> TempZone;           // Zone air temperature from the current warmup day
+    Array1D<Real64> LoadZone;           // Zone load from the current warmup day
+
+    Array2D<Real64> TempZoneRpt;       // Zone air temperature to report (average over all warmup days)
+    Array1D<Real64> TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
+    Array2D<Real64> LoadZoneRpt;       // Zone load to report (average over all warmup days)
+    Array1D<Real64> LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
+    Array2D<Real64> MaxLoadZoneRpt;    // Maximum zone load for reporting calcs
+
+    int CountWarmupDayPoints; // Count of warmup timesteps (to achieve warmup)
+
+    Array1D<HeatBalanceManager::WarmupConvergence> WarmupConvergenceValues;
+
     void clear_state() override
     {
+        MaxCoolLoadPrevDay.clear();
+        MaxCoolLoadZone.clear();
+        MaxHeatLoadPrevDay.clear();
+        MaxHeatLoadZone.clear();
+        MaxTempPrevDay.clear();
+        MaxTempZone.clear();
+        MinTempPrevDay.clear();
+        MinTempZone.clear();
+        WarmupTempDiff.clear();
+        WarmupLoadDiff.clear();
+        TempZoneSecPrevDay.clear();
+        LoadZoneSecPrevDay.clear();
+        TempZonePrevDay.clear();
+        LoadZonePrevDay.clear();
+        TempZone.clear();
+        LoadZone.clear();
+        TempZoneRpt.clear();
+        TempZoneRptStdDev.clear();
+        LoadZoneRpt.clear();
+        LoadZoneRptStdDev.clear();
+        MaxLoadZoneRpt.clear();
 
+        CountWarmupDayPoints = int();
+
+        WarmupConvergenceValues.clear();
     }
 };
 

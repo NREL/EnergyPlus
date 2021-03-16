@@ -134,33 +134,6 @@ namespace EnergyPlus::DisplacementVentMgr {
         // PURPOSE OF THIS SUBROUTINE:
         //   manage the UCSD Displacement Ventilation model
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using DataHeatBalSurface::TempSurfIn;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-
-
         // initialize Displacement Ventilation model
         InitUCSDDV(state, ZoneNum);
 
@@ -276,6 +249,8 @@ namespace EnergyPlus::DisplacementVentMgr {
         Real64 LayH;     // Height of the Occupied/Mixed subzone interface
         Real64 LayFrac;  // Fraction height of the Occupied/Mixed subzone interface
         int SurfNum;     // Surface number
+
+        auto &TempSurfIn(state.dataHeatBalSurf->TempSurfIn);
 
         HAT_MX = 0.0;
         HAT_OC = 0.0;
@@ -724,8 +699,8 @@ namespace EnergyPlus::DisplacementVentMgr {
         ZoneEquipConfigNum = ZoneNum;
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).IsControlled) {
             for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                 CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -1118,7 +1093,7 @@ namespace EnergyPlus::DisplacementVentMgr {
 
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) {
             ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;
-            Node(ZoneNodeNum).Temp = state.dataRoomAirMod->ZTMX(ZoneNum);
+            state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataRoomAirMod->ZTMX(ZoneNum);
         }
 
         // Mixed for reporting purposes

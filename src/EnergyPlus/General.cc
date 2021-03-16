@@ -1219,9 +1219,6 @@ namespace General {
         Real64 SlatAng1;
 
         if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {
-            //  InterpSlatAng = 0.0
-            //  RETURN
-            // END IF
             SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
         } else {
             SlatAng1 = SlatAng;
@@ -1230,7 +1227,8 @@ namespace General {
         if (VarSlats) { // Variable-angle slats
             IBeta = 1 + int(SlatAng1 * DeltaAng_inv);
             InterpFac = (SlatAng1 - DeltaAng * (IBeta - 1)) * DeltaAng_inv;
-            InterpSlatAng = PropArray(IBeta) + InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
+            InterpSlatAng = PropArray(IBeta) +
+                    InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
         } else { // Fixed-angle slats or shade
             InterpSlatAng = PropArray(1);
         }
@@ -1305,21 +1303,6 @@ namespace General {
 
         IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2) / DeltaProfAng) + 1;
         ProfAngRatio = (ProfAng1 + DataGlobalConstants::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
-
-//        Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
-//
-//        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-//        Real64 InterpFac; // Interpolation factor
-//        int IAlpha;       // Profile angle index
-//
-//        // DeltaAng = Pi/36
-//        if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-//            InterpProfAng = 0.0;
-//        } else {
-//            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);
-//            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
-//            InterpProfAng = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
-//        }
 
         if (VarSlats) { // Variable-angle slats: interpolate in profile angle and slat angle
             IBeta = int(SlatAng1 / DeltaSlatAng) + 1;
