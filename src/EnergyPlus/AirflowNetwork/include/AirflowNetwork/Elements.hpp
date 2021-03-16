@@ -1706,43 +1706,43 @@ struct AirflowNetworkData : BaseGlobalStruct {
 
     void clear_state() override
     {
-        SimulateAirflowNetwork = 1;
-        AirflowNetworkNodeSimu.clear();
-        AirflowNetworkLinkSimu.clear();
+        this->SimulateAirflowNetwork = 1;
+        this->AirflowNetworkNodeSimu.clear();
+        this->AirflowNetworkLinkSimu.clear();
 
-        AirflowNetworkSimu = AirflowNetwork::AirflowNetworkSimuProp();
-        AirflowNetworkNodeData.clear();
-        AirflowNetworkCompData.clear();
-        AirflowNetworkLinkageData.clear();
-        MultizoneZoneData.clear();
-        MultizoneSurfaceData.clear();
-        MultizoneCompDetOpeningData.clear();
-        MultizoneCompSimpleOpeningData.clear();
-        MultizoneCompHorOpeningData.clear();
-        MultizoneSurfaceCrackData.clear();
-        MultizoneSurfaceELAData.clear();
-        MultizoneExternalNodeData.clear();
-        DeltaCp.clear();
-        EPDeltaCP.clear();
-        MultizoneCompExhaustFanData.clear();
-        IntraZoneNodeData.clear();       // Intra zone data set
-        IntraZoneLinkageData.clear(); // Intra zone linkage adat set
-        DisSysNodeData.clear();
-        DisSysCompLeakData.clear();
-        DisSysCompELRData.clear();
-        DisSysCompDuctData.clear();
-        DisSysCompDamperData.clear();
-        DisSysCompCVFData.clear();
-        DisSysCompDetFanData.clear();
-        DisSysCompCoilData.clear();
-        DisSysCompHXData.clear();
-        DisSysCompTermUnitData.clear();
-        DisSysCompCPDData.clear();
-        AirflowNetworkReportData.clear();
-        PressureControllerData.clear();
-        DisSysCompOutdoorAirData.clear();
-        DisSysCompReliefAirData.clear();
-        AirflowNetworkLinkageViewFactorData.clear();
+        this->AirflowNetworkSimu = AirflowNetwork::AirflowNetworkSimuProp();
+        this->AirflowNetworkNodeData.clear();
+        this->AirflowNetworkCompData.clear();
+        this->AirflowNetworkLinkageData.clear();
+        this->MultizoneZoneData.clear();
+        this->MultizoneSurfaceData.clear();
+        this->MultizoneCompDetOpeningData.clear();
+        this->MultizoneCompSimpleOpeningData.clear();
+        this->MultizoneCompHorOpeningData.clear();
+        this->MultizoneSurfaceCrackData.clear();
+        this->MultizoneSurfaceELAData.clear();
+        this->MultizoneExternalNodeData.clear();
+        this->DeltaCp.clear();
+        this->EPDeltaCP.clear();
+        this->MultizoneCompExhaustFanData.clear();
+        this->IntraZoneNodeData.clear();       // Intra zone data set
+        this->IntraZoneLinkageData.clear(); // Intra zone linkage adat set
+        this->DisSysNodeData.clear();
+        this->DisSysCompLeakData.clear();
+        this->DisSysCompELRData.clear();
+        this->DisSysCompDuctData.clear();
+        this->DisSysCompDamperData.clear();
+        this->DisSysCompCVFData.clear();
+        this->DisSysCompDetFanData.clear();
+        this->DisSysCompCoilData.clear();
+        this->DisSysCompHXData.clear();
+        this->DisSysCompTermUnitData.clear();
+        this->DisSysCompCPDData.clear();
+        this->AirflowNetworkReportData.clear();
+        this->PressureControllerData.clear();
+        this->DisSysCompOutdoorAirData.clear();
+        this->DisSysCompReliefAirData.clear();
+        this->AirflowNetworkLinkageViewFactorData.clear();
     }
 };
 
