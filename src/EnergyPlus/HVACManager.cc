@@ -239,8 +239,6 @@ namespace EnergyPlus::HVACManager {
 
         state.dataHeatBalFanSys->ZT = state.dataHeatBalFanSys->MAT;
         // save for use with thermal comfort control models (Fang, Pierce, and KSU)
-        // state.dataHeatBalFanSys->ZTAVComf = state.dataHeatBalFanSys->ZTAV;
-        // state.dataHeatBalFanSys->ZoneAirHumRatAvgComf = state.dataHeatBalFanSys->ZoneAirHumRatAvg;
         state.dataHeatBalFanSys->ZTAV = 0.0;
         state.dataHeatBalFanSys->ZoneThermostatSetPointHiAver = 0.0;
         state.dataHeatBalFanSys->ZoneThermostatSetPointLoAver = 0.0;
