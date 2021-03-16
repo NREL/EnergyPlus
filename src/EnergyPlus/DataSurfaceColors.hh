@@ -63,77 +63,45 @@ struct EnergyPlusData;
 
 namespace DataSurfaceColors {
 
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    extern int const NumColors;
+    extern int const ColorNo_Text;
+    extern int const ColorNo_Wall;
+    extern int const ColorNo_Window;
+    extern int const ColorNo_GlassDoor;
+    extern int const ColorNo_Door;
+    extern int const ColorNo_Floor;
+    extern int const ColorNo_Roof;
+    extern int const ColorNo_ShdDetBldg;
+    extern int const ColorNo_ShdDetFix;
+    extern int const ColorNo_ShdAtt;
+    extern int const ColorNo_PV;
+    extern int const ColorNo_TDDDome;
+    extern int const ColorNo_TDDDiffuser;
+    extern int const ColorNo_DaylSensor1;
+    extern int const ColorNo_DaylSensor2;
 
-    int constexpr NumColors(15);
-    enum class ColorNo {
-        Uunassigned,
-        Text,
-        Wall,
-        Window,
-        GlassDoor,
-        Door,
-        Floor,
-        Roof,
-        ShdDetBldg,
-        ShdDetFix,
-        ShdAtt,
-        PV,
-        TDDDome,
-        TDDDiffuser,
-        DaylSensor1,
-        DaylSensor2
-    };
+    extern Array1D_int const defaultcolorno; // text | wall | window | glassdoor | door | floor | roof | detached building shade (moves with building)
+                                             // | detached building fixed | attached building shading | PV | TDD:Dome | TDD:Diffuser | Daylight Sensor
+                                             // 1 | Daylight Sensor 2
 
-    std::array<int, NumColors+1> constexpr defaultcolorno(
-            {
-                    -1, 3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5
-            }); // dummy | text | wall | window | glassdoor |
-    // door | floor | roof | detached
-    // building shade (moves with
-    // building) | detached building
-    // fixed | attached building shading
-    // | PV | TDD:Dome | TDD:Diffuser |
-    // Daylight Sensor 1 | Daylight
-    // Sensor 2
+    extern Array1D_string const colorkeys;
 
-    std::array<const char *, NumColors+1> constexpr colorkeys(
-            {"Dummy",
-             "Text",
-             "Walls",
-             "Windows",
-             "GlassDoors",
-             "Doors",
-             "Roofs",
-             "Floors",
-             "DetachedBuildingShades",
-             "DetachedFixedShades",
-             "AttachedBuildingShades",
-             "Photovoltaics",
-             "TubularDaylightDomes",
-             "TubularDaylightDiffusers",
-             "DaylightReferencePoint1",
-             "DaylightReferencePoint2"});
+    extern Array1D_int const colorkeyptr;
 
-    std::array<ColorNo, NumColors+1> constexpr colorkeyptr(
-            {ColorNo::Uunassigned,
-             ColorNo::Text,
-             ColorNo::Wall,
-             ColorNo::Window,
-             ColorNo::GlassDoor,
-             ColorNo::Door,
-             ColorNo::Floor,
-             ColorNo::Roof,
-             ColorNo::ShdDetBldg,
-             ColorNo::ShdDetFix,
-             ColorNo::ShdAtt,
-             ColorNo::PV,
-             ColorNo::TDDDome,
-             ColorNo::TDDDiffuser,
-             ColorNo::DaylSensor1,
-             ColorNo::DaylSensor2});
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-    bool MatchAndSetColorTextString(EnergyPlusData &state, std::string const &String,          // string to be matched
-                                    int SetValue,                 // value to be used for the color
+    // MODULE VARIABLE DECLARATIONS:
+    extern Array1D_int DXFcolorno;
+
+    // SUBROUTINE SPECIFICATIONS FOR MODULE:
+
+    // Functions
+
+    bool MatchAndSetColorTextString(std::string const &String,          // string to be matched
+                                    int const SetValue,                 // value to be used for the color
                                     Optional_string_const ColorType = _ // for now, must be DXF
     );
 
@@ -142,12 +110,10 @@ namespace DataSurfaceColors {
 } // namespace DataSurfaceColors
 
 struct SurfaceColorData : BaseGlobalStruct {
-    Array1D_int DXFcolorno;
+
     void clear_state() override
     {
-        DXFcolorno.clear();
-        DXFcolorno.allocate(DataSurfaceColors::NumColors+1);
-        DXFcolorno = DataSurfaceColors::defaultcolorno;
+
     }
 };
 

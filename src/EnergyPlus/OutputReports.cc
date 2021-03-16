@@ -376,49 +376,49 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
 
     // This writes "True North" above the Arrow Head
     print(of, Format_710, "Text - True North");
-    print(of, Format_800, state.dataSurfColor->DXFcolorno((int)ColorNo::Text), StemX(1) - 1.0, StemY(1), StemZ(1));
+    print(of, Format_800, DXFcolorno(ColorNo_Text), StemX(1) - 1.0, StemY(1), StemZ(1));
 
     print(of, Format_710, "Text - Building Title");
-    print(of, Format_801, state.dataSurfColor->DXFcolorno((int)ColorNo::Text), StemX(1) - 4.0, StemY(1) - 4.0, StemZ(1), "Building - " + state.dataHeatBal->BuildingName);
+    print(of, Format_801, DXFcolorno(ColorNo_Text), StemX(1) - 4.0, StemY(1) - 4.0, StemZ(1), "Building - " + state.dataHeatBal->BuildingName);
 
     // We want to point the north arrow to true north
     print(of, Format_710, "North Arrow Stem");
-    print(of, Format_703_0, state.dataSurfColor->DXFcolorno((int)ColorNo::Text));
+    print(of, Format_703_0, DXFcolorno(ColorNo_Text));
     print(of, Format_703_1, StemX(1), StemY(1), StemZ(1));
     print(of, Format_703_2, StemX(2), StemY(2), StemZ(2));
     print(of, Format_703_3, StemX(3), StemY(3), StemZ(3));
     print(of, Format_703_4, StemX(4), StemY(4), StemZ(4));
 
     print(of, Format_710, "North Arrow Head 1");
-    print(of, Format_703_0, state.dataSurfColor->DXFcolorno((int)ColorNo::Text));
+    print(of, Format_703_0, DXFcolorno(ColorNo_Text));
     print(of, Format_703_1, Head1X(1), Head1Y(1), Head1Z(1));
     print(of, Format_703_2, Head1X(2), Head1Y(2), Head1Z(2));
     print(of, Format_703_3, Head1X(3), Head1Y(3), Head1Z(3));
     print(of, Format_703_4, Head1X(4), Head1Y(4), Head1Z(4));
 
     print(of, Format_710, "North Arrow Head 2");
-    print(of, Format_703_0, state.dataSurfColor->DXFcolorno((int)ColorNo::Text));
+    print(of, Format_703_0, DXFcolorno(ColorNo_Text));
     print(of, Format_703_1, Head2X(1), Head2Y(1), Head2Z(1));
     print(of, Format_703_2, Head2X(2), Head2Y(2), Head2Z(2));
     print(of, Format_703_3, Head2X(3), Head2Y(3), Head2Z(3));
     print(of, Format_703_4, Head2X(4), Head2Y(4), Head2Z(4));
 
     print(of, Format_710, "North Arrow Side 1");
-    print(of, Format_703_0, state.dataSurfColor->DXFcolorno((int)ColorNo::Text));
+    print(of, Format_703_0, DXFcolorno(ColorNo_Text));
     print(of, Format_703_1, NSide1X(1), NSide1Y(1), NSide1Z(1));
     print(of, Format_703_2, NSide1X(2), NSide1Y(2), NSide1Z(2));
     print(of, Format_703_3, NSide1X(3), NSide1Y(3), NSide1Z(3));
     print(of, Format_703_4, NSide1X(4), NSide1Y(4), NSide1Z(4));
 
     print(of, Format_710, "North Arrow Side 2");
-    print(of, Format_703_0, state.dataSurfColor->DXFcolorno((int)ColorNo::Text));
+    print(of, Format_703_0, DXFcolorno(ColorNo_Text));
     print(of, Format_703_1, NSide2X(1), NSide2Y(1), NSide2Z(1));
     print(of, Format_703_2, NSide2X(2), NSide2Y(2), NSide2Z(2));
     print(of, Format_703_3, NSide2X(3), NSide2Y(3), NSide2Z(3));
     print(of, Format_703_4, NSide2X(4), NSide2Y(4), NSide2Z(4));
 
     print(of, Format_710, "North Arrow Side 3");
-    print(of, Format_703_0, state.dataSurfColor->DXFcolorno((int)ColorNo::Text));
+    print(of, Format_703_0, DXFcolorno(ColorNo_Text));
     print(of, Format_703_1, NSide3X(1), NSide3Y(1), NSide3Z(1));
     print(of, Format_703_2, NSide3X(2), NSide3Y(2), NSide3Z(2));
     print(of, Format_703_3, NSide3X(3), NSide3Y(3), NSide3Z(3));
@@ -439,19 +439,19 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
 
     // Do any daylighting reference points on layer for zone
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-        auto curcolorno = ColorNo::DaylSensor1;
+        auto curcolorno = ColorNo_DaylSensor1;
 
         for (int refpt = 1; refpt <= state.dataDaylightingData->ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
             print(of, "999\n{}:{}:{}\n", state.dataHeatBal->Zone(zones).Name, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
             print(of,
                   Format_709,
                   normalizeName(state.dataHeatBal->Zone(zones).Name),
-                  state.dataSurfColor->DXFcolorno((int)curcolorno),
+                  DXFcolorno(curcolorno),
                   state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt),
                   state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt),
                   state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt),
                   0.2);
-            curcolorno = ColorNo::DaylSensor2; // ref pts 2 and later are this color
+            curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
         }
     }
 }
@@ -566,7 +566,7 @@ void DXFOut(EnergyPlusData &state,
 
     WriteDXFCommon(state, dxffile, ColorScheme);
 
-    auto colorindex = ColorNo::ShdDetFix;
+    auto colorindex = ColorNo_ShdDetFix;
     //  Do all detached shading surfaces first
     for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         std::string ShadeType;
@@ -574,9 +574,9 @@ void DXFOut(EnergyPlusData &state,
         if (state.dataSurface->Surface(surf).HeatTransSurf) continue;
         if (state.dataSurface->Surface(surf).Class == SurfaceClass::Shading) continue;
         if (state.dataSurface->Surface(surf).Sides == 0) continue;
-        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_F) colorindex = ColorNo::ShdDetFix;
-        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_B) colorindex = ColorNo::ShdDetBldg;
-        if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo::PV;
+        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_F) colorindex = ColorNo_ShdDetFix;
+        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_B) colorindex = ColorNo_ShdDetBldg;
+        if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo_PV;
         if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_F) {
             ShadeType = "Fixed Shading";
             print(dxffile, Format_710, "Fixed Shading:" + state.dataSurface->Surface(surf).Name);
@@ -585,7 +585,7 @@ void DXFOut(EnergyPlusData &state,
             print(dxffile, Format_710, "Building Shading:" + state.dataSurface->Surface(surf).Name);
         }
         if (state.dataSurface->Surface(surf).Sides <= 4) {
-            print(dxffile, Format_704_0, ShadeType, state.dataSurfColor->DXFcolorno((int)colorindex));
+            print(dxffile, Format_704_0, ShadeType, DXFcolorno(colorindex));
             print(dxffile, Format_704_1, state.dataSurface->Surface(surf).Vertex(1).x, state.dataSurface->Surface(surf).Vertex(1).y, state.dataSurface->Surface(surf).Vertex(1).z);
             print(dxffile, Format_704_2, state.dataSurface->Surface(surf).Vertex(2).x, state.dataSurface->Surface(surf).Vertex(2).y, state.dataSurface->Surface(surf).Vertex(2).z);
             print(dxffile, Format_704_3, state.dataSurface->Surface(surf).Vertex(3).x, state.dataSurface->Surface(surf).Vertex(3).y, state.dataSurface->Surface(surf).Vertex(3).z);
@@ -600,7 +600,7 @@ void DXFOut(EnergyPlusData &state,
                 for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                     minz = min(minz, state.dataSurface->Surface(surf).Vertex(vert).z);
                 }
-                print(dxffile, Format_715, ShadeType, state.dataSurfColor->DXFcolorno((int)colorindex), minz, PolylineWidth, PolylineWidth);
+                print(dxffile, Format_715, ShadeType, DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
                 for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                     print(dxffile, Format_716, ShadeType, state.dataSurface->Surface(surf).Vertex(vert).x, state.dataSurface->Surface(surf).Vertex(vert).y, state.dataSurface->Surface(surf).Vertex(vert).z);
                 }
@@ -623,7 +623,7 @@ void DXFOut(EnergyPlusData &state,
                     print(dxffile,
                           Format_704,
                           ShadeType,
-                          state.dataSurfColor->DXFcolorno((int)colorindex),
+                          DXFcolorno(colorindex),
                           state.dataSurface->Surface(surf).Vertex(vv0).x,
                           state.dataSurface->Surface(surf).Vertex(vv0).y,
                           state.dataSurface->Surface(surf).Vertex(vv0).z,
@@ -648,21 +648,21 @@ void DXFOut(EnergyPlusData &state,
             if (state.dataSurface->Surface(surf).Zone != zones) continue;
             if (state.dataSurface->Surface(surf).Sides == 0) continue;
             if (state.dataSurface->Surface(surf).Class == SurfaceClass::IntMass) continue;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Wall) colorindex = ColorNo::Wall;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Roof) colorindex = ColorNo::Roof;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Floor) colorindex = ColorNo::Floor;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Door) colorindex = ColorNo::Door;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Wall) colorindex = ColorNo_Wall;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Roof) colorindex = ColorNo_Roof;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Floor) colorindex = ColorNo_Floor;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Door) colorindex = ColorNo_Door;
             if (state.dataSurface->Surface(surf).Class == SurfaceClass::Window) {
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = ColorNo::Window;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = ColorNo::GlassDoor;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = ColorNo::TDDDome;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = ColorNo::TDDDiffuser;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = ColorNo_Window;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
-            if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo::PV;
+            if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo_PV;
 
             print(dxffile, Format_710, state.dataSurface->Surface(surf).ZoneName + ':' + state.dataSurface->Surface(surf).Name);
             if (state.dataSurface->Surface(surf).Sides <= 4) {
-                print(dxffile, Format_704_0, TempZoneName, state.dataSurfColor->DXFcolorno((int)colorindex));
+                print(dxffile, Format_704_0, TempZoneName, DXFcolorno(colorindex));
                 print(dxffile, Format_704_1, state.dataSurface->Surface(surf).Vertex(1).x, state.dataSurface->Surface(surf).Vertex(1).y, state.dataSurface->Surface(surf).Vertex(1).z);
                 print(dxffile, Format_704_2, state.dataSurface->Surface(surf).Vertex(2).x, state.dataSurface->Surface(surf).Vertex(2).y, state.dataSurface->Surface(surf).Vertex(2).z);
                 print(dxffile, Format_704_3, state.dataSurface->Surface(surf).Vertex(3).x, state.dataSurface->Surface(surf).Vertex(3).y, state.dataSurface->Surface(surf).Vertex(3).z);
@@ -677,7 +677,7 @@ void DXFOut(EnergyPlusData &state,
                     for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                         minz = min(minz, state.dataSurface->Surface(surf).Vertex(vert).z);
                     }
-                    print(dxffile, Format_715, TempZoneName, state.dataSurfColor->DXFcolorno((int)colorindex), minz, PolylineWidth, PolylineWidth);
+                    print(dxffile, Format_715, TempZoneName, DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
                     for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                         print(dxffile,
                               Format_716,
@@ -705,7 +705,7 @@ void DXFOut(EnergyPlusData &state,
                         print(dxffile,
                               Format_704,
                               TempZoneName,
-                              state.dataSurfColor->DXFcolorno((int)colorindex),
+                              DXFcolorno(colorindex),
                               state.dataSurface->Surface(surf).Vertex(vv0).x,
                               state.dataSurface->Surface(surf).Vertex(vv0).y,
                               state.dataSurface->Surface(surf).Vertex(vv0).z,
@@ -727,11 +727,11 @@ void DXFOut(EnergyPlusData &state,
             if (state.dataSurface->Surface(surf).Class != SurfaceClass::Shading) continue;
             if (state.dataSurface->Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
             if (state.dataSurface->Surface(surf).Sides == 0) continue;
-            colorindex = ColorNo::ShdAtt;
-            if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo::PV;
+            colorindex = ColorNo_ShdAtt;
+            if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo_PV;
             print(dxffile, Format_710, state.dataSurface->Surface(surf).ZoneName + ':' + state.dataSurface->Surface(surf).Name);
             if (state.dataSurface->Surface(surf).Sides <= 4) {
-                print(dxffile, Format_704_0, TempZoneName, state.dataSurfColor->DXFcolorno((int)colorindex));
+                print(dxffile, Format_704_0, TempZoneName, DXFcolorno(colorindex));
                 print(dxffile, Format_704_1, state.dataSurface->Surface(surf).Vertex(1).x, state.dataSurface->Surface(surf).Vertex(1).y, state.dataSurface->Surface(surf).Vertex(1).z);
                 print(dxffile, Format_704_2, state.dataSurface->Surface(surf).Vertex(2).x, state.dataSurface->Surface(surf).Vertex(2).y, state.dataSurface->Surface(surf).Vertex(2).z);
                 print(dxffile, Format_704_3, state.dataSurface->Surface(surf).Vertex(3).x, state.dataSurface->Surface(surf).Vertex(3).y, state.dataSurface->Surface(surf).Vertex(3).z);
@@ -746,7 +746,7 @@ void DXFOut(EnergyPlusData &state,
                     for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                         minz = min(minz, state.dataSurface->Surface(surf).Vertex(vert).z);
                     }
-                    print(dxffile, Format_715, TempZoneName, state.dataSurfColor->DXFcolorno((int)colorindex), minz, PolylineWidth, PolylineWidth);
+                    print(dxffile, Format_715, TempZoneName, DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
                     for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                         print(dxffile,
                               Format_716,
@@ -785,7 +785,7 @@ void DXFOut(EnergyPlusData &state,
                         print(dxffile,
                               Format_704,
                               TempZoneName,
-                              state.dataSurfColor->DXFcolorno((int)colorindex),
+                              DXFcolorno(colorindex),
                               state.dataSurface->Surface(surf).Vertex(vv0).x,
                               state.dataSurface->Surface(surf).Vertex(vv0).y,
                               state.dataSurface->Surface(surf).Vertex(vv0).z,
@@ -810,7 +810,7 @@ void DXFOut(EnergyPlusData &state,
     DXFDaylightingReferencePoints(state, dxffile, false);
 
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-        const auto curcolorno = ColorNo::DaylSensor1;
+        const auto curcolorno = ColorNo_DaylSensor1;
 
         for (int mapnum = 1; mapnum <= state.dataDaylightingData->TotIllumMaps; ++mapnum) {
             if (state.dataDaylightingData->IllumMapCalc(mapnum).Zone != zones) continue;
@@ -819,7 +819,7 @@ void DXFOut(EnergyPlusData &state,
                 print(dxffile,
                       Format_709,
                       normalizeName(state.dataHeatBal->Zone(zones).Name),
-                      state.dataSurfColor->DXFcolorno((int)curcolorno),
+                      DXFcolorno(curcolorno),
                       state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(1, refpt),
                       state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(2, refpt),
                       state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(3, refpt),
@@ -908,9 +908,9 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
         std::string ShadeType;
         if (state.dataSurface->Surface(surf).HeatTransSurf) continue;
         if (state.dataSurface->Surface(surf).Class == SurfaceClass::Shading) continue;
-        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_F) colorindex = (int)ColorNo::ShdDetFix;
-        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_B) colorindex = (int)ColorNo::ShdDetBldg;
-        if (state.dataSurface->Surface(surf).IsPV) colorindex = (int)ColorNo::PV;
+        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_F) colorindex = ColorNo_ShdDetFix;
+        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_B) colorindex = ColorNo_ShdDetBldg;
+        if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo_PV;
         if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_F) {
             ShadeType = "Fixed Shading";
             print(dxffile, Format_710, "Fixed Shading:" + state.dataSurface->Surface(surf).Name);
@@ -932,7 +932,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
             } else {
                 sptr = 1;
             }
-            print(dxffile, Format_711, ShadeType, state.dataSurfColor->DXFcolorno(colorindex)); //,minz ,TRIM(PolylineWidth),TRIM(PolylineWidth)
+            print(dxffile, Format_711, ShadeType, DXFcolorno(colorindex)); //,minz ,TRIM(PolylineWidth),TRIM(PolylineWidth)
             print(dxffile,
                   Format_712,
                   state.dataSurface->Surface(surf).Vertex(vert).x,
@@ -952,17 +952,17 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
         for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             if (state.dataSurface->Surface(surf).Zone != zones) continue;
             if (state.dataSurface->Surface(surf).Class == SurfaceClass::IntMass) continue;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Wall) colorindex = (int)ColorNo::Wall;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Roof) colorindex = (int)ColorNo::Roof;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Floor) colorindex = (int)ColorNo::Floor;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Door) colorindex = (int)ColorNo::Door;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Wall) colorindex = ColorNo_Wall;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Roof) colorindex = ColorNo_Roof;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Floor) colorindex = ColorNo_Floor;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Door) colorindex = ColorNo_Door;
             if (state.dataSurface->Surface(surf).Class == SurfaceClass::Window) {
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = (int)ColorNo::Window;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = (int)ColorNo::GlassDoor;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = (int)ColorNo::TDDDome;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = (int)ColorNo::TDDDiffuser;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = ColorNo_Window;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
-            if (state.dataSurface->Surface(surf).IsPV) colorindex = (int)ColorNo::PV;
+            if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
             ++surfcount;
 
@@ -980,7 +980,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
                 } else {
                     sptr = 1;
                 }
-                print(dxffile, Format_711, TempZoneName, state.dataSurfColor->DXFcolorno(colorindex)); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
+                print(dxffile, Format_711, TempZoneName, DXFcolorno(colorindex)); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
                 print(dxffile,
                       Format_712,
                       state.dataSurface->Surface(surf).Vertex(vert).x,
@@ -1004,8 +1004,8 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (state.dataSurface->Surface(surf).Class != SurfaceClass::Shading) continue;
             if (state.dataSurface->Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
-            colorindex = (int)ColorNo::ShdAtt;
-            if (state.dataSurface->Surface(surf).IsPV) colorindex = (int)ColorNo::PV;
+            colorindex = ColorNo_ShdAtt;
+            if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
 
             print(dxffile, Format_710, state.dataSurface->Surface(surf).ZoneName + ':' + state.dataSurface->Surface(surf).Name);
@@ -1022,7 +1022,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
                 } else {
                     sptr = 1;
                 }
-                print(dxffile, Format_711, TempZoneName, state.dataSurfColor->DXFcolorno(colorindex)); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
+                print(dxffile, Format_711, TempZoneName, DXFcolorno(colorindex)); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
                 print(dxffile,
                       Format_712,
                       state.dataSurface->Surface(surf).Vertex(vert).x,
@@ -1116,9 +1116,9 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
 
         if (state.dataSurface->Surface(surf).HeatTransSurf) continue;
         if (state.dataSurface->Surface(surf).Class == SurfaceClass::Shading) continue;
-        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_F) colorindex = (int)ColorNo::ShdDetFix;
-        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_B) colorindex = (int)ColorNo::ShdDetBldg;
-        if (state.dataSurface->Surface(surf).IsPV) colorindex = (int)ColorNo::PV;
+        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_F) colorindex = ColorNo_ShdDetFix;
+        if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_B) colorindex = ColorNo_ShdDetBldg;
+        if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo_PV;
         if (state.dataSurface->Surface(surf).Class == SurfaceClass::Detached_F) {
             ShadeType = "Fixed Shading";
             print(dxffile, Format_710, "Fixed Shading:" + state.dataSurface->Surface(surf).Name);
@@ -1133,7 +1133,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             minz = min(minz, state.dataSurface->Surface(surf).Vertex(vert).z);
         }
 
-        print(dxffile, Format_715, ShadeType, state.dataSurfColor->DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
+        print(dxffile, Format_715, ShadeType, DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
         for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
             print(dxffile, Format_716, ShadeType, state.dataSurface->Surface(surf).Vertex(vert).x, state.dataSurface->Surface(surf).Vertex(vert).y, state.dataSurface->Surface(surf).Vertex(vert).z);
         }
@@ -1148,17 +1148,17 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
         for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             if (state.dataSurface->Surface(surf).Zone != zones) continue;
             if (state.dataSurface->Surface(surf).Class == SurfaceClass::IntMass) continue;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Wall) colorindex = (int)ColorNo::Wall;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Roof) colorindex = (int)ColorNo::Roof;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Floor) colorindex = (int)ColorNo::Floor;
-            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Door) colorindex = (int)ColorNo::Door;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Wall) colorindex = ColorNo_Wall;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Roof) colorindex = ColorNo_Roof;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Floor) colorindex = ColorNo_Floor;
+            if (state.dataSurface->Surface(surf).Class == SurfaceClass::Door) colorindex = ColorNo_Door;
             if (state.dataSurface->Surface(surf).Class == SurfaceClass::Window) {
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = (int)ColorNo::Window;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = (int)ColorNo::GlassDoor;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = (int)ColorNo::TDDDome;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = (int)ColorNo::TDDDiffuser;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = ColorNo_Window;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
-            if (state.dataSurface->Surface(surf).IsPV) colorindex = (int)ColorNo::PV;
+            if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
 
             print(dxffile, Format_710, state.dataSurface->Surface(surf).ZoneName + ':' + state.dataSurface->Surface(surf).Name);
@@ -1168,7 +1168,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
                 minz = min(minz, state.dataSurface->Surface(surf).Vertex(vert).z);
             }
 
-            print(dxffile, Format_715, TempZoneName, state.dataSurfColor->DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
+            print(dxffile, Format_715, TempZoneName, DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
             for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                 print(dxffile, Format_716, TempZoneName, state.dataSurface->Surface(surf).Vertex(vert).x, state.dataSurface->Surface(surf).Vertex(vert).y, state.dataSurface->Surface(surf).Vertex(vert).z);
             }
@@ -1180,8 +1180,8 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (state.dataSurface->Surface(surf).Class != SurfaceClass::Shading) continue;
             if (state.dataSurface->Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
-            colorindex = (int)ColorNo::ShdAtt;
-            if (state.dataSurface->Surface(surf).IsPV) colorindex = (int)ColorNo::PV;
+            colorindex = ColorNo_ShdAtt;
+            if (state.dataSurface->Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
 
             print(dxffile, Format_710, state.dataSurface->Surface(surf).ZoneName + ':' + state.dataSurface->Surface(surf).Name);
@@ -1191,7 +1191,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
                 minz = min(minz, state.dataSurface->Surface(surf).Vertex(vert).z);
             }
 
-            print(dxffile, Format_715, TempZoneName, state.dataSurfColor->DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
+            print(dxffile, Format_715, TempZoneName, DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
             for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                 print(dxffile, Format_716, TempZoneName, state.dataSurface->Surface(surf).Vertex(vert).x, state.dataSurface->Surface(surf).Vertex(vert).y, state.dataSurface->Surface(surf).Vertex(vert).z);
             }
