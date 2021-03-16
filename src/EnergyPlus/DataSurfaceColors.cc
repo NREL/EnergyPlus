@@ -51,9 +51,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DataSurfaceColors {
+namespace EnergyPlus::DataSurfaceColors {
 
     // Module containing the data dealing with the coloring of surfaces for
     // various outputs (such as DXF)
@@ -67,35 +65,6 @@ namespace DataSurfaceColors {
     // PURPOSE OF THIS MODULE:
     // Contain the data for surface colors and user settings for DXF and possibly
     // other surface reporting.
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    int const NumColors(15);
-    int const ColorNo_Text(1);
-    int const ColorNo_Wall(2);
-    int const ColorNo_Window(3);
-    int const ColorNo_GlassDoor(4);
-    int const ColorNo_Door(5);
-    int const ColorNo_Floor(6);
-    int const ColorNo_Roof(7);
-    int const ColorNo_ShdDetBldg(8);
-    int const ColorNo_ShdDetFix(9);
-    int const ColorNo_ShdAtt(10);
-    int const ColorNo_PV(11);
-    int const ColorNo_TDDDome(12);
-    int const ColorNo_TDDDiffuser(13);
-    int const ColorNo_DaylSensor1(14);
-    int const ColorNo_DaylSensor2(15);
 
     Array1D_int const defaultcolorno(NumColors, {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5}); // text | wall | window | glassdoor |
                                                                                                                  // door | floor | roof | detached
@@ -140,19 +109,11 @@ namespace DataSurfaceColors {
                                    ColorNo_DaylSensor1,
                                    ColorNo_DaylSensor2});
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
     Array1D_int DXFcolorno(NumColors, defaultcolorno);
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Functions
 
     bool MatchAndSetColorTextString(std::string const &String,      // string to be matched
                                     int const SetValue,             // value to be used for the color
-                                    Optional_string_const ColorType // for now, must be DXF
+                                    std::string const & ColorType // for now, must be DXF
     )
     {
 
@@ -162,28 +123,14 @@ namespace DataSurfaceColors {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // Return value
-        bool WasSet;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int found;
-
-        WasSet = false;
-        found = UtilityRoutines::FindItem(String, colorkeys, NumColors);
-
+        bool WasSet = false;
+        int found = UtilityRoutines::FindItem(String, colorkeys, NumColors);
         if (found != 0) {
-            if (present(ColorType)) {
-                if (ColorType() == "DXF") {
-                    DXFcolorno(colorkeyptr(found)) = SetValue;
-                    WasSet = true;
-                } else {
-                }
-            } else {
+            if (ColorType == "DXF") {
                 DXFcolorno(colorkeyptr(found)) = SetValue;
                 WasSet = true;
             }
         }
-
         return WasSet;
     }
 
@@ -209,25 +156,22 @@ namespace DataSurfaceColors {
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr auto CurrentModuleObject("OutputControl:SurfaceColorScheme");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas;
-        int numNumbers;
-        int numptr;
-        int numargs;
-        int status;
-        Array1D_string cAlphas;
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
-        Array1D_bool lAlphaBlanks;
-        Array1D_bool lNumericBlanks;
-        Array1D<Real64> rNumerics;
-
         DXFcolorno = defaultcolorno;
-        // first see if there is a scheme name
-        numptr = inputProcessor->getObjectItemNum(state, CurrentModuleObject, SchemeName);
 
+        // first see if there is a scheme name
+        int numptr = inputProcessor->getObjectItemNum(state, CurrentModuleObject, SchemeName);
         if (numptr > 0) {
 
+            int NumAlphas;
+            int numNumbers;
+            int numargs;
+            int status;
+            Array1D_string cAlphas;
+            Array1D_string cAlphaFields;
+            Array1D_string cNumericFields;
+            Array1D_bool lAlphaBlanks;
+            Array1D_bool lNumericBlanks;
+            Array1D<Real64> rNumerics;
             inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, numargs, NumAlphas, numNumbers);
 
             cAlphas.allocate(NumAlphas);
@@ -266,19 +210,9 @@ namespace DataSurfaceColors {
                                      cAlphas(numargs + 1) + ", is invalid.  No color set.");
                 }
             }
-
-            cAlphas.deallocate();
-            cAlphaFields.deallocate();
-            lAlphaBlanks.deallocate();
-            rNumerics.deallocate();
-            cNumericFields.deallocate();
-            lNumericBlanks.deallocate();
-
         } else {
             ShowWarningError(state, "SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used.");
         }
     }
-
-} // namespace DataSurfaceColors
 
 } // namespace EnergyPlus

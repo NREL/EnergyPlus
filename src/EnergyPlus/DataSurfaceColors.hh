@@ -63,24 +63,22 @@ struct EnergyPlusData;
 
 namespace DataSurfaceColors {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const NumColors;
-    extern int const ColorNo_Text;
-    extern int const ColorNo_Wall;
-    extern int const ColorNo_Window;
-    extern int const ColorNo_GlassDoor;
-    extern int const ColorNo_Door;
-    extern int const ColorNo_Floor;
-    extern int const ColorNo_Roof;
-    extern int const ColorNo_ShdDetBldg;
-    extern int const ColorNo_ShdDetFix;
-    extern int const ColorNo_ShdAtt;
-    extern int const ColorNo_PV;
-    extern int const ColorNo_TDDDome;
-    extern int const ColorNo_TDDDiffuser;
-    extern int const ColorNo_DaylSensor1;
-    extern int const ColorNo_DaylSensor2;
+    int constexpr NumColors = 15;
+    int constexpr ColorNo_Text = 1;
+    int constexpr ColorNo_Wall = 2;
+    int constexpr ColorNo_Window = 3;
+    int constexpr ColorNo_GlassDoor = 4;
+    int constexpr ColorNo_Door = 5;
+    int constexpr ColorNo_Floor = 6;
+    int constexpr ColorNo_Roof = 7;
+    int constexpr ColorNo_ShdDetBldg = 8;
+    int constexpr ColorNo_ShdDetFix = 9;
+    int constexpr ColorNo_ShdAtt = 10;
+    int constexpr ColorNo_PV = 11;
+    int constexpr ColorNo_TDDDome = 12;
+    int constexpr ColorNo_TDDDiffuser = 13;
+    int constexpr ColorNo_DaylSensor1 = 14;
+    int constexpr ColorNo_DaylSensor2 = 15;
 
     extern Array1D_int const defaultcolorno; // text | wall | window | glassdoor | door | floor | roof | detached building shade (moves with building)
                                              // | detached building fixed | attached building shading | PV | TDD:Dome | TDD:Diffuser | Daylight Sensor
@@ -90,19 +88,11 @@ namespace DataSurfaceColors {
 
     extern Array1D_int const colorkeyptr;
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
     extern Array1D_int DXFcolorno;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Functions
-
     bool MatchAndSetColorTextString(std::string const &String,          // string to be matched
-                                    int const SetValue,                 // value to be used for the color
-                                    Optional_string_const ColorType = _ // for now, must be DXF
+                                    int SetValue,                 // value to be used for the color
+                                    std::string const & ColorType // for now, must be DXF
     );
 
     void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType = _);
