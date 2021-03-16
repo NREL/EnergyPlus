@@ -187,8 +187,8 @@ namespace AirflowNetwork {
         // If multizone airflow is simulated only, the array size is allocated based on the multizone network.
 
 
-        NetworkNumOfLinks = AirflowNetworkNumOfLinks;
-        NetworkNumOfNodes = AirflowNetworkNumOfNodes;
+        NetworkNumOfLinks = state.dataAirflowNetwork->AirflowNetworkNumOfLinks;
+        NetworkNumOfNodes = state.dataAirflowNetwork->AirflowNetworkNumOfNodes;
 
         AFECTL.allocate(NetworkNumOfLinks);
         AFLOW2.allocate(NetworkNumOfLinks);
@@ -215,7 +215,7 @@ namespace AirflowNetwork {
         SUMF.allocate(NetworkNumOfNodes);
 
         n = 0;
-        for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
+        for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfLinks; ++i) {
             j = state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum;
             if (j == iComponentTypeNum::DOP) {
                 ++n;
@@ -225,7 +225,7 @@ namespace AirflowNetwork {
         DpProf.allocate(n * (NrInt + 2));
         RhoProfF.allocate(n * (NrInt + 2));
         RhoProfT.allocate(n * (NrInt + 2));
-        DpL.allocate(AirflowNetworkNumOfLinks, 2);
+        DpL.allocate(state.dataAirflowNetwork->AirflowNetworkNumOfLinks, 2);
 
         PB = 101325.0;
         //   LIST = 5
@@ -492,7 +492,7 @@ namespace AirflowNetwork {
 
 
         // Initialize pressure for pressure control and for Initialization Type = LinearInitializationMethod
-        if ((state.dataAirflowNetwork->AirflowNetworkSimu.InitFlag == 0) || (PressureSetFlag > 0 && AirflowNetworkFanActivated)) {
+        if ((state.dataAirflowNetwork->AirflowNetworkSimu.InitFlag == 0) || (state.dataAirflowNetwork->PressureSetFlag > 0 && state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
             for (n = 1; n <= NetworkNumOfNodes; ++n) {
                 if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = 0.0;
             }
@@ -888,7 +888,7 @@ namespace AirflowNetwork {
             int m = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1];
             //!!! Check array of DP. DpL is used for multizone air flow calculation only
             //!!! and is not for forced air calculation
-            if (i > NumOfLinksMultiZone) {
+            if (i > state.dataAirflowNetwork->NumOfLinksMultiZone) {
                 DP = PZ(n) - PZ(m) + PS(i) + PW(i);
             } else {
                 DP = PZ(n) - PZ(m) + DpL(i, 1) + PW(i);
@@ -1960,14 +1960,14 @@ namespace AirflowNetwork {
         Real64 RhoL1; // Air density [kg/m3]
         Real64 RhoL2;
         Real64 Pbz;                                     // Pbarom at entrance level [Pa]
-        Array2D<Real64> RhoDrL(NumOfLinksMultiZone, 2); // dry air density on both sides of the link [kg/m3]
+        Array2D<Real64> RhoDrL(state.dataAirflowNetwork->NumOfLinksMultiZone, 2); // dry air density on both sides of the link [kg/m3]
         Real64 TempL1;                                  // Temp in From and To zone at link level [C]
         Real64 TempL2;
         //      REAL(r64) Tout ! outside temperature [C]
         Real64 Xhl1; // Humidity in From and To zone at link level [kg/kg]
         Real64 Xhl2;
         //      REAL(r64) Xhout ! outside humidity [kg/kg]
-        Array1D<Real64> Hfl(NumOfLinksMultiZone); // Own height factor for large (slanted) openings
+        Array1D<Real64> Hfl(state.dataAirflowNetwork->NumOfLinksMultiZone); // Own height factor for large (slanted) openings
         int Nl;                                   // number of links
 
         Array1D<Real64> DpF(2);
@@ -2017,7 +2017,7 @@ namespace AirflowNetwork {
 
         Hfl = 1.0;
         Pbz = state.dataEnvrn->OutBaroPress;
-        Nl = NumOfLinksMultiZone;
+        Nl = state.dataAirflowNetwork->NumOfLinksMultiZone;
         OpenNum = 0;
         RhoLd(1) = 1.2;
         RhoLd(2) = 1.2;
@@ -2025,7 +2025,7 @@ namespace AirflowNetwork {
 
         for (i = 1; i <= Nl; ++i) {
             // Check surface tilt
-            if (i <= Nl - NumOfLinksIntraZone) { // Revised by L.Gu, on 9 / 29 / 10
+            if (i <= Nl - state.dataAirflowNetwork->NumOfLinksIntraZone) { // Revised by L.Gu, on 9 / 29 / 10
                 if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).DetOpenNum > 0 && state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).Tilt < 90) {
                     Hfl(i) = state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).SinTilt;
                 }

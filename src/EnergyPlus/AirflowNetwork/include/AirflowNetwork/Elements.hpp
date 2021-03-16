@@ -214,42 +214,6 @@ namespace AirflowNetwork {
     int constexpr AirflowNetworkControlMultiADS(5); // Perform distribution system during system on time
                                                 // and multizone calculations during off time
 
-    extern Array1D_bool AirflowNetworkZoneFlag;
-
-    extern int NumOfNodesMultiZone;    // Number of nodes for multizone calculation
-    extern int NumOfNodesDistribution; // Number of nodes for distribution system calculation
-    extern int NumOfLinksMultiZone;    // Number of links for multizone calculation
-    extern int NumOfLinksDistribution; // Number of links for distribution system calculation
-    extern int NumOfNodesIntraZone;    // Number of nodes for intrazone calculation
-    extern int NumOfLinksIntraZone;    // Number of links for intrazone calculation
-
-    extern int AirflowNetworkNumOfNodes; // Number of nodes for AirflowNetwork calculation
-    // = NumOfNodesMultiZone+NumOfNodesDistribution
-    extern int AirflowNetworkNumOfComps; // Number of components for AirflowNetwork calculation
-    extern int AirflowNetworkNumOfLinks; // Number of links for AirflowNetwork calculation
-    // = NumOfLinksMultiZone+NumOfLinksDistribution
-    // RoomAirManager use
-    extern int AirflowNetworkNumOfSurfaces; // The number of surfaces for multizone calculation
-    extern int AirflowNetworkNumOfZones;    // The number of zones for multizone calculation
-
-    extern bool RollBackFlag;                         // Roll back flag when system time step down shifting
-    extern Array1D<Real64> ANZT;                      // Local zone air temperature for roll back use
-    extern Array1D<Real64> ANZW;                      // Local zone air humidity ratio for roll back use
-    extern Array1D<Real64> ANCO;                      // Local zone air CO2 for roll back use
-    extern Array1D<Real64> ANGC;                      // Local zone air generic contaminant for roll back use
-    extern int AirflowNetworkNumOfExhFan;             // Number of zone exhaust fans
-    extern Array1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
-    extern bool AirflowNetworkFanActivated;           // Supply fan activation flag
-    extern bool AirflowNetworkUnitarySystem;          // set to TRUE for unitary systems (to make answers equal, will remove eventually)
-    // Multispeed HP only
-    extern int MultiSpeedHPIndicator; // Indicator for multispeed heat pump use
-    // Addiitonal airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
-    extern Real64 VAVTerminalRatio;       // The terminal flow ratio when a supply VAV fan reach its max flow rate
-    extern bool VAVSystem;                // This flag is used to represent a VAV system
-    extern Real64 ExhaustFanMassFlowRate; // Exhaust fan flow rate used in PressureStat
-    extern int PressureSetFlag;           // PressureSet flag
-    extern Real64 ReliefMassFlowRate;     // OA Mixer relief node flow rate used in PressureStat
-
     // Types
 
     struct AirflowNetworkSimuProp // Basic parameters for AirflowNetwork simulation
@@ -1659,6 +1623,42 @@ struct AirflowNetworkData : BaseGlobalStruct {
 
     int SimulateAirflowNetwork = 1;
 
+    Array1D_bool AirflowNetworkZoneFlag;
+
+    int NumOfNodesMultiZone = 0;    // Number of nodes for multizone calculation
+    int NumOfNodesDistribution = 0; // Number of nodes for distribution system calculation
+    int NumOfLinksMultiZone = 0;    // Number of links for multizone calculation
+    int NumOfLinksDistribution = 0; // Number of links for distribution system calculation
+    int NumOfNodesIntraZone = 0;    // Number of nodes for intrazone calculation
+    int NumOfLinksIntraZone = 0;    // Number of links for intrazone calculation
+
+    int AirflowNetworkNumOfNodes = 0; // Number of nodes for AirflowNetwork calculation
+    // = NumOfNodesMultiZone+NumOfNodesDistribution
+    int AirflowNetworkNumOfComps = 0; // Number of components for AirflowNetwork calculation
+    int AirflowNetworkNumOfLinks = 0; // Number of links for AirflowNetwork calculation
+    // = NumOfLinksMultiZone+NumOfLinksDistribution
+    // RoomAirManager use
+    int AirflowNetworkNumOfSurfaces = 0; // The number of surfaces for multizone calculation
+    int AirflowNetworkNumOfZones = 0;    // The number of zones for multizone calculation
+
+    bool RollBackFlag = false;                 // Roll back flag when system time step down shifting
+    Array1D<Real64> ANZT;                      // Local zone air temperature for roll back use
+    Array1D<Real64> ANZW;                      // Local zone air humidity ratio for roll back use
+    Array1D<Real64> ANCO;                      // Local zone air CO2 for roll back use
+    Array1D<Real64> ANGC;                      // Local zone air generic contaminant for roll back use
+    int AirflowNetworkNumOfExhFan = 0;          // Number of zone exhaust fans
+    Array1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
+    bool AirflowNetworkFanActivated = false;   // Supply fan activation flag
+    bool AirflowNetworkUnitarySystem = false;  // set to TRUE for unitary systems (to make answers equal, will remove eventually)
+    // Multispeed HP only
+    int MultiSpeedHPIndicator = 0; // Indicator for multispeed heat pump use
+    // Additional airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
+    Real64 VAVTerminalRatio = 0.0;       // The terminal flow ratio when a supply VAV fan reach its max flow rate
+    bool VAVSystem = false;              // This flag is used to represent a VAV system
+    Real64 ExhaustFanMassFlowRate = 0.0; // Exhaust fan flow rate used in PressureStat
+    int PressureSetFlag = 0;             // PressureSet flag
+    Real64 ReliefMassFlowRate = 0.0;     // OA Mixer relief node flow rate used in PressureStat
+
     Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
 
@@ -1709,7 +1709,30 @@ struct AirflowNetworkData : BaseGlobalStruct {
         this->SimulateAirflowNetwork = 1;
         this->AirflowNetworkNodeSimu.clear();
         this->AirflowNetworkLinkSimu.clear();
-
+        this->AirflowNetworkZoneFlag.clear();
+        this->NumOfNodesMultiZone = 0;
+        this->NumOfNodesDistribution = 0;
+        this->NumOfLinksMultiZone = 0;
+        this->NumOfLinksDistribution = 0;
+        this->NumOfNodesIntraZone = 0;
+        this->NumOfLinksIntraZone = 0;
+        this->AirflowNetworkNumOfNodes = 0;
+        this->AirflowNetworkNumOfComps = 0;
+        this->AirflowNetworkNumOfLinks = 0;
+        this->AirflowNetworkNumOfSurfaces = 0;
+        this->AirflowNetworkNumOfZones = 0;
+        this->RollBackFlag = false;
+        this->ANZT.clear();
+        this->ANZW.clear();
+        this->ANCO.clear();
+        this->ANGC.clear();
+        this->AirflowNetworkNumOfExhFan = 0;
+        this->AirflowNetworkZoneExhaustFan.clear();
+        this->AirflowNetworkFanActivated = false;
+        this->AirflowNetworkUnitarySystem = false;
+        this->MultiSpeedHPIndicator = 0;
+        this->VAVTerminalRatio = 0.0;
+        this->VAVSystem = false;
         this->AirflowNetworkSimu = AirflowNetwork::AirflowNetworkSimuProp();
         this->AirflowNetworkNodeData.clear();
         this->AirflowNetworkCompData.clear();

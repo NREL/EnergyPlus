@@ -2306,7 +2306,7 @@ namespace EnergyPlus::Fans {
 
         if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
             state.dataLoopNodes->Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
-            if (AirflowNetwork::AirflowNetworkNumOfExhFan == 0) {
+            if (state.dataAirflowNetwork->AirflowNetworkNumOfExhFan == 0) {
                 UnbalExhMassFlow = Fan(FanNum).InletAirMassFlowRate;
                 if (Fan(FanNum).BalancedFractSchedNum > 0) {
                     BalancedExhMassFlow = UnbalExhMassFlow * GetCurrentScheduleValue(state, Fan(FanNum).BalancedFractSchedNum);

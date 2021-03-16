@@ -1818,7 +1818,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                     if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
                         state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
                         (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-                         AirflowNetwork::AirflowNetworkFanActivated)) {
+                         state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
                         // Multizone airflow calculated in AirflowNetwork
                         B = CO2Gain + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrCO +
                             state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrCO;
@@ -1925,7 +1925,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                     if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
                         state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
                         (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-                         AirflowNetwork::AirflowNetworkFanActivated)) {
+                         state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
                         // Multizone airflow calculated in AirflowNetwork
                         B = GCGain + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrGC +
                             state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrGC;
@@ -2499,7 +2499,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
                     state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
                     (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-                     AirflowNetwork::AirflowNetworkFanActivated)) {
+                     state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
                     // Multizone airflow calculated in AirflowNetwork
                     B = CO2Gain +
                         (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrCO +
@@ -2563,7 +2563,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
                     state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
                     (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-                     AirflowNetwork::AirflowNetworkFanActivated)) {
+                     state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
                     // Multizone airflow calculated in AirflowNetwork
                     B = GCGain +
                         (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrGC +

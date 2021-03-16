@@ -2638,7 +2638,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                     if (SELECT_CASE_var == ZoneSplitter_Type) { // 'AirLoopHVAC:ZoneSplitter'
 
-                        if (!(AirflowNetwork::AirflowNetworkFanActivated &&
+                        if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
                               state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
                             SimAirLoopSplitter(state, state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                                FirstHVACIteration,
@@ -3120,7 +3120,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                     if (SELECT_CASE_var == ZoneSplitter_Type) { // 'AirLoopHVAC:ZoneSplitter'
 
-                        if (!(AirflowNetwork::AirflowNetworkFanActivated &&
+                        if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
                               state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
                             SimAirLoopSplitter(state, state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                                FirstHVACIteration,
@@ -3957,7 +3957,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                 for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++NodeNum) {
 
-                    if (AirflowNetwork::AirflowNetworkNumOfExhFan == 0) {
+                    if (state.dataAirflowNetwork->AirflowNetworkNumOfExhFan == 0) {
                         state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate += Node(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(NodeNum)).MassFlowRate;
                     }
                 }
@@ -4951,9 +4951,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         // CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(NZ)) &
                         if (!state.dataGlobal->KickOffSimulation) {
                             if (!(state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) ||
-                                !AirflowNetwork::AirflowNetworkZoneFlag(NZ))
+                                !state.dataAirflowNetwork->AirflowNetworkZoneFlag(NZ))
                                 state.dataHeatBal->ZnAirRpt(NZ).VentilFanElec += state.dataHeatBal->Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
-                        } else if (!AirflowNetwork::AirflowNetworkZoneFlag(NZ)) {
+                        } else if (!state.dataAirflowNetwork->AirflowNetworkZoneFlag(NZ)) {
                             state.dataHeatBal->ZnAirRpt(NZ).VentilFanElec += state.dataHeatBal->Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
                         }
                     } else {

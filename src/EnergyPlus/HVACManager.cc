@@ -291,7 +291,7 @@ namespace EnergyPlus::HVACManager {
 
         CalcAirFlowSimple(state);
         if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-            AirflowNetwork::RollBackFlag = false;
+            state.dataAirflowNetwork->RollBackFlag = false;
             ManageAirflowNetworkBalance(state, false);
         }
 
@@ -350,7 +350,7 @@ namespace EnergyPlus::HVACManager {
                 ManageHybridVentilation(state);
                 CalcAirFlowSimple(state, SysTimestepLoop);
                 if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    AirflowNetwork::RollBackFlag = false;
+                    state.dataAirflowNetwork->RollBackFlag = false;
                     ManageAirflowNetworkBalance(state, false);
                 }
 
@@ -2200,7 +2200,7 @@ namespace EnergyPlus::HVACManager {
             ADSCorrectionFactor = 1.0;
             if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                 if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
-                    AirflowNetwork::AirflowNetworkZoneFlag(ZoneLoop)) {
+                    state.dataAirflowNetwork->AirflowNetworkZoneFlag(ZoneLoop)) {
                     ADSCorrectionFactor = 0.0;
                 }
             }
@@ -2245,7 +2245,7 @@ namespace EnergyPlus::HVACManager {
             if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                 // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
                 if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
-                    AirflowNetwork::AirflowNetworkZoneFlag(ZoneLoop))
+                    state.dataAirflowNetwork->AirflowNetworkZoneFlag(ZoneLoop))
                     ADSCorrectionFactor = 0.0;
             }
 

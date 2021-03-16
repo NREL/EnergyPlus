@@ -1071,7 +1071,7 @@ namespace RoomAirModelManager {
             }
 
             // If a crack is used it must have an air flow coefficient = 0.5
-            for (Loop2 = 1; Loop2 <= AirflowNetwork::NumOfLinksMultiZone; ++Loop2) {
+            for (Loop2 = 1; Loop2 <= state.dataAirflowNetwork->NumOfLinksMultiZone; ++Loop2) {
                 state.dataRoomAirModelMgr->NodeNum1 = state.dataAirflowNetwork->MultizoneSurfaceData(Loop2).NodeNums[0];
                 state.dataRoomAirModelMgr->NodeNum2 = state.dataAirflowNetwork->MultizoneSurfaceData(Loop2).NodeNums[1];
                 if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(Loop2).SurfNum).Zone == ThisZone ||
@@ -1963,7 +1963,7 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->CVNumAirflowNetworkSurfaces = 0;
 
             // calculate maximum number of airflow network surfaces in each zone
-            for (state.dataRoomAirModelMgr->Loop = 1; state.dataRoomAirModelMgr->Loop <= AirflowNetwork::NumOfLinksMultiZone;
+            for (state.dataRoomAirModelMgr->Loop = 1; state.dataRoomAirModelMgr->Loop <= state.dataAirflowNetwork->NumOfLinksMultiZone;
                  ++state.dataRoomAirModelMgr->Loop) {
                 ++AuxSurf(state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop).SurfNum).Zone);
                 ++state.dataRoomAirMod->CVNumAirflowNetworkSurfaces;
@@ -1994,7 +1994,7 @@ namespace RoomAirModelManager {
             AuxAirflowNetworkSurf.allocate({0, MaxSurf}, state.dataGlobal->NumOfZones);
             // Width and Height for airflow network surfaces
             if (!allocated(state.dataRoomAirMod->SurfParametersCVDV)) {
-                state.dataRoomAirMod->SurfParametersCVDV.allocate(AirflowNetwork::NumOfLinksMultiZone);
+                state.dataRoomAirMod->SurfParametersCVDV.allocate(state.dataAirflowNetwork->NumOfLinksMultiZone);
             }
 
             state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV = 0;
@@ -2006,7 +2006,7 @@ namespace RoomAirModelManager {
                 if (AuxSurf(state.dataRoomAirModelMgr->Loop) != 0) {
                     Real64 const ceilingHeight(state.dataRoomAirMod->ZoneCeilingHeight((state.dataRoomAirModelMgr->Loop - 1) * 2 + 1));
                     SurfNum = 1;
-                    for (state.dataRoomAirModelMgr->Loop2 = 1; state.dataRoomAirModelMgr->Loop2 <= AirflowNetwork::NumOfLinksMultiZone;
+                    for (state.dataRoomAirModelMgr->Loop2 = 1; state.dataRoomAirModelMgr->Loop2 <= state.dataAirflowNetwork->NumOfLinksMultiZone;
                          ++state.dataRoomAirModelMgr->Loop2) {
                         if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Zone ==
                             state.dataRoomAirModelMgr->Loop) {

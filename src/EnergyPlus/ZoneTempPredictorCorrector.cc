@@ -4546,7 +4546,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
                 state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
                 (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-                 AirflowNetwork::AirflowNetworkFanActivated)) {
+                 state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
                 // Multizone airflow calculated in AirflowNetwork
                 B = (LatentGain / H2OHtOfVap) + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrW +
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrW + state.dataHeatBalFanSys->SumHmARaW(ZoneNum);
@@ -5494,7 +5494,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
             state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
             (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-             AirflowNetwork::AirflowNetworkFanActivated)) {
+             state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
             B = (LatentGain / H2OHtOfVap) +
                 (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrW + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrW) +
@@ -6136,7 +6136,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
             state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
             (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-             AirflowNetwork::AirflowNetworkFanActivated)) {
+             state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
             SumMCp = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
             SumMCpT = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
@@ -6435,7 +6435,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
             state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
             (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-             AirflowNetwork::AirflowNetworkFanActivated)) {
+             state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
             SumMCpDtInfil = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT -
                             state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp * state.dataHeatBalFanSys->MAT(ZoneNum);

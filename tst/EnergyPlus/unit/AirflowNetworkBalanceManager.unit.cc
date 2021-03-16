@@ -101,7 +101,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestOtherSideCoefficients
     int i = 2;
 
     state->dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtSurfaces = 2;
-    AirflowNetwork::AirflowNetworkNumOfSurfaces = 2;
+    state->dataAirflowNetwork->AirflowNetworkNumOfSurfaces = 2;
 
     state->dataAirflowNetwork->MultizoneSurfaceData.allocate(i);
     state->dataSurface->Surface.allocate(i);
@@ -2268,7 +2268,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->dataScheduleMgr->Schedule(UtilityRoutines::FindItemInList("VENTINGSCHED", state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}))).CurrentValue = 25.55;  // VentingSched
     state->dataScheduleMgr->Schedule(UtilityRoutines::FindItemInList("WINDOWVENTSCHED", state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}))).CurrentValue = 1.0; // WindowVentSched
 
-    AirflowNetwork::AirflowNetworkFanActivated = true;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
     state->dataEnvrn->OutHumRat = 0.0008389;
     state->dataEnvrn->OutBaroPress = 99063.0;
@@ -2323,10 +2323,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     // Check indoor pressure and mass flow rate
     EXPECT_NEAR(PressureSet, state->dataAirflowNetwork->AirflowNetworkNodeSimu(3).PZ, 0.0001);
-    EXPECT_NEAR(0.00255337, AirflowNetwork::ReliefMassFlowRate, 0.0001);
+    EXPECT_NEAR(0.00255337, state->dataAirflowNetwork->ReliefMassFlowRate, 0.0001);
 
     // Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off
-    AirflowNetwork::AirflowNetworkFanActivated = false;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = false;
 
     state->dataAirflowNetworkBalanceManager->exchangeData.allocate(state->dataGlobal->NumOfZones);
 
@@ -2338,7 +2338,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_NEAR(0.0, state->dataAirflowNetworkBalanceManager->linkReport(50).FLOW, 0.0001);
 
     // Start a test for #6005
-    AirflowNetwork::ANZT = 26.0;
+    state->dataAirflowNetwork->ANZT = 26.0;
     state->dataAirflowNetwork->MultizoneSurfaceData(2).HybridVentClose = true;
     state->dataAirflowNetwork->MultizoneSurfaceData(5).HybridVentClose = true;
     state->dataAirflowNetwork->MultizoneSurfaceData(14).HybridVentClose = true;
@@ -13126,7 +13126,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataScheduleMgr->Schedule(17).CurrentValue = 1.0;          // HVACTemplate-Always 1
     state->dataScheduleMgr->Schedule(18).CurrentValue = 0.0;          // HVACTemplate-Always 0
 
-    AirflowNetwork::AirflowNetworkFanActivated = true;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
     state->dataEnvrn->OutHumRat = 0.0008389;
     state->dataEnvrn->OutBaroPress = 99063.0;
@@ -13183,7 +13183,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_NEAR(0.1095108, state->dataAirflowNetwork->AirflowNetworkLinkSimu(66).FLOW, 0.0001);
     EXPECT_NEAR(0.1005046, state->dataAirflowNetwork->AirflowNetworkLinkSimu(15).FLOW, 0.0001);
 
-    AirflowNetwork::AirflowNetworkFanActivated = false;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = false;
     // #7977
     CalcAirflowNetworkAirBalance(*state);
      state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
@@ -15605,7 +15605,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     state->dataScheduleMgr->Schedule(13).CurrentValue = 1.0;
     state->dataScheduleMgr->Schedule(14).CurrentValue = 1.0;
 
-    AirflowNetwork::AirflowNetworkFanActivated = true;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
     state->dataEnvrn->OutHumRat = 0.0008389;
     state->dataEnvrn->OutBaroPress = 99063.0;
@@ -15772,13 +15772,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     // One AirflowNetwork:MultiZone:Zone object
-    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
     state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ATTIC ZONE";
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
-    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
     state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ATTIC ZONE";
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
@@ -19947,7 +19947,7 @@ std::string const idf_objects = delimited_string({
     // Read AirflowNetwork inputs
     GetAirflowNetworkInput(*state);
 
-    AirflowNetwork::AirflowNetworkFanActivated = true;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
     state->dataEnvrn->OutHumRat = 0.0008389;
     state->dataEnvrn->OutBaroPress = 99063.0;
@@ -19980,7 +19980,7 @@ std::string const idf_objects = delimited_string({
     state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
 
-    AirflowNetwork::AirflowNetworkFanActivated = false;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = false;
 
      state->dataHeatBalFanSys->MAT.allocate(5);
      state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
@@ -20204,13 +20204,13 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneE
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     // One AirflowNetwork:MultiZone:Zone object
-    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
     state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
-    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
     state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
@@ -20344,13 +20344,13 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportZoneERV
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     // One AirflowNetwork:MultiZone:Zone object
-    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
     state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
-    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
     state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
@@ -20476,13 +20476,13 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportUnbalan
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     // One AirflowNetwork:MultiZone:Zone object
-    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
     state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
-    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
     state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
@@ -20615,13 +20615,13 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportHPWH)
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     // One AirflowNetwork:MultiZone:Zone object
-    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
     state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
-    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
     state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
@@ -20729,13 +20729,13 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWH)
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     // One AirflowNetwork:MultiZone:Zone object
-    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
     state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
-    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
     state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
@@ -20836,13 +20836,13 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZon
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     // One AirflowNetwork:MultiZone:Zone object
-    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
     state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
     state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
-    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
     state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;

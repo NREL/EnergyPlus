@@ -85,52 +85,6 @@ namespace AirflowNetwork {
     // Link simulation variable in air distribution system
     // Sensible and latent exchange variable in air distribution system
 
-    // Vent Control  DistSys Control  Flag    Description
-    //  NONE           NONE           0      No AirflowNetwork and SIMPLE
-    //  SIMPLE         NONE           1      Simple calculations only
-    //  MULTIZONE      NONE           2      Perform multizone calculations only
-    //  NONE           DISTSYS        3      Perform distribution system during system on time only
-    //  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
-    //  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
-
-
-
-    Array1D_bool AirflowNetworkZoneFlag;
-
-    int NumOfNodesMultiZone(0);    // Number of nodes for multizone calculation
-    int NumOfNodesDistribution(0); // Number of nodes for distribution system calculation
-    int NumOfLinksMultiZone(0);    // Number of links for multizone calculation
-    int NumOfLinksDistribution(0); // Number of links for distribution system calculation
-    int NumOfNodesIntraZone(0);    // Number of nodes for intrazone calculation
-    int NumOfLinksIntraZone(0);    // Number of links for intrazone calculation
-
-    int AirflowNetworkNumOfNodes(0); // Number of nodes for AirflowNetwork calculation
-    // = NumOfNodesMultiZone+NumOfNodesDistribution
-    int AirflowNetworkNumOfComps(0); // Number of components for AirflowNetwork calculation
-    int AirflowNetworkNumOfLinks(0); // Number of links for AirflowNetwork calculation
-    // = NumOfLinksMultiZone+NumOfLinksDistribution
-    // RoomAirManager use
-    int AirflowNetworkNumOfSurfaces(0); // The number of surfaces for multizone calculation
-    int AirflowNetworkNumOfZones(0);    // The number of zones for multizone calculation
-
-    bool RollBackFlag(false);                  // Roll back flag when system time step down shifting
-    Array1D<Real64> ANZT;                      // Local zone air temperature for roll back use
-    Array1D<Real64> ANZW;                      // Local zone air humidity ratio for roll back use
-    Array1D<Real64> ANCO;                      // Local zone air CO2 for roll back use
-    Array1D<Real64> ANGC;                      // Local zone air generic contaminant for roll back use
-    int AirflowNetworkNumOfExhFan(0);          // Number of zone exhaust fans
-    Array1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
-    bool AirflowNetworkFanActivated(false);    // Supply fan activation flag
-    bool AirflowNetworkUnitarySystem(false);   // set to TRUE for unitary systems (to make answers equal, will remove eventually)
-    // Multispeed HP only
-    int MultiSpeedHPIndicator(0); // Indicator for multispeed heat pump use
-    // Additional airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
-    Real64 VAVTerminalRatio(0.0);       // The terminal flow ratio when a supply VAV fan reach its max flow rate
-    bool VAVSystem(false);              // This flag is used to represent a VAV system
-    Real64 ExhaustFanMassFlowRate(0.0); // Exhaust fan flow rate used in PressureStat
-    int PressureSetFlag(0);             // PressureSet flag
-    Real64 ReliefMassFlowRate(0.0);     // OA Mixer relief node flow rate used in PressureStat
-
     // Object Data
     //Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
     //Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
@@ -487,7 +441,7 @@ namespace AirflowNetwork {
 
 
         // Crack standard condition from given inputs
-        if (i > NetworkNumOfLinks - NumOfLinksIntraZone) {
+        if (i > NetworkNumOfLinks - state.dataAirflowNetwork->NumOfLinksIntraZone) {
             Corr = 1.0;
         } else {
             Corr = state.dataAirflowNetwork->MultizoneSurfaceData(i).Factor;
@@ -604,7 +558,7 @@ namespace AirflowNetwork {
 
 
         // Crack standard condition from given inputs
-        //if (i > NetworkNumOfLinks - NumOfLinksIntraZone) {
+        //if (i > NetworkNumOfLinks - state.dataAirflowNetwork->NumOfLinksIntraZone) {
         //    Corr = 1.0;
         //} else {
         //    Corr = state.dataAirflowNetwork->MultizoneSurfaceData(i).Factor;
@@ -905,7 +859,7 @@ namespace AirflowNetwork {
                 F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             } else {
                 F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate * Ctrl;
-                if (MultiSpeedHPIndicator == 2) {
+                if (state.dataAirflowNetwork->MultiSpeedHPIndicator == 2) {
                     F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate * state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio +
                            state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate * (1.0 - state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
                 }
@@ -917,7 +871,7 @@ namespace AirflowNetwork {
                 NF = GenericDuct(0.1, 0.001, LFLAG, PDROP, propN, propM, F, DF);
             }
 
-            if (MultiSpeedHPIndicator == 2) {
+            if (state.dataAirflowNetwork->MultiSpeedHPIndicator == 2) {
                 F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             }
         } else if (FanTypeNum == FanType_SimpleVAV) {
@@ -942,9 +896,9 @@ namespace AirflowNetwork {
                 }
             }
             F[0] = SumTermFlow / (1.0 - SumFracSuppLeak);
-            VAVTerminalRatio = 0.0;
+            state.dataAirflowNetwork->VAVTerminalRatio = 0.0;
             if (F[0] > MaxAirMassFlowRate) {
-                VAVTerminalRatio = MaxAirMassFlowRate / F[0];
+                state.dataAirflowNetwork->VAVTerminalRatio = MaxAirMassFlowRate / F[0];
                 F[0] = MaxAirMassFlowRate;
             }
         }
@@ -2810,8 +2764,8 @@ namespace AirflowNetwork {
         // If damper, setup the airflows from nodal values calculated from terminal
         if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).VAVTermDamper) {
             F[0] = state.dataLoopNodes->Node(DamperInletNode).MassFlowRate;
-            if (VAVTerminalRatio > 0.0) {
-                F[0] *= VAVTerminalRatio;
+            if (state.dataAirflowNetwork->VAVTerminalRatio > 0.0) {
+                F[0] *= state.dataAirflowNetwork->VAVTerminalRatio;
             }
             DF[0] = 0.0;
         }
@@ -3157,8 +3111,8 @@ namespace AirflowNetwork {
 
         if (state.dataLoopNodes->Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
-            if (PressureSetFlag == PressureCtrlExhaust) {
-                F[0] = ExhaustFanMassFlowRate;
+            if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlExhaust) {
+                F[0] = state.dataAirflowNetwork->ExhaustFanMassFlowRate;
             } else {
                 F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             }
@@ -3284,8 +3238,8 @@ namespace AirflowNetwork {
 
         if (state.dataLoopNodes->Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
-            if (PressureSetFlag == PressureCtrlExhaust) {
-                F[0] = ExhaustFanMassFlowRate;
+            if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlExhaust) {
+                F[0] = state.dataAirflowNetwork->ExhaustFanMassFlowRate;
             } else {
                 F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             }
@@ -3640,8 +3594,8 @@ namespace AirflowNetwork {
         if (state.dataLoopNodes->Node(OutletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
             DF[0] = 0.0;
-            if (PressureSetFlag == PressureCtrlRelief) {
-                F[0] = ReliefMassFlowRate;
+            if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlRelief) {
+                F[0] = state.dataAirflowNetwork->ReliefMassFlowRate;
             } else {
                 F[0] = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                 if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
@@ -3721,30 +3675,6 @@ namespace AirflowNetwork {
 
     void clear_state()
     {
-        AirflowNetworkZoneFlag.deallocate();
-        NumOfNodesMultiZone = 0;
-        NumOfNodesDistribution = 0;
-        NumOfLinksMultiZone = 0;
-        NumOfLinksDistribution = 0;
-        NumOfNodesIntraZone = 0;
-        NumOfLinksIntraZone = 0;
-        AirflowNetworkNumOfNodes = 0;
-        AirflowNetworkNumOfComps = 0;
-        AirflowNetworkNumOfLinks = 0;
-        AirflowNetworkNumOfSurfaces = 0;
-        AirflowNetworkNumOfZones = 0;
-        RollBackFlag = false;
-        ANZT.deallocate();
-        ANZW.deallocate();
-        ANCO.deallocate();
-        ANGC.deallocate();
-        AirflowNetworkNumOfExhFan = 0;
-        AirflowNetworkZoneExhaustFan.deallocate();
-        AirflowNetworkFanActivated = false;
-        AirflowNetworkUnitarySystem = false;
-        MultiSpeedHPIndicator = 0;
-        VAVTerminalRatio = 0.0;
-        VAVSystem = false;
         //AirflowNetworkExchangeData.deallocate();
         //AirflowNetworkMultiExchangeData.deallocate();
         //AirflowNetworkLinkReport.deallocate();

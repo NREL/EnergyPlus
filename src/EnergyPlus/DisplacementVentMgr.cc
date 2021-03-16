@@ -767,7 +767,7 @@ namespace EnergyPlus::DisplacementVentMgr {
         // outflowing. The lower apertures have to be located below 0.8m and the upper apertures
         // have to be located above 1.8m.
 
-        if (AirflowNetwork::NumOfLinksMultiZone > 0) {
+        if (state.dataAirflowNetwork->NumOfLinksMultiZone > 0) {
             for (Loop = 1; Loop <= state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, ZoneNum); ++Loop) {
                 // direct AirflowNetwork surface
 
