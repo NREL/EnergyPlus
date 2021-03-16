@@ -12181,22 +12181,22 @@ namespace EnergyPlus::OutputReportTabular {
         if (ort->displaySurfaceShadowing) {
             numreceivingfields = 0;
             for (HTS = 1; HTS <= state.dataSurface->TotSurfaces; ++HTS) {
-                numreceivingfields += ShadowComb(HTS).NumGenSurf;
-                numreceivingfields += ShadowComb(HTS).NumSubSurf;
+                numreceivingfields += state.dataShadowComb->ShadowComb(HTS).NumGenSurf;
+                numreceivingfields += state.dataShadowComb->ShadowComb(HTS).NumSubSurf;
             }
 
             state.dataOutRptPredefined->ShadowRelate.allocate(numreceivingfields);
             state.dataOutRptPredefined->numShadowRelate = 0;
             for (HTS = 1; HTS <= state.dataSurface->TotSurfaces; ++HTS) {
-                for (NGSS = 1; NGSS <= ShadowComb(HTS).NumGenSurf; ++NGSS) {
+                for (NGSS = 1; NGSS <= state.dataShadowComb->ShadowComb(HTS).NumGenSurf; ++NGSS) {
                     ++state.dataOutRptPredefined->numShadowRelate;
-                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).GenSurf(NGSS);
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = state.dataShadowComb->ShadowComb(HTS).GenSurf(NGSS);
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSurface;
                 }
-                for (NGSS = 1; NGSS <= ShadowComb(HTS).NumSubSurf; ++NGSS) {
+                for (NGSS = 1; NGSS <= state.dataShadowComb->ShadowComb(HTS).NumSubSurf; ++NGSS) {
                     ++state.dataOutRptPredefined->numShadowRelate;
-                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).SubSurf(NGSS);
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = state.dataShadowComb->ShadowComb(HTS).SubSurf(NGSS);
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSubsurface;
                 }
