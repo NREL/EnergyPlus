@@ -1298,8 +1298,8 @@ namespace EnergyPlus::WaterCoils {
                                 } else {
                                     CompType = cAllCoilTypes(Coil_CoolingWater);
                                 }
-                                coilSelectionReportObj->setCoilLvgAirTemp(state, state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, TOutNew);
-                                coilSelectionReportObj->setCoilLvgAirHumRat(state, state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, WOutNew);
+                                state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirTemp(state, state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, TOutNew);
+                                state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirHumRat(state, state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, WOutNew);
                                 // end update outlet air conditions used for sizing
                             }
                         }
@@ -1618,11 +1618,11 @@ namespace EnergyPlus::WaterCoils {
                               "Water Heating Coil Capacity Information,Coil:Heating:Water",
                               state.dataWaterCoils->WaterCoil(CoilNum).Name,
                               state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate);
-                        coilSelectionReportObj->setCoilAirFlow(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilAirFlow(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                "Coil:Heating:Water",
                                                                state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
                                                                state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize);
-                        coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                                    "Coil:Heating:Water",
                                                                                    state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate,
                                                                                    state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize,
@@ -1658,11 +1658,11 @@ namespace EnergyPlus::WaterCoils {
                               state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate,
                               RatedLatentCapacity,
                               RatedSHR);
-                        coilSelectionReportObj->setCoilAirFlow(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilAirFlow(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                "Coil:Cooling:Water:DetailedGeometry",
                                                                state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
                                                                state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize); // Coil Report
-                        coilSelectionReportObj->setCoilWaterCoolingCapacity(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterCoolingCapacity(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                             "Coil:Cooling:Water:DetailedGeometry",
                                                                             state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
                                                                             state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize,
@@ -1702,11 +1702,11 @@ namespace EnergyPlus::WaterCoils {
                               RatedSHR,
                               UATotal,
                               SurfaceArea);
-                        coilSelectionReportObj->setCoilAirFlow(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilAirFlow(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                "Coil:Cooling:Water",
                                                                state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
                                                                state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize); // Coil Report
-                        coilSelectionReportObj->setCoilWaterCoolingCapacity(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterCoolingCapacity(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                             "Coil:Cooling:Water",
                                                                             state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
                                                                             state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize,
@@ -1764,7 +1764,7 @@ namespace EnergyPlus::WaterCoils {
                 // call set routine in coil report
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterDetailedFlatCooling ||
                     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) {
-                    coilSelectionReportObj->setRatedCoilConditions(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(state,
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                    coilTypeName,
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate, // this is the report variable
@@ -1781,7 +1781,7 @@ namespace EnergyPlus::WaterCoils {
                                                                    -999.0,
                                                                    -999.0); // coil effectiveness
                 } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterSimpleHeating) {
-                    coilSelectionReportObj->setRatedCoilConditions(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(state,
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                    coilTypeName,
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, // this is the report variable
@@ -4752,7 +4752,7 @@ namespace EnergyPlus::WaterCoils {
                 std::string coilObjClassName;
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterSimpleHeating) {
                     coilObjClassName = "Coil:Heating:Water";
-                    coilSelectionReportObj->setCoilFinalSizes(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                               coilObjClassName,
                                                               state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate,
                                                               state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate,
@@ -4761,7 +4761,7 @@ namespace EnergyPlus::WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes = false;
                 } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterDetailedFlatCooling) {
                     coilObjClassName = "Coil:Cooling:Water:DetailedGeometry";
-                    coilSelectionReportObj->setCoilFinalSizes(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                               coilObjClassName,
                                                               state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
                                                               -999.0,
@@ -4770,7 +4770,7 @@ namespace EnergyPlus::WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes = false;
                 } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) {
                     coilObjClassName = "Coil:Cooling:Water";
-                    coilSelectionReportObj->setCoilFinalSizes(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                               coilObjClassName,
                                                               state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
                                                               -999.0,

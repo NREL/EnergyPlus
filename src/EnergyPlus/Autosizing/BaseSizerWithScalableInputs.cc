@@ -100,7 +100,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
         switch (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum) {
         case DataAirSystems::structArrayLegacyFanModels: {
             if (SupFanNum > 0) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                              this->compName,
                                                              this->compType,
                                                              state.dataFans->Fan(SupFanNum).FanName,
@@ -111,7 +111,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {
             if (this->primaryAirSystem(this->curSysNum).supFanVecIndex >= 0) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                              this->compName,
                                                              this->compType,
                                                              HVACFan::fanObjs[this->primaryAirSystem(this->curSysNum).supFanVecIndex]->name,

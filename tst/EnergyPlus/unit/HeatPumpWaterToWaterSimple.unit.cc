@@ -410,7 +410,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                           "    1640,                    !- Rated Heating Power Consumption {W}",
                           "    HtgCapCurve,             !- Heating Capacity Curve Name",
                           "    HtgPowCurve;             !- Heating Compressor Power Curve Name",
-                              
+
                           "Curve:QuadLinear,",
                           "    HtgCapCurve,             ! Curve Name",
                           "    -3.01043,                ! CoefficientC1",
@@ -745,7 +745,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 
@@ -1182,7 +1182,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
                           "    HtgPowCurve,                !- Heating Compressor Power Curve Name",
                           "    3.3475,                  !- Reference Coefficient of Performance",
                           "    1.0;                     !- Sizing Factor",
-                                                            
+
                           "Curve:QuadLinear,",
                           "    HtgCapCurve,             ! Curve Name",
                           "    -3.01043,                ! CoefficientC1",
@@ -1523,7 +1523,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 

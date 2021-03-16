@@ -1663,7 +1663,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Existing code for hot water baseboard models (radiant-convective variety)
 
         // Using/Aliasing
-        using DataHeatBalSurface::TempSurfInTmp;
         using DataSurfaces::WinShadingType;
 
         // Return value
@@ -1699,7 +1698,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                 }
             }
 
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;

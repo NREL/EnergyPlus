@@ -139,7 +139,6 @@ namespace LowTempRadiantSystem {
     using DataHeatBalance::Air;
     using DataHeatBalance::RegularMaterial;
     using DataHVACGlobals::SmallLoad;
-    using DataSurfaces::HeatTransferModel_CTF;
     using Psychrometrics::PsyTdpFnWPb;
 
     // Data
@@ -3484,9 +3483,6 @@ namespace LowTempRadiantSystem {
         auto &Zone(state.dataHeatBal->Zone);
 
         // Using/Aliasing
-        using DataHeatBalSurface::TH;
-        using DataSurfaces::HeatTransferModel_CondFD;
-        using DataSurfaces::HeatTransferModel_CTF;
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3637,7 +3633,7 @@ namespace LowTempRadiantSystem {
                 // as well as all of the heat balance terms "hidden" in Ck and Cl).
                 ConstrNum = Surface(SurfNum).Construction;
 
-                if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF) {
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF) {
 
                     Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
                     Cb = state.dataHeatBalFanSys->RadSysTiHBToutCoef(SurfNum);
@@ -3657,7 +3653,7 @@ namespace LowTempRadiantSystem {
 
                     state.dataHeatBalFanSys->QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
 
-                } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
 
                     state.dataHeatBalFanSys->QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - state.dataHeatBalFanSys->TCondFDSourceNode(SurfNum));
                 }
@@ -3721,7 +3717,8 @@ namespace LowTempRadiantSystem {
             if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT )) {
+                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
+                        (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT)) {
                         // Condensation warning--must shut off radiant system
                         this->CondCausedShutDown = true;
                         WaterMassFlow = 0.0;
@@ -3747,8 +3744,9 @@ namespace LowTempRadiantSystem {
                                 ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
-                                ShowContinueError(
-                                    state, format("Predicted radiant system surface temperature = {:.2R}", TH(2, 1, this->SurfacePtr(RadSurfNum2))));
+                                ShowContinueError(state,
+                                                  format("Predicted radiant system surface temperature = {:.2R}",
+                                                         state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2))));
                                 ShowContinueError(
                                     state, format("Zone dew-point temperature + safety delta T= {:.2R}", DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT));
                                 ShowContinueErrorTimeStamp(state, "");
@@ -3772,7 +3770,7 @@ namespace LowTempRadiantSystem {
             } else if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlNone)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
+                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
                         // Condensation occurring but user does not want to shut radiant system off ever
                         this->CondCausedShutDown = true;
                     }
@@ -3783,9 +3781,10 @@ namespace LowTempRadiantSystem {
                 LowestRadSurfTemp = 999.9;
                 CondSurfNum = 0;
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT)) {
-                        if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < LowestRadSurfTemp) {
-                            LowestRadSurfTemp = TH(2, 1, this->SurfacePtr(RadSurfNum2));
+                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
+                        (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT)) {
+                        if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) < LowestRadSurfTemp) {
+                            LowestRadSurfTemp = state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2));
                             CondSurfNum = RadSurfNum2;
                         }
                     }
@@ -3819,7 +3818,8 @@ namespace LowTempRadiantSystem {
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Now check all of the surface temperatures.  If any potentially have condensation, leave the system off.
                     for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                        if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT)) {
+                        if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
+                            (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT)) {
                             this->CondCausedShutDown = true;
                         }
                     }
@@ -3828,7 +3828,7 @@ namespace LowTempRadiantSystem {
                     // flow rate.
                     if (!this->CondCausedShutDown) {
                         PredictedCondTemp = DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT;
-                        ZeroFlowSurfTemp = TH(2, 1, this->SurfacePtr(CondSurfNum));
+                        ZeroFlowSurfTemp = state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(CondSurfNum));
                         ReductionFrac = (ZeroFlowSurfTemp - PredictedCondTemp) / std::abs(ZeroFlowSurfTemp - LowestRadSurfTemp);
                         if (ReductionFrac < 0.0) ReductionFrac = 0.0; // Shouldn't happen as the above check should have screened this out
                         if (ReductionFrac > 1.0) ReductionFrac = 1.0; // Shouldn't happen either because condensation doesn't exist then
@@ -3856,7 +3856,7 @@ namespace LowTempRadiantSystem {
                                 this->DesignObjectPtr,
                                 typeOfRadiantSystem);
 
-                            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF) {
+                            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF) {
                                 // For documentation on coefficients, see code earlier in this subroutine
                                 Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
                                 Cb = state.dataHeatBalFanSys->RadSysTiHBToutCoef(SurfNum);
@@ -3871,7 +3871,7 @@ namespace LowTempRadiantSystem {
                                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
                                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
-                            } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                            } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - state.dataHeatBalFanSys->TCondFDSourceNode(SurfNum));
                             }
                             if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
@@ -3886,7 +3886,7 @@ namespace LowTempRadiantSystem {
                         // condensation, shut things down and be done.
                         for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                             if (this->CondCausedShutDown) break;
-                            if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (PredictedCondTemp)) {
+                            if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (PredictedCondTemp)) {
                                 // Condensation still present--must shut off radiant system
                                 this->CondCausedShutDown = true;
                                 WaterMassFlow = 0.0;
@@ -3918,8 +3918,9 @@ namespace LowTempRadiantSystem {
                                 ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(CondSurfNum)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
-                                ShowContinueError(
-                                    state, format("Predicted radiant system surface temperature = {:.2R}", TH(2, 1, this->SurfacePtr(CondSurfNum))));
+                                ShowContinueError(state,
+                                                  format("Predicted radiant system surface temperature = {:.2R}",
+                                                         state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(CondSurfNum))));
                                 ShowContinueError(
                                     state, format("Zone dew-point temperature + safety delta T= {:.2R}", DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT));
                                 ShowContinueErrorTimeStamp(state, "");
@@ -4488,9 +4489,6 @@ namespace LowTempRadiantSystem {
         auto &Zone(state.dataHeatBal->Zone);
 
         // Using/Aliasing
-        using DataHeatBalSurface::TH;
-        using DataSurfaces::HeatTransferModel_CondFD;
-        using DataSurfaces::HeatTransferModel_CTF;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SetComponentFlowRate;
 
@@ -4681,10 +4679,10 @@ namespace LowTempRadiantSystem {
 
                 if (!Iteration) {
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF)
+                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF)
                         state.dataHeatBalFanSys->QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD)
+                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD)
                         state.dataHeatBalFanSys->QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - state.dataHeatBalFanSys->TCondFDSourceNode(SurfNum));
 
                     if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
@@ -4814,7 +4812,8 @@ namespace LowTempRadiantSystem {
             if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT)) {
+                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
+                        (DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT)) {
                         // Condensation warning--must shut off radiant system
                         this->CondCausedShutDown = true;
                         WaterMassFlow = 0.0;
@@ -4840,8 +4839,9 @@ namespace LowTempRadiantSystem {
                                 ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
-                                ShowContinueError(
-                                    state, format("Predicted radiant system surface temperature = {:.2R}", TH(2, 1, this->SurfacePtr(RadSurfNum2))));
+                                ShowContinueError(state,
+                                                  format("Predicted radiant system surface temperature = {:.2R}",
+                                                         state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2))));
                                 ShowContinueError(
                                     state, format("Zone dew-point temperature + safety delta T= {:.2R}", DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT));
                                 ShowContinueErrorTimeStamp(state, "");
@@ -4865,7 +4865,7 @@ namespace LowTempRadiantSystem {
             } else if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlNone)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
+                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
                         // Condensation occurring but user does not want to shut radiant system off ever
                         this->CondCausedShutDown = true;
                     }
@@ -4874,7 +4874,8 @@ namespace LowTempRadiantSystem {
             } else if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlVariedOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT)) {
+                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
+                        (DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT)) {
                         VarOffCond = true;
                         if (CFloCondIterNum >= 2) {
                             // We have already iterated once so now we must shut off radiant system
@@ -4904,7 +4905,8 @@ namespace LowTempRadiantSystem {
                                     ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                     ShowContinueError(
                                         state,
-                                        format("Predicted radiant system surface temperature = {:.2R}", TH(2, 1, this->SurfacePtr(RadSurfNum2))));
+                                                      format("Predicted radiant system surface temperature = {:.2R}",
+                                                             state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2))));
                                     ShowContinueError(
                                         state, format("Zone dew-point temperature + safety delta T= {:.2R}", DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT));
                                     ShowContinueErrorTimeStamp(state, "");
@@ -5362,9 +5364,9 @@ namespace LowTempRadiantSystem {
         case LowTempRadiantControlTypes::OWBControl:
             return state.dataHeatBal->Zone(this->ZonePtr).OutWetBulbTemp;
         case LowTempRadiantControlTypes::SurfFaceTempControl:
-            return DataHeatBalSurface::TempSurfIn(this->SurfacePtr(1)); // Grabs the inside face temperature of the first surface in the list
+            return state.dataHeatBalSurf->TempSurfIn(this->SurfacePtr(1)); // Grabs the inside face temperature of the first surface in the list
         case LowTempRadiantControlTypes::SurfIntTempControl:
-            return DataHeatBalSurface::TempUserLoc(
+            return state.dataHeatBalSurf->TempUserLoc(
                 this->SurfacePtr(1)); // Grabs the temperature inside the slab at the location specified by the user
         case LowTempRadiantControlTypes::RunningMeanODBControl:
             return this->todayRunningMeanOutdoorDryBulbTemperature;
@@ -5708,7 +5710,6 @@ namespace LowTempRadiantSystem {
         // Using/Aliasing
         using namespace DataSurfaces;
         using namespace DataHeatBalance;
-        using namespace DataHeatBalSurface;
 
         // Return value
         Real64 sumHATsurf(0.0);
@@ -5737,7 +5738,7 @@ namespace LowTempRadiantSystem {
                 }
             }
 
-            sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * Area * TempSurfInTmp(surfNum);
+            sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(surfNum);
         }
 
         return sumHATsurf;

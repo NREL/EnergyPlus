@@ -2932,7 +2932,7 @@ namespace EnergyPlus::SingleDuct {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = 1.0;
             }
             if (this->ReheatComp_Index > 0) {
-                coilSelectionReportObj->setCoilReheatMultiplier(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilReheatMultiplier(state,
                     this->ReheatName, this->ReheatComp, TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult);
             }
         }
