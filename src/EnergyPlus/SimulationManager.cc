@@ -278,7 +278,7 @@ namespace SimulationManager {
         CheckIfAnyBasements(state);
         CheckIfAnyIdealCondEntSetPoint(state);
         createFacilityElectricPowerServiceObject(state);
-        createCoilSelectionReportObj();
+        createCoilSelectionReportObj(state);
 
         ManageBranchInput(state); // just gets input and returns.
 

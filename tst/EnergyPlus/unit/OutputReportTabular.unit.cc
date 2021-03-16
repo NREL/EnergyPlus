@@ -6447,7 +6447,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test)
 {
     Psychrometrics::InitializePsychRoutines();
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
 
     CompLoadTablesType compLoad;
     int timeOfMax = 63;
@@ -6932,7 +6932,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     Psychrometrics::InitializePsychRoutines();
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
 
     // Two design days
     int numDesDays = 2;

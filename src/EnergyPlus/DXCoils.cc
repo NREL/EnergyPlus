@@ -6175,7 +6175,7 @@ namespace EnergyPlus::DXCoils {
                 RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp, state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
-                coilSelectionReportObj->setRatedCoilConditions(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(state,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate, // this is the report variable
@@ -6330,7 +6330,7 @@ namespace EnergyPlus::DXCoils {
                 RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp, state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
-                coilSelectionReportObj->setRatedCoilConditions(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(state,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).TotalHeatingEnergyRate, // this is the report variable
@@ -6474,7 +6474,7 @@ namespace EnergyPlus::DXCoils {
             // store fan info for coil
             if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex > -1) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
@@ -6484,7 +6484,7 @@ namespace EnergyPlus::DXCoils {
 
             } else {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
@@ -13371,7 +13371,7 @@ namespace EnergyPlus::DXCoils {
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 Real64 ratedSensCap(0.0);
                 ratedSensCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) * state.dataDXCoils->DXCoil(DXCoilNum).RatedSHR(1);
-                coilSelectionReportObj->setCoilFinalSizes(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state,
                                                           state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                           state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                           state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1),
@@ -15165,14 +15165,14 @@ namespace EnergyPlus::DXCoils {
             state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum = SupplyFan_TypeNum;
             if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex > -1) {
                 if (SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                  HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->name,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                 } else {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                  state.dataFans->Fan(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex).FanName,

@@ -383,7 +383,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataSize->DataWaterLoopNum = 1;
     FluidProperties::NumOfGlycols = 1;
 
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
     WaterCoils::SizeWaterCoil(*state, CoilNum);
 
     EXPECT_DOUBLE_EQ(0.159, state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate);

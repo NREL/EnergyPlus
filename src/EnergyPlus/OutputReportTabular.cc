@@ -5102,7 +5102,7 @@ namespace EnergyPlus::OutputReportTabular {
             if (ort->displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
             if (ort->displayVisualResilienceSummary) WriteVisualResilienceTables(state);
 
-            coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
+            state.dataRptCoilSelection->coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables(state);                                // moved to come after zone load components is finished
 
             if (state.dataGlobal->DoWeathSim) {
@@ -13109,7 +13109,7 @@ namespace EnergyPlus::OutputReportTabular {
                                                        surfDelaySeqCool);
                         CollectPeakZoneConditions(state, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                         // send latent load info to coil summary report
-                        coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
+                        state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
 
                         heatDesSelected = state.dataSize->CalcFinalZoneSizing(iZone).HeatDDNum;
                         ZoneHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
@@ -13145,7 +13145,7 @@ namespace EnergyPlus::OutputReportTabular {
                         CollectPeakZoneConditions(state, ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
 
                         // send latent load info to coil summary report
-                        coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
+                        state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
 
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneCoolCompLoadTables(iZone));
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneHeatCompLoadTables(iZone));
@@ -13855,7 +13855,7 @@ namespace EnergyPlus::OutputReportTabular {
                     compLoad.peakDateHrMin = format("{}/{} {}",
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).Month,
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
-                                                    coilSelectionReportObj->getTimeText(state, timeOfMax));
+                                                    state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
                 } else {
                     compLoad.peakDateHrMin = state.dataSize->CoolPeakDateHrMin(zoneIndex);
                 }
@@ -13909,7 +13909,7 @@ namespace EnergyPlus::OutputReportTabular {
                     compLoad.peakDateHrMin = format("{}/{} {}",
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).Month,
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
-                                                    coilSelectionReportObj->getTimeText(state, timeOfMax));
+                                                    state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
                 } else {
                     compLoad.peakDateHrMin = state.dataSize->HeatPeakDateHrMin(zoneIndex);
                 }

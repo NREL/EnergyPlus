@@ -714,14 +714,14 @@ namespace WindowAC {
         }
         for (WindACNum = 1; WindACNum <= state.dataWindowAC->NumWindAC; ++WindACNum) {
             if (state.dataWindowAC->WindAC(WindACNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                              state.dataWindowAC->WindAC(WindACNum).DXCoilName,
                                                              state.dataWindowAC->WindAC(WindACNum).DXCoilType,
                                                              state.dataWindowAC->WindAC(WindACNum).FanName,
                                                              DataAirSystems::objectVectorOOFanSystemModel,
                                                              state.dataWindowAC->WindAC(WindACNum).FanIndex);
             } else {
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                              state.dataWindowAC->WindAC(WindACNum).DXCoilName,
                                                              state.dataWindowAC->WindAC(WindACNum).DXCoilType,
                                                              state.dataWindowAC->WindAC(WindACNum).FanName,

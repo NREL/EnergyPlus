@@ -169,7 +169,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PollutionModule::clear_state();
     Psychrometrics::clear_state();
     PVWatts::clear_state();
-    clearCoilSelectionReportObj(); // ReportCoilSelection
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelUserTempPattern::clear_state();
     ScheduleManager::clear_state();

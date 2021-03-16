@@ -248,7 +248,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataEnvrn->OutDryBulbTemp = 5.0;
     OutputReportPredefined::SetPredefinedTables(*state);
     Psychrometrics::InitializePsychRoutines();
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
 
     int UnitNum = 1;
     bool FirstHVACIteration = true;
