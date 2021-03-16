@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
 
     Psychrometrics::InitializePsychRoutines();
@@ -464,7 +464,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
@@ -2688,7 +2688,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);

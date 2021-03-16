@@ -7467,7 +7467,7 @@ namespace EnergyPlus::OutputReportTabular {
                 ort->gatherElecSurplusSold /= largeConversionFactor;
 
                 // get change in overall state of charge for electrical storage devices.
-                if (facilityElectricServiceObj->numElecStorageDevices > 0) {
+                if (state.dataElectPwrSvcMgr->facilityElectricServiceObj->numElecStorageDevices > 0) {
                     // All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not
                     // necessary OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum(
                     // ElecStorage.ThisTimeStepStateOfCharge() ) ) + gatherElecStorage;

@@ -7816,7 +7816,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
 
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
 
     SetPredefinedTables(*state);
 
@@ -9343,7 +9343,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     EXPECT_NEAR(1.0/enerConv, 948.0, 0.5);
 
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
 
     SetPredefinedTables(*state);
 

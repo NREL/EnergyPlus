@@ -135,7 +135,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DesiccantDehumidifiers::clear_state();
     DisplacementVentMgr::clear_state();
     DualDuct::clear_state();
-    clearFacilityElectricPowerServiceObject();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeFluidCoolers::clear_state();
     FaultsManager::clear_state();

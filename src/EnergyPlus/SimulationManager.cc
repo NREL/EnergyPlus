@@ -183,15 +183,8 @@ namespace SimulationManager {
         // simulation.  This includes the environment loop, a day loop, an
         // hour loop, and a time step loop.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-
         using BranchInputManager::ManageBranchInput;
         using BranchInputManager::TestBranchIntegrity;
         using BranchNodeConnections::CheckNodeConnections;
@@ -206,7 +199,6 @@ namespace SimulationManager {
         using EMSManager::CheckIfAnyEMS;
         using EMSManager::ManageEMS;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
-
         using HVACControllers::DumpAirLoopStatistics;
         using MixedAir::CheckControllerLists;
         using NodeInputManager::CheckMarkedNodes;
@@ -233,16 +225,6 @@ namespace SimulationManager {
         using Psychrometrics::InitializePsychRoutines;
         using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
 
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool Available; // an environment is available to process
         bool ErrorsFound(false);
@@ -252,7 +234,6 @@ namespace SimulationManager {
         bool oneTimeUnderwaterBoundaryCheck = true;
         bool AnyUnderwaterBoundaries = false;
         int EnvCount;
-
 
         state.files.outputControl.getInput(state);
         state.dataResultsFramework->resultsFramework->setupOutputOptions(state);
@@ -267,7 +248,6 @@ namespace SimulationManager {
             sqlite->createSQLiteSimulationsRecord(1, DataStringGlobals::VerString, DataStringGlobals::CurrentDateTime);
             sqlite->sqliteCommit();
         }
-
 
         PostIPProcessing(state);
 
@@ -297,7 +277,7 @@ namespace SimulationManager {
         CheckIfAnySlabs(state);
         CheckIfAnyBasements(state);
         CheckIfAnyIdealCondEntSetPoint(state);
-        createFacilityElectricPowerServiceObject();
+        createFacilityElectricPowerServiceObject(state);
         createCoilSelectionReportObj();
 
         ManageBranchInput(state); // just gets input and returns.
@@ -373,7 +353,7 @@ namespace SimulationManager {
             }
             UpdateMeterReporting(state);
             CheckPollutionMeterReporting(state);
-            facilityElectricServiceObj->verifyCustomMetersElecPowerMgr(state);
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->verifyCustomMetersElecPowerMgr(state);
             SetupPollutionCalculations(state);
             InitDemandManagers(state);
             TestBranchIntegrity(state, ErrFound);

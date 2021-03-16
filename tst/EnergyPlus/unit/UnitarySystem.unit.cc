@@ -2699,8 +2699,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     bool const ZoneEquipment = true;
     Real64 sensOut = 0.0;
     Real64 latOut = 0.0;
-    
-    // this setup is a continuous fan cycling coil op mode 
+
+    // this setup is a continuous fan cycling coil op mode
     thisSys->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
 
     thisSys->simulate(*state,
@@ -7665,7 +7665,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
     SimulationManager::GetProjectData(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(*state);
@@ -9409,7 +9409,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
     SimulationManager::GetProjectData(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(*state);
@@ -11346,7 +11346,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
     SimulationManager::GetProjectData(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->DoingSizing = true;
