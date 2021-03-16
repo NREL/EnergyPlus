@@ -88,7 +88,7 @@ namespace AirflowNetwork {
 
         void allocate(EnergyPlusData &state);
         void initialize(EnergyPlusData &state);
-        void setsky();
+        void setsky(EnergyPlusData &state);
         void airmov(EnergyPlusData &state);
         void solvzp(EnergyPlusData &state, int &ITER);  // number of iterations
         void filjac(EnergyPlusData &state,
@@ -238,7 +238,8 @@ namespace AirflowNetwork {
                 std::ostream &UOUT        // Output file
     );
 
-    void PresProfile(int const il,                  // Linkage number
+    void PresProfile(EnergyPlusData &state,
+                     int const il,                  // Linkage number
                      int const Pprof,               // Opening number
                      Real64 const G,                // gravitation field strength [N/kg]
                      const Array1D<Real64> &DpF,    // Stack pressures at start heights of Layers

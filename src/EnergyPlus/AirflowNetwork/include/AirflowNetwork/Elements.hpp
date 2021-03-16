@@ -1652,48 +1652,6 @@ namespace AirflowNetwork {
 
     // Object Data
 
-    extern AirflowNetworkSimuProp AirflowNetworkSimu;
-    // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
-                            // field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration |
-                            // Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit |
-                            // Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along
-                            // Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening
-                            // error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large
-                            // opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag
-                            // type
-    extern Array1D<AirflowNetworkNodeProp> AirflowNetworkNodeData;
-    extern Array1D<AirflowNetworkCompProp> AirflowNetworkCompData;
-    extern Array1D<AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
-    extern Array1D<MultizoneZoneProp> MultizoneZoneData;
-    extern Array1D<MultizoneSurfaceProp> MultizoneSurfaceData;
-    extern Array1D<DetailedOpening> MultizoneCompDetOpeningData;
-    extern Array1D<SimpleOpening> MultizoneCompSimpleOpeningData;
-    extern Array1D<HorizontalOpening> MultizoneCompHorOpeningData;
-    extern Array1D<SurfaceCrack> MultizoneSurfaceCrackData;
-    extern Array1D<EffectiveLeakageArea> MultizoneSurfaceELAData;
-    extern Array1D<MultizoneExternalNodeProp> MultizoneExternalNodeData;
-    extern Array1D<DeltaCpProp> DeltaCp;
-    extern Array1D<DeltaCpProp> EPDeltaCP;
-    extern Array1D<ZoneExhaustFan> MultizoneCompExhaustFanData;
-    extern Array1D<IntraZoneNodeProp> IntraZoneNodeData;       // Intra zone data set
-    extern Array1D<IntraZoneLinkageProp> IntraZoneLinkageData; // Intra zone linkage adat set
-    extern Array1D<DisSysNodeProp> DisSysNodeData;
-    extern Array1D<DuctLeak> DisSysCompLeakData;
-    extern Array1D<EffectiveLeakageRatio> DisSysCompELRData;
-    extern Array1D<Duct> DisSysCompDuctData;
-    extern Array1D<Damper> DisSysCompDamperData;
-    extern Array1D<ConstantVolumeFan> DisSysCompCVFData;
-    extern Array1D<DetailedFan> DisSysCompDetFanData;
-    extern Array1D<DisSysCompCoilProp> DisSysCompCoilData;
-    extern Array1D<DisSysCompHXProp> DisSysCompHXData;
-    extern Array1D<DisSysCompTermUnitProp> DisSysCompTermUnitData;
-    extern Array1D<ConstantPressureDrop> DisSysCompCPDData;
-    extern Array1D<AiflowNetworkReportProp> AirflowNetworkReportData;
-    extern Array1D<PressureControllerProp> PressureControllerData;
-    extern Array1D<OutdoorAirFan> DisSysCompOutdoorAirData;
-    extern Array1D<ReliefFlow> DisSysCompReliefAirData;
-    extern Array1D<AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
-
     void clear_state();
 
 } // namespace AirflowNetwork
@@ -1703,10 +1661,86 @@ struct AirflowNetworkData : BaseGlobalStruct {
     Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
 
+    AirflowNetwork::AirflowNetworkSimuProp AirflowNetworkSimu;
+    // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
+    // field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration |
+    // Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit |
+    // Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along
+    // Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening
+    // error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large
+    // opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag
+    // type
+    Array1D<AirflowNetwork::AirflowNetworkNodeProp> AirflowNetworkNodeData;
+    Array1D<AirflowNetwork::AirflowNetworkCompProp> AirflowNetworkCompData;
+    Array1D<AirflowNetwork::AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
+    Array1D<AirflowNetwork::MultizoneZoneProp> MultizoneZoneData;
+    Array1D<AirflowNetwork::MultizoneSurfaceProp> MultizoneSurfaceData;
+    Array1D<AirflowNetwork::DetailedOpening> MultizoneCompDetOpeningData;
+    Array1D<AirflowNetwork::SimpleOpening> MultizoneCompSimpleOpeningData;
+    Array1D<AirflowNetwork::HorizontalOpening> MultizoneCompHorOpeningData;
+    Array1D<AirflowNetwork::SurfaceCrack> MultizoneSurfaceCrackData;
+    Array1D<AirflowNetwork::EffectiveLeakageArea> MultizoneSurfaceELAData;
+    Array1D<AirflowNetwork::MultizoneExternalNodeProp> MultizoneExternalNodeData;
+    Array1D<AirflowNetwork::DeltaCpProp> DeltaCp;
+    Array1D<AirflowNetwork::DeltaCpProp> EPDeltaCP;
+    Array1D<AirflowNetwork::ZoneExhaustFan> MultizoneCompExhaustFanData;
+    Array1D<AirflowNetwork::IntraZoneNodeProp> IntraZoneNodeData;       // Intra zone data set
+    Array1D<AirflowNetwork::IntraZoneLinkageProp> IntraZoneLinkageData; // Intra zone linkage adat set
+    Array1D<AirflowNetwork::DisSysNodeProp> DisSysNodeData;
+    Array1D<AirflowNetwork::DuctLeak> DisSysCompLeakData;
+    Array1D<AirflowNetwork::EffectiveLeakageRatio> DisSysCompELRData;
+    Array1D<AirflowNetwork::Duct> DisSysCompDuctData;
+    Array1D<AirflowNetwork::Damper> DisSysCompDamperData;
+    Array1D<AirflowNetwork::ConstantVolumeFan> DisSysCompCVFData;
+    Array1D<AirflowNetwork::DetailedFan> DisSysCompDetFanData;
+    Array1D<AirflowNetwork::DisSysCompCoilProp> DisSysCompCoilData;
+    Array1D<AirflowNetwork::DisSysCompHXProp> DisSysCompHXData;
+    Array1D<AirflowNetwork::DisSysCompTermUnitProp> DisSysCompTermUnitData;
+    Array1D<AirflowNetwork::ConstantPressureDrop> DisSysCompCPDData;
+    Array1D<AirflowNetwork::AiflowNetworkReportProp> AirflowNetworkReportData;
+    Array1D<AirflowNetwork::PressureControllerProp> PressureControllerData;
+    Array1D<AirflowNetwork::OutdoorAirFan> DisSysCompOutdoorAirData;
+    Array1D<AirflowNetwork::ReliefFlow> DisSysCompReliefAirData;
+    Array1D<AirflowNetwork::AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
+
     void clear_state() override
     {
         AirflowNetworkNodeSimu.clear();
         AirflowNetworkLinkSimu.clear();
+
+        AirflowNetworkSimu = AirflowNetwork::AirflowNetworkSimuProp();
+        AirflowNetworkNodeData.clear();
+        AirflowNetworkCompData.clear();
+        AirflowNetworkLinkageData.clear();
+        MultizoneZoneData.clear();
+        MultizoneSurfaceData.clear();
+        MultizoneCompDetOpeningData.clear();
+        MultizoneCompSimpleOpeningData.clear();
+        MultizoneCompHorOpeningData.clear();
+        MultizoneSurfaceCrackData.clear();
+        MultizoneSurfaceELAData.clear();
+        MultizoneExternalNodeData.clear();
+        DeltaCp.clear();
+        EPDeltaCP.clear();
+        MultizoneCompExhaustFanData.clear();
+        IntraZoneNodeData.clear();       // Intra zone data set
+        IntraZoneLinkageData.clear(); // Intra zone linkage adat set
+        DisSysNodeData.clear();
+        DisSysCompLeakData.clear();
+        DisSysCompELRData.clear();
+        DisSysCompDuctData.clear();
+        DisSysCompDamperData.clear();
+        DisSysCompCVFData.clear();
+        DisSysCompDetFanData.clear();
+        DisSysCompCoilData.clear();
+        DisSysCompHXData.clear();
+        DisSysCompTermUnitData.clear();
+        DisSysCompCPDData.clear();
+        AirflowNetworkReportData.clear();
+        PressureControllerData.clear();
+        DisSysCompOutdoorAirData.clear();
+        DisSysCompReliefAirData.clear();
+        AirflowNetworkLinkageViewFactorData.clear();
     }
 };
 

@@ -12802,45 +12802,45 @@ namespace EnergyPlus::OutputReportTabular {
                     ((state.dataHeatBal->ZnAirRpt(iZone).InfilHeatGain - state.dataHeatBal->ZnAirRpt(iZone).InfilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     ort->infilInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiSenGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiSenLossW); // air flow network
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneInfiSenGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneInfiSenLossW); // air flow network
                 }
                 ort->infilLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     ((state.dataHeatBal->ZnAirRpt(iZone).InfilLatentGain - state.dataHeatBal->ZnAirRpt(iZone).InfilLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     ort->infilLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiLatGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiLatLossW); // air flow network
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneInfiLatGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneInfiLatLossW); // air flow network
                 }
 
                 ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     ((state.dataHeatBal->ZnAirRpt(iZone).VentilHeatGain - state.dataHeatBal->ZnAirRpt(iZone).VentilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenLossW); // air flow network
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneVentSenGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneVentSenLossW); // air flow network
                 }
                 ort->zoneVentLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     ((state.dataHeatBal->ZnAirRpt(iZone).VentilLatentGain - state.dataHeatBal->ZnAirRpt(iZone).VentilLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentLatGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentLatLossW); // air flow network
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneVentLatGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneVentLatLossW); // air flow network
                 }
 
                 ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     ((state.dataHeatBal->ZnAirRpt(iZone).MixHeatGain - state.dataHeatBal->ZnAirRpt(iZone).MixHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixSenGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixSenLossW); // air flow network
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneMixSenGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneMixSenLossW); // air flow network
                 }
                 ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     ((state.dataHeatBal->ZnAirRpt(iZone).MixLatentGain - state.dataHeatBal->ZnAirRpt(iZone).MixLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixLatGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixLatLossW); // air flow network
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneMixLatGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(iZone).MultiZoneMixLatLossW); // air flow network
                 }
             }
         }

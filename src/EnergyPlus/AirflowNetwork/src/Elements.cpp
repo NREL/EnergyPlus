@@ -143,40 +143,7 @@ namespace AirflowNetwork {
     //Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
     //Array1D<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
     //Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
-    AirflowNetworkSimuProp AirflowNetworkSimu;
-    Array1D<AirflowNetworkNodeProp> AirflowNetworkNodeData;
-    Array1D<AirflowNetworkCompProp> AirflowNetworkCompData;
-    Array1D<AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
-    Array1D<MultizoneZoneProp> MultizoneZoneData;
-    Array1D<MultizoneSurfaceProp> MultizoneSurfaceData;
-    Array1D<DetailedOpening> MultizoneCompDetOpeningData;
-    Array1D<SimpleOpening> MultizoneCompSimpleOpeningData;
-    Array1D<HorizontalOpening> MultizoneCompHorOpeningData;
     // Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
-    Array1D<SurfaceCrack> MultizoneSurfaceCrackData;
-    Array1D<EffectiveLeakageArea> MultizoneSurfaceELAData;
-    Array1D<MultizoneExternalNodeProp> MultizoneExternalNodeData;
-    Array1D<DeltaCpProp> DeltaCp;
-    Array1D<DeltaCpProp> EPDeltaCP;
-    Array1D<ZoneExhaustFan> MultizoneCompExhaustFanData;
-    Array1D<IntraZoneNodeProp> IntraZoneNodeData;
-    Array1D<IntraZoneLinkageProp> IntraZoneLinkageData;
-    Array1D<DisSysNodeProp> DisSysNodeData;
-    Array1D<DuctLeak> DisSysCompLeakData;
-    Array1D<EffectiveLeakageRatio> DisSysCompELRData;
-    Array1D<Duct> DisSysCompDuctData;
-    Array1D<Damper> DisSysCompDamperData;
-    Array1D<ConstantVolumeFan> DisSysCompCVFData;
-    Array1D<DetailedFan> DisSysCompDetFanData;
-    Array1D<DisSysCompCoilProp> DisSysCompCoilData;
-    Array1D<DisSysCompHXProp> DisSysCompHXData;
-    Array1D<DisSysCompTermUnitProp> DisSysCompTermUnitData;
-    Array1D<ConstantPressureDrop> DisSysCompCPDData;
-    Array1D<AiflowNetworkReportProp> AirflowNetworkReportData;
-    Array1D<PressureControllerProp> PressureControllerData;
-    Array1D<OutdoorAirFan> DisSysCompOutdoorAirData;
-    Array1D<ReliefFlow> DisSysCompReliefAirData;
-    Array1D<AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
 
     static Real64 square(Real64 x)
     {
@@ -239,7 +206,7 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
 
-        // CompNum = AirflowNetworkCompData(j).TypeNum;
+        // CompNum = state.dataAirflowNetwork->AirflowNetworkCompData(j).TypeNum;
         ed = roughness / hydraulicDiameter;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
@@ -391,7 +358,7 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
 
-        // CompNum = AirflowNetworkCompData(j).TypeNum;
+        // CompNum = state.dataAirflowNetwork->AirflowNetworkCompData(j).TypeNum;
         ed = roughness / hydraulicDiameter;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
@@ -529,9 +496,9 @@ namespace AirflowNetwork {
         if (i > NetworkNumOfLinks - NumOfLinksIntraZone) {
             Corr = 1.0;
         } else {
-            Corr = MultizoneSurfaceData(i).Factor;
+            Corr = state.dataAirflowNetwork->MultizoneSurfaceData(i).Factor;
         }
-        // CompNum = AirflowNetworkCompData(j).TypeNum;
+        // CompNum = state.dataAirflowNetwork->AirflowNetworkCompData(j).TypeNum;
         RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
         VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
@@ -646,9 +613,9 @@ namespace AirflowNetwork {
         //if (i > NetworkNumOfLinks - NumOfLinksIntraZone) {
         //    Corr = 1.0;
         //} else {
-        //    Corr = MultizoneSurfaceData(i).Factor;
+        //    Corr = state.dataAirflowNetwork->MultizoneSurfaceData(i).Factor;
         //}
-        // CompNum = AirflowNetworkCompData(j).TypeNum;
+        // CompNum = state.dataAirflowNetwork->AirflowNetworkCompData(j).TypeNum;
         RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
         VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
@@ -934,7 +901,7 @@ namespace AirflowNetwork {
         int NF(1);
 
 
-        int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+        int AirLoopNum = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).AirLoopNum;
 
         if (FanTypeNum == FanType_SimpleOnOff) {
             if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataLoopNodes->Node(InletNode).MassFlowRate == 0.0) {
@@ -964,19 +931,19 @@ namespace AirflowNetwork {
             SumTermFlow = 0.0;
             SumFracSuppLeak = 0.0;
             for (k = 1; k <= NetworkNumOfLinks; ++k) {
-                if (AirflowNetworkLinkageData(k).VAVTermDamper && AirflowNetworkLinkageData(k).AirLoopNum == AirLoopNum) {
-                    k1 = AirflowNetworkNodeData(AirflowNetworkLinkageData(k).NodeNums[0]).EPlusNodeNum;
+                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(k).VAVTermDamper && state.dataAirflowNetwork->AirflowNetworkLinkageData(k).AirLoopNum == AirLoopNum) {
+                    k1 = state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[0]).EPlusNodeNum;
                     if (state.dataLoopNodes->Node(k1).MassFlowRate > 0.0) {
                         SumTermFlow += state.dataLoopNodes->Node(k1).MassFlowRate;
                     }
                 }
-                if (AirflowNetworkCompData(AirflowNetworkLinkageData(k).CompNum).CompTypeNum == iComponentTypeNum::ELR) {
+                if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).CompNum).CompTypeNum == iComponentTypeNum::ELR) {
                     // Calculate supply leak sensible losses
-                    Node1 = AirflowNetworkLinkageData(k).NodeNums[0];
-                    Node2 = AirflowNetworkLinkageData(k).NodeNums[1];
-                    if ((AirflowNetworkNodeData(Node2).EPlusZoneNum > 0) && (AirflowNetworkNodeData(Node1).EPlusNodeNum == 0) &&
-                        (AirflowNetworkNodeData(Node1).AirLoopNum == AirLoopNum)) {
-                        SumFracSuppLeak += DisSysCompELRData(AirflowNetworkCompData(AirflowNetworkLinkageData(k).CompNum).TypeNum).ELR;
+                    Node1 = state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[0];
+                    Node2 = state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[1];
+                    if ((state.dataAirflowNetwork->AirflowNetworkNodeData(Node2).EPlusZoneNum > 0) && (state.dataAirflowNetwork->AirflowNetworkNodeData(Node1).EPlusNodeNum == 0) &&
+                        (state.dataAirflowNetwork->AirflowNetworkNodeData(Node1).AirLoopNum == AirLoopNum)) {
+                        SumFracSuppLeak += state.dataAirflowNetwork->DisSysCompELRData(state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).CompNum).TypeNum).ELR;
                     }
                 }
             }
@@ -1661,10 +1628,10 @@ namespace AirflowNetwork {
 
         // Get component properties
         DifLim = 1.0e-4;
-        Width = MultizoneSurfaceData(IL).Width;
-        Height = MultizoneSurfaceData(IL).Height;
-        Fact = MultizoneSurfaceData(IL).OpenFactor;
-        Loc = (AirflowNetworkLinkageData(IL).DetOpenNum - 1) * (NrInt + 2);
+        Width = state.dataAirflowNetwork->MultizoneSurfaceData(IL).Width;
+        Height = state.dataAirflowNetwork->MultizoneSurfaceData(IL).Height;
+        Fact = state.dataAirflowNetwork->MultizoneSurfaceData(IL).OpenFactor;
+        Loc = (state.dataAirflowNetwork->AirflowNetworkLinkageData(IL).DetOpenNum - 1) * (NrInt + 2);
         iNum = NumFac;
         ActCD = 0.0;
 
@@ -1723,12 +1690,12 @@ namespace AirflowNetwork {
 
         // Get opening data based on the opening factor
         if (Fact == 0) {
-            ActLw = MultizoneSurfaceData(IL).Width;
-            ActLh = MultizoneSurfaceData(IL).Height;
+            ActLw = state.dataAirflowNetwork->MultizoneSurfaceData(IL).Width;
+            ActLh = state.dataAirflowNetwork->MultizoneSurfaceData(IL).Height;
             Cfact = 0.0;
         } else {
-            ActLw = MultizoneSurfaceData(IL).Width * WFact;
-            ActLh = MultizoneSurfaceData(IL).Height * HFact;
+            ActLw = state.dataAirflowNetwork->MultizoneSurfaceData(IL).Width * WFact;
+            ActLh = state.dataAirflowNetwork->MultizoneSurfaceData(IL).Height * HFact;
             ActCD = Cfact;
         }
 
@@ -1741,15 +1708,15 @@ namespace AirflowNetwork {
         } else if (Type == 2) {
             Lextra = 0.0;
             Axishght = LVOValue;
-            ActLw = MultizoneSurfaceData(IL).Width;
-            ActLh = MultizoneSurfaceData(IL).Height;
+            ActLw = state.dataAirflowNetwork->MultizoneSurfaceData(IL).Width;
+            ActLh = state.dataAirflowNetwork->MultizoneSurfaceData(IL).Height;
         }
 
         // Add window multiplier with window close
-        if (MultizoneSurfaceData(IL).Multiplier > 1.0) Cs *= MultizoneSurfaceData(IL).Multiplier;
+        if (state.dataAirflowNetwork->MultizoneSurfaceData(IL).Multiplier > 1.0) Cs *= state.dataAirflowNetwork->MultizoneSurfaceData(IL).Multiplier;
         // Add window multiplier with window open
         if (Fact > 0.0) {
-            if (MultizoneSurfaceData(IL).Multiplier > 1.0) ActLw *= MultizoneSurfaceData(IL).Multiplier;
+            if (state.dataAirflowNetwork->MultizoneSurfaceData(IL).Multiplier > 1.0) ActLw *= state.dataAirflowNetwork->MultizoneSurfaceData(IL).Multiplier;
         }
 
         // Add recurring warnings
@@ -2064,14 +2031,14 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_903("(A5,3I3,4E16.7)");
 
 
-        Width = MultizoneSurfaceData(i).Width;
-        Height = MultizoneSurfaceData(i).Height;
+        Width = state.dataAirflowNetwork->MultizoneSurfaceData(i).Width;
+        Height = state.dataAirflowNetwork->MultizoneSurfaceData(i).Height;
         coeff = FlowCoef * 2.0 * (Width + Height);
-        OpenFactor = MultizoneSurfaceData(i).OpenFactor;
+        OpenFactor = state.dataAirflowNetwork->MultizoneSurfaceData(i).OpenFactor;
         if (OpenFactor > 0.0) {
             Width *= OpenFactor;
-            if (state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).Tilt < 90.0) {
-                Height *= state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SinTilt;
+            if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).Tilt < 90.0) {
+                Height *= state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).SinTilt;
             }
         }
 
@@ -2082,10 +2049,10 @@ namespace AirflowNetwork {
         }
 
         // Add window multiplier with window close
-        if (MultizoneSurfaceData(i).Multiplier > 1.0) coeff *= MultizoneSurfaceData(i).Multiplier;
+        if (state.dataAirflowNetwork->MultizoneSurfaceData(i).Multiplier > 1.0) coeff *= state.dataAirflowNetwork->MultizoneSurfaceData(i).Multiplier;
         // Add window multiplier with window open
         if (OpenFactor > 0.0) {
-            if (MultizoneSurfaceData(i).Multiplier > 1.0) Width *= MultizoneSurfaceData(i).Multiplier;
+            if (state.dataAirflowNetwork->MultizoneSurfaceData(i).Multiplier > 1.0) Width *= state.dataAirflowNetwork->MultizoneSurfaceData(i).Multiplier;
         }
 
         DRHO = propN.density - propM.density;
@@ -2187,8 +2154,8 @@ namespace AirflowNetwork {
         Real64 Co;
         int k;
 
-        int n = AirflowNetworkLinkageData(i).NodeNums[0];
-        int m = AirflowNetworkLinkageData(i).NodeNums[1];
+        int n = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0];
+        int m = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1];
 
 
         // Get component properties
@@ -2200,7 +2167,7 @@ namespace AirflowNetwork {
             DF[0] = 0.5 * F[0] / DP;
         } else {
             for (k = 1; k <= NetworkNumOfLinks; ++k) {
-                if (AirflowNetworkLinkageData(k).NodeNums[1] == n) {
+                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[1] == n) {
                     F[0] = solver.AFLOW(k);
                     break;
                 }
@@ -2847,7 +2814,7 @@ namespace AirflowNetwork {
             }
         }
         // If damper, setup the airflows from nodal values calculated from terminal
-        if (AirflowNetworkLinkageData(i).VAVTermDamper) {
+        if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).VAVTermDamper) {
             F[0] = state.dataLoopNodes->Node(DamperInletNode).MassFlowRate;
             if (VAVTerminalRatio > 0.0) {
                 F[0] *= VAVTerminalRatio;
@@ -3206,7 +3173,7 @@ namespace AirflowNetwork {
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
-            Corr = MultizoneSurfaceData(i).Factor;
+            Corr = state.dataAirflowNetwork->MultizoneSurfaceData(i).Factor;
             RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
@@ -3441,9 +3408,9 @@ namespace AirflowNetwork {
 
         // Get information on the horizontal opening
         RhozAver = (propN.density + propM.density) / 2.0;
-        Width = MultizoneSurfaceData(i).Width;
-        Height = MultizoneSurfaceData(i).Height;
-        Fact = MultizoneSurfaceData(i).OpenFactor;
+        Width = state.dataAirflowNetwork->MultizoneSurfaceData(i).Width;
+        Height = state.dataAirflowNetwork->MultizoneSurfaceData(i).Height;
+        Fact = state.dataAirflowNetwork->MultizoneSurfaceData(i).OpenFactor;
         expn = FlowExpo;
         coef = FlowCoef;
         // Slope = MultizoneCompHorOpeningData(CompNum).Slope;
@@ -3464,7 +3431,7 @@ namespace AirflowNetwork {
         BuoFlow = 0.0;
         dPBuoFlow = 0.0;
 
-        if (AirflowNetworkLinkageData(i).NodeHeights[0] > AirflowNetworkLinkageData(i).NodeHeights[1]) {
+        if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0] > state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1]) {
             // Node N is upper zone
             if (propN.density > propM.density) {
                 BuoFlowMax = RhozAver * 0.055 * std::sqrt(9.81 * std::abs(propN.density - propM.density) * pow_5(DH) / RhozAver);
@@ -3557,7 +3524,7 @@ namespace AirflowNetwork {
         Real64 FT;
 
 
-        int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+        int AirLoopNum = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).AirLoopNum;
 
         if (state.dataLoopNodes->Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
@@ -3674,7 +3641,7 @@ namespace AirflowNetwork {
         Real64 FT;
 
 
-        int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+        int AirLoopNum = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).AirLoopNum;
 
         if (state.dataLoopNodes->Node(OutletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
@@ -3790,36 +3757,6 @@ namespace AirflowNetwork {
         //AirflowNetworkLinkReport.deallocate();
         //AirflowNetworkNodeReport.deallocate();
         //AirflowNetworkLinkReport1.deallocate();
-        AirflowNetworkSimu = AirflowNetworkSimuProp();
-        AirflowNetworkNodeData.deallocate();
-        AirflowNetworkCompData.deallocate();
-        AirflowNetworkLinkageData.deallocate();
-        MultizoneZoneData.deallocate();
-        MultizoneSurfaceData.deallocate();
-        MultizoneCompDetOpeningData.deallocate();
-        MultizoneCompSimpleOpeningData.deallocate();
-        MultizoneCompHorOpeningData.deallocate();
-        MultizoneSurfaceCrackData.deallocate();
-        MultizoneSurfaceELAData.deallocate();
-        MultizoneExternalNodeData.deallocate();
-        DeltaCp.deallocate();
-        EPDeltaCP.deallocate();
-        MultizoneCompExhaustFanData.deallocate();
-        IntraZoneNodeData.deallocate();
-        IntraZoneLinkageData.deallocate();
-        DisSysNodeData.deallocate();
-        DisSysCompLeakData.deallocate();
-        DisSysCompELRData.deallocate();
-        DisSysCompDuctData.deallocate();
-        DisSysCompDamperData.deallocate();
-        DisSysCompCVFData.deallocate();
-        DisSysCompDetFanData.deallocate();
-        DisSysCompCoilData.deallocate();
-        DisSysCompHXData.deallocate();
-        DisSysCompTermUnitData.deallocate();
-        DisSysCompCPDData.deallocate();
-        AirflowNetworkReportData.deallocate();
-        AirflowNetworkLinkageViewFactorData.deallocate();
         lowerLimitErrIdx = 0;
         upperLimitErrIdx = 0;
     }

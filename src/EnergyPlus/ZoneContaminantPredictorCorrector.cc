@@ -384,7 +384,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
 
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum =
-                UtilityRoutines::FindItemInList(AlphaName(2), AirflowNetwork::MultizoneSurfaceData, &AirflowNetwork::MultizoneSurfaceProp::SurfName);
+                UtilityRoutines::FindItemInList(AlphaName(2), state.dataAirflowNetwork->MultizoneSurfaceData, &AirflowNetwork::MultizoneSurfaceProp::SurfName);
             if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum == 0) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
@@ -393,7 +393,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             }
             // Ensure external surface
             if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum > 0 &&
-                state.dataSurface->Surface(AirflowNetwork::MultizoneSurfaceData(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum).SurfNum).ExtBoundCond != ExternalEnvironment) {
+                state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum).SurfNum).ExtBoundCond != ExternalEnvironment) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + ". The entered surface (" + AlphaName(2) +
                                 ") is not an exterior surface");
                 ErrorsFound = true;
@@ -458,7 +458,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                                 state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name);
 
             if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum > 0) {
-                ZonePtr = state.dataSurface->Surface(AirflowNetwork::MultizoneSurfaceData(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum).SurfNum).Zone;
+                ZonePtr = state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum).SurfNum).Zone;
             } else {
                 ZonePtr = 0;
             }
@@ -1540,8 +1540,8 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven; ++Loop) {
                     SurfNum = state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum;
-                    Pi = state.dataAirflowNetwork->AirflowNetworkNodeSimu(AirflowNetwork::MultizoneSurfaceData(SurfNum).NodeNums[0]).PZ;
-                    Pj = state.dataAirflowNetwork->AirflowNetworkNodeSimu(AirflowNetwork::MultizoneSurfaceData(SurfNum).NodeNums[1]).PZ;
+                    Pi = state.dataAirflowNetwork->AirflowNetworkNodeSimu(state.dataAirflowNetwork->MultizoneSurfaceData(SurfNum).NodeNums[0]).PZ;
+                    Pj = state.dataAirflowNetwork->AirflowNetworkNodeSimu(state.dataAirflowNetwork->MultizoneSurfaceData(SurfNum).NodeNums[1]).PZ;
                     if (Pj >= Pi) {
                         GCGain = state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoef *
                                  GetCurrentScheduleValue(state, state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr) *
