@@ -106,9 +106,6 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
     // Using/Aliasing
     using namespace DataHeatBalance;
     using namespace DataMoistureBalanceEMPD;
-    using DataMoistureBalance::HConvInFD;
-    using DataMoistureBalance::HMassConvInFD;
-    using DataMoistureBalance::RhoVaporAirIn;
 
     Real64 CalcDepthFromPeriod(EnergyPlusData &state,
                                Real64 const period,          // in seconds
@@ -465,8 +462,8 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         auto const &surface(state.dataSurface->Surface(SurfNum));                 // input
         auto &rv_surface(state.dataMstBalEMPD->RVSurface(SurfNum));                  // output
         auto const &rv_surface_old(state.dataMstBalEMPD->RVSurfaceOld(SurfNum));     // input
-        auto const &h_mass_conv_in_fd(HMassConvInFD(SurfNum)); // input
-        auto const &rho_vapor_air_in(RhoVaporAirIn(SurfNum));  // input
+        auto const &h_mass_conv_in_fd(state.dataMstBal->HMassConvInFD(SurfNum)); // input
+        auto const &rho_vapor_air_in(state.dataMstBal->RhoVaporAirIn(SurfNum));  // input
         Real64 RHZone;
         Real64 mass_flux_surf_deep;
         Real64 mass_flux_surf_deep_max;

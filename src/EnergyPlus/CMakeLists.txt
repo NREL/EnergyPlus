@@ -189,7 +189,6 @@ set(SRC
     DataIPShortCuts.cc
     DataIPShortCuts.hh
     DataLoopNode.hh
-    DataMoistureBalance.cc
     DataMoistureBalance.hh
     DataMoistureBalanceEMPD.hh
     DataOutputs.cc

@@ -766,9 +766,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBal->HConvIn(4) = 0.5;
     state->dataHeatBal->HConvIn(5) = 0.5;
     state->dataHeatBal->HConvIn(6) = 0.5;
-    DataMoistureBalance::HConvInFD.allocate(6);
-    DataMoistureBalance::RhoVaporAirIn.allocate(6);
-    DataMoistureBalance::HMassConvInFD.allocate(6);
+    state->dataMstBal->HConvInFD.allocate(6);
+    state->dataMstBal->RhoVaporAirIn.allocate(6);
+    state->dataMstBal->HMassConvInFD.allocate(6);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -803,9 +803,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBal->TempEffBulkAir.deallocate();
     DataHeatBalSurface::TH.deallocate();
     state->dataHeatBal->HConvIn.deallocate();
-    DataMoistureBalance::HConvInFD.deallocate();
-    DataMoistureBalance::RhoVaporAirIn.deallocate();
-    DataMoistureBalance::HMassConvInFD.deallocate();
+    state->dataMstBal->HConvInFD.deallocate();
+    state->dataMstBal->RhoVaporAirIn.deallocate();
+    state->dataMstBal->HMassConvInFD.deallocate();
     state->dataHeatBalFanSys->ZoneLatentGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
@@ -1302,9 +1302,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataHeatBal->HConvIn(4) = 0.5;
     state->dataHeatBal->HConvIn(5) = 0.5;
     state->dataHeatBal->HConvIn(6) = 0.5;
-    DataMoistureBalance::HConvInFD.allocate(6);
-    DataMoistureBalance::RhoVaporAirIn.allocate(6);
-    DataMoistureBalance::HMassConvInFD.allocate(6);
+    state->dataMstBal->HConvInFD.allocate(6);
+    state->dataMstBal->RhoVaporAirIn.allocate(6);
+    state->dataMstBal->HMassConvInFD.allocate(6);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -1871,9 +1871,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataHeatBal->HConvIn(4) = 0.5;
     state->dataHeatBal->HConvIn(5) = 0.5;
     state->dataHeatBal->HConvIn(6) = 0.5;
-    DataMoistureBalance::HConvInFD.allocate(6);
-    DataMoistureBalance::RhoVaporAirIn.allocate(6);
-    DataMoistureBalance::HMassConvInFD.allocate(6);
+    state->dataMstBal->HConvInFD.allocate(6);
+    state->dataMstBal->RhoVaporAirIn.allocate(6);
+    state->dataMstBal->HMassConvInFD.allocate(6);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -2436,9 +2436,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBal->HConvIn(4) = 0.5;
     state->dataHeatBal->HConvIn(5) = 0.5;
     state->dataHeatBal->HConvIn(6) = 0.5;
-    DataMoistureBalance::HConvInFD.allocate(6);
-    DataMoistureBalance::RhoVaporAirIn.allocate(6);
-    DataMoistureBalance::HMassConvInFD.allocate(6);
+    state->dataMstBal->HConvInFD.allocate(6);
+    state->dataMstBal->RhoVaporAirIn.allocate(6);
+    state->dataMstBal->HMassConvInFD.allocate(6);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -2475,9 +2475,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBal->TempEffBulkAir.deallocate();
     DataHeatBalSurface::TH.deallocate();
     state->dataHeatBal->HConvIn.deallocate();
-    DataMoistureBalance::HConvInFD.deallocate();
-    DataMoistureBalance::RhoVaporAirIn.deallocate();
-    DataMoistureBalance::HMassConvInFD.deallocate();
+    state->dataMstBal->HConvInFD.deallocate();
+    state->dataMstBal->RhoVaporAirIn.deallocate();
+    state->dataMstBal->HMassConvInFD.deallocate();
     state->dataHeatBalFanSys->ZoneLatentGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
@@ -3073,9 +3073,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
 
     DataHeatBalSurface::TH.allocate(2, 2, 6);
     state->dataHeatBal->HConvIn.allocate(6);
-    DataMoistureBalance::HConvInFD.allocate(6);
-    DataMoistureBalance::RhoVaporAirIn.allocate(6);
-    DataMoistureBalance::HMassConvInFD.allocate(6);
+    state->dataMstBal->HConvInFD.allocate(6);
+    state->dataMstBal->RhoVaporAirIn.allocate(6);
+    state->dataMstBal->HMassConvInFD.allocate(6);
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
