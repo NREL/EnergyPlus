@@ -198,7 +198,6 @@ set(SRC
     DataPhotovoltaics.hh
     DataPrecisionGlobals.hh
     DataReportingFlags.hh
-    DataRoomAirModel.cc
     DataRoomAirModel.hh
     DataRootFinder.hh
     DataRuntimeLanguage.cc
