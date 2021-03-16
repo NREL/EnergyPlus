@@ -72,7 +72,6 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
@@ -136,7 +135,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     FaultsManager::clear_state();
     FluidProperties::clear_state();
     Furnaces::clear_state();
-    General::clear_state();
     GroundTemperatureManager::clear_state();
     HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
