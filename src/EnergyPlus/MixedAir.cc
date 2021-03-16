@@ -2976,6 +2976,13 @@ namespace EnergyPlus::MixedAir {
                                         "Average",
                                         airloopName);
 
+                    SetupOutputVariable(state, "Air System Outdoor Air Limiting Factor",
+                                        OutputProcessor::Unit::W,
+                                        loopOAController.OALimitingFactor,
+                                        "System",
+                                        "Average",
+                                        airloopName);
+
                     SetupOutputVariable(state, "Air System Outdoor Air Flow Fraction",
                                         OutputProcessor::Unit::None,
                                         loopOAController.OAFractionRpt,
@@ -3377,6 +3384,8 @@ namespace EnergyPlus::MixedAir {
             AirLoopCyclingFan = false;
         }
 
+        this->OALimitingFactor = limitFactorNone; // oa controller limiting factor
+
         // Check for no flow
         if (this->MixMassFlow <= SmallMassFlow) {
 
@@ -3433,6 +3442,7 @@ namespace EnergyPlus::MixedAir {
             MinOASchedVal = GetCurrentScheduleValue(state, this->MinOASchPtr);
             MinOASchedVal = min(max(MinOASchedVal, 0.0), 1.0);
             OutAirMinFrac *= MinOASchedVal;
+            this->OALimitingFactor = limitFactorLimits;
         }
 
         // Get mechanical ventilation
@@ -3478,7 +3488,10 @@ namespace EnergyPlus::MixedAir {
                 }
             }
         }
-        OutAirMinFrac = max(OutAirMinFrac, MechVentOutsideAirMinFrac);
+        if (MechVentOutsideAirMinFrac > OutAirMinFrac) {
+            OutAirMinFrac = MechVentOutsideAirMinFrac;
+            this->OALimitingFactor = limitFactorDCV;
+        }
 
         OutAirMinFrac = min(max(OutAirMinFrac, 0.0), 1.0);
 
@@ -3515,14 +3528,21 @@ namespace EnergyPlus::MixedAir {
 
         // Do not allow OA to be below Exh for controller:outside air
         if (this->ControllerType_Num == iControllerType::ControllerOutsideAir) {
-            this->OAMassFlow = max(this->ExhMassFlow, this->OAMassFlow);
+            if (this->ExhMassFlow > this->OAMassFlow) {
+                this->OAMassFlow = this->ExhMassFlow;
+                this->OALimitingFactor = limitFactorExhaust;
+            }
         }
 
         // if fixed minimum, don't let go below min OA
         if (this->FixedMin) {
             // cycling fans allow "average" min OA to be below minimum
             if (!AirLoopCyclingFan) {
-                this->OAMassFlow = max(this->OAMassFlow, this->MinOAMassFlowRate * MinOASchedVal);
+                Real64 minOASchedMassFlowRate = this->MinOAMassFlowRate * MinOASchedVal;
+                if (minOASchedMassFlowRate > this->OAMassFlow) {
+                    this->OAMassFlow = minOASchedMassFlowRate;
+                    this->OALimitingFactor = limitFactorLimits;
+                }
             }
         }
 
@@ -3531,7 +3551,11 @@ namespace EnergyPlus::MixedAir {
             Real64 MinOAflowfracVal = GetCurrentScheduleValue(state, this->MinOAflowSchPtr);
             MinOAflowfracVal = min(max(MinOAflowfracVal, 0.0), 1.0);
             OutAirMinFrac = max(MinOAflowfracVal, OutAirMinFrac);
-            this->OAMassFlow = max(this->OAMassFlow, this->MixMassFlow * MinOAflowfracVal);
+            Real64 minOAFracMassFlowRate = this->MixMassFlow * MinOAflowfracVal;
+            if (minOAFracMassFlowRate > this->OAMassFlow) {
+                this->OAMassFlow = minOAFracMassFlowRate;
+                this->OALimitingFactor = limitFactorLimits;
+            }
         }
 
         // Apply Maximum Fraction of Outdoor Air Schedule
@@ -3541,26 +3565,43 @@ namespace EnergyPlus::MixedAir {
             MaxOAflowfracVal = min(max(MaxOAflowfracVal, 0.0), 1.0);
             currentMaxOAMassFlowRate = min(this->MaxOAMassFlowRate, this->MixMassFlow * MaxOAflowfracVal);
             OutAirMinFrac = min(MaxOAflowfracVal, OutAirMinFrac);
-            this->OAMassFlow = min(this->OAMassFlow, currentMaxOAMassFlowRate);
+            if (currentMaxOAMassFlowRate < this->OAMassFlow) {
+                this->OAMassFlow = currentMaxOAMassFlowRate;
+                this->OALimitingFactor = limitFactorLimits;
+            }
         }
 
         // Don't let the OA flow be > than the max OA limit. OA for high humidity control is allowed to be greater than max OA.
         // Night Ventilation has priority and may override an OASignal > 1 high humidity condition with OASignal = 1
         if (HighHumidityOperationFlag) {
-            this->OAMassFlow = min(this->OAMassFlow, this->MaxOAMassFlowRate * max(1.0, OASignal));
+            Real64 maxOAMassFlow = this->MaxOAMassFlowRate * max(1.0, OASignal);
+            if (maxOAMassFlow < this->OAMassFlow) {
+                this->OAMassFlow = maxOAMassFlow;
+                this->OALimitingFactor = limitFactorLimits;
+            }
         } else {
-            this->OAMassFlow = min(this->OAMassFlow, this->MaxOAMassFlowRate);
+            if (this->MaxOAMassFlowRate < this->OAMassFlow) {
+                this->OAMassFlow = this->MaxOAMassFlowRate;
+                this->OALimitingFactor = limitFactorLimits;
+            }
         }
 
-        if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate))
+        if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && (this->ManageDemand) &&
+            (this->OAMassFlow > this->DemandLimitFlowRate)) {
             this->OAMassFlow = this->DemandLimitFlowRate;
+            this->OALimitingFactor = limitFactorDemandLimit;
+        }
         if (this->EMSOverrideOARate) {
             this->OAMassFlow = this->EMSOARateValue;
+            this->OALimitingFactor = limitFactorEMS;
         }
 
         // Don't let OA flow be > mixed air flow.
         // Seems if RAB (return air bypass) that this should be don't let OA flow be > design supply flow but that causes other issues
-        this->OAMassFlow = min(this->OAMassFlow, this->MixMassFlow);
+        if (this->MixMassFlow < this->OAMassFlow) {
+            this->OAMassFlow = this->MixMassFlow;
+            this->OALimitingFactor = limitFactorMixedAir;
+        }
 
         // save the min outside air flow fraction and max outside air mass flow rate
         if (AirLoopNum > 0) {
@@ -4502,6 +4543,7 @@ namespace EnergyPlus::MixedAir {
             if (this->MixMassFlow > 0.0) {
                 //   calculate the actual ratio of outside air to mixed air so the magnitude of OA during high humidity control is correct
                 OASignal = max(OutAirMinFrac, (this->HighRHOAFlowRatio * this->MaxOAMassFlowRate / this->MixMassFlow));
+                this->OALimitingFactor = limitFactorHighHum;
             }
         }
 
@@ -4514,7 +4556,14 @@ namespace EnergyPlus::MixedAir {
             // OutAirMinFrac = MaximumOAFracBySetPoint;
             //    if (AirLoopNum > 0) AirLoopFlow(AirLoopNum).MinOutAir = OutAirMinFrac * this->MixMassFlow;
             //}
-            OASignal = max(min(MaximumOAFracBySetPoint, OASignal), OutAirMinFrac);
+            if (MaximumOAFracBySetPoint < OASignal) {
+                OASignal = MaximumOAFracBySetPoint;
+                this->OALimitingFactor = limitFactorLimits;
+            }
+            if (OutAirMinFrac > OASignal) {
+                OASignal = OutAirMinFrac;
+                this->OALimitingFactor = limitFactorLimits;
+            }
         }
 
         if (AirLoopNum > 0) {
@@ -4547,9 +4596,6 @@ namespace EnergyPlus::MixedAir {
             }
         }
 
-        // Night ventilation control overrides economizer and high humidity control.
-        if (AirLoopNightVent) OASignal = 1.0;
-
         // Set economizer report variable and status flag
         if (this->Econo == iEconoOp::NoEconomizer) {
             // No economizer
@@ -4561,11 +4607,20 @@ namespace EnergyPlus::MixedAir {
                 // Economizer is enabled
                 this->EconomizerStatus = 1;
                 this->EconoActive = true;
+                if ((OASignal > OutAirMinFrac) && !HighHumidityOperationFlag) {
+                    this->OALimitingFactor = limitFactorEconomizer;
+                }
             } else {
                 // Economizer is disabled
                 this->EconomizerStatus = 0;
                 this->EconoActive = false;
             }
+        }
+
+        // Night ventilation control overrides economizer and high humidity control.
+        if (AirLoopNightVent) {
+            OASignal = 1.0;
+            this->OALimitingFactor = limitFactorNightVent;
         }
 
         // Set high humidity control report variable and status flag
