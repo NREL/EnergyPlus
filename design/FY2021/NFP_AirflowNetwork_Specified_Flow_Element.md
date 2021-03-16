@@ -33,8 +33,8 @@ The constant flow with specified flow will return 1, and the Jacobian values are
 ## Approach ##
 This feature will be added through the execution of these subtasks:
 
-  * Create a new airflow element ConstantFlowRate
-  * Create a new input object AirflowNetwork:MultiZone:ConstantFlowRate
+  * Create a new airflow element SpecifiedFlowRate
+  * Create a new input object AirflowNetwork:MultiZone:SpecifiedFlowRate
   * Create necessary inputs to allow users to incorporate this element into models
   * Create unit tests and documentation
 
@@ -42,11 +42,11 @@ This feature will be added through the execution of these subtasks:
 Unit test will be added to ensure numerical values are calculated properly.
 
 ## Input Output Reference Documentation ##
-Additions will be made to the Input Output Reference for the ConstantFlowRate airflow element.
+Additions will be made to the Input Output Reference for the SpecifiedFlowRate airflow element.
 
 ## Input Description ##
 ```
-AirflowNetwork:MultiZone:ConstantFlowRate,
+AirflowNetwork:MultiZone:SpecifiedFlowRate,
       \min-fields 2
       \memo This object specifies the flow through a link.
  A1 , \field Name
@@ -74,7 +74,7 @@ No new output variables will be implemented with this work as existing variables
 There will be no change to the Engineering Reference as the constant airflow rate will be user-defined in this case.
 
 ## Example File and Transition Changes ##
-Suitable example file will be generated. Since the ConstantAirflow object is being added, no transition rules are anticipated.
+Suitable example file will be generated. Since the SpecifiedFlowRate object is being added, no transition rules are anticipated.
 
 ## References ##
 NA
