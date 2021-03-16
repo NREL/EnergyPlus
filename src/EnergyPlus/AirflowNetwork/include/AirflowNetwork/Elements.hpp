@@ -189,8 +189,8 @@ namespace AirflowNetwork {
         SurfAvg = 2
     };
 
-    extern int const PressureCtrlExhaust;
-    extern int const PressureCtrlRelief;
+    int constexpr PressureCtrlExhaust = 1;
+    int constexpr PressureCtrlRelief = 2;
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -1622,9 +1622,7 @@ namespace AirflowNetwork {
 struct AirflowNetworkData : BaseGlobalStruct {
 
     int SimulateAirflowNetwork = 1;
-
     Array1D_bool AirflowNetworkZoneFlag;
-
     int NumOfNodesMultiZone = 0;    // Number of nodes for multizone calculation
     int NumOfNodesDistribution = 0; // Number of nodes for distribution system calculation
     int NumOfLinksMultiZone = 0;    // Number of links for multizone calculation
@@ -1646,7 +1644,7 @@ struct AirflowNetworkData : BaseGlobalStruct {
     Array1D<Real64> ANZW;                      // Local zone air humidity ratio for roll back use
     Array1D<Real64> ANCO;                      // Local zone air CO2 for roll back use
     Array1D<Real64> ANGC;                      // Local zone air generic contaminant for roll back use
-    int AirflowNetworkNumOfExhFan = 0;          // Number of zone exhaust fans
+    int AirflowNetworkNumOfExhFan = 0;         // Number of zone exhaust fans
     Array1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
     bool AirflowNetworkFanActivated = false;   // Supply fan activation flag
     bool AirflowNetworkUnitarySystem = false;  // set to TRUE for unitary systems (to make answers equal, will remove eventually)
@@ -1748,7 +1746,7 @@ struct AirflowNetworkData : BaseGlobalStruct {
         this->DeltaCp.clear();
         this->EPDeltaCP.clear();
         this->MultizoneCompExhaustFanData.clear();
-        this->IntraZoneNodeData.clear();       // Intra zone data set
+        this->IntraZoneNodeData.clear();    // Intra zone data set
         this->IntraZoneLinkageData.clear(); // Intra zone linkage adat set
         this->DisSysNodeData.clear();
         this->DisSysCompLeakData.clear();

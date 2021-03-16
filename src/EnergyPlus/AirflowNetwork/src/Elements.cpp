@@ -75,8 +75,6 @@ namespace AirflowNetwork {
     // all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    int const PressureCtrlExhaust(1);
-    int const PressureCtrlRelief(2);
 
     // DERIVED TYPE DEFINITIONS:
 
