@@ -6160,8 +6160,51 @@ namespace EnergyPlus::OutputReportTabular {
                 state.dataOutRptPredefined->pdchOaTaAlTmAboveUnocc,
                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccTotal);
-            // Average Outdoor Air During Occupancy by Airloop
+
+            // Air loop times at OA limiting factors
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctNoLimit,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNone]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctLimit,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorLimits]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctEcono,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEconomizer]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctExhaust,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorExhaust]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctMixedLimit,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorMixedAir]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctHiHumid,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorHighHum]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctDCV,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDCV]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctNiteVent,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNightVent]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctDemand,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDemandLimit]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctEMS,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEMS]);
+
             if (state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal > 0.0) {
+                // Average Outdoor Air During Occupancy by Airloop
                 Real64 totTimeOccSec = state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal * SecInHour;
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaOccAlMechVent,
@@ -6197,6 +6240,99 @@ namespace EnergyPlus::OutputReportTabular {
                                  state.dataOutRptPredefined->pdchOaOccAlTmAbove,
                                  state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
                                  state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotalOcc);
+
+                // Average Outdoor Air at OA Limiting Factors During Occupancy by Airloop
+
+                Real64 avgFlow = 0.0;
+                int time = state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimitOcc[MixedAir::limitFactorNone];
+                if (time > 0) {
+                    avgFlow = state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotAtLimitOcc[MixedAir::limitFactorNone] / (time * SecInHour);
+                } else {
+                    avgFlow = 0.0;
+                }
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOaAvFctNoLimit, state.dataAirSystemsData->PrimaryAirSystems(iSys).Name, avgFlow, 4);
+
+                time = state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimitOcc[MixedAir::limitFactorLimits];
+                if (time > 0) {
+                    avgFlow = state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotAtLimitOcc[MixedAir::limitFactorLimits] / (time * SecInHour);
+                } else {
+                    avgFlow = 0.0;
+                }
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOaAvFctLimit, state.dataAirSystemsData->PrimaryAirSystems(iSys).Name, avgFlow, 4);
+
+                time = state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimitOcc[MixedAir::limitFactorEconomizer];
+                if (time > 0) {
+                    avgFlow = state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotAtLimitOcc[MixedAir::limitFactorEconomizer] / (time * SecInHour);
+                } else {
+                    avgFlow = 0.0;
+                }
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOaAvFctEcono, state.dataAirSystemsData->PrimaryAirSystems(iSys).Name, avgFlow, 4);
+
+                time = state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimitOcc[MixedAir::limitFactorExhaust];
+                if (time > 0) {
+                    avgFlow = state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotAtLimitOcc[MixedAir::limitFactorExhaust] / (time * SecInHour);
+                } else {
+                    avgFlow = 0.0;
+                }
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOaAvFctExhaust, state.dataAirSystemsData->PrimaryAirSystems(iSys).Name, avgFlow, 4);
+
+                time = state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimitOcc[MixedAir::limitFactorMixedAir];
+                if (time > 0) {
+                    avgFlow = state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotAtLimitOcc[MixedAir::limitFactorMixedAir] / (time * SecInHour);
+                } else {
+                    avgFlow = 0.0;
+                }
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOaAvFctMixedLimit, state.dataAirSystemsData->PrimaryAirSystems(iSys).Name, avgFlow, 4);
+
+                time = state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimitOcc[MixedAir::limitFactorHighHum];
+                if (time > 0) {
+                    avgFlow = state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotAtLimitOcc[MixedAir::limitFactorHighHum] / (time * SecInHour);
+                } else {
+                    avgFlow = 0.0;
+                }
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOaAvFctHiHumid, state.dataAirSystemsData->PrimaryAirSystems(iSys).Name, avgFlow, 4);
+
+                time = state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimitOcc[MixedAir::limitFactorDCV];
+                if (time > 0) {
+                    avgFlow = state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotAtLimitOcc[MixedAir::limitFactorDCV] / (time * SecInHour);
+                } else {
+                    avgFlow = 0.0;
+                }
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOaAvFctDCV, state.dataAirSystemsData->PrimaryAirSystems(iSys).Name, avgFlow, 4);
+
+                time = state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimitOcc[MixedAir::limitFactorNightVent];
+                if (time > 0) {
+                    avgFlow = state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotAtLimitOcc[MixedAir::limitFactorNightVent] / (time * SecInHour);
+                } else {
+                    avgFlow = 0.0;
+                }
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOaAvFctNiteVent, state.dataAirSystemsData->PrimaryAirSystems(iSys).Name, avgFlow, 4);
+
+                time = state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimitOcc[MixedAir::limitFactorDemandLimit];
+                if (time > 0) {
+                    avgFlow = state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotAtLimitOcc[MixedAir::limitFactorDemandLimit] / (time * SecInHour);
+                } else {
+                    avgFlow = 0.0;
+                }
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOaAvFctDemand, state.dataAirSystemsData->PrimaryAirSystems(iSys).Name, avgFlow, 4);
+
+                time = state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimitOcc[MixedAir::limitFactorEMS];
+                if (time > 0) {
+                    Real64 avgFlow = state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotAtLimitOcc[MixedAir::limitFactorEMS] / (time * SecInHour);
+                } else {
+                    avgFlow = 0.0;
+                }
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOaAvFctEMS, state.dataAirSystemsData->PrimaryAirSystems(iSys).Name, avgFlow, 4);
             }
         }
         // add total rows for outdoor air details
