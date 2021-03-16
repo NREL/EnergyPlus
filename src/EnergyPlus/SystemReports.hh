@@ -142,9 +142,9 @@ namespace SystemReports {
         Real64 SysTimeVentUnoccTotal = 0.0;      // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
         Real64 SysTimeOccupiedTotal = 0.0;       // time [hrs] that any zone is occupied
 
-        std::vector<Real64> SysTimeAtOALimit{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};    // time [hrs] at limit [n]
-        std::vector<Real64> SysTimeAtOALimitOcc{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // time [hrs] at limit [n] during occupied
-        std::vector<Real64> SysMechVentTotAtLimitOcc{
+        std::vector<Real64> SysTimeAtOALimit = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};    // time [hrs] at limit [n]
+        std::vector<Real64> SysTimeAtOALimitOcc = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // time [hrs] at limit [n] during occupied
+        std::vector<Real64> SysMechVentTotAtLimitOcc = {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // air loop mech vent total vol OA at limit [n] {m3} during occupied
 
     };
