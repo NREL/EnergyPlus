@@ -1902,7 +1902,7 @@ namespace AirflowNetworkBalanceManager {
         SetOutAirNodes(state);
 
         if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "Input")) {
-            AirflowNetworkSimu.iWPCCntr = iWPCCntr_Input;
+            AirflowNetworkSimu.iWPCCnt = iWPCCntr::Input;
             if (lAlphaBlanks(4)) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + " object, " + cAlphaFields(3) + " = INPUT.");
                 ShowContinueError(state, ".." + cAlphaFields(4) + " was not entered.");
@@ -1919,7 +1919,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
         } else if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
-            AirflowNetworkSimu.iWPCCntr = iWPCCntr_SurfAvg;
+            AirflowNetworkSimu.iWPCCnt = iWPCCntr::SurfAvg;
             if (!(UtilityRoutines::SameString(AirflowNetworkSimu.BldgType, "LowRise") ||
                   UtilityRoutines::SameString(AirflowNetworkSimu.BldgType, "HighRise"))) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + " object, " + cAlphaFields(5) + " = " + Alphas(5) + " is invalid.");
@@ -2208,7 +2208,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // *** Read AirflowNetwork external node
-        if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
+        if (AirflowNetworkSimu.iWPCCnt == iWPCCntr::Input) {
             // Wind coefficient == Surface-Average does not need inputs of external nodes
             state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode = inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:ExternalNode");
             if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
@@ -2659,7 +2659,7 @@ namespace AirflowNetworkBalanceManager {
             }
 
             // Outside face environment
-            if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
+            if (AirflowNetworkSimu.iWPCCnt == iWPCCntr::Input) {
                 n = state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond;
                 if (n == ExternalEnvironment || (n == OtherSideCoefNoCalcExt && state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).ExtWind)) {
                     ++state.dataAirflowNetworkBalanceManager->NumOfExtNodes;
@@ -2780,7 +2780,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Ensure the number of external node = the number of external surface with HeightOption choice = OpeningHeight
-        if (UtilityRoutines::SameString(AirflowNetworkSimu.HeightOption, "OpeningHeight") && AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
+        if (UtilityRoutines::SameString(AirflowNetworkSimu.HeightOption, "OpeningHeight") && AirflowNetworkSimu.iWPCCnt == iWPCCntr::Input) {
             if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtSurfaces != state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode) {
                 ShowSevereError(state, RoutineName +
                                 "When the choice of Height Selection for Local Wind Speed Calculation is OpeningHeight, the number of external "
@@ -3161,7 +3161,7 @@ namespace AirflowNetworkBalanceManager {
         ZoneBCCheck.deallocate();
 
         // Validate CP Value number
-        if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) { // Surface-Average does not need inputs of external nodes
+        if (AirflowNetworkSimu.iWPCCnt == iWPCCntr::Input) { // Surface-Average does not need inputs of external nodes
             // Ensure different curve is used to avoid a single side boundary condition
             found = false;
             bool differentAngle = false;
@@ -3336,7 +3336,7 @@ namespace AirflowNetworkBalanceManager {
                     if (IntraZoneLinkageData(i).NodeNums[1] > 0) {
                         IntraZoneLinkageData(i).NodeHeights[1] = Zone(MultizoneZoneData(IntraZoneLinkageData(i).NodeNums[1]).ZoneNum).Centroid.z;
                     } else {
-                        if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) { // Surface-Average does not need inputs of external nodes
+                        if (AirflowNetworkSimu.iWPCCnt == iWPCCntr::Input) { // Surface-Average does not need inputs of external nodes
                             IntraZoneLinkageData(i).NodeNums[1] = MultizoneSurfaceData(IntraZoneLinkageData(i).LinkNum).NodeNums[1];
                             if (IntraZoneLinkageData(i).NodeNums[1] == 0) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "='" + Alphas(1) + "': Invalid " + cAlphaFields(3) +
@@ -3346,7 +3346,7 @@ namespace AirflowNetworkBalanceManager {
                                 ErrorsFound = true;
                             }
                         }
-                        if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_SurfAvg) {
+                        if (AirflowNetworkSimu.iWPCCnt == iWPCCntr::SurfAvg) {
                             if (!lAlphaBlanks(3)) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + "='" + Alphas(1) + " The input of " + cAlphaFields(3) +
                                                  " is not needed, ");
@@ -3750,7 +3750,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Assign numbers of nodes and linkages
         if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
-            if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
+            if (AirflowNetworkSimu.iWPCCnt == iWPCCntr::Input) {
                 NumOfNodesMultiZone = AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode;
             } else {
                 NumOfNodesMultiZone = AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->NumOfExtNodes;
@@ -3775,7 +3775,7 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkNodeData(i).NodeHeight = MultizoneZoneData(i).Height;
         }
         // External node
-        if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
+        if (AirflowNetworkSimu.iWPCCnt == iWPCCntr::Input) {
             for (int i = AirflowNetworkNumOfZones + 1; i <= NumOfNodesMultiZone; ++i) {
                 AirflowNetworkNodeData(i).Name = MultizoneExternalNodeData(i - AirflowNetworkNumOfZones).Name;
                 AirflowNetworkNodeData(i).NodeTypeNum = 1;
@@ -4613,7 +4613,7 @@ namespace AirflowNetworkBalanceManager {
             ErrorsFound = true;
         }
 
-        if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
+        if (AirflowNetworkSimu.iWPCCnt == iWPCCntr::Input) {
             for (count = 1; count <= AirflowNetworkNumOfSurfaces; ++count) {
                 if (AirflowNetworkLinkageData(count).NodeNums[0] == 0) {
                     ShowSevereError(state, "The surface is not found in AIRFLOWNETWORK:MULTIZONE:SURFACE = " + AirflowNetworkLinkageData(count).Name);

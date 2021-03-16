@@ -182,8 +182,11 @@ namespace AirflowNetwork {
         SPO = 14  // Splitter Outlet Node
     };
 
-    extern int const iWPCCntr_Input;
-    extern int const iWPCCntr_SurfAvg;
+    enum class iWPCCntr : int{
+        Unassigned = 0,
+        Input = 1,
+        SurfAvg = 2
+    };
 
     extern int const PressureCtrlExhaust;
     extern int const PressureCtrlRelief;
@@ -263,7 +266,7 @@ namespace AirflowNetwork {
         // MULTIZONE WITH DISTRIBUTION ONLY DURING FAN OPERATION,
         // and NO MULTIZONE OR DISTRIBUTION
         std::string WPCCntr;      // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-        int iWPCCntr;             // Integer equivalent for WPCCntr field
+        iWPCCntr iWPCCnt = iWPCCntr::Unassigned;        // Integer equivalent for WPCCntr field
         std::string BldgType;     // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
         std::string HeightOption; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
         int MaxIteration;         // Maximum number of iteration, default 500
@@ -297,7 +300,6 @@ namespace AirflowNetwork {
         AirflowNetworkSimuProp(std::string const &AirflowNetworkSimuName, // Provide a unique object name
                                std::string const &Control,                // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
                                std::string const &WPCCntr,      // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-                               int const iWPCCntr,              // Integer equivalent for WPCCntr field
                                std::string const &BldgType,     // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATION"
                                std::string const &HeightOption, // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
                                int const MaxIteration,          // Maximum number of iteration, default 500
@@ -317,7 +319,7 @@ namespace AirflowNetwork {
                                Solver solver,                     // Solver type
                                bool const TExtHeightDep           // Choice of height dependence of external node temperature
                                )
-            : AirflowNetworkSimuName(AirflowNetworkSimuName), Control(Control), WPCCntr(WPCCntr), iWPCCntr(iWPCCntr), BldgType(BldgType),
+            : AirflowNetworkSimuName(AirflowNetworkSimuName), Control(Control), WPCCntr(WPCCntr), BldgType(BldgType),
               HeightOption(HeightOption), MaxIteration(MaxIteration), InitFlag(InitFlag), solver(solver), RelTol(RelTol), AbsTol(AbsTol),
               ConvLimit(ConvLimit), MaxPressure(MaxPressure), Azimuth(Azimuth), AspectRatio(AspectRatio), DiffP(DiffP),
               ExtLargeOpeningErrCount(ExtLargeOpeningErrCount), ExtLargeOpeningErrIndex(ExtLargeOpeningErrIndex),

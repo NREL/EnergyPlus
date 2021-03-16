@@ -92,8 +92,6 @@ namespace AirflowNetwork {
     int const EPlusTypeNum_SPI(13); // Splitter inlet Node
     int const EPlusTypeNum_SPO(14); // Splitter Outlet Node
 
-    int const iWPCCntr_Input(1);
-    int const iWPCCntr_SurfAvg(2);
 
     int const PressureCtrlExhaust(1);
     int const PressureCtrlRelief(2);
