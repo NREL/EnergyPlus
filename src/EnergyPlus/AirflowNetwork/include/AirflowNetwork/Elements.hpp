@@ -55,6 +55,7 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+struct AirflowNetworkData;
 
 namespace AirflowNetwork {
 
@@ -1698,6 +1699,14 @@ namespace AirflowNetwork {
     void clear_state();
 
 } // namespace AirflowNetwork
+
+struct AirflowNetworkData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 
