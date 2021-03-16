@@ -2888,7 +2888,7 @@ namespace HeatingCoils {
         }
         if (HeatingCoil(CoilNum).reportCoilFinalSizes) {
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
-                coilSelectionReportObj->setCoilFinalSizes(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state,
                                                           HeatingCoil(CoilNum).Name,
                                                           coilObjClassName,
                                                           HeatingCoil(CoilNum).NominalCapacity,

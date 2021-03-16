@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#include <memory>
 #include <string>
 
 // EnergyPlus Headers
@@ -72,16 +73,9 @@
 
 namespace EnergyPlus {
 
-std::unique_ptr<ReportCoilSelection> coilSelectionReportObj;
-
-void createCoilSelectionReportObj()
+void createCoilSelectionReportObj(EnergyPlusData &state)
 {
-    coilSelectionReportObj = std::unique_ptr<ReportCoilSelection>(new ReportCoilSelection());
-}
-
-void clearCoilSelectionReportObj()
-{
-    coilSelectionReportObj.release();
+    state.dataRptCoilSelection->coilSelectionReportObj = std::make_unique<ReportCoilSelection>();
 }
 
 CoilSelectionData::CoilSelectionData( // constructor
@@ -515,7 +509,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
         switch (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanModelTypeEnum) {
         case DataAirSystems::structArrayLegacyFanModels: {
 
-            coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
                                                          c->coilObjName,
                                                          state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).SupFanNum).FanName,
                                                          DataAirSystems::structArrayLegacyFanModels,
@@ -524,7 +518,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {
 
-            coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
                                                          c->coilObjName,
                                                          HVACFan::fanObjs[state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex]->name,
                                                          DataAirSystems::objectVectorOOFanSystemModel,
@@ -996,7 +990,7 @@ void ReportCoilSelection::setCoilWaterFlowNodeNums(EnergyPlusData &state,
         bool errorsfound = false;
         plantSizNum = PlantUtilities::MyPlantSizingIndex(state, "water coil", coilName, inletNodeNum, outletNodeNum, errorsfound);
     }
-    coilSelectionReportObj->setCoilWaterFlowPltSizNum(state, coilName, coilType, waterVdot, isAutoSized, plantSizNum, plantLoopNum);
+    state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterFlowPltSizNum(state, coilName, coilType, waterVdot, isAutoSized, plantSizNum, plantLoopNum);
 }
 
 void ReportCoilSelection::setCoilWaterFlowPltSizNum(EnergyPlusData &state,
