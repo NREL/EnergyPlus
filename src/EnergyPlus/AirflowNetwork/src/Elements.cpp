@@ -75,24 +75,6 @@ namespace AirflowNetwork {
     // all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-
-    // EPlus node type
-    int const EPlusTypeNum_ZIN(1);  // Zone inlet node
-    int const EPlusTypeNum_ZOU(2);  // Zone outlet node
-    int const EPlusTypeNum_SPL(3);  // Splitter node
-    int const EPlusTypeNum_MIX(4);  // Mixer node
-    int const EPlusTypeNum_OAN(5);  // Outside air system node
-    int const EPlusTypeNum_EXT(6);  // OA system inlet node
-    int const EPlusTypeNum_FIN(7);  // Fan Inlet node
-    int const EPlusTypeNum_FOU(8);  // Fan Outlet Node
-    int const EPlusTypeNum_COU(9);  // Coil Outlet Node
-    int const EPlusTypeNum_HXO(10); // Heat exchanger Outlet Node
-    int const EPlusTypeNum_DIN(11); // Damper Inlet node
-    int const EPlusTypeNum_DOU(12); // Damper Outlet Node
-    int const EPlusTypeNum_SPI(13); // Splitter inlet Node
-    int const EPlusTypeNum_SPO(14); // Splitter Outlet Node
-
-
     int const PressureCtrlExhaust(1);
     int const PressureCtrlRelief(2);
 
