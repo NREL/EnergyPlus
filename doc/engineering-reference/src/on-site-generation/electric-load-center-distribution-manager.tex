@@ -403,12 +403,13 @@ It needs to be noted that the temperature effects on battery performance and bat
 
 Bindner H., Cronin T., Lundsager P., Manwell J.F., Abdulwahid U., and Baring-Gould I. 2005. Lifetime Modeling of Lead Acid Batteries. Riso National Laboratory, Roskilde, Denmark.
 
+\noindent
 Downing S. D. and Socie D. F. 1982.~ Simple rainflow counting algorithms, International Journal of Fatigue, 1982.
 
+\noindent
 Manwell J. F. and McGowan J. G. 1993. A lead acid battery storage model for hybrid energy systems, Solar Energy 50(5): 399- 405.
 
-\subsection{Electrical Storage – Lithium-Ion NMC Model with Capacity Degradation Estimation
-}
+\subsection{Electrical Storage – Lithium-Ion NMC Model with Capacity Degradation Estimation}
 
 The Lithium-Ion NMC Model (object: ElectricLoadCenter:Storage:LithiumIonNMC) comprises a performance model and a capacity degradation model. The performance model captures the dynamics of the voltage, charging and discharging power of the battery, and battery temperature, and the capacity degradation model  estimates the loss in maximum available capacity with calendar age, and use. The performance and capacity degradation models are imported from the shared library of the System Advisory Model (SAM). The models are intended to represent Lithium-ion batteries with NMC chemistry. A detailed description of the performance model can be obtained from (DiOrio, 2015), and the capacity degradation model from (Smith 2017). A brief description of the performance, and capacity degradation models are provided below. 
 
@@ -519,7 +520,20 @@ Q_{max}^{neg}=\sqrt{(c_0^2-2c_2 c_0 N)}
 \end{equation}
 As in the case with the calendar life degradation, the parameters $c_0$ and $c_2$ were determined experimentally. 
 
-The description of the model parameters, and constants can be found in (Smith, 2017), and the corresponding values can be found in (Mishra, 2020). 
+The description of the model parameters, and constants can be found in (Smith, 2017), and the corresponding values can be found in (Mishra, 2020).
+
+\subsubsection{References}\label{references-022}
+
+N. DiOrio et al. Technoeconomic modeling of battery energy storage in SAM. Tech. rep. National Renewable Energy Lab. (NREL), Golden, CO (United States), 2015.
+
+\noindent
+K.  Smith  et  al.  “Life  prediction  model  for  grid-connected  Li-ion  batteryenergy  storage  system”.  In: 2017 American Control Conference (ACC). IEEE. 2017, pp. 4062–4068.
+
+\noindent
+O. Tremblay, L.-A. Dessaint, and A.-I. Dekkiche. “A generic battery modelfor the dynamic simulation of hybrid electric vehicles”. In: 2007 IEEE Vehicle Power and Propulsion Conference. Ieee. 2007, pp. 284–289.
+
+\noindent
+P. P. Mishra et al. “Analysis of degradation in residential battery energystorage systems for rate-based use-cases”. In: Applied Energy 264 (2020), p. 114632.
 
 \subsection{Electric Load Center Transformers}\label{electric-load-center-transformers}
 
