@@ -66,52 +66,7 @@ namespace EnergyPlus::DataSurfaceColors {
     // Contain the data for surface colors and user settings for DXF and possibly
     // other surface reporting.
 
-    Array1D_int const defaultcolorno(NumColors, {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5}); // text | wall | window | glassdoor |
-                                                                                                                 // door | floor | roof | detached
-                                                                                                                 // building shade (moves with
-                                                                                                                 // building) | detached building
-                                                                                                                 // fixed | attached building shading
-                                                                                                                 // | PV | TDD:Dome | TDD:Diffuser |
-                                                                                                                 // Daylight Sensor 1 | Daylight
-                                                                                                                 // Sensor 2
-
-    Array1D_string const colorkeys(NumColors,
-                                   {"Text",
-                                    "Walls",
-                                    "Windows",
-                                    "GlassDoors",
-                                    "Doors",
-                                    "Roofs",
-                                    "Floors",
-                                    "DetachedBuildingShades",
-                                    "DetachedFixedShades",
-                                    "AttachedBuildingShades",
-                                    "Photovoltaics",
-                                    "TubularDaylightDomes",
-                                    "TubularDaylightDiffusers",
-                                    "DaylightReferencePoint1",
-                                    "DaylightReferencePoint2"});
-
-    Array1D_int const colorkeyptr(NumColors,
-                                  {ColorNo_Text,
-                                   ColorNo_Wall,
-                                   ColorNo_Window,
-                                   ColorNo_GlassDoor,
-                                   ColorNo_Door,
-                                   ColorNo_Floor,
-                                   ColorNo_Roof,
-                                   ColorNo_ShdDetBldg,
-                                   ColorNo_ShdDetFix,
-                                   ColorNo_ShdAtt,
-                                   ColorNo_PV,
-                                   ColorNo_TDDDome,
-                                   ColorNo_TDDDiffuser,
-                                   ColorNo_DaylSensor1,
-                                   ColorNo_DaylSensor2});
-
-    Array1D_int DXFcolorno(NumColors, defaultcolorno);
-
-    bool MatchAndSetColorTextString(std::string const &String,      // string to be matched
+    bool MatchAndSetColorTextString(EnergyPlusData &state, std::string const &String,      // string to be matched
                                     int const SetValue,             // value to be used for the color
                                     std::string const & ColorType // for now, must be DXF
     )
@@ -124,10 +79,10 @@ namespace EnergyPlus::DataSurfaceColors {
         //       RE-ENGINEERED  na
 
         bool WasSet = false;
-        int found = UtilityRoutines::FindItem(String, colorkeys, NumColors);
+        int found = UtilityRoutines::FindItem(String, state.dataSurfColor->colorkeys, NumColors);
         if (found != 0) {
             if (ColorType == "DXF") {
-                DXFcolorno(colorkeyptr(found)) = SetValue;
+                state.dataSurfColor->DXFcolorno(state.dataSurfColor->colorkeyptr(found)) = SetValue;
                 WasSet = true;
             }
         }
@@ -156,7 +111,7 @@ namespace EnergyPlus::DataSurfaceColors {
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr auto CurrentModuleObject("OutputControl:SurfaceColorScheme");
 
-        DXFcolorno = defaultcolorno;
+        state.dataSurfColor->DXFcolorno = state.dataSurfColor->defaultcolorno;
 
         // first see if there is a scheme name
         int numptr = inputProcessor->getObjectItemNum(state, CurrentModuleObject, SchemeName);
@@ -205,7 +160,7 @@ namespace EnergyPlus::DataSurfaceColors {
                     }
                     continue;
                 }
-                if (!MatchAndSetColorTextString(cAlphas(numargs + 1), numptr, ColorType)) {
+                if (!MatchAndSetColorTextString(state, cAlphas(numargs + 1), numptr, ColorType)) {
                     ShowWarningError(state, "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
                                      cAlphas(numargs + 1) + ", is invalid.  No color set.");
                 }
