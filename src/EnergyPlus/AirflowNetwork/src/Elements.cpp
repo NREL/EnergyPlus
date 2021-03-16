@@ -138,8 +138,6 @@ namespace AirflowNetwork {
     Real64 ReliefMassFlowRate(0.0);     // OA Mixer relief node flow rate used in PressureStat
 
     // Object Data
-    Array1D<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
-    Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
     //Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
     //Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
     //Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
@@ -3787,8 +3785,6 @@ namespace AirflowNetwork {
         MultiSpeedHPIndicator = 0;
         VAVTerminalRatio = 0.0;
         VAVSystem = false;
-        AirflowNetworkNodeSimu.deallocate();
-        AirflowNetworkLinkSimu.deallocate();
         //AirflowNetworkExchangeData.deallocate();
         //AirflowNetworkMultiExchangeData.deallocate();
         //AirflowNetworkLinkReport.deallocate();

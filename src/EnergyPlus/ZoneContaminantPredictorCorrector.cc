@@ -1540,8 +1540,8 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven; ++Loop) {
                     SurfNum = state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum;
-                    Pi = AirflowNetwork::AirflowNetworkNodeSimu(AirflowNetwork::MultizoneSurfaceData(SurfNum).NodeNums[0]).PZ;
-                    Pj = AirflowNetwork::AirflowNetworkNodeSimu(AirflowNetwork::MultizoneSurfaceData(SurfNum).NodeNums[1]).PZ;
+                    Pi = state.dataAirflowNetwork->AirflowNetworkNodeSimu(AirflowNetwork::MultizoneSurfaceData(SurfNum).NodeNums[0]).PZ;
+                    Pj = state.dataAirflowNetwork->AirflowNetworkNodeSimu(AirflowNetwork::MultizoneSurfaceData(SurfNum).NodeNums[1]).PZ;
                     if (Pj >= Pi) {
                         GCGain = state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoef *
                                  GetCurrentScheduleValue(state, state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr) *

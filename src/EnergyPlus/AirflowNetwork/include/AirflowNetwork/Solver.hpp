@@ -87,7 +87,7 @@ namespace AirflowNetwork {
         {}
 
         void allocate(EnergyPlusData &state);
-        void initialize();
+        void initialize(EnergyPlusData &state);
         void setsky();
         void airmov(EnergyPlusData &state);
         void solvzp(EnergyPlusData &state, int &ITER);  // number of iterations

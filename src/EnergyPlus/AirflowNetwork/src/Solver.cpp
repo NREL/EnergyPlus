@@ -243,9 +243,9 @@ namespace AirflowNetwork {
         for (i = 1; i <= NetworkNumOfNodes; ++i) {
             // TZ(i) = AirflowNetworkNodeSimu(i).TZ;
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
-            PZ(i) = AirflowNetworkNodeSimu(i).PZ;
-            properties[i].temperature = AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidityRatio = AirflowNetworkNodeSimu(i).WZ;
+            PZ(i) = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ;
+            properties[i].temperature = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ;
+            properties[i].humidityRatio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
 
@@ -315,7 +315,7 @@ namespace AirflowNetwork {
         AU.allocate(IK(NetworkNumOfNodes + 1));
     }
 
-    void Solver::initialize()
+    void Solver::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -364,9 +364,9 @@ namespace AirflowNetwork {
         for (int i = 1; i <= NetworkNumOfNodes; ++i) {
             // TZ(i) = AirflowNetworkNodeSimu(i).TZ;
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
-            PZ(i) = AirflowNetworkNodeSimu(i).PZ;
-            properties[i].temperature = AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidityRatio = AirflowNetworkNodeSimu(i).WZ;
+            PZ(i) = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ;
+            properties[i].temperature = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ;
+            properties[i].humidityRatio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
     }
@@ -559,40 +559,40 @@ namespace AirflowNetwork {
             if (AFLOW2(i) != 0.0) {
             }
             if (AFLOW(i) > 0.0) {
-                AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
-                AirflowNetworkLinkSimu(i).FLOW2 = 0.0;
+                state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
+                state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = 0.0;
             } else {
-                AirflowNetworkLinkSimu(i).FLOW = 0.0;
-                AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
+                state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = 0.0;
+                state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
             }
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::HOP) {
                 if (AFLOW(i) > 0.0) {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
                 } else {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW2(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i) + AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i) + AFLOW2(i);
                 }
             }
             if (AirflowNetworkLinkageData(i).DetOpenNum > 0) {
                 if (AFLOW2(i) != 0.0) {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
                 }
             }
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SOP && AFLOW2(i) != 0.0) {
                 if (AFLOW(i) >= 0.0) {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = std::abs(AFLOW2(i));
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = std::abs(AFLOW2(i));
                 } else {
-                    AirflowNetworkLinkSimu(i).FLOW = std::abs(AFLOW2(i));
-                    AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = std::abs(AFLOW2(i));
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
                 }
             }
         }
 
         for (i = 1; i <= NetworkNumOfNodes; ++i) {
-            AirflowNetworkNodeSimu(i).PZ = PZ(i);
+            state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ = PZ(i);
         }
     }
 
@@ -903,7 +903,7 @@ namespace AirflowNetwork {
                 DP = DisSysCompCPDData(AirflowNetworkCompData(j).TypeNum).DP;
             }
 
-            AirflowNetworkLinkSimu(i).DP = DP;
+            state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).DP = DP;
             AFLOW(i) = F[0];
             AFLOW2(i) = 0.0;
             if (AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::DOP) {

@@ -1651,8 +1651,6 @@ namespace AirflowNetwork {
     };
 
     // Object Data
-    extern Array1D<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
-    extern Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
 
     extern AirflowNetworkSimuProp AirflowNetworkSimu;
     // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
@@ -1702,9 +1700,13 @@ namespace AirflowNetwork {
 
 struct AirflowNetworkData : BaseGlobalStruct {
 
+    Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
+    Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
+
     void clear_state() override
     {
-
+        AirflowNetworkNodeSimu.clear();
+        AirflowNetworkLinkSimu.clear();
     }
 };
 
