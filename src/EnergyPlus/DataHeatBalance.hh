@@ -1943,7 +1943,7 @@ struct HeatBalanceData : BaseGlobalStruct
     int DefaultOutsideConvectionAlgo = 1;   // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
     int SolarDistribution = 0;              // Solar Distribution Algorithm
     int InsideSurfIterations = 0;           // Counts inside surface iterations
-    int OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF; // Global HeatBalanceAlgorithm setting
+    DataSurfaces::iHeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting
     // Flags for HeatTransfer Algorithms Used
     bool AllCTF = true;                  // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
     bool AnyCTF = false;                 // CTF used
@@ -2225,7 +2225,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->DefaultOutsideConvectionAlgo = 1;
         this->SolarDistribution = 0;
         this->InsideSurfIterations = 0;
-        this->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+        this->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
         this->AllCTF = true;
         this->AnyCTF = false;
         this->AnyEMPD = false;

@@ -289,7 +289,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
                 ConstrNum = Surface(SurfNum).Construction;
                 if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
-                if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
+                if (Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
                 SurfaceFD(SurfNum).UpdateMoistureBalance();
             }
         }
@@ -725,8 +725,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             int const lastSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
                 auto const &surface(Surface(SurfNum));
-                if (surface.HeatTransferAlgorithm != HeatTransferModel_CTF &&
-                    surface.HeatTransferAlgorithm != HeatTransferModel_EMPD)
+                if (surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF &&
+                    surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD)
                     continue;
                 // Outside surface temp of "normal" windows not needed in Window5 calculation approach
                 // Window layer temperatures are calculated in CalcHeatBalanceInsideSurf
@@ -4341,8 +4341,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     if (!state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
                         // check if constructions appear compatible
 
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
-                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
+                            Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
                             // compare old construction to new construction and see if terms match
                             // set as okay and turn false if find a big problem
                             state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
@@ -4403,7 +4403,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 Surface(SurfNum).Construction = Surface(SurfNum).EMSConstructionOverrideValue;
                             }
 
-                        } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                        } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                             state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
                             state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
                             if (ConstructFD(Surface(SurfNum).Construction).TotNodes !=
@@ -4444,7 +4444,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 Surface(SurfNum).Construction = Surface(SurfNum).EMSConstructionOverrideValue;
                             }
 
-                        } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) { // don't allow
+                        } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) { // don't allow
                             ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not available with Heat transfer "
                                             "algorithm CombinedHeatAndMoistureFiniteElement.");
                             ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
@@ -4452,7 +4452,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
                             state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
 
-                        } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_Kiva) { // don't allow
+                        } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::Kiva) { // don't allow
                             ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not available for Surfaces with "
                                             "Foundation Outside Boundary Condition.");
                             ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
@@ -4605,7 +4605,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 int l21 = l211 + SurfNum - 1;
                 auto const &surface(Surface(SurfNum));
 
-                if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD)) continue;
+                if ((surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) && (surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD)) continue;
 
                 int const ConstrNum(surface.Construction);
                 auto const &construct(state.dataConstruction->Construct(ConstrNum));
@@ -4672,7 +4672,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
                 int l11 = l111 + SurfNum - 1;
                 int l21 = l211 + SurfNum - 1;
-                if ((Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CTF) && (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD))
+                if ((Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) && (Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD))
                     continue;
                 if (SUMH(SurfNum) == 0) { // First time step in a block for a surface, update arrays
                     state.dataHeatBalSurfMgr->TempExt1(SurfNum) = TH[l11];
@@ -4698,7 +4698,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                 auto const &surface(Surface(SurfNum));
 
-                if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD))
+                if ((surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) && (surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD))
                     continue;
 
                 int const ConstrNum(surface.Construction);
@@ -5541,7 +5541,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
 
                         // start HAMT
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                             // Set variables used in the HAMT moisture balance
                             TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTemp, 1.0, HBSurfManGroundHAMT);
@@ -5559,7 +5559,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         }
                         // end HAMT
 
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                             // Set variables used in the FD moisture balance
                             TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTemp, 1.0);
@@ -5583,7 +5583,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
                             state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
 
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                             // Set variables used in the HAMT moisture balance
                             TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTempFC, 1.0, HBSurfManGroundHAMT);
@@ -5600,7 +5600,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             HAirFD(SurfNum) = HAir;
                         }
 
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                             // Set variables used in the FD moisture balance
                             TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTempFC, 1.0);
@@ -5657,8 +5657,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
                             state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
 
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
+                            Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                             // Set variables used in the FD moisture balance and HAMT
                             TempOutsideAirFD(SurfNum) = TH(1, 1, SurfNum);
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat,
@@ -5714,8 +5714,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
                             state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
 
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
+                            Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                             // Set variables used in the FD moisture balance and HAMT
                             TempOutsideAirFD(SurfNum) = TempExt;
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat,
@@ -5733,8 +5733,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         }
 
                         // Call the outside surface temp calculation and pass the necessary terms
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
-                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
+                            Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
                             CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
                             if (MovInsulErrorFlag)
                                 ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
@@ -5762,8 +5762,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
                             state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
 
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
+                            Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                             // Set variables used in the FD moisture balance and HAMT
                             TempOutsideAirFD(SurfNum) = TempExt;
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat,
@@ -5781,8 +5781,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         }
 
                         // Call the outside surface temp calculation and pass the necessary terms
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
-                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
+                            Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
 
                             if (Surface(SurfNum).ExtCavityPresent) {
                                 CalcExteriorVentedCavity(state, SurfNum);
@@ -5792,8 +5792,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             if (MovInsulErrorFlag)
                                 ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
 
-                        } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                                   Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                        } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
+                                   Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                             if (Surface(SurfNum).ExtCavityPresent) {
                                 CalcExteriorVentedCavity(state, SurfNum);
                             }
@@ -5848,7 +5848,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 TempExt = Surface(SurfNum).OutWetBulbTemp;
 
                                 // start HAMT
-                                if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                                     // Set variables used in the HAMT moisture balance
                                     TempOutsideAirFD(SurfNum) = TempExt;
                                     RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, TempOutsideAirFD(SurfNum), 1.0,
@@ -5865,7 +5865,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 }
                                 // end HAMT
 
-                                if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                                     // Set variables used in the FD moisture balance
                                     TempOutsideAirFD(SurfNum) = TempExt;
                                     RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(TempOutsideAirFD(SurfNum), 1.0);
@@ -5883,8 +5883,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                                 TempExt = Surface(SurfNum).OutDryBulbTemp;
 
-                                if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                                    Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
+                                    Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                                     // Set variables used in the FD moisture balance and HAMT
                                     TempOutsideAirFD(SurfNum) = TempExt;
                                     RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat,
@@ -5922,8 +5922,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                             TempExt = Surface(SurfNum).OutDryBulbTemp;
 
-                            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                                Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
+                                Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                                 // Set variables used in the FD moisture balance and HAMT
                                 TempOutsideAirFD(SurfNum) = TempExt;
                                 RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat,
@@ -5954,8 +5954,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             }
                         }
 
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
-                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD ||
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
+                            Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD ||
                             Surface(SurfNum).Class == SurfaceClass::TDD_Dome) {
                             CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
                             if (MovInsulErrorFlag)
@@ -5981,8 +5981,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                             // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
 
-                            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                                Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
+                                Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                                 // Set variables used in the FD moisture balance HAMT
                                 TempOutsideAirFD(SurfNum) = TempSurfIn(SurfNum);
                                 RhoVaporAirOut(SurfNum) = RhoVaporAirIn(SurfNum);
@@ -6004,8 +6004,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                             // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
 
-                            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                                Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
+                                Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                                 // Set variables used in the FD moisture balance and HAMT
                                 TempOutsideAirFD(SurfNum) = TH(2, 1, Surface(SurfNum).ExtBoundCond);
                                 RhoVaporAirOut(SurfNum) = RhoVaporAirIn(Surface(SurfNum).ExtBoundCond);
@@ -6076,7 +6076,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 auto const &zone(state.dataHeatBal->Zone(iZone));
                 for (int iSurf = zone.HTSurfaceFirst, eSurf = zone.HTSurfaceLast; iSurf <= eSurf; ++iSurf) {
                     auto const alg(Surface(iSurf).HeatTransferAlgorithm);
-                    if ((alg == HeatTransferModel_CondFD) || (alg == HeatTransferModel_HAMT) || (alg == HeatTransferModel_Kiva)) {
+                    if ((alg == DataSurfaces::iHeatTransferModel::CondFD) || (alg == DataSurfaces::iHeatTransferModel::HAMT) || (alg == DataSurfaces::iHeatTransferModel::Kiva)) {
                         DataHeatBalSurface::Zone_has_mixed_HT_models[iZone] = true;
                         break;
                     }
@@ -6337,7 +6337,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     // Calculate the inside surface moisture quantities
                     // calculate the inside surface moisture transfer conditions
                     // check for saturation conditions of air
-                    if ((surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) || (surface.HeatTransferAlgorithm == HeatTransferModel_HAMT)) {
+                    if ((surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) || (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT)) {
                         int ZoneNum = Surface(SurfNum).Zone;
                         Real64 const MAT_zone(state.dataHeatBalFanSys->MAT(ZoneNum));
                         Real64 const ZoneAirHumRat_zone(max(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), 1.0e-5));
@@ -6377,10 +6377,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 if (surface.ExtBoundCond == SurfNum) {
                     // CR6869 -- let Window HB take care of it      IF (Surface(SurfNum)%ExtBoundCond == SurfNum) THEN
                     // Surface is adiabatic
-                    if (surface.HeatTransferAlgorithm == HeatTransferModel_CTF ||
-                        surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) { // Regular CTF Surface and/or EMPD surface
+                    if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
+                        surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) { // Regular CTF Surface and/or EMPD surface
 
-                        if (surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+                        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
                             MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(state, SurfNum, TempSurfInTmp(SurfNum), MAT_zone, TempSurfInSat);
                         }
                         // Pre-calculate a few terms
@@ -6421,7 +6421,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                                                       // non-pool equation for details) | Iterative damping term (for stability) |
                                                                       // Conduction term (both partition sides same temp) | Pool and damping term
                         }
-                        if (surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+                        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
                             TempSurfInTmp(SurfNum) -=
                                 state.dataMstBalEMPD->HeatFluxLatent(SurfNum) * TempDiv; // Conduction term (both partition sides same temp) |
                                                                                             // Conduction term (both partition sides same temp) |
@@ -6454,12 +6454,12 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                                                       // term (both partition sides same temp) | Convection and damping term
                         }
 
-                    } else if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD || surface.HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                    } else if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD || surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
 
-                        if (surface.HeatTransferAlgorithm == HeatTransferModel_HAMT)
+                        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT)
                             HeatBalanceHAMTManager::ManageHeatBalHAMT(state, SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp); // HAMT
 
-                        if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                             HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff(state, SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp);
                         }
 
@@ -6478,10 +6478,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                     if (HMovInsul <= 0.0) { // No movable insulation present, normal heat balance equation
 
-                        if (surface.HeatTransferAlgorithm == HeatTransferModel_CTF ||
-                            surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) { // Regular CTF Surface and/or EMPD surface
+                        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
+                            surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) { // Regular CTF Surface and/or EMPD surface
 
-                            if (surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+                            if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
                                 MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(state, SurfNum, TempSurfInTmp(SurfNum), MAT_zone, TempSurfInSat);
                             }
                             // Pre-calculate a few terms
@@ -6527,7 +6527,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                                                           // stability) | Current conduction from | the outside surface |
                                                                           // Coefficient for conduction (current time) | Pool and damping term
                             }
-                            if (surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+                            if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
                                 TempSurfInTmp(SurfNum) -= state.dataMstBalEMPD->HeatFluxLatent(SurfNum) *
                                                           TempDiv; // Coefficient for conduction (current time) | Convection and damping term
                                 if (TempSurfInSat > TempSurfInTmp(SurfNum)) {
@@ -6576,10 +6576,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 }
                             }
 
-                        } else if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                                   surface.HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                        } else if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
+                                   surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
 
-                            if (surface.HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                            if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                                 if (surface.ExtBoundCond > 0) {
                                     // HAMT get the correct other side zone zone air temperature --
                                     int OtherSideSurfNum = surface.ExtBoundCond;
@@ -6590,12 +6590,12 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 HeatBalanceHAMTManager::ManageHeatBalHAMT(state, SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp);
                             }
 
-                            if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD)
+                            if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD)
                                 HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff(state, SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp);
 
                             TH11 = TempSurfOutTmp;
 
-                        } else if (surface.HeatTransferAlgorithm == HeatTransferModel_Kiva) {
+                        } else if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::Kiva) {
                             // Read Kiva results for each surface
                             TempSurfInTmp(SurfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv;
                             SurfOpaqInsFaceConductionFlux(SurfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.qtot;
@@ -6825,7 +6825,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             Real64 MaxDelTemp = 0.0; // Maximum change in surface temperature for any opaque surface from one iteration to the next
             for (int SurfNum : HTNonWindowSurfs) {
                 MaxDelTemp = max(std::abs(TempSurfIn(SurfNum) - TempInsOld(SurfNum)), MaxDelTemp);
-                if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                     // also check all internal nodes as well as surface faces
                     MaxDelTemp = max(MaxDelTemp, HeatBalFiniteDiffManager::SurfaceFD(SurfNum).MaxNodeDelTemp);
                 }
@@ -6940,7 +6940,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 auto const &surface(Surface(SurfNum));
                 int ZoneNum = surface.Zone;
 
-                if (surface.HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                     HeatBalanceHAMTManager::UpdateHeatBalHAMT(state, SurfNum);
 
                     Real64 const FD_Area_fac(HMassConvInFD(SurfNum) * surface.Area);
@@ -6962,7 +6962,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                     state.dataHeatBalFanSys->SumHmARaW(ZoneNum) += FD_Area_fac * RhoVaporSurfIn(SurfNum); // old eq'n: FD_Area_fac * RhoAirZone * Wsurf;
 
-                } else if (surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+                } else if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
                     // need to calculate the amount of moisture that is entering or
                     // leaving the zone  Qm [kg/sec] = hmi * Area * (Del Rhov)
                     // {Hmi [m/sec];     Area [m2];    Rhov [kg moist/m3]  }

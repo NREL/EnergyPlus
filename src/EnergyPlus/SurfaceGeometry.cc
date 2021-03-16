@@ -7017,7 +7017,7 @@ namespace SurfaceGeometry {
         static bool ErrorsFoundMultiSurf(false);
         static bool ErrorsFoundSurfList(false);
         static bool ErrorsFoundByConstruct(false);
-        int tmpAlgoInput;
+        DataSurfaces::iHeatTransferModel tmpAlgoInput;
         int Item;
         int Item1;
         int NumAlphas;
@@ -7129,16 +7129,16 @@ namespace SurfaceGeometry {
                 auto const SELECT_CASE_var(cAlphaArgs(2));
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
-                    tmpAlgoInput = HeatTransferModel_CTF;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
-                    tmpAlgoInput = HeatTransferModel_EMPD;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::EMPD;
                     state.dataHeatBal->AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
-                    tmpAlgoInput = HeatTransferModel_HAMT;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::HAMT;
                     state.dataHeatBal->AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                    tmpAlgoInput = HeatTransferModel_CondFD;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::CondFD;
                     state.dataHeatBal->AnyCondFD = true;
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2));
@@ -7174,16 +7174,16 @@ namespace SurfaceGeometry {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
-                    tmpAlgoInput = HeatTransferModel_CTF;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
-                    tmpAlgoInput = HeatTransferModel_EMPD;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::EMPD;
                     state.dataHeatBal->AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
-                    tmpAlgoInput = HeatTransferModel_HAMT;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::HAMT;
                     state.dataHeatBal->AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                    tmpAlgoInput = HeatTransferModel_CondFD;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::CondFD;
                     state.dataHeatBal->AnyCondFD = true;
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3));
@@ -7324,16 +7324,16 @@ namespace SurfaceGeometry {
                 auto const SELECT_CASE_var(cAlphaArgs(2));
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
-                    tmpAlgoInput = HeatTransferModel_CTF;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
-                    tmpAlgoInput = HeatTransferModel_EMPD;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::EMPD;
                     state.dataHeatBal->AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
-                    tmpAlgoInput = HeatTransferModel_HAMT;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::HAMT;
                     state.dataHeatBal->AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                    tmpAlgoInput = HeatTransferModel_CondFD;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::CondFD;
                     state.dataHeatBal->AnyCondFD = true;
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2));
@@ -7379,16 +7379,16 @@ namespace SurfaceGeometry {
                 auto const SELECT_CASE_var(cAlphaArgs(2));
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
-                    tmpAlgoInput = HeatTransferModel_CTF;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
-                    tmpAlgoInput = HeatTransferModel_EMPD;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::EMPD;
                     state.dataHeatBal->AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
-                    tmpAlgoInput = HeatTransferModel_HAMT;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::HAMT;
                     state.dataHeatBal->AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                    tmpAlgoInput = HeatTransferModel_CondFD;
+                    tmpAlgoInput = DataSurfaces::iHeatTransferModel::CondFD;
                     state.dataHeatBal->AnyCondFD = true;
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2));
@@ -7414,7 +7414,7 @@ namespace SurfaceGeometry {
         // Change algorithm for Kiva and air boundary foundation surfaces
         for (auto &surf : state.dataSurface->Surface) {
             if (surf.ExtBoundCond == KivaFoundation) {
-                surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
+                surf.HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::Kiva;
                 state.dataHeatBal->AnyKiva = true;
             }
         }
@@ -7530,7 +7530,9 @@ namespace SurfaceGeometry {
             int ExtSurfNum;
             for (Item = 1; Item <= state.dataSurface->TotSurfaces; ++Item) {
                 if (state.dataSurface->Surface(Item).ExtBoundCond > 0) {
-                    if (state.dataSurface->Surface(Item).HeatTransferAlgorithm <= 0) continue;
+                    if ((state.dataSurface->Surface(Item).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::NotSet) ||
+                        (state.dataSurface->Surface(Item).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::None))
+                        continue;
                     ExtSurfNum = state.dataSurface->Surface(Item).ExtBoundCond;
                     if (state.dataSurface->Surface(Item).HeatTransferAlgorithm != state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm) {
                         ShowWarningError(state, "An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in "
@@ -7558,21 +7560,21 @@ namespace SurfaceGeometry {
             if (state.dataSurface->Surface(Item).Class == SurfaceClass::Window || state.dataSurface->Surface(Item).Class == SurfaceClass::GlassDoor) {
                 // todo, add complex fenestration switch  HeatTransferModel_ComplexFenestration
                 if (state.dataSurface->SurfWinWindowModelType(Item) == WindowBSDFModel) {
-                    state.dataSurface->Surface(Item).HeatTransferAlgorithm = HeatTransferModel_ComplexFenestration;
+                    state.dataSurface->Surface(Item).HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::ComplexFenestration;
                 } else {
-                    state.dataSurface->Surface(Item).HeatTransferAlgorithm = HeatTransferModel_Window5;
+                    state.dataSurface->Surface(Item).HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::Window5;
                 }
             }
             if (state.dataSurface->Surface(Item).Class == SurfaceClass::Detached_B || state.dataSurface->Surface(Item).Class == SurfaceClass::Detached_F ||
                 state.dataSurface->Surface(Item).Class == SurfaceClass::Shading || state.dataSurface->Surface(Item).Class == SurfaceClass::Overhang ||
                 state.dataSurface->Surface(Item).Class == SurfaceClass::Fin) {
-                state.dataSurface->Surface(Item).HeatTransferAlgorithm = HeatTransferModel_None;
+                state.dataSurface->Surface(Item).HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::None;
             }
             if (state.dataSurface->Surface(Item).Class == SurfaceClass::TDD_Diffuser || state.dataSurface->Surface(Item).Class == SurfaceClass::TDD_Dome) {
-                state.dataSurface->Surface(Item).HeatTransferAlgorithm = HeatTransferModel_TDD;
+                state.dataSurface->Surface(Item).HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::TDD;
             }
 
-            if (state.dataSurface->Surface(Item).HeatTransferAlgorithm == HeatTransferModel_CTF || state.dataSurface->Surface(Item).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+            if (state.dataSurface->Surface(Item).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF || state.dataSurface->Surface(Item).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
                 state.dataConstruction->Construct(state.dataSurface->Surface(Item).Construction).IsUsedCTF = true;
             }
         }
@@ -13029,7 +13031,7 @@ namespace SurfaceGeometry {
                             // Radiant enclosure setup
                             constr.IsUsedCTF = false;
                             surf.HeatTransSurf = false;
-                            surf.HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_AirBoundaryNoHT;
+                            surf.HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::AirBoundaryNoHT;
                             thisSideEnclosureNum = state.dataHeatBal->Zone(surf.Zone).RadiantEnclosureNum;
                             otherSideEnclosureNum = state.dataHeatBal->Zone(state.dataSurface->Surface(surf.ExtBoundCond).Zone).RadiantEnclosureNum;
                         } else {

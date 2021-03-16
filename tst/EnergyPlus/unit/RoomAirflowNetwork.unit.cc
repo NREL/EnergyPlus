@@ -263,8 +263,8 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataSurface->Surface(1).Area = 1.0;
     state->dataSurface->Surface(2).Area = 2.0;
 
-    state->dataSurface->Surface(1).HeatTransferAlgorithm = HeatTransferModel_EMPD;
-    state->dataSurface->Surface(2).HeatTransferAlgorithm = HeatTransferModel_EMPD;
+    state->dataSurface->Surface(1).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
+    state->dataSurface->Surface(2).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
     state->dataMstBalEMPD->RVSurface(1) = 0.0011;
     state->dataMstBalEMPD->RVSurface(2) = 0.0012;
 
