@@ -4298,14 +4298,13 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // if zone mass balance true, set to expected return flow
         if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) {
-            // applied zone return flow schedule multiplier
+            // applies zone return flow schedule multiplier
             ExpTotalReturnMassFlow = returnSchedFrac * ExpTotalReturnMassFlow;
             // set air flow rate for each return node
             Real64 zoneTotReturnFlow = 0.0;
             Real64 returnNodeMassFlow = 0.0;
             for (int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
                 int retNode = thisZoneEquip.ReturnNode(returnNum);
-                Real64 curReturnFlow = state.dataLoopNodes->Node(retNode).MassFlowRate;
                 if (retNode > 0) {
                     if (numRetNodes == 1) {
                         returnNodeMassFlow = ExpTotalReturnMassFlow;
@@ -4342,7 +4341,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
             } else {
                 FinalTotalReturnMassFlow = ExpTotalReturnMassFlow;
             }
-
         } else {
             // Adjust return flows if greater than expected (i.e. there is exhaust or mixing flow reducing the total available for return)
             if ((totReturnFlow > ExpTotalReturnMassFlow) && (totVarReturnFlow > 0.0)) {
