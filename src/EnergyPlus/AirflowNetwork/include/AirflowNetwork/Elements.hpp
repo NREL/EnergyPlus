@@ -199,7 +199,6 @@ namespace AirflowNetwork {
     // Link simulation variable in air distribution system
     // Sensible and latent exchange variable in air distribution system
 
-    extern int SimulateAirflowNetwork;
     // Vent Control  DistSys Control  Flag    Description
     //  NONE           NONE           0      No AirflowNetwork and SIMPLE
     //  SIMPLE         NONE           1      Simple calculations only
@@ -208,12 +207,12 @@ namespace AirflowNetwork {
     //  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
     //  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
 
-    extern int const AirflowNetworkControlSimple;    // Simple calculations only
-    extern int const AirflowNetworkControlMultizone; // Perform multizone calculations only
-    extern int const AirflowNetworkControlSimpleADS; // Perform distribution system during system
+    int constexpr AirflowNetworkControlSimple(1);    // Simple calculations only
+    int constexpr AirflowNetworkControlMultizone(2); // Perform multizone calculations only
+    int constexpr AirflowNetworkControlSimpleADS(4); // Perform distribution system during system
     // on time and simple calculations during off time
-    extern int const AirflowNetworkControlMultiADS; // Perform distribution system during system on time
-    // and multizone calculations during off time
+    int constexpr AirflowNetworkControlMultiADS(5); // Perform distribution system during system on time
+                                                // and multizone calculations during off time
 
     extern Array1D_bool AirflowNetworkZoneFlag;
 
@@ -1658,6 +1657,8 @@ namespace AirflowNetwork {
 
 struct AirflowNetworkData : BaseGlobalStruct {
 
+    int SimulateAirflowNetwork = 1;
+
     Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
 
@@ -1705,6 +1706,7 @@ struct AirflowNetworkData : BaseGlobalStruct {
 
     void clear_state() override
     {
+        SimulateAirflowNetwork = 1;
         AirflowNetworkNodeSimu.clear();
         AirflowNetworkLinkSimu.clear();
 

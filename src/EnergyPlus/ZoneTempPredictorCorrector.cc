@@ -4543,9 +4543,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             H2OHtOfVap = PsyHgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataHeatBalFanSys->ZT(ZoneNum));
 
             // Assume that the system will have flow
-            if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-                AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-                (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+                state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+                (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
                  AirflowNetwork::AirflowNetworkFanActivated)) {
                 // Multizone airflow calculated in AirflowNetwork
                 B = (LatentGain / H2OHtOfVap) + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrW +
@@ -4886,7 +4886,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                               (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
                 //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
                     TempIndCoef += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalSen;
                 }
                 //    TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
@@ -4978,7 +4978,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
                 //      TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
                     TempIndCoef += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalSen;
                 }
                 //      TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
@@ -5491,9 +5491,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         A = ZoneMassFlowRate + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) + state.dataHeatBalFanSys->SumHmARa(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) +
                 state.dataHeatBalFanSys->MDotOA(ZoneNum);
 
-        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-            (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
              AirflowNetwork::AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
             B = (LatentGain / H2OHtOfVap) +
@@ -5504,7 +5504,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         }
         C = RhoAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
-        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             B += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalLat;
         }
 
@@ -5759,7 +5759,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                               (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
                 //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
                     TempIndCoef += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalSen;
                 }
                 // Calculate air capacity using UseAnalyticalSolution
@@ -6133,9 +6133,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) + state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
 
         // Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model
-        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-            (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
              AirflowNetwork::AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
             SumMCp = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
@@ -6432,9 +6432,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                                 state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * state.dataHeatBalFanSys->MAT(ZoneNum)); // infiltration | Ventilation (simple) | Earth tube. | Cooltower | combined OA flow
 
         // Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model (if used)
-        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-            (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
              AirflowNetwork::AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
             SumMCpDtInfil = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT -

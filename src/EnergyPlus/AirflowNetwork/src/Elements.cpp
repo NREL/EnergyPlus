@@ -85,7 +85,6 @@ namespace AirflowNetwork {
     // Link simulation variable in air distribution system
     // Sensible and latent exchange variable in air distribution system
 
-    int SimulateAirflowNetwork(1);
     // Vent Control  DistSys Control  Flag    Description
     //  NONE           NONE           0      No AirflowNetwork and SIMPLE
     //  SIMPLE         NONE           1      Simple calculations only
@@ -94,12 +93,7 @@ namespace AirflowNetwork {
     //  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
     //  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
 
-    int const AirflowNetworkControlSimple(1);    // Simple calculations only
-    int const AirflowNetworkControlMultizone(2); // Perform multizone calculations only
-    int const AirflowNetworkControlSimpleADS(4); // Perform distribution system during system
-    // on time and simple calculations during off time
-    int const AirflowNetworkControlMultiADS(5); // Perform distribution system during system on time
-    // and multizone calculations during off time
+
 
     Array1D_bool AirflowNetworkZoneFlag;
 
@@ -3727,7 +3721,6 @@ namespace AirflowNetwork {
 
     void clear_state()
     {
-        SimulateAirflowNetwork = 1;
         AirflowNetworkZoneFlag.deallocate();
         NumOfNodesMultiZone = 0;
         NumOfNodesDistribution = 0;

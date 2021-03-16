@@ -735,7 +735,7 @@ namespace EnergyPlus::DisplacementVentMgr {
         SumMCp = state.dataHeatBalFanSys->MCPI(ZoneNum) + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) + state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
         SumMCpT =
                 state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) + state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
-        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
             SumMCp = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
             SumMCpT = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
         }

@@ -3986,8 +3986,8 @@ namespace HVACMultiSpeedHeatPump {
             MSHPHeatRecovery(state, MSHeatPumpNum);
         }
 
-        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
             state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOnMassFlowrate = CompOnMassFlow;
             state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOffMassFlowrate = CompOffMassFlow;
             state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
