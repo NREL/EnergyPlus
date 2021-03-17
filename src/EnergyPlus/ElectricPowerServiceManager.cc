@@ -84,27 +84,20 @@
 
 namespace EnergyPlus {
 
-std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
-
-void clearFacilityElectricPowerServiceObject()
+void createFacilityElectricPowerServiceObject(EnergyPlusData &state)
 {
-    facilityElectricServiceObj.release();
-}
-
-void createFacilityElectricPowerServiceObject()
-{
-    facilityElectricServiceObj = std::unique_ptr<ElectricPowerServiceManager>(new ElectricPowerServiceManager());
+    state.dataElectPwrSvcMgr->facilityElectricServiceObj = std::make_unique<ElectricPowerServiceManager>();
 }
 
 void initializeElectricPowerServiceZoneGains(EnergyPlusData &state) // namespace routine for handling call from InternalHeatGains
 {
     // internal zone gains need to be re initialized for begin new environment earlier than the main call into manage electric power service
-    if (facilityElectricServiceObj->newEnvironmentInternalGainsFlag && state.dataGlobal->BeginEnvrnFlag) {
-        facilityElectricServiceObj->reinitZoneGainsAtBeginEnvironment();
-        facilityElectricServiceObj->newEnvironmentInternalGainsFlag = false;
+    if (state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag && state.dataGlobal->BeginEnvrnFlag) {
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->reinitZoneGainsAtBeginEnvironment();
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        facilityElectricServiceObj->newEnvironmentInternalGainsFlag = true;
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag = true;
     }
 }
 
@@ -2120,7 +2113,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         // simulate
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->InitICEngineGenerators(state, runFlag, FirstHVACIteration);
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->CalcICEngineGeneratorModel(state, runFlag, tempLoad);
-        dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->update();
+        dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->update(state);
         electProdRate = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecPowerGenerated;
         electricityProd = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecEnergyGenerated;
         thermProdRate = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->QTotalHeatRecovered;
@@ -2210,7 +2203,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         // simulate
         dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->InitMTGenerators(state, runFlag, tempLoad, FirstHVACIteration);
         dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->CalcMTGeneratorModel(state, runFlag, tempLoad);
-        dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->UpdateMTGeneratorRecords();
+        dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->UpdateMTGeneratorRecords(state);
         electProdRate = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->ElecPowerGenerated;
         electricityProd = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->EnergyGen;
         thermProdRate = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->QHeatRecovered;
@@ -2334,7 +2327,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                 }
             }
 
-            zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), DataHeatBalance::Zone);
+            zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), state.dataHeatBal->Zone);
             if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
             if (zoneNum_ == 0) {
                 if (DataIPShortCuts::lAlphaFieldBlanks(3)) {
@@ -2770,7 +2763,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
 
         standbyPower_ = DataIPShortCuts::rNumericArgs(3);
 
-        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(5), DataHeatBalance::Zone);
+        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(5), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
         if (zoneNum_ == 0) {
             if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
@@ -3010,7 +3003,7 @@ ElectricStorage::ElectricStorage( // main constructor
             }
         }
 
-        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), DataHeatBalance::Zone);
+        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
         if (zoneNum_ == 0) {
             if (DataIPShortCuts::lAlphaFieldBlanks(3)) {
@@ -3857,7 +3850,7 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     // Set the temperature the battery sees
     if (zoneNum_ > 0) {
         // If in a zone, use the zone temperature
-        battState.thermal->T_room = DataHeatBalFanSys::ZT(zoneNum_);
+        battState.thermal->T_room = state.dataHeatBalFanSys->ZT(zoneNum_);
     } else {
         // If outside, use outdoor temperature
         battState.thermal->T_room = state.dataEnvrn->OutDryBulbTemp;
@@ -4214,7 +4207,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             errorsFound = true;
         }
 
-        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), DataHeatBalance::Zone);
+        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
         if (zoneNum_ == 0) {
             if (DataIPShortCuts::lAlphaFieldBlanks(4)) {
@@ -4494,7 +4487,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
         Real64 ambTemp = 20.0;
         if (heatLossesDestination_ == ThermalLossDestination::zoneGains) {
 
-            ambTemp = DataHeatBalance::ZnAirRpt(zoneNum_).MeanAirTemp;
+            ambTemp = state.dataHeatBal->ZnAirRpt(zoneNum_).MeanAirTemp;
         } else {
             ambTemp = 20.0;
         }

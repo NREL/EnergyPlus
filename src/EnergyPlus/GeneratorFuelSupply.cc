@@ -109,10 +109,7 @@ namespace GeneratorFuelSupply {
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using CurveManager::GetCurveIndex;
-        using DataLoopNode::NodeConnectionType_Sensor;
-        using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsNotParent;
-
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
 
@@ -158,7 +155,7 @@ namespace GeneratorFuelSupply {
 
                 state.dataGenerator->FuelSupply(FuelSupNum).NodeName = AlphArray(3);
                 state.dataGenerator->FuelSupply(FuelSupNum).NodeNum = GetOnlySingleNode(state,
-                    AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                    AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Sensor, 1, ObjectIsNotParent);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
                 if ((state.dataGenerator->FuelSupply(FuelSupNum).SchedNum == 0) && (state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode == DataGenerators::FuelTemperatureMode::FuelInTempSchedule)) {

@@ -142,11 +142,11 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // get inlet node num
         this->inletNodeNum = NodeInputManager::GetOnlySingleNode(
-            state, inletNodeName, errorsFound, this->moduleName, this->name, NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            state, inletNodeName, errorsFound, this->moduleName, this->name, DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
         // get outlet node num
         this->outletNodeNum = NodeInputManager::GetOnlySingleNode(
-            state, outletNodeName, errorsFound, this->moduleName, this->name, NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            state, outletNodeName, errorsFound, this->moduleName, this->name, DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
         this->available = true;
         this->on = true;
@@ -155,7 +155,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // load data
         this->designFlow = j["design_flow_rate"];
-        PlantUtilities::RegisterPlantCompDesignFlow(this->inletNodeNum, this->designFlow);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNodeNum, this->designFlow);
 
         this->soil.k = j["soil_thermal_conductivity"];
         this->soil.rho = j["soil_density"];
@@ -271,8 +271,8 @@ namespace EnergyPlus::GroundHeatExchangers {
                                                                  errorsFound,
                                                                  this->moduleName,
                                                                  objName,
-                                                                 NodeType_Water,
-                                                                 NodeConnectionType_Inlet,
+                                                                 DataLoopNode::NodeFluidType::Water,
+                                                                 DataLoopNode::NodeConnectionType::Inlet,
                                                                  1,
                                                                  ObjectIsNotParent);
 
@@ -283,8 +283,8 @@ namespace EnergyPlus::GroundHeatExchangers {
                                                                   errorsFound,
                                                                   this->moduleName,
                                                                   objName,
-                                                                  NodeType_Water,
-                                                                  NodeConnectionType_Outlet,
+                                                                  DataLoopNode::NodeFluidType::Water,
+                                                                  DataLoopNode::NodeConnectionType::Outlet,
                                                                   1,
                                                                   ObjectIsNotParent);
         this->available = true;
@@ -293,7 +293,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         BranchNodeConnections::TestCompSet(state, this->moduleName, objName, inletNodeName, outletNodeName, "Condenser Water Nodes");
 
         this->designFlow = j["design_flow_rate"];
-        PlantUtilities::RegisterPlantCompDesignFlow(this->inletNodeNum, this->designFlow);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNodeNum, this->designFlow);
 
         this->soil.k = j["ground_thermal_conductivity"];
         this->soil.rhoCp = j["ground_thermal_heat_capacity"];
@@ -948,7 +948,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         combineShortAndLongTimestepGFunctions();
 
         // save data for later
-        if (!DataSystemVariables::DisableGLHECaching) {
+        if (!state.dataSysVars->DisableGLHECaching) {
             myCacheData["Response Factors"]["time"] = std::vector<Real64>(this->myRespFactors->time.begin(), this->myRespFactors->time.end());
             myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(this->myRespFactors->LNTTS.begin(), this->myRespFactors->LNTTS.end());
             myCacheData["Response Factors"]["GFNC"] = std::vector<Real64>(this->myRespFactors->GFNC.begin(), this->myRespFactors->GFNC.end());
@@ -1358,7 +1358,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     void GLHEBase::makeThisGLHECacheAndCompareWithFileCache(EnergyPlusData &state)
     {
-        if (!DataSystemVariables::DisableGLHECaching) {
+        if (!state.dataSysVars->DisableGLHECaching) {
             makeThisGLHECacheStruct();
             readCacheFileAndCompareWithThisGLHECache(state);
         }
@@ -2089,7 +2089,7 @@ namespace EnergyPlus::GroundHeatExchangers {
             this->firstTime = false;
         }
 
-        this->inletTemp = Node(this->inletNodeNum).Temp;
+        this->inletTemp = state.dataLoopNodes->Node(this->inletNodeNum).Temp;
 
         Real64 cpFluid = GetSpecificHeatGlycol(state,
                                                state.dataPlnt->PlantLoop(this->loopNum).FluidName,
@@ -2136,7 +2136,7 @@ namespace EnergyPlus::GroundHeatExchangers {
             return;
         }
 
-        // Store state.dataGroundHeatExchanger->currentSimTime in prevTimeSteps only if a time step occurs
+        // Store currentSimTime in prevTimeSteps only if a time step occurs
         if (state.dataGroundHeatExchanger->prevTimeSteps(1) != state.dataGroundHeatExchanger->currentSimTime) {
             state.dataGroundHeatExchanger->prevTimeSteps =
                 eoshift(state.dataGroundHeatExchanger->prevTimeSteps, -1, state.dataGroundHeatExchanger->currentSimTime);
@@ -2368,8 +2368,9 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         SafeCopyPlantNode(state, this->inletNodeNum, this->outletNodeNum);
 
-        Node(this->outletNodeNum).Temp = this->outletTemp;
-        Node(this->outletNodeNum).Enthalpy = this->outletTemp * GetSpecificHeatGlycol(state,
+        state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->outletTemp;
+        state.dataLoopNodes->Node(this->outletNodeNum).Enthalpy =
+            this->outletTemp * GetSpecificHeatGlycol(state,
                                                                                       state.dataPlnt->PlantLoop(this->loopNum).FluidName,
                                                                                       this->outletTemp,
                                                                                       state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
@@ -2789,7 +2790,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         constexpr const char * RoutineName("calcPipeConvectionResistance");
 
         // Get fluid props
-        this->inletTemp = Node(this->inletNodeNum).Temp;
+        this->inletTemp = state.dataLoopNodes->Node(this->inletNodeNum).Temp;
 
         Real64 const cpFluid = GetSpecificHeatGlycol(state,
                                                      state.dataPlnt->PlantLoop(this->loopNum).FluidName,
@@ -3189,12 +3190,12 @@ namespace EnergyPlus::GroundHeatExchangers {
         Real64 fluidDensity = FluidProperties::GetDensityGlycol(
             state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
         this->designMassFlow = this->designFlow * fluidDensity;
-        PlantUtilities::InitComponentNodes(
+        PlantUtilities::InitComponentNodes(state, 
             0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
         this->lastQnSubHr = 0.0;
-        Node(this->inletNodeNum).Temp = this->tempGround;
-        Node(this->outletNodeNum).Temp = this->tempGround;
+        state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->tempGround;
+        state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->tempGround;
 
         // zero out all history arrays
         this->QnHr = 0.0;
@@ -3279,12 +3280,12 @@ namespace EnergyPlus::GroundHeatExchangers {
         Real64 fluidDensity = FluidProperties::GetDensityGlycol(
             state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
         this->designMassFlow = this->designFlow * fluidDensity;
-        PlantUtilities::InitComponentNodes(
+        PlantUtilities::InitComponentNodes(state, 
             0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
         this->lastQnSubHr = 0.0;
-        Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
-        Node(this->outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+        state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+        state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
 
         // zero out all history arrays
         this->QnHr = 0.0;

@@ -132,12 +132,14 @@ namespace BranchInputManager {
         std::string AssignedLoopName;     // Loop Name for this branch
         DataBranchAirLoopPlant::PressureCurveType PressureCurveType;            // Integer index of pressure curve type
         int PressureCurveIndex;           // Integer index of pressure curve
-        int FluidType;                    // Fluid type (see DataLoopNode)
+        DataLoopNode::NodeFluidType FluidType;                                  // Fluid type (see DataLoopNode)
         int NumOfComponents;              // Number of Components on this Branch
         Array1D<ComponentData> Component; // Component definitions for each component
 
         // Default Constructor
-        BranchData() : PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Unassigned), PressureCurveIndex(0), FluidType(DataLoopNode::NodeType_Unknown), NumOfComponents(0)
+        BranchData()
+            : PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Unassigned), PressureCurveIndex(0),
+              FluidType(DataLoopNode::NodeFluidType::blank), NumOfComponents(0)
         {
         }
 

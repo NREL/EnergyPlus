@@ -1303,8 +1303,8 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     MSHeatPump(2).TotCoolEnergyRate = 1000.0;
     MSHeatPump(1).FlowFraction = 1.0;
     MSHeatPump(2).FlowFraction = 1.0;
-    ScheduleManager::Schedule(17).CurrentValue = 1.0;
-    ScheduleManager::Schedule(9).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(17).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(9).CurrentValue = 1.0;
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.012;
@@ -1325,17 +1325,17 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     EXPECT_EQ(MSHeatPump(2).MinOATCompressorCooling, -25.0);
     EXPECT_EQ(MSHeatPump(2).MinOATCompressorHeating, -8.0);
 
-    DataLoopNode::Node(9).Temp = 24.0;
-    DataLoopNode::Node(9).HumRat = 0.008;
-    DataLoopNode::Node(6).Temp = 24.0;
-    DataLoopNode::Node(6).HumRat = 0.008;
-    DataLoopNode::Node(16).Temp = 24.0;
-    DataLoopNode::Node(16).HumRat = 0.008;
-    DataLoopNode::Node(16).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(16).Temp, DataLoopNode::Node(16).HumRat);
-    DataLoopNode::Node(24).MassFlowRateMax = DataLoopNode::Node(16).MassFlowRateMaxAvail;
+    state->dataLoopNodes->Node(9).Temp = 24.0;
+    state->dataLoopNodes->Node(9).HumRat = 0.008;
+    state->dataLoopNodes->Node(6).Temp = 24.0;
+    state->dataLoopNodes->Node(6).HumRat = 0.008;
+    state->dataLoopNodes->Node(16).Temp = 24.0;
+    state->dataLoopNodes->Node(16).HumRat = 0.008;
+    state->dataLoopNodes->Node(16).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(16).Temp, state->dataLoopNodes->Node(16).HumRat);
+    state->dataLoopNodes->Node(24).MassFlowRateMax = state->dataLoopNodes->Node(16).MassFlowRateMaxAvail;
 
-    Fans::Fan(2).MaxAirMassFlowRate = DataLoopNode::Node(16).MassFlowRateMaxAvail;
-    Fans::Fan(2).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataFans->Fan(2).MaxAirMassFlowRate = state->dataLoopNodes->Node(16).MassFlowRateMaxAvail;
+    state->dataFans->Fan(2).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(1) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
     state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(2) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(2) * state->dataEnvrn->StdRhoAir;
     state->dataDXCoils->DXCoil(2).MSRatedCBF(1) = 0.2;
@@ -1345,9 +1345,9 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     // Cooling
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     // Check outlet conditions
-    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 23.363295, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00796611, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43744.6339, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 23.363295, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).HumRat, 0.00796611, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 43744.6339, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.123500, 0.0001);
 
     // Direct solution
@@ -1355,25 +1355,25 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     MSHeatPump(2).FullOutput.allocate(2);
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     // Check outlet conditions
-    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 23.3641, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00796613, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43745.5237, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 23.3641, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).HumRat, 0.00796613, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 43745.5237, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.123430, 0.0001);
 
     QZnReq = -10000.00;
 
     state->dataGlobal->DoCoilDirectSolutions = false;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
-    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.4545, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.8507, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 21.4545, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).HumRat, 0.00792169, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 41684.8507, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.285914, 0.0001);
 
     state->dataGlobal->DoCoilDirectSolutions = true;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
-    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.4545, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.8507, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 21.4545, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).HumRat, 0.00792169, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 41684.8507, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.285914, 0.0001);
 
     // Heating
@@ -1383,15 +1383,15 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     state->dataEnvrn->OutHumRat = 0.008;
     state->dataGlobal->DoCoilDirectSolutions = false;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
-    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 26.546664, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.008, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 47077.4613, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 26.546664, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).HumRat, 0.008, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 47077.4613, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
     state->dataGlobal->DoCoilDirectSolutions = true;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
-    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 26.546664, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.008, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 47077.4613, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 26.546664, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).HumRat, 0.008, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 47077.4613, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
 
     state->dataGlobal->DoCoilDirectSolutions = false;
@@ -1402,7 +1402,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
 {
 
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     MSHeatPump.allocate(1);
     int HeatRecInNode(1);
     int HeatRecOutNode(2);
@@ -1410,30 +1410,30 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     MSHeatPump(1).HeatRecOutletNodeNum = HeatRecOutNode;
     MSHeatPump(1).MaxHeatRecOutletTemp = 80;
     MSHeatPump(1).HRLoopNum = 1; // index to plant
-    DataLoopNode::Node(HeatRecInNode).Temp = 50.0;
+    state->dataLoopNodes->Node(HeatRecInNode).Temp = 50.0;
     DataHVACGlobals::MSHPWasteHeat = 1000.0;
 
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
-    DataLoopNode::Node(HeatRecInNode).MassFlowRate = 0.0; // test heat recovery result with 0 water flow rate
+    state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate = 0.0; // test heat recovery result with 0 water flow rate
     HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);
 
     // outlet temp should equal inlet temp since mass flow rate = 0
     Real64 calculatedOutletTemp =
-        DataLoopNode::Node(HeatRecInNode).Temp + DataHVACGlobals::MSHPWasteHeat / (DataLoopNode::Node(HeatRecInNode).MassFlowRate * 4181.0);
+        state->dataLoopNodes->Node(HeatRecInNode).Temp + DataHVACGlobals::MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
     EXPECT_DOUBLE_EQ(0.0, MSHeatPump(1).HeatRecoveryRate);
     EXPECT_DOUBLE_EQ(50.0, MSHeatPump(1).HeatRecoveryInletTemp);
     EXPECT_DOUBLE_EQ(50.0, MSHeatPump(1).HeatRecoveryOutletTemp);
     EXPECT_DOUBLE_EQ(0.0, MSHeatPump(1).HeatRecoveryMassFlowRate);
 
-    DataLoopNode::Node(HeatRecInNode).MassFlowRate = 0.1; // initialize flow rate and test heat recovery result using 1 kW heat transfer to fluid
+    state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate = 0.1; // initialize flow rate and test heat recovery result using 1 kW heat transfer to fluid
     HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);
 
     // outlet temp should equal temperature rise due to 1 kW of heat input at 0.1 kg/s
     calculatedOutletTemp =
-        DataLoopNode::Node(HeatRecInNode).Temp + DataHVACGlobals::MSHPWasteHeat / (DataLoopNode::Node(HeatRecInNode).MassFlowRate * 4181.0);
+        state->dataLoopNodes->Node(HeatRecInNode).Temp + DataHVACGlobals::MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
     EXPECT_DOUBLE_EQ(1000.0, MSHeatPump(1).HeatRecoveryRate);
     EXPECT_DOUBLE_EQ(50.0, MSHeatPump(1).HeatRecoveryInletTemp);
     EXPECT_DOUBLE_EQ(calculatedOutletTemp, MSHeatPump(1).HeatRecoveryOutletTemp);
@@ -1441,7 +1441,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     EXPECT_DOUBLE_EQ(0.1, MSHeatPump(1).HeatRecoveryMassFlowRate);
 
     DataHVACGlobals::MSHPWasteHeat = 100000.0; // test very high heat transfer that would limit outlet water temperature
-    DataLoopNode::Node(HeatRecInNode).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate = 0.1;
     HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);
 
     // outlet temp should equal max limit of 80 C since 100 kW would cause outlet water temperature to exceed 80 C
@@ -1449,7 +1449,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     EXPECT_DOUBLE_EQ(80.0, MSHeatPump(1).HeatRecoveryOutletTemp);
     EXPECT_DOUBLE_EQ(0.1, MSHeatPump(1).HeatRecoveryMassFlowRate);
     Real64 QHeatRecovery =
-        DataLoopNode::Node(HeatRecInNode).MassFlowRate * 4181.0 * (MSHeatPump(1).HeatRecoveryOutletTemp - MSHeatPump(1).HeatRecoveryInletTemp);
+        state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0 * (MSHeatPump(1).HeatRecoveryOutletTemp - MSHeatPump(1).HeatRecoveryInletTemp);
     EXPECT_DOUBLE_EQ(QHeatRecovery, MSHeatPump(1).HeatRecoveryRate);
     EXPECT_DOUBLE_EQ(12543.0, QHeatRecovery);
 }

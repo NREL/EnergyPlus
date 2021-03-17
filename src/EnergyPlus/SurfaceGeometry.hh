@@ -83,7 +83,7 @@ namespace SurfaceGeometry {
 
     void AllocateModuleArrays(EnergyPlusData &state);
 
-    void AllocateSurfaceWindows(int NumSurfaces);
+    void AllocateSurfaceWindows(EnergyPlusData &state, int NumSurfaces);
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -193,7 +193,8 @@ namespace SurfaceGeometry {
                                          Real64 const Length,
                                          Real64 const Height);
 
-    void MakeEquivalentRectangle(int const SurfNum, // Surface number
+    void MakeEquivalentRectangle(EnergyPlusData &state,
+                                 int const SurfNum, // Surface number
                                  bool &ErrorsFound  // Error flag indicator (true if errors found)
     );
 
@@ -265,7 +266,7 @@ namespace SurfaceGeometry {
 
     void CheckWindowShadingControlSimilarForWindow(EnergyPlusData &state, bool& ErrorsFound);
 
-    bool isWindowShadingControlSimilar(int a, int b);
+    bool isWindowShadingControlSimilar(EnergyPlusData &state, int a, int b);
 
     void GetStormWindowData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -306,17 +307,17 @@ namespace SurfaceGeometry {
 
     void insertVertexOnFace(DataVectorTypes::Face &face, int const &indexBefore, DataVectorTypes::Vector const &vertexToInsert);
 
-    bool areFloorAndCeilingSame(DataVectorTypes::Polyhedron const &zonePoly);
+    bool areFloorAndCeilingSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
-    bool areWallHeightSame(DataVectorTypes::Polyhedron const &zonePoly);
+    bool areWallHeightSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
-    std::tuple<bool, bool, bool> areSurfaceHorizAndVert(DataVectorTypes::Polyhedron const &zonePoly);
+    std::tuple<bool, bool, bool> areSurfaceHorizAndVert(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
-    bool areOppositeWallsSame(DataVectorTypes::Polyhedron const &zonePoly, Real64 &oppositeWallArea, Real64 &distanceBetweenOppositeWalls);
+    bool areOppositeWallsSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 &oppositeWallArea, Real64 &distanceBetweenOppositeWalls);
 
-    std::vector<int> listOfFacesFacingAzimuth(DataVectorTypes::Polyhedron const &zonePoly, Real64 const &azimuth);
+    std::vector<int> listOfFacesFacingAzimuth(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 const &azimuth);
 
-    int findPossibleOppositeFace(DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex);
+    int findPossibleOppositeFace(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex);
 
     bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex, int const &opFaceIndex, Real64 &distanceBetween);
 
@@ -378,11 +379,12 @@ namespace SurfaceGeometry {
                                          SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
                                          bool &ErrorsFound);                                                        // Set to true if errors found
 
-    void CheckConvexity(EnergyPlusData &state, int const SurfNum, // Current surface number
+    void CheckConvexity(EnergyPlusData &state,
+                        int const SurfNum, // Current surface number
                         int const NSides   // Number of sides to figure
     );
 
-    bool isRectangle(int const ThisSurf // Current surface number
+    bool isRectangle(EnergyPlusData &state, int const ThisSurf // Current surface number
     );
 
     void CheckForReversedLayers(EnergyPlusData &state,

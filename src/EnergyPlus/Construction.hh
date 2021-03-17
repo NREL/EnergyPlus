@@ -279,15 +279,9 @@ namespace Construction {
               CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0), CTFTUserOut({0, MaxCTFTerms - 1}, 0.0),
               CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0), NumHistories(0), NumCTFTerms(0), UValue(0.0),
               SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0), userTemperatureLocationPerpendicular(0.0),
-              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiff(DataHeatBalance::MaxSolidWinLayers, 0.0),
-              BlAbsDiff(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0),
-              BlAbsDiffGnd(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0),
-              BlAbsDiffSky(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffBack(DataHeatBalance::MaxSolidWinLayers, 0.0),
-              BlAbsDiffBack(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffShade(0.0),
-              AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0),
-              AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackShade(0.0), AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0),
-              ShadeAbsorpThermal(0.0), AbsBeamCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0),
-              AbsBeamBackCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsBeamShadeCoef(6, 0.0), TransDiff(0.0),
+              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiffShade(0.0), AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0),
+              AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackShade(0.0),
+              AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0), ShadeAbsorpThermal(0.0), AbsBeamShadeCoef(6, 0.0), TransDiff(0.0),
               BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0),
               BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0), BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0),
               ReflectSolDiffBack(0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffFront(0.0),
@@ -321,13 +315,15 @@ namespace Construction {
 
         void calculateFinalCoefficients();
 
-        void reportTransferFunction(EnergyPlusData &state, int const cCounter);
+        void reportTransferFunction(EnergyPlusData &state, int cCounter);
 
         bool isGlazingConstruction(EnergyPlusData &state) const;
 
         Real64 setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue);
 
         void setNodeSourceAndUserTemp(Array1D_int & Nodes);
+
+        void setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state);
     };
 }   // namespace Construction
 

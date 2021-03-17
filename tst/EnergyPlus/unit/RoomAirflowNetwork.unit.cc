@@ -92,34 +92,34 @@ protected:
     {
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
-        CurZoneEqNum = 0;
-        CurSysNum = 0;
-        CurOASysNum = 0;
+        state->dataSize->CurZoneEqNum = 0;
+        state->dataSize->CurSysNum = 0;
+        state->dataSize->CurOASysNum = 0;
         state->dataGlobal->NumOfZones = 1;
-        NumOfNodes = 5;
+        state->dataLoopNodes->NumOfNodes = 5;
         state->dataGlobal->BeginEnvrnFlag = true;
         int NumOfSurfaces = 2;
         state->dataRoomAirMod->RoomAirflowNetworkZoneInfo.allocate(state->dataGlobal->NumOfZones);
-        Zone.allocate(state->dataGlobal->NumOfZones);
+        state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
-        ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
-        NodeID.allocate(NumOfNodes);
-        Node.allocate(NumOfNodes);
-        Surface.allocate(NumOfSurfaces);
-        HConvIn.allocate(NumOfSurfaces);
-        TempSurfInTmp.allocate(NumOfSurfaces);
-        RVSurface.allocate(NumOfSurfaces);
-        RVSurfaceOld.allocate(NumOfSurfaces);
-        RVDeepLayer.allocate(NumOfSurfaces);
-        RVdeepOld.allocate(NumOfSurfaces);
-        RVSurfLayerOld.allocate(NumOfSurfaces);
-        RVSurfLayer.allocate(NumOfSurfaces);
+        state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
+        state->dataLoopNodes->NodeID.allocate(state->dataLoopNodes->NumOfNodes);
+        state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
+        state->dataSurface->Surface.allocate(NumOfSurfaces);
+        state->dataHeatBal->HConvIn.allocate(NumOfSurfaces);
+        state->dataHeatBalSurf->TempSurfInTmp.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVSurface.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVSurfaceOld.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVDeepLayer.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVdeepOld.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVSurfLayerOld.allocate(NumOfSurfaces);
+        state->dataMstBalEMPD->RVSurfLayer.allocate(NumOfSurfaces);
         RhoVaporSurfIn.allocate(NumOfSurfaces);
         RhoVaporAirIn.allocate(NumOfSurfaces);
         HMassConvInFD.allocate(NumOfSurfaces);
-        MAT.allocate(state->dataGlobal->NumOfZones);
-        ZoneAirHumRat.allocate(1);
+        state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+        state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
         AirflowNetwork::AirflowNetworkLinkageData.allocate(5);
         AirflowNetwork::AirflowNetworkNodeSimu.allocate(6);
         AirflowNetwork::AirflowNetworkLinkSimu.allocate(5);
@@ -139,7 +139,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     int RoomAirNode;
     TimeStepSys = 15.0 / 60.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    Zone(ZoneNum).ZoneVolCapMultpSens = 1;
+    state->dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens = 1;
 
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).IsUsed = true;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID = ZoneNum;
@@ -238,56 +238,56 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ActualZoneNum = ZoneNum;
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(1) = 1;
-    NodeID.allocate(NumOfNodes);
-    Node.allocate(NumOfNodes);
+    state->dataLoopNodes->NodeID.allocate(state->dataLoopNodes->NumOfNodes);
+    state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    Zone(ZoneNum).Volume = 100;
-    Zone(ZoneNum).IsControlled = true;
-    Zone(ZoneNum).SurfaceFirst = 1;
-    Zone(ZoneNum).SurfaceLast = 2;
-    Zone(ZoneNum).ZoneVolCapMultpMoist = 0;
+    state->dataHeatBal->Zone(ZoneNum).Volume = 100;
+    state->dataHeatBal->Zone(ZoneNum).IsControlled = true;
+    state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 2;
+    state->dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = 0;
 
-    ZoneIntGain(ZoneNum).NumberOfDevices = 1;
-    ZoneIntGain(ZoneNum).Device.allocate(ZoneIntGain(1).NumberOfDevices);
-    ZoneIntGain(ZoneNum).Device(1).CompObjectName = "PEOPLE";
-    ZoneIntGain(ZoneNum).Device(1).CompTypeOfNum = IntGainTypeOf_People;
-    ZoneIntGain(ZoneNum).Device(1).ConvectGainRate = 300.0;
-    ZoneIntGain(ZoneNum).Device(1).LatentGainRate = 200.0;
+    state->dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices = 1;
+    state->dataHeatBal->ZoneIntGain(ZoneNum).Device.allocate(state->dataHeatBal->ZoneIntGain(1).NumberOfDevices);
+    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).CompObjectName = "PEOPLE";
+    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).CompTypeOfNum = IntGainTypeOf_People;
+    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).ConvectGainRate = 300.0;
+    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).LatentGainRate = 200.0;
 
-    Surface(1).HeatTransSurf = true;
-    Surface(2).HeatTransSurf = true;
-    Surface(1).Area = 1.0;
-    Surface(2).Area = 2.0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Area = 1.0;
+    state->dataSurface->Surface(2).Area = 2.0;
 
-    Surface(1).HeatTransferAlgorithm = HeatTransferModel_EMPD;
-    Surface(2).HeatTransferAlgorithm = HeatTransferModel_EMPD;
-    RVSurface(1) = 0.0011;
-    RVSurface(2) = 0.0012;
+    state->dataSurface->Surface(1).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
+    state->dataSurface->Surface(2).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
+    state->dataMstBalEMPD->RVSurface(1) = 0.0011;
+    state->dataMstBalEMPD->RVSurface(2) = 0.0012;
 
-    NodeID(1) = "Supply";
-    NodeID(2) = "Return";
+    state->dataLoopNodes->NodeID(1) = "Supply";
+    state->dataLoopNodes->NodeID(2) = "Return";
 
-    ZoneAirHumRat(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
-    Node(1).Temp = 20.0;
-    Node(1).HumRat = 0.001;
-    Node(1).MassFlowRate = 0.01;
+    state->dataLoopNodes->Node(1).Temp = 20.0;
+    state->dataLoopNodes->Node(1).HumRat = 0.001;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.01;
 
-    MAT(1) = 20.0;
-    HConvIn(1) = 1.0;
-    HConvIn(2) = 1.0;
-    TempSurfInTmp(1) = 25.0;
-    TempSurfInTmp(2) = 30.0;
-    RhoVaporAirIn(1) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
-    RhoVaporAirIn(2) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
-    HMassConvInFD(1) = HConvIn(1) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *
-                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
-    HMassConvInFD(2) = HConvIn(2) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(2)) *
-                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
+    state->dataHeatBalFanSys->MAT(1) = 20.0;
+    state->dataHeatBal->HConvIn(1) = 1.0;
+    state->dataHeatBal->HConvIn(2) = 1.0;
+    state->dataHeatBalSurf->TempSurfInTmp(1) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(2) = 30.0;
+    RhoVaporAirIn(1) = PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
+    RhoVaporAirIn(2) = PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
+    HMassConvInFD(1) = state->dataHeatBal->HConvIn(1) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *
+                                     PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
+    HMassConvInFD(2) = state->dataHeatBal->HConvIn(2) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(2)) *
+                                     PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
 
     RoomAirNode = 1;
     auto &thisRAFN(RAFN(ZoneNum));
@@ -346,6 +346,6 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 
     thisRAFN.UpdateRoomAirModelAirflowNetwork(*state);
 
-    EXPECT_NEAR(24.397538, Node(2).Temp, 0.00001);
-    EXPECT_NEAR(0.0024802305, Node(2).HumRat, 0.000001);
+    EXPECT_NEAR(24.397538, state->dataLoopNodes->Node(2).Temp, 0.00001);
+    EXPECT_NEAR(0.0024802305, state->dataLoopNodes->Node(2).HumRat, 0.000001);
 }

@@ -177,8 +177,8 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
@@ -187,10 +187,10 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     SetSurfaceOutBulbTempAt(*state);
-    EXPECT_EQ("T3-RF1 - FLOOR:N", Surface(1).Name);
-    EXPECT_GT(Surface(1).Centroid.z, 20000.0);    // this condition is fatal
-    EXPECT_LT(Surface(1).OutDryBulbTemp, -100.0); // this condition is fatal
-    EXPECT_LT(Surface(1).OutWetBulbTemp, -100.0); // this condition is fatal
+    EXPECT_EQ("T3-RF1 - FLOOR:N", state->dataSurface->Surface(1).Name);
+    EXPECT_GT(state->dataSurface->Surface(1).Centroid.z, 20000.0);    // this condition is fatal
+    EXPECT_LT(state->dataSurface->Surface(1).OutDryBulbTemp, -100.0); // this condition is fatal
+    EXPECT_LT(state->dataSurface->Surface(1).OutWetBulbTemp, -100.0); // this condition is fatal
 }
 
 TEST_F(EnergyPlusFixture, SurfaceTest_Plane)

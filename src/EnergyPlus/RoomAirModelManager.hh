@@ -59,11 +59,6 @@ struct EnergyPlusData;
 
 namespace RoomAirModelManager {
 
-    extern bool GetUCSDDVDataFlag; // UCSD
-    extern bool GetAirModelData;   // Used to "get" all air model data
-
-    void clear_state();
-
     void ManageAirModel(EnergyPlusData &state, int &ZoneNum);
 
     void GetAirModelDatas(EnergyPlusData &state);
@@ -100,9 +95,99 @@ namespace RoomAirModelManager {
 
 struct RoomAirModelManagerData : BaseGlobalStruct {
 
+    bool GetUCSDDVDataFlag = true; // UCSD
+    bool GetAirModelData = true; // Used to "get" all air model data
+    bool MyOneTimeFlag = true;
+    int CompNum = 0;
+    int TypeNum = 0;
+    int NodeNum1 = 0;
+    int NodeNum2 = 0;
+    int CompNumber = 0;             // AirflowNetwork Component number
+    int TypeNumber = 0;             // Airflownetwork Type Number within a component
+    int NodeNumber1 = 0;            // The first node number in an AirflowNetwork linkage data
+    int NodeNumber2 = 0;            // The Second node number in an AirflowNetwork linkage data
+    int contFloorBegin = 0;            // counter
+    int contFloorLast = 0;             // counter
+    int contFloor = 0;                 // counter
+    int contCeilingBegin = 0;          // counter
+    int contCeilingLast = 0;           // counter
+    int contCeiling = 0;               // counter
+    int contWallBegin = 0;             // counter
+    int contWallLast = 0;              // counter
+    int contWall = 0;                  // counter
+    int contWindowBegin = 0;           // counter
+    int contWindowLast = 0;            // counter
+    int contWindow = 0;                // counter
+    int contInternalBegin = 0;         // counter
+    int contInternalLast = 0;          // counter
+    int contInternal = 0;              // counter
+    int contDoorBegin = 0;             // counter
+    int contDoorLast = 0;              // counter
+    int contDoor = 0;                  // counter
+    int Loop = 0;                      // counter
+    int Loop2 = 0;                     // counter
+    int Loop3 = 0;                     // counter
+    int i = 0;                         // counter
+    int N = 0;                         // counter
+    Real64 Z1ZoneAux = 0.0;            // Auxiliary variables
+    Real64 Z2ZoneAux = 0.0;            // Auxiliary variables
+    Real64 Z1Zone = 0.0;               // Auxiliary variables
+    Real64 Z2Zone = 0.0;               // Auxiliary variables
+    Real64 CeilingHeightDiffMax = 0.1; // Maximum difference between wall height and ceiling height
+    Real64 Z1ofZoneAux = 0.0;      // Auxiliary variables
+    Real64 Z2ofZoneAux = 0.0;     // Auxiliary variables
+    Real64 Z1ofZone = 0.0;         // Auxiliary variables
+    Real64 Z2ofZone = 0.0;         // Auxiliary variables
+    Real64 CeilingHeightDiffMaximum = 0.1; // Maximum difference between wall height and ceiling height
+    Array1D_bool MyEnvrnFlag;
+
     void clear_state() override
     {
-
+        this->GetUCSDDVDataFlag = true;
+        this->GetAirModelData = true;
+        this->MyOneTimeFlag = true;
+        this->CompNum = 0;
+        this->TypeNum = 0;
+        this->NodeNum1 = 0;
+        this->NodeNum2 = 0;
+        this->CompNumber = 0;
+        this->TypeNumber = 0;
+        this->NodeNumber1 = 0;
+        this->NodeNumber2 = 0;
+        this->contFloorBegin = 0;
+        this->contFloorLast = 0;
+        this->contFloor = 0;
+        this->contCeilingBegin = 0;
+        this->contCeilingLast = 0;
+        this->contCeiling = 0;
+        this->contWallBegin = 0;
+        this->contWallLast = 0;
+        this->contWall = 0;
+        this->contWindowBegin = 0;
+        this->contWindowLast = 0;
+        this->contWindow = 0;
+        this->contInternalBegin = 0;
+        this->contInternalLast = 0;
+        this->contInternal = 0;
+        this->contDoorBegin = 0;
+        this->contDoorLast = 0;
+        this->contDoor = 0;
+        this->Loop = 0;
+        this->Loop2 = 0;
+        this->Loop3 = 0;  
+        this->i = 0;
+        this->N = 0;
+        this->Z1ZoneAux = 0.0;
+        this->Z2ZoneAux = 0.0;
+        this->Z1Zone = 0.0;
+        this->Z2Zone = 0.0;
+        this->CeilingHeightDiffMax = 0.1;
+        this->Z1ofZoneAux = 0.0;
+        this->Z2ofZoneAux = 0.0;
+        this->Z1ofZone = 0.0;
+        this->Z2ofZone = 0.0;
+        this->CeilingHeightDiffMaximum = 0.1; 
+        this->MyEnvrnFlag.clear();
     }
 };
 

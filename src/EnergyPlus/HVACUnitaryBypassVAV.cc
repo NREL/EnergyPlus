@@ -128,67 +128,7 @@ namespace HVACUnitaryBypassVAV {
     // "Ventilation for Changeover-Bypass VAV Systems," D. Stanke, ASHRAE Journal Vol. 46, No. 11, November 2004.
     //  Lawrence Berkeley Laboratory. Nov. 1993. DOE-2 Supplement Version 2.1E, Winklemann et.al.
 
-    // Dehumidification control modes (DehumidControlMode) for Multimode units only
-    int const DehumidControl_None(0);
-    int const DehumidControl_Multimode(1);
-    int const DehumidControl_CoolReheat(2);
-
-    // Mode of operation
-    int const CoolingMode(1); // System operating mode is cooling
-    int const HeatingMode(2); // System operating mode is heating
-
-    // Priority control mode (prioritized thermostat signal)
-    int const CoolingPriority(1); // Controls CBVAV system based on cooling priority
-    int const HeatingPriority(2); // Controls CBVAV system based on heating priority
-    int const ZonePriority(3);    // Controls CBVAV system based on number of zones priority
-    int const LoadPriority(4);    // Controls CBVAV system based on total load priority
-
-    // Airflow control for contant fan mode
-    int const UseCompressorOnFlow(1);  // Set compressor OFF air flow rate equal to compressor ON air flow rate
-    int const UseCompressorOffFlow(2); // Set compressor OFF air flow rate equal to user defined value
-
     static std::string const fluidNameSteam("STEAM");
-
-    int NumCBVAV(0);                    // Number of CBVAV systems in input file
-    Real64 CompOnMassFlow(0.0);         // System air mass flow rate w/ compressor ON
-    Real64 OACompOnMassFlow(0.0);       // OA mass flow rate w/ compressor ON
-    Real64 CompOffMassFlow(0.0);        // System air mass flow rate w/ compressor OFF
-    Real64 OACompOffMassFlow(0.0);      // OA mass flow rate w/ compressor OFF
-    Real64 CompOnFlowRatio(0.0);        // fan flow ratio when coil on
-    Real64 CompOffFlowRatio(0.0);       // fan flow ratio when coil off
-    Real64 FanSpeedRatio(0.0);          // ratio of air flow ratio passed to fan object
-    Real64 BypassDuctFlowFraction(0.0); // Fraction of unit mass flow that returns to inlet of CBVAV unit through bypass duct
-    Real64 PartLoadFrac(0.0);           // Compressor part-load fraction
-    Real64 SaveCompressorPLR(0.0);      // Holds DX compressor PLR from active DX coil
-    Real64 TempSteamIn(100.0);          // steam coil steam inlet temperature
-    Array1D_bool CheckEquipName;
-    bool GetInputFlag(true); // Flag set to make sure you get input once
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Object Data
-    Array1D<CBVAVData> CBVAV;
-
-    // Functions
-
-    void clear_state()
-    {
-        CBVAV.deallocate();
-        NumCBVAV = 0;
-        CompOnMassFlow = 0.0;
-        OACompOnMassFlow = 0.0;
-        CompOffMassFlow = 0.0;
-        OACompOffMassFlow = 0.0;
-        CompOnFlowRatio = 0.0;
-        CompOffFlowRatio = 0.0;
-        FanSpeedRatio = 0.0;
-        BypassDuctFlowFraction = 0.0;
-        PartLoadFrac = 0.0;
-        SaveCompressorPLR = 0.0;
-        TempSteamIn = 100.0;
-        CheckEquipName.deallocate();
-        GetInputFlag = true;
-    }
 
     void SimUnitaryBypassVAV(EnergyPlusData &state,
                              std::string const &CompName,   // Name of the CBVAV system
@@ -210,35 +150,37 @@ namespace HVACUnitaryBypassVAV {
         Real64 QUnitOut = 0.0; // Sensible capacity delivered by this air loop system
 
         // First time SimUnitaryBypassVAV is called, get the input for all the CBVAVs
-        if (GetInputFlag) {
+        if (state.dataHVACUnitaryBypassVAV->GetInputFlag) {
             GetCBVAV(state);
-            GetInputFlag = false;
+            state.dataHVACUnitaryBypassVAV->GetInputFlag = false;
         }
 
         // Find the correct changeover-bypass VAV unit
         if (CompIndex == 0) {
-            CBVAVNum = UtilityRoutines::FindItemInList(CompName, CBVAV);
+            CBVAVNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACUnitaryBypassVAV->CBVAV);
             if (CBVAVNum == 0) {
                 ShowFatalError(state, "SimUnitaryBypassVAV: Unit not found=" + CompName);
             }
             CompIndex = CBVAVNum;
         } else {
             CBVAVNum = CompIndex;
-            if (CBVAVNum > NumCBVAV || CBVAVNum < 1) {
+            if (CBVAVNum > state.dataHVACUnitaryBypassVAV->NumCBVAV || CBVAVNum < 1) {
                 ShowFatalError(
                     state,
-                    format(
-                        "SimUnitaryBypassVAV:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", CBVAVNum, NumCBVAV, CompName));
+                    format("SimUnitaryBypassVAV:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      CBVAVNum,
+                                      state.dataHVACUnitaryBypassVAV->NumCBVAV,
+                                      CompName));
             }
-            if (CheckEquipName(CBVAVNum)) {
-                if (CompName != CBVAV(CBVAVNum).Name) {
+            if (state.dataHVACUnitaryBypassVAV->CheckEquipName(CBVAVNum)) {
+                if (CompName != state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum).Name) {
                     ShowFatalError(state,
                                    format("SimUnitaryBypassVAV: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
                                           CBVAVNum,
                                           CompName,
-                                          CBVAV(CBVAVNum).Name));
+                                          state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum).Name));
                 }
-                CheckEquipName(CBVAVNum) = false;
+                state.dataHVACUnitaryBypassVAV->CheckEquipName(CBVAVNum) = false;
             }
         }
 
@@ -277,17 +219,19 @@ namespace HVACUnitaryBypassVAV {
         QSensUnitOut = 0.0;  // probably don't need this initialization
         Real64 HeatingPower; // Power consumption of DX heating coil or electric heating coil [W]
 
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+
         // zero the fan and DX coils electricity consumption
         DataHVACGlobals::DXElecCoolingPower = 0.0;
         DataHVACGlobals::DXElecHeatingPower = 0.0;
         DataHVACGlobals::ElecHeatingCoilPower = 0.0;
-        SaveCompressorPLR = 0.0;
+        state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = 0.0;
 
         // initialize local variables
         bool UnitOn = true;
         int OutletNode = CBVAV(CBVAVNum).AirOutNode;
         int InletNode = CBVAV(CBVAVNum).AirInNode;
-        Real64 AirMassFlow = DataLoopNode::Node(InletNode).MassFlowRate;
+        Real64 AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         Real64 PartLoadFrac = 0.0;
 
         // set the on/off flags
@@ -312,7 +256,7 @@ namespace HVACUnitaryBypassVAV {
         }
         if (CBVAV(CBVAVNum).modeChanged) {
             // set outlet node SP for mixed air SP manager
-            DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).TempSetPoint = CalcSetPointTempTarget(state, CBVAVNum);
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirOutNode).TempSetPoint = CalcSetPointTempTarget(state, CBVAVNum);
             if (CBVAV(CBVAVNum).OutNodeSPMIndex > 0) {                                          // update mixed air SPM if exists
                 state.dataSetPointManager->MixedAirSetPtMgr(CBVAV(CBVAVNum).OutNodeSPMIndex).calculate(state); // update mixed air SP based on new mode
                 SetPointManager::UpdateMixedAirSetPoints(state); // need to know control node to fire off just one of these, do this later
@@ -320,17 +264,17 @@ namespace HVACUnitaryBypassVAV {
         }
 
         // calculate delivered capacity
-        AirMassFlow = DataLoopNode::Node(OutletNode).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
 
-        Real64 QTotUnitOut = AirMassFlow * (DataLoopNode::Node(OutletNode).Enthalpy - DataLoopNode::Node(InletNode).Enthalpy);
+        Real64 QTotUnitOut = AirMassFlow * (state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
 
-        Real64 MinOutletHumRat = min(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(OutletNode).HumRat);
+        Real64 MinOutletHumRat = min(state.dataLoopNodes->Node(InletNode).HumRat, state.dataLoopNodes->Node(OutletNode).HumRat);
 
-        QSensUnitOut = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinOutletHumRat) -
-                                      Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, MinOutletHumRat));
+        QSensUnitOut = AirMassFlow * (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, MinOutletHumRat) -
+                                      Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, MinOutletHumRat));
 
         // report variables
-        CBVAV(CBVAVNum).CompPartLoadRatio = SaveCompressorPLR;
+        CBVAV(CBVAVNum).CompPartLoadRatio = state.dataHVACUnitaryBypassVAV->SaveCompressorPLR;
         if (UnitOn) {
             CBVAV(CBVAVNum).FanPartLoadRatio = 1.0;
         } else {
@@ -358,7 +302,7 @@ namespace HVACUnitaryBypassVAV {
         if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             locFanElecPower = HVACFan::fanObjs[CBVAV(CBVAVNum).FanIndex]->fanPower();
         } else {
-            locFanElecPower = Fans::GetFanPower(CBVAV(CBVAVNum).FanIndex);
+            locFanElecPower = Fans::GetFanPower(state, CBVAV(CBVAVNum).FanIndex);
         }
 
         CBVAV(CBVAVNum).ElecPower = locFanElecPower + DataHVACGlobals::DXElecCoolingPower + HeatingPower;
@@ -389,11 +333,11 @@ namespace HVACUnitaryBypassVAV {
         std::string CompSetCoolInlet;       // Used in SetUpCompSets call
         std::string CompSetFanOutlet;       // Used in SetUpCompSets call
         std::string CompSetCoolOutlet;      // Used in SetUpCompSets call
-        static bool ErrorsFound(false);     // Set to true if errors in input, fatal at end of routine
-        static bool DXErrorsFound(false);   // Set to true if errors in get coil input
-        static bool FanErrFlag(false);      // Error flag returned during CALL to GetFanType
-        static bool errFlag(false);         // Error flag returned during CALL to mining functions
-        Array1D_int OANodeNums(4);          // Node numbers of OA mixer (OA, EA, RA, MA)
+        bool ErrorsFound(false);            // Set to true if errors in input, fatal at end of routine
+        bool DXErrorsFound(false);          // Set to true if errors in get coil input
+        bool FanErrFlag(false);             // Error flag returned during CALL to GetFanType
+        bool errFlag(false);                // Error flag returned during CALL to mining functions
+        Array1D_int OANodeNums(4);        // Node numbers of OA mixer (OA, EA, RA, MA)
         std::string HXDXCoolCoilName;       // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
         std::string MixerInletNodeName;     // Name of mixer inlet node
         std::string SplitterOutletNodeName; // Name of splitter outlet node
@@ -409,11 +353,15 @@ namespace HVACUnitaryBypassVAV {
 
         // find the number of each type of CBVAV unit
         std::string CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
+
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+        auto &NumCBVAV(state.dataHVACUnitaryBypassVAV->NumCBVAV);
+
         NumCBVAV = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         // allocate the data structures
         CBVAV.allocate(NumCBVAV);
-        CheckEquipName.dimension(NumCBVAV, true);
+        state.dataHVACUnitaryBypassVAV->CheckEquipName.dimension(NumCBVAV, true);
 
         // loop over CBVAV units; get and load the input data
         for (int CBVAVNum = 1; CBVAVNum <= NumCBVAV; ++CBVAVNum) {
@@ -508,8 +456,8 @@ namespace HVACUnitaryBypassVAV {
                                                                             ErrorsFound,
                                                                             CurrentModuleObject,
                                                                             Alphas(1),
-                                                                            DataLoopNode::NodeType_Air,
-                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                            DataLoopNode::NodeFluidType::Air,
+                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsParent);
 
@@ -520,8 +468,8 @@ namespace HVACUnitaryBypassVAV {
                                                                              ErrorsFound,
                                                                              CurrentModuleObject,
                                                                              Alphas(1),
-                                                                             DataLoopNode::NodeType_Air,
-                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                             DataLoopNode::NodeFluidType::Air,
+                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsParent);
 
@@ -529,8 +477,8 @@ namespace HVACUnitaryBypassVAV {
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1),
-                                                                                        DataLoopNode::NodeType_Air,
-                                                                                        DataLoopNode::NodeConnectionType_Internal,
+                                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                                        DataLoopNode::NodeConnectionType::Internal,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsParent);
 
@@ -539,16 +487,16 @@ namespace HVACUnitaryBypassVAV {
                                                                                               ErrorsFound,
                                                                                               CurrentModuleObject,
                                                                                               Alphas(1),
-                                                                                              DataLoopNode::NodeType_Air,
-                                                                                              DataLoopNode::NodeConnectionType_Internal,
+                                                                                              DataLoopNode::NodeFluidType::Air,
+                                                                                              DataLoopNode::NodeConnectionType::Internal,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsParent);
                 CBVAV(CBVAVNum).PlenumMixerInletAirNode = NodeInputManager::GetOnlySingleNode(state, Alphas(20),
                                                                                               ErrorsFound,
                                                                                               CurrentModuleObject,
                                                                                               Alphas(1) + "_PlenumMixerInlet",
-                                                                                              DataLoopNode::NodeType_Air,
-                                                                                              DataLoopNode::NodeConnectionType_Outlet,
+                                                                                              DataLoopNode::NodeFluidType::Air,
+                                                                                              DataLoopNode::NodeConnectionType::Outlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsParent);
             }
@@ -572,8 +520,8 @@ namespace HVACUnitaryBypassVAV {
                                                                                     ErrorsFound,
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1),
-                                                                                    DataLoopNode::NodeType_Air,
-                                                                                    DataLoopNode::NodeConnectionType_Internal,
+                                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                                    DataLoopNode::NodeConnectionType::Internal,
                                                                                     1,
                                                                                     DataLoopNode::ObjectIsParent);
 
@@ -581,8 +529,8 @@ namespace HVACUnitaryBypassVAV {
                                                                                     ErrorsFound,
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1) + "_Mixer",
-                                                                                    DataLoopNode::NodeType_Air,
-                                                                                    DataLoopNode::NodeConnectionType_Outlet,
+                                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                                     1,
                                                                                     DataLoopNode::ObjectIsParent);
 
@@ -590,8 +538,8 @@ namespace HVACUnitaryBypassVAV {
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1) + "_Splitter",
-                                                                                        DataLoopNode::NodeType_Air,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsParent);
 
@@ -665,7 +613,7 @@ namespace HVACUnitaryBypassVAV {
                     CBVAV(CBVAVNum).FanInletNodeNum = Fans::GetFanInletNode(state, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, FanErrFlag);
                     fanOutletNode = Fans::GetFanOutletNode(state, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, ErrorsFound);
                     Fans::GetFanIndex(state, CBVAV(CBVAVNum).FanName, CBVAV(CBVAVNum).FanIndex, FanErrFlag, ObjexxFCL::Optional_string_const());
-                    Fans::GetFanVolFlow(CBVAV(CBVAVNum).FanIndex, CBVAV(CBVAVNum).FanVolFlow);
+                    Fans::GetFanVolFlow(state, CBVAV(CBVAVNum).FanIndex, CBVAV(CBVAVNum).FanVolFlow);
                 }
             }
 
@@ -889,9 +837,9 @@ namespace HVACUnitaryBypassVAV {
                     //       UseCompressorOffFlow = operate at value specified by user (no input for this object type, UseCompONFlow)
                     //       AirFlowControl only valid if fan opmode = DataHVACGlobals::ContFanCycCoil
                     if (CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-                        CBVAV(CBVAVNum).AirFlowControl = UseCompressorOnFlow;
+                        CBVAV(CBVAVNum).AirFlowControl = AirFlowCtrlMode::UseCompressorOnFlow;
                     } else {
-                        CBVAV(CBVAVNum).AirFlowControl = UseCompressorOffFlow;
+                        CBVAV(CBVAVNum).AirFlowControl = AirFlowCtrlMode::UseCompressorOffFlow;
                     }
                 }
 
@@ -903,9 +851,9 @@ namespace HVACUnitaryBypassVAV {
                 }
                 CBVAV(CBVAVNum).OpMode = DataHVACGlobals::ContFanCycCoil;
                 if (CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-                    CBVAV(CBVAVNum).AirFlowControl = UseCompressorOnFlow;
+                    CBVAV(CBVAVNum).AirFlowControl = AirFlowCtrlMode::UseCompressorOnFlow;
                 } else {
-                    CBVAV(CBVAVNum).AirFlowControl = UseCompressorOffFlow;
+                    CBVAV(CBVAVNum).AirFlowControl = AirFlowCtrlMode::UseCompressorOffFlow;
                 }
             }
 
@@ -1010,8 +958,8 @@ namespace HVACUnitaryBypassVAV {
                         SteamCoils::GetCoilSteamInletNode(state, CBVAV(CBVAVNum).HeatCoilIndex, CBVAV(CBVAVNum).HeatCoilName, errFlag);
                     CBVAV(CBVAVNum).MaxHeatCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, CBVAV(CBVAVNum).HeatCoilIndex, errFlag);
                     int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                    Real64 SteamDensity =
-                        FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, getUnitaryHeatCoolVAVChangeoverBypass);
+                    Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(
+                        state, fluidNameSteam, state.dataHVACUnitaryBypassVAV->TempSteamIn, 1.0, SteamIndex, getUnitaryHeatCoolVAVChangeoverBypass);
                     if (CBVAV(CBVAVNum).MaxHeatCoilFluidFlow > 0.0) {
                         CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
                             SteamCoils::GetCoilMaxSteamFlowRate(state, CBVAV(CBVAVNum).HeatCoilIndex, errFlag) * SteamDensity;
@@ -1064,13 +1012,13 @@ namespace HVACUnitaryBypassVAV {
             }
 
             if (UtilityRoutines::SameString(Alphas(18), "CoolingPriority")) {
-                CBVAV(CBVAVNum).PriorityControl = CoolingPriority;
+                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::CoolingPriority;
             } else if (UtilityRoutines::SameString(Alphas(18), "HeatingPriority")) {
-                CBVAV(CBVAVNum).PriorityControl = HeatingPriority;
+                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::HeatingPriority;
             } else if (UtilityRoutines::SameString(Alphas(18), "ZonePriority")) {
-                CBVAV(CBVAVNum).PriorityControl = ZonePriority;
+                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::ZonePriority;
             } else if (UtilityRoutines::SameString(Alphas(18), "LoadPriority")) {
-                CBVAV(CBVAVNum).PriorityControl = LoadPriority;
+                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::LoadPriority;
             } else {
                 ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(18) + " = " + Alphas(18));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + CBVAV(CBVAVNum).Name);
@@ -1099,28 +1047,28 @@ namespace HVACUnitaryBypassVAV {
 
             // Dehumidification control mode
             if (UtilityRoutines::SameString(Alphas(19), "None")) {
-                CBVAV(CBVAVNum).DehumidControlType = DehumidControl_None;
+                CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
             } else if (UtilityRoutines::SameString(Alphas(19), "")) {
-                CBVAV(CBVAVNum).DehumidControlType = DehumidControl_None;
+                CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
             } else if (UtilityRoutines::SameString(Alphas(19), "Multimode")) {
                 if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl_Multimode;
+                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::Multimode;
                 } else {
                     ShowWarningError(state, "Invalid " + cAlphaFields(19) + " = " + Alphas(19));
                     ShowContinueError(state, "In " + CurrentModuleObject + " \"" + CBVAV(CBVAVNum).Name + "\".");
                     ShowContinueError(state, "Valid only with " + cAlphaFields(14) + " = Coil:Cooling:DX:TwoStageWithHumidityControlMode.");
                     ShowContinueError(state, "Setting " + cAlphaFields(19) + " to \"None\" and the simulation continues.");
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl_None;
+                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
                 }
             } else if (UtilityRoutines::SameString(Alphas(19), "CoolReheat")) {
                 if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl_CoolReheat;
+                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::CoolReheat;
                 } else {
                     ShowWarningError(state, "Invalid " + cAlphaFields(19) + " = " + Alphas(19));
                     ShowContinueError(state, "In " + CurrentModuleObject + " \"" + CBVAV(CBVAVNum).Name + "\".");
                     ShowContinueError(state, "Valid only with " + cAlphaFields(14) + " = Coil:Cooling:DX:TwoStageWithHumidityControlMode.");
                     ShowContinueError(state, "Setting " + cAlphaFields(19) + " to \"None\" and the simulation continues.");
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl_None;
+                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
                 }
             } else {
                 ShowSevereError(state, "Invalid " + cAlphaFields(19) + " =" + Alphas(19));
@@ -1163,14 +1111,14 @@ namespace HVACUnitaryBypassVAV {
 
             // Add fan to component sets array
             if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::BlowThru) {
-                CompSetFanInlet = DataLoopNode::NodeID(CBVAV(CBVAVNum).MixerMixedAirNode);
-                CompSetFanOutlet = DataLoopNode::NodeID(CBVAV(CBVAVNum).DXCoilInletNode);
+                CompSetFanInlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).MixerMixedAirNode);
+                CompSetFanOutlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).DXCoilInletNode);
             } else {
-                CompSetFanInlet = DataLoopNode::NodeID(CBVAV(CBVAVNum).HeatingCoilOutletNode);
+                CompSetFanInlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).HeatingCoilOutletNode);
                 CompSetFanOutlet = SplitterOutletNodeName;
             }
-            CompSetCoolInlet = DataLoopNode::NodeID(CBVAV(CBVAVNum).DXCoilInletNode);
-            CompSetCoolOutlet = DataLoopNode::NodeID(CBVAV(CBVAVNum).DXCoilOutletNode);
+            CompSetCoolInlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).DXCoilInletNode);
+            CompSetCoolOutlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).DXCoilOutletNode);
 
             // Add fan to component sets array
             BranchNodeConnections::SetUpCompSets(state,
@@ -1189,21 +1137,21 @@ namespace HVACUnitaryBypassVAV {
                                                  CBVAV(CBVAVNum).Name,
                                                  CBVAV(CBVAVNum).HeatCoilType,
                                                  CBVAV(CBVAVNum).HeatCoilName,
-                                                 DataLoopNode::NodeID(CBVAV(CBVAVNum).HeatingCoilInletNode),
-                                                 DataLoopNode::NodeID(CBVAV(CBVAVNum).HeatingCoilOutletNode));
+                                                 state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).HeatingCoilInletNode),
+                                                 state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).HeatingCoilOutletNode));
 
             // Set up component set for OA mixer - use OA node and Mixed air node
             BranchNodeConnections::SetUpCompSets(state, CBVAV(CBVAVNum).UnitType,
                                                  CBVAV(CBVAVNum).Name,
                                                  CBVAV(CBVAVNum).OAMixType,
                                                  CBVAV(CBVAVNum).OAMixName,
-                                                 DataLoopNode::NodeID(CBVAV(CBVAVNum).MixerOutsideAirNode),
-                                                 DataLoopNode::NodeID(CBVAV(CBVAVNum).MixerMixedAirNode));
+                                                 state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).MixerOutsideAirNode),
+                                                 state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).MixerMixedAirNode));
 
             BranchNodeConnections::TestCompSet(state, CBVAV(CBVAVNum).UnitType,
                                                CBVAV(CBVAVNum).Name,
-                                               DataLoopNode::NodeID(CBVAV(CBVAVNum).AirInNode),
-                                               DataLoopNode::NodeID(CBVAV(CBVAVNum).AirOutNode),
+                                               state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).AirInNode),
+                                               state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).AirOutNode),
                                                "Air Nodes");
 
             //   Find air loop associated with CBVAV system
@@ -1289,7 +1237,6 @@ namespace HVACUnitaryBypassVAV {
 
         if (ErrorsFound) {
             ShowFatalError(state, "GetCBVAV: Errors found in getting " + CurrentModuleObject + " input.");
-            ShowContinueError(state, "... Preceding condition causes termination.");
         }
 
         for (int CBVAVNum = 1; CBVAVNum <= NumCBVAV; ++CBVAVNum) {
@@ -1436,39 +1383,38 @@ namespace HVACUnitaryBypassVAV {
         static std::string const RoutineName("InitCBVAV");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);     // Initialization flag
-        static Array1D_bool MyEnvrnFlag;     // Used for initializations each begin environment flag
-        static Array1D_bool MySizeFlag;      // Used for sizing CBVAV inputs one time
-        static Array1D_bool MyPlantScanFlag; // Used for initializations plant component for heating coils
-        Real64 QSensUnitOut;                 // Output of CBVAV system with coils off
-        Real64 OutsideAirMultiplier;         // Outside air multiplier schedule (= 1.0 if no schedule)
-        static bool EMSSetPointCheck(false); // local temporary
-        static bool ErrorsFound(false);      // Set to true if errors in input, fatal at end of routine
-        Real64 QCoilActual;                  // actual CBVAV steam heating coil load met (W)
-        bool ErrorFlag;                      // local error flag returned from data mining
-        Real64 mdot;                         // heating coil fluid mass flow rate, kg/s
+        Real64 QSensUnitOut;          // Output of CBVAV system with coils off
+        Real64 OutsideAirMultiplier;  // Outside air multiplier schedule (= 1.0 if no schedule)
+        bool EMSSetPointCheck(false); // local temporary
+        bool ErrorsFound(false);      // Set to true if errors in input, fatal at end of routine
+        Real64 QCoilActual;           // actual CBVAV steam heating coil load met (W)
+        bool ErrorFlag;               // local error flag returned from data mining
+        Real64 mdot;                  // heating coil fluid mass flow rate, kg/s
+
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+        auto &NumCBVAV(state.dataHVACUnitaryBypassVAV->NumCBVAV);
 
         int InNode = CBVAV(CBVAVNum).AirInNode;
         int OutNode = CBVAV(CBVAVNum).AirOutNode;
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (state.dataHVACUnitaryBypassVAV->MyOneTimeFlag) {
 
-            MyEnvrnFlag.allocate(NumCBVAV);
-            MySizeFlag.allocate(NumCBVAV);
-            MyPlantScanFlag.allocate(NumCBVAV);
-            MyEnvrnFlag = true;
-            MySizeFlag = true;
-            MyPlantScanFlag = true;
+            state.dataHVACUnitaryBypassVAV->MyEnvrnFlag.allocate(NumCBVAV);
+            state.dataHVACUnitaryBypassVAV->MySizeFlag.allocate(NumCBVAV);
+            state.dataHVACUnitaryBypassVAV->MyPlantScanFlag.allocate(NumCBVAV);
+            state.dataHVACUnitaryBypassVAV->MyEnvrnFlag = true;
+            state.dataHVACUnitaryBypassVAV->MySizeFlag = true;
+            state.dataHVACUnitaryBypassVAV->MyPlantScanFlag = true;
 
-            MyOneTimeFlag = false;
+            state.dataHVACUnitaryBypassVAV->MyOneTimeFlag = false;
             // speed up test based on code from 16 years ago to correct cycling fan economizer defect
             // see https://github.com/NREL/EnergyPlusArchive/commit/a2202f8a168fd0330bf3a45392833405e8bd08f2
             // This test sets simple flag so air loop doesn't iterate twice each pass (reverts above change)
-            // state.dataAirLoop->AirLoopControlInfo(AirLoopNum).Simple = true;
+            // AirLoopControlInfo(AirLoopNum).Simple = true;
         }
 
-        if (MyPlantScanFlag(CBVAVNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) ||
                 (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam)) {
                 if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
@@ -1529,7 +1475,8 @@ namespace HVACUnitaryBypassVAV {
 
                     if (CBVAV(CBVAVNum).MaxHeatCoilFluidFlow > 0.0) {
                         int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        Real64 FluidDensity = FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                        Real64 FluidDensity = FluidProperties::GetSatDensityRefrig(
+                            state, fluidNameSteam, state.dataHVACUnitaryBypassVAV->TempSteamIn, 1.0, SteamIndex, RoutineName);
                         CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
                             SteamCoils::GetCoilMaxSteamFlowRate(state, CBVAV(CBVAVNum).HeatCoilIndex, ErrorsFound) * FluidDensity;
                     }
@@ -1541,16 +1488,16 @@ namespace HVACUnitaryBypassVAV {
                                                      .Branch(CBVAV(CBVAVNum).BranchNum)
                                                      .Comp(CBVAV(CBVAVNum).CompNum)
                                                      .NodeNumOut;
-                MyPlantScanFlag(CBVAVNum) = false;
+                state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) = false;
 
             } else { // CBVAV is not connected to plant
-                MyPlantScanFlag(CBVAVNum) = false;
+                state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) = false;
             }
-        } else if (MyPlantScanFlag(CBVAVNum) && !state.dataGlobal->AnyPlantInModel) {
-            MyPlantScanFlag(CBVAVNum) = false;
+        } else if (state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) && !state.dataGlobal->AnyPlantInModel) {
+            state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(CBVAVNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataHVACUnitaryBypassVAV->MySizeFlag(CBVAVNum)) {
             SizeCBVAV(state, CBVAVNum);
             // Pass the fan cycling schedule index up to the air loop. Set the air loop unitary system flag.
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr = CBVAV(CBVAVNum).FanOpModeSchedPtr;
@@ -1560,11 +1507,11 @@ namespace HVACUnitaryBypassVAV {
             // check for set point manager on outlet node of CBVAV
             CBVAV(CBVAVNum).OutNodeSPMIndex = SetPointManager::getSPMBasedOnNode(
                 state, OutNode, SetPointManager::iCtrlVarType::Temp, SetPointManager::SetPointManagerType::MixedAir, SetPointManager::CtrlNodeType::reference);
-            MySizeFlag(CBVAVNum) = false;
+            state.dataHVACUnitaryBypassVAV->MySizeFlag(CBVAVNum) = false;
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CBVAVNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataHVACUnitaryBypassVAV->MyEnvrnFlag(CBVAVNum)) {
             int MixerOutsideAirNode = CBVAV(CBVAVNum).MixerOutsideAirNode;
             Real64 RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
@@ -1575,20 +1522,20 @@ namespace HVACUnitaryBypassVAV {
             CBVAV(CBVAVNum).MaxNoCoolHeatAirMassFlow = RhoAir * CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow;
             CBVAV(CBVAVNum).NoCoolHeatOutAirMassFlow = RhoAir * CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow;
             // set the node max and min mass flow rates
-            DataLoopNode::Node(MixerOutsideAirNode).MassFlowRateMax = max(CBVAV(CBVAVNum).CoolOutAirMassFlow, CBVAV(CBVAVNum).HeatOutAirMassFlow);
-            DataLoopNode::Node(MixerOutsideAirNode).MassFlowRateMaxAvail =
+            state.dataLoopNodes->Node(MixerOutsideAirNode).MassFlowRateMax = max(CBVAV(CBVAVNum).CoolOutAirMassFlow, CBVAV(CBVAVNum).HeatOutAirMassFlow);
+            state.dataLoopNodes->Node(MixerOutsideAirNode).MassFlowRateMaxAvail =
                 max(CBVAV(CBVAVNum).CoolOutAirMassFlow, CBVAV(CBVAVNum).HeatOutAirMassFlow);
-            DataLoopNode::Node(MixerOutsideAirNode).MassFlowRateMin = 0.0;
-            DataLoopNode::Node(MixerOutsideAirNode).MassFlowRateMinAvail = 0.0;
-            DataLoopNode::Node(InNode).MassFlowRateMax = max(CBVAV(CBVAVNum).MaxCoolAirMassFlow, CBVAV(CBVAVNum).MaxHeatAirMassFlow);
-            DataLoopNode::Node(InNode).MassFlowRateMaxAvail = max(CBVAV(CBVAVNum).MaxCoolAirMassFlow, CBVAV(CBVAVNum).MaxHeatAirMassFlow);
-            DataLoopNode::Node(InNode).MassFlowRateMin = 0.0;
-            DataLoopNode::Node(InNode).MassFlowRateMinAvail = 0.0;
-            DataLoopNode::Node(OutNode).Temp = DataLoopNode::Node(InNode).Temp;
-            DataLoopNode::Node(OutNode).HumRat = DataLoopNode::Node(InNode).HumRat;
-            DataLoopNode::Node(OutNode).Enthalpy = DataLoopNode::Node(InNode).Enthalpy;
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerReliefAirNode) = DataLoopNode::Node(MixerOutsideAirNode);
-            MyEnvrnFlag(CBVAVNum) = false;
+            state.dataLoopNodes->Node(MixerOutsideAirNode).MassFlowRateMin = 0.0;
+            state.dataLoopNodes->Node(MixerOutsideAirNode).MassFlowRateMinAvail = 0.0;
+            state.dataLoopNodes->Node(InNode).MassFlowRateMax = max(CBVAV(CBVAVNum).MaxCoolAirMassFlow, CBVAV(CBVAVNum).MaxHeatAirMassFlow);
+            state.dataLoopNodes->Node(InNode).MassFlowRateMaxAvail = max(CBVAV(CBVAVNum).MaxCoolAirMassFlow, CBVAV(CBVAVNum).MaxHeatAirMassFlow);
+            state.dataLoopNodes->Node(InNode).MassFlowRateMin = 0.0;
+            state.dataLoopNodes->Node(InNode).MassFlowRateMinAvail = 0.0;
+            state.dataLoopNodes->Node(OutNode).Temp = state.dataLoopNodes->Node(InNode).Temp;
+            state.dataLoopNodes->Node(OutNode).HumRat = state.dataLoopNodes->Node(InNode).HumRat;
+            state.dataLoopNodes->Node(OutNode).Enthalpy = state.dataLoopNodes->Node(InNode).Enthalpy;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerReliefAirNode) = state.dataLoopNodes->Node(MixerOutsideAirNode);
+            state.dataHVACUnitaryBypassVAV->MyEnvrnFlag(CBVAVNum) = false;
             CBVAV(CBVAVNum).LastMode = HeatingMode;
             CBVAV(CBVAVNum).changeOverTimer = -1.0;
             //   set fluid-side hardware limits
@@ -1627,13 +1574,15 @@ namespace HVACUnitaryBypassVAV {
                         }
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                            Real64 FluidDensity = FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                            Real64 FluidDensity = FluidProperties::GetSatDensityRefrig(
+                                state, fluidNameSteam, state.dataHVACUnitaryBypassVAV->TempSteamIn, 1.0, SteamIndex, RoutineName);
                             CBVAV(CBVAVNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
                         }
                     }
                 } // end of IF(CBVAV(CBVAVNum)%MaxHeatCoilFluidFlow .EQ. DataSizing::AutoSize)THEN
 
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    CBVAV(CBVAVNum).MaxHeatCoilFluidFlow,
                                                    CBVAV(CBVAVNum).CoilControlNode,
                                                    CBVAV(CBVAVNum).CoilOutletNode,
@@ -1646,7 +1595,7 @@ namespace HVACUnitaryBypassVAV {
         }     // end one time inits
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(CBVAVNum) = true;
+            state.dataHVACUnitaryBypassVAV->MyEnvrnFlag(CBVAVNum) = true;
         }
 
         // IF CBVAV system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than CBVAV flow rates
@@ -1744,19 +1693,19 @@ namespace HVACUnitaryBypassVAV {
                 CBVAV(CBVAVNum).MaxNoCoolHeatAirMassFlow = RhoAir * CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow;
                 CBVAV(CBVAVNum).NoCoolHeatOutAirMassFlow = RhoAir * CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow;
                 // set the node max and min mass flow rates based on reset volume flow rates
-                DataLoopNode::Node(MixerOutsideAirNode).MassFlowRateMax = max(CBVAV(CBVAVNum).CoolOutAirMassFlow, CBVAV(CBVAVNum).HeatOutAirMassFlow);
-                DataLoopNode::Node(MixerOutsideAirNode).MassFlowRateMaxAvail =
+                state.dataLoopNodes->Node(MixerOutsideAirNode).MassFlowRateMax = max(CBVAV(CBVAVNum).CoolOutAirMassFlow, CBVAV(CBVAVNum).HeatOutAirMassFlow);
+                state.dataLoopNodes->Node(MixerOutsideAirNode).MassFlowRateMaxAvail =
                     max(CBVAV(CBVAVNum).CoolOutAirMassFlow, CBVAV(CBVAVNum).HeatOutAirMassFlow);
-                DataLoopNode::Node(MixerOutsideAirNode).MassFlowRateMin = 0.0;
-                DataLoopNode::Node(MixerOutsideAirNode).MassFlowRateMinAvail = 0.0;
-                DataLoopNode::Node(InNode).MassFlowRateMax = max(CBVAV(CBVAVNum).MaxCoolAirMassFlow, CBVAV(CBVAVNum).MaxHeatAirMassFlow);
-                DataLoopNode::Node(InNode).MassFlowRateMaxAvail = max(CBVAV(CBVAVNum).MaxCoolAirMassFlow, CBVAV(CBVAVNum).MaxHeatAirMassFlow);
-                DataLoopNode::Node(InNode).MassFlowRateMin = 0.0;
-                DataLoopNode::Node(InNode).MassFlowRateMinAvail = 0.0;
-                DataLoopNode::Node(OutNode).Temp = DataLoopNode::Node(InNode).Temp;
-                DataLoopNode::Node(OutNode).HumRat = DataLoopNode::Node(InNode).HumRat;
-                DataLoopNode::Node(OutNode).Enthalpy = DataLoopNode::Node(InNode).Enthalpy;
-                DataLoopNode::Node(CBVAV(CBVAVNum).MixerReliefAirNode) = DataLoopNode::Node(MixerOutsideAirNode);
+                state.dataLoopNodes->Node(MixerOutsideAirNode).MassFlowRateMin = 0.0;
+                state.dataLoopNodes->Node(MixerOutsideAirNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(InNode).MassFlowRateMax = max(CBVAV(CBVAVNum).MaxCoolAirMassFlow, CBVAV(CBVAVNum).MaxHeatAirMassFlow);
+                state.dataLoopNodes->Node(InNode).MassFlowRateMaxAvail = max(CBVAV(CBVAVNum).MaxCoolAirMassFlow, CBVAV(CBVAVNum).MaxHeatAirMassFlow);
+                state.dataLoopNodes->Node(InNode).MassFlowRateMin = 0.0;
+                state.dataLoopNodes->Node(InNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(OutNode).Temp = state.dataLoopNodes->Node(InNode).Temp;
+                state.dataLoopNodes->Node(OutNode).HumRat = state.dataLoopNodes->Node(InNode).HumRat;
+                state.dataLoopNodes->Node(OutNode).Enthalpy = state.dataLoopNodes->Node(InNode).Enthalpy;
+                state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerReliefAirNode) = state.dataLoopNodes->Node(MixerOutsideAirNode);
                 CBVAV(CBVAVNum).CheckFanFlow = false;
                 if (CBVAV(CBVAVNum).FanVolFlow > 0.0) {
                     CBVAV(CBVAVNum).HeatingSpeedRatio = CBVAV(CBVAVNum).MaxHeatAirVolFlow / CBVAV(CBVAVNum).FanVolFlow;
@@ -1788,69 +1737,69 @@ namespace HVACUnitaryBypassVAV {
         if (CBVAV(CBVAVNum).OpMode == DataHVACGlobals::ContFanCycCoil) {
             // constant fan mode
             if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
-                CompOnMassFlow = CBVAV(CBVAVNum).MaxHeatAirMassFlow;
-                CompOnFlowRatio = CBVAV(CBVAVNum).HeatingSpeedRatio;
-                OACompOnMassFlow = CBVAV(CBVAVNum).HeatOutAirMassFlow * OutsideAirMultiplier;
+                state.dataHVACUnitaryBypassVAV->CompOnMassFlow = CBVAV(CBVAVNum).MaxHeatAirMassFlow;
+                state.dataHVACUnitaryBypassVAV->CompOnFlowRatio = CBVAV(CBVAVNum).HeatingSpeedRatio;
+                state.dataHVACUnitaryBypassVAV->OACompOnMassFlow = CBVAV(CBVAVNum).HeatOutAirMassFlow * OutsideAirMultiplier;
             } else if (CBVAV(CBVAVNum).HeatCoolMode == CoolingMode) {
-                CompOnMassFlow = CBVAV(CBVAVNum).MaxCoolAirMassFlow;
-                CompOnFlowRatio = CBVAV(CBVAVNum).CoolingSpeedRatio;
-                OACompOnMassFlow = CBVAV(CBVAVNum).CoolOutAirMassFlow * OutsideAirMultiplier;
+                state.dataHVACUnitaryBypassVAV->CompOnMassFlow = CBVAV(CBVAVNum).MaxCoolAirMassFlow;
+                state.dataHVACUnitaryBypassVAV->CompOnFlowRatio = CBVAV(CBVAVNum).CoolingSpeedRatio;
+                state.dataHVACUnitaryBypassVAV->OACompOnMassFlow = CBVAV(CBVAVNum).CoolOutAirMassFlow * OutsideAirMultiplier;
             } else {
-                CompOnMassFlow = CBVAV(CBVAVNum).MaxNoCoolHeatAirMassFlow;
-                CompOnFlowRatio = CBVAV(CBVAVNum).NoHeatCoolSpeedRatio;
-                OACompOnMassFlow = CBVAV(CBVAVNum).NoCoolHeatOutAirMassFlow * OutsideAirMultiplier;
+                state.dataHVACUnitaryBypassVAV->CompOnMassFlow = CBVAV(CBVAVNum).MaxNoCoolHeatAirMassFlow;
+                state.dataHVACUnitaryBypassVAV->CompOnFlowRatio = CBVAV(CBVAVNum).NoHeatCoolSpeedRatio;
+                state.dataHVACUnitaryBypassVAV->OACompOnMassFlow = CBVAV(CBVAVNum).NoCoolHeatOutAirMassFlow * OutsideAirMultiplier;
             }
 
-            if (CBVAV(CBVAVNum).AirFlowControl == UseCompressorOnFlow) {
+            if (CBVAV(CBVAVNum).AirFlowControl == AirFlowCtrlMode::UseCompressorOnFlow) {
                 if (CBVAV(CBVAVNum).LastMode == HeatingMode) {
-                    CompOffMassFlow = CBVAV(CBVAVNum).MaxHeatAirMassFlow;
-                    CompOffFlowRatio = CBVAV(CBVAVNum).HeatingSpeedRatio;
-                    OACompOffMassFlow = CBVAV(CBVAVNum).HeatOutAirMassFlow * OutsideAirMultiplier;
+                    state.dataHVACUnitaryBypassVAV->CompOffMassFlow = CBVAV(CBVAVNum).MaxHeatAirMassFlow;
+                    state.dataHVACUnitaryBypassVAV->CompOffFlowRatio = CBVAV(CBVAVNum).HeatingSpeedRatio;
+                    state.dataHVACUnitaryBypassVAV->OACompOffMassFlow = CBVAV(CBVAVNum).HeatOutAirMassFlow * OutsideAirMultiplier;
                 } else {
-                    CompOffMassFlow = CBVAV(CBVAVNum).MaxCoolAirMassFlow;
-                    CompOffFlowRatio = CBVAV(CBVAVNum).CoolingSpeedRatio;
-                    OACompOffMassFlow = CBVAV(CBVAVNum).CoolOutAirMassFlow * OutsideAirMultiplier;
+                    state.dataHVACUnitaryBypassVAV->CompOffMassFlow = CBVAV(CBVAVNum).MaxCoolAirMassFlow;
+                    state.dataHVACUnitaryBypassVAV->CompOffFlowRatio = CBVAV(CBVAVNum).CoolingSpeedRatio;
+                    state.dataHVACUnitaryBypassVAV->OACompOffMassFlow = CBVAV(CBVAVNum).CoolOutAirMassFlow * OutsideAirMultiplier;
                 }
             } else {
-                CompOffMassFlow = CBVAV(CBVAVNum).MaxNoCoolHeatAirMassFlow;
-                CompOffFlowRatio = CBVAV(CBVAVNum).NoHeatCoolSpeedRatio;
-                OACompOffMassFlow = CBVAV(CBVAVNum).NoCoolHeatOutAirMassFlow * OutsideAirMultiplier;
+                state.dataHVACUnitaryBypassVAV->CompOffMassFlow = CBVAV(CBVAVNum).MaxNoCoolHeatAirMassFlow;
+                state.dataHVACUnitaryBypassVAV->CompOffFlowRatio = CBVAV(CBVAVNum).NoHeatCoolSpeedRatio;
+                state.dataHVACUnitaryBypassVAV->OACompOffMassFlow = CBVAV(CBVAVNum).NoCoolHeatOutAirMassFlow * OutsideAirMultiplier;
             }
         } else {
             // cycling fan mode
             if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
-                CompOnMassFlow = CBVAV(CBVAVNum).MaxHeatAirMassFlow;
-                CompOnFlowRatio = CBVAV(CBVAVNum).HeatingSpeedRatio;
-                OACompOnMassFlow = CBVAV(CBVAVNum).HeatOutAirMassFlow * OutsideAirMultiplier;
+                state.dataHVACUnitaryBypassVAV->CompOnMassFlow = CBVAV(CBVAVNum).MaxHeatAirMassFlow;
+                state.dataHVACUnitaryBypassVAV->CompOnFlowRatio = CBVAV(CBVAVNum).HeatingSpeedRatio;
+                state.dataHVACUnitaryBypassVAV->OACompOnMassFlow = CBVAV(CBVAVNum).HeatOutAirMassFlow * OutsideAirMultiplier;
             } else if (CBVAV(CBVAVNum).HeatCoolMode == CoolingMode) {
-                CompOnMassFlow = CBVAV(CBVAVNum).MaxCoolAirMassFlow;
-                CompOnFlowRatio = CBVAV(CBVAVNum).CoolingSpeedRatio;
-                OACompOnMassFlow = CBVAV(CBVAVNum).CoolOutAirMassFlow * OutsideAirMultiplier;
+                state.dataHVACUnitaryBypassVAV->CompOnMassFlow = CBVAV(CBVAVNum).MaxCoolAirMassFlow;
+                state.dataHVACUnitaryBypassVAV->CompOnFlowRatio = CBVAV(CBVAVNum).CoolingSpeedRatio;
+                state.dataHVACUnitaryBypassVAV->OACompOnMassFlow = CBVAV(CBVAVNum).CoolOutAirMassFlow * OutsideAirMultiplier;
             } else {
-                CompOnMassFlow = CBVAV(CBVAVNum).MaxCoolAirMassFlow;
-                CompOnFlowRatio = CBVAV(CBVAVNum).CoolingSpeedRatio;
-                OACompOnMassFlow = CBVAV(CBVAVNum).CoolOutAirMassFlow * OutsideAirMultiplier;
+                state.dataHVACUnitaryBypassVAV->CompOnMassFlow = CBVAV(CBVAVNum).MaxCoolAirMassFlow;
+                state.dataHVACUnitaryBypassVAV->CompOnFlowRatio = CBVAV(CBVAVNum).CoolingSpeedRatio;
+                state.dataHVACUnitaryBypassVAV->OACompOnMassFlow = CBVAV(CBVAVNum).CoolOutAirMassFlow * OutsideAirMultiplier;
             }
-            CompOffMassFlow = 0.0;
-            CompOffFlowRatio = 0.0;
-            OACompOffMassFlow = 0.0;
+            state.dataHVACUnitaryBypassVAV->CompOffMassFlow = 0.0;
+            state.dataHVACUnitaryBypassVAV->CompOffFlowRatio = 0.0;
+            state.dataHVACUnitaryBypassVAV->OACompOffMassFlow = 0.0;
         }
 
         // Check for correct control node at outlet of unit
         if (CBVAV(CBVAVNum).HumRatMaxCheck) {
-            if (CBVAV(CBVAVNum).DehumidControlType > 0) {
-                if (DataLoopNode::Node(OutNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
+            if (CBVAV(CBVAVNum).DehumidControlType != DehumidControl::None) {
+                if (state.dataLoopNodes->Node(OutNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowWarningError(state, "Unitary System:VAV:ChangeOverBypass = " + CBVAV(CBVAVNum).Name);
                         ShowContinueError(state, "Use SetpointManager:SingleZone:Humidity:Maximum to place a humidity setpoint at the air outlet node of "
                                           "the unitary system.");
                         ShowContinueError(state, "Setting Dehumidification Control Type to None and simulation continues.");
-                        CBVAV(CBVAVNum).DehumidControlType = 0;
+                        CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
                     } else {
                         // need call to EMS to check node
                         EMSSetPointCheck = false;
                         EMSManager::CheckIfNodeSetPointManagedByEMS(state, OutNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointCheck);
-                        bool foundControl = DataLoopNode::NodeSetpointCheck(OutNode).needsSetpointChecking = false;
+                        bool foundControl = state.dataLoopNodes->NodeSetpointCheck(OutNode).needsSetpointChecking = false;
                         if (EMSSetPointCheck) {
                             // There is no plugin anyways, so we now we have a bad condition.
                             ShowWarningError(state, "Unitary System:VAV:ChangeOverBypass = " + CBVAV(CBVAVNum).Name);
@@ -1859,7 +1808,7 @@ namespace HVACUnitaryBypassVAV {
                             ShowContinueError(state,
                                 "Or use an EMS Actuator to place a maximum humidity setpoint at the air outlet node of the unitary system.");
                             ShowContinueError(state, "Setting Dehumidification Control Type to None and simulation continues.");
-                            CBVAV(CBVAVNum).DehumidControlType = 0;
+                            CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
                         } else if (!foundControl) {
                             // Couldn't find a control, but no error? There are some plugins, so adjust warning message accordingly
                             ShowWarningError(state, "Unitary System:VAV:ChangeOverBypass = " + CBVAV(CBVAVNum).Name);
@@ -1872,7 +1821,7 @@ namespace HVACUnitaryBypassVAV {
                             // We do not change the DehumidControlType. There might be a PythonPlugin that will later actuate the HumRatMax
                             // All checks later are in the following form, and HumRatMax will be > 0 only if actually actuated (otherwise it's
                             // SensedNodeFlagValue = -999), so it's fine:
-                            // `CBVAV(CBVAVNum).DehumidControlType == DehumidControl_Multimode) && DataLoopNode::Node(OutletNode).HumRatMax > 0.0)`
+                            // `CBVAV(CBVAVNum).DehumidControlType == DehumidControl_Multimode) && state.dataLoopNodes->Node(OutletNode).HumRatMax > 0.0)`
                         }
                     }
                 }
@@ -1883,48 +1832,49 @@ namespace HVACUnitaryBypassVAV {
         }
 
         // Set the inlet node mass flow rate
-        if (ScheduleManager::GetCurrentScheduleValue(state, CBVAV(CBVAVNum).SchedPtr) > 0.0 && CompOnMassFlow != 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, CBVAV(CBVAVNum).SchedPtr) > 0.0 && state.dataHVACUnitaryBypassVAV->CompOnMassFlow != 0.0) {
             OnOffAirFlowRatio = 1.0;
             if (FirstHVACIteration) {
-                DataLoopNode::Node(CBVAV(CBVAVNum).AirInNode).MassFlowRate = CompOnMassFlow;
-                DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate = CompOnMassFlow;
-                DataLoopNode::Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate = OACompOnMassFlow;
-                DataLoopNode::Node(CBVAV(CBVAVNum).MixerReliefAirNode).MassFlowRate = OACompOnMassFlow;
-                BypassDuctFlowFraction = 0.0;
-                PartLoadFrac = 0.0;
+                state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirInNode).MassFlowRate = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
+                state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
+                state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate = state.dataHVACUnitaryBypassVAV->OACompOnMassFlow;
+                state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerReliefAirNode).MassFlowRate = state.dataHVACUnitaryBypassVAV->OACompOnMassFlow;
+                state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction = 0.0;
+                state.dataHVACUnitaryBypassVAV->PartLoadFrac = 0.0;
             } else {
                 if (CBVAV(CBVAVNum).HeatCoolMode != 0) {
-                    PartLoadFrac = 1.0;
+                    state.dataHVACUnitaryBypassVAV->PartLoadFrac = 1.0;
                 } else {
-                    PartLoadFrac = 0.0;
+                    state.dataHVACUnitaryBypassVAV->PartLoadFrac = 0.0;
                 }
                 if (CBVAV(CBVAVNum).OpMode == DataHVACGlobals::CycFanCycCoil) {
-                    BypassDuctFlowFraction = 0.0;
+                    state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction = 0.0;
                 } else {
                     if (CBVAV(CBVAVNum).PlenumMixerInletAirNode == 0) {
-                        BypassDuctFlowFraction = max(0.0, 1.0 - (DataLoopNode::Node(CBVAV(CBVAVNum).AirInNode).MassFlowRate / CompOnMassFlow));
+                        state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction = max(
+                            0.0, 1.0 - (state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirInNode).MassFlowRate / state.dataHVACUnitaryBypassVAV->CompOnMassFlow));
                     }
                 }
             }
         } else {
-            PartLoadFrac = 0.0;
-            DataLoopNode::Node(CBVAV(CBVAVNum).AirInNode).MassFlowRate = 0.0;
-            DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate = 0.0;
-            DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRateMaxAvail = 0.0;
+            state.dataHVACUnitaryBypassVAV->PartLoadFrac = 0.0;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirInNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRateMaxAvail = 0.0;
 
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate = 0.0;
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate = 0.0;
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerReliefAirNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerReliefAirNode).MassFlowRate = 0.0;
 
             OnOffAirFlowRatio = 1.0;
-            BypassDuctFlowFraction = 0.0;
+            state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction = 0.0;
         }
 
-        CalcCBVAV(state, CBVAVNum, FirstHVACIteration, PartLoadFrac, QSensUnitOut, OnOffAirFlowRatio, HXUnitOn);
+        CalcCBVAV(state, CBVAVNum, FirstHVACIteration, state.dataHVACUnitaryBypassVAV->PartLoadFrac, QSensUnitOut, OnOffAirFlowRatio, HXUnitOn);
 
         // If unit is scheduled OFF, setpoint is equal to inlet node temperature.
         if (ScheduleManager::GetCurrentScheduleValue(state, CBVAV(CBVAVNum).SchedPtr) == 0.0) {
-            CBVAV(CBVAVNum).OutletTempSetPoint = DataLoopNode::Node(InNode).Temp;
+            CBVAV(CBVAVNum).OutletTempSetPoint = state.dataLoopNodes->Node(InNode).Temp;
             return;
         }
 
@@ -1937,7 +1887,7 @@ namespace HVACUnitaryBypassVAV {
         CBVAV(CBVAVNum).CoilTempSetPoint = CBVAV(CBVAVNum).OutletTempSetPoint;
         if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::DrawThru) {
             CBVAV(CBVAVNum).CoilTempSetPoint -=
-                (DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).Temp - DataLoopNode::Node(CBVAV(CBVAVNum).FanInletNodeNum).Temp);
+                (state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirOutNode).Temp - state.dataLoopNodes->Node(CBVAV(CBVAVNum).FanInletNodeNum).Temp);
         }
 
         if (FirstHVACIteration) {
@@ -1945,7 +1895,7 @@ namespace HVACUnitaryBypassVAV {
                 WaterCoils::SimulateWaterCoilComponents(state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex);
 
                 //     set air-side and steam-side mass flow rates
-                DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate = CompOnMassFlow;
+                state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
                 mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
                 PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      CBVAV(CBVAVNum).CoilControlNode,
@@ -1965,7 +1915,7 @@ namespace HVACUnitaryBypassVAV {
             if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
 
                 //     set air-side and steam-side mass flow rates
-                DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate = CompOnMassFlow;
+                state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
                 mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
                 PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      CBVAV(CBVAVNum).CoilControlNode,
@@ -1987,13 +1937,14 @@ namespace HVACUnitaryBypassVAV {
             } // from IF(CBVAV(CBVAVNum)%HeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) THEN
         }     // from IF( FirstHVACIteration ) THEN
 
-        if ((CBVAV(CBVAVNum).HeatCoolMode == 0 && CBVAV(CBVAVNum).OpMode == DataHVACGlobals::CycFanCycCoil) || CompOnMassFlow == 0.0) {
-            PartLoadFrac = 0.0;
-            DataLoopNode::Node(CBVAV(CBVAVNum).AirInNode).MassFlowRate = 0.0;
-            DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRateMaxAvail = 0.0;
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate = 0.0;
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate = 0.0;
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerReliefAirNode).MassFlowRate = 0.0;
+        if ((CBVAV(CBVAVNum).HeatCoolMode == 0 && CBVAV(CBVAVNum).OpMode == DataHVACGlobals::CycFanCycCoil) ||
+            state.dataHVACUnitaryBypassVAV->CompOnMassFlow == 0.0) {
+            state.dataHVACUnitaryBypassVAV->PartLoadFrac = 0.0;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirInNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRateMaxAvail = 0.0;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerReliefAirNode).MassFlowRate = 0.0;
         }
     }
 
@@ -2010,8 +1961,10 @@ namespace HVACUnitaryBypassVAV {
         // METHODOLOGY EMPLOYED:
         // Obtains flow rates from the zone sizing arrays.
 
-        int curSysNum = DataSizing::CurSysNum;
-        int curOASysNum = DataSizing::CurOASysNum;
+        int curSysNum = state.dataSize->CurSysNum;
+        int curOASysNum = state.dataSize->CurOASysNum;
+
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
 
         if (curSysNum > 0 && curOASysNum == 0) {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
@@ -2033,7 +1986,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).MaxCoolAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesMainVolFlow;
+                CBVAV(CBVAVNum).MaxCoolAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxCoolAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).MaxCoolAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowWarningError(state, CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
@@ -2055,7 +2008,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).MaxHeatAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesMainVolFlow;
+                CBVAV(CBVAVNum).MaxHeatAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxHeatAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).MaxHeatAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowWarningError(state, CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
@@ -2077,7 +2030,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesMainVolFlow;
+                CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowWarningError(state, CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
@@ -2102,7 +2055,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).CoolOutAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesOutAirVolFlow;
+                CBVAV(CBVAVNum).CoolOutAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesOutAirVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).CoolOutAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).CoolOutAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowWarningError(state, CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
@@ -2126,7 +2079,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).HeatOutAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesOutAirVolFlow;
+                CBVAV(CBVAVNum).HeatOutAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesOutAirVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).HeatOutAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).HeatOutAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowContinueError(state, "The CBVAV system supply air fan air flow rate is less than the autosized value for the outdoor air flow rate "
@@ -2149,7 +2102,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesOutAirVolFlow;
+                CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesOutAirVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowContinueError(state, "The CBVAV system supply air fan air flow rate is less than the autosized value for the outdoor air flow rate "
@@ -2191,13 +2144,15 @@ namespace HVACUnitaryBypassVAV {
         Real64 FullOutput = 0; // Unit full output when compressor is operating [W]
         PartLoadFrac = 0.0;
 
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+
         if (ScheduleManager::GetCurrentScheduleValue(state, CBVAV(CBVAVNum).SchedPtr) == 0.0) return;
 
         // Get operating result
         PartLoadFrac = 1.0;
         CalcCBVAV(state, CBVAVNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
 
-        if ((DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).Temp - CBVAV(CBVAVNum).OutletTempSetPoint) > DataHVACGlobals::SmallTempDiff &&
+        if ((state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirOutNode).Temp - CBVAV(CBVAVNum).OutletTempSetPoint) > DataHVACGlobals::SmallTempDiff &&
             CBVAV(CBVAVNum).HeatCoolMode > 0 && PartLoadFrac < 1.0) {
             CalcCBVAV(state, CBVAVNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
         }
@@ -2239,31 +2194,34 @@ namespace HVACUnitaryBypassVAV {
         Real64 OutdoorDryBulbTemp; // Dry-bulb temperature at outdoor condenser
         Real64 OutdoorBaroPress;   // Barometric pressure at outdoor condenser
 
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
 
         int OutletNode = CBVAV(CBVAVNum).AirOutNode;
         int InletNode = CBVAV(CBVAVNum).AirInNode;
         if (CBVAV(CBVAVNum).CondenserNodeNum > 0) {
-            OutdoorDryBulbTemp = DataLoopNode::Node(CBVAV(CBVAVNum).CondenserNodeNum).Temp;
-            OutdoorBaroPress = DataLoopNode::Node(CBVAV(CBVAVNum).CondenserNodeNum).Press;
+            OutdoorDryBulbTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNum).CondenserNodeNum).Temp;
+            OutdoorBaroPress = state.dataLoopNodes->Node(CBVAV(CBVAVNum).CondenserNodeNum).Press;
         } else {
             OutdoorDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             OutdoorBaroPress = state.dataEnvrn->OutBaroPress;
         }
 
-        SaveCompressorPLR = 0.0;
+        state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = 0.0;
 
         // Bypass excess system air through bypass duct and calculate new mixed air conditions at OA mixer inlet node
         if (CBVAV(CBVAVNum).plenumIndex > 0 || CBVAV(CBVAVNum).mixerIndex > 0) {
-            Real64 saveMixerInletAirNodeFlow = DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode) = DataLoopNode::Node(InletNode);
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate = saveMixerInletAirNodeFlow;
+            Real64 saveMixerInletAirNodeFlow = state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode) = state.dataLoopNodes->Node(InletNode);
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate = saveMixerInletAirNodeFlow;
         } else {
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp =
-                (1.0 - BypassDuctFlowFraction) * DataLoopNode::Node(InletNode).Temp + BypassDuctFlowFraction * DataLoopNode::Node(OutletNode).Temp;
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).HumRat = (1.0 - BypassDuctFlowFraction) * DataLoopNode::Node(InletNode).HumRat +
-                                                                           BypassDuctFlowFraction * DataLoopNode::Node(OutletNode).HumRat;
-            DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
-                DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp, DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).HumRat);
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp =
+                (1.0 - state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction) * state.dataLoopNodes->Node(InletNode).Temp +
+                state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction * state.dataLoopNodes->Node(OutletNode).Temp;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).HumRat =
+                (1.0 - state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction) * state.dataLoopNodes->Node(InletNode).HumRat +
+                state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction * state.dataLoopNodes->Node(OutletNode).HumRat;
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+                state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).HumRat);
         }
         MixedAir::SimOAMixer(state, CBVAV(CBVAVNum).OAMixName, FirstHVACIteration, CBVAV(CBVAVNum).OAMixIndex);
 
@@ -2271,7 +2229,8 @@ namespace HVACUnitaryBypassVAV {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[CBVAV(CBVAVNum).FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _, _, _);
             } else {
-                Fans::SimulateFanComponents(state, CBVAV(CBVAVNum).FanName, FirstHVACIteration, CBVAV(CBVAVNum).FanIndex, FanSpeedRatio);
+                Fans::SimulateFanComponents(
+                    state, CBVAV(CBVAVNum).FanName, FirstHVACIteration, CBVAV(CBVAVNum).FanIndex, state.dataHVACUnitaryBypassVAV->FanSpeedRatio);
             }
         }
         // Simulate cooling coil if zone load is negative (cooling load)
@@ -2290,7 +2249,7 @@ namespace HVACUnitaryBypassVAV {
                                                                             CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                                             DataHVACGlobals::ContFanCycCoil,
                                                                             HXUnitOn);
-                        if (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
                             //         If coil inlet temp is already below the setpoint, simulated with coil off
                             PartLoadFrac = 0.0;
                             HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
@@ -2301,7 +2260,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                 CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                                                 DataHVACGlobals::ContFanCycCoil,
                                                                                 HXUnitOn);
-                        } else if (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
                             Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
                             Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
                             Par(3) = OnOffAirFlowRatio;
@@ -2344,9 +2303,9 @@ namespace HVACUnitaryBypassVAV {
                             } else if (SolFla == -2 && !state.dataGlobal->WarmupFlag) {
                                 PartLoadFrac = max(0.0,
                                                    min(1.0,
-                                                       (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
-                                                           (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
-                                                            DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
+                                                       (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
+                                                           (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
+                                                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
                                 if (CBVAV(CBVAVNum).HXDXIterationFailed < 1) {
                                     ++CBVAV(CBVAVNum).HXDXIterationFailed;
                                     ShowSevereError(state,
@@ -2374,7 +2333,7 @@ namespace HVACUnitaryBypassVAV {
                                            DataHVACGlobals::ContFanCycCoil,
                                            PartLoadFrac,
                                            OnOffAirFlowRatio);
-                        if (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
                             //         If coil inlet temp is already below the setpoint, simulated with coil off
                             PartLoadFrac = 0.0;
                             DXCoils::SimDXCoil(state,
@@ -2385,7 +2344,7 @@ namespace HVACUnitaryBypassVAV {
                                                DataHVACGlobals::ContFanCycCoil,
                                                PartLoadFrac,
                                                OnOffAirFlowRatio);
-                        } else if (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
                             Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
                             Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
                             Par(3) = OnOffAirFlowRatio;
@@ -2416,9 +2375,9 @@ namespace HVACUnitaryBypassVAV {
                             } else if (SolFla == -2 && !state.dataGlobal->WarmupFlag) {
                                 PartLoadFrac = max(0.0,
                                                    min(1.0,
-                                                       (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
-                                                           (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
-                                                            DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
+                                                       (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
+                                                           (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
+                                                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
                                 if (CBVAV(CBVAVNum).DXIterationFailed < 1) {
                                     ++CBVAV(CBVAVNum).DXIterationFailed;
                                     ShowSevereError(state, "DX unit part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
@@ -2436,7 +2395,8 @@ namespace HVACUnitaryBypassVAV {
                                 }
                             }
                         }
-                        SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                        state.dataHVACUnitaryBypassVAV->SaveCompressorPLR =
+                            state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                         Real64 QZnReq(0.0);                // Zone load (W), input to variable-speed DX coil
                         Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
@@ -2465,11 +2425,11 @@ namespace HVACUnitaryBypassVAV {
                                                                   QZnReq,
                                                                   QLatReq);
 
-                        Real64 NoOutput = DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                          (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
-                                                                      DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                           Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                      DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+                        Real64 NoOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                          (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
+                                                                      state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                           Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                      state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
 
                         // Get full load result
                         PartLoadFrac = 1.0;
@@ -2490,15 +2450,15 @@ namespace HVACUnitaryBypassVAV {
                                                                   QZnReq,
                                                                   QLatReq);
 
-                        Real64 FullOutput = DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                            (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
-                                                                        DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                             Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                        DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
-                        Real64 ReqOutput = DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                           (Psychrometrics::PsyHFnTdbW(DesOutTemp, DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                            Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                       DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+                        Real64 FullOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                            (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
+                                                                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                             Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+                        Real64 ReqOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                           (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                            Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                       state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
 
                         Real64 loadAccuracy(0.001);                  // Watts, power
                         Real64 tempAccuracy(0.001);                  // delta C, temperature
@@ -2560,16 +2520,16 @@ namespace HVACUnitaryBypassVAV {
                                                                           QLatReq,
                                                                           OnOffAirFlowRatio);
 
-                                Real64 TempSpeedOut = DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                                      (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
-                                                                                  DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                                       Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                                  DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+                                Real64 TempSpeedOut = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                                      (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
+                                                                                  state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                                       Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                                  state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
                                 Real64 TempSpeedReqst =
-                                    DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                    (Psychrometrics::PsyHFnTdbW(DesOutTemp, DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                     Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+                                    state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                    (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                     Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
 
                                 if ((TempSpeedOut - TempSpeedReqst) > tempAccuracy) {
                                     // Check to see which speed to meet the load
@@ -2592,16 +2552,16 @@ namespace HVACUnitaryBypassVAV {
                                                                                   QLatReq,
                                                                                   OnOffAirFlowRatio);
 
-                                        TempSpeedOut = DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                                       (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
-                                                                                   DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                                        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                                   DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+                                        TempSpeedOut = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                                       (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
+                                                                                   state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                                        Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                                   state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
                                         TempSpeedReqst =
-                                            DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                            (Psychrometrics::PsyHFnTdbW(DesOutTemp, DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                             Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                        DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+                                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                            (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                             Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
 
                                         if ((TempSpeedOut - TempSpeedReqst) < tempAccuracy) {
                                             SpeedNum = I;
@@ -2715,7 +2675,8 @@ namespace HVACUnitaryBypassVAV {
                         } else if (PartLoadFrac < 0.0) {
                             PartLoadFrac = 0.0;
                         }
-                        SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).CoolCoilCompIndex);
+                        state.dataHVACUnitaryBypassVAV->SaveCompressorPLR =
+                            VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).CoolCoilCompIndex);
                         // variable-speed air-to-air cooling coil, end -------------------------
 
                     } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
@@ -2739,7 +2700,7 @@ namespace HVACUnitaryBypassVAV {
                                                     DehumidMode,
                                                     CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                     DataHVACGlobals::ContFanCycCoil);
-                        if (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
                             PartLoadFrac = 0.0;
                             DXCoils::SimDXCoilMultiMode(state,
                                                         CBVAV(CBVAVNum).DXCoolCoilName,
@@ -2749,7 +2710,7 @@ namespace HVACUnitaryBypassVAV {
                                                         DehumidMode,
                                                         CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                         DataHVACGlobals::ContFanCycCoil);
-                        } else if (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
                             PartLoadFrac = 1.0;
                         } else {
                             Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
@@ -2776,9 +2737,9 @@ namespace HVACUnitaryBypassVAV {
                             } else if (SolFla == -2) {
                                 PartLoadFrac = max(0.0,
                                                    min(1.0,
-                                                       (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
-                                                           (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
-                                                            DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
+                                                       (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
+                                                           (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
+                                                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
                                 if (CBVAV(CBVAVNum).MMDXIterationFailed < 1) {
                                     ++CBVAV(CBVAVNum).MMDXIterationFailed;
                                     ShowSevereError(state, "DX unit part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
@@ -2799,9 +2760,9 @@ namespace HVACUnitaryBypassVAV {
                         // If humidity setpoint is not satisfied and humidity control type is Multimode,
                         // then turn on enhanced dehumidification mode 1
 
-                        if ((DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat > DataLoopNode::Node(OutletNode).HumRatMax) &&
-                            (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).HumRat > DataLoopNode::Node(OutletNode).HumRatMax) &&
-                            (CBVAV(CBVAVNum).DehumidControlType == DehumidControl_Multimode) && DataLoopNode::Node(OutletNode).HumRatMax > 0.0) {
+                        if ((state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
+                            (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
+                            (CBVAV(CBVAVNum).DehumidControlType == DehumidControl::Multimode) && state.dataLoopNodes->Node(OutletNode).HumRatMax > 0.0) {
 
                             // Determine required part load for enhanced dehumidification mode 1
 
@@ -2817,9 +2778,9 @@ namespace HVACUnitaryBypassVAV {
                                                         DehumidMode,
                                                         CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                         DataHVACGlobals::ContFanCycCoil);
-                            if (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
+                            if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
                                 PartLoadFrac = 0.0;
-                            } else if (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
+                            } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
                                 PartLoadFrac = 1.0;
                             } else {
                                 Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
@@ -2848,9 +2809,9 @@ namespace HVACUnitaryBypassVAV {
                                     PartLoadFrac =
                                         max(0.0,
                                             min(1.0,
-                                                (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
-                                                    (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
-                                                     DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
+                                                (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
+                                                    (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
+                                                     state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
                                     if (CBVAV(CBVAVNum).DMDXIterationFailed < 1) {
                                         ++CBVAV(CBVAVNum).DMDXIterationFailed;
                                         ShowSevereError(state,
@@ -2873,18 +2834,18 @@ namespace HVACUnitaryBypassVAV {
                         // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
                         // then run to meet latent load
 
-                        if ((DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat > DataLoopNode::Node(OutletNode).HumRatMax) &&
-                            (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).HumRat > DataLoopNode::Node(OutletNode).HumRatMax) &&
-                            (CBVAV(CBVAVNum).DehumidControlType == DehumidControl_CoolReheat) && DataLoopNode::Node(OutletNode).HumRatMax > 0.0) {
+                        if ((state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
+                            (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
+                            (CBVAV(CBVAVNum).DehumidControlType == DehumidControl::CoolReheat) && state.dataLoopNodes->Node(OutletNode).HumRatMax > 0.0) {
 
                             // Determine revised desired outlet temperature  - use approach temperature control strategy
                             // based on CONTROLLER:SIMPLE TEMPANDHUMRAT control type.
 
                             // Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
-                            ApproachTemp = DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp -
-                                           Psychrometrics::PsyTdpFnWPb(state, DataLoopNode::Node(OutletNode).HumRat, OutdoorBaroPress);
+                            ApproachTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp -
+                                           Psychrometrics::PsyTdpFnWPb(state, state.dataLoopNodes->Node(OutletNode).HumRat, OutdoorBaroPress);
                             // Calculate the dew point temperature at the SA humidity ratio setpoint
-                            DesiredDewPoint = Psychrometrics::PsyTdpFnWPb(state, DataLoopNode::Node(OutletNode).HumRatMax, OutdoorBaroPress);
+                            DesiredDewPoint = Psychrometrics::PsyTdpFnWPb(state, state.dataLoopNodes->Node(OutletNode).HumRatMax, OutdoorBaroPress);
                             // Adjust the calculated dew point temperature by the approach temp
                             CBVAV(CBVAVNum).CoilTempSetPoint = min(CBVAV(CBVAVNum).CoilTempSetPoint, (DesiredDewPoint + ApproachTemp));
 
@@ -2902,9 +2863,9 @@ namespace HVACUnitaryBypassVAV {
                                                         DehumidMode,
                                                         CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                         DataHVACGlobals::ContFanCycCoil);
-                            if (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
+                            if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
                                 PartLoadFrac = 0.0;
-                            } else if (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
+                            } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
                                 PartLoadFrac = 1.0;
                             } else {
                                 Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
@@ -2933,9 +2894,9 @@ namespace HVACUnitaryBypassVAV {
                                     PartLoadFrac =
                                         max(0.0,
                                             min(1.0,
-                                                (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
-                                                    (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
-                                                     DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
+                                                (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
+                                                    (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
+                                                     state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
                                     if (CBVAV(CBVAVNum).CRDXIterationFailed < 1) {
                                         ++CBVAV(CBVAVNum).CRDXIterationFailed;
                                         ShowSevereError(state,
@@ -2960,7 +2921,8 @@ namespace HVACUnitaryBypassVAV {
                         } else if (PartLoadFrac < 0.0) {
                             PartLoadFrac = 0.0;
                         }
-                        SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                        state.dataHVACUnitaryBypassVAV->SaveCompressorPLR =
+                            state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
 
                     } else {
                         ShowFatalError(state, "SimCBVAV System: Invalid DX Cooling Coil=" + CBVAV(CBVAVNum).DXCoolCoilType);
@@ -2977,7 +2939,7 @@ namespace HVACUnitaryBypassVAV {
                                                                         CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                                         DataHVACGlobals::ContFanCycCoil,
                                                                         HXUnitOn);
-                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                    state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
                 } else if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                     DXCoils::SimDXCoil(state,
                                        CBVAV(CBVAVNum).DXCoolCoilName,
@@ -2987,7 +2949,7 @@ namespace HVACUnitaryBypassVAV {
                                        DataHVACGlobals::ContFanCycCoil,
                                        0.0,
                                        OnOffAirFlowRatio);
-                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                    state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
                 } else if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                     DXCoils::SimDXCoilMultiMode(state,
                                                 CBVAV(CBVAVNum).DXCoolCoilName,
@@ -2997,7 +2959,7 @@ namespace HVACUnitaryBypassVAV {
                                                 0,
                                                 CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                 DataHVACGlobals::ContFanCycCoil);
-                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                    state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
                 } else if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                     Real64 QZnReq(0.0);                // Zone load (W), input to variable-speed DX coil
                     Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
@@ -3021,7 +2983,8 @@ namespace HVACUnitaryBypassVAV {
                                                               SpeedRatio,
                                                               QZnReq,
                                                               QLatReq);
-                    SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).CoolCoilCompIndex);
+                    state.dataHVACUnitaryBypassVAV->SaveCompressorPLR =
+                        VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).CoolCoilCompIndex);
                 }
             }
 
@@ -3100,8 +3063,8 @@ namespace HVACUnitaryBypassVAV {
                                            DataHVACGlobals::ContFanCycCoil,
                                            PartLoadFrac,
                                            OnOffAirFlowRatio);
-                        if (DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint &&
-                            DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint &&
+                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
                             // iterate to find PLR at CoilTempSetPoint
                             Par(1) = double(CBVAV(CBVAVNum).HeatCoilIndex);
                             Par(2) = min(CBVAV(CBVAVNum).CoilTempSetPoint, CBVAV(CBVAVNum).MaxLATHeating);
@@ -3141,7 +3104,7 @@ namespace HVACUnitaryBypassVAV {
                                            0.0,
                                            OnOffAirFlowRatio);
                     }
-                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
+                    state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
                 } else { // HeatCoolMode = CoolingMode
                     //     simulate DX heating coil with compressor off when cooling load is required
                     DXCoils::SimDXCoil(state,
@@ -3181,12 +3144,12 @@ namespace HVACUnitaryBypassVAV {
                                                           QZnReq,
                                                           QLatReq);
 
-                Real64 NoOutput = DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
-                                  (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp,
-                                                              DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat) -
-                                   Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
-                                                              DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
-                Real64 TempNoOutput = DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
+                Real64 NoOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
+                                  (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp,
+                                                              state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat) -
+                                   Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
+                                                              state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
+                Real64 TempNoOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
                 // Real64 NoLoadHumRatOut = VariableSpeedCoils::VarSpeedCoil( CBVAV( CBVAVNum ).CoolCoilCompIndex ).OutletAirHumRat;
 
                 // Get full load result
@@ -3209,15 +3172,15 @@ namespace HVACUnitaryBypassVAV {
                                                           QLatReq);
 
                 // Real64 FullLoadHumRatOut = VariableSpeedCoils::VarSpeedCoil( CBVAV( CBVAVNum ).CoolCoilCompIndex ).OutletAirHumRat;
-                Real64 FullOutput = DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
-                                    (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp,
-                                                                DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat) -
-                                     Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
-                                                                DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
-                Real64 ReqOutput = DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
-                                   (Psychrometrics::PsyHFnTdbW(DesOutTemp, DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat) -
-                                    Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
-                                                               DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
+                Real64 FullOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
+                                    (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp,
+                                                                state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat) -
+                                     Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
+                                                                state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
+                Real64 ReqOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
+                                   (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat) -
+                                    Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
+                                                               state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
 
                 Real64 loadAccuracy(0.001);                   // Watts, power
                 Real64 tempAccuracy(0.001);                   // delta C, temperature
@@ -3289,7 +3252,7 @@ namespace HVACUnitaryBypassVAV {
                                                                   QLatReq,
                                                                   OnOffAirFlowRatio);
 
-                        Real64 TempSpeedOut = DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
+                        Real64 TempSpeedOut = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
                         Real64 TempSpeedOutSpeed1 = TempSpeedOut;
 
                         if ((TempSpeedOut - DesOutTemp) < tempAccuracy) {
@@ -3313,7 +3276,7 @@ namespace HVACUnitaryBypassVAV {
                                                                           QLatReq,
                                                                           OnOffAirFlowRatio);
 
-                                TempSpeedOut = DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
+                                TempSpeedOut = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
 
                                 if ((TempSpeedOut - DesOutTemp) > tempAccuracy) {
                                     SpeedNum = I;
@@ -3452,19 +3415,20 @@ namespace HVACUnitaryBypassVAV {
                 } else if (PartLoadFrac < 0.0) {
                     PartLoadFrac = 0.0;
                 }
-                SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).DXHeatCoilIndexNum);
+                state.dataHVACUnitaryBypassVAV->SaveCompressorPLR =
+                    VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).DXHeatCoilIndexNum);
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam)) { // not a DX heating coil
                 if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
-                    CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat);
-                    QHeater = DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate * CpAir *
-                              (CBVAV(CBVAVNum).CoilTempSetPoint - DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp);
+                    CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat);
+                    QHeater = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate * CpAir *
+                              (CBVAV(CBVAVNum).CoilTempSetPoint - state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp);
                 } else {
                     QHeater = 0.0;
                 }
                 // Added None DX heating coils calling point
-                DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).TempSetPoint = CBVAV(CBVAVNum).CoilTempSetPoint;
+                state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).TempSetPoint = CBVAV(CBVAVNum).CoilTempSetPoint;
                 CalcNonDXHeatingCoils(state, CBVAVNum, FirstHVACIteration, QHeater, CBVAV(CBVAVNum).OpMode, QHeaterActual);
             } else {
                 ShowFatalError(state, "SimCBVAV System: Invalid Heating Coil=" + CBVAV(CBVAVNum).HeatCoilType);
@@ -3475,37 +3439,39 @@ namespace HVACUnitaryBypassVAV {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[CBVAV(CBVAVNum).FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _, _, _);
             } else {
-                Fans::SimulateFanComponents(state, CBVAV(CBVAVNum).FanName, FirstHVACIteration, CBVAV(CBVAVNum).FanIndex, FanSpeedRatio);
+                Fans::SimulateFanComponents(
+                    state, CBVAV(CBVAVNum).FanName, FirstHVACIteration, CBVAV(CBVAVNum).FanIndex, state.dataHVACUnitaryBypassVAV->FanSpeedRatio);
             }
         }
         int splitterOutNode = CBVAV(CBVAVNum).SplitterOutletAirNode;
-        DataLoopNode::Node(splitterOutNode).MassFlowRateSetPoint = DataLoopNode::Node(OutletNode).MassFlowRateSetPoint;
-        DataLoopNode::Node(OutletNode) = DataLoopNode::Node(splitterOutNode);
-        DataLoopNode::Node(OutletNode).TempSetPoint = CBVAV(CBVAVNum).OutletTempSetPoint;
-        DataLoopNode::Node(OutletNode).MassFlowRate =
-            (1.0 - BypassDuctFlowFraction) * DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
+        state.dataLoopNodes->Node(splitterOutNode).MassFlowRateSetPoint = state.dataLoopNodes->Node(OutletNode).MassFlowRateSetPoint;
+        state.dataLoopNodes->Node(OutletNode) = state.dataLoopNodes->Node(splitterOutNode);
+        state.dataLoopNodes->Node(OutletNode).TempSetPoint = CBVAV(CBVAVNum).OutletTempSetPoint;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRate =
+            (1.0 - state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction) * state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
         // report variable
-        CBVAV(CBVAVNum).BypassMassFlowRate = BypassDuctFlowFraction * DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
+        CBVAV(CBVAVNum).BypassMassFlowRate =
+            state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction * state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
         // initialize bypass duct connected to mixer or plenum with flow rate and conditions
         if (CBVAV(CBVAVNum).plenumIndex > 0 || CBVAV(CBVAVNum).mixerIndex > 0) {
             int plenumOrMixerInletNode = CBVAV(CBVAVNum).PlenumMixerInletAirNode;
-            DataLoopNode::Node(plenumOrMixerInletNode) = DataLoopNode::Node(splitterOutNode);
-            DataLoopNode::Node(plenumOrMixerInletNode).MassFlowRate =
-                BypassDuctFlowFraction * DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
-            DataLoopNode::Node(plenumOrMixerInletNode).MassFlowRateMaxAvail = DataLoopNode::Node(plenumOrMixerInletNode).MassFlowRate;
-            state.dataAirLoop->AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).BypassMassFlow = DataLoopNode::Node(plenumOrMixerInletNode).MassFlowRate;
+            state.dataLoopNodes->Node(plenumOrMixerInletNode) = state.dataLoopNodes->Node(splitterOutNode);
+            state.dataLoopNodes->Node(plenumOrMixerInletNode).MassFlowRate =
+                state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction * state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
+            state.dataLoopNodes->Node(plenumOrMixerInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(plenumOrMixerInletNode).MassFlowRate;
+            state.dataAirLoop->AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).BypassMassFlow = state.dataLoopNodes->Node(plenumOrMixerInletNode).MassFlowRate;
         }
 
         // calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio)
-        MinHumRat = min(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(OutletNode).HumRat);
-        LoadMet = DataLoopNode::Node(OutletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRat) -
-                                                                 Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, MinHumRat));
+        MinHumRat = min(state.dataLoopNodes->Node(InletNode).HumRat, state.dataLoopNodes->Node(OutletNode).HumRat);
+        LoadMet = state.dataLoopNodes->Node(OutletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, MinHumRat) -
+                                                                 Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, MinHumRat));
 
         // calculate OA fraction used for zone OA volume flow rate calc
         state.dataAirLoop->AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac = 0.0;
-        if (DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate > 0.0) {
+        if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate > 0.0) {
             state.dataAirLoop->AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac =
-                DataLoopNode::Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate / DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate;
+                state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate / state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate;
         }
     }
 
@@ -3525,6 +3491,8 @@ namespace HVACUnitaryBypassVAV {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int lastDayOfSim(0);   // used during warmup to reset changeOverTimer since need to do same thing next warmup day
         Real64 ZoneLoad = 0.0; // Total load in controlled zone [W]
+
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
 
         int dayOfSim = state.dataGlobal->DayOfSim; // DayOfSim increments during Warmup when it actually simulates the same day
         if (state.dataGlobal->WarmupFlag) {
@@ -3580,19 +3548,19 @@ namespace HVACUnitaryBypassVAV {
 
         {
             auto const SELECT_CASE_var(CBVAV(CBVAVNum).PriorityControl);
-            if (SELECT_CASE_var == CoolingPriority) {
+            if (SELECT_CASE_var == PriorityCtrlMode::CoolingPriority) {
                 if (QZoneReqCool < 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 } else if (QZoneReqHeat > 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                 }
-            } else if (SELECT_CASE_var == HeatingPriority) {
+            } else if (SELECT_CASE_var == PriorityCtrlMode::HeatingPriority) {
                 if (QZoneReqHeat > 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                 } else if (QZoneReqCool < 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 }
-            } else if (SELECT_CASE_var == ZonePriority) {
+            } else if (SELECT_CASE_var == PriorityCtrlMode::ZonePriority) {
                 if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
                     if (QZoneReqHeat > 0.0) {
                         CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
@@ -3614,7 +3582,7 @@ namespace HVACUnitaryBypassVAV {
                         CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                     }
                 }
-            } else if (SELECT_CASE_var == LoadPriority) {
+            } else if (SELECT_CASE_var == PriorityCtrlMode::LoadPriority) {
                 if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
@@ -3673,9 +3641,11 @@ namespace HVACUnitaryBypassVAV {
         Real64 SupplyAirTempToHeatSetPt; // Supply air temperature required to reach the heating setpoint [C]
         Real64 SupplyAirTempToCoolSetPt; // Supply air temperature required to reach the cooling setpoint [C]
 
-        Real64 DXCoolCoilInletTemp = DataLoopNode::Node(CBVAV(CBVAVNumber).DXCoilInletNode).Temp;
-        Real64 OutAirTemp = DataLoopNode::Node(CBVAV(CBVAVNumber).AirOutNode).Temp;
-        Real64 OutAirHumRat = DataLoopNode::Node(CBVAV(CBVAVNumber).AirOutNode).HumRat;
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+
+        Real64 DXCoolCoilInletTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNumber).DXCoilInletNode).Temp;
+        Real64 OutAirTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNumber).AirOutNode).Temp;
+        Real64 OutAirHumRat = state.dataLoopNodes->Node(CBVAV(CBVAVNumber).AirOutNode).HumRat;
 
         if (CBVAV(CBVAVNumber).HeatCoolMode == CoolingMode) { // Cooling required
             CalcSetPointTempTarget = 99999.0;
@@ -3710,15 +3680,15 @@ namespace HVACUnitaryBypassVAV {
 
             // Find the supply air temperature that will force the box to full flow
             if (BoxOutletNodeNum > 0) {
-                if (DataLoopNode::Node(BoxOutletNodeNum).MassFlowRateMax == 0.0) {
-                    SupplyAirTemp = DataLoopNode::Node(ZoneNodeNum).Temp;
+                if (state.dataLoopNodes->Node(BoxOutletNodeNum).MassFlowRateMax == 0.0) {
+                    SupplyAirTemp = state.dataLoopNodes->Node(ZoneNodeNum).Temp;
                 } else {
                     // The target supply air temperature is based on current zone temp and load and max box flow rate
                     SupplyAirTemp =
-                        DataLoopNode::Node(ZoneNodeNum).Temp + ZoneLoad / (CpSupplyAir * DataLoopNode::Node(BoxOutletNodeNum).MassFlowRateMax);
+                        state.dataLoopNodes->Node(ZoneNodeNum).Temp + ZoneLoad / (CpSupplyAir * state.dataLoopNodes->Node(BoxOutletNodeNum).MassFlowRateMax);
                 }
             } else {
-                SupplyAirTemp = DataLoopNode::Node(ZoneNodeNum).Temp;
+                SupplyAirTemp = state.dataLoopNodes->Node(ZoneNodeNum).Temp;
             }
 
             //     Save the MIN (cooling) or MAX (heating) temperature for coil control
@@ -3731,14 +3701,14 @@ namespace HVACUnitaryBypassVAV {
                 //       Should use CpAirAtCoolSetPoint or CpAirAtHeatSetPoint here?
                 //       If so, use ZoneThermostatSetPointLo(ZoneNum) and ZoneThermostatSetPointHi(ZoneNum)
                 //       along with the zone humidity ratio
-                if (DataLoopNode::Node(BoxOutletNodeNum).MassFlowRateMax == 0.0) {
-                    SupplyAirTempToHeatSetPt = DataLoopNode::Node(ZoneNodeNum).Temp;
-                    SupplyAirTempToCoolSetPt = DataLoopNode::Node(ZoneNodeNum).Temp;
+                if (state.dataLoopNodes->Node(BoxOutletNodeNum).MassFlowRateMax == 0.0) {
+                    SupplyAirTempToHeatSetPt = state.dataLoopNodes->Node(ZoneNodeNum).Temp;
+                    SupplyAirTempToCoolSetPt = state.dataLoopNodes->Node(ZoneNodeNum).Temp;
                 } else {
                     SupplyAirTempToHeatSetPt =
-                        DataLoopNode::Node(ZoneNodeNum).Temp + QToHeatSetPt / (CpSupplyAir * DataLoopNode::Node(BoxOutletNodeNum).MassFlowRateMax);
+                        state.dataLoopNodes->Node(ZoneNodeNum).Temp + QToHeatSetPt / (CpSupplyAir * state.dataLoopNodes->Node(BoxOutletNodeNum).MassFlowRateMax);
                     SupplyAirTempToCoolSetPt =
-                        DataLoopNode::Node(ZoneNodeNum).Temp + QToCoolSetPt / (CpSupplyAir * DataLoopNode::Node(BoxOutletNodeNum).MassFlowRateMax);
+                        state.dataLoopNodes->Node(ZoneNodeNum).Temp + QToCoolSetPt / (CpSupplyAir * state.dataLoopNodes->Node(BoxOutletNodeNum).MassFlowRateMax);
                 }
                 TSupplyToHeatSetPtMax = max(SupplyAirTempToHeatSetPt, TSupplyToHeatSetPtMax);
                 TSupplyToCoolSetPtMin = min(SupplyAirTempToCoolSetPt, TSupplyToCoolSetPtMin);
@@ -3756,7 +3726,7 @@ namespace HVACUnitaryBypassVAV {
                     CalcSetPointTempTarget = OutAirTemp;
                 }
             } else { // Reset setpoint to inlet air temp if unit is OFF and in cycling fan mode
-                CalcSetPointTempTarget = DataLoopNode::Node(CBVAV(CBVAVNumber).AirInNode).Temp;
+                CalcSetPointTempTarget = state.dataLoopNodes->Node(CBVAV(CBVAVNumber).AirInNode).Temp;
             }
             //   Reset cooling/heating mode to OFF if mixed air inlet temperature is below/above setpoint temperature.
             //   HeatCoolMode = 0 for OFF, 1 for cooling, 2 for heating
@@ -3830,10 +3800,12 @@ namespace HVACUnitaryBypassVAV {
         bool FirstHVACIter = (Par(5) == 1.0);
         bool HXUnitOn = (Par(6) == 1.0); // flag to enable heat exchanger
 
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+
         HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
             state, CBVAV(CBVAVNumTemp).DXCoolCoilName, FirstHVACIter, On, PartLoadFrac, CoilIndex, DataHVACGlobals::ContFanCycCoil, HXUnitOn);
 
-        Real64 OutletAirTemp = DataLoopNode::Node(CBVAV(CBVAVNumTemp).DXCoilOutletNode).Temp;
+        Real64 OutletAirTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNumTemp).DXCoilOutletNode).Temp;
         Real64 Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;
@@ -3920,6 +3892,8 @@ namespace HVACUnitaryBypassVAV {
         Real64 ZoneMassFlow; // Zone mass flow rate required to meet zone load [kg/s]
         Real64 ZoneLoad;     // Zone load calculated by ZoneTempPredictor [W]
 
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+
         int InletNode = CBVAV(CBVAVNum).AirInNode;                     // Inlet node number for CBVAVNum
         int OutletNode = CBVAV(CBVAVNum).AirOutNode;                   // Outlet node number for CBVAVNum
         int MixerMixedAirNode = CBVAV(CBVAVNum).MixerMixedAirNode;     // Mixed air node number in OA mixer
@@ -3928,7 +3902,7 @@ namespace HVACUnitaryBypassVAV {
         int MixerInletAirNode = CBVAV(CBVAVNum).MixerInletAirNode;     // Inlet air node number in OA mixer
 
         Real64 SystemMassFlow = 0.0; // System mass flow rate required for all zones [kg/s]
-        Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(OutletNode).HumRat); // Specific heat of outlet air [J/kg-K]
+        Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(OutletNode).HumRat); // Specific heat of outlet air [J/kg-K]
         // Determine zone air flow
         for (int ZoneNum = 1; ZoneNum <= CBVAV(CBVAVNum).NumControlledZones; ++ZoneNum) {
             int ZoneNodeNum = CBVAV(CBVAVNum).ActualZoneNodeNum(ZoneNum);
@@ -3948,8 +3922,8 @@ namespace HVACUnitaryBypassVAV {
             } else {
                 ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum)).RemainingOutputRequired;
             }
-            Real64 CpZoneAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(ZoneNodeNum).HumRat);
-            Real64 DeltaCpTemp = CpSupplyAir * DataLoopNode::Node(OutletNode).Temp - CpZoneAir * DataLoopNode::Node(ZoneNodeNum).Temp;
+            Real64 CpZoneAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
+            Real64 DeltaCpTemp = CpSupplyAir * state.dataLoopNodes->Node(OutletNode).Temp - CpZoneAir * state.dataLoopNodes->Node(ZoneNodeNum).Temp;
 
             // Need to check DeltaCpTemp and ensure that it is not zero
             if (DeltaCpTemp != 0.0) { // .AND. .NOT. CurDeadBandOrSetback(ZoneNum))THEN
@@ -3959,34 +3933,34 @@ namespace HVACUnitaryBypassVAV {
                 ZoneMassFlow = 0.0;
             }
             SystemMassFlow +=
-                max(DataLoopNode::Node(BoxOutletNodeNum).MassFlowRateMin, min(ZoneMassFlow, DataLoopNode::Node(BoxOutletNodeNum).MassFlowRateMax));
+                max(state.dataLoopNodes->Node(BoxOutletNodeNum).MassFlowRateMin, min(ZoneMassFlow, state.dataLoopNodes->Node(BoxOutletNodeNum).MassFlowRateMax));
         }
 
-        Real64 AverageUnitMassFlow = CompOnMassFlow;
-        Real64 AverageOAMassFlow = OACompOnMassFlow;
-        FanSpeedRatio = CompOnFlowRatio;
+        Real64 AverageUnitMassFlow = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
+        Real64 AverageOAMassFlow = state.dataHVACUnitaryBypassVAV->OACompOnMassFlow;
+        state.dataHVACUnitaryBypassVAV->FanSpeedRatio = state.dataHVACUnitaryBypassVAV->CompOnFlowRatio;
 
-        DataLoopNode::Node(MixerInletAirNode) = DataLoopNode::Node(InletNode);
+        state.dataLoopNodes->Node(MixerInletAirNode) = state.dataLoopNodes->Node(InletNode);
 
-        DataLoopNode::Node(MixerMixedAirNode).MassFlowRateMin = 0.0;
+        state.dataLoopNodes->Node(MixerMixedAirNode).MassFlowRateMin = 0.0;
 
         if (ScheduleManager::GetCurrentScheduleValue(state, CBVAV(CBVAVNum).SchedPtr) == 0.0 || AverageUnitMassFlow == 0.0) {
-            DataLoopNode::Node(InletNode).MassFlowRate = 0.0;
-            DataLoopNode::Node(MixerOutsideAirNode).MassFlowRate = 0.0;
-            DataLoopNode::Node(MixerReliefAirNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(MixerOutsideAirNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(MixerReliefAirNode).MassFlowRate = 0.0;
             OnOffAirFlowRatio = 0.0;
-            BypassDuctFlowFraction = 0.0;
+            state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction = 0.0;
         } else {
-            DataLoopNode::Node(MixerInletAirNode).MassFlowRate = AverageUnitMassFlow;
-            DataLoopNode::Node(MixerOutsideAirNode).MassFlowRate = AverageOAMassFlow;
-            DataLoopNode::Node(MixerReliefAirNode).MassFlowRate = AverageOAMassFlow;
+            state.dataLoopNodes->Node(MixerInletAirNode).MassFlowRate = AverageUnitMassFlow;
+            state.dataLoopNodes->Node(MixerOutsideAirNode).MassFlowRate = AverageOAMassFlow;
+            state.dataLoopNodes->Node(MixerReliefAirNode).MassFlowRate = AverageOAMassFlow;
             OnOffAirFlowRatio = 1.0;
             auto &cbVAVBoxOut(CBVAV(CBVAVNum).CBVAVBoxOutletNode);
             Real64 boxOutletNodeFlow = 0.0;
             for (int i = 1; i <= CBVAV(CBVAVNum).NumControlledZones; ++i) {
-                boxOutletNodeFlow += DataLoopNode::Node(cbVAVBoxOut(i)).MassFlowRate;
+                boxOutletNodeFlow += state.dataLoopNodes->Node(cbVAVBoxOut(i)).MassFlowRate;
             }
-            BypassDuctFlowFraction = max(0.0, 1.0 - (boxOutletNodeFlow / AverageUnitMassFlow));
+            state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction = max(0.0, 1.0 - (boxOutletNodeFlow / AverageUnitMassFlow));
         }
     }
 
@@ -4000,6 +3974,8 @@ namespace HVACUnitaryBypassVAV {
         // PURPOSE OF THIS SUBROUTINE:
         // Fills some of the report variables for the changeover-bypass VAV system
 
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+
         Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         CBVAV(CBVAVNum).TotCoolEnergy = CBVAV(CBVAVNum).TotCoolEnergyRate * ReportingConstant;
@@ -4012,7 +3988,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (CBVAV(CBVAVNum).FirstPass) {
             if (!state.dataGlobal->SysSizingCalc) {
-                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, CBVAV(CBVAVNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, CBVAV(CBVAVNum).FirstPass);
             }
         }
 
@@ -4053,6 +4029,9 @@ namespace HVACUnitaryBypassVAV {
         int SolFlag; // error flag
 
         Real64 QCoilActual = 0.0; // actual heating load met
+
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+
         if (HeatCoilLoad > DataHVACGlobals::SmallLoad) {
             {
                 auto const SELECT_CASE_var(CBVAV(CBVAVNum).HeatCoilType_Num);
@@ -4063,7 +4042,7 @@ namespace HVACUnitaryBypassVAV {
                                                                 HeatCoilLoad,
                                                                 CBVAV(CBVAVNum).HeatCoilIndex,
                                                                 QCoilActual,
-                                                                true,
+                                                                false,
                                                                 FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     // simulate the heating coil at maximum hot water flow rate
@@ -4153,7 +4132,7 @@ namespace HVACUnitaryBypassVAV {
                                                                 HeatCoilLoad,
                                                                 CBVAV(CBVAVNum).HeatCoilIndex,
                                                                 QCoilActual,
-                                                                true,
+                                                                false,
                                                                 FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     mdot = 0.0;
@@ -4205,6 +4184,8 @@ namespace HVACUnitaryBypassVAV {
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
+
+        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
 
         int CBVAVNum = int(Par(1));
         bool FirstHVACSoln = (Par(2) > 0.0);

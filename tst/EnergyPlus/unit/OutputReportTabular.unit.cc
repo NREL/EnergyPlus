@@ -90,15 +90,15 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::DataGlobalConstants;
-using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataSurfaces;
-using namespace EnergyPlus::OutputProcessor;
-using namespace EnergyPlus::OutputReportPredefined;
-using namespace EnergyPlus::OutputReportTabular;
-using namespace EnergyPlus::OutputProcessor;
+using namespace DataGlobalConstants;
+using namespace DataEnvironment;
+using namespace DataHeatBalance;
+using namespace DataSizing;
+using namespace DataSurfaces;
+using namespace OutputProcessor;
+using namespace OutputReportPredefined;
+using namespace OutputReportTabular;
+using namespace OutputProcessor;
 using namespace SimulationManager;
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString)
@@ -491,7 +491,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     state->dataEnvrn->TotDesDays = 2;
     state->dataEnvrn->TotRunDesPersDays = 3;
     state->dataGlobal->NumOfZones = 4;
-    TotSurfaces = 7;
+    state->dataSurface->TotSurfaces = 7;
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
     AllocateLoadComponentArrays(*state);
@@ -1428,7 +1428,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
 
     ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 
-    EXPECT_EQ(10.0, (Zone(2).Volume * Zone(2).Multiplier * Zone(2).ListMultiplier) / (Zone(1).Volume * Zone(1).Multiplier * Zone(1).ListMultiplier));
+    EXPECT_EQ(10.0, (state->dataHeatBal->Zone(2).Volume * state->dataHeatBal->Zone(2).Multiplier * state->dataHeatBal->Zone(2).ListMultiplier) / (state->dataHeatBal->Zone(1).Volume * state->dataHeatBal->Zone(1).Multiplier * state->dataHeatBal->Zone(1).ListMultiplier));
     // leaving a little wiggle room on these
     EXPECT_NEAR(10.0, (state->dataDXCoils->DXCoil(2).RatedTotCap(1) / state->dataDXCoils->DXCoil(1).RatedTotCap(1)), 0.00001);
     EXPECT_NEAR(10.0, (state->dataDXCoils->DXCoil(2).RatedAirVolFlowRate(1) / state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1)), 0.00001);
@@ -1442,60 +1442,60 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     UpdateTabularReports(*state, OutputProcessor::TimeStepType::TimeStepSystem);
 
     // zone equipment should report single zone magnitude, multipliers do not apply, should be > 0 or what's the point
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleRadGain, DataHeatBalance::ZnRpt(2).PeopleRadGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleConGain, DataHeatBalance::ZnRpt(2).PeopleConGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleSenGain, DataHeatBalance::ZnRpt(2).PeopleSenGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleNumOcc, DataHeatBalance::ZnRpt(2).PeopleNumOcc);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleLatGain, DataHeatBalance::ZnRpt(2).PeopleLatGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleTotGain, DataHeatBalance::ZnRpt(2).PeopleTotGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleRadGainRate, DataHeatBalance::ZnRpt(2).PeopleRadGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleConGainRate, DataHeatBalance::ZnRpt(2).PeopleConGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleSenGainRate, DataHeatBalance::ZnRpt(2).PeopleSenGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleLatGainRate, DataHeatBalance::ZnRpt(2).PeopleLatGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleTotGainRate, DataHeatBalance::ZnRpt(2).PeopleTotGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleRadGain, state->dataHeatBal->ZnRpt(2).PeopleRadGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleConGain, state->dataHeatBal->ZnRpt(2).PeopleConGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleSenGain, state->dataHeatBal->ZnRpt(2).PeopleSenGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleNumOcc, state->dataHeatBal->ZnRpt(2).PeopleNumOcc);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleLatGain, state->dataHeatBal->ZnRpt(2).PeopleLatGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleTotGain, state->dataHeatBal->ZnRpt(2).PeopleTotGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleRadGainRate, state->dataHeatBal->ZnRpt(2).PeopleRadGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleConGainRate, state->dataHeatBal->ZnRpt(2).PeopleConGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleSenGainRate, state->dataHeatBal->ZnRpt(2).PeopleSenGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleLatGainRate, state->dataHeatBal->ZnRpt(2).PeopleLatGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleTotGainRate, state->dataHeatBal->ZnRpt(2).PeopleTotGainRate);
 
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, DataHeatBalance::ZnRpt(2).LtsPower);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsElecConsump, DataHeatBalance::ZnRpt(2).LtsElecConsump);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsRadGain, DataHeatBalance::ZnRpt(2).LtsRadGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsVisGain, DataHeatBalance::ZnRpt(2).LtsVisGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsConGain, DataHeatBalance::ZnRpt(2).LtsConGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsRetAirGain, DataHeatBalance::ZnRpt(2).LtsRetAirGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsTotGain, DataHeatBalance::ZnRpt(2).LtsTotGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsRadGainRate, DataHeatBalance::ZnRpt(2).LtsRadGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsVisGainRate, DataHeatBalance::ZnRpt(2).LtsVisGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsConGainRate, DataHeatBalance::ZnRpt(2).LtsConGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsRetAirGainRate, DataHeatBalance::ZnRpt(2).LtsRetAirGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsTotGainRate, DataHeatBalance::ZnRpt(2).LtsTotGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsPower, state->dataHeatBal->ZnRpt(2).LtsPower);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsElecConsump, state->dataHeatBal->ZnRpt(2).LtsElecConsump);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsRadGain, state->dataHeatBal->ZnRpt(2).LtsRadGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsVisGain, state->dataHeatBal->ZnRpt(2).LtsVisGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsConGain, state->dataHeatBal->ZnRpt(2).LtsConGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsRetAirGain, state->dataHeatBal->ZnRpt(2).LtsRetAirGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsTotGain, state->dataHeatBal->ZnRpt(2).LtsTotGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsRadGainRate, state->dataHeatBal->ZnRpt(2).LtsRadGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsVisGainRate, state->dataHeatBal->ZnRpt(2).LtsVisGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsConGainRate, state->dataHeatBal->ZnRpt(2).LtsConGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsRetAirGainRate, state->dataHeatBal->ZnRpt(2).LtsRetAirGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsTotGainRate, state->dataHeatBal->ZnRpt(2).LtsTotGainRate);
 
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, DataHeatBalance::ZnRpt(2).ElecPower);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecConsump, DataHeatBalance::ZnRpt(2).ElecConsump);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecRadGain, DataHeatBalance::ZnRpt(2).ElecRadGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecConGain, DataHeatBalance::ZnRpt(2).ElecConGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecLatGain, DataHeatBalance::ZnRpt(2).ElecLatGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecLost, DataHeatBalance::ZnRpt(2).ElecLost);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecTotGain, DataHeatBalance::ZnRpt(2).ElecTotGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecRadGainRate, DataHeatBalance::ZnRpt(2).ElecRadGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecConGainRate, DataHeatBalance::ZnRpt(2).ElecConGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecLatGainRate, DataHeatBalance::ZnRpt(2).ElecLatGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecLostRate, DataHeatBalance::ZnRpt(2).ElecLostRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecTotGainRate, DataHeatBalance::ZnRpt(2).ElecTotGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecPower, state->dataHeatBal->ZnRpt(2).ElecPower);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecConsump, state->dataHeatBal->ZnRpt(2).ElecConsump);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecRadGain, state->dataHeatBal->ZnRpt(2).ElecRadGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecConGain, state->dataHeatBal->ZnRpt(2).ElecConGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecLatGain, state->dataHeatBal->ZnRpt(2).ElecLatGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecLost, state->dataHeatBal->ZnRpt(2).ElecLost);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecTotGain, state->dataHeatBal->ZnRpt(2).ElecTotGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecRadGainRate, state->dataHeatBal->ZnRpt(2).ElecRadGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecConGainRate, state->dataHeatBal->ZnRpt(2).ElecConGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecLatGainRate, state->dataHeatBal->ZnRpt(2).ElecLatGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecLostRate, state->dataHeatBal->ZnRpt(2).ElecLostRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecTotGainRate, state->dataHeatBal->ZnRpt(2).ElecTotGainRate);
 
     // expect occupancy time data to be equal
-    EXPECT_EQ(DataHeatBalance::ZonePreDefRep(1).NumOccAccumTime, DataHeatBalance::ZonePreDefRep(2).NumOccAccumTime);
-    EXPECT_EQ(DataHeatBalance::ZonePreDefRep(1).TotTimeOcc, DataHeatBalance::ZonePreDefRep(2).TotTimeOcc);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).NumOccAccumTime, state->dataHeatBal->ZonePreDefRep(2).NumOccAccumTime);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).TotTimeOcc, state->dataHeatBal->ZonePreDefRep(2).TotTimeOcc);
 
     // occupancy is reported on a zone basis without multipliers (until this changes, expect results to be equal)
-    EXPECT_EQ(DataHeatBalance::ZonePreDefRep(1).NumOccAccum, DataHeatBalance::ZonePreDefRep(2).NumOccAccum);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).NumOccAccum, state->dataHeatBal->ZonePreDefRep(2).NumOccAccum);
 
     // expect energy to report according to multipliers
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).MechVentVolTotalOcc / DataHeatBalance::ZonePreDefRep(1).MechVentVolTotalOcc), 0.00001);
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).MechVentVolMin / DataHeatBalance::ZonePreDefRep(1).MechVentVolMin), 0.00001);
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnZoneEqCl / DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl), 0.00001);
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnPeoplAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnPeoplAdd), 0.00001);
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnLiteAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnLiteAdd), 0.00001);
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnEquipAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnEquipAdd), 0.00001);
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnOtherRem / DataHeatBalance::ZonePreDefRep(1).SHGSAnOtherRem), 0.00001);
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).clPeak / DataHeatBalance::ZonePreDefRep(1).clPeak), 0.00001);
+    EXPECT_NEAR(10.0, (state->dataHeatBal->ZonePreDefRep(2).MechVentVolTotalOcc / state->dataHeatBal->ZonePreDefRep(1).MechVentVolTotalOcc), 0.00001);
+    EXPECT_NEAR(10.0, (state->dataHeatBal->ZonePreDefRep(2).MechVentVolMin / state->dataHeatBal->ZonePreDefRep(1).MechVentVolMin), 0.00001);
+    EXPECT_NEAR(10.0, (state->dataHeatBal->ZonePreDefRep(2).SHGSAnZoneEqCl / state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqCl), 0.00001);
+    EXPECT_NEAR(10.0, (state->dataHeatBal->ZonePreDefRep(2).SHGSAnPeoplAdd / state->dataHeatBal->ZonePreDefRep(1).SHGSAnPeoplAdd), 0.00001);
+    EXPECT_NEAR(10.0, (state->dataHeatBal->ZonePreDefRep(2).SHGSAnLiteAdd / state->dataHeatBal->ZonePreDefRep(1).SHGSAnLiteAdd), 0.00001);
+    EXPECT_NEAR(10.0, (state->dataHeatBal->ZonePreDefRep(2).SHGSAnEquipAdd / state->dataHeatBal->ZonePreDefRep(1).SHGSAnEquipAdd), 0.00001);
+    EXPECT_NEAR(10.0, (state->dataHeatBal->ZonePreDefRep(2).SHGSAnOtherRem / state->dataHeatBal->ZonePreDefRep(1).SHGSAnOtherRem), 0.00001);
+    EXPECT_NEAR(10.0, (state->dataHeatBal->ZonePreDefRep(2).clPeak / state->dataHeatBal->ZonePreDefRep(1).clPeak), 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
@@ -2463,13 +2463,13 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 
     ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 
-    EXPECT_EQ(10.0, (Zone(2).Volume * Zone(2).Multiplier * Zone(2).ListMultiplier) / (Zone(1).Volume * Zone(1).Multiplier * Zone(1).ListMultiplier));
+    EXPECT_EQ(10.0, (state->dataHeatBal->Zone(2).Volume * state->dataHeatBal->Zone(2).Multiplier * state->dataHeatBal->Zone(2).ListMultiplier) / (state->dataHeatBal->Zone(1).Volume * state->dataHeatBal->Zone(1).Multiplier * state->dataHeatBal->Zone(1).ListMultiplier));
 
     state->dataGlobal->DoWeathSim = true;                           // flag to trick tabular reports to scan meters
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
     UpdateTabularReports(*state, OutputProcessor::TimeStepType::TimeStepSystem);
 
-    EXPECT_NEAR(1.86168, DataSizing::FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
+    EXPECT_NEAR(1.86168, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
 }
 
 // TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
@@ -3735,10 +3735,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 
     GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
 
-    EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
-    EXPECT_EQ(reliefEnergy * DataGlobalConstants::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
-    EXPECT_EQ(condenserReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
-    EXPECT_EQ(condenserReject * DataGlobalConstants::convertJtoGJ, BuildingPreDefRep.emiHVACReject);
+    EXPECT_EQ(reliefEnergy, state->dataHeatBal->SysTotalHVACReliefHeatLoss);
+    EXPECT_EQ(reliefEnergy * DataGlobalConstants::convertJtoGJ, state->dataHeatBal->BuildingPreDefRep.emiHVACRelief);
+    EXPECT_EQ(condenserReject, state->dataHeatBal->SysTotalHVACRejectHeatLoss);
+    EXPECT_EQ(condenserReject * DataGlobalConstants::convertJtoGJ, state->dataHeatBal->BuildingPreDefRep.emiHVACReject);
 
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(2);
@@ -3759,10 +3759,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 
     Real64 coilReject = 1.0 * TimeStepSysSec + 200.0 + 10.0;
     GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
-    EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
-    EXPECT_EQ(2 * reliefEnergy * DataGlobalConstants::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
-    EXPECT_EQ(condenserReject + coilReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
-    EXPECT_EQ(2 * condenserReject * DataGlobalConstants::convertJtoGJ + coilReject * DataGlobalConstants::convertJtoGJ, BuildingPreDefRep.emiHVACReject);
+    EXPECT_EQ(reliefEnergy, state->dataHeatBal->SysTotalHVACReliefHeatLoss);
+    EXPECT_EQ(2 * reliefEnergy * DataGlobalConstants::convertJtoGJ, state->dataHeatBal->BuildingPreDefRep.emiHVACRelief);
+    EXPECT_EQ(condenserReject + coilReject, state->dataHeatBal->SysTotalHVACRejectHeatLoss);
+    EXPECT_EQ(2 * condenserReject * DataGlobalConstants::convertJtoGJ + coilReject * DataGlobalConstants::convertJtoGJ, state->dataHeatBal->BuildingPreDefRep.emiHVACReject);
 }
 
 TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
@@ -6046,83 +6046,83 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitSubstring_Test)
 
 TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    sqlite->sqliteBegin();
+    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularVeriSum = true;
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).FrameDivider = 0;
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).FrameDivider = 0;
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).FrameDivider = 0;
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).FrameDivider = 0;
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 1;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).FrameDivider = 1;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).FrameDivider = 1;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).FrameDivider = 2;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 1;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).FrameDivider = 2;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 1;
 
     // frames
-    TotFrameDivider = 2;
-    FrameDivider.allocate(TotFrameDivider);
-    FrameDivider(1).FrameWidth = 0.3;
-    FrameDivider(2).FrameWidth = 0.2;
+    state->dataHeatBal->TotFrameDivider = 2;
+    state->dataSurface->FrameDivider.allocate(state->dataHeatBal->TotFrameDivider);
+    state->dataSurface->FrameDivider(1).FrameWidth = 0.3;
+    state->dataSurface->FrameDivider(2).FrameWidth = 0.2;
 
     // zone
     state->dataGlobal->NumOfZones = 1;
-    Zone.allocate(state->dataGlobal->NumOfZones);
-    Zone(1).SystemZoneNodeNumber = 1;
-    Zone(1).Multiplier = 1.;
-    Zone(1).ListMultiplier = 1.;
-    Zone(1).FloorArea = 600.; // 20 x 30
-    Zone(1).Volume = 6000.;   // 20 x 30 x 10
-    Zone(1).isPartOfTotalArea = true;
-    Zone(1).ExtGrossWallArea = 500.;
-    Zone(1).ExteriorTotalGroundSurfArea = 0;
-    Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone(1).Multiplier = 1.;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(1).FloorArea = 600.; // 20 x 30
+    state->dataHeatBal->Zone(1).Volume = 6000.;   // 20 x 30 x 10
+    state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(1).ExtGrossWallArea = 500.;
+    state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     WriteVeriSumTable(*state);
 
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
-    EnergyPlus::sqlite->sqliteCommit();
+    sqlite->sqliteCommit();
 
     EXPECT_EQ(123ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
@@ -6156,123 +6156,123 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
 // Test for #6350 and #6469
 TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    sqlite->sqliteBegin();
+    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularVeriSum = true;
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 2;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 2;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 2;
 
     // Loads
-    DataHeatBalance::TotLights = 3;
-    Lights.allocate(DataHeatBalance::TotLights);
+    state->dataHeatBal->TotLights = 3;
+    state->dataHeatBal->Lights.allocate(state->dataHeatBal->TotLights);
 
-    DataHeatBalance::TotPeople = 3;
-    People.allocate(DataHeatBalance::TotPeople);
+    state->dataHeatBal->TotPeople = 3;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
 
-    DataHeatBalance::TotElecEquip = 3;
-    ZoneElectric.allocate(DataHeatBalance::TotElecEquip);
+    state->dataHeatBal->TotElecEquip = 3;
+    state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
-    Lights(1).ZonePtr = 1;
-    Lights(1).DesignLevel = 1000.0;
-    Lights(2).ZonePtr = 2;
-    Lights(2).DesignLevel = 100.0;
-    Lights(3).ZonePtr = 3;
-    Lights(3).DesignLevel = 10.0;
+    state->dataHeatBal->Lights(1).ZonePtr = 1;
+    state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
+    state->dataHeatBal->Lights(2).ZonePtr = 2;
+    state->dataHeatBal->Lights(2).DesignLevel = 100.0;
+    state->dataHeatBal->Lights(3).ZonePtr = 3;
+    state->dataHeatBal->Lights(3).DesignLevel = 10.0;
 
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 10.0;
-    People(2).ZonePtr = 2;
-    People(2).NumberOfPeople = 5.0;
-    People(3).ZonePtr = 3;
-    People(3).NumberOfPeople = 1.0;
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 10.0;
+    state->dataHeatBal->People(2).ZonePtr = 2;
+    state->dataHeatBal->People(2).NumberOfPeople = 5.0;
+    state->dataHeatBal->People(3).ZonePtr = 3;
+    state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
-    ZoneElectric(1).ZonePtr = 1;
-    ZoneElectric(1).DesignLevel = 500.0;
-    ZoneElectric(2).ZonePtr = 2;
-    ZoneElectric(2).DesignLevel = 50.0;
-    ZoneElectric(3).ZonePtr = 3;
-    ZoneElectric(3).DesignLevel = 5.0;
+    state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
+    state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
+    state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
     state->dataGlobal->NumOfZones = 3;
-    Zone.allocate(state->dataGlobal->NumOfZones);
-    Zone(1).Name = "PartofTot Conditioned Zone";
-    Zone(1).SystemZoneNodeNumber = 1; // Conditioned
-    Zone(1).isPartOfTotalArea = true;
-    Zone(1).Multiplier = 1.;
-    Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(1).Multiplier = 1.;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.;
     // 10x10x2
-    Zone(1).FloorArea = 1000.;
-    Zone(1).Volume = 2000.;
-    Zone(1).ExtGrossWallArea = 800.;
-    Zone(1).ExteriorTotalGroundSurfArea = 0;
-    Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone(1).FloorArea = 1000.;
+    state->dataHeatBal->Zone(1).Volume = 2000.;
+    state->dataHeatBal->Zone(1).ExtGrossWallArea = 800.;
+    state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
-    Zone(2).Name = "PartofTot Unconditioned Zone";
-    Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
-    Zone(2).isPartOfTotalArea = true;
-    Zone(2).Multiplier = 1.;
-    Zone(2).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(2).Multiplier = 1.;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1.;
     // 10x10x2
-    Zone(2).FloorArea = 100.;
-    Zone(2).Volume = 200.;
-    Zone(2).ExtGrossWallArea = 80.;
-    Zone(2).ExteriorTotalGroundSurfArea = 0;
-    Zone(2).ExtWindowArea = 0.0;
+    state->dataHeatBal->Zone(2).FloorArea = 100.;
+    state->dataHeatBal->Zone(2).Volume = 200.;
+    state->dataHeatBal->Zone(2).ExtGrossWallArea = 80.;
+    state->dataHeatBal->Zone(2).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
 
-    Zone(3).Name = "NOT PartofTot Conditioned Zone";
-    Zone(3).SystemZoneNodeNumber = 1; // Conditioned
-    Zone(3).isPartOfTotalArea = false;
-    Zone(3).Multiplier = 1.;
-    Zone(3).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
+    state->dataHeatBal->Zone(3).Multiplier = 1.;
+    state->dataHeatBal->Zone(3).ListMultiplier = 1.;
     // 10x10x2
-    Zone(3).FloorArea = 10.;
-    Zone(3).Volume = 20.;
-    Zone(3).ExtGrossWallArea = 8.;
-    Zone(3).ExteriorTotalGroundSurfArea = 0;
-    Zone(3).ExtWindowArea = 0.0;
+    state->dataHeatBal->Zone(3).FloorArea = 10.;
+    state->dataHeatBal->Zone(3).Volume = 20.;
+    state->dataHeatBal->Zone(3).ExtGrossWallArea = 8.;
+    state->dataHeatBal->Zone(3).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(3).ExtWindowArea = 0.0;
 
     WriteVeriSumTable(*state);
 
@@ -6282,14 +6282,14 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
-        {Zone(1).Name, "Conditioned (Y/N)", "Yes"},
-        {Zone(1).Name, "Part of Total Floor Area (Y/N)", "Yes"},
+        {state->dataHeatBal->Zone(1).Name, "Conditioned (Y/N)", "Yes"},
+        {state->dataHeatBal->Zone(1).Name, "Part of Total Floor Area (Y/N)", "Yes"},
 
-        {Zone(2).Name, "Conditioned (Y/N)", "No"},
-        {Zone(2).Name, "Part of Total Floor Area (Y/N)", "Yes"},
+        {state->dataHeatBal->Zone(2).Name, "Conditioned (Y/N)", "No"},
+        {state->dataHeatBal->Zone(2).Name, "Part of Total Floor Area (Y/N)", "Yes"},
 
-        {Zone(3).Name, "Conditioned (Y/N)", "Yes"},
-        {Zone(3).Name, "Part of Total Floor Area (Y/N)", "No"},
+        {state->dataHeatBal->Zone(3).Name, "Conditioned (Y/N)", "Yes"},
+        {state->dataHeatBal->Zone(3).Name, "Part of Total Floor Area (Y/N)", "No"},
     });
 
     // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
@@ -6321,46 +6321,46 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, Real64>> results({
-        {Zone(1).Name, "Area", Zone(1).FloorArea},
-        {Zone(2).Name, "Area", Zone(2).FloorArea},
-        {Zone(3).Name, "Area", Zone(3).FloorArea},
-        {"Total", "Area", Zone(1).FloorArea + Zone(2).FloorArea},
-        {"Conditioned Total", "Area", Zone(1).FloorArea},
-        {"Unconditioned Total", "Area", Zone(2).FloorArea},
-        {"Not Part of Total", "Area", Zone(3).FloorArea},
+        {state->dataHeatBal->Zone(1).Name, "Area", state->dataHeatBal->Zone(1).FloorArea},
+        {state->dataHeatBal->Zone(2).Name, "Area", state->dataHeatBal->Zone(2).FloorArea},
+        {state->dataHeatBal->Zone(3).Name, "Area", state->dataHeatBal->Zone(3).FloorArea},
+        {"Total", "Area", state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea},
+        {"Conditioned Total", "Area", state->dataHeatBal->Zone(1).FloorArea},
+        {"Unconditioned Total", "Area", state->dataHeatBal->Zone(2).FloorArea},
+        {"Not Part of Total", "Area", state->dataHeatBal->Zone(3).FloorArea},
 
-        {Zone(1).Name, "Volume", Zone(1).Volume},
-        {Zone(2).Name, "Volume", Zone(2).Volume},
-        {Zone(3).Name, "Volume", Zone(3).Volume},
-        {"Total", "Volume", Zone(1).Volume + Zone(2).Volume},
-        {"Conditioned Total", "Volume", Zone(1).Volume},
-        {"Unconditioned Total", "Volume", Zone(2).Volume},
-        {"Not Part of Total", "Volume", Zone(3).Volume},
+        {state->dataHeatBal->Zone(1).Name, "Volume", state->dataHeatBal->Zone(1).Volume},
+        {state->dataHeatBal->Zone(2).Name, "Volume", state->dataHeatBal->Zone(2).Volume},
+        {state->dataHeatBal->Zone(3).Name, "Volume", state->dataHeatBal->Zone(3).Volume},
+        {"Total", "Volume", state->dataHeatBal->Zone(1).Volume + state->dataHeatBal->Zone(2).Volume},
+        {"Conditioned Total", "Volume", state->dataHeatBal->Zone(1).Volume},
+        {"Unconditioned Total", "Volume", state->dataHeatBal->Zone(2).Volume},
+        {"Not Part of Total", "Volume", state->dataHeatBal->Zone(3).Volume},
 
-        {Zone(1).Name, "Lighting", Lights(1).DesignLevel / Zone(1).FloorArea},
-        {Zone(2).Name, "Lighting", Lights(2).DesignLevel / Zone(2).FloorArea},
-        {Zone(3).Name, "Lighting", Lights(3).DesignLevel / Zone(3).FloorArea},
-        {"Total", "Lighting", (Lights(1).DesignLevel + Lights(2).DesignLevel) / (Zone(1).FloorArea + Zone(2).FloorArea)},
-        {"Conditioned Total", "Lighting", Lights(1).DesignLevel / Zone(1).FloorArea},
-        {"Unconditioned Total", "Lighting", Lights(2).DesignLevel / Zone(2).FloorArea},
-        {"Not Part of Total", "Lighting", Lights(3).DesignLevel / Zone(3).FloorArea},
+        {state->dataHeatBal->Zone(1).Name, "Lighting", state->dataHeatBal->Lights(1).DesignLevel / state->dataHeatBal->Zone(1).FloorArea},
+        {state->dataHeatBal->Zone(2).Name, "Lighting", state->dataHeatBal->Lights(2).DesignLevel / state->dataHeatBal->Zone(2).FloorArea},
+        {state->dataHeatBal->Zone(3).Name, "Lighting", state->dataHeatBal->Lights(3).DesignLevel / state->dataHeatBal->Zone(3).FloorArea},
+        {"Total", "Lighting", (state->dataHeatBal->Lights(1).DesignLevel + state->dataHeatBal->Lights(2).DesignLevel) / (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea)},
+        {"Conditioned Total", "Lighting", state->dataHeatBal->Lights(1).DesignLevel / state->dataHeatBal->Zone(1).FloorArea},
+        {"Unconditioned Total", "Lighting", state->dataHeatBal->Lights(2).DesignLevel / state->dataHeatBal->Zone(2).FloorArea},
+        {"Not Part of Total", "Lighting", state->dataHeatBal->Lights(3).DesignLevel / state->dataHeatBal->Zone(3).FloorArea},
 
         // People/m^2
-        {Zone(1).Name, "People", Zone(1).FloorArea / People(1).NumberOfPeople},
-        {Zone(2).Name, "People", Zone(2).FloorArea / People(2).NumberOfPeople},
-        {Zone(3).Name, "People", Zone(3).FloorArea / People(3).NumberOfPeople},
-        {"Total", "People", (Zone(1).FloorArea + Zone(2).FloorArea) / (People(1).NumberOfPeople + People(2).NumberOfPeople)},
-        {"Conditioned Total", "People", Zone(1).FloorArea / People(1).NumberOfPeople},
-        {"Unconditioned Total", "People", Zone(2).FloorArea / People(2).NumberOfPeople},
-        {"Not Part of Total", "People", Zone(3).FloorArea / People(3).NumberOfPeople},
+        {state->dataHeatBal->Zone(1).Name, "People", state->dataHeatBal->Zone(1).FloorArea / state->dataHeatBal->People(1).NumberOfPeople},
+        {state->dataHeatBal->Zone(2).Name, "People", state->dataHeatBal->Zone(2).FloorArea / state->dataHeatBal->People(2).NumberOfPeople},
+        {state->dataHeatBal->Zone(3).Name, "People", state->dataHeatBal->Zone(3).FloorArea / state->dataHeatBal->People(3).NumberOfPeople},
+        {"Total", "People", (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea) / (state->dataHeatBal->People(1).NumberOfPeople + state->dataHeatBal->People(2).NumberOfPeople)},
+        {"Conditioned Total", "People", state->dataHeatBal->Zone(1).FloorArea / state->dataHeatBal->People(1).NumberOfPeople},
+        {"Unconditioned Total", "People", state->dataHeatBal->Zone(2).FloorArea / state->dataHeatBal->People(2).NumberOfPeople},
+        {"Not Part of Total", "People", state->dataHeatBal->Zone(3).FloorArea / state->dataHeatBal->People(3).NumberOfPeople},
 
-        {Zone(1).Name, "Plug and Process", ZoneElectric(1).DesignLevel / Zone(1).FloorArea},
-        {Zone(2).Name, "Plug and Process", ZoneElectric(2).DesignLevel / Zone(2).FloorArea},
-        {Zone(3).Name, "Plug and Process", ZoneElectric(3).DesignLevel / Zone(3).FloorArea},
-        {"Total", "Plug and Process", (ZoneElectric(1).DesignLevel + ZoneElectric(2).DesignLevel) / (Zone(1).FloorArea + Zone(2).FloorArea)},
-        {"Conditioned Total", "Plug and Process", ZoneElectric(1).DesignLevel / Zone(1).FloorArea},
-        {"Unconditioned Total", "Plug and Process", ZoneElectric(2).DesignLevel / Zone(2).FloorArea},
-        {"Not Part of Total", "Plug and Process", ZoneElectric(3).DesignLevel / Zone(3).FloorArea},
+        {state->dataHeatBal->Zone(1).Name, "Plug and Process", state->dataHeatBal->ZoneElectric(1).DesignLevel / state->dataHeatBal->Zone(1).FloorArea},
+        {state->dataHeatBal->Zone(2).Name, "Plug and Process", state->dataHeatBal->ZoneElectric(2).DesignLevel / state->dataHeatBal->Zone(2).FloorArea},
+        {state->dataHeatBal->Zone(3).Name, "Plug and Process", state->dataHeatBal->ZoneElectric(3).DesignLevel / state->dataHeatBal->Zone(3).FloorArea},
+        {"Total", "Plug and Process", (state->dataHeatBal->ZoneElectric(1).DesignLevel + state->dataHeatBal->ZoneElectric(2).DesignLevel) / (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea)},
+        {"Conditioned Total", "Plug and Process", state->dataHeatBal->ZoneElectric(1).DesignLevel / state->dataHeatBal->Zone(1).FloorArea},
+        {"Unconditioned Total", "Plug and Process", state->dataHeatBal->ZoneElectric(2).DesignLevel / state->dataHeatBal->Zone(2).FloorArea},
+        {"Not Part of Total", "Plug and Process", state->dataHeatBal->ZoneElectric(3).DesignLevel / state->dataHeatBal->Zone(3).FloorArea},
     });
 
     // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
@@ -6447,17 +6447,17 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test)
 {
     Psychrometrics::InitializePsychRoutines();
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
 
     CompLoadTablesType compLoad;
     int timeOfMax = 63;
     int zoneIndex = 1;
     bool isCooling = true;
 
-    Zone.allocate(1);
-    Zone(1).Multiplier = 1;
-    Zone(1).ListMultiplier = 1;
-    Zone(1).FloorArea = 12.;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Multiplier = 1;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1;
+    state->dataHeatBal->Zone(1).FloorArea = 12.;
 
     state->dataWeatherManager->DesDayInput.allocate(1);
     state->dataWeatherManager->DesDayInput(1).Month = 5;
@@ -6466,24 +6466,24 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
 
-    CoolPeakDateHrMin.allocate(1);
+    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
-    CalcFinalZoneSizing.allocate(1);
-    CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolOutTempSeq(63) = 38.;
-    CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolOutHumRatSeq(63) = 0.01459;
-    CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolZoneTempSeq(63) = 24.;
-    CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolZoneHumRatSeq(63) = 0.00979;
-    CalcFinalZoneSizing(1).DesCoolLoad = 500.;
-    CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
-    CalcFinalZoneSizing(1).CoolDesTemp = 13.;
-    CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
+    state->dataSize->CalcFinalZoneSizing.allocate(1);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq(63) = 38.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq(63) = 0.01459;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq(63) = 24.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq(63) = 0.00979;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolLoad = 500.;
+    state->dataSize->CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
+    state->dataSize->CalcFinalZoneSizing(1).CoolDesTemp = 13.;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
 
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(1).DesCoolLoad = 600.;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
     CollectPeakZoneConditions(*state, compLoad, 1, timeOfMax, zoneIndex, isCooling);
 
@@ -6525,89 +6525,89 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
     Array1D<ZompComponentAreasType> areas;
     areas.allocate(1);
 
-    Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
     state->dataGlobal->NumOfZones = 1;
-    Zone(1).FloorArea = 12.;
+    state->dataHeatBal->Zone(1).FloorArea = 12.;
 
-    Surface.allocate(13);
+    state->dataSurface->Surface.allocate(13);
 
-    Surface(1).GrossArea = 5.; // extWall
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Zone = 1;
-    Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).GrossArea = 5.; // extWall
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
 
-    Surface(2).GrossArea = 6.; // grdCntWall
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).ExtBoundCond = GroundFCfactorMethod;
-    Surface(2).Zone = 1;
-    Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).GrossArea = 6.; // grdCntWall
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).ExtBoundCond = GroundFCfactorMethod;
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
 
-    Surface(3).GrossArea = 7.; // intZoneWall
-    Surface(3).Class = SurfaceClass::Wall;
-    Surface(3).ExtBoundCond = 2;
-    Surface(3).Zone = 1;
-    Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).GrossArea = 7.; // intZoneWall
+    state->dataSurface->Surface(3).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).ExtBoundCond = 2;
+    state->dataSurface->Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
 
-    Surface(4).GrossArea = 8.; // roof
-    Surface(4).Class = SurfaceClass::Roof;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Zone = 1;
-    Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).GrossArea = 8.; // roof
+    state->dataSurface->Surface(4).Class = SurfaceClass::Roof;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Zone = 1;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
 
-    Surface(5).GrossArea = 9.; // ceiling
-    Surface(5).Class = SurfaceClass::Roof;
-    Surface(5).ExtBoundCond = 5;
-    Surface(5).Zone = 1;
-    Surface(5).HeatTransSurf = true;
+    state->dataSurface->Surface(5).GrossArea = 9.; // ceiling
+    state->dataSurface->Surface(5).Class = SurfaceClass::Roof;
+    state->dataSurface->Surface(5).ExtBoundCond = 5;
+    state->dataSurface->Surface(5).Zone = 1;
+    state->dataSurface->Surface(5).HeatTransSurf = true;
 
-    Surface(6).GrossArea = 10.; // extFloor
-    Surface(6).Class = SurfaceClass::Floor;
-    Surface(6).ExtBoundCond = ExternalEnvironment;
-    Surface(6).Zone = 1;
-    Surface(6).HeatTransSurf = true;
+    state->dataSurface->Surface(6).GrossArea = 10.; // extFloor
+    state->dataSurface->Surface(6).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(6).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(6).Zone = 1;
+    state->dataSurface->Surface(6).HeatTransSurf = true;
 
-    Surface(7).GrossArea = 11.; // grndCntFloor
-    Surface(7).Class = SurfaceClass::Floor;
-    Surface(7).ExtBoundCond = Ground;
-    Surface(7).Zone = 1;
-    Surface(7).HeatTransSurf = true;
+    state->dataSurface->Surface(7).GrossArea = 11.; // grndCntFloor
+    state->dataSurface->Surface(7).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(7).ExtBoundCond = Ground;
+    state->dataSurface->Surface(7).Zone = 1;
+    state->dataSurface->Surface(7).HeatTransSurf = true;
 
-    Surface(8).GrossArea = 12.; // intZoneFloor
-    Surface(8).Class = SurfaceClass::Floor;
-    Surface(8).ExtBoundCond = 3;
-    Surface(8).Zone = 1;
-    Surface(8).HeatTransSurf = true;
+    state->dataSurface->Surface(8).GrossArea = 12.; // intZoneFloor
+    state->dataSurface->Surface(8).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(8).ExtBoundCond = 3;
+    state->dataSurface->Surface(8).Zone = 1;
+    state->dataSurface->Surface(8).HeatTransSurf = true;
 
-    Surface(9).GrossArea = 13.; // fenestration
-    Surface(9).Class = SurfaceClass::Window;
-    Surface(9).ExtBoundCond = ExternalEnvironment;
-    Surface(9).Zone = 1;
-    Surface(9).HeatTransSurf = true;
+    state->dataSurface->Surface(9).GrossArea = 13.; // fenestration
+    state->dataSurface->Surface(9).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(9).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(9).Zone = 1;
+    state->dataSurface->Surface(9).HeatTransSurf = true;
 
-    Surface(10).GrossArea = 14.; // door
-    Surface(10).Class = SurfaceClass::Door;
-    Surface(10).ExtBoundCond = ExternalEnvironment;
-    Surface(10).Zone = 1;
-    Surface(10).HeatTransSurf = true;
+    state->dataSurface->Surface(10).GrossArea = 14.; // door
+    state->dataSurface->Surface(10).Class = SurfaceClass::Door;
+    state->dataSurface->Surface(10).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(10).Zone = 1;
+    state->dataSurface->Surface(10).HeatTransSurf = true;
 
-    Surface(11).GrossArea = 15.; // door (again)
-    Surface(11).Class = SurfaceClass::GlassDoor;
-    Surface(11).ExtBoundCond = ExternalEnvironment;
-    Surface(11).Zone = 1;
-    Surface(11).HeatTransSurf = true;
+    state->dataSurface->Surface(11).GrossArea = 15.; // door (again)
+    state->dataSurface->Surface(11).Class = SurfaceClass::GlassDoor;
+    state->dataSurface->Surface(11).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(11).Zone = 1;
+    state->dataSurface->Surface(11).HeatTransSurf = true;
 
-    Surface(12).GrossArea = 16.; // fenestration (again)
-    Surface(12).Class = SurfaceClass::TDD_Dome;
-    Surface(12).ExtBoundCond = ExternalEnvironment;
-    Surface(12).Zone = 1;
-    Surface(12).HeatTransSurf = true;
+    state->dataSurface->Surface(12).GrossArea = 16.; // fenestration (again)
+    state->dataSurface->Surface(12).Class = SurfaceClass::TDD_Dome;
+    state->dataSurface->Surface(12).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(12).Zone = 1;
+    state->dataSurface->Surface(12).HeatTransSurf = true;
 
-    Surface(13).GrossArea = 17.; // grndCntFloor (again)
-    Surface(13).Class = SurfaceClass::Floor;
-    Surface(13).ExtBoundCond = KivaFoundation;
-    Surface(13).Zone = 1;
-    Surface(13).HeatTransSurf = true;
+    state->dataSurface->Surface(13).GrossArea = 17.; // grndCntFloor (again)
+    state->dataSurface->Surface(13).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(13).ExtBoundCond = KivaFoundation;
+    state->dataSurface->Surface(13).Zone = 1;
+    state->dataSurface->Surface(13).HeatTransSurf = true;
 
     GetZoneComponentAreas(*state, areas);
 
@@ -6792,16 +6792,16 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
     state->dataGlobal->NumOfZones = 4;
-    Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
-    Zone(iZone).SurfaceFirst = 1;
-    Zone(iZone).SurfaceLast = 1;
-    Zone(iZone).RadiantEnclosureNum = 1;
+    state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(iZone).HTSurfaceLast = 1;
+    state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
-    Surface(1).HeatTransSurf = true;
-    Surface(1).Class = SurfaceClass::Window;
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Window;
 
     Array1D<Real64> peopleDelaySeq;
     peopleDelaySeq.allocate(state->dataGlobal->NumOfTimeStepInHour * 24);
@@ -6836,7 +6836,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
-    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, state->dataSurface->TotSurfaces);
     surfDelaySeqCool = 0.0;
 
     AllocateLoadComponentArrays(*state);
@@ -6882,29 +6882,29 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 
 TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_ZeroDesignDay)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    sqlite->sqliteBegin();
+    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     int numDesDays = 2;
     state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     state->dataGlobal->NumOfZones = 0;
     state->dataOutRptTab->displayAirLoopComponentLoadSummary = true;
     state->dataGlobal->CompLoadReportIsReq = true;
-    SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
 
-    SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
-    SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
 
     WriteLoadComponentSummaryTables(*state);
 
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
-    EnergyPlus::sqlite->sqliteCommit();
+    sqlite->sqliteCommit();
 
     EXPECT_EQ(460ul, tabularData.size());
     EXPECT_EQ(77ul, strings.size());
@@ -6916,8 +6916,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 // We ensure that if the Airloop peak matches the zone peak, we don't do the IP conversion twice
 TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_IPConversion)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    sqlite->sqliteBegin();
+    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     OutputReportTabular::SetupUnitConversions(*state);
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
@@ -6932,7 +6932,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     Psychrometrics::InitializePsychRoutines();
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
 
     // Two design days
     int numDesDays = 2;
@@ -6944,85 +6944,80 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataWeatherManager->DesDayInput(2).Month = 1;
     state->dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
 
-
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
     int numTimeStepInDay = 96;
 
-
     // One Zone
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Multiplier = 1;
-    DataHeatBalance::Zone(1).ListMultiplier = 1;
-    DataHeatBalance::Zone(1).FloorArea = 100.;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Multiplier = 1;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1;
+    state->dataHeatBal->Zone(1).FloorArea = 100.;
     // Trick E+ into not iterating on Surfaces
-    DataHeatBalance::Zone(1).SurfaceFirst = 1;
-    DataHeatBalance::Zone(1).SurfaceLast = 0;
-
-
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 0;
 
     // Cool Peak on 1st DD at 16:00 and Heat Peak on 2nd DD at 1:00
-    DataSizing::CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
 
     int coolDDNum = 1;
     int coolTimeOfMax = 64;
-    DataSizing::CalcFinalZoneSizing(1).CoolDDNum = coolDDNum;
-    DataSizing::CalcFinalZoneSizing(1).TimeStepNumAtCoolMax = coolTimeOfMax;
-    DataSizing::CoolPeakDateHrMin.allocate(1);
+    state->dataSize->CalcFinalZoneSizing(1).CoolDDNum = coolDDNum;
+    state->dataSize->CalcFinalZoneSizing(1).TimeStepNumAtCoolMax = coolTimeOfMax;
+    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
-    DataSizing::CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolOutTempSeq(coolTimeOfMax) = 38.;
-    DataSizing::CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolOutHumRatSeq(coolTimeOfMax) = 0.01459;
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneTempSeq(coolTimeOfMax) = 24.;
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneHumRatSeq(coolTimeOfMax) = 0.00979;
-    DataSizing::CalcFinalZoneSizing(1).DesCoolLoad = 500.;
-    DataSizing::CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
-    DataSizing::CalcFinalZoneSizing(1).CoolDesTemp = 13.;
-    DataSizing::CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
-
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq(coolTimeOfMax) = 38.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq(coolTimeOfMax) = 0.01459;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq(coolTimeOfMax) = 24.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq(coolTimeOfMax) = 0.00979;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolLoad = 500.;
+    state->dataSize->CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
+    state->dataSize->CalcFinalZoneSizing(1).CoolDesTemp = 13.;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
 
     int heatDDNum = 2;
     int heatTimeOfMax = 4;
-    DataSizing::CalcFinalZoneSizing(1).HeatDDNum = heatDDNum;
-    DataSizing::CalcFinalZoneSizing(1).TimeStepNumAtHeatMax = heatTimeOfMax;
-    DataSizing::HeatPeakDateHrMin.allocate(1);
+    state->dataSize->CalcFinalZoneSizing(1).HeatDDNum = heatDDNum;
+    state->dataSize->CalcFinalZoneSizing(1).TimeStepNumAtHeatMax = heatTimeOfMax;
+    state->dataSize->HeatPeakDateHrMin.allocate(1);
 
-    DataSizing::CalcFinalZoneSizing(1).HeatOutTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatOutTempSeq(heatTimeOfMax) = -17.4;
-    DataSizing::CalcFinalZoneSizing(1).HeatOutHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatOutHumRatSeq(heatTimeOfMax) = 0.01459;
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutTempSeq(heatTimeOfMax) = -17.4;
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutHumRatSeq(heatTimeOfMax) = 0.01459;
 
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(1).DesCoolLoad = 600.;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
     // One airloop, that serves this zone.
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataSizing::SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq(heatTimeOfMax) = 20.;
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneHumRatSeq(heatTimeOfMax) = 0.00979;
-    DataSizing::CalcFinalZoneSizing(1).DesHeatLoad = 750.;
-    DataSizing::CalcFinalZoneSizing(1).ZnHeatDgnSAMethod = SupplyAirTemperature;
-    DataSizing::CalcFinalZoneSizing(1).HeatDesTemp = 35.;
-    DataSizing::CalcFinalZoneSizing(1).DesHeatVolFlow = 3.3;
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneTempSeq(heatTimeOfMax) = 20.;
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneHumRatSeq(heatTimeOfMax) = 0.00979;
+    state->dataSize->CalcFinalZoneSizing(1).DesHeatLoad = 750.;
+    state->dataSize->CalcFinalZoneSizing(1).ZnHeatDgnSAMethod = SupplyAirTemperature;
+    state->dataSize->CalcFinalZoneSizing(1).HeatDesTemp = 35.;
+    state->dataSize->CalcFinalZoneSizing(1).DesHeatVolFlow = 3.3;
 
 
-    DataSizing::CalcZoneSizing.allocate(numDesDays, state->dataGlobal->NumOfZones);
-    DataSizing::CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing.allocate(numDesDays, state->dataGlobal->NumOfZones);
+    state->dataSize->CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
 
     state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;
@@ -7034,21 +7029,21 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test
-    DataSizing::FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
+    state->dataSize->FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
 
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = heatDDNum;
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = coolTimeOfMax;
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk(2) = heatTimeOfMax;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = heatDDNum;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = coolTimeOfMax;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk(2) = heatTimeOfMax;
 
 
     // Set up Facility to peak like the zone too
-    DataSizing::CalcFinalFacilitySizing.CoolDDNum = coolDDNum;
-    DataSizing::CalcFinalFacilitySizing.TimeStepNumAtCoolMax = coolTimeOfMax;
-    DataSizing::CalcFinalFacilitySizing.HeatDDNum = heatDDNum;
-    DataSizing::CalcFinalFacilitySizing.TimeStepNumAtHeatMax = heatTimeOfMax;
+    state->dataSize->CalcFinalFacilitySizing.CoolDDNum = coolDDNum;
+    state->dataSize->CalcFinalFacilitySizing.TimeStepNumAtCoolMax = coolTimeOfMax;
+    state->dataSize->CalcFinalFacilitySizing.HeatDDNum = heatDDNum;
+    state->dataSize->CalcFinalFacilitySizing.TimeStepNumAtHeatMax = heatTimeOfMax;
 
 
     AllocateLoadComponentArrays(*state);
@@ -7241,8 +7236,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
 // https://github.com/NREL/EnergyPlus/issues/6442
 TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    sqlite->sqliteBegin();
+    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->WriteTabularFiles = true;
 
@@ -7270,8 +7265,8 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     state->dataOutRptPredefined->reportName(5).show = true;
 
     WritePredefinedTables(*state);
-    EnergyPlus::sqlite->sqliteCommit();
-    EnergyPlus::sqlite->initializeIndexes();
+    sqlite->sqliteCommit();
+    sqlite->initializeIndexes();
 
     auto units = queryResult("Select Units From TabularDataWithStrings "
                              "WHERE ReportName = \"EquipmentSummary\" "
@@ -7281,7 +7276,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
                               "WHERE ReportName = \"EquipmentSummary\" "
                               "  AND ColumnName = \"Rated Net Cooling Capacity Test A\"",
                               "TabularDataWithStrings");
-    EnergyPlus::sqlite->sqliteCommit();
+    sqlite->sqliteCommit();
 
     EXPECT_EQ(1u, units.size());
     // Because the table has 8 cols
@@ -7300,8 +7295,8 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
 // https://github.com/NREL/EnergyPlus/issues/7565
 TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    sqlite->sqliteBegin();
+    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->WriteTabularFiles = true;
 
@@ -7324,8 +7319,8 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
     state->dataOutRptPredefined->reportName(7).show = true;
 
     WritePredefinedTables(*state);
-    EnergyPlus::sqlite->sqliteCommit();
-    EnergyPlus::sqlite->initializeIndexes();
+    sqlite->sqliteCommit();
+    sqlite->initializeIndexes();
 
     for (const std::string reportName: {"HVACSizingSummary", "CoilSizingDetails"}) {
 
@@ -7335,7 +7330,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
                                  "  AND ColumnName = \"Coil Leaving Air Humidity Ratio at Ideal Loads Peak\"",
                                  "TabularDataWithStrings");
 
-        EnergyPlus::sqlite->sqliteCommit();
+        sqlite->sqliteCommit();
 
         EXPECT_EQ(1u, result.size());
         // Because the table has 8 cols
@@ -7377,51 +7372,51 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     int nTests = expectedAzimuthToCards.size();
 
     // Allocate some needed arrays
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).ListMultiplier = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).ListMultiplier = 1;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).Name = "A Construction";
-    // Avoid trigerring CalcNominalWindowCond
+    // Avoid triggering CalcNominalWindowCond
     state->dataConstruction->Construct(1).SummerSHGC = 0.70;
     state->dataConstruction->Construct(1).VisTransNorm = 0.80;
 
-    DataHeatBalance::NominalU.allocate(1);
-    DataHeatBalance::NominalU(1) = 0.2;
+    state->dataHeatBal->NominalU.allocate(1);
+    state->dataHeatBal->NominalU(1) = 0.2;
 
     // Create one wall and one window with each azimuth from expectedAzimuthToCards
     // Azimuth & Cardinal entries happen in two separate blocks,
     // so test both to increase coverage and make sure both are correct
 
-    DataSurfaces::TotSurfaces = 2 * nTests ;
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
-    DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
-    SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
+    state->dataSurface->TotSurfaces = 2 * nTests ;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
 
     for (int i = 1; i <= nTests * 2; ++i) {
 
-        DataSurfaces::Surface(i).HeatTransSurf = true;
-        DataSurfaces::Surface(i).ExtBoundCond = ExternalEnvironment;
-        DataSurfaces::Surface(i).GrossArea = 200.;
-        DataSurfaces::Surface(i).Tilt = 90.;
-        DataSurfaces::Surface(i).Zone = 1;
-        DataSurfaces::Surface(i).Construction = 1;
-        DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+        state->dataSurface->Surface(i).HeatTransSurf = true;
+        state->dataSurface->Surface(i).ExtBoundCond = ExternalEnvironment;
+        state->dataSurface->Surface(i).GrossArea = 200.;
+        state->dataSurface->Surface(i).Tilt = 90.;
+        state->dataSurface->Surface(i).Zone = 1;
+        state->dataSurface->Surface(i).Construction = 1;
+        state->dataSurface->AllSurfaceListReportOrder.push_back(i);
 
         // Actual interesting stuff
         int entryIndex = (i-1) / 2;
         double azimuth = expectedAzimuthToCards[entryIndex].first;
-        DataSurfaces::Surface(i).Azimuth = azimuth;
+        state->dataSurface->Surface(i).Azimuth = azimuth;
 
         if (i % 2 == 1) {
             // It's a wall
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
-            DataSurfaces::Surface(i).Name = format("ExtWall_{}_{}", i, entryIndex);
+            state->dataSurface->Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
+            state->dataSurface->Surface(i).Name = format("ExtWall_{}_{}", i, entryIndex);
         } else {
             // It's a window
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Window;
-            DataSurfaces::Surface(i).Name = format("ExtWindow_{}_{}", i, entryIndex);
+            state->dataSurface->Surface(i).Class = DataSurfaces::SurfaceClass::Window;
+            state->dataSurface->Surface(i).Name = format("ExtWindow_{}_{}", i, entryIndex);
             // Window references the previous wall
-            DataSurfaces::Surface(i).BaseSurf = i - 1;
+            state->dataSurface->Surface(i).BaseSurf = i - 1;
         }
 
     }
@@ -7460,34 +7455,34 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         *****************************************************************************/
 
         // Internal: Dumb check to ensure we didn't mess up in the indexation
-        EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i).Name;
+        EXPECT_EQ(oriAzimuth, state->dataSurface->Surface(i).Azimuth) << "Surface Name = " << state->dataSurface->Surface(i).Name;
 
         // Check that the azimuth entry is the rounded version indeed
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchOpAzimuth, DataSurfaces::Surface(i).Name),
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchOpAzimuth, state->dataSurface->Surface(i).Name),
                   format("{:.2R}", expectedAzimuthToCard.first))
-            << "Surface Name = " << DataSurfaces::Surface(i).Name;
+            << "Surface Name = " << state->dataSurface->Surface(i).Name;
         // Check that we do get the expected cardinal direction
         EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchOpDir,
-                                                                   DataSurfaces::Surface(i).Name),
+                                                                   state->dataSurface->Surface(i).Name),
                   cardinalDir)
-            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << DataSurfaces::Surface(i).Name << "'.";
+            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << state->dataSurface->Surface(i).Name << "'.";
 
 
         /****************************************************************************
         *                           Window (even entries)                           *
         *****************************************************************************/
 
-        EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i+1).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i+1).Name;
+        EXPECT_EQ(oriAzimuth, state->dataSurface->Surface(i+1).Azimuth) << "Surface Name = " << state->dataSurface->Surface(i+1).Name;
 
         // Check that the azimuth entry is the rounded version indeed
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFenAzimuth, DataSurfaces::Surface(i + 1).Name),
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFenAzimuth, state->dataSurface->Surface(i + 1).Name),
                   format("{:.2R}", expectedAzimuthToCard.first))
-            << "Surface Name = " << DataSurfaces::Surface(i + 1).Name;
+            << "Surface Name = " << state->dataSurface->Surface(i + 1).Name;
         // Check that we do get the expected cardinal direction
         EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFenDir,
-                                                                   DataSurfaces::Surface(i+1).Name),
+                                                                   state->dataSurface->Surface(i+1).Name),
                   cardinalDir)
-            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << DataSurfaces::Surface(i+1).Name << "'.";
+            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << state->dataSurface->Surface(i+1).Name << "'.";
 
         // Increment twice
         i = i + 2;
@@ -7499,53 +7494,53 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
 TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
 {
     // Allocate some needed arrays
-    DataHeatBalance::Zone.allocate(2);
-    DataHeatBalance::Zone(1).ListMultiplier = 1;
-    DataHeatBalance::Zone(2).ListMultiplier = 1;
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataHeatBal->Zone(1).ListMultiplier = 1;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).Name = "A Construction";
     state->dataConstruction->Construct(1).OutsideAbsorpSolar = 0.4;
 
-    DataHeatBalance::NominalU.allocate(1);
-    DataHeatBalance::NominalU(1) = 0.2;
+    state->dataHeatBal->NominalU.allocate(1);
+    state->dataHeatBal->NominalU(1) = 0.2;
 
-    DataSurfaces::TotSurfaces = 4 ;
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+    state->dataSurface->TotSurfaces = 4 ;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // first surface, interzonal walls and doors
-    for (int i = 1; i <= TotSurfaces; i++){
-        DataSurfaces::Surface(i).HeatTransSurf = true;
-        DataSurfaces::Surface(i).Azimuth = 180.;
-        DataSurfaces::Surface(i).Tilt = 90.;
-        DataSurfaces::Surface(i).Construction = 1;
+    for (int i = 1; i <= state->dataSurface->TotSurfaces; i++){
+        state->dataSurface->Surface(i).HeatTransSurf = true;
+        state->dataSurface->Surface(i).Azimuth = 180.;
+        state->dataSurface->Surface(i).Tilt = 90.;
+        state->dataSurface->Surface(i).Construction = 1;
         // odd number - wall, even number - door
         if (i % 2 == 1) {
-            DataSurfaces::Surface(i).Name = "Interzonal_Wall_" + fmt::to_string((i + 1) / 2);
-            DataSurfaces::Surface(i).GrossArea = 200.;
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
-            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+            state->dataSurface->Surface(i).Name = "Interzonal_Wall_" + fmt::to_string((i + 1) / 2);
+            state->dataSurface->Surface(i).GrossArea = 200.;
+            state->dataSurface->Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
+            state->dataSurface->AllSurfaceListReportOrder.push_back(i);
         }else{
-            DataSurfaces::Surface(i).Name = "Interzonal_Door_" + fmt::to_string((i + 1) / 2);
-            DataSurfaces::Surface(i).BaseSurfName = DataSurfaces::Surface(i - 1).Name;
-            DataSurfaces::Surface(i).BaseSurf = i - 1;
-            DataSurfaces::Surface(i).GrossArea = 50.;
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Door;
-            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+            state->dataSurface->Surface(i).Name = "Interzonal_Door_" + fmt::to_string((i + 1) / 2);
+            state->dataSurface->Surface(i).BaseSurfName = state->dataSurface->Surface(i - 1).Name;
+            state->dataSurface->Surface(i).BaseSurf = i - 1;
+            state->dataSurface->Surface(i).GrossArea = 50.;
+            state->dataSurface->Surface(i).Class = DataSurfaces::SurfaceClass::Door;
+            state->dataSurface->AllSurfaceListReportOrder.push_back(i);
         }
         if ((i + 1) / 2 == 1) {
             // first pair of wall and door
-            DataSurfaces::Surface(i).Zone = 1;
-            DataSurfaces::Surface(i).ExtBoundCond = i + 2;
+            state->dataSurface->Surface(i).Zone = 1;
+            state->dataSurface->Surface(i).ExtBoundCond = i + 2;
         }else{
             // second pair of wall and door
-            DataSurfaces::Surface(i).Zone = 2;
-            DataSurfaces::Surface(i).ExtBoundCond = i - 2;
+            state->dataSurface->Surface(i).Zone = 2;
+            state->dataSurface->Surface(i).ExtBoundCond = i - 2;
         }
     }
-    DataSurfaces::Surface(1).ExtBoundCondName = "Interzonal_Wall_2";
-    DataSurfaces::Surface(2).ExtBoundCondName = "Interzonal_Door_2";
-    DataSurfaces::Surface(3).ExtBoundCondName = "Interzonal_Wall_1";
-    DataSurfaces::Surface(4).ExtBoundCondName = "Interzonal_Door_1";
+    state->dataSurface->Surface(1).ExtBoundCondName = "Interzonal_Wall_2";
+    state->dataSurface->Surface(2).ExtBoundCondName = "Interzonal_Door_2";
+    state->dataSurface->Surface(3).ExtBoundCondName = "Interzonal_Wall_1";
+    state->dataSurface->Surface(4).ExtBoundCondName = "Interzonal_Door_1";
 
     // Setup pre def tables
     OutputReportPredefined::SetPredefinedTables(*state);
@@ -7557,7 +7552,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
     // SubTable 'Opaque Interior' (pdstIntOpaque)
 
-    for (int i = 1; i <= TotSurfaces; i++){
+    for (int i = 1; i <= state->dataSurface->TotSurfaces; i++){
         if (i % 2 == 1){
 
             /****************************************************************************
@@ -7566,35 +7561,35 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
 
             // Check the wall gross area
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpGrArea,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "200.00");
             // Check the wall net area
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpNetArea,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "150.00");
             // Check the wall u value
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpUfactNoFilm,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "0.200");
             // Check the wall construction
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpCons,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "A Construction");
             // Check the wall reflectance
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpRefl,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "0.60");
             // Check the tilt
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpTilt,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "90.00");
             // Check the azimuth
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpAzimuth,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "180.00");
             // Check cardinal direction
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpDir,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "S");
         }else{
 
@@ -7604,20 +7599,20 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
 
             // Check the door gross area
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrGrArea,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "50.00");
             // Check the wall u value
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrUfactNoFilm,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "0.200");
             // Check the door construction
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrCons,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "A Construction");
             // Check the door parant surface name
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrParent,
-                                                                       DataSurfaces::Surface(i).Name),
-                                                                       DataSurfaces::Surface(i-1).Name);
+                                                                       state->dataSurface->Surface(i).Name),
+                                                                       state->dataSurface->Surface(i-1).Name);
         }
     }
 }
@@ -7625,8 +7620,8 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
 
 TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
 
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    sqlite->sqliteBegin();
+    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displaySourceEnergyEndUseSummary = true;
 
@@ -7636,118 +7631,118 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 2;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 2;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 2;
 
     // Loads
-    DataHeatBalance::TotLights = 3;
-    Lights.allocate(DataHeatBalance::TotLights);
+    state->dataHeatBal->TotLights = 3;
+    state->dataHeatBal->Lights.allocate(state->dataHeatBal->TotLights);
 
-    DataHeatBalance::TotPeople = 3;
-    People.allocate(DataHeatBalance::TotPeople);
+    state->dataHeatBal->TotPeople = 3;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
 
-    DataHeatBalance::TotElecEquip = 3;
-    ZoneElectric.allocate(DataHeatBalance::TotElecEquip);
+    state->dataHeatBal->TotElecEquip = 3;
+    state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
-    Lights(1).ZonePtr = 1;
-    Lights(1).DesignLevel = 1000.0;
-    Lights(2).ZonePtr = 2;
-    Lights(2).DesignLevel = 100.0;
-    Lights(3).ZonePtr = 3;
-    Lights(3).DesignLevel = 10.0;
+    state->dataHeatBal->Lights(1).ZonePtr = 1;
+    state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
+    state->dataHeatBal->Lights(2).ZonePtr = 2;
+    state->dataHeatBal->Lights(2).DesignLevel = 100.0;
+    state->dataHeatBal->Lights(3).ZonePtr = 3;
+    state->dataHeatBal->Lights(3).DesignLevel = 10.0;
 
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 10.0;
-    People(2).ZonePtr = 2;
-    People(2).NumberOfPeople = 5.0;
-    People(3).ZonePtr = 3;
-    People(3).NumberOfPeople = 1.0;
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 10.0;
+    state->dataHeatBal->People(2).ZonePtr = 2;
+    state->dataHeatBal->People(2).NumberOfPeople = 5.0;
+    state->dataHeatBal->People(3).ZonePtr = 3;
+    state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
-    ZoneElectric(1).ZonePtr = 1;
-    ZoneElectric(1).DesignLevel = 500.0;
-    ZoneElectric(2).ZonePtr = 2;
-    ZoneElectric(2).DesignLevel = 50.0;
-    ZoneElectric(3).ZonePtr = 3;
-    ZoneElectric(3).DesignLevel = 5.0;
+    state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
+    state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
+    state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
     state->dataGlobal->NumOfZones = 3;
-    Zone.allocate(state->dataGlobal->NumOfZones);
-    Zone(1).Name = "PartofTot Conditioned Zone";
-    Zone(1).SystemZoneNodeNumber = 1; // Conditioned
-    Zone(1).isPartOfTotalArea = true;
-    Zone(1).Multiplier = 1.;
-    Zone(1).ListMultiplier = 1.;
-    Zone(1).FloorArea = 1000.;
-    Zone(1).Volume = 2000.;
-    Zone(1).ExtGrossWallArea = 800.;
-    Zone(1).ExteriorTotalGroundSurfArea = 0;
-    Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(1).Multiplier = 1.;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(1).FloorArea = 1000.;
+    state->dataHeatBal->Zone(1).Volume = 2000.;
+    state->dataHeatBal->Zone(1).ExtGrossWallArea = 800.;
+    state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
-    Zone(2).Name = "PartofTot Unconditioned Zone";
-    Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
-    Zone(2).isPartOfTotalArea = true;
-    Zone(2).Multiplier = 1.;
-    Zone(2).ListMultiplier = 1.;
-    Zone(2).FloorArea = 100.;
-    Zone(2).Volume = 200.;
-    Zone(2).ExtGrossWallArea = 80.;
-    Zone(2).ExteriorTotalGroundSurfArea = 0;
-    Zone(2).ExtWindowArea = 0.0;
+    state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(2).Multiplier = 1.;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(2).FloorArea = 100.;
+    state->dataHeatBal->Zone(2).Volume = 200.;
+    state->dataHeatBal->Zone(2).ExtGrossWallArea = 80.;
+    state->dataHeatBal->Zone(2).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
 
-    Zone(3).Name = "NOT PartofTot Conditioned Zone";
-    Zone(3).SystemZoneNodeNumber = 1; // Conditioned
-    Zone(3).isPartOfTotalArea = false;
-    Zone(3).Multiplier = 1.;
-    Zone(3).ListMultiplier = 1.;
-    Zone(3).FloorArea = 10.;
-    Zone(3).Volume = 20.;
-    Zone(3).ExtGrossWallArea = 8.;
-    Zone(3).ExteriorTotalGroundSurfArea = 0;
-    Zone(3).ExtWindowArea = 0.0;
+    state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
+    state->dataHeatBal->Zone(3).Multiplier = 1.;
+    state->dataHeatBal->Zone(3).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(3).FloorArea = 10.;
+    state->dataHeatBal->Zone(3).Volume = 20.;
+    state->dataHeatBal->Zone(3).ExtGrossWallArea = 8.;
+    state->dataHeatBal->Zone(3).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(3).ExtWindowArea = 0.0;
 
     // Gross takes all that are PartOfTot
-    Real64 expectedBuildingGrossFloorArea = Zone(1).FloorArea + Zone(2).FloorArea;
+    Real64 expectedBuildingGrossFloorArea = state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea;
     // Conditioned takes only PartOfTot AND COnditioned
-    Real64 expectedBuildingConditionedFloorArea = Zone(1).FloorArea;
+    Real64 expectedBuildingConditionedFloorArea = state->dataHeatBal->Zone(1).FloorArea;
 
 
     // Assume that we only have electricity with a value of 3.6e6 * 1e4 J =10.000 kWh.
@@ -7802,13 +7797,13 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
         }
     }
 
-    EnergyPlus::sqlite->sqliteCommit();
+    sqlite->sqliteCommit();
 }
 
 TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 {
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    sqlite->sqliteBegin();
+    sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularBEPS = true;
     state->dataOutRptTab->displayDemandEndUse = true;
@@ -7821,7 +7816,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
 
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
 
     SetPredefinedTables(*state);
 
@@ -7941,7 +7936,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     OutputReportTabular::WriteBEPSTable(*state);
     OutputReportTabular::WriteDemandEndUseSummary(*state);
 
-    EnergyPlus::sqlite->sqliteCommit();
+    sqlite->sqliteCommit();
 
     // We test for Heating and Total, since they should be the same
     std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
@@ -8129,15 +8124,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
     state->dataGlobal->NumOfZones = 1;
-    Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
-    Zone(iZone).SurfaceFirst = 1;
-    Zone(iZone).SurfaceLast = 4;
-    Zone(iZone).RadiantEnclosureNum = 1;
+    state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(iZone).HTSurfaceLast = 4;
+    state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
     int radEnclosureNum = 1;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     Array1D<Real64> peopleDelaySeq;
     peopleDelaySeq.allocate(state->dataGlobal->NumOfTimeStepInHour * 24);
@@ -8172,25 +8167,25 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
-    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, state->dataSurface->TotSurfaces);
     surfDelaySeqCool = 0.0;
 
     AllocateLoadComponentArrays(*state);
 
     // Set surface values
     std::vector<Real64> surfBaseValue{100.0, 200.0, 300.0, 400.0};
-    Surface(1).Area = 10;
-    Surface(2).Area = 20;
-    Surface(3).Area = 30;
-    Surface(4).Area = 40;
-    Surface(1).HeatTransSurf = true;
-    Surface(2).HeatTransSurf = true;
-    Surface(3).HeatTransSurf = true;
-    Surface(4).HeatTransSurf = false;
-    Surface(1).Class = SurfaceClass::Window;
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(3).Class = SurfaceClass::Floor;
-    Surface(4).Class = SurfaceClass::Shading;
+    state->dataSurface->Surface(1).Area = 10;
+    state->dataSurface->Surface(2).Area = 20;
+    state->dataSurface->Surface(3).Area = 30;
+    state->dataSurface->Surface(4).Area = 40;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(4).HeatTransSurf = false;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Shading;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
@@ -8228,18 +8223,18 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
 
     // Rearrange surface values
     surfBaseValue = {300.0, 100.0, 400.0, 200.0};
-    Surface(2).Area = 10;
-    Surface(4).Area = 20;
-    Surface(1).Area = 30;
-    Surface(3).Area = 40;
-    Surface(2).HeatTransSurf = true;
-    Surface(4).HeatTransSurf = true;
-    Surface(1).HeatTransSurf = true;
-    Surface(3).HeatTransSurf = false;
-    Surface(2).Class = SurfaceClass::Window;
-    Surface(4).Class = SurfaceClass::Wall;
-    Surface(1).Class = SurfaceClass::Floor;
-    Surface(3).Class = SurfaceClass::Shading;
+    state->dataSurface->Surface(2).Area = 10;
+    state->dataSurface->Surface(4).Area = 20;
+    state->dataSurface->Surface(1).Area = 30;
+    state->dataSurface->Surface(3).Area = 40;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(3).HeatTransSurf = false;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Shading;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
@@ -8299,18 +8294,18 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
 
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 {
-    EnergyPlus::OutputReportTabular::clear_state(*state);
+    OutputReportTabular::clear_state(*state);
     state->dataGlobal->DoWeathSim = true;
 
     state->dataOutRptPredefined->pdrSensibleGain = 1;
     state->dataOutRptPredefined->reportName.allocate(1);
     state->dataOutRptPredefined->reportName(state->dataOutRptPredefined->pdrSensibleGain).show = true;
 
-    EnergyPlus::DataHVACGlobals::TimeStepSys = 10.0;
+    DataHVACGlobals::TimeStepSys = 10.0;
     state->dataGlobal->TimeStepZone = 20.0;
     state->dataDefineEquipment->NumAirDistUnits = 1;
 
-    EnergyPlus::DataHeatBalance::ZonePreDefRep.allocate(1);
+    state->dataHeatBal->ZonePreDefRep.allocate(1);
     state->dataDefineEquipment->AirDistUnit.allocate(1);
     state->dataDefineEquipment->AirDistUnit(1).ZoneNum = 1;
     state->dataDefineEquipment->AirDistUnit(1).HeatGain = 1000.0;
@@ -8319,22 +8314,22 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     state->dataDefineEquipment->AirDistUnit(1).CoolRate = 4.0;
 
     state->dataGlobal->NumOfZones = 1;
-    EnergyPlus::DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
-    EnergyPlus::DataHeatBalance::Zone(1).Multiplier = 1;
-    EnergyPlus::DataHeatBalance::Zone(1).ListMultiplier = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Multiplier = 1;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1;
 
-    EnergyPlus::DataHeatBalance::ZnRpt.allocate(1);
-    EnergyPlus::DataHeatBalance::ZnAirRpt.allocate(1);
+    state->dataHeatBal->ZnRpt.allocate(1);
+    state->dataHeatBal->ZnAirRpt.allocate(1);
 
-    EnergyPlus::DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
-    EnergyPlus::DataHeatBalance::ZoneWinHeatLossRepEnergy.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
+    state->dataHeatBal->ZoneWinHeatLossRepEnergy.allocate(1);
 
     GatherHeatGainReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
 
-    EXPECT_EQ(1.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*DataGlobalConstants::SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqHt);
-    EXPECT_EQ(0.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*DataGlobalConstants::SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl);
-    EXPECT_EQ(1000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUHt);
-    EXPECT_EQ(-2000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUCl);
+    EXPECT_EQ(1.0*(DataHVACGlobals::TimeStepSys)*DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqHt);
+    EXPECT_EQ(0.0*(DataHVACGlobals::TimeStepSys)*DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqCl);
+    EXPECT_EQ(1000.0, state->dataHeatBal->ZonePreDefRep(1).SHGSAnHvacATUHt);
+    EXPECT_EQ(-2000.0, state->dataHeatBal->ZonePreDefRep(1).SHGSAnHvacATUCl);
 }
 
 
@@ -8436,8 +8431,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 
     // Test the regular scenario (No missing or default values) Case 1: UseoutputControlTableStyle
     std::string const idf_objects =
-        delimited_string({"Output:SQLite,", 
-            "SimpleAndTabular, !-Option Type", 
+        delimited_string({"Output:SQLite,",
+            "SimpleAndTabular, !-Option Type",
             "UseOutputControlTableStyle; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -8446,7 +8441,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
     DataStringGlobals::outputSqlFileName = "eplussqlite1.err";
     DataStringGlobals::outputSqliteErrFileName = "eplusout1.sql";
 
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
     EXPECT_NE(sqlite, nullptr);
@@ -8460,8 +8455,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
 {
     // Test the regular scenario (No missing or default values) Case 2: InchPound
-    std::string const idf_objects = delimited_string({"Output:SQLite,", 
-        "SimpleAndTabular, !-Option Type", 
+    std::string const idf_objects = delimited_string({"Output:SQLite,",
+        "SimpleAndTabular, !-Option Type",
         "InchPound; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -8470,7 +8465,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
 
     DataStringGlobals::outputSqlFileName = "eplussqlite2.err";
     DataStringGlobals::outputSqliteErrFileName = "eplusout2.sql";
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound);
     EXPECT_NE(sqlite, nullptr);
@@ -8484,8 +8479,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
 {
     // Test the regular scenario (No missing or default values) Case 3: None
-    std::string const idf_objects = delimited_string({"Output:SQLite,", 
-        "SimpleAndTabular, !-Option Type", 
+    std::string const idf_objects = delimited_string({"Output:SQLite,",
+        "SimpleAndTabular, !-Option Type",
         "None; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -8494,7 +8489,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
 
     DataStringGlobals::outputSqlFileName = "eplussqlite3.err";
     DataStringGlobals::outputSqliteErrFileName = "eplusout3.sql";
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None);
     EXPECT_NE(sqlite, nullptr);
@@ -8519,7 +8514,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     DataStringGlobals::outputSqlFileName = "eplussqlite4.err";
     DataStringGlobals::outputSqliteErrFileName = "eplusout4.sql";
-    
+
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
@@ -8547,7 +8542,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
     DataStringGlobals::outputSqlFileName = "eplussqlite5.err";
     DataStringGlobals::outputSqliteErrFileName = "eplusout5.sql";
 
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
     EXPECT_NE(sqlite, nullptr);
@@ -8566,12 +8561,12 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     state->dataOutRptTab->displayHeatEmissionsSummary = true;
 
     // DetermineBuildingFloorArea
-    BuildingPreDefRep.emiEnvelopConv = 1000.00; // * energyconversion, 2);
-    BuildingPreDefRep.emiZoneExfiltration = 50.00; // * energyconversion, 2);
-    BuildingPreDefRep.emiZoneExhaust = 200.00; // * energyconversion, 2);
-    BuildingPreDefRep.emiHVACRelief = 500.00; // * energyconversion, 2);
-    BuildingPreDefRep.emiHVACReject = 1750.00; // * energyconversion, 2);
-    BuildingPreDefRep.emiTotHeat = 4000.00; // * energyconversion, 2);
+    state->dataHeatBal->BuildingPreDefRep.emiEnvelopConv = 1000.00; // * energyconversion, 2);
+    state->dataHeatBal->BuildingPreDefRep.emiZoneExfiltration = 50.00; // * energyconversion, 2);
+    state->dataHeatBal->BuildingPreDefRep.emiZoneExhaust = 200.00; // * energyconversion, 2);
+    state->dataHeatBal->BuildingPreDefRep.emiHVACRelief = 500.00; // * energyconversion, 2);
+    state->dataHeatBal->BuildingPreDefRep.emiHVACReject = 1750.00; // * energyconversion, 2);
+    state->dataHeatBal->BuildingPreDefRep.emiTotHeat = 4000.00; // * energyconversion, 2);
 
     // Test Combination 0: GJ
     state->dataOutRptTab->unitsStyle = iUnitsStyle::JtoGJ;
@@ -8590,12 +8585,12 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
 
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results0({
-        {"Envelope Convection", BuildingPreDefRep.emiEnvelopConv * energyconversion},
-        {"Zone Exfiltration", BuildingPreDefRep.emiZoneExfiltration * energyconversion},
-        {"Zone Exhaust Air", BuildingPreDefRep.emiZoneExhaust * energyconversion},
-        {"HVAC Relief Air", BuildingPreDefRep.emiHVACRelief * energyconversion},
-        {"HVAC Reject Heat", BuildingPreDefRep.emiHVACReject * energyconversion},
-        {"Total", BuildingPreDefRep.emiTotHeat * energyconversion},
+        {"Envelope Convection", state->dataHeatBal->BuildingPreDefRep.emiEnvelopConv * energyconversion},
+        {"Zone Exfiltration", state->dataHeatBal->BuildingPreDefRep.emiZoneExfiltration * energyconversion},
+        {"Zone Exhaust Air", state->dataHeatBal->BuildingPreDefRep.emiZoneExhaust * energyconversion},
+        {"HVAC Relief Air", state->dataHeatBal->BuildingPreDefRep.emiHVACRelief * energyconversion},
+        {"HVAC Reject Heat", state->dataHeatBal->BuildingPreDefRep.emiHVACReject * energyconversion},
+        {"Total", state->dataHeatBal->BuildingPreDefRep.emiTotHeat * energyconversion},
 
     });
 
@@ -8608,7 +8603,7 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
             std::string query("SELECT Value From TabularDataWithStrings"
                               "  WHERE ReportName = '" + reportName + "'"
                               "  AND TableName = '" + tableName + "'"
-                              "  AND RowName = '" + rowName + "'" 
+                              "  AND RowName = '" + rowName + "'"
                               "  AND ColumnName = '" + columnName + "'"
                               "  AND Units = '" + unitsName + "'"
             );
@@ -8637,12 +8632,12 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
 
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results1({
-        {"Envelope Convection", BuildingPreDefRep.emiEnvelopConv * energyconversion},
-        {"Zone Exfiltration", BuildingPreDefRep.emiZoneExfiltration * energyconversion},
-        {"Zone Exhaust Air", BuildingPreDefRep.emiZoneExhaust * energyconversion},
-        {"HVAC Relief Air", BuildingPreDefRep.emiHVACRelief * energyconversion},
-        {"HVAC Reject Heat", BuildingPreDefRep.emiHVACReject * energyconversion},
-        {"Total", BuildingPreDefRep.emiTotHeat * energyconversion},
+        {"Envelope Convection", state->dataHeatBal->BuildingPreDefRep.emiEnvelopConv * energyconversion},
+        {"Zone Exfiltration", state->dataHeatBal->BuildingPreDefRep.emiZoneExfiltration * energyconversion},
+        {"Zone Exhaust Air", state->dataHeatBal->BuildingPreDefRep.emiZoneExhaust * energyconversion},
+        {"HVAC Relief Air", state->dataHeatBal->BuildingPreDefRep.emiHVACRelief * energyconversion},
+        {"HVAC Reject Heat", state->dataHeatBal->BuildingPreDefRep.emiHVACReject * energyconversion},
+        {"Total", state->dataHeatBal->BuildingPreDefRep.emiTotHeat * energyconversion},
 
     });
 
@@ -8675,12 +8670,12 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
         }
     }
 
-    // Test Combination 2: 
+    // Test Combination 2:
     state->dataOutRptTab->unitsStyle = iUnitsStyle::JtoKWH;
     state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::InchPound;
 
-    // Test 2.5: 
-    // Actually here is an additonal test unit for the getSpecificUnitDivider: 
+    // Test 2.5:
+    // Actually here is an additonal test unit for the getSpecificUnitDivider:
     SetupUnitConversions(*state);
     Real64 rconv = getSpecificUnitDivider(*state, "GJ", "kBtu");
     energyconversion = 1.0 / rconv; // 948.45
@@ -8698,12 +8693,12 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
 
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results2({
-        {"Envelope Convection", BuildingPreDefRep.emiEnvelopConv * energyconversion},
-        {"Zone Exfiltration", BuildingPreDefRep.emiZoneExfiltration * energyconversion},
-        {"Zone Exhaust Air", BuildingPreDefRep.emiZoneExhaust * energyconversion},
-        {"HVAC Relief Air", BuildingPreDefRep.emiHVACRelief * energyconversion},
-        {"HVAC Reject Heat", BuildingPreDefRep.emiHVACReject * energyconversion},
-        {"Total", BuildingPreDefRep.emiTotHeat * energyconversion},
+        {"Envelope Convection", state->dataHeatBal->BuildingPreDefRep.emiEnvelopConv * energyconversion},
+        {"Zone Exfiltration", state->dataHeatBal->BuildingPreDefRep.emiZoneExfiltration * energyconversion},
+        {"Zone Exhaust Air", state->dataHeatBal->BuildingPreDefRep.emiZoneExhaust * energyconversion},
+        {"HVAC Relief Air", state->dataHeatBal->BuildingPreDefRep.emiHVACRelief * energyconversion},
+        {"HVAC Reject Heat", state->dataHeatBal->BuildingPreDefRep.emiHVACReject * energyconversion},
+        {"Total", state->dataHeatBal->BuildingPreDefRep.emiTotHeat * energyconversion},
 
     });
 
@@ -8750,118 +8745,118 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 2;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 2;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 2;
 
     // Loads
-    DataHeatBalance::TotLights = 3;
-    Lights.allocate(DataHeatBalance::TotLights);
+    state->dataHeatBal->TotLights = 3;
+    state->dataHeatBal->Lights.allocate(state->dataHeatBal->TotLights);
 
-    DataHeatBalance::TotPeople = 3;
-    People.allocate(DataHeatBalance::TotPeople);
+    state->dataHeatBal->TotPeople = 3;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
 
-    DataHeatBalance::TotElecEquip = 3;
-    ZoneElectric.allocate(DataHeatBalance::TotElecEquip);
+    state->dataHeatBal->TotElecEquip = 3;
+    state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
-    Lights(1).ZonePtr = 1;
-    Lights(1).DesignLevel = 1000.0;
-    Lights(2).ZonePtr = 2;
-    Lights(2).DesignLevel = 100.0;
-    Lights(3).ZonePtr = 3;
-    Lights(3).DesignLevel = 10.0;
+    state->dataHeatBal->Lights(1).ZonePtr = 1;
+    state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
+    state->dataHeatBal->Lights(2).ZonePtr = 2;
+    state->dataHeatBal->Lights(2).DesignLevel = 100.0;
+    state->dataHeatBal->Lights(3).ZonePtr = 3;
+    state->dataHeatBal->Lights(3).DesignLevel = 10.0;
 
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 10.0;
-    People(2).ZonePtr = 2;
-    People(2).NumberOfPeople = 5.0;
-    People(3).ZonePtr = 3;
-    People(3).NumberOfPeople = 1.0;
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 10.0;
+    state->dataHeatBal->People(2).ZonePtr = 2;
+    state->dataHeatBal->People(2).NumberOfPeople = 5.0;
+    state->dataHeatBal->People(3).ZonePtr = 3;
+    state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
-    ZoneElectric(1).ZonePtr = 1;
-    ZoneElectric(1).DesignLevel = 500.0;
-    ZoneElectric(2).ZonePtr = 2;
-    ZoneElectric(2).DesignLevel = 50.0;
-    ZoneElectric(3).ZonePtr = 3;
-    ZoneElectric(3).DesignLevel = 5.0;
+    state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
+    state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
+    state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
     state->dataGlobal->NumOfZones = 3;
-    Zone.allocate(state->dataGlobal->NumOfZones);
-    Zone(1).Name = "PartofTot Conditioned Zone";
-    Zone(1).SystemZoneNodeNumber = 1; // Conditioned
-    Zone(1).isPartOfTotalArea = true;
-    Zone(1).Multiplier = 1.;
-    Zone(1).ListMultiplier = 1.;
-    Zone(1).FloorArea = 1000.;
-    Zone(1).Volume = 2000.;
-    Zone(1).ExtGrossWallArea = 800.;
-    Zone(1).ExteriorTotalGroundSurfArea = 0;
-    Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(1).Multiplier = 1.;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(1).FloorArea = 1000.;
+    state->dataHeatBal->Zone(1).Volume = 2000.;
+    state->dataHeatBal->Zone(1).ExtGrossWallArea = 800.;
+    state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
-    Zone(2).Name = "PartofTot Unconditioned Zone";
-    Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
-    Zone(2).isPartOfTotalArea = true;
-    Zone(2).Multiplier = 1.;
-    Zone(2).ListMultiplier = 1.;
-    Zone(2).FloorArea = 100.;
-    Zone(2).Volume = 200.;
-    Zone(2).ExtGrossWallArea = 80.;
-    Zone(2).ExteriorTotalGroundSurfArea = 0;
-    Zone(2).ExtWindowArea = 0.0;
+    state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(2).Multiplier = 1.;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(2).FloorArea = 100.;
+    state->dataHeatBal->Zone(2).Volume = 200.;
+    state->dataHeatBal->Zone(2).ExtGrossWallArea = 80.;
+    state->dataHeatBal->Zone(2).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
 
-    Zone(3).Name = "NOT PartofTot Conditioned Zone";
-    Zone(3).SystemZoneNodeNumber = 1; // Conditioned
-    Zone(3).isPartOfTotalArea = false;
-    Zone(3).Multiplier = 1.;
-    Zone(3).ListMultiplier = 1.;
-    Zone(3).FloorArea = 10.;
-    Zone(3).Volume = 20.;
-    Zone(3).ExtGrossWallArea = 8.;
-    Zone(3).ExteriorTotalGroundSurfArea = 0;
-    Zone(3).ExtWindowArea = 0.0;
+    state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
+    state->dataHeatBal->Zone(3).Multiplier = 1.;
+    state->dataHeatBal->Zone(3).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(3).FloorArea = 10.;
+    state->dataHeatBal->Zone(3).Volume = 20.;
+    state->dataHeatBal->Zone(3).ExtGrossWallArea = 8.;
+    state->dataHeatBal->Zone(3).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(3).ExtWindowArea = 0.0;
 
     // Gross takes all that are PartOfTot
-    Real64 expectedBuildingGrossFloorArea = Zone(1).FloorArea + Zone(2).FloorArea;
+    Real64 expectedBuildingGrossFloorArea = state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea;
     // Conditioned takes only PartOfTot AND COnditioned
-    Real64 expectedBuildingConditionedFloorArea = Zone(1).FloorArea;
+    Real64 expectedBuildingConditionedFloorArea = state->dataHeatBal->Zone(1).FloorArea;
 
     // Assume that we only have electricity with a value of 3.6e6 * 1e4 J =10.000 kWh.
     // And that this only comes for a single end use DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)=1
@@ -8885,7 +8880,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     EXPECT_EQ(expectedBuildingGrossFloorArea, state->dataOutRptTab->buildingGrossFloorArea);
     EXPECT_EQ(expectedBuildingConditionedFloorArea, state->dataOutRptTab->buildingConditionedFloorArea);
 
-    //expectedBuildingGrossFloorArea /= areaConv; 
+    //expectedBuildingGrossFloorArea /= areaConv;
     //expectedBuildingConditionedFloorArea /= areaConv;
 
     //eleckWh /= largeConv;
@@ -8979,69 +8974,69 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).FrameDivider = 0;
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).FrameDivider = 0;
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).FrameDivider = 0;
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).FrameDivider = 0;
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 1;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).FrameDivider = 1;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).FrameDivider = 1;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).FrameDivider = 2;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 1;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).FrameDivider = 2;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 1;
 
     // frames
-    TotFrameDivider = 2;
-    FrameDivider.allocate(TotFrameDivider);
-    FrameDivider(1).FrameWidth = 0.3;
-    FrameDivider(2).FrameWidth = 0.2;
+    state->dataHeatBal->TotFrameDivider = 2;
+    state->dataSurface->FrameDivider.allocate(state->dataHeatBal->TotFrameDivider);
+    state->dataSurface->FrameDivider(1).FrameWidth = 0.3;
+    state->dataSurface->FrameDivider(2).FrameWidth = 0.2;
 
     // zone
     state->dataGlobal->NumOfZones = 1;
-    Zone.allocate(state->dataGlobal->NumOfZones);
-    Zone(1).SystemZoneNodeNumber = 1;
-    Zone(1).Multiplier = 1.;
-    Zone(1).ListMultiplier = 1.;
-    Zone(1).FloorArea = 600.; // 20 x 30
-    Zone(1).Volume = 6000.;   // 20 x 30 x 10
-    Zone(1).isPartOfTotalArea = true;
-    Zone(1).ExtGrossWallArea = 500.;
-    Zone(1).ExteriorTotalGroundSurfArea = 0;
-    Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone(1).Multiplier = 1.;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(1).FloorArea = 600.; // 20 x 30
+    state->dataHeatBal->Zone(1).Volume = 6000.;   // 20 x 30 x 10
+    state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(1).ExtGrossWallArea = 500.;
+    state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::None;
     state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
@@ -9096,116 +9091,116 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 2;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 2;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 2;
 
     // Loads
-    DataHeatBalance::TotLights = 3;
-    Lights.allocate(DataHeatBalance::TotLights);
+    state->dataHeatBal->TotLights = 3;
+    state->dataHeatBal->Lights.allocate(state->dataHeatBal->TotLights);
 
-    DataHeatBalance::TotPeople = 3;
-    People.allocate(DataHeatBalance::TotPeople);
+    state->dataHeatBal->TotPeople = 3;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
 
-    DataHeatBalance::TotElecEquip = 3;
-    ZoneElectric.allocate(DataHeatBalance::TotElecEquip);
+    state->dataHeatBal->TotElecEquip = 3;
+    state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
-    Lights(1).ZonePtr = 1;
-    Lights(1).DesignLevel = 1000.0;
-    Lights(2).ZonePtr = 2;
-    Lights(2).DesignLevel = 100.0;
-    Lights(3).ZonePtr = 3;
-    Lights(3).DesignLevel = 10.0;
+    state->dataHeatBal->Lights(1).ZonePtr = 1;
+    state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
+    state->dataHeatBal->Lights(2).ZonePtr = 2;
+    state->dataHeatBal->Lights(2).DesignLevel = 100.0;
+    state->dataHeatBal->Lights(3).ZonePtr = 3;
+    state->dataHeatBal->Lights(3).DesignLevel = 10.0;
 
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 10.0;
-    People(2).ZonePtr = 2;
-    People(2).NumberOfPeople = 5.0;
-    People(3).ZonePtr = 3;
-    People(3).NumberOfPeople = 1.0;
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 10.0;
+    state->dataHeatBal->People(2).ZonePtr = 2;
+    state->dataHeatBal->People(2).NumberOfPeople = 5.0;
+    state->dataHeatBal->People(3).ZonePtr = 3;
+    state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
-    ZoneElectric(1).ZonePtr = 1;
-    ZoneElectric(1).DesignLevel = 500.0;
-    ZoneElectric(2).ZonePtr = 2;
-    ZoneElectric(2).DesignLevel = 50.0;
-    ZoneElectric(3).ZonePtr = 3;
-    ZoneElectric(3).DesignLevel = 5.0;
+    state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
+    state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
+    state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
     state->dataGlobal->NumOfZones = 3;
-    Zone.allocate(state->dataGlobal->NumOfZones);
-    Zone(1).Name = "PartofTot Conditioned Zone";
-    Zone(1).SystemZoneNodeNumber = 1; // Conditioned
-    Zone(1).isPartOfTotalArea = true;
-    Zone(1).Multiplier = 1.;
-    Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(1).Multiplier = 1.;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.;
     // 10x10x2
-    Zone(1).FloorArea = 1000.;
-    Zone(1).Volume = 2000.;
-    Zone(1).ExtGrossWallArea = 800.;
-    Zone(1).ExteriorTotalGroundSurfArea = 0;
-    Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone(1).FloorArea = 1000.;
+    state->dataHeatBal->Zone(1).Volume = 2000.;
+    state->dataHeatBal->Zone(1).ExtGrossWallArea = 800.;
+    state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
-    Zone(2).Name = "PartofTot Unconditioned Zone";
-    Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
-    Zone(2).isPartOfTotalArea = true;
-    Zone(2).Multiplier = 1.;
-    Zone(2).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(2).Multiplier = 1.;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1.;
     // 10x10x2
-    Zone(2).FloorArea = 100.;
-    Zone(2).Volume = 200.;
-    Zone(2).ExtGrossWallArea = 80.;
-    Zone(2).ExteriorTotalGroundSurfArea = 0;
-    Zone(2).ExtWindowArea = 0.0;
+    state->dataHeatBal->Zone(2).FloorArea = 100.;
+    state->dataHeatBal->Zone(2).Volume = 200.;
+    state->dataHeatBal->Zone(2).ExtGrossWallArea = 80.;
+    state->dataHeatBal->Zone(2).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
 
-    Zone(3).Name = "NOT PartofTot Conditioned Zone";
-    Zone(3).SystemZoneNodeNumber = 1; // Conditioned
-    Zone(3).isPartOfTotalArea = false;
-    Zone(3).Multiplier = 1.;
-    Zone(3).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
+    state->dataHeatBal->Zone(3).Multiplier = 1.;
+    state->dataHeatBal->Zone(3).ListMultiplier = 1.;
     // 10x10x2
-    Zone(3).FloorArea = 10.;
-    Zone(3).Volume = 20.;
-    Zone(3).ExtGrossWallArea = 8.;
-    Zone(3).ExteriorTotalGroundSurfArea = 0;
-    Zone(3).ExtWindowArea = 0.0;
+    state->dataHeatBal->Zone(3).FloorArea = 10.;
+    state->dataHeatBal->Zone(3).Volume = 20.;
+    state->dataHeatBal->Zone(3).ExtGrossWallArea = 8.;
+    state->dataHeatBal->Zone(3).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(3).ExtWindowArea = 0.0;
 
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::None;
     state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
@@ -9229,14 +9224,14 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
-        {Zone(1).Name, "Conditioned (Y/N)", "Yes"},
-        {Zone(1).Name, "Part of Total Floor Area (Y/N)", "Yes"},
+        {state->dataHeatBal->Zone(1).Name, "Conditioned (Y/N)", "Yes"},
+        {state->dataHeatBal->Zone(1).Name, "Part of Total Floor Area (Y/N)", "Yes"},
 
-        {Zone(2).Name, "Conditioned (Y/N)", "No"},
-        {Zone(2).Name, "Part of Total Floor Area (Y/N)", "Yes"},
+        {state->dataHeatBal->Zone(2).Name, "Conditioned (Y/N)", "No"},
+        {state->dataHeatBal->Zone(2).Name, "Part of Total Floor Area (Y/N)", "Yes"},
 
-        {Zone(3).Name, "Conditioned (Y/N)", "Yes"},
-        {Zone(3).Name, "Part of Total Floor Area (Y/N)", "No"},
+        {state->dataHeatBal->Zone(3).Name, "Conditioned (Y/N)", "Yes"},
+        {state->dataHeatBal->Zone(3).Name, "Part of Total Floor Area (Y/N)", "No"},
     });
 
     // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
@@ -9268,46 +9263,46 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, Real64>> results({
-        {Zone(1).Name, "Area", Zone(1).FloorArea/areaConv},
-        {Zone(2).Name, "Area", Zone(2).FloorArea/areaConv},
-        {Zone(3).Name, "Area", Zone(3).FloorArea/areaConv},
-        {"Total", "Area", (Zone(1).FloorArea + Zone(2).FloorArea)/areaConv},
-        {"Conditioned Total", "Area", Zone(1).FloorArea/areaConv},
-        {"Unconditioned Total", "Area", Zone(2).FloorArea/areaConv},
-        {"Not Part of Total", "Area", Zone(3).FloorArea/areaConv},
+        {state->dataHeatBal->Zone(1).Name, "Area", state->dataHeatBal->Zone(1).FloorArea/areaConv},
+        {state->dataHeatBal->Zone(2).Name, "Area", state->dataHeatBal->Zone(2).FloorArea/areaConv},
+        {state->dataHeatBal->Zone(3).Name, "Area", state->dataHeatBal->Zone(3).FloorArea/areaConv},
+        {"Total", "Area", (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea)/areaConv},
+        {"Conditioned Total", "Area", state->dataHeatBal->Zone(1).FloorArea/areaConv},
+        {"Unconditioned Total", "Area", state->dataHeatBal->Zone(2).FloorArea/areaConv},
+        {"Not Part of Total", "Area", state->dataHeatBal->Zone(3).FloorArea/areaConv},
 
-        {Zone(1).Name, "Volume", Zone(1).Volume/volConv},
-        {Zone(2).Name, "Volume", Zone(2).Volume/volConv},
-        {Zone(3).Name, "Volume", Zone(3).Volume/volConv},
-        {"Total", "Volume", (Zone(1).Volume + Zone(2).Volume)/volConv},
-        {"Conditioned Total", "Volume", Zone(1).Volume/volConv},
-        {"Unconditioned Total", "Volume", Zone(2).Volume/volConv},
-        {"Not Part of Total", "Volume", Zone(3).Volume/volConv},
+        {state->dataHeatBal->Zone(1).Name, "Volume", state->dataHeatBal->Zone(1).Volume/volConv},
+        {state->dataHeatBal->Zone(2).Name, "Volume", state->dataHeatBal->Zone(2).Volume/volConv},
+        {state->dataHeatBal->Zone(3).Name, "Volume", state->dataHeatBal->Zone(3).Volume/volConv},
+        {"Total", "Volume", (state->dataHeatBal->Zone(1).Volume + state->dataHeatBal->Zone(2).Volume)/volConv},
+        {"Conditioned Total", "Volume", state->dataHeatBal->Zone(1).Volume/volConv},
+        {"Unconditioned Total", "Volume", state->dataHeatBal->Zone(2).Volume/volConv},
+        {"Not Part of Total", "Volume", state->dataHeatBal->Zone(3).Volume/volConv},
 
-        {Zone(1).Name, "Lighting", Lights(1).DesignLevel * Wm2_unitConv / Zone(1).FloorArea},
-        {Zone(2).Name, "Lighting", Lights(2).DesignLevel * Wm2_unitConv / Zone(2).FloorArea},
-        {Zone(3).Name, "Lighting", Lights(3).DesignLevel * Wm2_unitConv / Zone(3).FloorArea},
-        {"Total", "Lighting", (Lights(1).DesignLevel + Lights(2).DesignLevel) * Wm2_unitConv / (Zone(1).FloorArea + Zone(2).FloorArea)},
-        {"Conditioned Total", "Lighting", Lights(1).DesignLevel * Wm2_unitConv / Zone(1).FloorArea},
-        {"Unconditioned Total", "Lighting", Lights(2).DesignLevel * Wm2_unitConv / Zone(2).FloorArea},
-        {"Not Part of Total", "Lighting", Lights(3).DesignLevel * Wm2_unitConv / Zone(3).FloorArea},
+        {state->dataHeatBal->Zone(1).Name, "Lighting", state->dataHeatBal->Lights(1).DesignLevel * Wm2_unitConv / state->dataHeatBal->Zone(1).FloorArea},
+        {state->dataHeatBal->Zone(2).Name, "Lighting", state->dataHeatBal->Lights(2).DesignLevel * Wm2_unitConv / state->dataHeatBal->Zone(2).FloorArea},
+        {state->dataHeatBal->Zone(3).Name, "Lighting", state->dataHeatBal->Lights(3).DesignLevel * Wm2_unitConv / state->dataHeatBal->Zone(3).FloorArea},
+        {"Total", "Lighting", (state->dataHeatBal->Lights(1).DesignLevel + state->dataHeatBal->Lights(2).DesignLevel) * Wm2_unitConv / (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea)},
+        {"Conditioned Total", "Lighting", state->dataHeatBal->Lights(1).DesignLevel * Wm2_unitConv / state->dataHeatBal->Zone(1).FloorArea},
+        {"Unconditioned Total", "Lighting", state->dataHeatBal->Lights(2).DesignLevel * Wm2_unitConv / state->dataHeatBal->Zone(2).FloorArea},
+        {"Not Part of Total", "Lighting", state->dataHeatBal->Lights(3).DesignLevel * Wm2_unitConv / state->dataHeatBal->Zone(3).FloorArea},
 
         // People/m^2
-        {Zone(1).Name, "People", Zone(1).FloorArea /areaConv / People(1).NumberOfPeople},
-        {Zone(2).Name, "People", Zone(2).FloorArea / areaConv / People(2).NumberOfPeople},
-        {Zone(3).Name, "People", Zone(3).FloorArea / areaConv / People(3).NumberOfPeople},
-        {"Total", "People", (Zone(1).FloorArea + Zone(2).FloorArea) / areaConv / (People(1).NumberOfPeople + People(2).NumberOfPeople)},
-        {"Conditioned Total", "People", Zone(1).FloorArea / areaConv / People(1).NumberOfPeople},
-        {"Unconditioned Total", "People", Zone(2).FloorArea / areaConv / People(2).NumberOfPeople},
-        {"Not Part of Total", "People", Zone(3).FloorArea / areaConv / People(3).NumberOfPeople},
+        {state->dataHeatBal->Zone(1).Name, "People", state->dataHeatBal->Zone(1).FloorArea /areaConv / state->dataHeatBal->People(1).NumberOfPeople},
+        {state->dataHeatBal->Zone(2).Name, "People", state->dataHeatBal->Zone(2).FloorArea / areaConv / state->dataHeatBal->People(2).NumberOfPeople},
+        {state->dataHeatBal->Zone(3).Name, "People", state->dataHeatBal->Zone(3).FloorArea / areaConv / state->dataHeatBal->People(3).NumberOfPeople},
+        {"Total", "People", (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea) / areaConv / (state->dataHeatBal->People(1).NumberOfPeople + state->dataHeatBal->People(2).NumberOfPeople)},
+        {"Conditioned Total", "People", state->dataHeatBal->Zone(1).FloorArea / areaConv / state->dataHeatBal->People(1).NumberOfPeople},
+        {"Unconditioned Total", "People", state->dataHeatBal->Zone(2).FloorArea / areaConv / state->dataHeatBal->People(2).NumberOfPeople},
+        {"Not Part of Total", "People", state->dataHeatBal->Zone(3).FloorArea / areaConv / state->dataHeatBal->People(3).NumberOfPeople},
 
-        {Zone(1).Name, "Plug and Process", ZoneElectric(1).DesignLevel * Wm2_unitConv / Zone(1).FloorArea},
-        {Zone(2).Name, "Plug and Process", ZoneElectric(2).DesignLevel * Wm2_unitConv / Zone(2).FloorArea},
-        {Zone(3).Name, "Plug and Process", ZoneElectric(3).DesignLevel * Wm2_unitConv / Zone(3).FloorArea},
-        {"Total", "Plug and Process", (ZoneElectric(1).DesignLevel + ZoneElectric(2).DesignLevel)*Wm2_unitConv / (Zone(1).FloorArea + Zone(2).FloorArea)},
-        {"Conditioned Total", "Plug and Process", ZoneElectric(1).DesignLevel*Wm2_unitConv / Zone(1).FloorArea},
-        {"Unconditioned Total", "Plug and Process", ZoneElectric(2).DesignLevel*Wm2_unitConv / Zone(2).FloorArea},
-        {"Not Part of Total", "Plug and Process", ZoneElectric(3).DesignLevel*Wm2_unitConv / Zone(3).FloorArea},
+        {state->dataHeatBal->Zone(1).Name, "Plug and Process", state->dataHeatBal->ZoneElectric(1).DesignLevel * Wm2_unitConv / state->dataHeatBal->Zone(1).FloorArea},
+        {state->dataHeatBal->Zone(2).Name, "Plug and Process", state->dataHeatBal->ZoneElectric(2).DesignLevel * Wm2_unitConv / state->dataHeatBal->Zone(2).FloorArea},
+        {state->dataHeatBal->Zone(3).Name, "Plug and Process", state->dataHeatBal->ZoneElectric(3).DesignLevel * Wm2_unitConv / state->dataHeatBal->Zone(3).FloorArea},
+        {"Total", "Plug and Process", (state->dataHeatBal->ZoneElectric(1).DesignLevel + state->dataHeatBal->ZoneElectric(2).DesignLevel)*Wm2_unitConv / (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea)},
+        {"Conditioned Total", "Plug and Process", state->dataHeatBal->ZoneElectric(1).DesignLevel*Wm2_unitConv / state->dataHeatBal->Zone(1).FloorArea},
+        {"Unconditioned Total", "Plug and Process", state->dataHeatBal->ZoneElectric(2).DesignLevel*Wm2_unitConv / state->dataHeatBal->Zone(2).FloorArea},
+        {"Not Part of Total", "Plug and Process", state->dataHeatBal->ZoneElectric(3).DesignLevel*Wm2_unitConv / state->dataHeatBal->Zone(3).FloorArea},
     });
 
     // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
@@ -9348,7 +9343,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     EXPECT_NEAR(1.0/enerConv, 948.0, 0.5);
 
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
 
     SetPredefinedTables(*state);
 

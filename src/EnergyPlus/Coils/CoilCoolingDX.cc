@@ -147,16 +147,16 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    errorsFound,
                                                                    coilCoolingDXObjectName,
                                                                    input_data.name,
-                                                                   DataLoopNode::NodeType_Air,
-                                                                   DataLoopNode::NodeConnectionType_Inlet,
+                                                                   DataLoopNode::NodeFluidType::Air,
+                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                    1,
                                                                    DataLoopNode::ObjectIsNotParent);
     this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state, input_data.evaporator_outlet_node_name,
                                                                     errorsFound,
                                                                     coilCoolingDXObjectName,
                                                                     input_data.name,
-                                                                    DataLoopNode::NodeType_Air,
-                                                                    DataLoopNode::NodeConnectionType_Outlet,
+                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                     1,
                                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -164,8 +164,8 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    errorsFound,
                                                                    coilCoolingDXObjectName,
                                                                    input_data.name,
-                                                                   DataLoopNode::NodeType_Air,
-                                                                   DataLoopNode::NodeConnectionType_Inlet,
+                                                                   DataLoopNode::NodeFluidType::Air,
+                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                    2,
                                                                    DataLoopNode::ObjectIsNotParent);
 
@@ -181,8 +181,8 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                         errorsFound,
                                                                         coilCoolingDXObjectName,
                                                                         input_data.name,
-                                                                        DataLoopNode::NodeType_Air,
-                                                                        DataLoopNode::NodeConnectionType_Outlet,
+                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                         2,
                                                                         DataLoopNode::ObjectIsNotParent);
 
@@ -461,10 +461,10 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
     }
 
     // get node references
-    auto &evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);
-    auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
-    auto &condInletNode = DataLoopNode::Node(this->condInletNodeIndex);
-    auto &condOutletNode = DataLoopNode::Node(this->condOutletNodeIndex);
+    auto &evapInletNode = state.dataLoopNodes->Node(this->evapInletNodeIndex);
+    auto &evapOutletNode = state.dataLoopNodes->Node(this->evapOutletNodeIndex);
+    auto &condInletNode = state.dataLoopNodes->Node(this->condInletNodeIndex);
+    auto &condOutletNode = state.dataLoopNodes->Node(this->condOutletNodeIndex);
 
     // call the simulation, which returns useful data
     // TODO: check the avail schedule and reset data/pass through data as needed

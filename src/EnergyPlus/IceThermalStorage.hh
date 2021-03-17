@@ -161,7 +161,7 @@ namespace IceThermalStorage {
 
         void CalcIceStorageCharge(EnergyPlusData &state);
 
-        void CalcQiceChargeMaxByChiller(Real64 &QiceMaxByChiller);
+        void CalcQiceChargeMaxByChiller(EnergyPlusData &state, Real64 &QiceMaxByChiller);
 
         void CalcQiceChargeMaxByITS(Real64 chillerOutletTemp, Real64 &QiceMaxByITS);
 

@@ -182,35 +182,27 @@ set(SRC
     DataHVACGlobals.cc
     DataHVACGlobals.hh
     DataHVACSystems.hh
-    DataHeatBalFanSys.cc
     DataHeatBalFanSys.hh
-    DataHeatBalSurface.cc
     DataHeatBalSurface.hh
     DataHeatBalance.cc
     DataHeatBalance.hh
     DataIPShortCuts.cc
     DataIPShortCuts.hh
-    DataLoopNode.cc
     DataLoopNode.hh
     DataMoistureBalance.cc
     DataMoistureBalance.hh
-    DataMoistureBalanceEMPD.cc
     DataMoistureBalanceEMPD.hh
     DataOutputs.cc
     DataOutputs.hh
     DataPhotovoltaics.cc
     DataPhotovoltaics.hh
-    DataPrecisionGlobals.cc
     DataPrecisionGlobals.hh
-    DataReportingFlags.cc
     DataReportingFlags.hh
     DataRoomAirModel.cc
     DataRoomAirModel.hh
-    DataRootFinder.cc
     DataRootFinder.hh
     DataRuntimeLanguage.cc
     DataRuntimeLanguage.hh
-    DataShadowingCombinations.cc
     DataShadowingCombinations.hh
     DataSizing.cc
     DataSizing.hh
@@ -1024,6 +1016,12 @@ if(BUILD_TESTING)
     add_test(
       NAME "API.test_DataTransferTypes"
       COMMAND "${PYTHON_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py"
+      WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
+    configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_SysExit.py" "${API_TEST_TARGET_DIR}/test_SysExit.py" COPYONLY)
+    add_test(
+      NAME "API.test_SysExit"
+      COMMAND "${PYTHON_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_SysExit.py"
       WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_OutputFiles.py" "${API_TEST_TARGET_DIR}/test_OutputFiles.py" @ONLY)

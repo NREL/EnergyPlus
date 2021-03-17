@@ -159,7 +159,8 @@ namespace PlantComponentTemperatureSources {
                                                            state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
                                                            RoutineName);
             this->MassFlowRateMax = this->DesVolFlowRate * rho;
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->MassFlowRateMax,
                                                this->InletNodeNum,
                                                this->OutletNodeNum,
@@ -176,7 +177,7 @@ namespace PlantComponentTemperatureSources {
         }
 
         // OK, so we can set up the inlet and boundary temperatures now
-        this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
         if (this->TempSpecType == iTempSpecType::Schedule) {
             this->BoundaryTemp = ScheduleManager::GetCurrentScheduleValue(state, this->TempSpecScheduleNum);
         }
@@ -285,8 +286,8 @@ namespace PlantComponentTemperatureSources {
         int PltSizNum = state.dataPlnt->PlantLoop(this->Location.loopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                tmpVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate; //* WaterSource(SourceNum)%SizFac
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                tmpVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate; //* WaterSource(SourceNum)%SizFac
                 if (!this->DesVolFlowRateWasAutoSized) tmpVolFlowRate = this->DesVolFlowRate;
             } else {
                 if (this->DesVolFlowRateWasAutoSized) tmpVolFlowRate = 0.0;
@@ -313,7 +314,7 @@ namespace PlantComponentTemperatureSources {
                                                          "User-Specified Design Fluid Flow Rate [m3/s]",
                                                          DesVolFlowRateUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Design Fluid Flow Rate of {:.5R} [m3/s]", DesVolFlowRateUser));
                                     ShowContinueError(state,
@@ -341,7 +342,7 @@ namespace PlantComponentTemperatureSources {
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->InletNodeNum, tmpVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, tmpVolFlowRate);
 
         if (ErrorsFound) {
             ShowFatalError(state, "Preceding sizing errors cause program termination");
@@ -375,9 +376,9 @@ namespace PlantComponentTemperatureSources {
         }
     }
 
-    void WaterSourceSpecs::update()
+    void WaterSourceSpecs::update(EnergyPlusData &state)
     {
-        DataLoopNode::Node(this->OutletNodeNum).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNodeNum).Temp = this->OutletTemp;
     }
 
     void WaterSourceSpecs::simulate(EnergyPlusData &state,
@@ -388,7 +389,7 @@ namespace PlantComponentTemperatureSources {
     {
         this->initialize(state, CurLoad);
         this->calculate(state);
-        this->update();
+        this->update(state);
     }
 
     void WaterSourceSpecs::getDesignCapacities(
@@ -479,16 +480,16 @@ namespace PlantComponentTemperatureSources {
                                                                                       ErrorsFound,
                                                                                       cCurrentModuleObject,
                                                                                       cAlphaArgs(1),
-                                                                                      DataLoopNode::NodeType_Water,
-                                                                                      DataLoopNode::NodeConnectionType_Inlet,
+                                                                                      DataLoopNode::NodeFluidType::Water,
+                                                                                      DataLoopNode::NodeConnectionType::Inlet,
                                                                                       1,
                                                                                       DataLoopNode::ObjectIsNotParent);
             state.dataPlantCompTempSrc->WaterSource(SourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(3),
                                                                                        ErrorsFound,
                                                                                        cCurrentModuleObject,
                                                                                        cAlphaArgs(1),
-                                                                                       DataLoopNode::NodeType_Water,
-                                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                                       DataLoopNode::NodeFluidType::Water,
+                                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                                        1,
                                                                                        DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");

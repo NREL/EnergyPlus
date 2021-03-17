@@ -70,22 +70,22 @@ TEST_F(EnergyPlusFixture, PlantUtilities_RegisterPlantCompDesignFlowTest1)
     // first call just puts first value in array
     int TestNodeNum1 = 123;
     Real64 TestFlowRate1 = 45.6;
-    SaveNumPlantComps = 0;
-    RegisterPlantCompDesignFlow(TestNodeNum1, TestFlowRate1);
-    EXPECT_EQ(TestNodeNum1, CompDesWaterFlow(1).SupNode);
-    EXPECT_EQ(TestFlowRate1, CompDesWaterFlow(1).DesVolFlowRate);
+    state->dataSize->SaveNumPlantComps = 0;
+    RegisterPlantCompDesignFlow(*state, TestNodeNum1, TestFlowRate1);
+    EXPECT_EQ(TestNodeNum1, state->dataSize->CompDesWaterFlow(1).SupNode);
+    EXPECT_EQ(TestFlowRate1, state->dataSize->CompDesWaterFlow(1).DesVolFlowRate);
 
     // second call searches array and since node not found adds an entry to array
     int TestNodeNum2 = 234;
     Real64 TestFlowRate2 = 56.7;
-    RegisterPlantCompDesignFlow(TestNodeNum2, TestFlowRate2);
-    EXPECT_EQ(TestNodeNum2, CompDesWaterFlow(2).SupNode);
-    EXPECT_EQ(TestFlowRate2, CompDesWaterFlow(2).DesVolFlowRate);
+    RegisterPlantCompDesignFlow(*state, TestNodeNum2, TestFlowRate2);
+    EXPECT_EQ(TestNodeNum2, state->dataSize->CompDesWaterFlow(2).SupNode);
+    EXPECT_EQ(TestFlowRate2, state->dataSize->CompDesWaterFlow(2).DesVolFlowRate);
 
     // third call searches array and since node was found adds an entry to array
     Real64 TestFlowRate3 = 67.8;
-    RegisterPlantCompDesignFlow(TestNodeNum1, TestFlowRate3);
-    EXPECT_EQ(TestFlowRate3, CompDesWaterFlow(1).DesVolFlowRate);
+    RegisterPlantCompDesignFlow(*state, TestNodeNum1, TestFlowRate3);
+    EXPECT_EQ(TestFlowRate3, state->dataSize->CompDesWaterFlow(1).DesVolFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
@@ -222,30 +222,30 @@ TEST_F(EnergyPlusFixture, TestAnyPlantSplitterMixerLacksContinuity)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Splitter.BranchNumOut(1) = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Splitter.BranchNumOut(2) = 2;
 
-    DataLoopNode::Node.allocate(3);
+    state->dataLoopNodes->Node.allocate(3);
 
     // case 1: inlet flow and outlet flow match up
-    DataLoopNode::Node(1).MassFlowRate = 3.0;
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
-    DataLoopNode::Node(3).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 3.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(3).MassFlowRate = 2.0;
     EXPECT_FALSE(PlantUtilities::AnyPlantSplitterMixerLacksContinuity(*state));
 
     // case 2: inlet flow > outlet flow
-    DataLoopNode::Node(1).MassFlowRate = 4.0;
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
-    DataLoopNode::Node(3).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 4.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(3).MassFlowRate = 2.0;
     EXPECT_TRUE(PlantUtilities::AnyPlantSplitterMixerLacksContinuity(*state));
 
     // case 3: inlet flow < outlet flow
-    DataLoopNode::Node(1).MassFlowRate = 1.0;
-    DataLoopNode::Node(2).MassFlowRate = 2.0;
-    DataLoopNode::Node(3).MassFlowRate = 3.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(3).MassFlowRate = 3.0;
     EXPECT_TRUE(PlantUtilities::AnyPlantSplitterMixerLacksContinuity(*state));
 
     // case 4: all zero flow
-    DataLoopNode::Node(1).MassFlowRate = 0.0;
-    DataLoopNode::Node(2).MassFlowRate = 0.0;
-    DataLoopNode::Node(3).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.0;
     EXPECT_FALSE(PlantUtilities::AnyPlantSplitterMixerLacksContinuity(*state));
 }
 
@@ -364,11 +364,11 @@ TEST_F(EnergyPlusFixture, TestCheckPlantConvergence)
     // That function is nice because it is very tightly contained, so we don't have to set up a lot of global state
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumIn = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumOut = 2;
-    auto &inNode = DataLoopNode::Node(1);
-    auto &outNode = DataLoopNode::Node(2);
+    auto &inNode = state->dataLoopNodes->Node(1);
+    auto &outNode = state->dataLoopNodes->Node(2);
     Real64 const roomTemp = 25.0;
     Real64 const nonZeroFlow = 3.14;
 
@@ -443,7 +443,7 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType) {
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumIn = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumOut = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;

@@ -1208,7 +1208,7 @@ namespace HybridEvapCoolingModel {
         // METHODOLOGY EMPLOYED:
         // 1) Clear out the set of operating settings from the previous time step.
         // 2) Iterate through each operating mode and weed out modes that are not intended to operate in current environmental conditions.
-        //		-> For each mode that is viable iterate thought the solution space and identify settings that meet the ventilation
+        //        -> For each mode that is viable iterate thought the solution space and identify settings that meet the ventilation
         // requirements
         //      -> settings that do are stored in the a container (Settings)
         // 3) Iterate through all the settings in Settings
@@ -1218,25 +1218,25 @@ namespace HybridEvapCoolingModel {
         // 6) Calculate setting power consumption, use the setting delivered ventilation and loads to calculate the
         // 7) minimum runtime fraction needed to meet those loads, then assuming that part runtime fraction calculate the setting part run time power
         // use. 8)   If the setting meets both the conditioning and humidification loads then test to see if its optimal in terms of energy use.
-        //  		->if so, save that setting as the current optimal.
-        //  		->if not ignore it.
-        //  	If the setting failed ot meet either the conditioning or humidification loads, then
-        //  	-> firstly check to see if no previous other setting (in this calculation step) has met both the load and humidification requirements
-        //  			-> if so
-        //  				-> check if this setting meets the conditioning load (only)
-        //  					-> if so
-        //  						->check to see if this setting is better at meeting the dehumidification or humidification lad
+        //          ->if so, save that setting as the current optimal.
+        //          ->if not ignore it.
+        //      If the setting failed ot meet either the conditioning or humidification loads, then
+        //      -> firstly check to see if no previous other setting (in this calculation step) has met both the load and humidification requirements
+        //              -> if so
+        //                  -> check if this setting meets the conditioning load (only)
+        //                      -> if so
+        //                          ->check to see if this setting is better at meeting the dehumidification or humidification lad
         //  than any previous setting this step.
-        //  						-> if its not, ignore it.
-        // 		  				-> if not
-        // 		  					->check to see if any previous setting met the conditioning load
-        // 		  						->if not:
-        // 		  							->see if this setting is better at meeting the conditioning load than
+        //                          -> if its not, ignore it.
+        //                           -> if not
+        //                               ->check to see if any previous setting met the conditioning load
+        //                                   ->if not:
+        //                                       ->see if this setting is better at meeting the conditioning load than
         // any previous setting this calculation step.
-        // 		  								-> if so save as current optimal
-        // 		  								-> if its not, ignore it.
-        // 		  						-> if so: then ignore it.
-        //  			->if not, then a previous setting is better than this one by default, and so ignore it.
+        //                                           -> if so save as current optimal
+        //                                           -> if its not, ignore it.
+        //                                   -> if so: then ignore it.
+        //              ->if not, then a previous setting is better than this one by default, and so ignore it.
         // 9) Identify error states if the no setting meets the environmental conditions, or the supply air humidity or temperature constraints.
         // 10) if we met the load set operating settings to be a combination of the optimal setting at the minium required runtime fraction
         // 11) if we partly met the load then do the best we can and run full out in that optimal setting.
@@ -1297,7 +1297,7 @@ namespace HybridEvapCoolingModel {
             int solution_map_sizeX = Mode.sol.MassFlowRatio.size();
             int solution_map_sizeY = Mode.sol.OutdoorAirFraction.size();
 
-            // Check that in this mode the //Outdoor Air Relative Humidity(0 - 100 % )	//Outdoor Air Humidity Ratio(g / g)//Outdoor Air
+            // Check that in this mode the //Outdoor Air Relative Humidity(0 - 100 % )    //Outdoor Air Humidity Ratio(g / g)//Outdoor Air
             // Temperature(degC)
             if (Mode.MeetsOAEnvConstraints(StepIns.Tosa, Wosa, 100 * StepIns.RHosa)) {
                 EnvironmentConditionsMet = EnvironmentConditionsMetOnce = true;
