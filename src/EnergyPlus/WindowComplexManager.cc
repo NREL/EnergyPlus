@@ -278,7 +278,7 @@ namespace WindowComplexManager {
             // Tilt = WindowList( IWind ).Tilt;
             // Get the number of back surfaces for this window
             BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf; // ShadowComb is organized by base surface
-            int NBkSurf = ShadowComb(BaseSurf).NumBackSurf;
+            int NBkSurf = state.dataShadowComb->ShadowComb(BaseSurf).NumBackSurf;
             state.dataBSDFWindow->ComplexWind(ISurf).NBkSurf = NBkSurf;
             // Define the back surface directions
             state.dataBSDFWindow->ComplexWind(ISurf).sWinSurf.allocate(NBkSurf);
@@ -286,7 +286,7 @@ namespace WindowComplexManager {
             // Define the unit vectors pointing from the window center to the back surface centers
             for (int KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf) {
                 BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf;             // ShadowComb is organized by base surface
-                int JSurf = ShadowComb(BaseSurf).BackSurf(KBkSurf); // these are all proper back surfaces
+                int JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf); // these are all proper back surfaces
                 V = state.dataSurface->Surface(JSurf).Centroid - state.dataSurface->Surface(ISurf).Centroid;
                 VLen = magnitude(V);
                 // Define the unit vector from the window center to the back
@@ -796,7 +796,7 @@ namespace WindowComplexManager {
         RegWinIndex.allocate(Window.NBkSurf);
         for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) {
             BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf; // ShadowComb is organized by base surface
-            JSurf = ShadowComb(BaseSurf).BackSurf(KBkSurf);
+            JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
             if (state.dataSurface->SurfWinWindowModelType(JSurf) == WindowBSDFModel) continue;
             if (!(state.dataSurface->Surface(JSurf).Class == SurfaceClass::Window || state.dataSurface->Surface(JSurf).Class == SurfaceClass::GlassDoor)) continue;
             if (!(state.dataSurface->Surface(JSurf).HeatTransSurf && state.dataSurface->Surface(JSurf).ExtBoundCond == ExternalEnvironment && state.dataSurface->Surface(JSurf).ExtSolar)) continue;
@@ -1514,7 +1514,7 @@ namespace WindowComplexManager {
             //  Insert treatment of intersection & reflection from interior reveals here
             for (KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf) {  // back surf loop
                 BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf;             // ShadowComb is organized by base surface
-                JSurf = ShadowComb(BaseSurf).BackSurf(KBkSurf); // these are all proper back surfaces
+                JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf); // these are all proper back surfaces
                 PierceSurface(state, JSurf, state.dataSurface->Surface(ISurf).Centroid, Geom.sTrn(IRay), HitPt, hit);
                 if (!hit) continue; // Miss: Try next surface
                 if (TotHits == 0) {
@@ -1837,7 +1837,7 @@ namespace WindowComplexManager {
         if (!allocated(State.BkSurf)) State.BkSurf.allocate(Window.NBkSurf);
         for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) { // back surface loop
             BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf;                   // ShadowComb is organized by base surface
-            JSurf = ShadowComb(BaseSurf).BackSurf(KBkSurf);
+            JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
             if (state.dataSurface->SurfWinWindowModelType(JSurf) != WindowBSDFModel) continue;
 
             //  Directional-hemispherical back reflectance

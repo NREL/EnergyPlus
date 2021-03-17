@@ -752,7 +752,7 @@ namespace EnergyPlus::DXCoils {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetDXCoils: "); // include trailing blank space
-        static Real64 const minOATCompDXCooling = -25.0;      // min OAT for compressor operation for DX cooling coils
+        constexpr Real64 minOATCompDXCooling = -25.0;      // min OAT for compressor operation for DX cooling coils
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DXCoilIndex;                 // loop index
@@ -768,7 +768,7 @@ namespace EnergyPlus::DXCoils {
         int NumAlphas2;                  // Number of alphas in input for performance object
         int NumNumbers2;                 // Number of numeric items in input for performance object
         int IOStatus;                    // Input status returned from GetObjectItem
-        static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);         // Set to true if errors in input, fatal at end of routine
         int DXHPWaterHeaterCoilNum;      // Loop index for 1,NumDXHeatPumpWaterHeaterCoils
         int CapacityStageNum;            // Loop index for 1,Number of capacity stages
         int DehumidModeNum;              // Loop index for 1,Number of enhanced dehumidification modes
@@ -788,9 +788,9 @@ namespace EnergyPlus::DXCoils {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int MaxNumbers(0);        // Maximum number of numeric input fields
-        static int MaxAlphas(0);         // Maximum number of alpha input fields
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
+        int MaxNumbers(0);               // Maximum number of numeric input fields
+        int MaxAlphas(0);                // Maximum number of alpha input fields
+        int TotalArgs(0);                // Total number of alpha and numeric arguments (max) for a
         //   certain object in the input file
         Real64 MinCurveVal; // used for testing PLF curve output
         Real64 MinCurvePLR; // used for testing PLF curve output
@@ -5943,7 +5943,7 @@ namespace EnergyPlus::DXCoils {
         Real64 RatedHeatPumpIndoorHumRat;  // Inlet humidity ratio to heat pump evaporator at rated conditions [kgWater/kgDryAir]
         Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
         Real64 HPInletAirHumRat;           // Rated inlet air humidity ratio for heat pump water heater [kgWater/kgDryAir]
-        static bool ErrorsFound(false);    // TRUE when errors found
+        bool ErrorsFound(false);           // TRUE when errors found
         int CapacityStageNum;              // Loop index for 1,Number of capacity stages
         int DehumidModeNum;                // Loop index for 1,Number of enhanced dehumidification modes
         int Mode;                          // Performance mode for MultiMode DX coil; Always 1 for other coil types
@@ -6175,7 +6175,7 @@ namespace EnergyPlus::DXCoils {
                 RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp, state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
-                coilSelectionReportObj->setRatedCoilConditions(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(state,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate, // this is the report variable
@@ -6330,7 +6330,7 @@ namespace EnergyPlus::DXCoils {
                 RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp, state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
-                coilSelectionReportObj->setRatedCoilConditions(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(state,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).TotalHeatingEnergyRate, // this is the report variable
@@ -6474,7 +6474,7 @@ namespace EnergyPlus::DXCoils {
             // store fan info for coil
             if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex > -1) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
@@ -6484,7 +6484,7 @@ namespace EnergyPlus::DXCoils {
 
             } else {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
@@ -13371,7 +13371,7 @@ namespace EnergyPlus::DXCoils {
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 Real64 ratedSensCap(0.0);
                 ratedSensCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) * state.dataDXCoils->DXCoil(DXCoilNum).RatedSHR(1);
-                coilSelectionReportObj->setCoilFinalSizes(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state,
                                                           state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                           state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                           state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1),
@@ -15165,14 +15165,14 @@ namespace EnergyPlus::DXCoils {
             state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum = SupplyFan_TypeNum;
             if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex > -1) {
                 if (SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                  HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->name,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                 } else {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                  state.dataFans->Fan(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex).FanName,

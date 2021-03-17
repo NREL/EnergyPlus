@@ -5101,7 +5101,7 @@ namespace EnergyPlus::OutputReportTabular {
             if (ort->displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
             if (ort->displayVisualResilienceSummary) WriteVisualResilienceTables(state);
 
-            coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
+            state.dataRptCoilSelection->coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables(state);                                // moved to come after zone load components is finished
 
             if (state.dataGlobal->DoWeathSim) {
@@ -7556,7 +7556,7 @@ namespace EnergyPlus::OutputReportTabular {
                 ort->gatherElecSurplusSold /= largeConversionFactor;
 
                 // get change in overall state of charge for electrical storage devices.
-                if (facilityElectricServiceObj->numElecStorageDevices > 0) {
+                if (state.dataElectPwrSvcMgr->facilityElectricServiceObj->numElecStorageDevices > 0) {
                     // All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not
                     // necessary OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum(
                     // ElecStorage.ThisTimeStepStateOfCharge() ) ) + gatherElecStorage;
@@ -12270,22 +12270,22 @@ namespace EnergyPlus::OutputReportTabular {
         if (ort->displaySurfaceShadowing) {
             numreceivingfields = 0;
             for (HTS = 1; HTS <= state.dataSurface->TotSurfaces; ++HTS) {
-                numreceivingfields += ShadowComb(HTS).NumGenSurf;
-                numreceivingfields += ShadowComb(HTS).NumSubSurf;
+                numreceivingfields += state.dataShadowComb->ShadowComb(HTS).NumGenSurf;
+                numreceivingfields += state.dataShadowComb->ShadowComb(HTS).NumSubSurf;
             }
 
             state.dataOutRptPredefined->ShadowRelate.allocate(numreceivingfields);
             state.dataOutRptPredefined->numShadowRelate = 0;
             for (HTS = 1; HTS <= state.dataSurface->TotSurfaces; ++HTS) {
-                for (NGSS = 1; NGSS <= ShadowComb(HTS).NumGenSurf; ++NGSS) {
+                for (NGSS = 1; NGSS <= state.dataShadowComb->ShadowComb(HTS).NumGenSurf; ++NGSS) {
                     ++state.dataOutRptPredefined->numShadowRelate;
-                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).GenSurf(NGSS);
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = state.dataShadowComb->ShadowComb(HTS).GenSurf(NGSS);
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSurface;
                 }
-                for (NGSS = 1; NGSS <= ShadowComb(HTS).NumSubSurf; ++NGSS) {
+                for (NGSS = 1; NGSS <= state.dataShadowComb->ShadowComb(HTS).NumSubSurf; ++NGSS) {
                     ++state.dataOutRptPredefined->numShadowRelate;
-                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).SubSurf(NGSS);
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = state.dataShadowComb->ShadowComb(HTS).SubSurf(NGSS);
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSubsurface;
                 }
@@ -13198,7 +13198,7 @@ namespace EnergyPlus::OutputReportTabular {
                                                        surfDelaySeqCool);
                         CollectPeakZoneConditions(state, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                         // send latent load info to coil summary report
-                        coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
+                        state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
 
                         heatDesSelected = state.dataSize->CalcFinalZoneSizing(iZone).HeatDDNum;
                         ZoneHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
@@ -13234,7 +13234,7 @@ namespace EnergyPlus::OutputReportTabular {
                         CollectPeakZoneConditions(state, ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
 
                         // send latent load info to coil summary report
-                        coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
+                        state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
 
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneCoolCompLoadTables(iZone));
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneHeatCompLoadTables(iZone));
@@ -13944,7 +13944,7 @@ namespace EnergyPlus::OutputReportTabular {
                     compLoad.peakDateHrMin = format("{}/{} {}",
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).Month,
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
-                                                    coilSelectionReportObj->getTimeText(state, timeOfMax));
+                                                    state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
                 } else {
                     compLoad.peakDateHrMin = state.dataSize->CoolPeakDateHrMin(zoneIndex);
                 }
@@ -13998,7 +13998,7 @@ namespace EnergyPlus::OutputReportTabular {
                     compLoad.peakDateHrMin = format("{}/{} {}",
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).Month,
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
-                                                    coilSelectionReportObj->getTimeText(state, timeOfMax));
+                                                    state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
                 } else {
                     compLoad.peakDateHrMin = state.dataSize->HeatPeakDateHrMin(zoneIndex);
                 }

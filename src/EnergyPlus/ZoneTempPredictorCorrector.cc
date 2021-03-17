@@ -4332,8 +4332,6 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // for BLAST.
 
         // Using/Aliasing
-        using DataSurfaces::HeatTransferModel_EMPD;
-        using DataSurfaces::HeatTransferModel_HAMT;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -4528,7 +4526,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             bool no_ht_EMPD_or_HAMT(true);
             for (int i = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst, e = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
                 auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
-                if ((htAlgo == HeatTransferModel_EMPD) || (htAlgo == HeatTransferModel_HAMT)) {
+                if ((htAlgo == DataSurfaces::iHeatTransferModel::EMPD) || (htAlgo == DataSurfaces::iHeatTransferModel::HAMT)) {
                     no_ht_EMPD_or_HAMT = false;
                     break;
                 }
@@ -5366,8 +5364,6 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // for BLAST.
 
         // Using/Aliasing
-        using DataSurfaces::HeatTransferModel_EMPD;
-        using DataSurfaces::HeatTransferModel_HAMT;
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -5473,7 +5469,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         bool no_ht_EMPD_or_HAMT(true);
         for (int i = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst, e = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
             auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
-            if ((htAlgo == HeatTransferModel_EMPD) || (htAlgo == HeatTransferModel_HAMT)) {
+            if ((htAlgo == DataSurfaces::iHeatTransferModel::EMPD) || (htAlgo == DataSurfaces::iHeatTransferModel::HAMT)) {
                 no_ht_EMPD_or_HAMT = false;
                 break;
             }
@@ -6605,7 +6601,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * Area * (state.dataHeatBalSurf->TempSurfInTmp(SurfNum) - RefAirTemp);
 
             // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                 state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyM += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyM;
                 state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyH += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyF;
             }

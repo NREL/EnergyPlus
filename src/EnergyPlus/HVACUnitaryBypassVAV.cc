@@ -333,11 +333,11 @@ namespace HVACUnitaryBypassVAV {
         std::string CompSetCoolInlet;       // Used in SetUpCompSets call
         std::string CompSetFanOutlet;       // Used in SetUpCompSets call
         std::string CompSetCoolOutlet;      // Used in SetUpCompSets call
-        static bool ErrorsFound(false);     // Set to true if errors in input, fatal at end of routine
-        static bool DXErrorsFound(false);   // Set to true if errors in get coil input
-        static bool FanErrFlag(false);      // Error flag returned during CALL to GetFanType
-        static bool errFlag(false);         // Error flag returned during CALL to mining functions
-        Array1D_int OANodeNums(4);          // Node numbers of OA mixer (OA, EA, RA, MA)
+        bool ErrorsFound(false);            // Set to true if errors in input, fatal at end of routine
+        bool DXErrorsFound(false);          // Set to true if errors in get coil input
+        bool FanErrFlag(false);             // Error flag returned during CALL to GetFanType
+        bool errFlag(false);                // Error flag returned during CALL to mining functions
+        Array1D_int OANodeNums(4);        // Node numbers of OA mixer (OA, EA, RA, MA)
         std::string HXDXCoolCoilName;       // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
         std::string MixerInletNodeName;     // Name of mixer inlet node
         std::string SplitterOutletNodeName; // Name of splitter outlet node
@@ -1237,7 +1237,6 @@ namespace HVACUnitaryBypassVAV {
 
         if (ErrorsFound) {
             ShowFatalError(state, "GetCBVAV: Errors found in getting " + CurrentModuleObject + " input.");
-            ShowContinueError(state, "... Preceding condition causes termination.");
         }
 
         for (int CBVAVNum = 1; CBVAVNum <= NumCBVAV; ++CBVAVNum) {
@@ -1384,17 +1383,13 @@ namespace HVACUnitaryBypassVAV {
         static std::string const RoutineName("InitCBVAV");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);     // Initialization flag
-        static Array1D_bool MyEnvrnFlag;     // Used for initializations each begin environment flag
-        static Array1D_bool MySizeFlag;      // Used for sizing CBVAV inputs one time
-        static Array1D_bool MyPlantScanFlag; // Used for initializations plant component for heating coils
-        Real64 QSensUnitOut;                 // Output of CBVAV system with coils off
-        Real64 OutsideAirMultiplier;         // Outside air multiplier schedule (= 1.0 if no schedule)
-        static bool EMSSetPointCheck(false); // local temporary
-        static bool ErrorsFound(false);      // Set to true if errors in input, fatal at end of routine
-        Real64 QCoilActual;                  // actual CBVAV steam heating coil load met (W)
-        bool ErrorFlag;                      // local error flag returned from data mining
-        Real64 mdot;                         // heating coil fluid mass flow rate, kg/s
+        Real64 QSensUnitOut;          // Output of CBVAV system with coils off
+        Real64 OutsideAirMultiplier;  // Outside air multiplier schedule (= 1.0 if no schedule)
+        bool EMSSetPointCheck(false); // local temporary
+        bool ErrorsFound(false);      // Set to true if errors in input, fatal at end of routine
+        Real64 QCoilActual;           // actual CBVAV steam heating coil load met (W)
+        bool ErrorFlag;               // local error flag returned from data mining
+        Real64 mdot;                  // heating coil fluid mass flow rate, kg/s
 
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
         auto &NumCBVAV(state.dataHVACUnitaryBypassVAV->NumCBVAV);
@@ -1403,23 +1398,23 @@ namespace HVACUnitaryBypassVAV {
         int OutNode = CBVAV(CBVAVNum).AirOutNode;
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (state.dataHVACUnitaryBypassVAV->MyOneTimeFlag) {
 
-            MyEnvrnFlag.allocate(NumCBVAV);
-            MySizeFlag.allocate(NumCBVAV);
-            MyPlantScanFlag.allocate(NumCBVAV);
-            MyEnvrnFlag = true;
-            MySizeFlag = true;
-            MyPlantScanFlag = true;
+            state.dataHVACUnitaryBypassVAV->MyEnvrnFlag.allocate(NumCBVAV);
+            state.dataHVACUnitaryBypassVAV->MySizeFlag.allocate(NumCBVAV);
+            state.dataHVACUnitaryBypassVAV->MyPlantScanFlag.allocate(NumCBVAV);
+            state.dataHVACUnitaryBypassVAV->MyEnvrnFlag = true;
+            state.dataHVACUnitaryBypassVAV->MySizeFlag = true;
+            state.dataHVACUnitaryBypassVAV->MyPlantScanFlag = true;
 
-            MyOneTimeFlag = false;
+            state.dataHVACUnitaryBypassVAV->MyOneTimeFlag = false;
             // speed up test based on code from 16 years ago to correct cycling fan economizer defect
             // see https://github.com/NREL/EnergyPlusArchive/commit/a2202f8a168fd0330bf3a45392833405e8bd08f2
             // This test sets simple flag so air loop doesn't iterate twice each pass (reverts above change)
             // AirLoopControlInfo(AirLoopNum).Simple = true;
         }
 
-        if (MyPlantScanFlag(CBVAVNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) ||
                 (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam)) {
                 if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
@@ -1493,16 +1488,16 @@ namespace HVACUnitaryBypassVAV {
                                                      .Branch(CBVAV(CBVAVNum).BranchNum)
                                                      .Comp(CBVAV(CBVAVNum).CompNum)
                                                      .NodeNumOut;
-                MyPlantScanFlag(CBVAVNum) = false;
+                state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) = false;
 
             } else { // CBVAV is not connected to plant
-                MyPlantScanFlag(CBVAVNum) = false;
+                state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) = false;
             }
-        } else if (MyPlantScanFlag(CBVAVNum) && !state.dataGlobal->AnyPlantInModel) {
-            MyPlantScanFlag(CBVAVNum) = false;
+        } else if (state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) && !state.dataGlobal->AnyPlantInModel) {
+            state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(CBVAVNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataHVACUnitaryBypassVAV->MySizeFlag(CBVAVNum)) {
             SizeCBVAV(state, CBVAVNum);
             // Pass the fan cycling schedule index up to the air loop. Set the air loop unitary system flag.
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr = CBVAV(CBVAVNum).FanOpModeSchedPtr;
@@ -1512,11 +1507,11 @@ namespace HVACUnitaryBypassVAV {
             // check for set point manager on outlet node of CBVAV
             CBVAV(CBVAVNum).OutNodeSPMIndex = SetPointManager::getSPMBasedOnNode(
                 state, OutNode, SetPointManager::iCtrlVarType::Temp, SetPointManager::SetPointManagerType::MixedAir, SetPointManager::CtrlNodeType::reference);
-            MySizeFlag(CBVAVNum) = false;
+            state.dataHVACUnitaryBypassVAV->MySizeFlag(CBVAVNum) = false;
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CBVAVNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataHVACUnitaryBypassVAV->MyEnvrnFlag(CBVAVNum)) {
             int MixerOutsideAirNode = CBVAV(CBVAVNum).MixerOutsideAirNode;
             Real64 RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
@@ -1540,7 +1535,7 @@ namespace HVACUnitaryBypassVAV {
             state.dataLoopNodes->Node(OutNode).HumRat = state.dataLoopNodes->Node(InNode).HumRat;
             state.dataLoopNodes->Node(OutNode).Enthalpy = state.dataLoopNodes->Node(InNode).Enthalpy;
             state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerReliefAirNode) = state.dataLoopNodes->Node(MixerOutsideAirNode);
-            MyEnvrnFlag(CBVAVNum) = false;
+            state.dataHVACUnitaryBypassVAV->MyEnvrnFlag(CBVAVNum) = false;
             CBVAV(CBVAVNum).LastMode = HeatingMode;
             CBVAV(CBVAVNum).changeOverTimer = -1.0;
             //   set fluid-side hardware limits
@@ -1600,7 +1595,7 @@ namespace HVACUnitaryBypassVAV {
         }     // end one time inits
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(CBVAVNum) = true;
+            state.dataHVACUnitaryBypassVAV->MyEnvrnFlag(CBVAVNum) = true;
         }
 
         // IF CBVAV system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than CBVAV flow rates
