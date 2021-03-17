@@ -585,7 +585,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
     Real64 outrh = Psychrometrics::PsyRhFnTdbWPb(state, outtdb, outw, outp);
 
     if (outrh >= 1.0) {
-        ShowWarningError(state, "For object = " + this->object_name + ", name = \"" + this->name + "\"");
+        ShowWarningError(state, RoutineName + ": For object = " + this->object_name + ", name = \"" + this->name + "\"");
         ShowContinueError(state, "Calculated outlet air relative humidity greater than 1. The combination of");
         ShowContinueError(state, "rated air volume flow rate, total cooling capacity and sensible heat ratio yields coil exiting");
         ShowContinueError(state, "air conditions above the saturation curve. Possible fixes are to reduce the rated total cooling");
@@ -612,8 +612,9 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
             outtdb = outletAirTempSat + 0.005;
             outw = Psychrometrics::PsyWFnTdbH(state, outtdb, outh, RoutineName);
             Real64 adjustedSHR = (Psychrometrics::PsyHFnTdbW(tdb, outw) - outh) / deltaH;
-            ShowWarningError(state, RoutineName + object_name + " \"" + name +
-                             "\", SHR adjusted to achieve valid outlet air properties and the simulation continues.");
+            ShowWarningError(state,
+                             RoutineName + object_name + " \"" + name +
+                                 "\", SHR adjusted to achieve valid outlet air properties and the simulation continues.");
             ShowContinueError(state, format("Initial SHR = {:.5R}", this->grossRatedSHR));
             ShowContinueError(state, format("Adjusted SHR = {:.5R}", adjustedSHR));
         }
