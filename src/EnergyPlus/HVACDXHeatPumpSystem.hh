@@ -194,6 +194,22 @@ struct HVACDXHeatPumpSystemData : BaseGlobalStruct {
     bool ErrorsFound = false;    // If errors detected in input
     int TotalArgs = 0;           // Total number of alpha and numeric arguments (max) for a certain object in the input file
     bool MySetPointCheckFlag = true;
+    int SpeedNum = 1;                   // speed number of variable speed DX cooling coil
+    Real64 QZnReq = 0.001;              // Zone load (W), input to variable-speed DX coil
+    Real64 QLatReq = 0.0;               // Zone latent load, input to variable-speed DX coil
+    Real64 MaxONOFFCyclesperHour = 4.0; // Maximum cycling rate of heat pump [cycles/hr]
+    Real64 HPTimeConstant = 0.0;        // Heat pump time constant [s]
+    Real64 FanDelayTime = 0.0;          // Fan delay time, time delay for the HP's fan to
+    Real64 OnOffAirFlowRatio = 1.0;     // ratio of compressor on flow to average flow over time step
+    Real64 SpeedRatio = 0.0;            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+    int SpeedNumber = 1;                // speed number of variable speed DX cooling coil
+    Real64 QZoneReq = 0.001;            // Zone load (W), input to variable-speed DX coil
+    Real64 QLatentReq = 0.0;            // Zone latent load, input to variable-speed DX coil
+    Real64 MaxONOFFCyclesperHr = 4.0;   // Maximum cycling rate of heat pump [cycles/hr]
+    Real64 HPTimeConst = 0.0;           // Heat pump time constant [s]
+    Real64 HPFanDelayTime = 0.0;        // Fan delay time, time delay for the HP's fan to
+    Real64 AirFlowOnOffRatio = 1.0;     // ratio of compressor on flow to average flow over time step
+    Real64 SpeedPartLoadRatio = 1.0;    // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
     void clear_state() override
     {
@@ -211,6 +227,22 @@ struct HVACDXHeatPumpSystemData : BaseGlobalStruct {
         this->ErrorsFound = false;
         this->TotalArgs = 0;
         this->MySetPointCheckFlag = true;
+        this->SpeedNum = 1;
+        this->QZnReq = 0.001;
+        this->QLatReq = 0.0;
+        this->MaxONOFFCyclesperHour = 4.0;
+        this->HPTimeConstant = 0.0;
+        this->FanDelayTime = 0.0;
+        this->OnOffAirFlowRatio = 1.0;
+        this->SpeedRatio = 0.0;
+        this->SpeedNumber = 1;
+        this->QZoneReq = 0.001;
+        this->QLatentReq = 0.0;
+        this->MaxONOFFCyclesperHr = 4.0;
+        this->HPTimeConst = 0.0;
+        this->HPFanDelayTime = 0.0;
+        this->AirFlowOnOffRatio = 1.0;
+        this->SpeedPartLoadRatio = 1.0; 
     }
 };
 
