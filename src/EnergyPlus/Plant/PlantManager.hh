@@ -111,11 +111,27 @@ struct PlantMgrData : BaseGlobalStruct {
 
     bool InitLoopEquip = true;
     bool GetCompSizFac = true;
+    bool SupplyEnvrnFlag = true;
+    bool MySetPointCheckFlag = true;
+    Array1D_bool PlantLoopSetPointInitFlag;
+    bool MyEnvrnFlag = true;
+    int OtherLoopCallingIndex = 0;
+    int OtherLoopDemandSideCallingIndex = 0;
+    int NewOtherDemandSideCallingIndex = 0;
+    int newCallingIndex = 0;
 
     void clear_state() override
     {
         this->InitLoopEquip = true;
         this->GetCompSizFac = true;
+        this->SupplyEnvrnFlag = true;
+        this->MySetPointCheckFlag = true;
+        this->PlantLoopSetPointInitFlag.clear();
+        this->MyEnvrnFlag = true;
+        this->OtherLoopCallingIndex = 0;
+        this->OtherLoopDemandSideCallingIndex = 0;
+        this->NewOtherDemandSideCallingIndex = 0;
+        this->newCallingIndex = 0;
     }
 };
 

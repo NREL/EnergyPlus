@@ -763,16 +763,16 @@ namespace EnergyPlus::PlantManager {
 
             std::string LoopIdentifier;
 
-            static Array1D_string BranchNames;     // Branch names from GetBranchList call
-            static Array1D_string CompTypes;       // Branch names from GetBranchList call
-            static Array1D_string CompNames;       // Branch names from GetBranchList call
-            static Array1D_int CompCtrls;          // Branch names from GetBranchList call
-            static Array1D_string InletNodeNames;  // Node names from GetBranchData call
-            static Array1D_string OutletNodeNames; // Node names from GetBranchData call
-            static Array1D_int InletNodeNumbers;   // Node numbers from GetBranchData call
-            static Array1D_int OutletNodeNumbers;  // Node numbers from GetBranchData call
-            static Array1D_bool SplitOutBranch;
-            static Array1D_bool MixerInBranch;
+            Array1D_string BranchNames;     // Branch names from GetBranchList call
+            Array1D_string CompTypes;       // Branch names from GetBranchList call
+            Array1D_string CompNames;       // Branch names from GetBranchList call
+            Array1D_int CompCtrls;          // Branch names from GetBranchList call
+            Array1D_string InletNodeNames;  // Node names from GetBranchData call
+            Array1D_string OutletNodeNames; // Node names from GetBranchData call
+            Array1D_int InletNodeNumbers;   // Node numbers from GetBranchData call
+            Array1D_int OutletNodeNumbers;  // Node numbers from GetBranchData call
+            Array1D_bool SplitOutBranch;
+            Array1D_bool MixerInBranch;
             bool errFlag;
             int LoopNumInArray;
 
@@ -2090,16 +2090,11 @@ namespace EnergyPlus::PlantManager {
             bool ErrorsFound(false);
             bool FinishSizingFlag;
 
-            static bool SupplyEnvrnFlag(true);
-            static bool MySetPointCheckFlag(true);
-
-            static Array1D_bool PlantLoopSetPointInitFlag;
-
             int HalfLoopNum;
             int passNum;
 
-            if (!allocated(PlantLoopSetPointInitFlag)) {
-                PlantLoopSetPointInitFlag.allocate(state.dataPlnt->TotNumLoops);
+            if (!allocated(state.dataPlantMgr->PlantLoopSetPointInitFlag)) {
+                state.dataPlantMgr->PlantLoopSetPointInitFlag.allocate(state.dataPlnt->TotNumLoops);
             }
 
             // Initialize the setpoints  for Load range based schemes only as determined by the init flag
@@ -2123,7 +2118,7 @@ namespace EnergyPlus::PlantManager {
             //*****************************************************************
             // ONE TIME LOOP NODE SETPOINT CHECK
             //*****************************************************************
-            if (MySetPointCheckFlag && DoSetPointTest) {
+            if (state.dataPlantMgr->MySetPointCheckFlag && DoSetPointTest) {
 
                 // check for missing setpoints
                 for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
@@ -2154,7 +2149,7 @@ namespace EnergyPlus::PlantManager {
                         }
                     }
                 }
-                MySetPointCheckFlag = false;
+                state.dataPlantMgr->MySetPointCheckFlag = false;
             }
             //*****************************************************************
             // END ONE TIME LOOP NODE SETPOINT CHECK
@@ -2302,7 +2297,7 @@ namespace EnergyPlus::PlantManager {
             //*****************************************************************
             // BEGIN ONE TIME ENVIRONMENT INITS
             //*****************************************************************
-            if (SupplyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
+            if (state.dataPlantMgr->SupplyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
                 for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
@@ -2379,12 +2374,12 @@ namespace EnergyPlus::PlantManager {
                     }
                 }
 
-                SupplyEnvrnFlag = false;
+                state.dataPlantMgr->SupplyEnvrnFlag = false;
                 //!*****************************************************************
                 // !END OF ONE TIME ENVIRONMENT INITS
                 //!*****************************************************************
             } //
-            if (!state.dataGlobal->BeginEnvrnFlag) SupplyEnvrnFlag = true;
+            if (!state.dataGlobal->BeginEnvrnFlag) state.dataPlantMgr->SupplyEnvrnFlag = true;
 
             if (ErrorsFound) ShowFatalError(state, "Preceding errors caused termination");
         }
@@ -2429,7 +2424,7 @@ namespace EnergyPlus::PlantManager {
             int BranchInlet;     // branch inlet node number
             int ComponentInlet;  // component inlet node number
             int ComponentOutlet; // component outlet node number
-            static bool MyEnvrnFlag(true);
+
             Real64 LoopMinMassFlowRate; // minimum allowable loop mass flow rate
             Real64 SteamDensity;
             Real64 SteamTemp;
@@ -2443,7 +2438,7 @@ namespace EnergyPlus::PlantManager {
             // BEGIN ENVIRONMENT INITS
             //*****************************************************************
 
-            if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
+            if (state.dataPlantMgr->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
                 for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
@@ -2600,13 +2595,13 @@ namespace EnergyPlus::PlantManager {
                     loop.OutletNodeTemperature = 0.0;
                 }
 
-                MyEnvrnFlag = false;
+                state.dataPlantMgr->MyEnvrnFlag = false;
                 //*****************************************************************
                 // END OF ENVIRONMENT INITS
                 //*****************************************************************
             }
 
-            if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag = true;
+            if (!state.dataGlobal->BeginEnvrnFlag) state.dataPlantMgr->MyEnvrnFlag = true;
 
             // FirstHVACiteration inits
             for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
@@ -3405,10 +3400,7 @@ namespace EnergyPlus::PlantManager {
             int LoopSideNum;
             int OtherLoopNum;
             int OtherLoopSideNum;
-            static int OtherLoopCallingIndex(0);
-            static int OtherLoopDemandSideCallingIndex(0);
-            static int NewOtherDemandSideCallingIndex(0);
-            static int newCallingIndex(0);
+
             bool thisLoopPutsDemandOnAnother;
             int ConnctNum;
 
@@ -3422,41 +3414,41 @@ namespace EnergyPlus::PlantManager {
                          ConnctNum <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected); ++ConnctNum) {
                         OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopNum;
                         OtherLoopSideNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopSideNum;
-                        OtherLoopCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum, OtherLoopSideNum);
+                        state.dataPlantMgr->OtherLoopCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum, OtherLoopSideNum);
 
                         thisLoopPutsDemandOnAnother = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(
                                 ConnctNum).LoopDemandsOnRemote;
                         if (thisLoopPutsDemandOnAnother) {             // make sure this loop side is called before the other loop side
-                            if (OtherLoopCallingIndex < HalfLoopNum) { // rearrange
-                                newCallingIndex = min(HalfLoopNum + 1, state.dataPlnt->TotNumHalfLoops);
-                                ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
+                            if (state.dataPlantMgr->OtherLoopCallingIndex < HalfLoopNum) { // rearrange
+                                state.dataPlantMgr->newCallingIndex = min(HalfLoopNum + 1, state.dataPlnt->TotNumHalfLoops);
+                                ShiftPlantLoopSideCallingOrder(state,  state.dataPlantMgr->OtherLoopCallingIndex, state.dataPlantMgr->newCallingIndex);
                             }
 
                         } else {                                       // make sure the other is called before this one
-                            if (OtherLoopCallingIndex > HalfLoopNum) { // rearrange
-                                newCallingIndex = max(HalfLoopNum, 1);
+                            if (state.dataPlantMgr->OtherLoopCallingIndex > HalfLoopNum) { // rearrange
+                                state.dataPlantMgr->newCallingIndex = max(HalfLoopNum, 1);
 
                                 if (OtherLoopSideNum ==
                                     SupplySide) { // if this is a supplyside, don't push it before its own demand side
-                                    OtherLoopDemandSideCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum,
+                                    state.dataPlantMgr->OtherLoopDemandSideCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum,
                                                                                                  DemandSide);
-                                    if (OtherLoopDemandSideCallingIndex <
+                                    if (state.dataPlantMgr->OtherLoopDemandSideCallingIndex <
                                         HalfLoopNum) {                             // good to go
-                                        newCallingIndex = min(OtherLoopDemandSideCallingIndex + 1,
+                                        state.dataPlantMgr->newCallingIndex = min(state.dataPlantMgr->OtherLoopDemandSideCallingIndex + 1,
                                                               state.dataPlnt->TotNumHalfLoops); // put it right after its demand side
-                                        ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
+                                        ShiftPlantLoopSideCallingOrder(state,  state.dataPlantMgr->OtherLoopCallingIndex, state.dataPlantMgr->newCallingIndex);
                                     } else { // move both sides of other loop before this, keeping demand side in front
-                                        NewOtherDemandSideCallingIndex = max(HalfLoopNum, 1);
-                                        ShiftPlantLoopSideCallingOrder(state,  OtherLoopDemandSideCallingIndex,
-                                                                       NewOtherDemandSideCallingIndex);
+                                        state.dataPlantMgr->NewOtherDemandSideCallingIndex = max(HalfLoopNum, 1);
+                                        ShiftPlantLoopSideCallingOrder(state,  state.dataPlantMgr->OtherLoopDemandSideCallingIndex,
+                                                                       state.dataPlantMgr->NewOtherDemandSideCallingIndex);
                                         // get fresh pointer after it has changed in previous call
-                                        OtherLoopCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum,
+                                        state.dataPlantMgr->OtherLoopCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum,
                                                                                            OtherLoopSideNum);
-                                        newCallingIndex = NewOtherDemandSideCallingIndex + 1;
-                                        ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
+                                        state.dataPlantMgr->newCallingIndex = state.dataPlantMgr->NewOtherDemandSideCallingIndex + 1;
+                                        ShiftPlantLoopSideCallingOrder(state,  state.dataPlantMgr->OtherLoopCallingIndex, state.dataPlantMgr->newCallingIndex);
                                     }
                                 } else {
-                                    ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
+                                    ShiftPlantLoopSideCallingOrder(state,  state.dataPlantMgr->OtherLoopCallingIndex, state.dataPlantMgr->newCallingIndex);
                                 }
                             }
                         }

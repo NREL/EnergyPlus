@@ -97,7 +97,6 @@ namespace HeatBalFiniteDiffManager {
     //    involving latent heat, Simulation, Vol 18, No. 2, February 1972
 
     // Using/Aliasing
-    using namespace DataMoistureBalance;
     using DataHeatBalance::Air;
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalSurface::MinSurfaceTempLimit;
@@ -513,17 +512,17 @@ namespace HeatBalFiniteDiffManager {
                 SurfaceFD(SurfNum).PhaseChangeStateOldOld = 0;
                 SurfaceFD(SurfNum).PhaseChangeTemperatureReverse = 50;
 
-                TempOutsideAirFD(SurfNum) = 0.0;
-                RhoVaporAirOut(SurfNum) = 0.0;
-                RhoVaporSurfIn(SurfNum) = 0.0;
-                RhoVaporAirIn(SurfNum) = 0.0;
-                HConvExtFD(SurfNum) = 0.0;
-                HMassConvExtFD(SurfNum) = 0.0;
-                HConvInFD(SurfNum) = 0.0;
-                HMassConvInFD(SurfNum) = 0.0;
-                HSkyFD(SurfNum) = 0.0;
-                HGrndFD(SurfNum) = 0.0;
-                HAirFD(SurfNum) = 0.0;
+                state.dataMstBal->TempOutsideAirFD(SurfNum) = 0.0;
+                state.dataMstBal->RhoVaporAirOut(SurfNum) = 0.0;
+                state.dataMstBal->RhoVaporSurfIn(SurfNum) = 0.0;
+                state.dataMstBal->RhoVaporAirIn(SurfNum) = 0.0;
+                state.dataMstBal->HConvExtFD(SurfNum) = 0.0;
+                state.dataMstBal->HMassConvExtFD(SurfNum) = 0.0;
+                state.dataMstBal->HConvInFD(SurfNum) = 0.0;
+                state.dataMstBal->HMassConvInFD(SurfNum) = 0.0;
+                state.dataMstBal->HSkyFD(SurfNum) = 0.0;
+                state.dataMstBal->HGrndFD(SurfNum) = 0.0;
+                state.dataMstBal->HAirFD(SurfNum) = 0.0;
             }
             WarmupSurfTemp = 0;
             MyEnvrnFlag = false;
@@ -1197,7 +1196,7 @@ namespace HeatBalFiniteDiffManager {
 
         TempSurfOutTmp = TDT(1);
         TempSurfInTmp = TDT(TotNodes + 1);
-        RhoVaporSurfIn(Surf) = 0.0;
+        state.dataMstBal->RhoVaporSurfIn(Surf) = 0.0;
 
         // For ground surfaces or when raining, outside face inner half-node heat capacity was unknown and set to -1 in ExteriorBCEqns
         // Now check for the flag and set equal to the second node's outer half-node heat capacity if needed
@@ -1460,8 +1459,8 @@ namespace HeatBalFiniteDiffManager {
         }
 
         if (surface_ExtBoundCond == Ground || state.dataEnvrn->IsRain) {
-            TDT(i) = TT(i) = TempOutsideAirFD(Surf);
-            RhoT(i) = RhoVaporAirOut(Surf);
+            TDT(i) = TT(i) = state.dataMstBal->TempOutsideAirFD(Surf);
+            RhoT(i) = state.dataMstBal->RhoVaporAirOut(Surf);
             SurfaceFD(Surf).CpDelXRhoS1(i) = 0.0;  // Outside face  does not have an outer half node
             SurfaceFD(Surf).CpDelXRhoS2(i) = -1.0; // Set this to -1 as a flag, then set to node 2's outer half node heat capacity
         } else if (surface_ExtBoundCond > 0) {
@@ -1538,13 +1537,13 @@ namespace HeatBalFiniteDiffManager {
             auto const TDT_p(TDT(i + 1));
 
             // Boundary Conditions from Simulation for Exterior
-            Real64 const hconvo(HConvExtFD(Surf));
+            Real64 const hconvo(state.dataMstBal->HConvExtFD(Surf));
 
-            Real64 const hrad(HAirFD(Surf));
-            Real64 const hsky(HSkyFD(Surf));
-            Real64 const hgnd(HGrndFD(Surf));
-            Real64 const Toa(TempOutsideAirFD(Surf));
-            Real64 const Tgnd(TempOutsideAirFD(Surf));
+            Real64 const hrad(state.dataMstBal->HAirFD(Surf));
+            Real64 const hsky(state.dataMstBal->HSkyFD(Surf));
+            Real64 const hgnd(state.dataMstBal->HGrndFD(Surf));
+            Real64 const Toa(state.dataMstBal->TempOutsideAirFD(Surf));
+            Real64 const Tgnd(state.dataMstBal->TempOutsideAirFD(Surf));
 
             if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
 
@@ -2213,7 +2212,7 @@ namespace HeatBalFiniteDiffManager {
         Real64 const QRadThermInFD(state.dataHeatBal->SurfQRadThermInAbs(Surf)); // Thermal radiation absorbed on inside surfaces
 
         // Boundary Conditions from Simulation for Interior
-        Real64 hconvi(HConvInFD(Surf));
+        Real64 hconvi(state.dataMstBal->HConvInFD(Surf));
 
         Real64 const Tia(state.dataHeatBalFanSys->MAT(surface.Zone));
 
