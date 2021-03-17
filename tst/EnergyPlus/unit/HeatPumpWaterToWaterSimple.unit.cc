@@ -836,7 +836,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     } // ... End environment loop.
 
-    EXPECT_NEAR(DataLoopNode::Node(12).MassFlowRate, 0.3, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(12).MassFlowRate, 0.3, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
