@@ -355,7 +355,7 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     state->dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
     state->dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
 
-    AirflowNetwork::SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControlMultiADS;
+    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControlMultiADS;
     ReportFurnace(*state, FurnaceNum, 1);
 
     EXPECT_EQ(2.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate);
@@ -373,7 +373,7 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 
     EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
-    AirflowNetwork::SimulateAirflowNetwork = 0;
+    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
     state->dataFurnaces->Furnace.deallocate();
 }
 

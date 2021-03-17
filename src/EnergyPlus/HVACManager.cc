@@ -290,8 +290,8 @@ namespace EnergyPlus::HVACManager {
         ManageHybridVentilation(state);
 
         CalcAirFlowSimple(state);
-        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-            AirflowNetwork::RollBackFlag = false;
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            state.dataAirflowNetwork->RollBackFlag = false;
             ManageAirflowNetworkBalance(state, false);
         }
 
@@ -349,8 +349,8 @@ namespace EnergyPlus::HVACManager {
 
                 ManageHybridVentilation(state);
                 CalcAirFlowSimple(state, SysTimestepLoop);
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    AirflowNetwork::RollBackFlag = false;
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    state.dataAirflowNetwork->RollBackFlag = false;
                     ManageAirflowNetworkBalance(state, false);
                 }
 
@@ -1732,7 +1732,7 @@ namespace EnergyPlus::HVACManager {
         if (FirstHVACIteration) {
             RepIterAir = 0;
             // Call AirflowNetwork simulation to calculate air flows and pressures
-            if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ManageAirflowNetworkBalance(state, FirstHVACIteration);
             }
             ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
@@ -1756,7 +1756,7 @@ namespace EnergyPlus::HVACManager {
                 ++IterAir; // Increment the iteration counter
                 // Call AirflowNetwork simulation to calculate air flows and pressures
                 ResimulateAirZone = false;
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
                 }
                 if (SimAirLoops) {
@@ -1782,7 +1782,7 @@ namespace EnergyPlus::HVACManager {
                 FlowMaxAvailAlreadyReset = false;
 
                 //      IterAir = IterAir + 1   ! Increment the iteration counter
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     if (ResimulateAirZone) { // Need to make sure that SimAirLoop and SimZoneEquipment are simulated
                         SimAirLoops = true;  // at min three times using ONOFF fan with the AirflowNetwork model
                         SimZoneEquipment = true;
@@ -2189,18 +2189,18 @@ namespace EnergyPlus::HVACManager {
         auto &Fan(state.dataFans->Fan);
 
         // Ensure no airflownetwork and simple calculations
-        if (AirflowNetwork::SimulateAirflowNetwork == 0) return;
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == 0) return;
 
-        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) ReportAirflowNetwork(state);
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) ReportAirflowNetwork(state);
 
         // Reports zone exhaust loss by exhaust fans
         for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
             CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
             H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
             ADSCorrectionFactor = 1.0;
-            if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                 if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
-                    AirflowNetwork::AirflowNetworkZoneFlag(ZoneLoop)) {
+                    state.dataAirflowNetwork->AirflowNetworkZoneFlag(ZoneLoop)) {
                     ADSCorrectionFactor = 0.0;
                 }
             }
@@ -2227,8 +2227,8 @@ namespace EnergyPlus::HVACManager {
         }
 
         // Report results for SIMPLE option only
-        if (!(AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
-              AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS))
+        if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
+              state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS))
             return;
 
         if (ReportAirHeatBalanceFirstTimeFlag) {
@@ -2242,10 +2242,10 @@ namespace EnergyPlus::HVACManager {
             // Break the infiltration load into heat gain and loss components
             ADSCorrectionFactor = 1.0;
 
-            if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                 // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
                 if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
-                    AirflowNetwork::AirflowNetworkZoneFlag(ZoneLoop))
+                    state.dataAirflowNetwork->AirflowNetworkZoneFlag(ZoneLoop))
                     ADSCorrectionFactor = 0.0;
             }
 
