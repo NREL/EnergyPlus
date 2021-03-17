@@ -95,7 +95,6 @@
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
@@ -155,7 +154,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
     LowTempRadiantSystem::clear_state();
-    OutputReportTabular::clear_state(state);
     PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();

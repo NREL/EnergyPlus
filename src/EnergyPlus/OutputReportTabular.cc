@@ -170,12 +170,6 @@ namespace EnergyPlus::OutputReportTabular {
     using namespace DataHeatBalance;
     using namespace HybridModel;
 
-    // Functions
-    void clear_state(EnergyPlusData &state)
-    {
-        OutputReportTabular::ResetTabularReports(state);
-    }
-
     std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file)
     {
         std::ofstream &tbl_stream(*state.dataOutRptTab->TabularOutputFile(iStyle));
@@ -15592,6 +15586,7 @@ namespace EnergyPlus::OutputReportTabular {
         // Jason Glazer - October 2015
         // Reset all gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
+        state.dataOutRptTab->gatherElapsedTimeBEPS = 0.0;
         ResetMonthlyGathering(state);
         OutputReportTabularAnnual::ResetAnnualGathering(state);
         ResetBinGathering(state);
@@ -15603,6 +15598,7 @@ namespace EnergyPlus::OutputReportTabular {
         ThermalComfort::ResetThermalComfortSimpleASH55(state);
         ThermalComfort::ResetSetPointMet(state);
         ResetAdaptiveComfort(state);
+        state.dataOutputProcessor->isFinalYear = true;
     }
 
     void ResetMonthlyGathering(EnergyPlusData &state)
