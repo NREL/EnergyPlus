@@ -106,7 +106,6 @@ namespace HeatBalFiniteDiffManager {
     using HeatBalanceMovableInsulation::EvalOutsideMovableInsulation;
 
     // MODULE PARAMETER DEFINITIONS:
-    constexpr Real64 Lambda(2500000.0);
     constexpr Real64 smalldiff(1.e-8); // Used in places where "equality" tests should not be used.
 
     constexpr int CrankNicholsonSecondOrder(1); // original CondFD scheme.  semi implicit, second order in time
@@ -630,8 +629,11 @@ namespace HeatBalFiniteDiffManager {
         }
 
         for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
-            // Need to skip window constructions and eventually window materials
+            // Need to skip window constructions, IRT, air wall and construction not in use.
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
+            if (state.dataConstruction->Construct(ConstrNum).TypeIsIRT) continue;
+            if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundary) continue;
+            if (!state.dataConstruction->Construct(ConstrNum).IsUsed) continue;
 
             ConstructFD(ConstrNum).Name.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
             ConstructFD(ConstrNum).Thickness.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
@@ -1274,6 +1276,8 @@ namespace HeatBalFiniteDiffManager {
 
                 if (state.dataConstruction->Construct(ThisNum).TypeIsWindow) continue;
                 if (state.dataConstruction->Construct(ThisNum).TypeIsIRT) continue;
+                if (state.dataConstruction->Construct(ThisNum).TypeIsAirBoundary) continue;
+                if (!state.dataConstruction->Construct(ThisNum).IsUsed) continue;
 
                 static constexpr auto Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
                 print(state.files.eio,

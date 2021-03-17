@@ -7474,8 +7474,8 @@ namespace VariableSpeedCoils {
             //   Calculate apparatus dew point conditions using TotCap and CBF
             Real64 hDelta = TotCapCalc / AirMassFlow;                       // Change in air enthalpy across the cooling coil [J/kg]
             Real64 hADP = InletEnthalpy - hDelta / (1.0 - localCBF);        // Apparatus dew point enthalpy [J/kg]
-            Real64 tADP = PsyTsatFnHPb(state, hADP, Pressure);                     // Apparatus dew point temperature [C]
-            Real64 wADP = PsyWFnTdbH(state, tADP, hADP);                           // Apparatus dew point humidity ratio [kg/kg]
+            Real64 tADP = PsyTsatFnHPb(state, hADP, Pressure, RoutineName); // Apparatus dew point temperature [C]
+            Real64 wADP = PsyWFnTdbH(state, tADP, hADP, RoutineName);       // Apparatus dew point humidity ratio [kg/kg]
             Real64 hTinwADP = PsyHFnTdbW(InletDryBulb, wADP);               // Enthalpy at inlet dry-bulb and wADP [J/kg]
             SHRCalc = min((hTinwADP - hADP) / (InletEnthalpy - hADP), 1.0); // temporary calculated value of SHR
 

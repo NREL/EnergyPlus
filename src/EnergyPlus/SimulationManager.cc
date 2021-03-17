@@ -3066,7 +3066,7 @@ void Resimulate(EnergyPlusData &state,
         // HVAC simulation
         ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
-        CalcAirFlowSimple(state, 0, state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance, state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
+        CalcAirFlowSimple(state, 0, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
         ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
