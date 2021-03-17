@@ -354,7 +354,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         using CurveManager::CurveValue;
         using FluidProperties::GetSpecificHeatGlycol;
-
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::RhoH2O;
 
@@ -14687,7 +14686,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         return Residuum;
     }
 
-    Real64 VRFTerminalUnitEquipment::HeatingCoilCapacityLimit(EnergyPlusData &state, 
+    Real64 VRFTerminalUnitEquipment::HeatingCoilCapacityLimit(EnergyPlusData &state,
         Real64 const HeatCoilAirInletNode, // supplemental heating coil air inlet node
         Real64 const HeatCoilMaxSATAllowed // supplemental heating coil maximum supply air temperature allowed [C]
     )

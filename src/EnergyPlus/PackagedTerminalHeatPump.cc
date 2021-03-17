@@ -3540,7 +3540,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         for (PTUnitNum = 1; PTUnitNum <= state.dataPTHP->NumPTUs; ++PTUnitNum) {
             if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3548,7 +3548,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3556,7 +3556,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3564,7 +3564,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3573,7 +3573,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             } else {
                 if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3581,7 +3581,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3589,7 +3589,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3597,7 +3597,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,

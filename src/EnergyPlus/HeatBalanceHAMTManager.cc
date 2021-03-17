@@ -113,13 +113,8 @@ namespace HeatBalanceHAMTManager {
     // Using/Aliasing
     using namespace DataMoistureBalance;
     using namespace DataSurfaces;
-    using DataHeatBalSurface::MaxSurfaceTempLimit;
-    using DataHeatBalSurface::MaxSurfaceTempLimitBeforeFatal;
     using DataHeatBalSurface::MinSurfaceTempLimit;
     using DataHeatBalSurface::MinSurfaceTempLimitBeforeFatal;
-    using DataHeatBalSurface::SurfNetLWRadToSurf;
-    using DataHeatBalSurface::SurfOpaqQRadSWInAbs;
-    using DataHeatBalSurface::SurfOpaqQRadSWOutAbs;
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
 
@@ -659,7 +654,7 @@ namespace HeatBalanceHAMTManager {
         state.dataHeatBalHAMTMgr->TotCellsMax = 0;
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::HAMT) continue;
             conid = state.dataSurface->Surface(sid).Construction;
             if (conid == 0) continue;
             for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
@@ -757,7 +752,7 @@ namespace HeatBalanceHAMTManager {
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (!state.dataSurface->Surface(sid).HeatTransSurf) continue;
             if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::HAMT) continue;
             // Boundary Cells
             runor = -0.02;
             // Air Convection Cell
@@ -898,7 +893,7 @@ namespace HeatBalanceHAMTManager {
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (!state.dataSurface->Surface(sid).HeatTransSurf) continue;
             if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::HAMT) continue;
             cells(state.dataHeatBalHAMTMgr->Extcell(sid)).origin(1) += cells(state.dataHeatBalHAMTMgr->Extcell(sid)).length(1) / 2.0;
             cells(state.dataHeatBalHAMTMgr->Intcell(sid)).origin(1) -= cells(state.dataHeatBalHAMTMgr->Intcell(sid)).length(1) / 2.0;
             cells(state.dataHeatBalHAMTMgr->Extcell(sid)).volume = 0.0;
@@ -992,7 +987,6 @@ namespace HeatBalanceHAMTManager {
         // To calculate the heat and moisture transfer through the surface
 
         // Using/Aliasing
-        using DataHeatBalSurface::SurfQAdditionalHeatSourceInside;
         using DataSurfaces::OtherSideCondModeledExt;
 
         // Locals
@@ -1088,7 +1082,7 @@ namespace HeatBalanceHAMTManager {
         } else {
             cells(state.dataHeatBalHAMTMgr->ExtSkycell(sid)).temp = state.dataEnvrn->SkyTemp;
 
-            cells(Extcell(sid)).Qadds = state.dataSurface->Surface(sid).Area * SurfOpaqQRadSWOutAbs(sid);
+            cells(Extcell(sid)).Qadds = state.dataSurface->Surface(sid).Area * state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(sid);
         }
 
         cells(state.dataHeatBalHAMTMgr->ExtGrncell(sid)).temp = TempOutsideAirFD(sid);
@@ -1112,8 +1106,12 @@ namespace HeatBalanceHAMTManager {
         cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).htc = HConvInFD(sid);
 
         cells(Intcell(sid)).Qadds =
-            state.dataSurface->Surface(sid).Area * (SurfOpaqQRadSWInAbs(sid) + SurfNetLWRadToSurf(sid) + state.dataHeatBalFanSys->QHTRadSysSurf(sid) + state.dataHeatBalFanSys->QCoolingPanelSurf(sid) + state.dataHeatBalFanSys->QHWBaseboardSurf(sid) +
-                    state.dataHeatBalFanSys->QSteamBaseboardSurf(sid) + state.dataHeatBalFanSys->QElecBaseboardSurf(sid) + state.dataHeatBal->SurfQRadThermInAbs(sid) + SurfQAdditionalHeatSourceInside(sid));
+            state.dataSurface->Surface(sid).Area *
+            (state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(sid) + state.dataHeatBalSurf->SurfNetLWRadToSurf(sid) +
+             state.dataHeatBalFanSys->QHTRadSysSurf(sid) +
+             state.dataHeatBalFanSys->QCoolingPanelSurf(sid) + state.dataHeatBalFanSys->QHWBaseboardSurf(sid) + state.dataHeatBalFanSys->QSteamBaseboardSurf(sid) +
+                                     state.dataHeatBalFanSys->QElecBaseboardSurf(sid) + state.dataHeatBal->SurfQRadThermInAbs(sid) +
+                                     state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(sid));
         // Check, Is this per unit area or for the whole wall.
         //    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)
 
@@ -1270,7 +1268,7 @@ namespace HeatBalanceHAMTManager {
             // Check for silly temperatures
             tempmax = maxval(cells, &subcell::tempp1);
             tempmin = minval(cells, &subcell::tempp1);
-            if (tempmax > MaxSurfaceTempLimit) {
+            if (tempmax > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
                 if (!state.dataGlobal->WarmupFlag) {
                     if (state.dataSurface->Surface(sid).HighTempErrCount == 0) {
                         ShowSevereMessage(state,
@@ -1286,7 +1284,7 @@ namespace HeatBalanceHAMTManager {
                                                    "C");
                 }
             }
-            if (tempmax > MaxSurfaceTempLimitBeforeFatal) {
+            if (tempmax > state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal) {
                 if (!state.dataGlobal->WarmupFlag) {
                     ShowSevereError(state,
                                     format("HAMT: HAMT: Temperature (high) out of bounds ( {:.2R}) for surface={}", tempmax, state.dataSurface->Surface(sid).Name));

@@ -2622,11 +2622,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // Determine flow rate and temperature of supply air based on type of damper
 
-        //bool AdjustZoneMassFlowFlag(true); // holds zone mixing and infiltration flow calc status
-
-        bool AdjustZoneMixingFlowFlag(true); // holds zone mixing air flow calc status
-        bool AdjustZoneInfiltrationFlowFlag(true); // holds zone infiltration air flow calc status
-
         FirstCall = true;
         ErrorFlag = false;
 
@@ -2673,11 +2668,12 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // Loop over all the primary air loop; simulate their components (equipment)
         // and controllers
-
         if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
-            if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) AdjustZoneMixingFlowFlag = false;
-            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::NoInfiltrationFlow) AdjustZoneInfiltrationFlowFlag = false;
-            CalcAirFlowSimple(state, 0, AdjustZoneMixingFlowFlag, AdjustZoneInfiltrationFlowFlag);
+            if (FirstHVACIteration) {
+                CalcAirFlowSimple(state, 0);
+            } else {
+                CalcAirFlowSimple(state, 0, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
+            }        
         }
 
         for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
@@ -3993,7 +3989,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                 // Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhaust flow
                 StdTotalReturnMassFlow = TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate -
-                                         (TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExhBalanced);
+                    (TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExhBalanced);
+
                 if (!state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
                     if (StdTotalReturnMassFlow < 0.0) {
                         state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ExcessZoneExh = -StdTotalReturnMassFlow;

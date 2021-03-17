@@ -246,15 +246,15 @@ namespace EnergyPlus {
                     // Aggregate the heat flux
                     // Zone-coupled slab
                     if (thisDomain.HasZoneCoupledSlab) {
-                        thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux();
+                        thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux(state);
                         thisDomain.NumHeatFlux += 1;
                         thisDomain.HeatFlux = thisDomain.AggregateHeatFlux / thisDomain.NumHeatFlux;
                     } else { // Coupled basement
 
                         // basement walls
-                        thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux();
+                        thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux(state);
                         // basement floor
-                        thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux();
+                        thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux(state);
 
                         thisDomain.NumHeatFlux += 1;
                         thisDomain.WallHeatFlux = thisDomain.AggregateWallHeatFlux / thisDomain.NumHeatFlux;
@@ -264,14 +264,14 @@ namespace EnergyPlus {
                     // Aggregate the heat flux
                     // Zone-coupled slab
                     if (thisDomain.HasZoneCoupledSlab) {
-                        thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux();
+                        thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux(state);
                         thisDomain.NumHeatFlux += 1;
                         thisDomain.HeatFlux = thisDomain.AggregateHeatFlux / thisDomain.NumHeatFlux;
                     } else if (thisDomain.HasZoneCoupledBasement) { // Coupled basement
                         // basement walls
-                        thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux();
+                        thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux(state);
                         // basement floor
-                        thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux();
+                        thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux(state);
 
                         thisDomain.NumHeatFlux += 1;
                         thisDomain.WallHeatFlux = thisDomain.AggregateWallHeatFlux / thisDomain.NumHeatFlux;
@@ -4219,7 +4219,7 @@ namespace EnergyPlus {
                                 if (this->HasZoneCoupledBasement) {
                                     cell.Temperature = this->EvaluateZoneInterfaceTemperature(cell);
                                 } else { // FHX model
-                                    cell.Temperature = this->EvaluateBasementCellTemperature(cell);
+                                    cell.Temperature = this->EvaluateBasementCellTemperature(state, cell);
                                 }
                                 break;
                             case CellType::ZoneGroundInterface:
@@ -4574,7 +4574,7 @@ namespace EnergyPlus {
             return Numerator / Denominator;
         }
 
-        Real64 Domain::EvaluateBasementCellTemperature(CartesianCell &cell) {
+        Real64 Domain::EvaluateBasementCellTemperature(EnergyPlusData &state, CartesianCell &cell) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4604,7 +4604,7 @@ namespace EnergyPlus {
                     Beta = cell.Beta / 2.0;
 
                     // get the average basement wall heat flux and add it to the tally
-                    HeatFlux = this->GetBasementWallHeatFlux();
+                    HeatFlux = this->GetBasementWallHeatFlux(state);
                     Numerator += Beta * HeatFlux * cell.height();
 
                     // then get the +x conduction to continue the heat balance
@@ -4623,7 +4623,7 @@ namespace EnergyPlus {
                     Beta = cell.Beta / 2.0;
 
                     // get the average basement floor heat flux and add it to the tally
-                    HeatFlux = this->GetBasementFloorHeatFlux();
+                    HeatFlux = this->GetBasementFloorHeatFlux(state);
                     Numerator += Beta * HeatFlux * cell.width();
 
                     // then get the -y conduction to continue the heat balance
@@ -4800,7 +4800,7 @@ namespace EnergyPlus {
             return Numerator / Denominator;
         }
 
-        Real64 Domain::GetBasementWallHeatFlux() {
+        Real64 Domain::GetBasementWallHeatFlux(EnergyPlusData &state) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4811,12 +4811,12 @@ namespace EnergyPlus {
             Real64 RunningSummation = 0.0;
             auto const &numSurfaces = static_cast<unsigned int>(this->BasementZone.WallSurfacePointers.size());
             for (auto &surfaceIndex : this->BasementZone.WallSurfacePointers) {
-                RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(surfaceIndex);
+                RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(surfaceIndex);
             }
             return -RunningSummation / numSurfaces; // heat flux is negative here
         }
 
-        Real64 Domain::GetBasementFloorHeatFlux() {
+        Real64 Domain::GetBasementFloorHeatFlux(EnergyPlusData &state) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4827,7 +4827,7 @@ namespace EnergyPlus {
             Real64 RunningSummation = 0.0;
             auto const &numSurfaces = static_cast<unsigned int>(this->BasementZone.FloorSurfacePointers.size());
             for (auto &surfaceIndex : this->BasementZone.FloorSurfacePointers) {
-                RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(surfaceIndex);
+                RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(surfaceIndex);
             }
             return -RunningSummation / numSurfaces; // heat flux is negative here
         }
@@ -4860,7 +4860,7 @@ namespace EnergyPlus {
             state.dataSurface->OSCM(OSCMIndex).HRad = 0.0;
         }
 
-        Real64 Domain::GetZoneInterfaceHeatFlux() {
+        Real64 Domain::GetZoneInterfaceHeatFlux(EnergyPlusData &state) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4871,7 +4871,7 @@ namespace EnergyPlus {
             Real64 RunningSummation = 0.0;
             auto const &NumSurfaces = this->ZoneCoupledSurfaces.size();
             for (auto &z : this->ZoneCoupledSurfaces) {
-                RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(z.IndexInSurfaceArray);
+                RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(z.IndexInSurfaceArray);
             }
             return -RunningSummation / NumSurfaces; // heat flux is negative here
         }

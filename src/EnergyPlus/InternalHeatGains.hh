@@ -193,10 +193,22 @@ struct InternalHeatGainsData : BaseGlobalStruct {
     bool GetInternalHeatGainsInputFlag = true; // Controls the GET routine calling (limited to first time)
     bool ErrorsFound = false;                   // if errors were found in the input
 
+    // static variables extracted from functions
+    bool UsingThermalComfort = false;
+    Real64 sumArea = 0.0;
+    Real64 sumPower = 0.0;
+    Real64 curQL = 0.0; // radiant value prior to adjustment for pulse for load component report
+    Real64 adjQL = 0.0; // radiant value including adjustment for pulse for load component report
+
     void clear_state() override {
 
         this->GetInternalHeatGainsInputFlag = true;
         this->ErrorsFound = false;
+        this->UsingThermalComfort = false;
+        this->sumArea = 0.0;
+        this->sumPower = 0.0;
+        this->curQL = 0.0;
+        this->adjQL = 0.0;
     }
 };
 
