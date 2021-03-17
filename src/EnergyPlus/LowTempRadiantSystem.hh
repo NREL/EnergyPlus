@@ -498,8 +498,6 @@ namespace LowTempRadiantSystem {
 
     // Functions
 
-    void clear_state();
-
     void SimLowTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
                                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                  Real64 &LoadMet,               // load met by the radiant system, in Watts
@@ -537,6 +535,22 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
     int NumOfCFloLowTempRadSysDes = 0; // Number of constant flow (hydronic) low tempererature radiant design systems
     int NumOfElecLowTempRadSys = 0;    // Number of electric low tempererature radiant systems
     int TotalNumOfRadSystems = 0;      // Total number of low temperature radiant systems
+
+    bool GetInputFlag = true;
+    int CFloCondIterNum = 0;     // Number of iterations for a constant flow radiant system--controls variable cond sys ctrl
+    int MaxCloNumOfSurfaces = 0; // Used to set allocate size in CalcClo routine
+    bool VarOffCond = false;     // Set to true when in cooling for constant flow system + variable off condensation predicted
+    bool FirstTimeInit = true;   // Set to true for first pass through init routine then set to false
+    bool anyRadiantSystemUsingRunningMeanAverage =
+        false;                // Set to true when there is at least one constant flow radiant system that uses the running mean average
+    Real64 LoopReqTemp = 0.0; // Temperature required at the inlet of the pump (from the loop) to meet control logic
+    std::unordered_map<std::string, std::string> LowTempRadUniqueNames;
+    bool FirstTimeFlag = true; // for setting size of Ckj, Cmj, WaterTempOut arrays // state
+    bool MyEnvrnFlagGeneral = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+    bool MyOneTimeFlag = true;             // Initialization flag
+    bool warnTooLow = false;
+    bool warnTooHigh = false;
 
     // Limit temperatures to indicate that a system cannot heat or cannot cool
     Real64 LowTempHeating = -200.0; // Used to indicate that a user does not have a heating control temperature
@@ -586,6 +600,21 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
         NumOfCFloLowTempRadSysDes = 0;
         NumOfElecLowTempRadSys = 0;
         TotalNumOfRadSystems = 0;
+
+        CFloCondIterNum = 0;
+        MaxCloNumOfSurfaces = 0;
+        VarOffCond = false;
+        FirstTimeInit = true;
+        anyRadiantSystemUsingRunningMeanAverage = false;
+        LoopReqTemp = 0.0;
+        LowTempRadUniqueNames.clear();
+        GetInputFlag = true;
+        FirstTimeFlag = true;
+        MyEnvrnFlagGeneral = true;
+        ZoneEquipmentListChecked = false;
+        MyOneTimeFlag = true;
+        warnTooLow = false;
+        warnTooHigh = false;
 
         QRadSysSrcAvg.clear();
         ZeroSourceSumHATsurf.clear();
