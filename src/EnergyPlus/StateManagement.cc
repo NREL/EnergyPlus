@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
@@ -111,7 +110,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataStringGlobals::clear_state();
     DataViewFactorInformation::clear_state();
     DesiccantDehumidifiers::clear_state();
-    DualDuct::clear_state();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeFluidCoolers::clear_state();
     FluidProperties::clear_state();
