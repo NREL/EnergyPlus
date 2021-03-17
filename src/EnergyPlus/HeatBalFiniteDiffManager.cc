@@ -649,8 +649,10 @@ namespace HeatBalFiniteDiffManager {
         }
 
         for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
-            // Need to skip window constructions and eventually window materials
+            // Need to skip window constructions, IRT, air wall and construction not in use.
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
+            if (state.dataConstruction->Construct(ConstrNum).TypeIsIRT) continue;
+            if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundary) continue;
             if (!state.dataConstruction->Construct(ConstrNum).IsUsed) continue;
 
             ConstructFD(ConstrNum).Name.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);

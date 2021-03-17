@@ -302,12 +302,14 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_skipNotUsedConstructionAndAir
      "Construction:AirBoundary,",
      "   Air Wall_ConstructionAirBoundary,  !- Name",
      "   None,                    !- Air Exchange Method",
-     "   0;                       !- Simple Mixing Air Changes per Hour {1 / hr}", });
-
+     "   0;                       !- Simple Mixing Air Changes per Hour {1 / hr}",
+     "Output:Constructions,",
+     "Constructions;",
+     "Output:Constructions,",
+     "Materials;", });
 
     ASSERT_TRUE(process_idf(idf_objects));
-
-      
+          
     ErrorsFound = false;
     GetMaterialData(*state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
@@ -317,34 +319,24 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_skipNotUsedConstructionAndAir
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
     // allocate properties for construction objects when it is used or not for building surfaces in the model
-
+    
     state->dataConstruction->Construct(1).IsUsed=false;
     state->dataConstruction->Construct(2).IsUsed = true;
     state->dataConstruction->Construct(3).IsUsed = true;
 
-    ConstructFD.allocate(1);
-    
-    // verify whether air wall or construction not in use was excluded from finite difference method.
-    for (int ConstrNum = 1; ConstrNum <= 3; ++ConstrNum) {
-
-        if (state->dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
-        if (state->dataConstruction->Construct(ConstrNum).TypeIsIRT) continue;
-        if (state->dataConstruction->Construct(ConstrNum).TypeIsAirBoundary) continue;
-        if (!state->dataConstruction->Construct(ConstrNum).IsUsed) continue;
-        thisConstructNum = ConstrNum;
-        ConstructFD(1).Name.allocate(state->dataConstruction->Construct(ConstrNum).TotLayers);
-        thisTotalLayers = state->dataConstruction->Construct(thisConstructNum).TotLayers;
-
-     }
- 
+    //call the function for initialization of finite difference calculation
+    InitialInitHeatBalFiniteDiff(*state);  
+     
     // check the values are correct
- 
-    EXPECT_EQ(2, thisConstructNum);
-    EXPECT_EQ(3, thisTotalLayers);
+    EXPECT_EQ(0, ConstructFD(1).Name.size());
+    EXPECT_EQ(3, ConstructFD(2).Name.size());
+    EXPECT_EQ(0, ConstructFD(3).Name.size());
+    EXPECT_EQ("F16 ACOUSTIC TILE", ConstructFD(2).Name(1));
+    EXPECT_EQ("F05 CEILING AIR SPACE RESISTANCE", ConstructFD(2).Name(2));
+    EXPECT_EQ("M11 100MM LIGHTWEIGHT CONCRETE", ConstructFD(2).Name(3));
     
     // deallocate
     ConstructFD.deallocate();
-    state->dataConstruction->Construct.deallocate();
 }
 
 } // namespace EnergyPlus
