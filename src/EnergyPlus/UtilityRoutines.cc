@@ -610,7 +610,6 @@ namespace UtilityRoutines {
         using BranchNodeConnections::CheckNodeConnections;
         using BranchNodeConnections::TestCompSetInletOutletNodes;
         using ExternalInterface::CloseSocket;
-        using ExternalInterface::NumExternalInterfaces;
 
         using NodeInputManager::CheckMarkedNodes;
         using NodeInputManager::SetupNodeVarsForReporting;
@@ -687,18 +686,18 @@ namespace UtilityRoutines {
         NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
 
         // catch up with timings if in middle
-        Time_Finish = epElapsedTime();
-        if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
-        Elapsed_Time = Time_Finish - Time_Start;
+        state.dataSysVars->Time_Finish = epElapsedTime();
+        if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
+        state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
 #endif
-        if (Elapsed_Time < 0.0) Elapsed_Time = 0.0;
-        Hours = Elapsed_Time / 3600.0;
-        Elapsed_Time -= Hours * 3600.0;
-        Minutes = Elapsed_Time / 60.0;
-        Elapsed_Time -= Minutes * 60.0;
-        Seconds = Elapsed_Time;
+        if (state.dataSysVars->Elapsed_Time < 0.0) state.dataSysVars->Elapsed_Time = 0.0;
+        Hours = state.dataSysVars->Elapsed_Time / 3600.0;
+        state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
+        Minutes = state.dataSysVars->Elapsed_Time / 60.0;
+        state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
+        Seconds = state.dataSysVars->Elapsed_Time;
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
@@ -740,7 +739,7 @@ namespace UtilityRoutines {
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
         // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
         // indicating that E+ terminated with an error.
-        if (NumExternalInterfaces > 0) CloseSocket(-1);
+        if (state.dataExternalInterface->NumExternalInterfaces > 0) CloseSocket(state, -1);
 
         if (state.dataGlobal->eplusRunningViaAPI) {
             state.files.flushAll();
@@ -766,18 +765,13 @@ namespace UtilityRoutines {
         // Use INQUIRE to determine if file is open.
 
         // Using/Aliasing
-        using DataReportingFlags::DebugOutput;
         using DaylightingManager::CloseDFSFile;
         using DaylightingManager::CloseReportIllumMaps;
-
-        //      LOGICAL :: exists, opened
-        //      INTEGER :: UnitNumber
-        //      INTEGER :: ios
 
         CloseReportIllumMaps(state);
         CloseDFSFile(state);
 
-        if (DebugOutput || (state.files.debug.good() && state.files.debug.position() > 0)) {
+        if (state.dataReportFlag->DebugOutput || (state.files.debug.good() && state.files.debug.position() > 0)) {
             state.files.debug.close();
         } else {
             state.files.debug.del();
@@ -805,8 +799,6 @@ namespace UtilityRoutines {
         using namespace DataTimings;
         using namespace DataErrorTracking;
         using ExternalInterface::CloseSocket;
-        using ExternalInterface::haveExternalInterfaceBCVTB;
-        using ExternalInterface::NumExternalInterfaces;
 
         using SolarShading::ReportSurfaceErrors;
 
@@ -841,20 +833,20 @@ namespace UtilityRoutines {
         NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
         strip(NumSevereDuringSizing);
 
-        Time_Finish = epElapsedTime();
-        if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
-        Elapsed_Time = Time_Finish - Time_Start;
+        state.dataSysVars->Time_Finish = epElapsedTime();
+        if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
+        state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
         if (state.dataGlobal->createPerfLog) {
-            UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", Elapsed_Time));
+            UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
         }
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
 #endif
-        Hours = Elapsed_Time / 3600.0;
-        Elapsed_Time -= Hours * 3600.0;
-        Minutes = Elapsed_Time / 60.0;
-        Elapsed_Time -= Minutes * 60.0;
-        Seconds = Elapsed_Time;
+        Hours = state.dataSysVars->Elapsed_Time / 3600.0;
+        state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
+        Minutes = state.dataSysVars->Elapsed_Time / 60.0;
+        state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
+        Seconds = state.dataSysVars->Elapsed_Time;
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
@@ -894,7 +886,7 @@ namespace UtilityRoutines {
         std::cerr << "EnergyPlus Completed Successfully." << std::endl;
         // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
         // indicating that E+ finished its simulation
-        if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
+        if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
 
         if (state.dataGlobal->eplusRunningViaAPI) {
             state.files.flushAll();

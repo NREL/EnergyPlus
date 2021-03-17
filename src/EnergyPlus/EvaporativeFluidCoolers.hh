@@ -268,7 +268,7 @@ namespace EvaporativeFluidCoolers {
 
         void UpdateEvapFluidCooler(EnergyPlusData &state);
 
-        void ReportEvapFluidCooler(bool RunFlag);
+        void ReportEvapFluidCooler(EnergyPlusData &state, bool RunFlag);
 
         void CalcSingleSpeedEvapFluidCooler(EnergyPlusData &state);
 

@@ -134,33 +134,6 @@ namespace EnergyPlus::DisplacementVentMgr {
         // PURPOSE OF THIS SUBROUTINE:
         //   manage the UCSD Displacement Ventilation model
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using DataHeatBalSurface::TempSurfIn;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-
-
         // initialize Displacement Ventilation model
         InitUCSDDV(state, ZoneNum);
 
@@ -276,6 +249,8 @@ namespace EnergyPlus::DisplacementVentMgr {
         Real64 LayH;     // Height of the Occupied/Mixed subzone interface
         Real64 LayFrac;  // Fraction height of the Occupied/Mixed subzone interface
         int SurfNum;     // Surface number
+
+        auto &TempSurfIn(state.dataHeatBalSurf->TempSurfIn);
 
         HAT_MX = 0.0;
         HAT_OC = 0.0;
@@ -724,8 +699,8 @@ namespace EnergyPlus::DisplacementVentMgr {
         ZoneEquipConfigNum = ZoneNum;
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).IsControlled) {
             for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                 CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -735,7 +710,7 @@ namespace EnergyPlus::DisplacementVentMgr {
         SumMCp = state.dataHeatBalFanSys->MCPI(ZoneNum) + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) + state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
         SumMCpT =
                 state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) + state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
-        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
             SumMCp = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
             SumMCpT = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
         }
@@ -767,19 +742,19 @@ namespace EnergyPlus::DisplacementVentMgr {
         // outflowing. The lower apertures have to be located below 0.8m and the upper apertures
         // have to be located above 1.8m.
 
-        if (AirflowNetwork::NumOfLinksMultiZone > 0) {
+        if (state.dataAirflowNetwork->NumOfLinksMultiZone > 0) {
             for (Loop = 1; Loop <= state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, ZoneNum); ++Loop) {
                 // direct AirflowNetwork surface
 
-                if (state.dataSurface->Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone == ZoneNum) {
+                if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone == ZoneNum) {
 
                     if ((state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax < 0.8 &&
-                         AirflowNetwork::AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0)) {
+                         state.dataAirflowNetwork->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0)) {
                         FlagApertures = 0;
                         break;
                     }
                     if (state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin > 1.8 &&
-                        AirflowNetwork::AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
+                        state.dataAirflowNetwork->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
                         FlagApertures = 0;
                         break;
                     }
@@ -795,38 +770,38 @@ namespace EnergyPlus::DisplacementVentMgr {
                 } else {
 
                     if (state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
-                                Zone(state.dataSurface->Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
+                                Zone(state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
                                 Zone(ZoneNum).OriginZ <
                             0.8 &&
-                        AirflowNetwork::AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
+                        state.dataAirflowNetwork->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
                         FlagApertures = 0;
                         break;
                     }
                     if (state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
-                                Zone(state.dataSurface->Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
+                                Zone(state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
                                 Zone(ZoneNum).OriginZ >
                             1.8 &&
-                        AirflowNetwork::AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0) {
+                        state.dataAirflowNetwork->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0) {
                         FlagApertures = 0;
                         break;
                     }
                     if ((state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
-                                 Zone(state.dataSurface->Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                 Zone(state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
                                      .OriginZ -
                                  Zone(ZoneNum).OriginZ >
                              0.8 &&
                             state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
-                                 Zone(state.dataSurface->Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                 Zone(state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
                                      .OriginZ -
                                  Zone(ZoneNum).OriginZ <
                              1.8) ||
                         (state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
-                                 Zone(state.dataSurface->Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                 Zone(state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
                                      .OriginZ -
                                  Zone(ZoneNum).OriginZ >
                              0.8 &&
                                 state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
-                                 Zone(state.dataSurface->Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                 Zone(state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
                                      .OriginZ -
                                  Zone(ZoneNum).OriginZ <
                              1.8)) {
@@ -1118,7 +1093,7 @@ namespace EnergyPlus::DisplacementVentMgr {
 
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) {
             ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;
-            Node(ZoneNodeNum).Temp = state.dataRoomAirMod->ZTMX(ZoneNum);
+            state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataRoomAirMod->ZTMX(ZoneNum);
         }
 
         // Mixed for reporting purposes

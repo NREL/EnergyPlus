@@ -893,20 +893,20 @@ namespace SystemAvailabilityManager {
                                                                               ErrorsFound,
                                                                               cCurrentModuleObject,
                                                                               cAlphaArgs(1),
-                                                                              NodeType_Unknown,
-                                                                              NodeConnectionType_Sensor,
+                                                                              DataLoopNode::NodeFluidType::blank,
+                                                                              DataLoopNode::NodeConnectionType::Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).HotNode, cCurrentModuleObject, cAlphaArgs(1), "Hot Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).HotNode, cCurrentModuleObject, cAlphaArgs(1), "Hot Node");
                 state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode = GetOnlySingleNode(state, cAlphaArgs(3),
                                                                                ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
-                                                                               NodeType_Unknown,
-                                                                               NodeConnectionType_Sensor,
+                                                                               DataLoopNode::NodeFluidType::blank,
+                                                                               DataLoopNode::NodeConnectionType::Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode, cCurrentModuleObject, cAlphaArgs(1), "Cold Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode, cCurrentModuleObject, cAlphaArgs(1), "Cold Node");
 
                 state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).TempDiffOn = rNumericArgs(1);
 
@@ -960,11 +960,11 @@ namespace SystemAvailabilityManager {
                                                                                ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
-                                                                               NodeType_Unknown,
-                                                                               NodeConnectionType_Sensor,
+                                                                               DataLoopNode::NodeFluidType::blank,
+                                                                               DataLoopNode::NodeConnectionType::Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
 
@@ -1006,11 +1006,11 @@ namespace SystemAvailabilityManager {
                                                                               ErrorsFound,
                                                                               cCurrentModuleObject,
                                                                               cAlphaArgs(1),
-                                                                              NodeType_Unknown,
-                                                                              NodeConnectionType_Sensor,
+                                                                              DataLoopNode::NodeFluidType::blank,
+                                                                              DataLoopNode::NodeConnectionType::Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
 
@@ -1052,11 +1052,11 @@ namespace SystemAvailabilityManager {
                                                                                ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
-                                                                               NodeType_Unknown,
-                                                                               NodeConnectionType_Sensor,
+                                                                               DataLoopNode::NodeFluidType::blank,
+                                                                               DataLoopNode::NodeConnectionType::Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
 
@@ -1109,11 +1109,11 @@ namespace SystemAvailabilityManager {
                                                                               ErrorsFound,
                                                                               cCurrentModuleObject,
                                                                               cAlphaArgs(1),
-                                                                              NodeType_Unknown,
-                                                                              NodeConnectionType_Sensor,
+                                                                              DataLoopNode::NodeFluidType::blank,
+                                                                              DataLoopNode::NodeConnectionType::Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
 
@@ -3483,12 +3483,10 @@ namespace SystemAvailabilityManager {
 
         // METHODOLOGY EMPLOYED:
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
         Real64 DeltaTemp;
 
-        DeltaTemp = Node(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).HotNode).Temp - Node(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode).Temp;
+        DeltaTemp = state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).HotNode).Temp -
+                    state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode).Temp;
 
         if (DeltaTemp >= state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).TempDiffOn) {
             AvailStatus = CycleOn;
@@ -3520,9 +3518,8 @@ namespace SystemAvailabilityManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
 
-        using DataLoopNode::Node;
-
-        if (Node(state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Node).Temp >= state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Temp) {
+        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Node).Temp >=
+            state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Temp) {
             AvailStatus = ForceOff;
         } else {
             AvailStatus = NoAction;
@@ -3545,9 +3542,8 @@ namespace SystemAvailabilityManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
 
-        using DataLoopNode::Node;
-
-        if (Node(state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Node).Temp >= state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Temp) {
+        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Node).Temp >=
+            state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Temp) {
             AvailStatus = CycleOn;
         } else {
             AvailStatus = NoAction;
@@ -3570,8 +3566,6 @@ namespace SystemAvailabilityManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
 
-        using DataLoopNode::Node;
-
         // If applicability schedule is off, then availability manager is inactive, return no action
         if (state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).SchedPtr > 0) {
             if (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).SchedPtr) <= 0.0) {
@@ -3582,7 +3576,7 @@ namespace SystemAvailabilityManager {
         }
 
         // Availability manager is active, check temperature limit
-        if (Node(state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Node).Temp <= state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Temp) {
+        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Node).Temp <= state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Temp) {
             AvailStatus = ForceOff;
         } else {
             AvailStatus = NoAction;
@@ -3605,9 +3599,8 @@ namespace SystemAvailabilityManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
 
-        using DataLoopNode::Node;
-
-        if (Node(state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Node).Temp <= state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Temp) {
+        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Node).Temp <=
+            state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Temp) {
             AvailStatus = CycleOn;
         } else {
             AvailStatus = NoAction;
@@ -4066,7 +4059,7 @@ namespace SystemAvailabilityManager {
             }
 
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0 &&
-                AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                 ShowContinueError(state, "The simple airflow objects are used for natural ventilation calculation.");
                 ShowContinueError(state, "The Airflow Network model is not allowed to perform. Please set the control type = NoMultizoneOrDistribution");
@@ -4074,10 +4067,10 @@ namespace SystemAvailabilityManager {
             }
 
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr == 0) {
-                if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                     ShowContinueError(state, "The Airflow Network model is not available for Hybrid Ventilation Control.");
-                } else if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+                } else if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                     ShowContinueError(state, "Please check the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.");
                     ShowContinueError(state, "The suggested choices are MultizoneWithDistribution or MultizoneWithoutDistribution.");
@@ -4557,7 +4550,7 @@ namespace SystemAvailabilityManager {
                     ACH = 0.0;
                     HybridVentModeOA = true;
                     if (!state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
-                        if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                        if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                             HybridVentModeOA = false;
                         }
                     }

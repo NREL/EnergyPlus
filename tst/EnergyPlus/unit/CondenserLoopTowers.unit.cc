@@ -498,7 +498,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -516,10 +516,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     Real64 MyLoad = 0.0;
     state->dataCondenserLoopTowers->towers(1).calculateMerkelVariableSpeedTower(*state, MyLoad);
     state->dataCondenserLoopTowers->towers(1).update(*state);
-    state->dataCondenserLoopTowers->towers(1).report(true);
+    state->dataCondenserLoopTowers->towers(1).report(*state, true);
 
     // test that tower is really not cooling with no load so temp in and out is the same issue #4927
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(9).Temp, DataLoopNode::Node(10).Temp);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(9).Temp, state->dataLoopNodes->Node(10).Temp);
 }
 
 TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
@@ -890,7 +890,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -907,24 +907,24 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     state->dataCondenserLoopTowers->towers(1).initialize(*state);
     state->dataCondenserLoopTowers->towers(1).calculateSingleSpeedTower(*state);
     state->dataCondenserLoopTowers->towers(1).update(*state);
-    state->dataCondenserLoopTowers->towers(1).report(true);
+    state->dataCondenserLoopTowers->towers(1).report(*state, true);
 
     // test that tower outlet temperature = set point temperature
     int inletNodeIndex = 0;
     int outletNodeIndex = 0;
-    auto inletNode = std::find(DataLoopNode::NodeID.begin(), DataLoopNode::NodeID.end(), "TOWERWATERSYS PUMP-TOWERWATERSYS COOLTOWERNODE");
-    ASSERT_TRUE(inletNode != DataLoopNode::NodeID.end());
-    if (inletNode != DataLoopNode::NodeID.end()) {
-        inletNodeIndex = std::distance(DataLoopNode::NodeID.begin(), inletNode);
+    auto inletNode = std::find(state->dataLoopNodes->NodeID.begin(), state->dataLoopNodes->NodeID.end(), "TOWERWATERSYS PUMP-TOWERWATERSYS COOLTOWERNODE");
+    ASSERT_TRUE(inletNode != state->dataLoopNodes->NodeID.end());
+    if (inletNode != state->dataLoopNodes->NodeID.end()) {
+        inletNodeIndex = std::distance(state->dataLoopNodes->NodeID.begin(), inletNode);
     }
-    auto outletNode = std::find(DataLoopNode::NodeID.begin(), DataLoopNode::NodeID.end(), "TOWERWATERSYS SUPPLY EQUIPMENT OUTLET NODE");
-    ASSERT_TRUE(outletNode != DataLoopNode::NodeID.end());
-    if (outletNode != DataLoopNode::NodeID.end()) {
-        outletNodeIndex = std::distance(DataLoopNode::NodeID.begin(), outletNode);
+    auto outletNode = std::find(state->dataLoopNodes->NodeID.begin(), state->dataLoopNodes->NodeID.end(), "TOWERWATERSYS SUPPLY EQUIPMENT OUTLET NODE");
+    ASSERT_TRUE(outletNode != state->dataLoopNodes->NodeID.end());
+    if (outletNode != state->dataLoopNodes->NodeID.end()) {
+        outletNodeIndex = std::distance(state->dataLoopNodes->NodeID.begin(), outletNode);
     }
     // TODO: FIXME: This is failing. Actual is -10.409381032746095, expected is 30.
-     EXPECT_GT( DataLoopNode::Node( inletNodeIndex ).Temp, 30.0 ); // inlet node temperature
-     EXPECT_DOUBLE_EQ( 30.0, DataLoopNode::Node( outletNodeIndex ).Temp ); // outlet node temperature
+     EXPECT_GT( state->dataLoopNodes->Node( inletNodeIndex ).Temp, 30.0 ); // inlet node temperature
+     EXPECT_DOUBLE_EQ( 30.0, state->dataLoopNodes->Node( outletNodeIndex ).Temp ); // outlet node temperature
 
     // input not needed for sizing (WasAutoSized = false) using NominalCapacity method but this variable should still size
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUAWasAutoSized);
@@ -1321,7 +1321,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -1736,7 +1736,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -2220,7 +2220,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -2647,7 +2647,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -3034,7 +3034,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 
@@ -3426,7 +3426,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 
@@ -3899,7 +3899,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
 
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone);
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state);
@@ -3927,7 +3927,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutHumRat =
         Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
-    DataLoopNode::Node(VSTower.WaterInletNodeNum).Temp = 35.0;
+    state->dataLoopNodes->Node(VSTower.WaterInletNodeNum).Temp = 35.0;
 
     VSTower.initialize(*state);
     state->dataGlobal->BeginEnvrnFlag = false;

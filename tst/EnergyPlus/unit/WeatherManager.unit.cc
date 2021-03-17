@@ -747,7 +747,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->BeginSimFlag = true;
-    DataReportingFlags::DoWeatherInitReporting = true;
+    state->dataReportFlag->DoWeatherInitReporting = true;
 
     WeatherManager::SetupInterpolationValues(*state);
     WeatherManager::AllocateWeatherData(*state);

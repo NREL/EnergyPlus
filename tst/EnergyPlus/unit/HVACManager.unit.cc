@@ -245,16 +245,16 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
-    Fans::Fan.allocate(1);
+    state->dataFans->Fan.allocate(1);
     state->dataFans->NumFans = 1;
-    Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_ZoneExhaust;
-    Fans::Fan(1).OutletAirMassFlowRate = 1.0;
-    Fans::Fan(1).OutletAirTemp = 22.0;
-    Fans::Fan(1).OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(Fans::Fan(1).OutletAirTemp, 0.0005);
-    Fans::Fan(1).InletNodeNum = 1;
+    state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_ZoneExhaust;
+    state->dataFans->Fan(1).OutletAirMassFlowRate = 1.0;
+    state->dataFans->Fan(1).OutletAirTemp = 22.0;
+    state->dataFans->Fan(1).OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataFans->Fan(1).OutletAirTemp, 0.0005);
+    state->dataFans->Fan(1).InletNodeNum = 1;
 
-    DataLoopNode::Node.allocate(1);
-    DataLoopNode::Node(1).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node.allocate(1);
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
 
     // Call HVACManager
     ReportAirHeatBalance(*state);
