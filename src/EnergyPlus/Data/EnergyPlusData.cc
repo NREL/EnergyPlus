@@ -60,6 +60,7 @@ namespace EnergyPlus {
         this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
         this->dataAirSystemsData = std::make_unique<AirSystemsData>();
         this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
+        this->dataAirflowNetwork = std::make_unique<AirflowNetworkData>();
         this->dataAutoSizingBase = std::make_unique<AutoSizingBaseData>();
         this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
         this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
@@ -305,6 +306,7 @@ namespace EnergyPlus {
         this->dataAirLoopHVACDOAS->clear_state();
         this->dataAirSystemsData->clear_state();
         this->dataAirflowNetworkBalanceManager->clear_state();
+        this->dataAirflowNetwork->clear_state();
         this->dataAutoSizingBase->clear_state();
         this->dataBSDFWindow->clear_state();
         this->dataBaseSizerFanHeatInputs->clear_state();
