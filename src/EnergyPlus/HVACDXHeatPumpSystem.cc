@@ -1141,16 +1141,16 @@ namespace HVACDXHeatPumpSystem {
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
-                              state.dataHVACDXHeatPumpSys->MaxONOFFCyclesperHour,
-                              state.dataHVACDXHeatPumpSys->HPTimeConstant,
-                              state.dataHVACDXHeatPumpSys->FanDelayTime,
+                              state.dataHVACDXHeatPumpSys->MaximumONOFFCyclesperHour,
+                              state.dataHVACDXHeatPumpSys->TimeConstant,
+                              state.dataHVACDXHeatPumpSys->HeatPumpFanDelayTime,
                               On,
                               PartLoadRatio,
                               state.dataHVACDXHeatPumpSys->SpeedNum,
                               state.dataHVACDXHeatPumpSys->SpeedRatio,
-                              state.dataHVACDXHeatPumpSys->QZnReq,
-                              state.dataHVACDXHeatPumpSys->QLatReq,
-                              state.dataHVACDXHeatPumpSys->OnOffAirFlowRatio);
+                              state.dataHVACDXHeatPumpSys->QZnReqr,
+                              state.dataHVACDXHeatPumpSys->QLatReqr,
+                              state.dataHVACDXHeatPumpSys->OnandOffAirFlowRatio);
 
         OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
