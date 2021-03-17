@@ -67,11 +67,6 @@ struct EnergyPlusData;
 namespace HeatBalFiniteDiffManager {
 
     // MODULE PARAMETER DEFINITIONS:
-    extern Real64 const Lambda;
-    extern Real64 const smalldiff; // Used in places where "equality" tests should not be used.
-
-    extern int const CrankNicholsonSecondOrder; // original CondFD scheme.  semi implicit, second order in time
-    extern int const FullyImplicitFirstOrder;   // fully implicit scheme, first order in time.
     extern Array1D_string const cCondFDSchemeType;
 
     extern Real64 const TempInitValue; // Initialization value for Temperature
