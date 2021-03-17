@@ -895,7 +895,6 @@ namespace Photovoltaics {
         //    integrated photovoltaics. Solar 2002, Sunrise on the Reliable Energy Economy, June 15-19, 2002 Reno, NV
 
         // Using/Aliasing
-        using DataHeatBalSurface::SurfTempOut;
         using TranspiredCollector::GetUTSCTsColl;
 
         int ThisSurf; // working variable for indexing surfaces
@@ -937,7 +936,7 @@ namespace Photovoltaics {
 
                 } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
                     // get back-of-module temperature from elsewhere in EnergyPlus
-                    PVarray(PVnum).SNLPVCalc.Tback = SurfTempOut(PVarray(PVnum).SurfacePtr);
+                    PVarray(PVnum).SNLPVCalc.Tback = state.dataHeatBalSurf->SurfTempOut(PVarray(PVnum).SurfacePtr);
 
                     PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
                                                                             PVarray(PVnum).SNLPVinto.IcBeam,
@@ -1181,7 +1180,6 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the PV performance.
 
-        using DataHeatBalSurface::SurfTempOut;
         using TranspiredCollector::GetUTSCTsColl;
 
         Real64 const EPS(0.001);
@@ -1266,7 +1264,7 @@ namespace Photovoltaics {
                                 (1.0 -
                                  std::exp(-PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep));
                     } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                        CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
+                        CellTemp = state.dataHeatBalSurf->SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
                     } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
                         GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, CellTemp);
                         CellTemp += DataGlobalConstants::KelvinConv;
@@ -1339,7 +1337,7 @@ namespace Photovoltaics {
                                (PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
                                    std::exp(-PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep);
                 } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                    CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
+                    CellTemp = state.dataHeatBalSurf->SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
                 } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
                     GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, CellTemp);
                     CellTemp += DataGlobalConstants::KelvinConv;

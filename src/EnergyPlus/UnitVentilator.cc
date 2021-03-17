@@ -1119,7 +1119,7 @@ namespace UnitVentilator {
         for (UnitVentNum = 1; UnitVentNum <= state.dataUnitVentilators->NumOfUnitVents; ++UnitVentNum) {
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilPresent) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
@@ -1127,7 +1127,7 @@ namespace UnitVentilator {
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
@@ -1136,7 +1136,7 @@ namespace UnitVentilator {
                 }
             } else {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilPresent) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
@@ -1144,7 +1144,7 @@ namespace UnitVentilator {
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
@@ -1156,7 +1156,7 @@ namespace UnitVentilator {
         for (UnitVentNum = 1; UnitVentNum <= state.dataUnitVentilators->NumOfUnitVents; ++UnitVentNum) {
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilPresent) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
@@ -1164,7 +1164,7 @@ namespace UnitVentilator {
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
@@ -1173,7 +1173,7 @@ namespace UnitVentilator {
                 }
             } else {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilPresent) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
@@ -1181,7 +1181,7 @@ namespace UnitVentilator {
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,

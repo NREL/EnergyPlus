@@ -366,7 +366,6 @@ namespace MundtSimMgr {
         // na
 
         // Using/Aliasing
-        using DataHeatBalSurface::TempSurfIn;
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using Psychrometrics::PsyCpAirFnW;
@@ -460,7 +459,7 @@ namespace MundtSimMgr {
 
         // get surface data
         for (SurfNum = 1; SurfNum <= ZoneData(ZoneNum).NumOfSurfs; ++SurfNum) {
-            MundtAirSurf(SurfNum, MundtZoneNum).Temp = TempSurfIn(ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
+            MundtAirSurf(SurfNum, MundtZoneNum).Temp = state.dataHeatBalSurf->TempSurfIn(ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
             MundtAirSurf(SurfNum, MundtZoneNum).Hc = state.dataHeatBal->HConvIn(ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
         }
     }

@@ -2027,13 +2027,6 @@ namespace WindowManager {
 
         // Using/Aliasing
         using namespace DataBSDFWindow;
-        using DataHeatBalSurface::QConvOutReport;
-        using DataHeatBalSurface::QdotConvOutRep;
-        using DataHeatBalSurface::QdotConvOutRepPerArea;
-        using DataHeatBalSurface::QdotRadOutRep;
-        using DataHeatBalSurface::QdotRadOutRepPerArea;
-        using DataHeatBalSurface::SurfQRadLWOutSrdSurfs;
-        using DataHeatBalSurface::QRadOutReport;
         using General::InterpSlatAng; // Function for slat angle interpolation
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
@@ -2623,9 +2616,9 @@ namespace WindowManager {
         }
         // update exterior environment surface heat loss reporting
         Tsout = SurfOutsideTemp + state.dataWindowManager->TKelvin;
-        QdotConvOutRep(SurfNum) = -surface.Area * state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout);
-        QdotConvOutRepPerArea(SurfNum) = -state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout);
-        QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+        state.dataHeatBalSurf->QdotConvOutRep(SurfNum) = -surface.Area * state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout);
+        state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum) = -state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout);
+        state.dataHeatBalSurf->QConvOutReport(SurfNum) = state.dataHeatBalSurf->QdotConvOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
         Real64 const Tsout_4(pow_4(Tsout)); // Tuned To reduce pow calls and redundancies
         Real64 const Tout_4(pow_4(state.dataWindowManager->tout));
@@ -2649,14 +2642,15 @@ namespace WindowManager {
         Real64 const rad_out_sky_per_area = - emiss_sigma_product * state.dataSurface->AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(state.dataEnvrn->SkyTempKelvin));
         Real64 const rad_out_per_area = rad_out_air_per_area + rad_out_sky_per_area + rad_out_ground_per_area + rad_out_lw_srd_per_area;
 
-        SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
-        QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area;
-        QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
-        QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+        state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
+        state.dataHeatBalSurf->QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area;
+        state.dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
+        state.dataHeatBalSurf->QRadOutReport(SurfNum) = state.dataHeatBalSurf->QdotRadOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
         // Radiation emission to air rate
-        DataHeatBalSurface::QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
-        DataHeatBalSurface::QHeatEmiReport(SurfNum) = surface.Area * state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout) + DataHeatBalSurface::QAirExtReport(SurfNum);
+        state.dataHeatBalSurf->QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
+        state.dataHeatBalSurf->QHeatEmiReport(SurfNum) =
+            surface.Area * state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout) + state.dataHeatBalSurf->QAirExtReport(SurfNum);
 
     }
 
