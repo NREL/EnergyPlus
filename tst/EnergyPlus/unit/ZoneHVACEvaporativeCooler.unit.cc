@@ -97,7 +97,7 @@ protected:
         state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
-        DataLoopNode::Node.allocate(NumOfNodes);
+        state->dataLoopNodes->Node.allocate(NumOfNodes);
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
         state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
 
@@ -212,16 +212,16 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
 
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = thisZoneEvapCooler.UnitReliefNodeNum;
 
-    DataLoopNode::Node.redimension(NumOfNodes);
-    DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 24.0;
-    DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0080;
-    DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
-                                   DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
+    state->dataLoopNodes->Node.redimension(NumOfNodes);
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 24.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0080;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
+                                   state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    DataLoopNode::Node(thisZoneEvapCooler.OAInletNodeNum).Temp = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(thisZoneEvapCooler.OAInletNodeNum).HumRat = state->dataEnvrn->OutHumRat;
-    DataLoopNode::Node(thisZoneEvapCooler.OAInletNodeNum).Enthalpy =
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).Enthalpy =
         Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
 
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.0;
@@ -336,16 +336,16 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
 
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = thisZoneEvapCooler.UnitReliefNodeNum;
 
-    DataLoopNode::Node.redimension(NumOfNodes);
-    DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 24.0;
-    DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0080;
-    DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
-                                   DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
+    state->dataLoopNodes->Node.redimension(NumOfNodes);
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 24.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0080;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
+                                   state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    DataLoopNode::Node(thisZoneEvapCooler.OAInletNodeNum).Temp = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(thisZoneEvapCooler.OAInletNodeNum).HumRat = state->dataEnvrn->OutHumRat;
-    DataLoopNode::Node(thisZoneEvapCooler.OAInletNodeNum).Enthalpy =
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).Enthalpy =
         Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
 
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.0;
@@ -468,21 +468,21 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
 
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = thisZoneEvapCooler.UnitReliefNodeNum;
 
-    DataLoopNode::Node.redimension(NumOfNodes);
-    DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 24.0;
-    DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0080;
-    DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
-                                   DataLoopNode::Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
+    state->dataLoopNodes->Node.redimension(NumOfNodes);
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 24.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0080;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
+                                   state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    DataLoopNode::Node(thisZoneEvapCooler.OAInletNodeNum).Temp = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(thisZoneEvapCooler.OAInletNodeNum).HumRat = state->dataEnvrn->OutHumRat;
-    DataLoopNode::Node(thisZoneEvapCooler.OAInletNodeNum).Enthalpy =
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).Enthalpy =
         Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
 
-    DataLoopNode::Node(thisEvapCooler.SecondaryInletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(thisEvapCooler.SecondaryInletNode).HumRat = state->dataEnvrn->OutHumRat;
-    DataLoopNode::Node(thisEvapCooler.SecondaryInletNode).Enthalpy =
+    state->dataLoopNodes->Node(thisEvapCooler.SecondaryInletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(thisEvapCooler.SecondaryInletNode).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(thisEvapCooler.SecondaryInletNode).Enthalpy =
         Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
 
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.0;

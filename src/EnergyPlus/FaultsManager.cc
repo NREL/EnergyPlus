@@ -873,13 +873,13 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     }
                     // Read in controller input if not done yet
-                    if (HVACControllers::GetControllerInputFlag) {
+                    if (state.dataHVACControllers->GetControllerInputFlag) {
                         HVACControllers::GetControllerInput(state);
-                        HVACControllers::GetControllerInputFlag = false;
+                        state.dataHVACControllers->GetControllerInputFlag = false;
                     }
                     // Check the controller name
                     int ControlNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).WaterCoilControllerName,
-                                                                     HVACControllers::ControllerProps,
+                                                                     state.dataHVACControllers->ControllerProps,
                                                                      &HVACControllers::ControllerPropsType::ControllerName);
                     if (ControlNum <= 0) {
                         ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + " = \"" +
@@ -887,11 +887,11 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
                         // Link the controller with the fault model
-                        HVACControllers::ControllerProps(ControlNum).FaultyCoilSATFlag = true;
-                        HVACControllers::ControllerProps(ControlNum).FaultyCoilSATIndex = jFault_CoilSAT;
+                        state.dataHVACControllers->ControllerProps(ControlNum).FaultyCoilSATFlag = true;
+                        state.dataHVACControllers->ControllerProps(ControlNum).FaultyCoilSATIndex = jFault_CoilSAT;
 
                         // Check whether the controller match the coil
-                        if (HVACControllers::ControllerProps(ControlNum).SensedNode != state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum) {
+                        if (state.dataHVACControllers->ControllerProps(ControlNum).SensedNode != state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum) {
                             ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + " = \"" +
                                             cAlphaArgs(6) + "\" does not match " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5));
                             ErrorsFound = true;
@@ -1400,7 +1400,7 @@ namespace FaultsManager {
             state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanName = cAlphaArgs(3);
 
             // Check whether the specified fan exists in the fan list
-            if (UtilityRoutines::FindItemInList(cAlphaArgs(3), Fans::Fan, &Fans::FanEquipConditions::FanName) <= 0) {
+            if (UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataFans->Fan, &Fans::FanEquipConditions::FanName) <= 0) {
                 ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                 "\" not found.");
                 ErrorsFound = true;
@@ -1408,9 +1408,9 @@ namespace FaultsManager {
 
             // Assign fault index to the fan object
             for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
-                if (UtilityRoutines::SameString(Fans::Fan(FanNum).FanName, cAlphaArgs(3))) {
-                    Fans::Fan(FanNum).FaultyFilterFlag = true;
-                    Fans::Fan(FanNum).FaultyFilterIndex = jFault_AirFilter;
+                if (UtilityRoutines::SameString(state.dataFans->Fan(FanNum).FanName, cAlphaArgs(3))) {
+                    state.dataFans->Fan(FanNum).FaultyFilterFlag = true;
+                    state.dataFans->Fan(FanNum).FaultyFilterIndex = jFault_AirFilter;
                     break;
                 }
             }
@@ -1672,14 +1672,14 @@ namespace FaultsManager {
                     ErrorsFound = true;
                 } else {
                     // Coil is found: check if the right type
-                    if ( (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_SimpleHeating) ||
-                         (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_Cooling) )
+                    if ( (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterSimpleHeating) ||
+                         (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) )
                     {
                         // Link the Coil with the fault model
                         state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag = true;
                         state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex = jFault_FoulingCoil;
 
-                        state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoiledType = state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num;
+                        state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoiledType = state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
                         state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoilNum = CoilNum;
 
                         SetupOutputVariable(state, "Coil Fouling Factor",
@@ -1691,7 +1691,7 @@ namespace FaultsManager {
 
                         // Coil:Cooling:Water doesn't report UA because it's not variable,
                         // but here, it's useful since we do change it via fouling, so report it
-                        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_Cooling) {
+                        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) {
                             SetupOutputVariable(state, "Cooling Coil Total U Factor Times Area Value",
                                     OutputProcessor::Unit::W_K,
                                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal,
@@ -1745,7 +1745,7 @@ namespace FaultsManager {
                     } else {
                         ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid "
                                        + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) + "\".");
-                        ShowContinueError(state, "Coil was found but it is not one of the supported types (\"Coil:Cooling:Water\" or \"Coil:Heating:Water\").");
+                        ShowContinueError(state, R"(Coil was found but it is not one of the supported types ("Coil:Cooling:Water" or "Coil:Heating:Water").)");
                         ErrorsFound = true;
                     }
                 }
@@ -2063,9 +2063,9 @@ namespace FaultsManager {
         FanFound = false;
 
         for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
-            if (UtilityRoutines::SameString(Fan(FanNum).FanName, FanName)) {
-                FanMaxAirFlowRate = Fan(FanNum).MaxAirFlowRate;
-                FanDeltaPress = Fan(FanNum).DeltaPress;
+            if (UtilityRoutines::SameString(state.dataFans->Fan(FanNum).FanName, FanName)) {
+                FanMaxAirFlowRate = state.dataFans->Fan(FanNum).MaxAirFlowRate;
+                FanDeltaPress = state.dataFans->Fan(FanNum).DeltaPress;
                 FanFound = true;
                 break;
             }

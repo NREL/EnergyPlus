@@ -302,7 +302,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         QLatUnitOut = 0.0;
         OutletNode = state.dataPTHP->PTUnit(PTUnitNum).AirOutNode;
         InletNode = state.dataPTHP->PTUnit(PTUnitNum).AirInNode;
-        AirMassFlow = Node(InletNode).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         OpMode = state.dataPTHP->PTUnit(PTUnitNum).OpMode;
 
         // reset operation flag if unit is off
@@ -352,23 +352,23 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         }
 
         // calculate delivered capacity
-        AirMassFlow = Node(InletNode).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
 
         if (!state.dataPTHP->PTUnit(PTUnitNum).useVSCoilModel) {
             CalcPTUnit(state, PTUnitNum, FirstHVACIteration, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, state.dataPTHP->SupHeaterLoad, HXUnitOn);
         } else {
             // calculate delivered capacity
-            MinHumRat = min(Node(InletNode).HumRat, Node(OutletNode).HumRat);
-            QSensUnitOut = AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRat) - PsyHFnTdbW(Node(InletNode).Temp, MinHumRat));
+            MinHumRat = min(state.dataLoopNodes->Node(InletNode).HumRat, state.dataLoopNodes->Node(OutletNode).HumRat);
+            QSensUnitOut = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, MinHumRat) - PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, MinHumRat));
         }
 
         // CR9155 Remove specific humidity calculations
-        SpecHumOut = Node(OutletNode).HumRat;
-        SpecHumIn = Node(InletNode).HumRat;
+        SpecHumOut = state.dataLoopNodes->Node(OutletNode).HumRat;
+        SpecHumIn = state.dataLoopNodes->Node(InletNode).HumRat;
         QLatUnitOut = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate, kg/s (dehumid = negative)
         QSensUnitOutNoATM =
-            AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
-        QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
+            AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) - PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
+        QTotUnitOut = AirMassFlow * (state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
 
         if (!state.dataPTHP->PTUnit(PTUnitNum).useVSCoilModel) {
             // report variables
@@ -398,7 +398,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         Real64 locFanElecPower = 0.0;
         if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            locFanElecPower = Fans::GetFanPower(state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
+            locFanElecPower = Fans::GetFanPower(state, state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
         } else {
             locFanElecPower = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->fanPower();
         }
@@ -622,10 +622,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
 
             state.dataPTHP->PTUnit(PTUnitNum).AirInNode =
-                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).AirOutNode =
-                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
             state.dataPTHP->PTUnit(PTUnitNum).OAMixName = Alphas(6);
@@ -734,7 +734,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     GetFanIndex(state, state.dataPTHP->PTUnit(PTUnitNum).FanName, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
                     FanInletNodeNum = GetFanInletNode(state, state.dataPTHP->PTUnit(PTUnitNum).FanType, state.dataPTHP->PTUnit(PTUnitNum).FanName, errFlag);
                     FanOutletNodeNum = GetFanOutletNode(state, state.dataPTHP->PTUnit(PTUnitNum).FanType, state.dataPTHP->PTUnit(PTUnitNum).FanName, errFlag);
-                    GetFanVolFlow(state.dataPTHP->PTUnit(PTUnitNum).FanIndex, FanVolFlow);
+                    GetFanVolFlow(state, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, FanVolFlow);
                     state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                     // Get the fan's availability schedule
                     state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, state.dataPTHP->PTUnit(PTUnitNum).FanType, state.dataPTHP->PTUnit(PTUnitNum).FanName, errFlag);
@@ -1026,7 +1026,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Heat Pumps air inlet node name must be the same as a zone exhaust node name.");
                     ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "..Heat pumps inlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                    ShowContinueError(state, "..Heat pumps inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
                     ErrorsFound = true;
                 }
             }
@@ -1047,7 +1047,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Heat Pumps air outlet node name must be the same as a zone inlet node name.");
                     ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "..Heat pumps outlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
+                    ShowContinueError(state, "..Heat pumps outlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
                     ErrorsFound = true;
                 }
             }
@@ -1057,7 +1057,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\". heat pump unit air inlet node name must be the same as the air terminal mixer outlet node name.");
                     ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                    ShowContinueError(state, "..heat pump unit air inlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                    ShowContinueError(state, "..heat pump unit air inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
                     ErrorsFound = true;
                 }
             }
@@ -1067,7 +1067,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\". heat pump unit air outlet node name must be the same as the air terminal mixer secondary node name.");
                     ShowContinueError(state, "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:SupplySideMixer object.");
-                    ShowContinueError(state, "..heat pump unit air outlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
+                    ShowContinueError(state, "..heat pump unit air outlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
                     ErrorsFound = true;
                 }
                 // check that the air teminal mixer secondary node is the supplemental heat coil air outlet node
@@ -1076,7 +1076,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                         "\". supplemental heating coil air outlet node name must be the same as an air terminal mixer secondary air node name.");
                     ShowContinueError(state, "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                    ShowContinueError(state, "..heat pump unit supp heater outlet node name = " + NodeID(SuppHeatOutletNodeNum));
+                    ShowContinueError(state, "..heat pump unit supp heater outlet node name = " + state.dataLoopNodes->NodeID(SuppHeatOutletNodeNum));
                     ErrorsFound = true;
                 }
             }
@@ -1087,8 +1087,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
                         ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\" PTUnit air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
-                        ShowContinueError(state, "..PTUnit air inlet node name            = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
-                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + NodeID(OANodeNums(3)));
+                        ShowContinueError(state, "..PTUnit air inlet node name            = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + state.dataLoopNodes->NodeID(OANodeNums(3)));
                         ErrorsFound = true;
                     }
                     // Fan inlet node name must be the same as the heat pump's OA mixer mixed air node name
@@ -1096,8 +1096,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\" Fan inlet node name must be the same as the heat pumps");
                         ShowContinueError(state, "OutdoorAir:Mixer mixed air node name when blow through " + cAlphaFields(15) + " is specified.");
-                        ShowContinueError(state, "..Fan inlet node name                   = " + NodeID(FanInletNodeNum));
-                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air node name = " + NodeID(OANodeNums(4)));
+                        ShowContinueError(state, "..Fan inlet node name                   = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air node name = " + state.dataLoopNodes->NodeID(OANodeNums(4)));
                         ErrorsFound = true;
                     }
                 }
@@ -1105,30 +1105,30 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Fan outlet node name must be the same as the cooling coil");
                     ShowContinueError(state, " inlet node name when blow through " + cAlphaFields(15) + " is specified.");
-                    ShowContinueError(state, "..Fan outlet node name         = " + NodeID(FanOutletNodeNum));
-                    ShowContinueError(state, "..Cooling coil inlet node name = " + NodeID(CoolCoilInletNodeNum));
+                    ShowContinueError(state, "..Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNodeNum));
+                    ShowContinueError(state, "..Cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolCoilInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (CoolCoilOutletNodeNum != HeatCoilInletNodeNum) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Cooling coil outlet node name must be the same as the heating coil inlet node name.");
-                    ShowContinueError(state, "..Cooling coil outlet node name = " + NodeID(CoolCoilOutletNodeNum));
-                    ShowContinueError(state, "..Heating coil inlet node name  = " + NodeID(HeatCoilInletNodeNum));
+                    ShowContinueError(state, "..Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolCoilOutletNodeNum));
+                    ShowContinueError(state, "..Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatCoilInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (HeatCoilOutletNodeNum != SuppHeatInletNodeNum) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Heating coil outlet node name must be the same as the supplemental heating coil inlet");
                     ShowContinueError(state, " node name when blow through " + cAlphaFields(14) + " is specified.");
-                    ShowContinueError(state, "..Heating coil outlet node name              = " + NodeID(HeatCoilOutletNodeNum));
-                    ShowContinueError(state, "..Supplemental heating coil inlet node name  = " + NodeID(SuppHeatInletNodeNum));
+                    ShowContinueError(state, "..Heating coil outlet node name              = " + state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum));
+                    ShowContinueError(state, "..Supplemental heating coil inlet node name  = " + state.dataLoopNodes->NodeID(SuppHeatInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (SuppHeatOutletNodeNum != state.dataPTHP->PTUnit(PTUnitNum).AirOutNode) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Supplemental heating coil outlet node name must be the same as the heat pumps outlet node name.");
-                    ShowContinueError(state, "..Supplemental heating coil outlet node name = " + NodeID(SuppHeatOutletNodeNum));
-                    ShowContinueError(state, "..Heat pumps outlet node name                   = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
+                    ShowContinueError(state, "..Supplemental heating coil outlet node name = " + state.dataLoopNodes->NodeID(SuppHeatOutletNodeNum));
+                    ShowContinueError(state, "..Heat pumps outlet node name                   = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
                     ErrorsFound = true;
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
@@ -1137,7 +1137,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\". fan inlet node name must be the same as an air terminal mixer outlet node name.");
                         ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                        ShowContinueError(state, "..fan inlet node name = " + NodeID(FanInletNodeNum));
+                        ShowContinueError(state, "..fan inlet node name = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
                         ErrorsFound = true;
                     }
                 }
@@ -1148,8 +1148,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
                         ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\" PTUnit air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
-                        ShowContinueError(state, "..PTUnit air inlet node name            = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
-                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + NodeID(OANodeNums(3)));
+                        ShowContinueError(state, "..PTUnit air inlet node name            = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + state.dataLoopNodes->NodeID(OANodeNums(3)));
                         ErrorsFound = true;
                     }
                     // Fan outlet node name must be the same as the supplemental heating coil inlet node name
@@ -1157,38 +1157,38 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\" OutdoorAir:Mixer mixed air node name must be the same as the cooling coil");
                         ShowContinueError(state, " inlet node name when draw through " + cAlphaFields(15) + " is specified.");
-                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air name = " + NodeID(OANodeNums(4)));
-                        ShowContinueError(state, "..Cooling coil inlet node name     = " + NodeID(CoolCoilInletNodeNum));
+                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air name = " + state.dataLoopNodes->NodeID(OANodeNums(4)));
+                        ShowContinueError(state, "..Cooling coil inlet node name     = " + state.dataLoopNodes->NodeID(CoolCoilInletNodeNum));
                         ErrorsFound = true;
                     }
                 }
                 if (CoolCoilOutletNodeNum != HeatCoilInletNodeNum) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Cooling coil outlet node name must be the same as the heating coil inlet node name.");
-                    ShowContinueError(state, "..Cooling coil outlet node name = " + NodeID(CoolCoilOutletNodeNum));
-                    ShowContinueError(state, "..Heating coil inlet node name  = " + NodeID(HeatCoilInletNodeNum));
+                    ShowContinueError(state, "..Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolCoilOutletNodeNum));
+                    ShowContinueError(state, "..Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatCoilInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (HeatCoilOutletNodeNum != FanInletNodeNum) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Heating coil outlet node name must be the same as the fan inlet node name");
                     ShowContinueError(state, " when draw through " + cAlphaFields(15) + " is specified.");
-                    ShowContinueError(state, "..Heating coil outlet node name = " + NodeID(HeatCoilOutletNodeNum));
-                    ShowContinueError(state, "..Fan inlet node name           = " + NodeID(FanInletNodeNum));
+                    ShowContinueError(state, "..Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum));
+                    ShowContinueError(state, "..Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (SuppHeatInletNodeNum != FanOutletNodeNum) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\" Fan outlet node name must be the same");
                     ShowContinueError(state, "as the supplemental heating coil inlet node name when draw through " + cAlphaFields(15) + " is specified.");
-                    ShowContinueError(state, "..Fan outlet node = " + NodeID(FanOutletNodeNum));
-                    ShowContinueError(state, "..Supplemental heating coil inlet node = " + NodeID(SuppHeatInletNodeNum));
+                    ShowContinueError(state, "..Fan outlet node = " + state.dataLoopNodes->NodeID(FanOutletNodeNum));
+                    ShowContinueError(state, "..Supplemental heating coil inlet node = " + state.dataLoopNodes->NodeID(SuppHeatInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (SuppHeatOutletNodeNum != state.dataPTHP->PTUnit(PTUnitNum).AirOutNode) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Supplemental heating coil outlet node name must be the same as the heat pumps outlet node name.");
-                    ShowContinueError(state, "..Supplemental heating coil outlet node name = " + NodeID(SuppHeatOutletNodeNum));
-                    ShowContinueError(state, "..Heat pumps outlet node name                = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
+                    ShowContinueError(state, "..Supplemental heating coil outlet node name = " + state.dataLoopNodes->NodeID(SuppHeatOutletNodeNum));
+                    ShowContinueError(state, "..Heat pumps outlet node name                = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
                     ErrorsFound = true;
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
@@ -1197,7 +1197,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\". cooling coil inlet node name must be the same as an air terminal mixer outlet node name.");
                         ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                        ShowContinueError(state, "..cooling coil inlet node name = " + NodeID(CoolCoilInletNodeNum));
+                        ShowContinueError(state, "..cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolCoilInletNodeNum));
                         ErrorsFound = true;
                     }
                 }
@@ -1393,14 +1393,14 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             }
 
-            CompSetFanInlet = NodeID(FanInletNodeNum);
-            CompSetFanOutlet = NodeID(FanOutletNodeNum);
-            CompSetCoolInlet = NodeID(CoolCoilInletNodeNum);
-            CompSetCoolOutlet = NodeID(CoolCoilOutletNodeNum);
-            CompSetHeatInlet = NodeID(HeatCoilInletNodeNum);
-            CompSetHeatOutlet = NodeID(HeatCoilOutletNodeNum);
-            CompSetSupHeatInlet = NodeID(SuppHeatInletNodeNum);
-            CompSetSupHeatOutlet = NodeID(SuppHeatOutletNodeNum);
+            CompSetFanInlet = state.dataLoopNodes->NodeID(FanInletNodeNum);
+            CompSetFanOutlet = state.dataLoopNodes->NodeID(FanOutletNodeNum);
+            CompSetCoolInlet = state.dataLoopNodes->NodeID(CoolCoilInletNodeNum);
+            CompSetCoolOutlet = state.dataLoopNodes->NodeID(CoolCoilOutletNodeNum);
+            CompSetHeatInlet = state.dataLoopNodes->NodeID(HeatCoilInletNodeNum);
+            CompSetHeatOutlet = state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum);
+            CompSetSupHeatInlet = state.dataLoopNodes->NodeID(SuppHeatInletNodeNum);
+            CompSetSupHeatOutlet = state.dataLoopNodes->NodeID(SuppHeatOutletNodeNum);
 
             // Add fan to component sets array
             SetUpCompSets(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType,
@@ -1437,22 +1437,22 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTHPUnit) {
                 if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                     // Add heating coil water inlet node as actuator node for coil
-                    TempNodeNum = GetOnlySingleNode(state, NodeID(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode),
+                    TempNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode),
                                                     ErrorsFound,
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                                    NodeType_Water,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 } else if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                     // Add heating coil steam inlet node as actualtor node for coil
-                    TempNodeNum = GetOnlySingleNode(state, NodeID(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode),
+                    TempNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode),
                                                     ErrorsFound,
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                                    NodeType_Steam,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeFluidType::Steam,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 }
@@ -1463,8 +1463,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                               state.dataPTHP->PTUnit(PTUnitNum).Name,
                               state.dataPTHP->PTUnit(PTUnitNum).OAMixType,
                               state.dataPTHP->PTUnit(PTUnitNum).OAMixName,
-                              NodeID(OANodeNums(1)),
-                              NodeID(OANodeNums(4)));
+                              state.dataLoopNodes->NodeID(OANodeNums(1)),
+                              state.dataLoopNodes->NodeID(OANodeNums(4)));
             }
         }
 
@@ -1518,10 +1518,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
 
             state.dataPTHP->PTUnit(PTUnitNum).AirInNode =
-                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).AirOutNode =
-                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
             state.dataPTHP->PTUnit(PTUnitNum).OAMixName = Alphas(6);
@@ -1644,7 +1644,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     GetFanIndex(state, state.dataPTHP->PTUnit(PTUnitNum).FanName, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
                     FanInletNodeNum = GetFanInletNode(state, state.dataPTHP->PTUnit(PTUnitNum).FanType, state.dataPTHP->PTUnit(PTUnitNum).FanName, errFlag);
                     FanOutletNodeNum = GetFanOutletNode(state, state.dataPTHP->PTUnit(PTUnitNum).FanType, state.dataPTHP->PTUnit(PTUnitNum).FanName, errFlag);
-                    GetFanVolFlow(state.dataPTHP->PTUnit(PTUnitNum).FanIndex, FanVolFlow);
+                    GetFanVolFlow(state, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, FanVolFlow);
                     state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                 }
             }
@@ -1860,7 +1860,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Air-conditioners air inlet node name must be the same as a zone exhaust node name.");
                     ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "..Air-conditioners inlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                    ShowContinueError(state, "..Air-conditioners inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
                     ErrorsFound = true;
                 }
             }
@@ -1881,7 +1881,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Air-conditioners air outlet node name must be the same as a zone inlet node name.");
                     ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "..Air-conditioners outlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
+                    ShowContinueError(state, "..Air-conditioners outlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
                     ErrorsFound = true;
                 }
             }
@@ -1891,7 +1891,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Air-conditioners air inlet node name must be the same as the air terminal mixer outlet node name.");
                     ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                    ShowContinueError(state, "..Air-conditioners air inlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                    ShowContinueError(state, "..Air-conditioners air inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
                     ErrorsFound = true;
                 }
             }
@@ -1901,7 +1901,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Air-conditioners air outlet node name must be the same as the air terminal mixer secondary node name.");
                     ShowContinueError(state, "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                    ShowContinueError(state, "..Air-conditioners air outlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
+                    ShowContinueError(state, "..Air-conditioners air outlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
                     ErrorsFound = true;
                 }
             }
@@ -1915,8 +1915,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\" Fan inlet node name must be the same as the air conditioners");
                         ShowContinueError(state, "OutdoorAir:Mixer mixed air node name when blow through " + cAlphaFields(13) + " is specified.");
-                        ShowContinueError(state, "..Fan inlet node name                   = " + NodeID(FanInletNodeNum));
-                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air node name = " + NodeID(OANodeNums(4)));
+                        ShowContinueError(state, "..Fan inlet node name                   = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air node name = " + state.dataLoopNodes->NodeID(OANodeNums(4)));
                         ErrorsFound = true;
                     }
 
@@ -1924,8 +1924,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError(state, "..Heat Pump air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
-                        ShowContinueError(state, "..Heat Pump air inlet node name         = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
-                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + NodeID(OANodeNums(3)));
+                        ShowContinueError(state, "..Heat Pump air inlet node name         = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + state.dataLoopNodes->NodeID(OANodeNums(3)));
                         ErrorsFound = true;
                     }
                 }
@@ -1934,23 +1934,23 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Fan outlet node name must be the same as the cooling coil");
                     ShowContinueError(state, " inlet node name when blow through " + cAlphaFields(12) + " is specified.");
-                    ShowContinueError(state, "..Fan outlet node name         = " + NodeID(FanOutletNodeNum));
-                    ShowContinueError(state, "..Cooling coil inlet node name = " + NodeID(CoolCoilInletNodeNum));
+                    ShowContinueError(state, "..Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNodeNum));
+                    ShowContinueError(state, "..Cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolCoilInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (CoolCoilOutletNodeNum != HeatCoilInletNodeNum) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Cooling coil outlet node name must be the same as the heating coil inlet node name.");
-                    ShowContinueError(state, "..Cooling coil outlet node name = " + NodeID(CoolCoilOutletNodeNum));
-                    ShowContinueError(state, "..Heating coil inlet node name  = " + NodeID(HeatCoilInletNodeNum));
+                    ShowContinueError(state, "..Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolCoilOutletNodeNum));
+                    ShowContinueError(state, "..Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatCoilInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (HeatCoilOutletNodeNum != state.dataPTHP->PTUnit(PTUnitNum).AirOutNode) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Heating coil outlet node name must be the same as the air conditioners outlet");
                     ShowContinueError(state, " node name when blow through " + cAlphaFields(12) + " is specified.");
-                    ShowContinueError(state, "..Heating coil outlet node name      = " + NodeID(HeatCoilOutletNodeNum));
-                    ShowContinueError(state, "..Air conditioners outlet node name  = " + NodeID(SuppHeatInletNodeNum));
+                    ShowContinueError(state, "..Heating coil outlet node name      = " + state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum));
+                    ShowContinueError(state, "..Air conditioners outlet node name  = " + state.dataLoopNodes->NodeID(SuppHeatInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (!state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists && OANodeNums(4) == 0) {
@@ -1959,8 +1959,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError(state, "..Fan inlet node name must be the same as the Air-conditioners inlet air node name");
                         ShowContinueError(state, "..when blow through " + cAlphaFields(16) + " is specified and an outdoor air mixer is not used.");
-                        ShowContinueError(state, "..Fan inlet node name           = " + NodeID(FanInletNodeNum));
-                        ShowContinueError(state, "..Heat pump air inlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                        ShowContinueError(state, "..Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                        ShowContinueError(state, "..Heat pump air inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
                         ErrorsFound = true;
                     }
                 }
@@ -1970,7 +1970,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\". fan inlet node name must be the same as an air terminal mixer outlet node name.");
                         ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                        ShowContinueError(state, "..fan inlet node name = " + NodeID(FanInletNodeNum));
+                        ShowContinueError(state, "..fan inlet node name = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
                         ErrorsFound = true;
                     }
                 }
@@ -1982,8 +1982,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
                         ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\" Air Conditioners air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
-                        ShowContinueError(state, "..Air Conditioner air inlet node name   = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
-                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + NodeID(OANodeNums(3)));
+                        ShowContinueError(state, "..Air Conditioner air inlet node name   = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + state.dataLoopNodes->NodeID(OANodeNums(3)));
                         ErrorsFound = true;
                     }
                     // cooling coil inlet node name must be the same as the OA mixers mixed air node name
@@ -1991,31 +1991,31 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\" OutdoorAir:Mixer mixed air node name must be the same as the cooling coil");
                         ShowContinueError(state, " inlet node name when draw through " + cAlphaFields(13) + " is specified.");
-                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air name = " + NodeID(OANodeNums(4)));
-                        ShowContinueError(state, "..Cooling coil inlet node name     = " + NodeID(CoolCoilInletNodeNum));
+                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air name = " + state.dataLoopNodes->NodeID(OANodeNums(4)));
+                        ShowContinueError(state, "..Cooling coil inlet node name     = " + state.dataLoopNodes->NodeID(CoolCoilInletNodeNum));
                         ErrorsFound = true;
                     }
                 }
                 if (CoolCoilOutletNodeNum != HeatCoilInletNodeNum) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Cooling coil outlet node name must be the same as the heating coil inlet node name.");
-                    ShowContinueError(state, "..Cooling coil outlet node name = " + NodeID(CoolCoilOutletNodeNum));
-                    ShowContinueError(state, "..Heating coil inlet node name  = " + NodeID(HeatCoilInletNodeNum));
+                    ShowContinueError(state, "..Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolCoilOutletNodeNum));
+                    ShowContinueError(state, "..Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatCoilInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (HeatCoilOutletNodeNum != FanInletNodeNum) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\" Heating coil outlet node name must be the same as the fan inlet node name");
                     ShowContinueError(state, " when blow through " + cAlphaFields(13) + " is specified.");
-                    ShowContinueError(state, "..Heating coil outlet node name = " + NodeID(HeatCoilOutletNodeNum));
-                    ShowContinueError(state, "..Fan inlet node name           = " + NodeID(FanInletNodeNum));
+                    ShowContinueError(state, "..Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum));
+                    ShowContinueError(state, "..Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (FanOutletNodeNum != state.dataPTHP->PTUnit(PTUnitNum).AirOutNode) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\" Fan outlet node name must be the same");
                     ShowContinueError(state, "as the air conditioners outlet node name when draw through " + cAlphaFields(13) + " is specified.");
-                    ShowContinueError(state, "..Fan outlet node  name             = " + NodeID(FanOutletNodeNum));
-                    ShowContinueError(state, "..Air conditioners outlet node name = " + NodeID(SuppHeatInletNodeNum));
+                    ShowContinueError(state, "..Fan outlet node  name             = " + state.dataLoopNodes->NodeID(FanOutletNodeNum));
+                    ShowContinueError(state, "..Air conditioners outlet node name = " + state.dataLoopNodes->NodeID(SuppHeatInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
@@ -2024,7 +2024,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\". cooling coil inlet node name must be the same as an air terminal mixer outlet node name.");
                         ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                        ShowContinueError(state, "..cooling coil inlet node name = " + NodeID(CoolCoilInletNodeNum));
+                        ShowContinueError(state, "..cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolCoilInletNodeNum));
                         ErrorsFound = true;
                     }
                 }
@@ -2203,56 +2203,56 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             }
 
-            CompSetFanInlet = NodeID(FanInletNodeNum);
-            CompSetFanOutlet = NodeID(FanOutletNodeNum);
-            CompSetCoolInlet = NodeID(CoolCoilInletNodeNum);
-            CompSetCoolOutlet = NodeID(CoolCoilOutletNodeNum);
-            CompSetHeatInlet = NodeID(HeatCoilInletNodeNum);
-            CompSetHeatOutlet = NodeID(HeatCoilOutletNodeNum);
+            CompSetFanInlet = state.dataLoopNodes->NodeID(FanInletNodeNum);
+            CompSetFanOutlet = state.dataLoopNodes->NodeID(FanOutletNodeNum);
+            CompSetCoolInlet = state.dataLoopNodes->NodeID(CoolCoilInletNodeNum);
+            CompSetCoolOutlet = state.dataLoopNodes->NodeID(CoolCoilOutletNodeNum);
+            CompSetHeatInlet = state.dataLoopNodes->NodeID(HeatCoilInletNodeNum);
+            CompSetHeatOutlet = state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum);
 
             // Add fan to component sets array
             SetUpCompSets(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                           state.dataPTHP->PTUnit(PTUnitNum).Name,
                           state.dataPTHP->PTUnit(PTUnitNum).FanType,
                           state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                          NodeID(FanInletNodeNum),
-                          NodeID(FanOutletNodeNum));
+                          state.dataLoopNodes->NodeID(FanInletNodeNum),
+                          state.dataLoopNodes->NodeID(FanOutletNodeNum));
 
             // Add cooling coil to component sets array
             SetUpCompSets(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                           state.dataPTHP->PTUnit(PTUnitNum).Name,
                           state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType,
                           state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
-                          NodeID(CoolCoilInletNodeNum),
-                          NodeID(CoolCoilOutletNodeNum));
+                          state.dataLoopNodes->NodeID(CoolCoilInletNodeNum),
+                          state.dataLoopNodes->NodeID(CoolCoilOutletNodeNum));
 
             // Add heating coil to component sets array
             SetUpCompSets(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                           state.dataPTHP->PTUnit(PTUnitNum).Name,
                           state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType,
                           ACHeatCoilName,
-                          NodeID(HeatCoilInletNodeNum),
-                          NodeID(HeatCoilOutletNodeNum));
+                          state.dataLoopNodes->NodeID(HeatCoilInletNodeNum),
+                          state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum));
 
             if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                 if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                     // Add heating coil water inlet node as actuator node for coil
-                    TempNodeNum = GetOnlySingleNode(state, NodeID(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode),
+                    TempNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode),
                                                     ErrorsFound,
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                                    NodeType_Water,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 } else if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                     // Add heating coil steam inlet node as actualtor node for coil
-                    TempNodeNum = GetOnlySingleNode(state, NodeID(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode),
+                    TempNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode),
                                                     ErrorsFound,
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                                    NodeType_Steam,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeFluidType::Steam,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 }
@@ -2264,8 +2264,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                               state.dataPTHP->PTUnit(PTUnitNum).Name,
                               state.dataPTHP->PTUnit(PTUnitNum).OAMixType,
                               state.dataPTHP->PTUnit(PTUnitNum).OAMixName,
-                              NodeID(OANodeNums(1)),
-                              NodeID(OANodeNums(4)));
+                              state.dataLoopNodes->NodeID(OANodeNums(1)),
+                              state.dataLoopNodes->NodeID(OANodeNums(4)));
             }
         }
 
@@ -2323,10 +2323,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
 
             state.dataPTHP->PTUnit(PTUnitNum).AirInNode =
-                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).AirOutNode =
-                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
 
             state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
             state.dataPTHP->PTUnit(PTUnitNum).OAMixName = Alphas(6);
@@ -2402,7 +2402,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                             ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                             ErrorsFound = true;
                         } else {
-                            GetFanVolFlow(state.dataPTHP->PTUnit(PTUnitNum).FanIndex, FanVolFlow);
+                            GetFanVolFlow(state, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, FanVolFlow);
                             state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                         }
                         errFlag = false;
@@ -2654,8 +2654,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                        ErrorsFound,
                                                                        CurrentModuleObject,
                                                                        Alphas(1),
-                                                                       NodeType_Air,
-                                                                       NodeConnectionType_OutsideAirReference,
+                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                       DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                        1,
                                                                        ObjectIsNotParent);
                 // need better verification.
@@ -2725,15 +2725,15 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (CoolCoilOutletNodeNum != HeatCoilInletNodeNum) { // cooling coil outlet must equal heating coil inlet
                 ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                 "\" Cooling coil outlet node name must be the same as the heating coil inlet node name.");
-                ShowContinueError(state, "..Cooling coil outlet node name = " + NodeID(CoolCoilOutletNodeNum));
-                ShowContinueError(state, "..Heating coil inlet node name  = " + NodeID(HeatCoilInletNodeNum));
+                ShowContinueError(state, "..Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolCoilOutletNodeNum));
+                ShowContinueError(state, "..Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatCoilInletNodeNum));
                 ErrorsFound = true;
             }
             if (SuppHeatOutletNodeNum != state.dataPTHP->PTUnit(PTUnitNum).AirOutNode) { // check that supp HC out = heat pump air outlet
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, "..Supplemental heating coil outlet node name must be the same as the heat pumps outlet node name.");
-                ShowContinueError(state, "..Supplemental heating coil outlet node name = " + NodeID(SuppHeatOutletNodeNum));
-                ShowContinueError(state, "..Heat pumps outlet node name                   = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
+                ShowContinueError(state, "..Supplemental heating coil outlet node name = " + state.dataLoopNodes->NodeID(SuppHeatOutletNodeNum));
+                ShowContinueError(state, "..Heat pumps outlet node name                   = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
                 ErrorsFound = true;
             }
             // check that PTUnit inlet node is a zone exhaust node.
@@ -2752,7 +2752,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Heat Pumps air inlet node name must be the same as a zone exhaust node name.");
                     ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "..Heat pumps inlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                    ShowContinueError(state, "..Heat pumps inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
                     ErrorsFound = true;
                 }
             }
@@ -2773,7 +2773,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Heat Pumps air outlet node name must be the same as a zone inlet node name.");
                     ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "..Heat pumps outlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
+                    ShowContinueError(state, "..Heat pumps outlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
                     ErrorsFound = true;
                 }
             }
@@ -2783,7 +2783,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\". heat pump unit air inlet node name must be the same as the air terminal mixer outlet node name.");
                     ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                    ShowContinueError(state, "..heat pump unit air inlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                    ShowContinueError(state, "..heat pump unit air inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
                     ErrorsFound = true;
                 }
             }
@@ -2793,7 +2793,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                     "\". heat pump unit air outlet node name must be the same as the air terminal mixer secondary node name.");
                     ShowContinueError(state, "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                    ShowContinueError(state, "..heat pump unit air outlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
+                    ShowContinueError(state, "..heat pump unit air outlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode));
                     ErrorsFound = true;
                 }
                 // check that the air terminal mixer secondary node is the supplemental heat coil air outlet node
@@ -2802,7 +2802,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                         "\". supplemental heating coil air outlet node name must be the same as an air terminal mixer secondary air node name.");
                     ShowContinueError(state, "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                    ShowContinueError(state, "..heat pump unit supp heater outlet node name = " + NodeID(SuppHeatOutletNodeNum));
+                    ShowContinueError(state, "..heat pump unit supp heater outlet node name = " + state.dataLoopNodes->NodeID(SuppHeatOutletNodeNum));
                     ErrorsFound = true;
                 }
             }
@@ -2813,16 +2813,16 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Fan outlet node name must be the same as the cooling coil inlet node name");
                     ShowContinueError(state, "..when blow through " + cAlphaFields(16) + " is specified.");
-                    ShowContinueError(state, "..Fan outlet node name         = " + NodeID(FanOutletNodeNum));
-                    ShowContinueError(state, "..Cooling coil inlet node name = " + NodeID(CoolCoilInletNodeNum));
+                    ShowContinueError(state, "..Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNodeNum));
+                    ShowContinueError(state, "..Cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolCoilInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (HeatCoilOutletNodeNum != SuppHeatInletNodeNum) { // check that heating coil outlet equals supp heating coil inlet
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Heating coil outlet node name must be the same as the supplemental heating coil inlet node name");
                     ShowContinueError(state, "..when blow through " + cAlphaFields(16) + " is specified.");
-                    ShowContinueError(state, "..Heating coil outlet node name              = " + NodeID(HeatCoilOutletNodeNum));
-                    ShowContinueError(state, "..Supplemental heating coil inlet node name  = " + NodeID(SuppHeatInletNodeNum));
+                    ShowContinueError(state, "..Heating coil outlet node name              = " + state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum));
+                    ShowContinueError(state, "..Supplemental heating coil inlet node name  = " + state.dataLoopNodes->NodeID(SuppHeatInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (!state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists && OANodeNums(4) > 0) {
@@ -2831,16 +2831,16 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError(state, "..Fan inlet node name must be the same as the heat pumps OutdoorAir:Mixer mixed air node name");
                         ShowContinueError(state, "..when blow through " + cAlphaFields(16) + " is specified.");
-                        ShowContinueError(state, "..Fan inlet node name                   = " + NodeID(FanInletNodeNum));
-                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air node name = " + NodeID(OANodeNums(4)));
+                        ShowContinueError(state, "..Fan inlet node name                   = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air node name = " + state.dataLoopNodes->NodeID(OANodeNums(4)));
                         ErrorsFound = true;
                     }
                     // OA mixer return node must equal heat pump air inlet node
                     if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError(state, "..Heat Pump air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
-                        ShowContinueError(state, "..Heat Pump air inlet node name         = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
-                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + NodeID(OANodeNums(3)));
+                        ShowContinueError(state, "..Heat Pump air inlet node name         = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + state.dataLoopNodes->NodeID(OANodeNums(3)));
                         ErrorsFound = true;
                     }
                 }
@@ -2850,8 +2850,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError(state, "..Fan inlet node name must be the same as the heat pumps inlet air node name");
                         ShowContinueError(state, "..when blow through " + cAlphaFields(16) + " is specified and an outdoor air mixer is not used.");
-                        ShowContinueError(state, "..Fan inlet node name           = " + NodeID(FanInletNodeNum));
-                        ShowContinueError(state, "..Heat pump air inlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                        ShowContinueError(state, "..Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                        ShowContinueError(state, "..Heat pump air inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
                         ErrorsFound = true;
                     }
                 }
@@ -2861,7 +2861,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\". fan inlet node name must be the same as an air terminal mixer outlet node name.");
                         ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                        ShowContinueError(state, "..fan inlet node name = " + NodeID(FanInletNodeNum));
+                        ShowContinueError(state, "..fan inlet node name = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
                         ErrorsFound = true;
                     }
                 }
@@ -2873,16 +2873,16 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Heating coil outlet node name must be the same as the fan inlet node name");
                     ShowContinueError(state, "..when draw through " + cAlphaFields(16) + " is specified.");
-                    ShowContinueError(state, "..Heating coil outlet node name = " + NodeID(HeatCoilOutletNodeNum));
-                    ShowContinueError(state, "..Fan inlet node name           = " + NodeID(FanInletNodeNum));
+                    ShowContinueError(state, "..Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum));
+                    ShowContinueError(state, "..Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (SuppHeatInletNodeNum != FanOutletNodeNum) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Fan outlet node name must be the same as the supplemental heating coil inlet node name ");
                     ShowContinueError(state, "..when draw through " + cAlphaFields(16) + " is specified.");
-                    ShowContinueError(state, "..Fan outlet node = " + NodeID(FanOutletNodeNum));
-                    ShowContinueError(state, "..Supplemental heating coil inlet node = " + NodeID(SuppHeatInletNodeNum));
+                    ShowContinueError(state, "..Fan outlet node = " + state.dataLoopNodes->NodeID(FanOutletNodeNum));
+                    ShowContinueError(state, "..Supplemental heating coil inlet node = " + state.dataLoopNodes->NodeID(SuppHeatInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (OANodeNums(4) == 0) {
@@ -2891,8 +2891,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError(state, "..Heat pump air inlet node name must be the same as the cooling coil inlet node name");
                         ShowContinueError(state, "..when draw through " + cAlphaFields(16) + " is specified and an outdoor air mixer is not used.");
-                        ShowContinueError(state, "..Heat pump air inlet node name = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
-                        ShowContinueError(state, "..Cooling coil inlet node name  = " + NodeID(CoolCoilInletNodeNum));
+                        ShowContinueError(state, "..Heat pump air inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                        ShowContinueError(state, "..Cooling coil inlet node name  = " + state.dataLoopNodes->NodeID(CoolCoilInletNodeNum));
                         ErrorsFound = true;
                     }
                 }
@@ -2902,16 +2902,16 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, CurrentModuleObject + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\" OutdoorAir:Mixer mixed air node name must be the same as the cooling coil");
                         ShowContinueError(state, " inlet node name when draw through " + cAlphaFields(16) + " is specified.");
-                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air name = " + NodeID(OANodeNums(4)));
-                        ShowContinueError(state, "..Cooling coil inlet node name    = " + NodeID(CoolCoilInletNodeNum));
+                        ShowContinueError(state, "..OutdoorAir:Mixer mixed air name = " + state.dataLoopNodes->NodeID(OANodeNums(4)));
+                        ShowContinueError(state, "..Cooling coil inlet node name    = " + state.dataLoopNodes->NodeID(CoolCoilInletNodeNum));
                         ErrorsFound = true;
                     }
                     // check OA Mixer return node
                     if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError(state, "..Heat Pump air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
-                        ShowContinueError(state, "..Heat Pump air inlet node name         = " + NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
-                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + NodeID(OANodeNums(3)));
+                        ShowContinueError(state, "..Heat Pump air inlet node name         = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                        ShowContinueError(state, "..OutdoorAir:Mixer return air node name = " + state.dataLoopNodes->NodeID(OANodeNums(3)));
                         ErrorsFound = true;
                     }
                 }
@@ -2921,20 +2921,20 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         ShowSevereError(state, CurrentModuleObject + " = \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
                                         "\". cooling coil inlet node name must be the same as an air terminal mixer outlet node name.");
                         ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object.");
-                        ShowContinueError(state, "..cooling coil inlet node name = " + NodeID(CoolCoilInletNodeNum));
+                        ShowContinueError(state, "..cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolCoilInletNodeNum));
                         ErrorsFound = true;
                     }
                 }
             } // end draw through IF block
 
-            CompSetFanInlet = NodeID(FanInletNodeNum);
-            CompSetFanOutlet = NodeID(FanOutletNodeNum);
-            CompSetCoolInlet = NodeID(CoolCoilInletNodeNum);
-            CompSetCoolOutlet = NodeID(CoolCoilOutletNodeNum);
-            CompSetHeatInlet = NodeID(HeatCoilInletNodeNum);
-            CompSetHeatOutlet = NodeID(HeatCoilOutletNodeNum);
-            CompSetSupHeatInlet = NodeID(SuppHeatInletNodeNum);
-            CompSetSupHeatOutlet = NodeID(SuppHeatOutletNodeNum);
+            CompSetFanInlet = state.dataLoopNodes->NodeID(FanInletNodeNum);
+            CompSetFanOutlet = state.dataLoopNodes->NodeID(FanOutletNodeNum);
+            CompSetCoolInlet = state.dataLoopNodes->NodeID(CoolCoilInletNodeNum);
+            CompSetCoolOutlet = state.dataLoopNodes->NodeID(CoolCoilOutletNodeNum);
+            CompSetHeatInlet = state.dataLoopNodes->NodeID(HeatCoilInletNodeNum);
+            CompSetHeatOutlet = state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum);
+            CompSetSupHeatInlet = state.dataLoopNodes->NodeID(SuppHeatInletNodeNum);
+            CompSetSupHeatOutlet = state.dataLoopNodes->NodeID(SuppHeatOutletNodeNum);
 
             // Add fan to component sets array
             SetUpCompSets(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType,
@@ -2967,22 +2967,22 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTWSHPUnit) {
                 if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                     // Add heating coil water inlet node as actuator node for coil
-                    TempNodeNum = GetOnlySingleNode(state, NodeID(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode),
+                    TempNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode),
                                                     ErrorsFound,
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                                    NodeType_Water,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 } else if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                     // Add heating coil steam inlet node as actualtor node for coil
-                    TempNodeNum = GetOnlySingleNode(state, NodeID(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode),
+                    TempNodeNum = GetOnlySingleNode(state, state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode),
                                                     ErrorsFound,
                                                     state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                     state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                                    NodeType_Steam,
-                                                    NodeConnectionType_Actuator,
+                                                    DataLoopNode::NodeFluidType::Steam,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
                                                     1,
                                                     ObjectIsParent);
                 }
@@ -2993,8 +2993,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                               state.dataPTHP->PTUnit(PTUnitNum).Name,
                               state.dataPTHP->PTUnit(PTUnitNum).OAMixType,
                               state.dataPTHP->PTUnit(PTUnitNum).OAMixName,
-                              NodeID(OANodeNums(1)),
-                              NodeID(OANodeNums(4)));
+                              state.dataLoopNodes->NodeID(OANodeNums(1)),
+                              state.dataLoopNodes->NodeID(OANodeNums(4)));
             }
 
             // Set the Design Fan Volume Flow Rate
@@ -3002,7 +3002,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
             } else {
                 errFlag = false;
-                GetFanVolFlow(state.dataPTHP->PTUnit(PTUnitNum).FanIndex, FanVolFlow);
+                GetFanVolFlow(state, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, FanVolFlow);
                 state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                 if (errFlag) {
                     ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
@@ -3540,7 +3540,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         for (PTUnitNum = 1; PTUnitNum <= state.dataPTHP->NumPTUs; ++PTUnitNum) {
             if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3548,7 +3548,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3556,7 +3556,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3564,7 +3564,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3573,7 +3573,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             } else {
                 if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3581,7 +3581,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3589,7 +3589,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3597,7 +3597,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType,
                                                                  state.dataPTHP->PTUnit(PTUnitNum).FanName,
@@ -3988,7 +3988,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
                 } else {
-                    GetFanVolFlow(state.dataPTHP->PTUnit(PTUnitNum).FanIndex, state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate);
+                    GetFanVolFlow(state, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, state.dataPTHP->PTUnit(PTUnitNum).ActualFanVolFlowRate);
                 }
             }
         }
@@ -4041,7 +4041,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataPTHP->PTUnit(PTUnitNum).FanVolFlow = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
                 } else {
-                    GetFanVolFlow(state.dataPTHP->PTUnit(PTUnitNum).FanIndex, state.dataPTHP->PTUnit(PTUnitNum).FanVolFlow);
+                    GetFanVolFlow(state, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, state.dataPTHP->PTUnit(PTUnitNum).FanVolFlow);
                 }
 
                 if (state.dataPTHP->PTUnit(PTUnitNum).FanVolFlow != AutoSize) {
@@ -4126,18 +4126,18 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     }
                     // set the node max and min mass flow rates based on reset volume flow rates
                     if (state.dataPTHP->PTUnit(PTUnitNum).NumOfSpeedHeating > 0) {
-                        Node(InNode).MassFlowRateMax =
+                        state.dataLoopNodes->Node(InNode).MassFlowRateMax =
                             max(state.dataPTHP->PTUnit(PTUnitNum).CoolMassFlowRate(NumOfSpeedCooling), state.dataPTHP->PTUnit(PTUnitNum).HeatMassFlowRate(NumOfSpeedHeating));
-                        Node(InNode).MassFlowRateMaxAvail =
+                        state.dataLoopNodes->Node(InNode).MassFlowRateMaxAvail =
                             max(state.dataPTHP->PTUnit(PTUnitNum).CoolMassFlowRate(NumOfSpeedCooling), state.dataPTHP->PTUnit(PTUnitNum).HeatMassFlowRate(NumOfSpeedHeating));
                     } else {
-                        Node(InNode).MassFlowRateMax = state.dataPTHP->PTUnit(PTUnitNum).CoolMassFlowRate(NumOfSpeedCooling);
-                        Node(InNode).MassFlowRateMaxAvail = state.dataPTHP->PTUnit(PTUnitNum).CoolMassFlowRate(NumOfSpeedCooling);
+                        state.dataLoopNodes->Node(InNode).MassFlowRateMax = state.dataPTHP->PTUnit(PTUnitNum).CoolMassFlowRate(NumOfSpeedCooling);
+                        state.dataLoopNodes->Node(InNode).MassFlowRateMaxAvail = state.dataPTHP->PTUnit(PTUnitNum).CoolMassFlowRate(NumOfSpeedCooling);
                     }
 
-                    Node(InNode).MassFlowRateMin = 0.0;
-                    Node(InNode).MassFlowRateMinAvail = 0.0;
-                    Node(OutNode) = Node(InNode);
+                    state.dataLoopNodes->Node(InNode).MassFlowRateMin = 0.0;
+                    state.dataLoopNodes->Node(InNode).MassFlowRateMinAvail = 0.0;
+                    state.dataLoopNodes->Node(OutNode) = state.dataLoopNodes->Node(InNode);
                 }
             }
 
@@ -4165,18 +4165,18 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             // set the node max and min mass flow rates
             // outside air mixer is optional, check that node num > 0
             if (OutsideAirNode > 0) {
-                Node(OutsideAirNode).MassFlowRateMax = max(state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirMassFlow, state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirMassFlow);
-                Node(OutsideAirNode).MassFlowRateMin = 0.0;
-                Node(OutsideAirNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMax = max(state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirMassFlow, state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirMassFlow);
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMin = 0.0;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMinAvail = 0.0;
             }
-            Node(OutNode).MassFlowRateMax = max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirMassFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow);
-            Node(OutNode).MassFlowRateMin = 0.0;
-            Node(OutNode).MassFlowRateMinAvail = 0.0;
-            Node(InNode).MassFlowRateMax = max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirMassFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow);
-            Node(InNode).MassFlowRateMin = 0.0;
-            Node(InNode).MassFlowRateMinAvail = 0.0;
+            state.dataLoopNodes->Node(OutNode).MassFlowRateMax = max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirMassFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow);
+            state.dataLoopNodes->Node(OutNode).MassFlowRateMin = 0.0;
+            state.dataLoopNodes->Node(OutNode).MassFlowRateMinAvail = 0.0;
+            state.dataLoopNodes->Node(InNode).MassFlowRateMax = max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirMassFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow);
+            state.dataLoopNodes->Node(InNode).MassFlowRateMin = 0.0;
+            state.dataLoopNodes->Node(InNode).MassFlowRateMinAvail = 0.0;
             if (state.dataPTHP->PTUnit(PTUnitNum).AirReliefNode > 0) {
-                Node(state.dataPTHP->PTUnit(PTUnitNum).AirReliefNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirReliefNode).MassFlowRateMinAvail = 0.0;
             }
             MyEnvrnFlag(PTUnitNum) = false;
             state.dataPTHP->PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
@@ -4210,7 +4210,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         }
                     }
                 }
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    state.dataPTHP->PTUnit(PTUnitNum).MaxHeatCoilFluidFlow,
                                    state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                    state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
@@ -4249,7 +4250,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         }
                     }
                 }
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow,
                                    state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                    state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
@@ -4451,7 +4453,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
 
                 //     set water-side mass flow rates
-                Node(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilInletNodeNum).MassFlowRate = state.dataPTHP->CompOnMassFlow;
+                state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilInletNodeNum).MassFlowRate = state.dataPTHP->CompOnMassFlow;
 
                 mdot = state.dataPTHP->PTUnit(PTUnitNum).MaxHeatCoilFluidFlow;
 
@@ -4472,7 +4474,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
 
                 //     set air-side and steam-side mass flow rates
-                Node(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilInletNodeNum).MassFlowRate = state.dataPTHP->CompOnMassFlow;
+                state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilInletNodeNum).MassFlowRate = state.dataPTHP->CompOnMassFlow;
 
                 mdot = state.dataPTHP->PTUnit(PTUnitNum).MaxHeatCoilFluidFlow;
                 SetComponentFlowRate(state, mdot,
@@ -4498,7 +4500,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
 
                 //     set air-side and steam-side mass flow rates
-                Node(state.dataPTHP->PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = state.dataPTHP->CompOnMassFlow;
+                state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = state.dataPTHP->CompOnMassFlow;
                 mdot = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
                 SetComponentFlowRate(state, mdot,
                                      state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
@@ -4517,7 +4519,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
 
                 //     set air-side and steam-side mass flow rates
-                Node(state.dataPTHP->PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = state.dataPTHP->CompOnMassFlow;
+                state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = state.dataPTHP->CompOnMassFlow;
                 mdot = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
                 SetComponentFlowRate(state, mdot,
                                      state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
@@ -5454,7 +5456,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum == 0) {
             OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         } else {
-            OutsideDryBulbTemp = Node(state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum).Temp;
+            OutsideDryBulbTemp = state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum).Temp;
         }
 
         if (GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).SchedPtr) == 0.0) return;
@@ -5632,7 +5634,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         // check the outlet of the supplemental heater to be lower than the maximum supplemental heater supply air temperature
         if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
-            if (Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp > state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat && SupHeaterLoad > 0.0) {
+            if (state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp > state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat && SupHeaterLoad > 0.0) {
 
                 // If supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
                 SupHeaterLoad = 0.0;
@@ -5675,10 +5677,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 //     the supplemental heater, otherwise leave the supplemental heater off. If the supplemental heater is to be turned on,
                 //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
                 //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
-                if (Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp < state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat) {
-                    CpAir = PsyCpAirFnW(Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).HumRat);
-                    SupHeaterLoad = Node(state.dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
-                                    (state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat - Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp);
+                if (state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp < state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat) {
+                    CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).HumRat);
+                    SupHeaterLoad = state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
+                                    (state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat - state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp);
 
                 } else {
                     SupHeaterLoad = 0.0;
@@ -5775,22 +5777,22 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum == 0) {
             OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         } else {
-            OutsideDryBulbTemp = Node(state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum).Temp;
+            OutsideDryBulbTemp = state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum).Temp;
         }
 
         state.dataPTHP->SaveCompressorPLR = 0.0;
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
         SetAverageAirFlow(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
 
-        AirMassFlow = Node(InletNode).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
 
         if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists) {
             // There is an air terminal mixer
             ATMixOutNode = state.dataPTHP->PTUnit(PTUnitNum).ATMixerOutNode;
             if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) { // if there is an inlet side air terminal mixer
                 // set the primary air inlet mass flow rate
-                Node(state.dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRate =
-                    min(Node(state.dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail, Node(InletNode).MassFlowRate);
+                state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRate =
+                    min(state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(InletNode).MassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
                 // the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
                 SimATMixer(state, state.dataPTHP->PTUnit(PTUnitNum).ATMixerName, FirstHVACIteration, state.dataPTHP->PTUnit(PTUnitNum).ATMixerIndex);
@@ -6240,16 +6242,16 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists) {
             if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 // Air terminal supply side mixer
-                LoadMet = Node(ATMixOutNode).MassFlowRate *
-                          (PsyHFnTdbW(Node(ATMixOutNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
+                LoadMet = state.dataLoopNodes->Node(ATMixOutNode).MassFlowRate *
+                          (PsyHFnTdbW(state.dataLoopNodes->Node(ATMixOutNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat) - PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat));
             } else {
                 // Air terminal inlet side mixer
                 LoadMet =
-                    AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
+                    AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat) - PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat));
             }
         } else {
-            MinHumRat = min(Node(InletNode).HumRat, Node(OutletNode).HumRat);
-            LoadMet = AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRat) - PsyHFnTdbW(Node(InletNode).Temp, MinHumRat));
+            MinHumRat = min(state.dataLoopNodes->Node(InletNode).HumRat, state.dataLoopNodes->Node(OutletNode).HumRat);
+            LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, MinHumRat) - PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, MinHumRat));
         }
     }
 
@@ -6507,7 +6509,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         auto & thisUnit = state.dataPTHP->PTUnit(PTUnitNum);
         SimulateHeatingCoilComponents(
             state, thisUnit.SuppHeatCoilName, FirstHVACIteration, TempSupHeater, thisUnit.SuppHeatCoilIndex, _, true);
-        SupSATResidual = Node(thisUnit.AirOutNode).Temp - thisUnit.MaxSATSupHeat;
+        SupSATResidual = state.dataLoopNodes->Node(thisUnit.AirOutNode).Temp - thisUnit.MaxSATSupHeat;
 
         return SupSATResidual;
     }
@@ -6654,13 +6656,13 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
             ((GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff)) {
 
-            Node(InletNode).MassFlowRate = AverageUnitMassFlow;
-            Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = AverageUnitMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
             if (OutsideAirNode > 0) {
-                Node(OutsideAirNode).MassFlowRate = AverageOAMassFlow;
-                Node(OutsideAirNode).MassFlowRateMaxAvail = AverageOAMassFlow;
-                Node(AirRelNode).MassFlowRate = AverageOAMassFlow;
-                Node(AirRelNode).MassFlowRateMaxAvail = AverageOAMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = AverageOAMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMaxAvail = AverageOAMassFlow;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRate = AverageOAMassFlow;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRateMaxAvail = AverageOAMassFlow;
             }
             if (AverageUnitMassFlow > 0.0) {
                 OnOffAirFlowRatio = state.dataPTHP->CompOnMassFlow / AverageUnitMassFlow;
@@ -6670,10 +6672,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         } else {
 
-            Node(InletNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
             if (OutsideAirNode > 0) {
-                Node(OutsideAirNode).MassFlowRate = 0.0;
-                Node(AirRelNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRate = 0.0;
             }
             OnOffAirFlowRatio = 0.0;
         }
@@ -6729,7 +6731,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // adjust fan report variable to represent how the SZVAV model performs
         if (state.dataPTHP->PTUnit(PTUnitNum).simASHRAEModel) {
             state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio =
-                Node(state.dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate / max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirMassFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow);
+                state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate / max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirMassFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow);
         }
 
         if (state.dataPTHP->PTUnit(PTUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
@@ -7207,12 +7209,12 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                              HXUnitOn);
 
         // calculate delivered capacity
-        AirMassFlow = Node(InletNode).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
 
-        QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
+        QTotUnitOut = AirMassFlow * (state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
 
-        Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
-        Node(OutletNode).MassFlowRateMaxAvail = AirMassFlow;
+        state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = AirMassFlow;
 
         // report variables
         state.dataPTHP->PTUnit(PTUnitNum).CompPartLoadRatio = state.dataPTHP->SaveCompressorPLR;
@@ -7609,7 +7611,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         // check the outlet of the supplemental heater to be lower than the maximum supplemental heater supply air temperature
         if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
-            if (Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp > state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat && SupHeaterLoad > 0.0) {
+            if (state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp > state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat && SupHeaterLoad > 0.0) {
 
                 // If supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
                 SupHeaterLoad = 0.0;
@@ -7652,10 +7654,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 //     the supplemental heater, otherwise leave the supplemental heater off. If the supplemental heater is to be turned on,
                 //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
                 //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
-                if (Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp < state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat) {
-                    CpAir = PsyCpAirFnW(Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).HumRat);
-                    SupHeaterLoad = Node(state.dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
-                                    (state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat - Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp);
+                if (state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp < state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat) {
+                    CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).HumRat);
+                    SupHeaterLoad = state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
+                                    (state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat - state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp);
 
                 } else {
                     SupHeaterLoad = 0.0;
@@ -7998,15 +8000,15 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
         SetVSHPAirFlow(state, PTUnitNum, ZoneNum, PartLoadFrac, OnOffAirFlowRatio, SpeedNum, SpeedRatio);
 
-        AirMassFlow = Node(InletNode).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
 
         if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists) {
             // There is an air terminal mixer
             ATMixOutNode = state.dataPTHP->PTUnit(PTUnitNum).ATMixerOutNode;
             if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) { // if there is an inlet side air terminal mixer
                 // set the primary air inlet mass flow rate
-                Node(state.dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRate =
-                    min(Node(state.dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail, Node(InletNode).MassFlowRate);
+                state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRate =
+                    min(state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(InletNode).MassFlowRate);
                 // now calculate the mixer outlet conditions (and the secondary air inlet flow rate)
                 // the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
                 SimATMixer(state, state.dataPTHP->PTUnit(PTUnitNum).ATMixerName, FirstHVACIteration, state.dataPTHP->PTUnit(PTUnitNum).ATMixerIndex);
@@ -8379,16 +8381,16 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists) {
             if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 // Air terminal supply side mixer
-                LoadMet = Node(ATMixOutNode).MassFlowRate *
-                          (PsyHFnTdbW(Node(ATMixOutNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
+                LoadMet = state.dataLoopNodes->Node(ATMixOutNode).MassFlowRate *
+                          (PsyHFnTdbW(state.dataLoopNodes->Node(ATMixOutNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat) - PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat));
             } else {
                 // Air terminal inlet side mixer
                 LoadMet =
-                    AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
+                    AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat) - PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat));
             }
         } else {
-            MinHumRat = min(Node(InletNode).HumRat, Node(OutletNode).HumRat);
-            LoadMet = AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRat) - PsyHFnTdbW(Node(InletNode).Temp, MinHumRat));
+            MinHumRat = min(state.dataLoopNodes->Node(InletNode).HumRat, state.dataLoopNodes->Node(OutletNode).HumRat);
+            LoadMet = AirMassFlow * (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, MinHumRat) - PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, MinHumRat));
         }
 
         LatentLoadMet = 0.0;
@@ -8522,13 +8524,13 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
             ((GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff)) {
 
-            Node(InletNode).MassFlowRate = AverageUnitMassFlow;
-            Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = AverageUnitMassFlow;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
             if (OutsideAirNode > 0) {
-                Node(OutsideAirNode).MassFlowRate = AverageOAMassFlow;
-                Node(OutsideAirNode).MassFlowRateMaxAvail = AverageOAMassFlow;
-                Node(AirRelNode).MassFlowRate = AverageOAMassFlow;
-                Node(AirRelNode).MassFlowRateMaxAvail = AverageOAMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = AverageOAMassFlow;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMaxAvail = AverageOAMassFlow;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRate = AverageOAMassFlow;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRateMaxAvail = AverageOAMassFlow;
             }
             if (AverageUnitMassFlow > 0.0) {
                 OnOffAirFlowRatio = state.dataPTHP->CompOnMassFlow / AverageUnitMassFlow;
@@ -8538,10 +8540,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         } else {
 
-            Node(InletNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
             if (OutsideAirNode > 0) {
-                Node(OutsideAirNode).MassFlowRate = 0.0;
-                Node(AirRelNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(AirRelNode).MassFlowRate = 0.0;
             }
             OnOffAirFlowRatio = 0.0;
         }
@@ -8632,7 +8634,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 && state.dataPTHP->CompOnMassFlow != 0.0) {
             OnOffAirFlowRatio = 1.0;
             if (FirstHVACIteration) {
-                Node(InNode).MassFlowRate = state.dataPTHP->CompOnMassFlow;
+                state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataPTHP->CompOnMassFlow;
                 PartLoadRatio = 0.0;
             } else {
                 if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode != iCompMode::Unassigned) {
@@ -8643,9 +8645,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         } else {
             PartLoadRatio = 0.0;
-            Node(InNode).MassFlowRate = 0.0;
-            Node(OutNode).MassFlowRate = 0.0;
-            Node(OutNode).MassFlowRateMaxAvail = 0.0;
+            state.dataLoopNodes->Node(InNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(OutNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(OutNode).MassFlowRateMaxAvail = 0.0;
             OnOffAirFlowRatio = 1.0;
         }
 
@@ -8803,21 +8805,21 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (iterateOnAirOnly) {
 
             // set air flow rate bounded by low speed and high speed air flow rates
-            Node(AirControlNode).MassFlowRate = airMdot * (lowSpeedRatio + (PartLoadRatio * (1.0 - lowSpeedRatio)));
+            state.dataLoopNodes->Node(AirControlNode).MassFlowRate = airMdot * (lowSpeedRatio + (PartLoadRatio * (1.0 - lowSpeedRatio)));
             // FanPartLoadRatio is used to pass info over to function SetAverageAirFlow since air and coil PLR are disassociated in the SZVAV model
             // FanPartLoadRatio is a report variable that is updated (overwritten) in ReportUnitarySystem
             state.dataPTHP->PTUnit(UnitarySysNum).FanPartLoadRatio = PartLoadRatio;
-            //            if( WaterControlNode > 0 ) Node( WaterControlNode ).MassFlowRate = highWaterMdot;
+            //            if( WaterControlNode > 0 ) state.dataLoopNodes->Node( WaterControlNode ).MassFlowRate = highWaterMdot;
 
         } else {
 
-            Node(AirControlNode).MassFlowRate = airMdot;
+            state.dataLoopNodes->Node(AirControlNode).MassFlowRate = airMdot;
             state.dataPTHP->PTUnit(UnitarySysNum).FanPartLoadRatio =
                 max(0.0, ((airMdot - (systemMaxAirFlowRate * lowSpeedRatio)) / ((1.0 - lowSpeedRatio) * systemMaxAirFlowRate)));
 
             if (WaterControlNode > 0) {
                 waterMdot = highWaterMdot * PartLoadRatio;
-                Node(WaterControlNode).MassFlowRate = waterMdot;
+                state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = waterMdot;
             }
         }
 
@@ -8828,12 +8830,12 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             // cooling load using water cooling coil
             coolingPLR = PartLoadRatio;
             //            PTUnit( UnitarySysNum ).CoolingPartLoadFrac = PartLoadRatio;
-            state.dataPTHP->PTUnit(UnitarySysNum).CoolCoilWaterFlowRatio = Node(WaterControlNode).MassFlowRate / state.dataPTHP->PTUnit(UnitarySysNum).MaxCoolCoilFluidFlow;
+            state.dataPTHP->PTUnit(UnitarySysNum).CoolCoilWaterFlowRatio = state.dataLoopNodes->Node(WaterControlNode).MassFlowRate / state.dataPTHP->PTUnit(UnitarySysNum).MaxCoolCoilFluidFlow;
         } else if (WaterControlNode > 0 && WaterControlNode == state.dataPTHP->PTUnit(UnitarySysNum).HeatCoilFluidInletNode) {
             // heating load using water heating coil
             heatingPLR = PartLoadRatio;
             //            PTUnit( UnitarySysNum ).HeatingPartLoadFrac = PartLoadRatio;
-            state.dataPTHP->PTUnit(UnitarySysNum).HeatCoilWaterFlowRatio = Node(WaterControlNode).MassFlowRate / state.dataPTHP->PTUnit(UnitarySysNum).MaxHeatCoilFluidFlow;
+            state.dataPTHP->PTUnit(UnitarySysNum).HeatCoilWaterFlowRatio = state.dataLoopNodes->Node(WaterControlNode).MassFlowRate / state.dataPTHP->PTUnit(UnitarySysNum).MaxHeatCoilFluidFlow;
         } else if (coolingLoad) { // non-water coil with cooling load
             coolingPLR = PartLoadRatio;
             //            PTUnit( UnitarySysNum ).CoolingPartLoadFrac = coolingPLR;
@@ -8856,7 +8858,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         } else {
             // Calculate residual based on outlet temperature
             OutletNode = state.dataPTHP->PTUnit(UnitarySysNum).AirOutNode;
-            Residuum = (Node(OutletNode).Temp - SATempTarget) * 10.0;
+            Residuum = (state.dataLoopNodes->Node(OutletNode).Temp - SATempTarget) * 10.0;
         }
 
         return Residuum;
@@ -8919,14 +8921,14 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (Par(18) == 1.0) HXUnitOn = true;
 
         // set air flow rate
-        Node(state.dataPTHP->PTUnit(UnitarySystemNum).AirInNode).MassFlowRate = MinAirFlow + (PartLoadRatio * (maxAirFlow - MinAirFlow));
+        state.dataLoopNodes->Node(state.dataPTHP->PTUnit(UnitarySystemNum).AirInNode).MassFlowRate = MinAirFlow + (PartLoadRatio * (maxAirFlow - MinAirFlow));
         state.dataPTHP->PTUnit(UnitarySystemNum).FanPartLoadRatio =
-            max(0.0, ((Node(state.dataPTHP->PTUnit(UnitarySystemNum).AirInNode).MassFlowRate - (maxAirFlow * lowSpeedRatio)) / ((1.0 - lowSpeedRatio) * maxAirFlow)));
+            max(0.0, ((state.dataLoopNodes->Node(state.dataPTHP->PTUnit(UnitarySystemNum).AirInNode).MassFlowRate - (maxAirFlow * lowSpeedRatio)) / ((1.0 - lowSpeedRatio) * maxAirFlow)));
         // set water flow rate
         if (WaterControlNode > 0 && WaterControlNode == state.dataPTHP->PTUnit(UnitarySystemNum).CoolCoilFluidInletNode) {
-            Node(WaterControlNode).MassFlowRate = MinWaterFlow + (PartLoadRatio * (state.dataPTHP->PTUnit(UnitarySystemNum).MaxCoolCoilFluidFlow - MinWaterFlow));
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = MinWaterFlow + (PartLoadRatio * (state.dataPTHP->PTUnit(UnitarySystemNum).MaxCoolCoilFluidFlow - MinWaterFlow));
         } else if (WaterControlNode > 0 && WaterControlNode == state.dataPTHP->PTUnit(UnitarySystemNum).HeatCoilFluidInletNode) {
-            Node(WaterControlNode).MassFlowRate = MinWaterFlow + (PartLoadRatio * (state.dataPTHP->PTUnit(UnitarySystemNum).MaxHeatCoilFluidFlow - MinWaterFlow));
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = MinWaterFlow + (PartLoadRatio * (state.dataPTHP->PTUnit(UnitarySystemNum).MaxHeatCoilFluidFlow - MinWaterFlow));
         } else if (coolingLoad) {
             coolingPLR = PartLoadRatio;
             // PTUnit( UnitarySysNum ).CoolingPartLoadFrac = coolingPLR;

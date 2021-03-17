@@ -416,13 +416,13 @@ namespace HeatRecovery {
             state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirInTemp = rNumericArgs(6);
             state.dataHeatRecovery->ExchCond(ExchNum).NomElecPower = rNumericArgs(7);
             state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
 
             TestCompSet(state, cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum), state.dataHeatRecovery->ExchCond(ExchNum).Name, cAlphaArgs(5), cAlphaArgs(6), "Process Air Nodes");
 
@@ -493,13 +493,13 @@ namespace HeatRecovery {
                 ShowContinueError(state, "Latent cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
             state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
 
             state.dataHeatRecovery->ExchCond(ExchNum).NomElecPower = rNumericArgs(10);
 
@@ -600,20 +600,20 @@ namespace HeatRecovery {
             // In this module, Sup = Regeneration nodes and Sec = Process nodes
             // regeneration air inlet and outlet nodes
             state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             // process air inlet and outlet nodes
             state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
 
             // Set up the component set for the process side of the HX (Sec = Process)
             TestCompSet(state, cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum),
                         state.dataHeatRecovery->ExchCond(ExchNum).Name,
-                        NodeID(state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode),
-                        NodeID(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode),
+                        state.dataLoopNodes->NodeID(state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode),
+                        state.dataLoopNodes->NodeID(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode),
                         "Process Air Nodes");
 
             HeatExchPerfType = cAlphaArgs(7);
@@ -1397,7 +1397,7 @@ namespace HeatRecovery {
                 } else if (SELECT_CASE_var == HX_AIRTOAIR_GENERIC) {
 
                     if (state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode > 0 && state.dataHeatRecovery->ExchCond(ExIndex).ControlToTemperatureSetPoint) {
-                        if (Node(state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode).TempSetPoint == SensedNodeFlagValue) {
+                        if (state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode).TempSetPoint == SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "Missing temperature setpoint for " + cHXTypes(state.dataHeatRecovery->ExchCond(ExIndex).ExchTypeNum) + " \"" +
                                                 state.dataHeatRecovery->ExchCond(ExIndex).Name + "\" :");
@@ -1439,14 +1439,15 @@ namespace HeatRecovery {
         SecInNode = state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode;
 
         // Get information from inlet nodes
-        state.dataHeatRecovery->ExchCond(ExchNum).SupInTemp = Node(SupInNode).Temp;
-        state.dataHeatRecovery->ExchCond(ExchNum).SupInHumRat = Node(SupInNode).HumRat;
-        state.dataHeatRecovery->ExchCond(ExchNum).SupInEnth = Node(SupInNode).Enthalpy;
-        state.dataHeatRecovery->ExchCond(ExchNum).SupInMassFlow = Node(SupInNode).MassFlowRate;
-        state.dataHeatRecovery->ExchCond(ExchNum).SecInTemp = Node(SecInNode).Temp;
-        state.dataHeatRecovery->ExchCond(ExchNum).SecInHumRat = Node(SecInNode).HumRat;
-        state.dataHeatRecovery->ExchCond(ExchNum).SecInEnth = Node(SecInNode).Enthalpy;
-        state.dataHeatRecovery->ExchCond(ExchNum).SecInMassFlow = Node(SecInNode).MassFlowRate;
+
+        state.dataHeatRecovery->ExchCond(ExchNum).SupInTemp = state.dataLoopNodes->Node(SupInNode).Temp;
+        state.dataHeatRecovery->ExchCond(ExchNum).SupInHumRat = state.dataLoopNodes->Node(SupInNode).HumRat;
+        state.dataHeatRecovery->ExchCond(ExchNum).SupInEnth = state.dataLoopNodes->Node(SupInNode).Enthalpy;
+        state.dataHeatRecovery->ExchCond(ExchNum).SupInMassFlow = state.dataLoopNodes->Node(SupInNode).MassFlowRate;
+        state.dataHeatRecovery->ExchCond(ExchNum).SecInTemp = state.dataLoopNodes->Node(SecInNode).Temp;
+        state.dataHeatRecovery->ExchCond(ExchNum).SecInHumRat = state.dataLoopNodes->Node(SecInNode).HumRat;
+        state.dataHeatRecovery->ExchCond(ExchNum).SecInEnth = state.dataLoopNodes->Node(SecInNode).Enthalpy;
+        state.dataHeatRecovery->ExchCond(ExchNum).SecInMassFlow = state.dataLoopNodes->Node(SecInNode).MassFlowRate;
 
         // initialize the output variables
         state.dataHeatRecovery->ExchCond(ExchNum).SensHeatingRate = 0.0;
@@ -1482,7 +1483,7 @@ namespace HeatRecovery {
                 if (state.dataHeatRecovery->MySetPointTest(ExchNum)) {
                     if (!state.dataGlobal->SysSizingCalc && DoSetPointTest) {
                         if (!state.dataHeatRecovery->CalledFromParentObject) {
-                            if (Node(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode).HumRatMax == SensedNodeFlagValue) {
+                            if (state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode).HumRatMax == SensedNodeFlagValue) {
                                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                     ShowWarningError(state, "Missing optional HumRatMax setpoint for " + cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum) + " \"" +
                                                      state.dataHeatRecovery->ExchCond(ExchNum).Name + "\"");
@@ -1493,7 +1494,7 @@ namespace HeatRecovery {
                                 } else {
                                     // need call to EMS to check node
                                     CheckIfNodeSetPointManagedByEMS(state, state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, LocalWarningError);
-                                    DataLoopNode::NodeSetpointCheck(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode).needsSetpointChecking = false;
+                                    state.dataLoopNodes->NodeSetpointCheck(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode).needsSetpointChecking = false;
                                     if (LocalWarningError) {
                                         ShowWarningError(state, "Missing optional HumRatMax setpoint for " + cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum) +
                                                          " \"" + state.dataHeatRecovery->ExchCond(ExchNum).Name + "\"");
@@ -2007,7 +2008,7 @@ namespace HeatRecovery {
         state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth = state.dataHeatRecovery->ExchCond(ExNum).SupInEnth;
         state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth = state.dataHeatRecovery->ExchCond(ExNum).SecInEnth;
         SupOutNode = state.dataHeatRecovery->ExchCond(ExNum).SupOutletNode;
-        HXTempSetPoint = Node(SupOutNode).TempSetPoint;
+        HXTempSetPoint = state.dataLoopNodes->Node(SupOutNode).TempSetPoint;
 
         if (present(EconomizerFlag)) {
             EconomizerActiveFlag = EconomizerFlag;
@@ -2726,8 +2727,8 @@ namespace HeatRecovery {
 
                     if (!state.dataHeatRecovery->CalledFromParentObject) {
                         //       calculate part-load ratio for HX
-                        MaxHumRatNeeded = Node(state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode).HumRatMax;
-                        MinHumRatNeeded = Node(state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode).HumRatMin;
+                        MaxHumRatNeeded = state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode).HumRatMax;
+                        MinHumRatNeeded = state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode).HumRatMin;
                         // Calculate partload fraction of dehumidification capacity required to meet setpoint
 
                         //       check the model output, if the regen delta W is positive, the process air stream is dehumidified
@@ -3085,7 +3086,7 @@ namespace HeatRecovery {
             //    Average SupInMassFlow and SecOutMassFlow rates have been reduced due to frost control
             //      Equipment attached to the supply inlet node may have problems with our setting the
             //      mass flow rate in the next statement. This is done only to simulate exhaust air recirc.
-            Node(state.dataHeatRecovery->ExchCond(ExNum).SupInletNode).MassFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow * (1.0 - DFFraction);
+            state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExNum).SupInletNode).MassFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow * (1.0 - DFFraction);
             state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow *= (1.0 - DFFraction);
 
         } // End of IF (Exhaust Air Recirculation)
@@ -3151,36 +3152,36 @@ namespace HeatRecovery {
         SecOutNode = state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode;
 
         // Set the outlet air nodes of the heat exchanger
-        Node(SupOutNode).Temp = state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp;
-        Node(SupOutNode).HumRat = state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat;
-        Node(SupOutNode).Enthalpy = state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth;
-        Node(SupOutNode).MassFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow;
-        Node(SecOutNode).Temp = state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp;
-        Node(SecOutNode).HumRat = state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat;
-        Node(SecOutNode).Enthalpy = state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth;
-        Node(SecOutNode).MassFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow;
+        state.dataLoopNodes->Node(SupOutNode).Temp = state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp;
+        state.dataLoopNodes->Node(SupOutNode).HumRat = state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat;
+        state.dataLoopNodes->Node(SupOutNode).Enthalpy = state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth;
+        state.dataLoopNodes->Node(SupOutNode).MassFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow;
+        state.dataLoopNodes->Node(SecOutNode).Temp = state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp;
+        state.dataLoopNodes->Node(SecOutNode).HumRat = state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat;
+        state.dataLoopNodes->Node(SecOutNode).Enthalpy = state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth;
+        state.dataLoopNodes->Node(SecOutNode).MassFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow;
 
         // Set the outlet nodes for properties that just pass through & not used
-        Node(SupOutNode).Quality = Node(SupInNode).Quality;
-        Node(SupOutNode).Press = Node(SupInNode).Press;
-        Node(SupOutNode).MassFlowRateMin = Node(SupInNode).MassFlowRateMin;
-        Node(SupOutNode).MassFlowRateMax = Node(SupInNode).MassFlowRateMax;
-        Node(SupOutNode).MassFlowRateMinAvail = Node(SupInNode).MassFlowRateMinAvail;
-        Node(SupOutNode).MassFlowRateMaxAvail = Node(SupInNode).MassFlowRateMaxAvail;
-        Node(SecOutNode).Quality = Node(SecInNode).Quality;
-        Node(SecOutNode).Press = Node(SecInNode).Press;
-        Node(SecOutNode).MassFlowRateMin = Node(SecInNode).MassFlowRateMin;
-        Node(SecOutNode).MassFlowRateMax = Node(SecInNode).MassFlowRateMax;
-        Node(SecOutNode).MassFlowRateMinAvail = Node(SecInNode).MassFlowRateMinAvail;
-        Node(SecOutNode).MassFlowRateMaxAvail = Node(SecInNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(SupOutNode).Quality = state.dataLoopNodes->Node(SupInNode).Quality;
+        state.dataLoopNodes->Node(SupOutNode).Press = state.dataLoopNodes->Node(SupInNode).Press;
+        state.dataLoopNodes->Node(SupOutNode).MassFlowRateMin = state.dataLoopNodes->Node(SupInNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(SupOutNode).MassFlowRateMax = state.dataLoopNodes->Node(SupInNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(SupOutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(SupInNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(SupOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(SupInNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(SecOutNode).Quality = state.dataLoopNodes->Node(SecInNode).Quality;
+        state.dataLoopNodes->Node(SecOutNode).Press = state.dataLoopNodes->Node(SecInNode).Press;
+        state.dataLoopNodes->Node(SecOutNode).MassFlowRateMin = state.dataLoopNodes->Node(SecInNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(SecOutNode).MassFlowRateMax = state.dataLoopNodes->Node(SecInNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(SecOutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(SecInNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(SecOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(SecInNode).MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(SupOutNode).CO2 = Node(SupInNode).CO2;
-            Node(SecOutNode).CO2 = Node(SecInNode).CO2;
+            state.dataLoopNodes->Node(SupOutNode).CO2 = state.dataLoopNodes->Node(SupInNode).CO2;
+            state.dataLoopNodes->Node(SecOutNode).CO2 = state.dataLoopNodes->Node(SecInNode).CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(SupOutNode).GenContam = Node(SupInNode).GenContam;
-            Node(SecOutNode).GenContam = Node(SecInNode).GenContam;
+            state.dataLoopNodes->Node(SupOutNode).GenContam = state.dataLoopNodes->Node(SupInNode).GenContam;
+            state.dataLoopNodes->Node(SecOutNode).GenContam = state.dataLoopNodes->Node(SecInNode).GenContam;
         }
     }
 

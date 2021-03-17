@@ -1382,7 +1382,6 @@ namespace HighTempRadiantSystem {
         // Using/Aliasing
         using namespace DataSurfaces;
         using namespace DataHeatBalance;
-        using namespace DataHeatBalSurface;
 
         // Return value
         Real64 SumHATsurf;
@@ -1420,7 +1419,7 @@ namespace HighTempRadiantSystem {
                 }
             }
 
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;

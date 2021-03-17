@@ -251,9 +251,9 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = DataSizing::AutoSize;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = DataSizing::AutoSize;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = DataSizing::AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = state->dataFans->Fan(1).FanName;
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).FanName;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";

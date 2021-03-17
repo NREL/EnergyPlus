@@ -946,15 +946,15 @@ namespace HeatBalanceManager {
                 auto const SELECT_CASE_var(AlphaName(1));
                 // The default is CTF
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
 
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::EMPD;
                     state.dataHeatBal->AnyEMPD = true;
                     state.dataHeatBal->AllCTF = false;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CondFD;
                     state.dataHeatBal->AnyCondFD = true;
                     state.dataHeatBal->AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
@@ -970,7 +970,7 @@ namespace HeatBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::HAMT;
                     state.dataHeatBal->AnyHAMT = true;
                     state.dataHeatBal->AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
@@ -989,18 +989,18 @@ namespace HeatBalanceManager {
                     }
 
                 } else {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
                 }
             }
 
             if (NumNumber > 0) {
-                MaxSurfaceTempLimit = BuildingNumbers(1);
-                MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
-                if (MaxSurfaceTempLimit < MinSurfaceTempLimit) {
-                } else if (MaxSurfaceTempLimit < 0.0) {
-                    MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
-                    MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
+                state.dataHeatBalSurf->MaxSurfaceTempLimit = BuildingNumbers(1);
+                state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal = state.dataHeatBalSurf->MaxSurfaceTempLimit * 2.5;
+                if (state.dataHeatBalSurf->MaxSurfaceTempLimit < MinSurfaceTempLimit) {
+                } else if (state.dataHeatBalSurf->MaxSurfaceTempLimit < 0.0) {
+                    state.dataHeatBalSurf->MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
+                    state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal = state.dataHeatBalSurf->MaxSurfaceTempLimit * 2.5;
                 }
             }
 
@@ -1012,10 +1012,10 @@ namespace HeatBalanceManager {
             }
 
         } else {
-            state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+            state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
             state.dataHeatBal->AnyCTF = true;
-            MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
-            MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
+            state.dataHeatBalSurf->MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
+            state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal = state.dataHeatBalSurf->MaxSurfaceTempLimit * 2.5;
         }
 
         // algorithm input checks now deferred until surface properties are read in,
@@ -1246,6 +1246,7 @@ namespace HeatBalanceManager {
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = None");
                     }
                 }
+                if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow = true;
             }
             if (NumAlpha > 1) {
                 {
@@ -1303,6 +1304,7 @@ namespace HeatBalanceManager {
         } else {
             state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
         }
+        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow) state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow = true;
 
         constexpr const char * Format_732(
             "! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing and Return {{AdjustMixingOnly | AdjustReturnOnly | AdjustMixingThenReturn | AdjustReturnThenMixing | None}}, Adjust Zone Infiltration "
@@ -4974,8 +4976,6 @@ namespace HeatBalanceManager {
         using namespace DataIPShortCuts;
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
-        using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -5044,8 +5044,8 @@ namespace HeatBalanceManager {
                                             ErrorsFound,
                                             cCurrentModuleObject,
                                             cAlphaArgs(1),
-                                            NodeType_Air,
-                                            NodeConnectionType_Inlet,
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::NodeConnectionType::Inlet,
                                             1,
                                             ObjectIsParent);
                 if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
@@ -5264,7 +5264,6 @@ namespace HeatBalanceManager {
         // Using/Aliasing
         using namespace WindowManager;
         using namespace SolarShading;
-        using DataLoopNode::Node;
         using DaylightingDevices::InitDaylightingDevices;
         using OutAirNodeManager::SetOutAirNodes;
         //  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
@@ -5398,25 +5397,25 @@ namespace HeatBalanceManager {
             SetOutAirNodes(state);
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (state.dataHeatBal->Zone(ZoneNum).HasLinkedOutAirNode) {
-                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
-                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
+                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulb;
+                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulb;
                     }
-                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum > 0) {
-                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
+                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulb;
+                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulb;
                     }
-                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum > 0) {
-                        state.dataHeatBal->Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
+                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).WindSpeed = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeed;
+                        state.dataHeatBal->Zone(ZoneNum).WindSpeed = state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeed;
                     }
-                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum > 0) {
-                        state.dataHeatBal->Zone(ZoneNum).WindDir = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).WindDir = GetCurrentScheduleValue(state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).WindDir = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDir;
+                        state.dataHeatBal->Zone(ZoneNum).WindDir = state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDir;
                     }
                 }
             }
@@ -5989,8 +5988,9 @@ namespace HeatBalanceManager {
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
-                    state.dataHeatBal->SurfWinFenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
-                    state.dataHeatBal->SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempFront(1, SurfNum) = state.dataHeatBalSurf->TH(1, 1, SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) =
+                        state.dataHeatBalSurf->TH(2, 1, SurfNum);
                 }
             }
         }
@@ -6026,7 +6026,6 @@ namespace HeatBalanceManager {
         using NodeInputManager::CalcMoreNodeInfo;
         using OutputReportTabular::UpdateTabularReports;
         using ScheduleManager::ReportScheduleValues;
-        using namespace DataReportingFlags;
 
         ReportScheduleValues(state);
 
@@ -6047,18 +6046,18 @@ namespace HeatBalanceManager {
             }
             if (!state.dataGlobal->BeginDayFlag) state.dataEnvrn->PrintEnvrnStampWarmupPrinted = false;
             if (state.dataEnvrn->PrintEnvrnStampWarmup) {
-                if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
+                if (state.dataReportFlag->PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
                     constexpr const char * EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
                     print(state.files.mtr, "{}\n", EndOfHeaderString);
-                    PrintEndDataDictionary = false;
+                    state.dataReportFlag->PrintEndDataDictionary = false;
                 }
                 if (state.dataGlobal->DoOutputReporting) {
                     constexpr const char * EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
                     print(state.files.eso,
                           EnvironmentStampFormatStr,
                           "1",
-                          "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                          "Warmup {" + state.dataReportFlag->cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                           state.dataEnvrn->Latitude,
                           state.dataEnvrn->Longitude,
                           state.dataEnvrn->TimeZoneNumber,
@@ -6067,7 +6066,7 @@ namespace HeatBalanceManager {
                     print(state.files.mtr,
                           EnvironmentStampFormatStr,
                           "1",
-                          "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                          "Warmup {" + state.dataReportFlag->cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                           state.dataEnvrn->Latitude,
                           state.dataEnvrn->Longitude,
                           state.dataEnvrn->TimeZoneNumber,

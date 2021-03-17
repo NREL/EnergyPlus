@@ -469,16 +469,16 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;              // inputs from dual duct VAV AT
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired = 2000.0;
-    DataLoopNode::Node(ZoneNodeNum).Temp = 20.0;
-    DataLoopNode::Node(HotInNode).Temp = 35.0;
-    DataLoopNode::Node(HotInNode).HumRat = 0.0075;
-    DataLoopNode::Node(HotInNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(HotInNode).Temp, DataLoopNode::Node(HotInNode).HumRat);
+    state->dataLoopNodes->Node(ZoneNodeNum).Temp = 20.0;
+    state->dataLoopNodes->Node(HotInNode).Temp = 35.0;
+    state->dataLoopNodes->Node(HotInNode).HumRat = 0.0075;
+    state->dataLoopNodes->Node(HotInNode).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(HotInNode).Temp, state->dataLoopNodes->Node(HotInNode).HumRat);
 
     // test with heating load and turndown fraction schedule value set 1.0
     DualDuct::dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = 1; //
-    DataLoopNode::Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     DualDuct::dd_airterminal(DDNum).InitDualDuct(*state, FirstHVACIteration);
@@ -495,14 +495,14 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     EXPECT_EQ(SysMinMassFlowRes, thisDDAirTerminal.dd_airterminalOutlet.AirMassFlowRateMinAvail);
     EXPECT_EQ(SysMinMassFlowRes, thisDDAirTerminal.dd_airterminalHotAirInlet.AirMassFlowRateMax * thisDDAirTerminal.ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes, thisDDAirTerminal.dd_airterminalHotAirInlet.AirMassFlowRateMax * thisDDAirTerminal.ZoneMinAirFracDes * thisDDAirTerminal.ZoneTurndownMinAirFrac);
-    EXPECT_EQ(0.0, DataLoopNode::Node(ColdInNode).MassFlowRate);
+    EXPECT_EQ(0.0, state->dataLoopNodes->Node(ColdInNode).MassFlowRate);
 
     // test with heating load and turndown fraction schedule value set 0.5
     DualDuct::dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = 2;
     SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.30 * 0.5; // min flow rate at 0.5 turndown fraction
-    DataLoopNode::Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
-    DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
+    state->dataLoopNodes->Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     DualDuct::dd_airterminal(DDNum).InitDualDuct(*state, FirstHVACIteration);
@@ -519,5 +519,5 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     EXPECT_EQ(SysMinMassFlowRes, thisDDAirTerminal.dd_airterminalOutlet.AirMassFlowRateMinAvail);
     EXPECT_EQ(SysMinMassFlowRes, thisDDAirTerminal.dd_airterminalHotAirInlet.AirMassFlowRateMax * thisDDAirTerminal.ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes, thisDDAirTerminal.dd_airterminalHotAirInlet.AirMassFlowRateMax * thisDDAirTerminal.ZoneMinAirFracDes * thisDDAirTerminal.ZoneTurndownMinAirFrac);
-    EXPECT_EQ(0.0, DataLoopNode::Node(ColdInNode).MassFlowRate);
+    EXPECT_EQ(0.0, state->dataLoopNodes->Node(ColdInNode).MassFlowRate);
 }

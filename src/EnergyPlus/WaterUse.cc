@@ -420,16 +420,16 @@ namespace WaterUse {
                                                                                                    ErrorsFound,
                                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                                    DataIPShortCuts::cAlphaArgs(1),
-                                                                                                   DataLoopNode::NodeType_Water,
-                                                                                                   DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                   DataLoopNode::NodeFluidType::Water,
+                                                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                                                    1,
                                                                                                    DataLoopNode::ObjectIsNotParent);
                     state.dataWaterUse->WaterConnections(WaterConnNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                                     ErrorsFound,
                                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                                     DataIPShortCuts::cAlphaArgs(1),
-                                                                                                    DataLoopNode::NodeType_Water,
-                                                                                                    DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                    DataLoopNode::NodeFluidType::Water,
+                                                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                                                     1,
                                                                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -1024,7 +1024,8 @@ namespace WaterUse {
             if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
                 // Clear node initial conditions
                 if (this->InletNode > 0 && this->OutletNode > 0) {
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                                        this->PeakMassFlowRate,
                                                        this->InletNode,
                                                        this->OutletNode,
@@ -1033,7 +1034,7 @@ namespace WaterUse {
                                                        this->PlantLoopBranchNum,
                                                        this->PlantLoopCompNum);
 
-                    this->ReturnTemp = DataLoopNode::Node(this->InletNode).Temp;
+                    this->ReturnTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
                 }
 
                 this->Init = false;
@@ -1043,7 +1044,7 @@ namespace WaterUse {
 
             if (this->InletNode > 0) {
                 if (!state.dataGlobal->DoingSizing) {
-                    this->HotTemp = DataLoopNode::Node(this->InletNode).Temp;
+                    this->HotTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
                 } else {
                     // plant loop will not be running so need a value here.
                     // should change to use tank setpoint but water use connections don't have knowledge of the tank they are fed by
@@ -1287,7 +1288,7 @@ namespace WaterUse {
             PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode, this->PlantLoopNum);
 
             // Set outlet node variables that are possibly changed
-            DataLoopNode::Node(this->OutletNode).Temp = this->ReturnTemp;
+            state.dataLoopNodes->Node(this->OutletNode).Temp = this->ReturnTemp;
             // should add enthalpy update to return?
         }
     }
