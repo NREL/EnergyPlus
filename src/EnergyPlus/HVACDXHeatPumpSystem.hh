@@ -185,6 +185,16 @@ struct HVACDXHeatPumpSystemData : BaseGlobalStruct {
     Array1D_bool CheckEquipName;
     Array1D<HVACDXHeatPumpSystem::DXHeatPumpSystemStruct> DXHeatPumpSystem;
 
+    Real64 QZnReq = 0.001;              // Zone load (W), input to variable-speed DX coil
+    Real64 QLatReq = 0.0;               // Zone latent load, input to variable-speed DX coil
+    Real64 MaxONOFFCyclesperHour = 4.0; // Maximum cycling rate of heat pump [cycles/hr]
+    Real64 HPTimeConstant = 0.0;        // Heat pump time constant [s]
+    Real64 FanDelayTime = 0.0;          // Fan delay time, time delay for the HP's fan to
+    Real64 OnOffAirFlowRatio = 1.0;     // ratio of compressor on flow to average flow over time step
+    bool ErrorsFound = false;    // If errors detected in input
+    int TotalArgs = 0;           // Total number of alpha and numeric arguments (max) for a certain object in the input file
+    bool MySetPointCheckFlag = true;
+
     void clear_state() override
     {
         this->GetInputFlag = true;
@@ -192,6 +202,15 @@ struct HVACDXHeatPumpSystemData : BaseGlobalStruct {
         this->EconomizerFlag = false;
         this->CheckEquipName.deallocate();
         this->DXHeatPumpSystem.deallocate();
+        this->QZnReq = 0.001;
+        this->QLatReq = 0.0;
+        this->MaxONOFFCyclesperHour = 4.0;
+        this->HPTimeConstant = 0.0;
+        this->FanDelayTime = 0.0;
+        this->OnOffAirFlowRatio = 1.0;
+        this->ErrorsFound = false;
+        this->TotalArgs = 0;
+        this->MySetPointCheckFlag = true;
     }
 };
 
