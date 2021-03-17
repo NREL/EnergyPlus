@@ -1741,7 +1741,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest_Zero_Cp_Fix)
     SimulationManager::ManageSimulation(*state);
     EXPECT_TRUE(has_err_output(true));
 
-    auto &generatorController = facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0];
+    auto &generatorController = state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0];
     EXPECT_EQ(GeneratorType::FuelCell, generatorController->compGenTypeOf_Num);
     EXPECT_EQ("GENERATOR FUEL CELL 1", generatorController->name);
     EXPECT_EQ("GENERATOR:FUELCELL", generatorController->typeOfName);
