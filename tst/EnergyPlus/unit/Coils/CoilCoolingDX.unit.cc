@@ -147,8 +147,8 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     auto &thisCoil(coilCoolingDXs[coilIndex]);
 
     // fix the inlet conditions
-    auto &evapInletNode = DataLoopNode::Node(thisCoil.evapInletNodeIndex);
-    auto &condInletNode = DataLoopNode::Node(thisCoil.condInletNodeIndex);
+    auto &evapInletNode = state->dataLoopNodes->Node(thisCoil.evapInletNodeIndex);
+    auto &condInletNode = state->dataLoopNodes->Node(thisCoil.condInletNodeIndex);
     evapInletNode.Temp = 28.5;
     evapInletNode.Press = 101325;
     evapInletNode.HumRat = 0.014;
@@ -165,7 +165,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     DataHVACGlobals::MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
 
     // we'll use this later
-    auto &evapOutletNode = DataLoopNode::Node(thisCoil.evapOutletNodeIndex);
+    auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
 
     // set some values to run at rated conditions and call to run normal mode speed 1
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
@@ -286,8 +286,8 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
     auto &thisCoil(coilCoolingDXs[coilIndex]);
 
     // fix the inlet conditions
-    auto &evapInletNode = DataLoopNode::Node(thisCoil.evapInletNodeIndex);
-    auto &condInletNode = DataLoopNode::Node(thisCoil.condInletNodeIndex);
+    auto &evapInletNode = state->dataLoopNodes->Node(thisCoil.evapInletNodeIndex);
+    auto &condInletNode = state->dataLoopNodes->Node(thisCoil.condInletNodeIndex);
     evapInletNode.Temp = 28.5;
     evapInletNode.Press = 101325;
     evapInletNode.HumRat = 0.014;
@@ -304,7 +304,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
     DataHVACGlobals::MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
 
     // we'll use this later
-    auto &evapOutletNode = DataLoopNode::Node(thisCoil.evapOutletNodeIndex);
+    auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
 
     bool setExpectations = true;
 
@@ -372,7 +372,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     DataHVACGlobals::MSHPMassFlowRateLow = 0.6;
     DataHVACGlobals::MSHPMassFlowRateHigh = 1.0;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(17);
@@ -386,8 +386,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     auto &Coil = state->dataDXCoils->DXCoil(1);
     auto &constantcurve1 = state->dataCurveManager->PerfCurve(1);
     auto &constantcurve2 = state->dataCurveManager->PerfCurve(2);
-    auto &AirInletNode = DataLoopNode::Node(1);
-    auto &AirOutletNode = DataLoopNode::Node(2);
+    auto &AirInletNode = state->dataLoopNodes->Node(1);
+    auto &AirOutletNode = state->dataLoopNodes->Node(2);
     state->dataEnvrn->StdBaroPress = 101325.0;
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
@@ -674,8 +674,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     auto &thisCoil(coilCoolingDXs[coilIndex]);
 
     // fix the inlet conditions
-    auto &evapInletNode = DataLoopNode::Node(thisCoil.evapInletNodeIndex);
-    auto &condInletNode = DataLoopNode::Node(thisCoil.condInletNodeIndex);
+    auto &evapInletNode = state->dataLoopNodes->Node(thisCoil.evapInletNodeIndex);
+    auto &condInletNode = state->dataLoopNodes->Node(thisCoil.condInletNodeIndex);
     evapInletNode.Press = 101325;
     condInletNode.Temp = 30.0;
     condInletNode.Press = 101325;
@@ -689,7 +689,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     DataHVACGlobals::MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
 
     // we'll use this later
-    auto &evapOutletNode = DataLoopNode::Node(thisCoil.evapOutletNodeIndex);
+    auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
 
     // Test 1 - dry coil - run the coil at low speed
     evapInletNode.Temp = 35.0;
@@ -788,7 +788,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     DataHVACGlobals::MSHPMassFlowRateLow = 0.6;
     DataHVACGlobals::MSHPMassFlowRateHigh = 1.0;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(17);
@@ -802,8 +802,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     auto& Coil = state->dataDXCoils->DXCoil(1);
     auto& constantcurve1 = state->dataCurveManager->PerfCurve(1);
     auto& constantcurve2 = state->dataCurveManager->PerfCurve(2);
-    auto& AirInletNode = DataLoopNode::Node(1);
-    auto& AirOutletNode = DataLoopNode::Node(2);
+    auto& AirInletNode = state->dataLoopNodes->Node(1);
+    auto& AirOutletNode = state->dataLoopNodes->Node(2);
     state->dataEnvrn->StdBaroPress = 101325.0;
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
@@ -1091,8 +1091,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     auto& thisCoil(coilCoolingDXs[coilIndex]);
 
     // fix the inlet conditions
-    auto& evapInletNode = DataLoopNode::Node(thisCoil.evapInletNodeIndex);
-    auto& condInletNode = DataLoopNode::Node(thisCoil.condInletNodeIndex);
+    auto& evapInletNode = state->dataLoopNodes->Node(thisCoil.evapInletNodeIndex);
+    auto& condInletNode = state->dataLoopNodes->Node(thisCoil.condInletNodeIndex);
     evapInletNode.Press = 101325;
     condInletNode.Temp = 30.0;
     condInletNode.Press = 101325;
@@ -1106,7 +1106,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     DataHVACGlobals::MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
 
     // we'll use this later
-    auto& evapOutletNode = DataLoopNode::Node(thisCoil.evapOutletNodeIndex);
+    auto& evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
 
     // Test 1 - dry coil - run the coil at low speed
     evapInletNode.Temp = 35.0;
@@ -1204,7 +1204,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     state->dataDXCoils->NumDXCoils = 1;
     state->dataCurveManager->NumCurves = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(17);
@@ -1218,8 +1218,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     auto& Coil = state->dataDXCoils->DXCoil(1);
     auto& constantcurve1 = state->dataCurveManager->PerfCurve(1);
     auto& constantcurve2 = state->dataCurveManager->PerfCurve(2);
-    auto& AirInletNode = DataLoopNode::Node(1);
-    auto& AirOutletNode = DataLoopNode::Node(2);
+    auto& AirInletNode = state->dataLoopNodes->Node(1);
+    auto& AirOutletNode = state->dataLoopNodes->Node(2);
     state->dataEnvrn->StdBaroPress = 101325.0;
     //Real64 ratedInletAirTemp = 26.6667;
     //Real64 ratedInletAirHumRat = 0.0111847;
@@ -1436,7 +1436,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     state->dataDXCoils->NumDXCoils = 1;
     state->dataCurveManager->NumCurves = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(17);
@@ -1450,8 +1450,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     auto& Coil = state->dataDXCoils->DXCoil(1);
     auto& constantcurve1 = state->dataCurveManager->PerfCurve(1);
     auto& constantcurve2 = state->dataCurveManager->PerfCurve(2);
-    auto& AirInletNode = DataLoopNode::Node(1);
-    auto& AirOutletNode = DataLoopNode::Node(2);
+    auto& AirInletNode = state->dataLoopNodes->Node(1);
+    auto& AirOutletNode = state->dataLoopNodes->Node(2);
     state->dataEnvrn->StdBaroPress = 101325.0;
     //Real64 ratedInletAirTemp = 26.6667;
     //Real64 ratedInletAirHumRat = 0.0111847;
