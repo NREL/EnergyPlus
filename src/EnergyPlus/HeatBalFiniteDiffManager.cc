@@ -106,7 +106,6 @@ namespace HeatBalFiniteDiffManager {
     using HeatBalanceMovableInsulation::EvalOutsideMovableInsulation;
 
     // MODULE PARAMETER DEFINITIONS:
-    constexpr Real64 Lambda(2500000.0);
     constexpr Real64 smalldiff(1.e-8); // Used in places where "equality" tests should not be used.
 
     constexpr int CrankNicholsonSecondOrder(1); // original CondFD scheme.  semi implicit, second order in time

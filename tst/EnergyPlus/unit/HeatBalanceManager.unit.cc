@@ -394,7 +394,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, AdjustMixingOnly);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::AdjustMixingOnly);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, AddInfiltrationFlow);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, MixingSourceZonesOnly);
 }
@@ -457,7 +457,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, NoAdjustReturnAndMixing);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, AdjustInfiltrationFlow);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, AllZones);
 
@@ -604,7 +604,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, NoAdjustReturnAndMixing);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, NoInfiltrationFlow);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, 0);
 }

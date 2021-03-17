@@ -1222,31 +1222,31 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if (SELECT_CASE_var == "ADJUSTMIXINGONLY") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustMixingOnly;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustMixingOnly;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(1) = "AdjustMixingOnly";
                     } else if (SELECT_CASE_var == "ADJUSTRETURNONLY") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustReturnOnly;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustReturnOnly;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(1) = "AdjustReturnOnly";
                     } else if (SELECT_CASE_var == "ADJUSTMIXINGTHENRETURN") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustMixingThenReturn;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustMixingThenReturn;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(1) = "AdjustMixingThenReturn";
                     } else if (SELECT_CASE_var == "ADJUSTRETURNTHENMIXING") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustReturnThenMixing;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustReturnThenMixing;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(1) = "AdjustReturnThenMixing";
                     } else if (SELECT_CASE_var == "NONE") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = NoAdjustReturnAndMixing;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::NoAdjustReturnAndMixing;
                         AlphaName(1) = "None";
                     } else {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = NoAdjustReturnAndMixing;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::NoAdjustReturnAndMixing;
                         AlphaName(1) = "None";
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = None");
                     }
                 }
-                if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow = true;
+                if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow = true;
             }
             if (NumAlpha > 1) {
                 {

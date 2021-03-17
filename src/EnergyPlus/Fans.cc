@@ -593,7 +593,7 @@ namespace EnergyPlus::Fans {
 
             if (NumAlphas > 8 && !lAlphaFieldBlanks(9)) {
 
-                if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) {
+                if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) {
                     // do not include adjusted for "balanced" exhaust flow in the zone total return calculation
                     ShowWarningError(state,
                                      RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9) +
