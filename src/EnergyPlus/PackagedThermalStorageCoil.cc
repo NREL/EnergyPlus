@@ -204,11 +204,11 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         static std::string const RoutineName("GetTESCoilInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int item;                       // do loop counter
-        int NumAlphas;                  // Number of alphas in input
-        int NumNumbers;                 // Number of numeric items in input
-        int IOStatus;                   // Input status returned from GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        int item;                // do loop counter
+        int NumAlphas;           // Number of alphas in input
+        int NumNumbers;          // Number of numeric items in input
+        int IOStatus;            // Input status returned from GetObjectItem
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         Real64 TminRho;
         Real64 TmaxRho;
         Real64 TminCp;
@@ -4348,14 +4348,14 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Real64 FreezingTemp(0.0); // zero degrees C
+        constexpr Real64 FreezingTemp(0.0); // zero degrees C
         static std::string const RoutineName("CalcTESIceStorageTank");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Cp;            // local specific heat
         Real64 QdotIce;       // local rate of heat transfer to ice (negative cooling) [W]
         Real64 TimeElapsed;   // Fraction of the current hour that has elapsed (h)
-        Real64 NewOutletTemp; // calculated new tankoutlet temp (C)
+        Real64 NewOutletTemp; // calculated new tank outlet temp (C)
 
         TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 

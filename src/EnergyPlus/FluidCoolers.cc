@@ -798,8 +798,8 @@ namespace EnergyPlus::FluidCoolers {
         // Based on SizeTower by Don Shirey, Sept/Oct 2002; Richard Raustad, Feb 2005
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500);    // Maximum number of iterations
-        Real64 const Acc(0.0001); // Accuracy of result
+        constexpr int MaxIte(500);    // Maximum number of iterations
+        constexpr Real64 Acc(0.0001); // Accuracy of result
         static std::string const CalledFrom("SizeFluidCooler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

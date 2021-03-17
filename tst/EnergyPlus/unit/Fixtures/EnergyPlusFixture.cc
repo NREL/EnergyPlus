@@ -116,7 +116,7 @@ void EnergyPlusFixture::SetUp()
 
     Psychrometrics::InitializePsychRoutines();
     FluidProperties::InitializeGlycRoutines();
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
 }
 
 void EnergyPlusFixture::TearDown()

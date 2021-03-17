@@ -869,7 +869,7 @@ namespace HVACDXSystem {
                 case DataAirSystems::structArrayLegacyFanModels: {
                     int SupFanNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum;
                     if (SupFanNum > 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoolingSystem(DXSystemNum).CoolingCoilName,
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoolingSystem(DXSystemNum).CoolingCoilName,
                                                                      DXCoolingSystem(DXSystemNum).CoolingCoilType,
                                                                      state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
                                                                      DataAirSystems::structArrayLegacyFanModels,
@@ -880,7 +880,7 @@ namespace HVACDXSystem {
                 }
                 case DataAirSystems::objectVectorOOFanSystemModel: {
                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex >= 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                             DXCoolingSystem(DXSystemNum).CoolingCoilName,
                             DXCoolingSystem(DXSystemNum).CoolingCoilType,
                             HVACFan::fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name,

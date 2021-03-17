@@ -407,7 +407,7 @@ namespace EnergyPlus::HVACManager {
             ManageWater(state);
             // update electricity data for net, purchased, sold etc.
             DummyLogical = false;
-            facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
 
             // Update the plant and condenser loop capacitance model temperature history.
             PlantManager::UpdateNodeThermalHistory(state);
@@ -741,7 +741,7 @@ namespace EnergyPlus::HVACManager {
             ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
             // need to call non zone equipment so water use zone gains can be included in sizing calcs
             ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipmentFlag);
-            facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
             return;
         }
 
@@ -1745,12 +1745,12 @@ namespace EnergyPlus::HVACManager {
             ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
             SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
             ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
-            facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
 
             ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
 
             state.dataErrTracking->AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
-            facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
         } else {
             FlowResolutionNeeded = false;
             while ((SimAirLoops || SimZoneEquipment) && (IterAir <= MaxAir)) {
@@ -1806,7 +1806,7 @@ namespace EnergyPlus::HVACManager {
             }
 
             if (SimElecCircuits) {
-                facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+                state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
             }
 
             if (!SimPlantLoops) {
@@ -1821,7 +1821,7 @@ namespace EnergyPlus::HVACManager {
             }
 
             if (SimElecCircuits) {
-                facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+                state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
             }
         }
     }

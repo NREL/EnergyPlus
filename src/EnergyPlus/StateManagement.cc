@@ -133,7 +133,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DesiccantDehumidifiers::clear_state();
     DisplacementVentMgr::clear_state();
     DualDuct::clear_state();
-    clearFacilityElectricPowerServiceObject();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeFluidCoolers::clear_state();
     FaultsManager::clear_state();
@@ -168,7 +167,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PollutionModule::clear_state();
     Psychrometrics::clear_state();
     PVWatts::clear_state();
-    clearCoilSelectionReportObj(); // ReportCoilSelection
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelUserTempPattern::clear_state();
     ScheduleManager::clear_state();

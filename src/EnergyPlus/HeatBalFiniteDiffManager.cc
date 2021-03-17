@@ -102,16 +102,15 @@ namespace HeatBalFiniteDiffManager {
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalSurface::MinSurfaceTempLimit;
     using DataSurfaces::Ground;
-    using DataSurfaces::HeatTransferModel_CondFD;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
     using HeatBalanceMovableInsulation::EvalOutsideMovableInsulation;
 
     // MODULE PARAMETER DEFINITIONS:
-    Real64 const Lambda(2500000.0);
-    Real64 const smalldiff(1.e-8); // Used in places where "equality" tests should not be used.
+    constexpr Real64 Lambda(2500000.0);
+    constexpr Real64 smalldiff(1.e-8); // Used in places where "equality" tests should not be used.
 
-    int const CrankNicholsonSecondOrder(1); // original CondFD scheme.  semi implicit, second order in time
-    int const FullyImplicitFirstOrder(2);   // fully implicit scheme, first order in time.
+    constexpr int CrankNicholsonSecondOrder(1); // original CondFD scheme.  semi implicit, second order in time
+    constexpr int FullyImplicitFirstOrder(2);   // fully implicit scheme, first order in time.
     Array1D_string const cCondFDSchemeType(2, {"CrankNicholsonSecondOrder", "FullyImplicitFirstOrder"});
 
     Real64 const TempInitValue(23.0);   // Initialization value for Temperature
@@ -469,9 +468,6 @@ namespace HeatBalFiniteDiffManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine sets the initial values for the FD moisture calculation
 
-        // Using/Aliasing
-        using DataSurfaces::HeatTransferModel_CondFD;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyEnvrnFlag(true);
         int SurfNum;
@@ -489,7 +485,7 @@ namespace HeatBalFiniteDiffManager {
         // now do begin environment inits.
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
+                if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
                 if (state.dataSurface->Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
                 ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
@@ -540,7 +536,7 @@ namespace HeatBalFiniteDiffManager {
         // now do every timestep inits
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
             if (state.dataSurface->Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
@@ -572,7 +568,6 @@ namespace HeatBalFiniteDiffManager {
         // Using/Aliasing
         using DataHeatBalance::HighDiffusivityThreshold;
         using DataHeatBalance::ThinMaterialLayerThreshold;
-        using DataSurfaces::HeatTransferModel_CondFD;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Lay;
@@ -635,8 +630,11 @@ namespace HeatBalFiniteDiffManager {
         }
 
         for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
-            // Need to skip window constructions and eventually window materials
+            // Need to skip window constructions, IRT, air wall and construction not in use.
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
+            if (state.dataConstruction->Construct(ConstrNum).TypeIsIRT) continue;
+            if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundary) continue;
+            if (!state.dataConstruction->Construct(ConstrNum).IsUsed) continue;
 
             ConstructFD(ConstrNum).Name.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
             ConstructFD(ConstrNum).Thickness.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
@@ -834,7 +832,7 @@ namespace HeatBalFiniteDiffManager {
         for (Surf = 1; Surf <= state.dataSurface->TotSurfaces; ++Surf) {
             if (!state.dataSurface->Surface(Surf).HeatTransSurf) continue;
             if (state.dataSurface->Surface(Surf).Class == DataSurfaces::SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(Surf).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
+            if (state.dataSurface->Surface(Surf).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
             ConstrNum = state.dataSurface->Surface(Surf).Construction;
             TotNodes = ConstructFD(ConstrNum).TotNodes;
 
@@ -911,7 +909,7 @@ namespace HeatBalFiniteDiffManager {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
             if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
 
             SetupOutputVariable(state, "CondFD Inner Solver Loop Iteration Count",
                                 OutputProcessor::Unit::None,
@@ -1279,6 +1277,8 @@ namespace HeatBalFiniteDiffManager {
 
                 if (state.dataConstruction->Construct(ThisNum).TypeIsWindow) continue;
                 if (state.dataConstruction->Construct(ThisNum).TypeIsIRT) continue;
+                if (state.dataConstruction->Construct(ThisNum).TypeIsAirBoundary) continue;
+                if (!state.dataConstruction->Construct(ThisNum).IsUsed) continue;
 
                 static constexpr auto Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
                 print(state.files.eio,
@@ -1442,7 +1442,6 @@ namespace HeatBalFiniteDiffManager {
         //       RE-ENGINEERED  Curtis Pedersen 2006
 
         // Using/Aliasing
-        using DataSurfaces::HeatTransferModel_CondFD;
         using DataSurfaces::OtherSideCondModeledExt;
 
         auto const &surface(state.dataSurface->Surface(Surf));
@@ -1548,7 +1547,7 @@ namespace HeatBalFiniteDiffManager {
             Real64 const Toa(TempOutsideAirFD(Surf));
             Real64 const Tgnd(TempOutsideAirFD(Surf));
 
-            if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+            if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
 
                 int const ConstrNum(surface.Construction);
                 int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
@@ -1844,7 +1843,7 @@ namespace HeatBalFiniteDiffManager {
 
         auto const &surface(state.dataSurface->Surface(Surf));
 
-        if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD) { // HT Algo issue
+        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) { // HT Algo issue
 
             int const ConstrNum(surface.Construction);
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
@@ -2194,9 +2193,6 @@ namespace HeatBalFiniteDiffManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the heat transfer at the node on the surfaces inside face (facing zone)
 
-        // Using/Aliasing
-        using DataSurfaces::HeatTransferModel_CondFD;
-
         auto const &surface(state.dataSurface->Surface(Surf));
 
         int const ConstrNum(surface.Construction);
@@ -2227,7 +2223,7 @@ namespace HeatBalFiniteDiffManager {
         auto TDT_i(TDT(i));
         Real64 const QFac(NetLWRadToSurfFD + QHtRadSysSurfFD + QHWBaseboardSurfFD + QSteamBaseboardSurfFD + QElecBaseboardSurfFD + QRadSWInFD +
                           QRadThermInFD + QCoolingPanelSurfFD);
-        if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
             auto const &mat(state.dataMaterial->Material(MatLay));
             auto const &matFD(MaterialFD(MatLay));

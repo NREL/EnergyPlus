@@ -282,7 +282,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     EXPECT_EQ(state->dataGlobal->NumOfTimeStepInHour, 4);
 
     // Needed to avoid crash in SetupSimulation (from ElectricPowerServiceManager.hh)
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
 
     bool ErrorsFound(false);
     SimulationManager::SetupSimulation(*state, ErrorsFound);

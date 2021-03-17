@@ -1619,7 +1619,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
+    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::iHeatTransferModel::CTF);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
@@ -1646,7 +1646,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
+    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::iHeatTransferModel::CTF);
     EXPECT_EQ(state->dataHeatBalSurf->MaxSurfaceTempLimit, 205.2);
     EXPECT_EQ(state->dataHeatBal->LowHConvLimit, 0.004);
     EXPECT_EQ(state->dataHeatBal->HighHConvLimit, 200.6);
@@ -1672,7 +1672,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
     EXPECT_TRUE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_EMPD);
+    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::iHeatTransferModel::EMPD);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
@@ -1695,7 +1695,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_TRUE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CondFD);
+    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::iHeatTransferModel::CondFD);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
@@ -1718,7 +1718,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_TRUE(state->dataHeatBal->AnyHAMT);
-    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_HAMT);
+    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::iHeatTransferModel::HAMT);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
