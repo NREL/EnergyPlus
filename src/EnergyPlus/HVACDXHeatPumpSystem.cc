@@ -1114,22 +1114,6 @@ namespace HVACDXHeatPumpSystem {
         // Return value
         Real64 Residuum; // residual to be minimized to zero
 
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = desired air outlet temperature [C]
-        // par(5) = supply air fan operating mode (ContFanCycCoil)
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int CoilIndex;                            // index of this coil
         Real64 OutletAirTemp;                     // outlet air temperature [C]
@@ -1183,22 +1167,6 @@ namespace HVACDXHeatPumpSystem {
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = desired air outlet temperature [C]
-        // par(5) = supply air fan operating mode (ContFanCycCoil)
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int CoilIndex;                            // index of this coil
