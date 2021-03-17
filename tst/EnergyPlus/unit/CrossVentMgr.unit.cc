@@ -83,11 +83,11 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, 1) = 1;
     state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, 2) = 2;
 
-    AirflowNetwork::MultizoneSurfaceData.allocate(MaxSurf);
-    AirflowNetwork::MultizoneSurfaceData(1).SurfNum = 6;
-    AirflowNetwork::MultizoneSurfaceData(1).OpenFactor = 1.;
-    AirflowNetwork::MultizoneSurfaceData(2).SurfNum = 9;
-    AirflowNetwork::MultizoneSurfaceData(2).OpenFactor = 1.;
+    state->dataAirflowNetwork->MultizoneSurfaceData.allocate(MaxSurf);
+    state->dataAirflowNetwork->MultizoneSurfaceData(1).SurfNum = 6;
+    state->dataAirflowNetwork->MultizoneSurfaceData(1).OpenFactor = 1.;
+    state->dataAirflowNetwork->MultizoneSurfaceData(2).SurfNum = 9;
+    state->dataAirflowNetwork->MultizoneSurfaceData(2).OpenFactor = 1.;
 
     state->dataSurface->Surface.allocate(10);
     state->dataSurface->Surface(6).Zone = 1;
@@ -114,24 +114,24 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     state->dataHeatBal->Zone(1).Volume = 996.75300003839993;
     state->dataHeatBal->Zone(1).FloorArea = 297.28972800000003;
 
-    AirflowNetwork::AirflowNetworkLinkSimu.allocate(1);
-    AirflowNetwork::AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu.allocate(1);
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
 
     state->dataEnvrn->WindDir = 271.66666666666669;
 
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
 
-    AirflowNetwork::AirflowNetworkLinkageData.allocate(2);
-    AirflowNetwork::AirflowNetworkLinkageData(1).CompNum = 1;
-    AirflowNetwork::AirflowNetworkLinkageData(2).CompNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData.allocate(2);
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(1).CompNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(2).CompNum = 1;
 
-    AirflowNetwork::AirflowNetworkCompData.allocate(3);
-    AirflowNetwork::AirflowNetworkCompData(1).TypeNum = 1;
-    AirflowNetwork::AirflowNetworkCompData(1).CompTypeNum = 1;
-    AirflowNetwork::AirflowNetworkCompData(2).TypeNum = 1;
-    AirflowNetwork::AirflowNetworkCompData(2).CompTypeNum = 3;
-    AirflowNetwork::AirflowNetworkCompData(3).TypeNum = 2;
-    AirflowNetwork::AirflowNetworkCompData(3).CompTypeNum = 2;
+    state->dataAirflowNetwork->AirflowNetworkCompData.allocate(3);
+    state->dataAirflowNetwork->AirflowNetworkCompData(1).TypeNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkCompData(1).CompTypeNum = AirflowNetwork::iComponentTypeNum::DOP;
+    state->dataAirflowNetwork->AirflowNetworkCompData(2).TypeNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkCompData(2).CompTypeNum = AirflowNetwork::iComponentTypeNum::SCR;
+    state->dataAirflowNetwork->AirflowNetworkCompData(3).TypeNum = 2;
+    state->dataAirflowNetwork->AirflowNetworkCompData(3).CompTypeNum = AirflowNetwork::iComponentTypeNum::SOP;
 
     state->dataRoomAirMod->SurfParametersCVDV.allocate(2);
     state->dataRoomAirMod->SurfParametersCVDV(1).Width = 22.715219999999999;

@@ -498,7 +498,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -890,7 +890,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -1321,7 +1321,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -1736,7 +1736,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -2220,7 +2220,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -2647,7 +2647,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -3034,7 +3034,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 
@@ -3426,7 +3426,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 
@@ -3899,7 +3899,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
 
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone);
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state);

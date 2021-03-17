@@ -1728,7 +1728,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
     state->dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(*state);
@@ -3302,7 +3302,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
     state->dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(*state);

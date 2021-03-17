@@ -56,7 +56,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
@@ -67,6 +66,7 @@
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -78,8 +78,6 @@
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
-#include <EnergyPlus/HVACManager.hh>
-#include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
@@ -117,7 +115,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
-    DataHeatBalSurface::clear_state();
     DataHVACGlobals::clear_state();
     DataIPShortCuts::clear_state();
     DataOutputs::clear_state();
@@ -127,7 +124,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataViewFactorInformation::clear_state();
     DesiccantDehumidifiers::clear_state();
     DualDuct::clear_state();
-    clearFacilityElectricPowerServiceObject();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeFluidCoolers::clear_state();
     FaultsManager::clear_state();
@@ -147,8 +143,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACDXSystem::clear_state();
     HVACHXAssistedCoolingCoil::clear_state();
     HVACFan::clearHVACFanObjects();
-    HVACManager::clear_state();
-    HVACMultiSpeedHeatPump::clear_state();
     HVACSingleDuctInduc::clear_state();
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
@@ -160,7 +154,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PhotovoltaicThermalCollectors::clear_state();
     Psychrometrics::clear_state();
     PVWatts::clear_state();
-    clearCoilSelectionReportObj(); // ReportCoilSelection
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelUserTempPattern::clear_state();
     ScheduleManager::clear_state();

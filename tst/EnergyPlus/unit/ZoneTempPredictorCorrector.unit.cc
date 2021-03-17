@@ -159,7 +159,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->SumHmARa.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
-    AirflowNetwork::SimulateAirflowNetwork = 0;
+    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
     state->dataHeatBalFanSys->MDotOA.allocate(1);
 
     state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
@@ -1006,7 +1006,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBal->HConvIn.allocate(3);
     state->dataLoopNodes->Node.allocate(4);
     state->dataHeatBal->TempEffBulkAir.allocate(3);
-    DataHeatBalSurface::TempSurfInTmp.allocate(3);
+    state->dataHeatBalSurf->TempSurfInTmp.allocate(3);
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(2).HeatTransSurf = true;
@@ -1017,9 +1017,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataSurface->Surface(1).TAirRef = ZoneMeanAirTemp;
     state->dataSurface->Surface(2).TAirRef = AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = ZoneSupplyAirTemp;
-    DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
-    DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
-    DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
+    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
+    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
     state->dataHeatBal->TempEffBulkAir(1) = 10.0;
     state->dataHeatBal->TempEffBulkAir(2) = 10.0;
     state->dataHeatBal->TempEffBulkAir(3) = 10.0;

@@ -561,17 +561,17 @@ namespace RoomAirModelAirflowNetwork {
         if (NodeNum > 0) {
             for (linkNum = 1; linkNum <= ThisRAFNNode.NumOfAirflowLinks; ++linkNum) {
                 Link = ThisRAFNNode.Link(linkNum).AirflowNetworkLinkSimuID;
-                if (AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[0] == NodeNum) { // incoming flow
-                    NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1];
-                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
-                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW2;
+                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[0] == NodeNum) { // incoming flow
+                    NodeIn = state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[1];
+                    ThisRAFNNode.Link(linkNum).TempIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).TZ;
+                    ThisRAFNNode.Link(linkNum).HumRatIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).WZ;
+                    ThisRAFNNode.Link(linkNum).MdotIn = state.dataAirflowNetwork->AirflowNetworkLinkSimu(Link).FLOW2;
                 }
-                if (AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1] == NodeNum) { // outgoing flow
-                    NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[0];
-                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
-                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW;
+                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[1] == NodeNum) { // outgoing flow
+                    NodeIn = state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[0];
+                    ThisRAFNNode.Link(linkNum).TempIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).TZ;
+                    ThisRAFNNode.Link(linkNum).HumRatIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).WZ;
+                    ThisRAFNNode.Link(linkNum).MdotIn = state.dataAirflowNetwork->AirflowNetworkLinkSimu(Link).FLOW;
                 }
             }
 
@@ -1053,7 +1053,7 @@ namespace RoomAirModelAirflowNetwork {
             } // End of check if window
 
             HA = HA + state.dataHeatBal->HConvIn(SurfNum) * Area;
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
 
             if (state.dataSurface->Surface(SurfNum).TAirRef == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature(which is to be solved for in CorrectZoneAirTemp).
@@ -1108,7 +1108,7 @@ namespace RoomAirModelAirflowNetwork {
         // Breakout summation of surface moisture interaction terms
 
         // Using/Aliasing
-        using DataHeatBalSurface::TempSurfInTmp;
+
         using HeatBalanceHAMTManager::UpdateHeatBalHAMT;
         using MoistureBalanceEMPDManager::UpdateMoistureBalanceEMPD;
         using Psychrometrics::PsyRhFnTdbRhov;
@@ -1149,8 +1149,7 @@ namespace RoomAirModelAirflowNetwork {
             auto & HMassConvInFD = state.dataMstBal->HMassConvInFD;
             auto & RhoVaporSurfIn = state.dataMstBal->RhoVaporSurfIn;
             auto & RhoVaporAirIn = state.dataMstBal->RhoVaporAirIn;
-
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                 UpdateHeatBalHAMT(state, SurfNum);
 
                 SumHmAW += HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
@@ -1158,14 +1157,17 @@ namespace RoomAirModelAirflowNetwork {
                 RhoAirZone = PsyRhoAirFnPbTdbW(state,
                     state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(SurfNum).Zone), PsyRhFnTdbRhov(state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
 
-                Wsurf = PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum), PsyRhFnTdbRhov(state, TempSurfInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"), state.dataEnvrn->OutBaroPress);
+                Wsurf = PsyWFnTdbRhPb(state,
+                                      state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
+                                      PsyRhFnTdbRhov(state, state.dataHeatBalSurf->TempSurfInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"),
+                                      state.dataEnvrn->OutBaroPress);
 
                 SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoAirZone;
 
                 SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoAirZone * Wsurf;
             }
 
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
 
                 UpdateMoistureBalanceEMPD(state, SurfNum);
                 RhoVaporSurfIn(SurfNum) = state.dataMstBalEMPD->RVSurface(SurfNum);
@@ -1173,9 +1175,10 @@ namespace RoomAirModelAirflowNetwork {
                 SumHmAW = SumHmAW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
                 SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area *
                                           PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
-                                                            TempSurfInTmp(SurfNum),
-                                                            PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum),
-                                                                          PsyRhFnTdbRhovLBnd0C(state, TempSurfInTmp(SurfNum), RhoVaporAirIn(SurfNum)),
+                                                            state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
+                                                            PsyWFnTdbRhPb(state,
+                                                                          state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
+                                                 PsyRhFnTdbRhovLBnd0C(state, state.dataHeatBalSurf->TempSurfInTmp(SurfNum), RhoVaporAirIn(SurfNum)),
                                                                           state.dataEnvrn->OutBaroPress));
                 SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoVaporSurfIn(SurfNum);
             }

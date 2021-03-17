@@ -107,7 +107,7 @@ protected:
         state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataSurface->Surface.allocate(NumOfSurfaces);
         state->dataHeatBal->HConvIn.allocate(NumOfSurfaces);
-        TempSurfInTmp.allocate(NumOfSurfaces);
+        state->dataHeatBalSurf->TempSurfInTmp.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVSurface.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVSurfaceOld.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVDeepLayer.allocate(NumOfSurfaces);
@@ -119,9 +119,9 @@ protected:
         state->dataMstBal->HMassConvInFD.allocate(NumOfSurfaces);
         state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
         state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-        AirflowNetwork::AirflowNetworkLinkageData.allocate(5);
-        AirflowNetwork::AirflowNetworkNodeSimu.allocate(6);
-        AirflowNetwork::AirflowNetworkLinkSimu.allocate(5);
+        state->dataAirflowNetwork->AirflowNetworkLinkageData.allocate(5);
+        state->dataAirflowNetwork->AirflowNetworkNodeSimu.allocate(6);
+        state->dataAirflowNetwork->AirflowNetworkLinkSimu.allocate(5);
         RAFN.allocate(state->dataGlobal->NumOfZones);
     }
 
@@ -196,38 +196,38 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).Link(3).AirflowNetworkLinkSimuID = 5;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).AirflowNetworkNodeID = 2;
 
-    AirflowNetwork::AirflowNetworkLinkageData(1).NodeNums[0] = 1;
-    AirflowNetwork::AirflowNetworkLinkageData(2).NodeNums[0] = 1;
-    AirflowNetwork::AirflowNetworkLinkageData(3).NodeNums[0] = 1;
-    AirflowNetwork::AirflowNetworkLinkageData(1).NodeNums[1] = 3;
-    AirflowNetwork::AirflowNetworkLinkageData(2).NodeNums[1] = 4;
-    AirflowNetwork::AirflowNetworkLinkageData(3).NodeNums[1] = 2;
-    AirflowNetwork::AirflowNetworkLinkageData(4).NodeNums[0] = 2;
-    AirflowNetwork::AirflowNetworkLinkageData(5).NodeNums[0] = 2;
-    AirflowNetwork::AirflowNetworkLinkageData(4).NodeNums[1] = 5;
-    AirflowNetwork::AirflowNetworkLinkageData(5).NodeNums[1] = 6;
-    AirflowNetwork::AirflowNetworkNodeSimu(1).TZ = 25.0;
-    AirflowNetwork::AirflowNetworkNodeSimu(1).WZ = 0.001;
-    AirflowNetwork::AirflowNetworkNodeSimu(2).TZ = 20.0;
-    AirflowNetwork::AirflowNetworkNodeSimu(2).WZ = 0.002;
-    AirflowNetwork::AirflowNetworkNodeSimu(3).TZ = 30.0;
-    AirflowNetwork::AirflowNetworkNodeSimu(3).WZ = 0.001;
-    AirflowNetwork::AirflowNetworkNodeSimu(4).TZ = 22.0;
-    AirflowNetwork::AirflowNetworkNodeSimu(4).WZ = 0.001;
-    AirflowNetwork::AirflowNetworkNodeSimu(5).TZ = 27.0;
-    AirflowNetwork::AirflowNetworkNodeSimu(5).WZ = 0.0015;
-    AirflowNetwork::AirflowNetworkNodeSimu(6).TZ = 20.0;
-    AirflowNetwork::AirflowNetworkNodeSimu(6).WZ = 0.002;
-    AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW = 0.0;
-    AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 = 0.01;
-    AirflowNetwork::AirflowNetworkLinkSimu(2).FLOW = 0.0;
-    AirflowNetwork::AirflowNetworkLinkSimu(2).FLOW2 = 0.02;
-    AirflowNetwork::AirflowNetworkLinkSimu(3).FLOW = 0.01;
-    AirflowNetwork::AirflowNetworkLinkSimu(3).FLOW2 = 0.0;
-    AirflowNetwork::AirflowNetworkLinkSimu(4).FLOW = 0.0;
-    AirflowNetwork::AirflowNetworkLinkSimu(4).FLOW2 = 0.01;
-    AirflowNetwork::AirflowNetworkLinkSimu(5).FLOW = 0.01;
-    AirflowNetwork::AirflowNetworkLinkSimu(5).FLOW2 = 0.0;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(1).NodeNums[0] = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(2).NodeNums[0] = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(3).NodeNums[0] = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(1).NodeNums[1] = 3;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(2).NodeNums[1] = 4;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(3).NodeNums[1] = 2;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(4).NodeNums[0] = 2;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(5).NodeNums[0] = 2;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(4).NodeNums[1] = 5;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(5).NodeNums[1] = 6;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(1).TZ = 25.0;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(1).WZ = 0.001;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(2).TZ = 20.0;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(2).WZ = 0.002;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(3).TZ = 30.0;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(3).WZ = 0.001;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(4).TZ = 22.0;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(4).WZ = 0.001;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(5).TZ = 27.0;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(5).WZ = 0.0015;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(6).TZ = 20.0;
+    state->dataAirflowNetwork->AirflowNetworkNodeSimu(6).WZ = 0.002;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(1).FLOW = 0.0;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(1).FLOW2 = 0.01;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(2).FLOW = 0.0;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(2).FLOW2 = 0.02;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(3).FLOW = 0.01;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(3).FLOW2 = 0.0;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(4).FLOW = 0.0;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(4).FLOW2 = 0.01;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(5).FLOW = 0.01;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(5).FLOW2 = 0.0;
 
     state->dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes = 1;
     state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipName.allocate(1);
@@ -262,8 +262,8 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataSurface->Surface(1).Area = 1.0;
     state->dataSurface->Surface(2).Area = 2.0;
 
-    state->dataSurface->Surface(1).HeatTransferAlgorithm = HeatTransferModel_EMPD;
-    state->dataSurface->Surface(2).HeatTransferAlgorithm = HeatTransferModel_EMPD;
+    state->dataSurface->Surface(1).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
+    state->dataSurface->Surface(2).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
     state->dataMstBalEMPD->RVSurface(1) = 0.0011;
     state->dataMstBalEMPD->RVSurface(2) = 0.0012;
 
@@ -279,8 +279,8 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBalFanSys->MAT(1) = 20.0;
     state->dataHeatBal->HConvIn(1) = 1.0;
     state->dataHeatBal->HConvIn(2) = 1.0;
-    TempSurfInTmp(1) = 25.0;
-    TempSurfInTmp(2) = 30.0;
+    state->dataHeatBalSurf->TempSurfInTmp(1) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(2) = 30.0;
     state->dataMstBal->RhoVaporAirIn(1) = PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
     state->dataMstBal->RhoVaporAirIn(2) = PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
     state->dataMstBal->HMassConvInFD(1) = state->dataHeatBal->HConvIn(1) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) + state->dataMstBal->RhoVaporAirIn(1)) *

@@ -182,7 +182,6 @@ set(SRC
     DataHVACGlobals.hh
     DataHVACSystems.hh
     DataHeatBalFanSys.hh
-    DataHeatBalSurface.cc
     DataHeatBalSurface.hh
     DataHeatBalance.cc
     DataHeatBalance.hh
@@ -201,7 +200,6 @@ set(SRC
     DataRootFinder.hh
     DataRuntimeLanguage.cc
     DataRuntimeLanguage.hh
-    DataShadowingCombinations.cc
     DataShadowingCombinations.hh
     DataSizing.cc
     DataSizing.hh

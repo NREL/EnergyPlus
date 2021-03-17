@@ -84,27 +84,20 @@
 
 namespace EnergyPlus {
 
-std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
-
-void clearFacilityElectricPowerServiceObject()
+void createFacilityElectricPowerServiceObject(EnergyPlusData &state)
 {
-    facilityElectricServiceObj.release();
-}
-
-void createFacilityElectricPowerServiceObject()
-{
-    facilityElectricServiceObj = std::unique_ptr<ElectricPowerServiceManager>(new ElectricPowerServiceManager());
+    state.dataElectPwrSvcMgr->facilityElectricServiceObj = std::make_unique<ElectricPowerServiceManager>();
 }
 
 void initializeElectricPowerServiceZoneGains(EnergyPlusData &state) // namespace routine for handling call from InternalHeatGains
 {
     // internal zone gains need to be re initialized for begin new environment earlier than the main call into manage electric power service
-    if (facilityElectricServiceObj->newEnvironmentInternalGainsFlag && state.dataGlobal->BeginEnvrnFlag) {
-        facilityElectricServiceObj->reinitZoneGainsAtBeginEnvironment();
-        facilityElectricServiceObj->newEnvironmentInternalGainsFlag = false;
+    if (state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag && state.dataGlobal->BeginEnvrnFlag) {
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->reinitZoneGainsAtBeginEnvironment();
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        facilityElectricServiceObj->newEnvironmentInternalGainsFlag = true;
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag = true;
     }
 }
 
