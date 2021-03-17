@@ -62,6 +62,8 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::HeatBalFiniteDiffManager;
+using namespace EnergyPlus::HeatBalanceManager;
+
 
 namespace EnergyPlus {
 
@@ -190,7 +192,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
 }
 
 TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChange)
-{
+{    
     // create a single PCM object in the input and process it
     std::string const idf_objects = delimited_string(
         {"  MaterialProperty:PhaseChangeHysteresis,", "    PCMNAME,   !- Name",
