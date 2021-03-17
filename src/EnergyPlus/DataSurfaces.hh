@@ -243,19 +243,47 @@ namespace DataSurfaces {
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential
 
-    // Parameters to indicate heat transfer model to use for surface
-    extern Array1D_string const HeatTransferModelNames;
-    constexpr int HeatTransferModel_NotSet(-1);
-    constexpr int HeatTransferModel_None(0); // shading surfaces
-    constexpr int HeatTransferModel_CTF(1);
-    constexpr int HeatTransferModel_EMPD(2);
-    constexpr int HeatTransferModel_CondFD(5);
-    constexpr int HeatTransferModel_HAMT(6);
-    constexpr int HeatTransferModel_Window5(7);             // original detailed layer-by-layer based on window 4 and window 5
-    constexpr int HeatTransferModel_ComplexFenestration(8); // BSDF
-    constexpr int HeatTransferModel_TDD(9);                 // tubular daylighting device
-    constexpr int HeatTransferModel_Kiva(10);               // Kiva ground calculations
-    constexpr int HeatTransferModel_AirBoundaryNoHT(11);    // Construction:AirBoundary - not IRT or interior window
+    enum class iHeatTransferModel
+    {
+        NotSet,
+        None, // shading surfaces
+        CTF,
+        EMPD,
+        CondFD,
+        HAMT,
+        Window5,             // original detailed layer-by-layer based on window 4 and window 5
+        ComplexFenestration, // BSDF
+        TDD,                 // tubular daylighting device
+        Kiva,                // Kiva ground calculations
+        AirBoundaryNoHT,     // Construction:AirBoundary - not IRT or interior window
+    };
+
+    inline std::string HeatTransferModelNames(iHeatTransferModel const &m)
+    {
+        switch(m){
+        case iHeatTransferModel::CTF:
+            return "CTF - ConductionTransferFunction";
+        case iHeatTransferModel::EMPD:
+            return "EMPD - MoisturePenetrationDepthConductionTransferFunction";
+        case iHeatTransferModel::CondFD:
+            return "CondFD - ConductionFiniteDifference";
+        case iHeatTransferModel::HAMT:
+            return "HAMT - CombinedHeatAndMoistureFiniteElement";
+        case iHeatTransferModel::Window5:
+            return "Window - Detailed layer-by-layer";
+        case iHeatTransferModel::ComplexFenestration:
+            return "Window - ComplexFenestration";
+        case iHeatTransferModel::TDD:
+            return "Tubular daylighting device";
+        case iHeatTransferModel::Kiva:
+            return "KivaFoundation - TwoDimensionalFiniteDifference";
+        case iHeatTransferModel::None:
+        case iHeatTransferModel::AirBoundaryNoHT:
+        case iHeatTransferModel::NotSet:
+        default:
+            return "";
+        }
+    }
 
     // Parameters for classification of outside face of surfaces
     constexpr int OutConvClass_WindwardVertWall(101);
@@ -527,9 +555,9 @@ namespace DataSurfaces {
         int OutsideHeatSourceTermSchedule; // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
         int InsideHeatSourceTermSchedule;  // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
         // False if a (detached) shadowing (sub)surface
-        int HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
-        std::string BaseSurfName;  // Name of BaseSurf
-        int BaseSurf;              // "Base surface" for this surface.  Applies mainly to subsurfaces
+        iHeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
+        std::string BaseSurfName;                 // Name of BaseSurf
+        int BaseSurf;                             // "Base surface" for this surface.  Applies mainly to subsurfaces
         // in which case it points back to the base surface number.
         // Equals 0 for detached shading.
         // BaseSurf equals surface number for all other surfaces.
@@ -707,7 +735,7 @@ namespace DataSurfaces {
             : Construction(0), EMSConstructionOverrideON(false), EMSConstructionOverrideValue(0), ConstructionStoredInputValue(0),
               Class(SurfaceClass::None), Shape(SurfaceShape::None), Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0),
               Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0), Width(0.0), HeatTransSurf(false), OutsideHeatSourceTermSchedule(0),
-              InsideHeatSourceTermSchedule(0), HeatTransferAlgorithm(HeatTransferModel_NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0),
+              InsideHeatSourceTermSchedule(0), HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0),
               ExtBoundCond(0), LowTempErrCount(0), HighTempErrCount(0), ExtSolar(false), ExtWind(false), IntConvCoeff(0),
               EMSOverrideIntConvCoef(false), EMSValueForIntConvCoef(0.0), ExtConvCoeff(0), EMSOverrideExtConvCoef(false), EMSValueForExtConvCoef(0.0),
               ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),

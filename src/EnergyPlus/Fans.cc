@@ -59,6 +59,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -591,18 +592,31 @@ namespace EnergyPlus::Fans {
             }
 
             if (NumAlphas > 8 && !lAlphaFieldBlanks(9)) {
-                Fan(FanNum).BalancedFractSchedNum = GetScheduleIndex(state, cAlphaArgs(9));
-                if (Fan(FanNum).BalancedFractSchedNum == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " entered =" + cAlphaArgs(9) + " for " +
-                                    cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                    ErrorsFound = true;
-                } else if (Fan(FanNum).BalancedFractSchedNum > 0) {
-                    if (!CheckScheduleValueMinMax(state, Fan(FanNum).BalancedFractSchedNum, ">=", 0.0, "<=", 1.0)) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " for " + cAlphaFieldNames(1) +
-                                        '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Error found in " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
-                        ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
+
+                if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) {
+                    // do not include adjusted for "balanced" exhaust flow in the zone total return calculation
+                    ShowWarningError(state,
+                                     RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9) +
+                                         " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                    ShowContinueError(state, "When zone air mass flow balance is enforced, this input field should be left blank.");
+                    ShowContinueError(state, "This schedule will be ignored in the simulation.");
+                    Fan(FanNum).BalancedFractSchedNum = 0;
+                } else {
+                    Fan(FanNum).BalancedFractSchedNum = GetScheduleIndex(state, cAlphaArgs(9));
+                    if (Fan(FanNum).BalancedFractSchedNum == 0) {
+                        ShowSevereError(state,
+                                        RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " entered =" + cAlphaArgs(9) +
+                                            " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
+                    } else if (Fan(FanNum).BalancedFractSchedNum > 0) {
+                        if (!CheckScheduleValueMinMax(state, Fan(FanNum).BalancedFractSchedNum, ">=", 0.0, "<=", 1.0)) {
+                            ShowSevereError(state,
+                                            RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " for " + cAlphaFieldNames(1) +
+                                                '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "Error found in " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
+                            ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
+                            ErrorsFound = true;
+                        }
                     }
                 }
             } else {

@@ -95,17 +95,6 @@ namespace EnergyPlus::DataSurfaces {
     // (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential (LKL - 13 Aug 2007)
-    Array1D_string const HeatTransferModelNames(10,
-                                                {"CTF - ConductionTransferFunction",
-                                                 "EMPD - MoisturePenetrationDepthConductionTransferFunction",
-                                                 "",
-                                                 "",
-                                                 "CondFD - ConductionFiniteDifference",
-                                                 "HAMT - CombinedHeatAndMoistureFiniteElement",
-                                                 "Window - Detailed layer-by-layer",
-                                                 "Window - ComplexFenestration",
-                                                 "Tubular daylighting device",
-                                                 "KivaFoundation - TwoDimensionalFiniteDifference"});
 
     // Constructor
     Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2D const &vl, Vector2D const &vu)

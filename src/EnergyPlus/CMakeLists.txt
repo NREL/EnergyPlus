@@ -203,7 +203,6 @@ set(SRC
     DataRootFinder.hh
     DataRuntimeLanguage.cc
     DataRuntimeLanguage.hh
-    DataShadowingCombinations.cc
     DataShadowingCombinations.hh
     DataSizing.cc
     DataSizing.hh

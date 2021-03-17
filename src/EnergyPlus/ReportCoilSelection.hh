@@ -73,11 +73,6 @@ public: // methods
     // Constructor
     CoilSelectionData(std::string const &coilName);
 
-    // Destructor
-    ~CoilSelectionData()
-    {
-    }
-
 public:                                  // data
     std::string coilName_;               // user-defined coil name
     std::string coilObjName;             // coil object name, e.g., Coil:Cooling:Water, Coil:Heating:DX:SingleSpeed, etc.
@@ -229,12 +224,6 @@ class ReportCoilSelection
 {
 public: // Creation
     ReportCoilSelection() : numCoilsReported_(0)
-    {
-    }
-
-public:
-    // destructor
-    ~ReportCoilSelection()
     {
     }
 
@@ -442,17 +431,15 @@ public: // data
 
 }; // end ReportCoilSelection class
 
-extern std::unique_ptr<ReportCoilSelection> coilSelectionReportObj;
-
-void createCoilSelectionReportObj();
-
-void clearCoilSelectionReportObj();
+void createCoilSelectionReportObj(EnergyPlusData &state);
 
 struct ReportCoilSelectionData : BaseGlobalStruct {
 
+    std::unique_ptr<ReportCoilSelection> coilSelectionReportObj;
+
     void clear_state() override
     {
-
+        this->coilSelectionReportObj.release();
     }
 };
 

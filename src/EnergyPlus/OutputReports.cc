@@ -1403,25 +1403,25 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 }
                 {
                     auto const SELECT_CASE_var(state.dataSurface->Surface(surf).HeatTransferAlgorithm);
-                    if (SELECT_CASE_var == HeatTransferModel_None) {
+                    if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::None) {
                         AlgoName = "None";
-                    } else if (SELECT_CASE_var == HeatTransferModel_CTF) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CTF) {
                         AlgoName = "CTF - ConductionTransferFunction";
-                    } else if (SELECT_CASE_var == HeatTransferModel_CondFD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CondFD) {
                         AlgoName = "CondFD - ConductionFiniteDifference";
-                    } else if (SELECT_CASE_var == HeatTransferModel_EMPD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::EMPD) {
                         AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-                    } else if (SELECT_CASE_var == HeatTransferModel_HAMT) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::HAMT) {
                         AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
-                    } else if (SELECT_CASE_var == HeatTransferModel_Kiva) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Kiva) {
                         AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
-                    } else if (SELECT_CASE_var == HeatTransferModel_Window5) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Window5) {
                         AlgoName = "Window5 Detailed Fenestration";
-                    } else if (SELECT_CASE_var == HeatTransferModel_ComplexFenestration) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::ComplexFenestration) {
                         AlgoName = "Window7 Complex Fenestration";
-                    } else if (SELECT_CASE_var == HeatTransferModel_TDD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::TDD) {
                         AlgoName = "Tubular Daylighting Device";
-                    } else if (SELECT_CASE_var == HeatTransferModel_AirBoundaryNoHT) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::AirBoundaryNoHT) {
                         AlgoName = "Air Boundary - No Heat Transfer";
                     }
                 }
@@ -1601,23 +1601,23 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                     if (state.dataSurface->FrameDivider(fd).FrameWidth > 0.0) {
                         {
                             auto const SELECT_CASE_var(state.dataSurface->Surface(surf).HeatTransferAlgorithm);
-                            if (SELECT_CASE_var == HeatTransferModel_None) {
+                            if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::None) {
                                 AlgoName = "None";
-                            } else if (SELECT_CASE_var == HeatTransferModel_CTF) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CTF) {
                                 AlgoName = "CTF - ConductionTransferFunction";
-                            } else if (SELECT_CASE_var == HeatTransferModel_CondFD) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CondFD) {
                                 AlgoName = "CondFD - ConductionFiniteDifference";
-                            } else if (SELECT_CASE_var == HeatTransferModel_EMPD) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::EMPD) {
                                 AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-                            } else if (SELECT_CASE_var == HeatTransferModel_HAMT) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::HAMT) {
                                 AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
-                            } else if (SELECT_CASE_var == HeatTransferModel_Kiva) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Kiva) {
                                 AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
-                            } else if (SELECT_CASE_var == HeatTransferModel_Window5) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Window5) {
                                 AlgoName = "Window5 Detailed Fenestration";
-                            } else if (SELECT_CASE_var == HeatTransferModel_ComplexFenestration) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::ComplexFenestration) {
                                 AlgoName = "Window7 Complex Fenestration";
-                            } else if (SELECT_CASE_var == HeatTransferModel_TDD) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::TDD) {
                                 AlgoName = "Tubular Daylighting Device";
                             }
                         }
@@ -1650,25 +1650,25 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 }
                 {
                     auto const SELECT_CASE_var(state.dataSurface->Surface(surf).HeatTransferAlgorithm);
-                    if (SELECT_CASE_var == HeatTransferModel_None) {
+                    if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::None) {
                         AlgoName = "None";
-                    } else if (SELECT_CASE_var == HeatTransferModel_CTF) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CTF) {
                         AlgoName = "CTF - ConductionTransferFunction";
-                    } else if (SELECT_CASE_var == HeatTransferModel_CondFD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CondFD) {
                         AlgoName = "CondFD - ConductionFiniteDifference";
-                    } else if (SELECT_CASE_var == HeatTransferModel_EMPD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::EMPD) {
                         AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-                    } else if (SELECT_CASE_var == HeatTransferModel_HAMT) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::HAMT) {
                         AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
-                    } else if (SELECT_CASE_var == HeatTransferModel_Kiva) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Kiva) {
                         AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
-                    } else if (SELECT_CASE_var == HeatTransferModel_Window5) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Window5) {
                         AlgoName = "Window5 Detailed Fenestration";
-                    } else if (SELECT_CASE_var == HeatTransferModel_ComplexFenestration) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::ComplexFenestration) {
                         AlgoName = "Window7 Complex Fenestration";
-                    } else if (SELECT_CASE_var == HeatTransferModel_TDD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::TDD) {
                         AlgoName = "Tubular Daylighting Device";
-                    } else if (SELECT_CASE_var == HeatTransferModel_AirBoundaryNoHT) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::AirBoundaryNoHT) {
                         AlgoName = "Air Boundary - No Heat Transfer";
                     }
                 }
