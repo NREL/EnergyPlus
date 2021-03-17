@@ -2147,6 +2147,8 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HeatingSystem = false;
 
     DesignObjectNum = 1;
+    state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes = 1;
+    state->dataLowTempRadSys->CflowRadiantSysDesign.allocate(state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes);
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).DesignObjectPtr = 1;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.0;
 
@@ -2189,6 +2191,8 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HeatingSystem = false;
 
     DesignObjectNum = 1;
+    state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes = 1;
+    state->dataLowTempRadSys->CflowRadiantSysDesign.allocate(state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes);
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).DesignObjectPtr = 1;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.0;
 
@@ -2231,6 +2235,8 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HeatingSystem = false;
 
     DesignObjectNum = 1;
+    state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes = 1;
+    state->dataLowTempRadSys->CflowRadiantSysDesign.allocate(state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes);
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).DesignObjectPtr = 1;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.0;
 

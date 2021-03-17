@@ -601,6 +601,7 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
         NumOfElecLowTempRadSys = 0;
         TotalNumOfRadSystems = 0;
 
+        // These are in the state space for Unit tests to work properly
         CFloCondIterNum = 0;
         MaxCloNumOfSurfaces = 0;
         VarOffCond = false;
@@ -615,6 +616,7 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
         MyOneTimeFlag = true;
         warnTooLow = false;
         warnTooHigh = false;
+        //
 
         QRadSysSrcAvg.clear();
         ZeroSourceSumHATsurf.clear();
