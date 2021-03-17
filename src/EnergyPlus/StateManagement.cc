@@ -127,7 +127,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataOutputs::clear_state();
     DataPhotovoltaics::clear_state();
     DataStringGlobals::clear_state();
-    DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
     DesiccantDehumidifiers::clear_state();
@@ -135,7 +134,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DualDuct::clear_state();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeFluidCoolers::clear_state();
-    FaultsManager::clear_state();
     FluidProperties::clear_state();
     General::clear_state();
     GroundTemperatureManager::clear_state();
@@ -167,5 +165,4 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PVWatts::clear_state();
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelUserTempPattern::clear_state();
-    ScheduleManager::clear_state();
 }

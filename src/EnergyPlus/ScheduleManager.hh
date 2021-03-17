@@ -172,10 +172,6 @@ namespace ScheduleManager {
 
     // Functions
 
-    // Clears the global data in ScheduleManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
     void ProcessScheduleInput(EnergyPlusData &state);
 
     void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
