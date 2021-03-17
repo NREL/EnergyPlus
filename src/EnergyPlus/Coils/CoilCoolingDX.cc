@@ -739,7 +739,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
             // report out final coil sizing info
             Real64 ratedSensCap(0.0);
             ratedSensCap = this->performance.normalMode.ratedGrossTotalCap * this->normModeNomSpeed().grossRatedSHR;
-            coilSelectionReportObj->setCoilFinalSizes(state,
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state,
                                                       this->name,
                                                       coilCoolingDXObjectName,
                                                       this->performance.normalMode.ratedGrossTotalCap,
@@ -750,7 +750,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
             // report out fan information
             if (this->supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
                 if (this->supplyFanIndex >= 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state, this->name,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state, this->name,
                                                                  coilCoolingDXObjectName,
                                                                  HVACFan::fanObjs[this->supplyFanIndex]->name,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
@@ -758,9 +758,9 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
                 }
             } else {
                 if (this->supplyFanIndex >= 1) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state, this->name,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state, this->name,
                                                                  coilCoolingDXObjectName,
-                                                                 Fans::Fan(this->supplyFanIndex).FanName,
+                                                                 state.dataFans->Fan(this->supplyFanIndex).FanName,
                                                                  DataAirSystems::structArrayLegacyFanModels,
                                                                  this->supplyFanIndex);
                 }
@@ -833,7 +833,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
                                                                           Psychrometrics::PsyHFnTdbW(dummyEvapOutlet.Temp, thisMinAirHumRat));
             Real64 const ratedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, dummyEvapOutlet.Temp, dummyEvapOutlet.HumRat, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
-            coilSelectionReportObj->setRatedCoilConditions(state,
+            state.dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(state,
                                                            this->name,
                                                            coilCoolingDXObjectName,
                                                            coolingRate,

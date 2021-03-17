@@ -6413,9 +6413,19 @@ namespace UnitarySystems {
                     }
                 }
 
-                if (thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingHXAssisted &&
-                    thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl &&
+                if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
                     thisSys.m_DehumidControlType_Num == DehumCtrlType::Multimode) {
+                    int numCoolingCoilModes = coilCoolingDXs[thisSys.m_CoolingCoilIndex].getNumModes();
+                    if (numCoolingCoilModes == 1) {
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                        ShowContinueError(state, "Illegal Dehumidification Control Type = " + loc_dehumm_ControlType);
+                        ShowContinueError(state, "Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil.");
+                        ShowContinueError(state, "Cooling coil named: " + coilCoolingDXs[thisSys.m_CoolingCoilIndex].name + " has only one mode");
+                        ShowFatalError(state, "Multimode cooling coil error causes program termination");
+                    }
+                } else if (thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingHXAssisted &&
+                           thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl &&
+                           thisSys.m_DehumidControlType_Num == DehumCtrlType::Multimode) {
                     ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                     ShowContinueError(state, "Illegal Dehumidification Control Type = " + loc_dehumm_ControlType);
                     ShowContinueError(state, "Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil.");
@@ -6428,18 +6438,6 @@ namespace UnitarySystems {
                             ShowContinueError(state, "Dehumidification control type is assumed to be CoolReheat and the simulation continues.");
                             thisSys.m_DehumidControlType_Num = DehumCtrlType::CoolReheat;
                         }
-                    }
-                }
-
-                if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
-                    thisSys.m_DehumidControlType_Num == DehumCtrlType::Multimode) {
-                    int numCoolingCoilModes = coilCoolingDXs[thisSys.m_CoolingCoilIndex].getNumModes();
-                    if (numCoolingCoilModes == 1) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Illegal Dehumidification Control Type = " + loc_dehumm_ControlType);
-                        ShowContinueError(state, "Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil.");
-                        ShowContinueError(state, "Cooling coil named: " + coilCoolingDXs[thisSys.m_CoolingCoilIndex].name + " has only one mode");
-                        ShowFatalError(state, "Multimode cooling coil error causes program termination");
                     }
                 }
 
@@ -11713,7 +11711,7 @@ namespace UnitarySystems {
                             this->m_CoolingSpeedNum = speedNum;
                             coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
                                 state, OperationMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode);
-                            if ((DataLoopNode::Node(OutletNode).Temp - DesOutTemp) < Acc) break;
+                            if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc) break;
                         }
                         if (this->m_CoolingSpeedNum == 1) {
                             this->m_CompPartLoadRatio = PartLoadFrac;
@@ -12238,7 +12236,7 @@ namespace UnitarySystems {
                             this->m_CoolingSpeedNum = speedNum;
                             coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
                                 state, OperationMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode);
-                            if ((DataLoopNode::Node(OutletNode).Temp - DesOutTemp) < Acc) break;
+                            if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc) break;
                         }
 
                         Par[1] = double(this->m_CoolingCoilIndex);
@@ -12598,7 +12596,7 @@ namespace UnitarySystems {
                                 this->m_CoolingSpeedNum = speedNum;
                                 coilCoolingDXs[this->m_CoolingCoilIndex].simulate(state, 
                                     OperationMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode);
-                                if ((DataLoopNode::Node(OutletNode).HumRat - DesOutHumRat) < Acc) break;
+                                if ((state.dataLoopNodes->Node(OutletNode).HumRat - DesOutHumRat) < Acc) break;
                             }
 
                             Par[1] = double(this->m_CoolingCoilIndex);
@@ -14715,9 +14713,9 @@ namespace UnitarySystems {
         }
         Real64 outletCondition = 0.0;
         if (RunOnSensible) {
-            outletCondition = DataLoopNode::Node(coilCoolingDXs[CoilIndex].evapOutletNodeIndex).Temp;
+            outletCondition = state.dataLoopNodes->Node(coilCoolingDXs[CoilIndex].evapOutletNodeIndex).Temp;
         } else {
-            outletCondition = DataLoopNode::Node(coilCoolingDXs[CoilIndex].evapOutletNodeIndex).HumRat;
+            outletCondition = state.dataLoopNodes->Node(coilCoolingDXs[CoilIndex].evapOutletNodeIndex).HumRat;
         }
         Residuum = Par[2] - outletCondition;
 
