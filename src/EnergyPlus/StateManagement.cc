@@ -82,8 +82,6 @@
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
-#include <EnergyPlus/HVACManager.hh>
-#include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
@@ -154,8 +152,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACDXSystem::clear_state();
     HVACHXAssistedCoolingCoil::clear_state();
     HVACFan::clearHVACFanObjects();
-    HVACManager::clear_state();
-    HVACMultiSpeedHeatPump::clear_state();
     HVACSingleDuctInduc::clear_state();
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
