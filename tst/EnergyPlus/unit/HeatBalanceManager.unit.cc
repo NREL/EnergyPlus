@@ -394,7 +394,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, AdjustMixingOnly);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::AdjustMixingOnly);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, AddInfiltrationFlow);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, MixingSourceZonesOnly);
 }
@@ -457,7 +457,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, NoAdjustReturnAndMixing);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, AdjustInfiltrationFlow);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, AllZones);
 
@@ -534,43 +534,43 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).OASysExists = true;
-    Node.allocate(8);
+    state->dataLoopNodes->Node.allocate(8);
 
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
-    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
 
-    Node(1).MassFlowRate = 0.0; // Zone 1 zone node
-    Node(2).MassFlowRate = 1.0; // Zone 1 inlet node
-    Node(3).MassFlowRate = 2.0; // Zone 1 exhaust node
-    Node(4).MassFlowRate = 9.0; // Zone 1 return node
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.0; // Zone 1 zone node
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0; // Zone 1 inlet node
+    state->dataLoopNodes->Node(3).MassFlowRate = 2.0; // Zone 1 exhaust node
+    state->dataLoopNodes->Node(4).MassFlowRate = 9.0; // Zone 1 return node
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = 2.0;
 
-    Node(5).MassFlowRate = 0.0; // Zone 2 zone node
-    Node(6).MassFlowRate = 2.0; // Zone 2 inlet node
-    Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
-    Node(8).MassFlowRate = 8.0; // Zone 2 return node
+    state->dataLoopNodes->Node(5).MassFlowRate = 0.0; // Zone 2 zone node
+    state->dataLoopNodes->Node(6).MassFlowRate = 2.0; // Zone 2 inlet node
+    state->dataLoopNodes->Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
+    state->dataLoopNodes->Node(8).MassFlowRate = 8.0; // Zone 2 return node
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneExh = 0.0;
-    state->dataAirLoop->AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    state->dataAirLoop->AirLoopFlow(1).OAFlow = state->dataLoopNodes->Node(2).MassFlowRate + state->dataLoopNodes->Node(6).MassFlowRate;
     state->dataAirLoop->AirLoopFlow(1).MaxOutAir = state->dataAirLoop->AirLoopFlow(1).OAFlow;
     state->dataHeatBal->Infiltration(1).MassFlowRate = 0.5;
     state->dataHeatBal->Mixing(1).MixingMassFlowRate = 0.1;
 
     // call zone air mass balance
     CalcZoneMassBalance(*state, false);
-    EXPECT_EQ(Node(4).MassFlowRate, 0.0);         // Zone 1 return node (max(0.0, 1-2)
+    EXPECT_EQ(state->dataLoopNodes->Node(4).MassFlowRate, 0.0);         // Zone 1 return node (max(0.0, 1-2)
     EXPECT_EQ(state->dataHeatBal->Infiltration(1).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
     EXPECT_EQ(state->dataHeatBal->Mixing(1).MixingMassFlowRate, 0.1); // Zone 1 to Zone 2 mixing flow rate (unchanged)
-    EXPECT_EQ(Node(8).MassFlowRate,
+    EXPECT_EQ(state->dataLoopNodes->Node(8).MassFlowRate,
               2.0); // Zone 2 return node (should be 2 now, because this has zone mass conservation active, so return should equal supply)
 
     state->dataHeatBalFanSys->ZoneReOrder.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     NumPrimaryAirSys = 0;
@@ -604,7 +604,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, NoAdjustReturnAndMixing);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, NoInfiltrationFlow);
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, 0);
 }
@@ -725,78 +725,78 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     state->dataGlobal->DayOfSim = 7;
     state->dataHeatBal->MinNumberOfWarmupDays = 25;
     state->dataGlobal->NumOfZones = 1;
-    WarmupConvergenceValues.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->WarmupConvergenceValues.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->TempConvergTol = 0.01;
     state->dataHeatBal->LoadsConvergTol = 0.01;
-    MaxTempPrevDay.allocate(state->dataGlobal->NumOfZones);
-    MaxTempPrevDay(1) = 23.0;
-    MaxTempZone.allocate(state->dataGlobal->NumOfZones);
-    MaxTempZone(1) = 23.0;
-    MinTempPrevDay.allocate(state->dataGlobal->NumOfZones);
-    MinTempPrevDay(1) = 23.0;
-    MinTempZone.allocate(state->dataGlobal->NumOfZones);
-    MinTempZone(1) = 23.0;
-    MaxHeatLoadZone.allocate(state->dataGlobal->NumOfZones);
-    MaxHeatLoadPrevDay.allocate(state->dataGlobal->NumOfZones);
-    WarmupConvergenceValues(1).TestMaxHeatLoadValue = 0.0;
-    MaxCoolLoadZone.allocate(state->dataGlobal->NumOfZones);
-    MaxCoolLoadPrevDay.allocate(state->dataGlobal->NumOfZones);
-    WarmupConvergenceValues(1).TestMaxCoolLoadValue = 0.0;
+    state->dataHeatBalMgr->MaxTempPrevDay.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MaxTempPrevDay(1) = 23.0;
+    state->dataHeatBalMgr->MaxTempZone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MaxTempZone(1) = 23.0;
+    state->dataHeatBalMgr->MinTempPrevDay.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MinTempPrevDay(1) = 23.0;
+    state->dataHeatBalMgr->MinTempZone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MinTempZone(1) = 23.0;
+    state->dataHeatBalMgr->MaxHeatLoadZone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue = 0.0;
+    state->dataHeatBalMgr->MaxCoolLoadZone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue = 0.0;
 
     // Test 1: All Maxs both less than MinLoad (100.0)
-    MaxHeatLoadZone(1) = 50.0;
-    MaxHeatLoadPrevDay(1) = 90.0;
-    MaxCoolLoadZone(1) = 50.0;
-    MaxCoolLoadPrevDay(1) = 90.0;
+    state->dataHeatBalMgr->MaxHeatLoadZone(1) = 50.0;
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay(1) = 90.0;
+    state->dataHeatBalMgr->MaxCoolLoadZone(1) = 50.0;
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay(1) = 90.0;
     CheckWarmupConvergence(*state);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.0, 0.0001);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.0, 0.0001);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(3), 2);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(4), 2);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.0, 0.0001);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.0, 0.0001);
 
     // Test 2: Max Previous Day both less than MinLoad
-    MaxHeatLoadZone(1) = 100.5;
-    MaxHeatLoadPrevDay(1) = 90.0;
-    MaxCoolLoadZone(1) = 100.5;
-    MaxCoolLoadPrevDay(1) = 90.0;
+    state->dataHeatBalMgr->MaxHeatLoadZone(1) = 100.5;
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay(1) = 90.0;
+    state->dataHeatBalMgr->MaxCoolLoadZone(1) = 100.5;
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay(1) = 90.0;
     CheckWarmupConvergence(*state);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(3), 2);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(4), 2);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
 
     // Test 3: Max Current Day both less than MinLoad
-    MaxHeatLoadZone(1) = 90.0;
-    MaxHeatLoadPrevDay(1) = 100.5;
-    MaxCoolLoadZone(1) = 90.0;
-    MaxCoolLoadPrevDay(1) = 100.5;
+    state->dataHeatBalMgr->MaxHeatLoadZone(1) = 90.0;
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay(1) = 100.5;
+    state->dataHeatBalMgr->MaxCoolLoadZone(1) = 90.0;
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay(1) = 100.5;
     CheckWarmupConvergence(*state);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(3), 2);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(4), 2);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
 
     // Test 4: Everything greater than MinLoad (pass convergence test)
-    MaxHeatLoadZone(1) = 201.0;
-    MaxHeatLoadPrevDay(1) = 200.0;
-    MaxCoolLoadZone(1) = 201.0;
-    MaxCoolLoadPrevDay(1) = 200.0;
+    state->dataHeatBalMgr->MaxHeatLoadZone(1) = 201.0;
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay(1) = 200.0;
+    state->dataHeatBalMgr->MaxCoolLoadZone(1) = 201.0;
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay(1) = 200.0;
     CheckWarmupConvergence(*state);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(3), 2);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(4), 2);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.005, 0.0001);
 
     // Test 5: Everything greater than MinLoad (fail convergence test)
-    MaxHeatLoadZone(1) = 210.0;
-    MaxHeatLoadPrevDay(1) = 200.0;
-    MaxCoolLoadZone(1) = 210.0;
-    MaxCoolLoadPrevDay(1) = 200.0;
+    state->dataHeatBalMgr->MaxHeatLoadZone(1) = 210.0;
+    state->dataHeatBalMgr->MaxHeatLoadPrevDay(1) = 200.0;
+    state->dataHeatBalMgr->MaxCoolLoadZone(1) = 210.0;
+    state->dataHeatBalMgr->MaxCoolLoadPrevDay(1) = 200.0;
     CheckWarmupConvergence(*state);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 1);
-    EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 1);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.05, 0.005);
-    EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.05, 0.005);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(3), 1);
+    EXPECT_EQ(state->dataHeatBalMgr->WarmupConvergenceValues(1).PassFlag(4), 1);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.05, 0.005);
+    EXPECT_NEAR(state->dataHeatBalMgr->WarmupConvergenceValues(1).TestMaxCoolLoadValue, 0.05, 0.005);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
@@ -1263,12 +1263,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     OutAirNodeManager::InitOutAirNodes(*state);
 
     // Test if local nodes data correctly overwritten
-    EXPECT_EQ(25.0, DataLoopNode::Node(1).OutAirDryBulb);
-    EXPECT_EQ(20.0, DataLoopNode::Node(1).OutAirWetBulb);
-    EXPECT_EQ(1.5, DataLoopNode::Node(1).OutAirWindSpeed);
-    EXPECT_EQ(90.0, DataLoopNode::Node(1).OutAirWindDir);
-    EXPECT_DOUBLE_EQ(0.012611481326656135, DataLoopNode::Node(1).HumRat);
-    EXPECT_DOUBLE_EQ(57247.660939392081, DataLoopNode::Node(1).Enthalpy);
+    EXPECT_EQ(25.0, state->dataLoopNodes->Node(1).OutAirDryBulb);
+    EXPECT_EQ(20.0, state->dataLoopNodes->Node(1).OutAirWetBulb);
+    EXPECT_EQ(1.5, state->dataLoopNodes->Node(1).OutAirWindSpeed);
+    EXPECT_EQ(90.0, state->dataLoopNodes->Node(1).OutAirWindDir);
+    EXPECT_DOUBLE_EQ(0.012611481326656135, state->dataLoopNodes->Node(1).HumRat);
+    EXPECT_DOUBLE_EQ(57247.660939392081, state->dataLoopNodes->Node(1).Enthalpy);
 
     InitHeatBalance(*state);
 
@@ -1279,10 +1279,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_EQ(90.0, state->dataHeatBal->Zone(1).WindDir);
 
     // Add a test for #7308 without inputs of schedule names
-    DataLoopNode::Node(1).OutAirDryBulbSchedNum = 0;
-    DataLoopNode::Node(1).OutAirWetBulbSchedNum = 0;
-    DataLoopNode::Node(1).OutAirWindSpeedSchedNum = 0;
-    DataLoopNode::Node(1).OutAirWindDirSchedNum = 0;
+    state->dataLoopNodes->Node(1).OutAirDryBulbSchedNum = 0;
+    state->dataLoopNodes->Node(1).OutAirWetBulbSchedNum = 0;
+    state->dataLoopNodes->Node(1).OutAirWindSpeedSchedNum = 0;
+    state->dataLoopNodes->Node(1).OutAirWindDirSchedNum = 0;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->OutWetBulbTemp = 20.0;
     state->dataEnvrn->WindSpeed = 1.5;
@@ -1619,7 +1619,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
+    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::iHeatTransferModel::CTF);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
@@ -1646,8 +1646,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
-    EXPECT_EQ(DataHeatBalSurface::MaxSurfaceTempLimit, 205.2);
+    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::iHeatTransferModel::CTF);
+    EXPECT_EQ(state->dataHeatBalSurf->MaxSurfaceTempLimit, 205.2);
     EXPECT_EQ(state->dataHeatBal->LowHConvLimit, 0.004);
     EXPECT_EQ(state->dataHeatBal->HighHConvLimit, 200.6);
 }
@@ -1672,7 +1672,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
     EXPECT_TRUE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_EMPD);
+    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::iHeatTransferModel::EMPD);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
@@ -1695,7 +1695,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_TRUE(state->dataHeatBal->AnyCondFD);
     EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
-    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CondFD);
+    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::iHeatTransferModel::CondFD);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
@@ -1718,7 +1718,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
     EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
     EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
     EXPECT_TRUE(state->dataHeatBal->AnyHAMT);
-    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_HAMT);
+    EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::iHeatTransferModel::HAMT);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
@@ -1896,14 +1896,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
 
     state->dataHeatBal->SurfWinFenLaySurfTempFront.dimension(10, state->dataSurface->TotSurfaces, 0.0);
     state->dataHeatBal->SurfWinFenLaySurfTempBack.dimension(10, state->dataSurface->TotSurfaces, 0.0);
-    DataHeatBalSurface::TH.dimension(2, Construction::MaxCTFTerms, state->dataSurface->TotSurfaces, 0.0);
+    state->dataHeatBalSurf->TH.dimension(2, Construction::MaxCTFTerms, state->dataSurface->TotSurfaces, 0.0);
 
-    DataHeatBalSurface::TH(1,1,1) = 21.0;
-    DataHeatBalSurface::TH(1,1,2) = 22.0;
-    DataHeatBalSurface::TH(1,1,3) = 23.0;
-    DataHeatBalSurface::TH(2,1,1) = 34.0;
-    DataHeatBalSurface::TH(2,1,2) = 35.0;
-    DataHeatBalSurface::TH(2,1,3) = 36.0;
+    state->dataHeatBalSurf->TH(1,1,1) = 21.0;
+    state->dataHeatBalSurf->TH(1,1,2) = 22.0;
+    state->dataHeatBalSurf->TH(1,1,3) = 23.0;
+    state->dataHeatBalSurf->TH(2,1,1) = 34.0;
+    state->dataHeatBalSurf->TH(2,1,2) = 35.0;
+    state->dataHeatBalSurf->TH(2,1,3) = 36.0;
 
     Real64 ZeroResult = 0.0;
 
@@ -1914,8 +1914,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(1,1),ZeroResult,0.0001);
 
     // Second surface is a window so these should be set
-    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(1,2),DataHeatBalSurface::TH(1,1,2),0.0001);
-    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(SurfsForRegWindow,2),DataHeatBalSurface::TH(2,1,2),0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(1, 2), state->dataHeatBalSurf->TH(1, 1, 2), 0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(SurfsForRegWindow, 2), state->dataHeatBalSurf->TH(2, 1, 2), 0.0001);
 
     // Third surface is a window but is also a BSDF (complex window) so these should NOT be set
     EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(1,3),ZeroResult,0.0001);

@@ -3440,6 +3440,8 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->DesDehumidElec = 0.0;
         state.dataSysRpts->SysEvapElec = 0.0;
 
+        auto &Node(state.dataLoopNodes->Node);
+
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             auto const &pas = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
             for (BranchNum = 1; BranchNum <= pas.NumBranches; ++BranchNum) {
@@ -4259,6 +4261,8 @@ namespace EnergyPlus::SystemReports {
         int ActualZoneNum;    // Zone forced Air zone number
         int OutAirNode;       // Zone forced Air unit outdoor air node number
         int thisZoneEquipNum; // loop counter
+
+        auto &Node(state.dataLoopNodes->Node);
 
         //  CALL GetComponentEnergyUse
         if (!state.dataSysRpts->VentReportStructureCreated) return;
@@ -5081,6 +5085,8 @@ namespace EnergyPlus::SystemReports {
                                          "Node Name>,<AirLoopHVAC Name>");
         static constexpr auto Format_714("! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed "
                                          "Air Outlet Node Name>,<AirLoopHVAC Name>");
+
+        auto &NodeID(state.dataLoopNodes->NodeID);
 
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", Format_706);

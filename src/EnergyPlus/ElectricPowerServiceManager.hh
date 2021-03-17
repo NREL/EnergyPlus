@@ -725,10 +725,6 @@ public: // Creation
     }
 
 public: // Methods
-    // Destructor
-    ~ElectricPowerServiceManager()
-    {
-    }
 
     void manageElectricPowerService(EnergyPlusData &state,
                                     bool const FirstHVACIteration,
@@ -801,17 +797,15 @@ private:                      // data
 
 }; // class ElectricPowerServiceManager
 
-extern std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
-
-void createFacilityElectricPowerServiceObject();
-
-void clearFacilityElectricPowerServiceObject();
+void createFacilityElectricPowerServiceObject(EnergyPlusData &state);
 
 struct ElectPwrSvcMgrData : BaseGlobalStruct {
 
+    std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
+
     void clear_state() override
     {
-
+        this->facilityElectricServiceObj.release();
     }
 };
 

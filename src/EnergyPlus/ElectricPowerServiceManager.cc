@@ -84,27 +84,20 @@
 
 namespace EnergyPlus {
 
-std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
-
-void clearFacilityElectricPowerServiceObject()
+void createFacilityElectricPowerServiceObject(EnergyPlusData &state)
 {
-    facilityElectricServiceObj.release();
-}
-
-void createFacilityElectricPowerServiceObject()
-{
-    facilityElectricServiceObj = std::unique_ptr<ElectricPowerServiceManager>(new ElectricPowerServiceManager());
+    state.dataElectPwrSvcMgr->facilityElectricServiceObj = std::make_unique<ElectricPowerServiceManager>();
 }
 
 void initializeElectricPowerServiceZoneGains(EnergyPlusData &state) // namespace routine for handling call from InternalHeatGains
 {
     // internal zone gains need to be re initialized for begin new environment earlier than the main call into manage electric power service
-    if (facilityElectricServiceObj->newEnvironmentInternalGainsFlag && state.dataGlobal->BeginEnvrnFlag) {
-        facilityElectricServiceObj->reinitZoneGainsAtBeginEnvironment();
-        facilityElectricServiceObj->newEnvironmentInternalGainsFlag = false;
+    if (state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag && state.dataGlobal->BeginEnvrnFlag) {
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->reinitZoneGainsAtBeginEnvironment();
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        facilityElectricServiceObj->newEnvironmentInternalGainsFlag = true;
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag = true;
     }
 }
 
@@ -2120,7 +2113,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         // simulate
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->InitICEngineGenerators(state, runFlag, FirstHVACIteration);
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->CalcICEngineGeneratorModel(state, runFlag, tempLoad);
-        dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->update();
+        dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->update(state);
         electProdRate = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecPowerGenerated;
         electricityProd = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecEnergyGenerated;
         thermProdRate = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->QTotalHeatRecovered;
@@ -2210,7 +2203,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         // simulate
         dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->InitMTGenerators(state, runFlag, tempLoad, FirstHVACIteration);
         dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->CalcMTGeneratorModel(state, runFlag, tempLoad);
-        dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->UpdateMTGeneratorRecords();
+        dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->UpdateMTGeneratorRecords(state);
         electProdRate = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->ElecPowerGenerated;
         electricityProd = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->EnergyGen;
         thermProdRate = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->QHeatRecovered;

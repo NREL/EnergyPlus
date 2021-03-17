@@ -586,7 +586,6 @@ namespace ElectricBaseboardRadiator {
         // This subroutine initializes the Baseboard units during simulation.
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -658,8 +657,8 @@ namespace ElectricBaseboardRadiator {
 
         // Do the every time step initializations
         ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
-        ElecBaseboard(BaseboardNum).AirInletTemp = Node(ZoneNode).Temp;
-        ElecBaseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
+        ElecBaseboard(BaseboardNum).AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
+        ElecBaseboard(BaseboardNum).AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
 
         // Set the reporting variables to zero at each timestep.
         ElecBaseboard(BaseboardNum).TotPower = 0.0;
@@ -1126,7 +1125,6 @@ namespace ElectricBaseboardRadiator {
         // Using/Aliasing
         using namespace DataSurfaces;
         using namespace DataHeatBalance;
-        using namespace DataHeatBalSurface;
 
         // Return value
         Real64 SumHATsurf;
@@ -1159,7 +1157,7 @@ namespace ElectricBaseboardRadiator {
                 }
             }
 
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;

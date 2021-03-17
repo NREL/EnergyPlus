@@ -160,7 +160,7 @@ Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalVa
     }
     this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject)
-        coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum(state,
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum(state,
             this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);
     return this->autoSizedValue;
 }

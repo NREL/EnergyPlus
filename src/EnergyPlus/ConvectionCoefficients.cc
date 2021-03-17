@@ -149,9 +149,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         //       Thermal Load Calculations, ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.137
         // 5.  ISO Standard 15099:2003e
 
-        // Using/Aliasing
-        using DataLoopNode::Node;
-        using DataLoopNode::NumOfNodes;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;                          // DO loop counter for zones
@@ -166,7 +163,8 @@ namespace EnergyPlus::ConvectionCoefficients {
         }
 
         if (state.dataConvectionCoefficient->NodeCheck) { // done once when conditions are ready...
-            if (!state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && state.dataZoneEquip->ZoneEquipInputsFilled && allocated(Node)) {
+            if (!state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && state.dataZoneEquip->ZoneEquipInputsFilled &&
+                allocated(state.dataLoopNodes->Node)) {
                 state.dataConvectionCoefficient->NodeCheck = false;
                 for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                     if (Zone(ZoneNum).InsideConvectionAlgo != CeilingDiffuser) continue;
@@ -193,33 +191,33 @@ namespace EnergyPlus::ConvectionCoefficients {
                     return e.InsideConvectionAlgo == DataHeatBalance::AdaptiveConvectionAlgorithm;
                 })) {
                 // need to clear out node conditions because dynamic assignments will be affected
-                if (NumOfNodes > 0 && allocated(Node)) {
-                    for (auto &e : Node) {
-                        e.Temp = DefaultNodeValues.Temp;
-                        e.TempMin = DefaultNodeValues.TempMin;
-                        e.TempMax = DefaultNodeValues.TempMax;
-                        e.TempSetPoint = DefaultNodeValues.TempSetPoint;
-                        e.MassFlowRate = DefaultNodeValues.MassFlowRate;
-                        e.MassFlowRateMin = DefaultNodeValues.MassFlowRateMin;
-                        e.MassFlowRateMax = DefaultNodeValues.MassFlowRateMax;
-                        e.MassFlowRateMinAvail = DefaultNodeValues.MassFlowRateMinAvail;
-                        e.MassFlowRateMaxAvail = DefaultNodeValues.MassFlowRateMaxAvail;
-                        e.MassFlowRateSetPoint = DefaultNodeValues.MassFlowRateSetPoint;
-                        e.Quality = DefaultNodeValues.Quality;
-                        e.Press = DefaultNodeValues.Press;
-                        e.Enthalpy = DefaultNodeValues.Enthalpy;
-                        e.HumRat = DefaultNodeValues.HumRat;
-                        e.HumRatMin = DefaultNodeValues.HumRatMin;
-                        e.HumRatMax = DefaultNodeValues.HumRatMax;
-                        e.HumRatSetPoint = DefaultNodeValues.HumRatSetPoint;
-                        e.TempSetPointHi = DefaultNodeValues.TempSetPointHi;
-                        e.TempSetPointLo = DefaultNodeValues.TempSetPointLo;
+                if (state.dataLoopNodes->NumOfNodes > 0 && allocated(state.dataLoopNodes->Node)) {
+                    for (auto &e : state.dataLoopNodes->Node) {
+                        e.Temp = state.dataLoopNodes->DefaultNodeValues.Temp;
+                        e.TempMin = state.dataLoopNodes->DefaultNodeValues.TempMin;
+                        e.TempMax = state.dataLoopNodes->DefaultNodeValues.TempMax;
+                        e.TempSetPoint = state.dataLoopNodes->DefaultNodeValues.TempSetPoint;
+                        e.MassFlowRate = state.dataLoopNodes->DefaultNodeValues.MassFlowRate;
+                        e.MassFlowRateMin = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMin;
+                        e.MassFlowRateMax = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMax;
+                        e.MassFlowRateMinAvail = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMinAvail;
+                        e.MassFlowRateMaxAvail = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMaxAvail;
+                        e.MassFlowRateSetPoint = state.dataLoopNodes->DefaultNodeValues.MassFlowRateSetPoint;
+                        e.Quality = state.dataLoopNodes->DefaultNodeValues.Quality;
+                        e.Press = state.dataLoopNodes->DefaultNodeValues.Press;
+                        e.Enthalpy = state.dataLoopNodes->DefaultNodeValues.Enthalpy;
+                        e.HumRat = state.dataLoopNodes->DefaultNodeValues.HumRat;
+                        e.HumRatMin = state.dataLoopNodes->DefaultNodeValues.HumRatMin;
+                        e.HumRatMax = state.dataLoopNodes->DefaultNodeValues.HumRatMax;
+                        e.HumRatSetPoint = state.dataLoopNodes->DefaultNodeValues.HumRatSetPoint;
+                        e.TempSetPointHi = state.dataLoopNodes->DefaultNodeValues.TempSetPointHi;
+                        e.TempSetPointLo = state.dataLoopNodes->DefaultNodeValues.TempSetPointLo;
                     }
-                    if (allocated(MoreNodeInfo)) {
-                        for (auto &e : MoreNodeInfo) {
-                            e.WetBulbTemp = DefaultNodeValues.Temp;
+                    if (allocated(state.dataLoopNodes->MoreNodeInfo)) {
+                        for (auto &e : state.dataLoopNodes->MoreNodeInfo) {
+                            e.WetBulbTemp = state.dataLoopNodes->DefaultNodeValues.Temp;
                             e.RelHumidity = 0.0;
-                            e.ReportEnthalpy = DefaultNodeValues.Enthalpy;
+                            e.ReportEnthalpy = state.dataLoopNodes->DefaultNodeValues.Enthalpy;
                             e.VolFlowRateStdRho = 0.0;
                             e.VolFlowRateCrntRho = 0.0;
                             e.Density = 0.0;
@@ -2595,7 +2593,7 @@ namespace EnergyPlus::ConvectionCoefficients {
     Real64 CalcZoneSystemACH(EnergyPlusData &state, int const ZoneNum)
     {
 
-        if (!allocated(Node)) {
+        if (!allocated(state.dataLoopNodes->Node)) {
             return 0.0;
         } else {
             // Set local variables
@@ -2619,9 +2617,9 @@ namespace EnergyPlus::ConvectionCoefficients {
             for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
                 if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).NumOutlets > 0) {
                     thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
-                    if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
-                        SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
-                        SumMdot += Node(thisZoneInletNode).MassFlowRate;
+                    if ((thisZoneInletNode > 0) && (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0)) {
+                        SumMdotTemp += state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate * state.dataLoopNodes->Node(thisZoneInletNode).Temp;
+                        SumMdot += state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate;
                     }
                 }
             }
@@ -2629,13 +2627,13 @@ namespace EnergyPlus::ConvectionCoefficients {
                 return SumMdotTemp / SumMdot; // mass flow weighted inlet temperature
             } else {
                 if (thisZoneInletNode > 0) {
-                    return Node(thisZoneInletNode).Temp;
+                    return state.dataLoopNodes->Node(thisZoneInletNode).Temp;
                 } else {
-                    return Node(ZoneNode).Temp;
+                    return state.dataLoopNodes->Node(ZoneNode).Temp;
                 }
             }
         } else {
-            return Node(ZoneNode).Temp;
+            return state.dataLoopNodes->Node(ZoneNode).Temp;
         }
     }
 
@@ -2649,8 +2647,11 @@ namespace EnergyPlus::ConvectionCoefficients {
         int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
         if (!state.dataGlobal->BeginEnvrnFlag && ZoneNode > 0) {
             int ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-            Real64 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-            return Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
+            Real64 AirDensity = PsyRhoAirFnPbTdbW(state,
+                                                  state.dataEnvrn->OutBaroPress,
+                                                  state.dataLoopNodes->Node(ZoneNode).Temp,
+                                                  PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
+            return state.dataLoopNodes->Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
         } else {
             return 0.0;
         }
@@ -2669,7 +2670,7 @@ namespace EnergyPlus::ConvectionCoefficients {
         Real64 ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
         int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber; // Zone node as defined in system simulation
         if (!state.dataGlobal->BeginEnvrnFlag && ZoneNode > 0) {
-            ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
+            ZoneMassFlowRate = state.dataLoopNodes->Node(ZoneNode).MassFlowRate / ZoneMult;
         } else { // because these are not updated yet for new environment
             ZoneMassFlowRate = 0.0;
         }
@@ -2810,15 +2811,18 @@ namespace EnergyPlus::ConvectionCoefficients {
         auto &Zone(state.dataHeatBal->Zone);
         auto &Surface(state.dataSurface->Surface);
 
-        if (state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !allocated(Node)) {
+        if (state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !allocated(state.dataLoopNodes->Node)) {
             ACH = 0.0;
         } else {
             // Set local variables
             ZoneVolume = Zone(ZoneNum).Volume;
             ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
             ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-            ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
+            AirDensity = PsyRhoAirFnPbTdbW(state,
+                                           state.dataEnvrn->OutBaroPress,
+                                           state.dataLoopNodes->Node(ZoneNode).Temp,
+                                           PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
+            ZoneMassFlowRate = state.dataLoopNodes->Node(ZoneNode).MassFlowRate / ZoneMult;
 
             if (ZoneMassFlowRate < MinFlow) {
                 ACH = 0.0;
@@ -4306,8 +4310,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         //  - also updates the reference air temperature type for use in the surface heat balance calcs
 
         // Using/Aliasing
-        using DataHeatBalSurface::QdotConvInRepPerArea;
-        using DataHeatBalSurface::TH;
 
         auto &Zone(state.dataHeatBal->Zone);
         auto &Surface(state.dataSurface->Surface);
@@ -4315,7 +4317,7 @@ namespace EnergyPlus::ConvectionCoefficients {
         Real64 tmpHc = 0.0;
 
         int const ZoneNum = Surface(SurfNum).Zone;
-        Real64 &Tsurface = TH(2, 1, SurfNum);
+        Real64 &Tsurface = state.dataHeatBalSurf->TH(2, 1, SurfNum);
         Real64 &Tzone = state.dataHeatBalFanSys->MAT(ZoneNum);
 
         auto &HnFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in;
@@ -4566,15 +4568,20 @@ namespace EnergyPlus::ConvectionCoefficients {
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FohannoPolidoriVerticalWall) {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    Real64 QdotConvection = -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum);
                     HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                         return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
                                                                Surface(SurfNum).IntConvZoneWallHeight,
                                                                Tsurf - DataGlobalConstants::KelvinConv, // Kiva already uses Kelvin, but algorithm expects C
-                                                               -QdotConvInRepPerArea(SurfNum));
+                                                               QdotConvection);
                     };
                 } else {
-                    tmpHc = CalcFohannoPolidoriVerticalWall(state,
-                        (Tsurface - Tzone), Surface(SurfNum).IntConvZoneWallHeight, Tsurface, -QdotConvInRepPerArea(SurfNum), SurfNum);
+                    tmpHc = CallCalcFohannoPolidoriVerticalWall(state,
+                                                                (Tsurface - Tzone),
+                                                                Surface(SurfNum).IntConvZoneWallHeight,
+                                                                Tsurface,
+                                                                -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum),
+                                                                SurfNum);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KaradagChilledCeiling) {
@@ -4648,10 +4655,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         // METHODOLOGY EMPLOYED:
         // separated out long case statement for selecting models.
 
-        // Using/Aliasing
-        using DataHeatBalSurface::QdotConvOutRepPerArea;
-        using DataHeatBalSurface::TH;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Hf(0.0); // the forced, or wind driven portion of film coefficient
         Real64 Hn(0.0); // the natural, or bouyancy driven portion of film coefficient
@@ -4665,6 +4668,8 @@ namespace EnergyPlus::ConvectionCoefficients {
         Kiva::ConvectionAlgorithm HnFn(KIVA_CONST_CONV(0.0));
 
         auto &Surface(state.dataSurface->Surface);
+        auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->QdotConvOutRepPerArea);
+        auto &TH(state.dataHeatBalSurf->TH);
 
         // first call Hn models
         {
@@ -4708,7 +4713,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                     // Not compatible with Kiva (Exterior surfaces in Kiva are not currently reported. Also need to add cell-level convection.)
                     ShowFatalError(state, "Fohanno Polidori convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
-                Hn = CalcFohannoPolidoriVerticalWall(state, (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
+                Hn = CallCalcFohannoPolidoriVerticalWall(state, (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
                                                      Surface(SurfNum).OutConvFaceHeight,
                                                      TH(1, 1, SurfNum),
                                                      -QdotConvOutRepPerArea(SurfNum),
@@ -4952,9 +4957,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         // METHODOLOGY EMPLOYED:
         // Decide surface classification based on wind and bouyancy, class, orientation
 
-        // Using/Aliasing
-        using DataHeatBalSurface::TH;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DeltaTemp(0.0);
         Real64 surfWindDir;
@@ -4970,7 +4972,7 @@ namespace EnergyPlus::ConvectionCoefficients {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 DeltaTemp = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - Surface(SurfNum).OutDryBulbTemp;
             } else {
-                DeltaTemp = TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp;
+                DeltaTemp = state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp;
             }
 
             if (DeltaTemp < 0.0) {
@@ -5068,7 +5070,6 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         // Using/Aliasing
         using namespace DataZoneEquipment;
-        using DataHeatBalSurface::TH;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
 
@@ -5100,6 +5101,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         auto &Zone(state.dataHeatBal->Zone);
         auto &Surface(state.dataSurface->Surface);
+        auto &TH(state.dataHeatBalSurf->TH);
 
         EquipOnCount = 0;
         ZoneNum = Surface(SurfNum).Zone;
@@ -5125,7 +5127,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                             // get inlet node, not zone node if possible
                             thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
                             if (thisZoneInletNode > 0) {
-                                if (Node(thisZoneInletNode).MassFlowRate > 0.0) {
+                                if (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_C;
                                     HeatingPriorityStack(EquipOnCount) =
@@ -5134,7 +5136,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                         state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                 }
                             } else {
-                                if (Node(ZoneNode).MassFlowRate > 0.0) {
+                                if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_C;
                                     HeatingPriorityStack(EquipOnCount) =
@@ -5151,7 +5153,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                             if (!(allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums))) continue;
                             thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
                             if (thisZoneInletNode > 0) {
-                                if (Node(thisZoneInletNode).MassFlowRate > 0.0) {
+                                if (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_D;
                                     HeatingPriorityStack(EquipOnCount) =
@@ -5160,7 +5162,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                         state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                 }
                             } else {
-                                if (Node(ZoneNode).MassFlowRate > 0.0) {
+                                if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_D;
                                     HeatingPriorityStack(EquipOnCount) =
@@ -5291,9 +5293,12 @@ namespace EnergyPlus::ConvectionCoefficients {
             GrH = (g * (Tmax - Tmin) * pow_3(Zone(ZoneNum).CeilingHeight)) / ((state.dataHeatBalFanSys->MAT(ZoneNum) + DataGlobalConstants::KelvinConv) * pow_2(v));
 
             // Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
-            if (Node(ZoneNode).MassFlowRate > 0.0) {
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-                Re = Node(ZoneNode).MassFlowRate / (v * AirDensity * std::pow(Zone(ZoneNum).Volume, OneThird));
+            if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
+                AirDensity = PsyRhoAirFnPbTdbW(state,
+                                               state.dataEnvrn->OutBaroPress,
+                                               state.dataLoopNodes->Node(ZoneNode).Temp,
+                                               PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
+                Re = state.dataLoopNodes->Node(ZoneNode).MassFlowRate / (v * AirDensity * std::pow(Zone(ZoneNum).Volume, OneThird));
             } else {
                 Re = 0.0;
             }
@@ -6062,7 +6067,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         // Using/Aliasing
         using namespace DataZoneEquipment;
         using CurveManager::CurveValue;
-        using DataHeatBalSurface::TH;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
 
@@ -6087,14 +6091,18 @@ namespace EnergyPlus::ConvectionCoefficients {
         SupplyAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
         if (Zone(ZoneNum).IsControlled) {
             ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-            AirChangeRate = (Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour) / (AirDensity * Zone(ZoneNum).Volume);
+            AirDensity = PsyRhoAirFnPbTdbW(state,
+                                           state.dataEnvrn->OutBaroPress,
+                                           state.dataLoopNodes->Node(ZoneNode).Temp,
+                                           PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
+            AirChangeRate = (state.dataLoopNodes->Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour) / (AirDensity * Zone(ZoneNum).Volume);
             if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex > 0) {
                 for (EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
                     if (allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums)) {
                         thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
-                        if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
-                            SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
+                        if ((thisZoneInletNode > 0) && (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0)) {
+                            SumMdotTemp +=
+                                state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate * state.dataLoopNodes->Node(thisZoneInletNode).Temp;
                         }
                     }
                 }
@@ -6124,7 +6132,7 @@ namespace EnergyPlus::ConvectionCoefficients {
         Real64 HcFnTempDiff(0.0), HcFnTempDiffDivHeight(0.0), HcFnACH(0.0), HcFnACHDivPerimLength(0.0);
         Kiva::ConvectionAlgorithm HcFnTempDiffFn(KIVA_CONST_CONV(0.0)), HcFnTempDiffDivHeightFn(KIVA_CONST_CONV(0.0));
         if (UserCurve.HcFnTempDiffCurveNum > 0) {
-            HcFnTempDiff = CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(TH(2, 1, SurfNum) - tmpAirTemp));
+            HcFnTempDiff = CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(state.dataHeatBalSurf->TH(2, 1, SurfNum) - tmpAirTemp));
             HcFnTempDiffFn = [&](double Tsurf, double Tamb, double, double, double) -> double {
                 return CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(Tsurf - Tamb));
             };
@@ -6132,7 +6140,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         if (UserCurve.HcFnTempDiffDivHeightCurveNum > 0) {
             HcFnTempDiffDivHeight = CurveValue(state, UserCurve.HcFnTempDiffDivHeightCurveNum,
-                                               (std::abs(TH(2, 1, SurfNum) - tmpAirTemp) / Surface(SurfNum).IntConvZoneWallHeight));
+                           (std::abs(state.dataHeatBalSurf->TH(2, 1, SurfNum) - tmpAirTemp) / Surface(SurfNum).IntConvZoneWallHeight));
             HcFnTempDiffDivHeightFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CurveValue(state, UserCurve.HcFnTempDiffDivHeightCurveNum, std::abs(Tsurf - Tamb) / Surface(SurfNum).IntConvZoneWallHeight);
             };
@@ -6176,7 +6184,6 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHeatBalSurface::TH;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 windVel;
@@ -6218,7 +6225,8 @@ namespace EnergyPlus::ConvectionCoefficients {
         }
 
         if (UserCurve.HnFnTempDiffCurveNum > 0) {
-            HnFnTempDiff = CurveValue(state, UserCurve.HnFnTempDiffCurveNum, std::abs(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp));
+            HnFnTempDiff = CurveValue(
+                state, UserCurve.HnFnTempDiffCurveNum, std::abs(state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp));
             HnFnTempDiffFn = [&](double Tsurf, double Tamb, double, double, double) -> double {
                 return CurveValue(state, UserCurve.HnFnTempDiffCurveNum, std::abs(Tsurf - Tamb));
             };
@@ -6228,7 +6236,7 @@ namespace EnergyPlus::ConvectionCoefficients {
             if (Surface(SurfNum).OutConvFaceHeight > 0.0) {
                 HnFnTempDiffDivHeight =
                     CurveValue(state, UserCurve.HnFnTempDiffDivHeightCurveNum,
-                               ((std::abs(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp)) / Surface(SurfNum).OutConvFaceHeight));
+                    ((std::abs(state.dataHeatBalSurf->TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp)) / Surface(SurfNum).OutConvFaceHeight));
                 HnFnTempDiffDivHeightFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                     return CurveValue(state, UserCurve.HnFnTempDiffDivHeightCurveNum, ((std::abs(Tsurf - Tamb)) / Surface(SurfNum).OutConvFaceHeight));
                 };
@@ -7341,12 +7349,12 @@ namespace EnergyPlus::ConvectionCoefficients {
         }
     }
 
-    Real64 CalcFohannoPolidoriVerticalWall(EnergyPlusData &state,
-                                           Real64 const DeltaTemp, // [C] temperature difference between surface and air
-                                           Real64 const Height,    // [m] characteristic size, height of zone
-                                           Real64 const SurfTemp,  // [C] surface temperature
-                                           Real64 const QdotConv,  // [W/m2] heat flux rate for rayleigh #
-                                           int const SurfNum       // for messages
+    Real64 CallCalcFohannoPolidoriVerticalWall(EnergyPlusData &state,
+                                               Real64 const DeltaTemp, // [C] temperature difference between surface and air
+                                               Real64 const Height,    // [m] characteristic size, height of zone
+                                               Real64 const SurfTemp,  // [C] surface temperature
+                                               Real64 const QdotConv,  // [W/m2] heat flux rate for rayleigh #
+                                               int const SurfNum       // for messages
     )
     {
 

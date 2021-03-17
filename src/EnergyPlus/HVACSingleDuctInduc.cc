@@ -355,11 +355,11 @@ namespace HVACSingleDuctInduc {
             if (lNumericBlanks(2)) IndUnit(IUNum).InducRatio = 2.5;
 
             IndUnit(IUNum).PriAirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent, cAlphaFields(3));
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent, cAlphaFields(3));
             IndUnit(IUNum).SecAirInNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent, cAlphaFields(4));
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent, cAlphaFields(4));
             IndUnit(IUNum).OutAirNode = GetOnlySingleNode(state,
-                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent, cAlphaFields(5));
+                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent, cAlphaFields(5));
 
             IndUnit(IUNum).HCoilType = Alphas(6); // type (key) of heating coil
             if (UtilityRoutines::SameString(IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
@@ -375,7 +375,7 @@ namespace HVACSingleDuctInduc {
                 ErrorsFound = true;
             }
             //      GetOnlySingleNode(state, Alphas(6),ErrorsFound,'AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction',Alphas(1), &
-            //                        NodeType_Water,NodeConnectionType_Actuator,1,ObjectIsParent)
+            //                        DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             IndUnit(IUNum).MaxVolHotWaterFlow = Numbers(3);
             IndUnit(IUNum).MinVolHotWaterFlow = Numbers(4);
             IndUnit(IUNum).HotControlOffset = Numbers(5);
@@ -397,7 +397,7 @@ namespace HVACSingleDuctInduc {
                 ErrorsFound = true;
             }
             //      GetOnlySingleNode(state, Alphas(7),ErrorsFound,'AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction',Alphas(1), &
-            //                        NodeType_Water,NodeConnectionType_Actuator,1,ObjectIsParent)
+            //                        DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             IndUnit(IUNum).MaxVolColdWaterFlow = Numbers(6);
             IndUnit(IUNum).MinVolColdWaterFlow = Numbers(7);
             IndUnit(IUNum).ColdControlOffset = Numbers(8);
@@ -418,7 +418,11 @@ namespace HVACSingleDuctInduc {
 
             // Register component set data
             TestCompSet(state,
-                IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, NodeID(IndUnit(IUNum).PriAirInNode), NodeID(IndUnit(IUNum).OutAirNode), "Air Nodes");
+                        IndUnit(IUNum).UnitType,
+                        IndUnit(IUNum).Name,
+                        state.dataLoopNodes->NodeID(IndUnit(IUNum).PriAirInNode),
+                        state.dataLoopNodes->NodeID(IndUnit(IUNum).OutAirNode),
+                        "Air Nodes");
 
             AirNodeFound = false;
             for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
@@ -430,7 +434,7 @@ namespace HVACSingleDuctInduc {
             if (IndUnit(IUNum).ADUNum == 0) {
                 ShowSevereError(state, RoutineName + "No matching Air Distribution Unit, for Unit = [" + IndUnit(IUNum).UnitType + ',' +
                                 IndUnit(IUNum).Name + "].");
-                ShowContinueError(state, "...should have outlet node=" + NodeID(IndUnit(IUNum).OutAirNode));
+                ShowContinueError(state, "...should have outlet node=" + state.dataLoopNodes->NodeID(IndUnit(IUNum).OutAirNode));
                 ErrorsFound = true;
             } else {
                 // Fill the Zone Equipment data with the supply air inlet node number of this unit.
@@ -440,7 +444,8 @@ namespace HVACSingleDuctInduc {
                         if (IndUnit(IUNum).OutAirNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                             if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
                                 ShowSevereError(state, "Error in connecting a terminal unit to a zone");
-                                ShowContinueError(state, NodeID(IndUnit(IUNum).OutAirNode) + " already connects to another zone");
+                                ShowContinueError(state,
+                                                  state.dataLoopNodes->NodeID(IndUnit(IUNum).OutAirNode) + " already connects to another zone");
                                 ShowContinueError(state, "Occurs for terminal unit " + IndUnit(IUNum).UnitType + " = " + IndUnit(IUNum).Name);
                                 ShowContinueError(state, "Check terminal unit node names for errors");
                                 ErrorsFound = true;
@@ -636,11 +641,11 @@ namespace HVACSingleDuctInduc {
                 IndUnit(IUNum).MaxTotAirMassFlow = RhoAir * IndUnit(IUNum).MaxTotAirVolFlow;
                 IndUnit(IUNum).MaxPriAirMassFlow = IndUnit(IUNum).MaxTotAirMassFlow / (1.0 + IndRat);
                 IndUnit(IUNum).MaxSecAirMassFlow = IndRat * IndUnit(IUNum).MaxTotAirMassFlow / (1.0 + IndRat);
-                Node(PriNode).MassFlowRateMax = IndUnit(IUNum).MaxPriAirMassFlow;
-                Node(PriNode).MassFlowRateMin = IndUnit(IUNum).MaxPriAirMassFlow;
-                Node(SecNode).MassFlowRateMax = IndUnit(IUNum).MaxSecAirMassFlow;
-                Node(SecNode).MassFlowRateMin = IndUnit(IUNum).MaxSecAirMassFlow;
-                Node(OutletNode).MassFlowRateMax = IndUnit(IUNum).MaxTotAirMassFlow;
+                state.dataLoopNodes->Node(PriNode).MassFlowRateMax = IndUnit(IUNum).MaxPriAirMassFlow;
+                state.dataLoopNodes->Node(PriNode).MassFlowRateMin = IndUnit(IUNum).MaxPriAirMassFlow;
+                state.dataLoopNodes->Node(SecNode).MassFlowRateMax = IndUnit(IUNum).MaxSecAirMassFlow;
+                state.dataLoopNodes->Node(SecNode).MassFlowRateMin = IndUnit(IUNum).MaxSecAirMassFlow;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = IndUnit(IUNum).MaxTotAirMassFlow;
             }
 
             HotConNode = IndUnit(IUNum).HWControlNode;
@@ -659,7 +664,8 @@ namespace HVACSingleDuctInduc {
                                    .Branch(IndUnit(IUNum).HWBranchNum)
                                    .Comp(IndUnit(IUNum).HWCompNum)
                                    .NodeNumOut;
-                InitComponentNodes(IndUnit(IUNum).MinHotWaterFlow,
+                InitComponentNodes(state,
+                                   IndUnit(IUNum).MinHotWaterFlow,
                                    IndUnit(IUNum).MaxHotWaterFlow,
                                    HotConNode,
                                    HWOutletNode,
@@ -684,7 +690,8 @@ namespace HVACSingleDuctInduc {
                                    .Branch(IndUnit(IUNum).CWBranchNum)
                                    .Comp(IndUnit(IUNum).CWCompNum)
                                    .NodeNumOut;
-                InitComponentNodes(IndUnit(IUNum).MinColdWaterFlow,
+                InitComponentNodes(state,
+                                   IndUnit(IUNum).MinColdWaterFlow,
                                    IndUnit(IUNum).MaxColdWaterFlow,
                                    ColdConNode,
                                    CWOutletNode,
@@ -707,28 +714,28 @@ namespace HVACSingleDuctInduc {
         // Do the start of HVAC time step initializations
         if (FirstHVACIteration) {
             // check for upstream zero flow. If nonzero and schedule ON, set primary flow to max
-            if (GetCurrentScheduleValue(state, IndUnit(IUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRate > 0.0) {
+            if (GetCurrentScheduleValue(state, IndUnit(IUNum).SchedPtr) > 0.0 && state.dataLoopNodes->Node(PriNode).MassFlowRate > 0.0) {
                 if (UtilityRoutines::SameString(IndUnit(IUNum).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
-                    Node(PriNode).MassFlowRate = IndUnit(IUNum).MaxPriAirMassFlow;
-                    Node(SecNode).MassFlowRate = IndUnit(IUNum).MaxSecAirMassFlow;
+                    state.dataLoopNodes->Node(PriNode).MassFlowRate = IndUnit(IUNum).MaxPriAirMassFlow;
+                    state.dataLoopNodes->Node(SecNode).MassFlowRate = IndUnit(IUNum).MaxSecAirMassFlow;
                 }
             } else {
-                Node(PriNode).MassFlowRate = 0.0;
-                Node(SecNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(PriNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(SecNode).MassFlowRate = 0.0;
             }
             // reset the max and min avail flows
-            if (GetCurrentScheduleValue(state, IndUnit(IUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRateMaxAvail > 0.0) {
+            if (GetCurrentScheduleValue(state, IndUnit(IUNum).SchedPtr) > 0.0 && state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail > 0.0) {
                 if (UtilityRoutines::SameString(IndUnit(IUNum).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
-                    Node(PriNode).MassFlowRateMaxAvail = IndUnit(IUNum).MaxPriAirMassFlow;
-                    Node(PriNode).MassFlowRateMinAvail = IndUnit(IUNum).MaxPriAirMassFlow;
-                    Node(SecNode).MassFlowRateMaxAvail = IndUnit(IUNum).MaxSecAirMassFlow;
-                    Node(SecNode).MassFlowRateMinAvail = IndUnit(IUNum).MaxSecAirMassFlow;
+                    state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail = IndUnit(IUNum).MaxPriAirMassFlow;
+                    state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail = IndUnit(IUNum).MaxPriAirMassFlow;
+                    state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = IndUnit(IUNum).MaxSecAirMassFlow;
+                    state.dataLoopNodes->Node(SecNode).MassFlowRateMinAvail = IndUnit(IUNum).MaxSecAirMassFlow;
                 }
             } else {
-                Node(PriNode).MassFlowRateMaxAvail = 0.0;
-                Node(PriNode).MassFlowRateMinAvail = 0.0;
-                Node(SecNode).MassFlowRateMaxAvail = 0.0;
-                Node(SecNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail = 0.0;
+                state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = 0.0;
+                state.dataLoopNodes->Node(SecNode).MassFlowRateMinAvail = 0.0;
             }
         }
     }
@@ -1162,7 +1169,7 @@ namespace HVACSingleDuctInduc {
                            .Branch(IndUnit(IUNum).CWBranchNum)
                            .Comp(IndUnit(IUNum).CWCompNum)
                            .NodeNumOut;
-        PriAirMassFlow = Node(PriNode).MassFlowRateMaxAvail;
+        PriAirMassFlow = state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail;
         SecAirMassFlow = InducRat * PriAirMassFlow;
         QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
@@ -1210,8 +1217,8 @@ namespace HVACSingleDuctInduc {
         if (PriAirMassFlow <= SmallMassFlow) UnitOn = false;
 
         // Set the unit's air inlet nodes mass flow rates
-        Node(PriNode).MassFlowRate = PriAirMassFlow;
-        Node(SecNode).MassFlowRate = SecAirMassFlow;
+        state.dataLoopNodes->Node(PriNode).MassFlowRate = PriAirMassFlow;
+        state.dataLoopNodes->Node(SecNode).MassFlowRate = SecAirMassFlow;
         // initialize the water inlet nodes to minimum
         // fire the unit at min water flow
         CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, QPriOnly);
@@ -1327,7 +1334,7 @@ namespace HVACSingleDuctInduc {
             // unit off
             CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, PowerMet);
         }
-        Node(OutletNode).MassFlowRateMax = IndUnit(IUNum).MaxTotAirMassFlow;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = IndUnit(IUNum).MaxTotAirMassFlow;
 
         // At this point we are done. There is no output to report or pass back up: the output provided is calculated
         // one level up in the calling routine SimZoneAirLoopEquipment. All the inlet and outlet flow rates and
@@ -1394,7 +1401,7 @@ namespace HVACSingleDuctInduc {
 
         PriNode = IndUnit(IUNum).PriAirInNode;
         OutletNode = IndUnit(IUNum).OutAirNode;
-        PriAirMassFlow = Node(PriNode).MassFlowRateMaxAvail;
+        PriAirMassFlow = state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail;
         InducRat = IndUnit(IUNum).InducRatio;
         SecAirMassFlow = InducRat * PriAirMassFlow;
         TotAirMassFlow = PriAirMassFlow + SecAirMassFlow;
@@ -1437,7 +1444,7 @@ namespace HVACSingleDuctInduc {
         SimulateWaterCoilComponents(state, IndUnit(IUNum).CCoil, FirstHVACIteration, IndUnit(IUNum).CCoil_Num);
         SimAirMixer(state, IndUnit(IUNum).MixerName, IndUnit(IUNum).Mixer_Num);
         LoadMet = TotAirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                                       Node(OutletNode).Temp, Node(OutletNode).HumRat, Node(ZoneNode).Temp, Node(ZoneNode).HumRat);
+                                       state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat);
     }
 
     Real64 FourPipeIUHeatingResidual(EnergyPlusData &state,
@@ -1605,7 +1612,8 @@ namespace HVACSingleDuctInduc {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (state.dataLoopNodes->Node(this->PriAirInNode).MassFlowRate / state.dataEnvrn->StdRhoAir) *
+                                       state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

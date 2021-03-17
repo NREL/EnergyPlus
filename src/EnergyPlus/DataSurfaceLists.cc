@@ -69,45 +69,6 @@ namespace EnergyPlus::DataSurfaceLists {
     // This data-only module contains type definitions and variables
     // associated with Radiant System Surface Groups.
 
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    int NumOfSurfaceLists(0);            // Number of surface lists in the user input file
-    int NumOfSurfListVentSlab(0);        // Number of surface lists in the user input file
-    bool SurfaceListInputsFilled(false); // Set to TRUE after first pass through air loop
-
-    // Object Data
-    Array1D<SurfaceListData> SurfList;
-    Array1D<SlabListData> SlabList;
-
-    // Functions
-
-    void clear_state()
-    {
-        NumOfSurfaceLists = 0;
-        NumOfSurfListVentSlab = 0;
-        SurfaceListInputsFilled = false;
-        SurfList.deallocate();
-        SlabList.deallocate();
-    }
-
     void GetSurfaceListsInputs(EnergyPlusData &state)
     {
 
@@ -154,6 +115,11 @@ namespace EnergyPlus::DataSurfaceLists {
 
         // Obtain all of the user data related to surface lists.  Need to get
         // this before getting the radiant system or ventilated slab data.
+
+        auto &SurfList(state.dataSurfLists->SurfList);
+        auto &SlabList(state.dataSurfLists->SlabList);
+        auto &NumOfSurfaceLists(state.dataSurfLists->NumOfSurfaceLists);
+        auto &NumOfSurfListVentSlab(state.dataSurfLists->NumOfSurfListVentSlab);
 
         ErrorsFound = false;
         NumOfSurfaceLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject1);
@@ -377,39 +343,15 @@ namespace EnergyPlus::DataSurfaceLists {
         // PURPOSE OF THIS FUNCTION:
         // Acts as a target for outside routines to make sure data is gotten before using.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int NumberOfSurfaceLists;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (!SurfaceListInputsFilled) {
+        if (!state.dataSurfLists->SurfaceListInputsFilled) {
             GetSurfaceListsInputs(state);
-            SurfaceListInputsFilled = true;
+            state.dataSurfLists->SurfaceListInputsFilled = true;
         }
 
-        NumberOfSurfaceLists = NumOfSurfaceLists;
+        NumberOfSurfaceLists = state.dataSurfLists->NumOfSurfaceLists;
         return NumberOfSurfaceLists;
     }
 
@@ -425,39 +367,15 @@ namespace EnergyPlus::DataSurfaceLists {
         // PURPOSE OF THIS FUNCTION:
         // Acts as a target for outside routines to make sure data is gotten before using.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int NumberOfSurfListVentSlab;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (!SurfaceListInputsFilled) {
+        if (!state.dataSurfLists->SurfaceListInputsFilled) {
             GetSurfaceListsInputs(state);
-            SurfaceListInputsFilled = true;
+            state.dataSurfLists->SurfaceListInputsFilled = true;
         }
 
-        NumberOfSurfListVentSlab = NumOfSurfListVentSlab;
+        NumberOfSurfListVentSlab = state.dataSurfLists->NumOfSurfListVentSlab;
 
         return NumberOfSurfListVentSlab;
     }

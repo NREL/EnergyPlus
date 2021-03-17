@@ -179,7 +179,6 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     // USE STATEMENTS:
     using namespace DataEnvironment;
-    using namespace DataReportingFlags;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -204,7 +203,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     bool WarmupFlag_reset = state.dataGlobal->WarmupFlag;
     int DayOfSim_reset = state.dataGlobal->DayOfSim;
     std::string DayOfSimChr_reset = state.dataGlobal->DayOfSimChr;
-    int NumOfWarmupDays_reset = NumOfWarmupDays;
+    int NumOfWarmupDays_reset = state.dataReportFlag->NumOfWarmupDays;
     bool BeginDayFlag_reset = state.dataGlobal->BeginDayFlag;
     bool EndDayFlag_reset = state.dataGlobal->EndDayFlag;
     bool BeginHourFlag_reset = state.dataGlobal->BeginHourFlag;
@@ -252,7 +251,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->DayOfSim = 0;
     state.dataGlobal->DayOfSimChr = "0";
-    NumOfWarmupDays = 0;
+    state.dataReportFlag->NumOfWarmupDays = 0;
 
     annualAveAirTemp_num = 0.0;
 
@@ -360,7 +359,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->WarmupFlag = WarmupFlag_reset;
     state.dataGlobal->DayOfSim = DayOfSim_reset;
     state.dataGlobal->DayOfSimChr = DayOfSimChr_reset;
-    NumOfWarmupDays = NumOfWarmupDays_reset;
+    state.dataReportFlag->NumOfWarmupDays = NumOfWarmupDays_reset;
     state.dataGlobal->BeginDayFlag = BeginDayFlag_reset;
     state.dataGlobal->EndDayFlag = EndDayFlag_reset;
     state.dataGlobal->BeginHourFlag = BeginHourFlag_reset;

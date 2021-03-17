@@ -482,11 +482,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     InternalHeatGains::CalcZoneITEq(*state);
     Real64 InitialPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
 
-    DataLoopNode::Node(1).Temp = 45.0;
+    state->dataLoopNodes->Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
     Real64 NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
     ASSERT_NE(InitialPower, NewPower);
-    HVACManager::ResetNodeData();
+    HVACManager::ResetNodeData(*state);
 
     InternalHeatGains::CalcZoneITEq(*state);
     NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
@@ -894,11 +894,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    DataLoopNode::Node(1).Temp = 45.0;
+    state->dataLoopNodes->Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
     ASSERT_DOUBLE_EQ(state->dataHeatBal->ZoneITEq(1).AirOutletDryBulbT + state->dataHeatBal->ZoneITEq(1).ReturnApproachTemp,
                      state->dataHeatBal->Zone(1).AdjustedReturnTempByITE);
-    ASSERT_DOUBLE_EQ(DataLoopNode::Node(1).Temp + state->dataHeatBal->ZoneITEq(1).SupplyApproachTemp, state->dataHeatBal->ZoneITEq(1).AirInletDryBulbT);
+    ASSERT_DOUBLE_EQ(state->dataLoopNodes->Node(1).Temp + state->dataHeatBal->ZoneITEq(1).SupplyApproachTemp,
+                     state->dataHeatBal->ZoneITEq(1).AirInletDryBulbT);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
@@ -1321,7 +1322,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     EXPECT_EQ(state->dataHeatBal->TotOthEquip, 1);
     EXPECT_EQ(state->dataHeatBal->TotBBHeat, 1);
 
-    EnergyPlus::createFacilityElectricPowerServiceObject(); // Needs to happen before InitInternalHeatGains
+    EnergyPlus::createFacilityElectricPowerServiceObject(*state); // Needs to happen before InitInternalHeatGains
 
     // First time should be all good, because ZnRpt values initialize to zero
     InternalHeatGains::InitInternalHeatGains(*state);
