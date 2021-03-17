@@ -68,7 +68,6 @@
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
-#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -97,7 +96,6 @@
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
-#include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
@@ -106,7 +104,6 @@
 #include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -160,7 +157,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HysteresisPhaseChange::clear_state();
     LowTempRadiantSystem::clear_state();
     OutputReportTabular::clear_state(state);
-    OutputReportTabularAnnual::clear_state();
     PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();

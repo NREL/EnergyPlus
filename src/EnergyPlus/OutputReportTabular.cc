@@ -3316,7 +3316,7 @@ namespace EnergyPlus::OutputReportTabular {
                             }
                         }
                     }
-                    OutputReportTabularAnnual::AddAnnualTableOfContents(tbl_stream);
+                    OutputReportTabularAnnual::AddAnnualTableOfContents(state, tbl_stream);
                 }
                 // add entries specifically added using AddTOCEntry
                 for (iEntry = 1; iEntry <= ort->TOCEntriesCount; ++iEntry) {
@@ -15594,7 +15594,7 @@ namespace EnergyPlus::OutputReportTabular {
         // so that only last year is reported in tabular reports
         state.dataOutRptTab->gatherElapsedTimeBEPS = 0.0;
         ResetMonthlyGathering(state);
-        OutputReportTabularAnnual::ResetAnnualGathering();
+        OutputReportTabularAnnual::ResetAnnualGathering(state);
         ResetBinGathering(state);
         ResetBEPSGathering(state);
         ResetSourceEnergyEndUseGathering(state);
