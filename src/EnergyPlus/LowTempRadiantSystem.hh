@@ -498,8 +498,6 @@ namespace LowTempRadiantSystem {
 
     // Functions
 
-    void clear_state();
-
     void SimLowTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
                                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                  Real64 &LoadMet,               // load met by the radiant system, in Watts

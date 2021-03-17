@@ -174,23 +174,6 @@ namespace LowTempRadiantSystem {
     bool warnTooLow = false;
     bool warnTooHigh = false;
 
-    void clear_state()
-    {
-        CFloCondIterNum = 0;
-        MaxCloNumOfSurfaces = 0;
-        VarOffCond = false;
-        FirstTimeInit = true;
-        anyRadiantSystemUsingRunningMeanAverage = false;
-        LoopReqTemp = 0.0;
-        LowTempRadUniqueNames.clear();
-        GetInputFlag = true;
-        FirstTimeFlag = true;
-        MyEnvrnFlagGeneral = true;
-        ZoneEquipmentListChecked = false;
-        MyOneTimeFlag = true;
-        warnTooLow = false;
-        warnTooHigh = false;
-    }
 
     void SimLowTempRadiantSystem(EnergyPlusData &state,
                                  std::string const &CompName,   // name of the low temperature radiant system
