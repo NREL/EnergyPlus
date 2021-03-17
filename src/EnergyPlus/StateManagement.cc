@@ -97,7 +97,6 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
-#include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
@@ -162,7 +161,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PhotovoltaicThermalCollectors::clear_state();
     PollutionModule::clear_state();
     Psychrometrics::clear_state();
-    PVWatts::clear_state();
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelUserTempPattern::clear_state();
     ScheduleManager::clear_state();
