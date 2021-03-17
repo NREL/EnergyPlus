@@ -137,7 +137,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     EvaporativeFluidCoolers::clear_state();
     FaultsManager::clear_state();
     FluidProperties::clear_state();
-    Furnaces::clear_state();
     General::clear_state();
     GroundTemperatureManager::clear_state();
     HeatBalanceIntRadExchange::clear_state();
