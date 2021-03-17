@@ -1162,19 +1162,19 @@ namespace DualDuct {
         if (this->MaxAirVolFlowRate == AutoSize) {
 
             if ((state.dataSize->CurZoneEqNum > 0) && (state.dataSize->CurTermUnitSizingNum > 0)) {
-                if (this->DamperType == DualDuct_ConstantVolume) {
-                    DamperType = cCMO_DDConstantVolume;
-                } else if (this->DamperType == DualDuct_VariableVolume) {
-                    DamperType = cCMO_DDVariableVolume;
-                } else if (this->DamperType == DualDuct_OutdoorAir) {
-                    DamperType = cCMO_DDVarVolOA;
+                if (this->DamperType == DualDuctDamper::ConstantVolume) {
+                    DamperType = state.dataDualDuct->cCMO_DDConstantVolume;
+                } else if (this->DamperType == DualDuctDamper::VariableVolume) {
+                    DamperType = state.dataDualDuct->cCMO_DDVariableVolume;
+                } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
+                    DamperType = state.dataDualDuct->cCMO_DDVarVolOA;
                 } else {
                     DamperType = "Invalid/Unknown";
                 }
                 CheckZoneSizing(state, DamperType, this->Name);
                 this->MaxAirVolFlowRate =
                     max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
-                if (this->DamperType == DualDuct_OutdoorAir) {
+                if (this->DamperType == DualDuctDamper::OutdoorAir) {
                     if (this->RecircIsUsed) {
                         this->DesignRecircFlowRate = max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow,
                                                          state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
@@ -1193,7 +1193,7 @@ namespace DualDuct {
                     this->DesignRecircFlowRate = 0.0;
                 }
                 BaseSizer::reportSizerOutput(state, DamperType, this->Name, "Maximum Air Flow Rate [m3/s]", this->MaxAirVolFlowRate);
-                if (this->DamperType == DualDuct_OutdoorAir) {
+                if (this->DamperType == DualDuctDamper::OutdoorAir) {
                     BaseSizer::reportSizerOutput(state, DamperType, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->DesignOAFlowRate);
                     if (this->RecircIsUsed) {
                         BaseSizer::reportSizerOutput(state, DamperType, this->Name, "Maximum Recirculated Air Flow Rate [m3/s]", this->DesignRecircFlowRate);
@@ -1525,10 +1525,10 @@ namespace DualDuct {
             // Using Mass Continuity to determine the other duct flow quantity
             this->dd_airterminalHotAirInlet.AirMassFlowRate = MassFlow - this->dd_airterminalColdAirInlet.AirMassFlowRate;
 
-            if (this->dd_airterminalHotAirInlet.AirMassFlowRate < MassFlowSetToler) {
+            if (this->dd_airterminalHotAirInlet.AirMassFlowRate < state.dataDualDuct->MassFlowSetToler) {
                 this->dd_airterminalHotAirInlet.AirMassFlowRate = 0.0;
                 this->dd_airterminalColdAirInlet.AirMassFlowRate = MassFlow;
-            } else if (this->dd_airterminalColdAirInlet.AirMassFlowRate < MassFlowSetToler) {
+            } else if (this->dd_airterminalColdAirInlet.AirMassFlowRate < state.dataDualDuct->MassFlowSetToler) {
                 this->dd_airterminalColdAirInlet.AirMassFlowRate = 0.0;
                 this->dd_airterminalHotAirInlet.AirMassFlowRate = MassFlow;
             }
@@ -1944,13 +1944,13 @@ namespace DualDuct {
             return;
         }
 
-        if (this->OAPerPersonMode == PerPersonDCVByCurrentLevel) {
+        if (this->OAPerPersonMode == PerPersonMode::DCVByCurrentLevel) {
             UseOccSchFlag = true;
             PerPersonNotSet = false;
         } else {
             UseOccSchFlag = false;
             PerPersonNotSet = false;
-            if (this->OAPerPersonMode == PerPersonModeNotSet) PerPersonNotSet = true;
+            if (this->OAPerPersonMode == PerPersonMode::ModeNotSet) PerPersonNotSet = true;
         }
 
         OAVolumeFlowRate =
@@ -1993,7 +1993,7 @@ namespace DualDuct {
         int OAInletNode; // Outdoor Air Duct Inlet Node - for DualDuctOutdoorAir
         int RAInletNode; // Recirculated Air Duct Inlet Node - for DualDuctOutdoorAir
 
-        if (this->DamperType == DualDuct_ConstantVolume || this->DamperType == DualDuct_VariableVolume) {
+        if (this->DamperType == DualDuctDamper::ConstantVolume || this->DamperType == DualDuctDamper::VariableVolume) {
 
             OutletNode = this->OutletNodeNum;
             HotInletNode = this->HotAirInletNodeNum;
@@ -2038,7 +2038,7 @@ namespace DualDuct {
 
             this->CalcOutdoorAirVolumeFlowRate(state);
 
-        } else if (this->DamperType == DualDuct_OutdoorAir) {
+        } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
 
             OutletNode = this->OutletNodeNum;
             OAInletNode = this->OAInletNodeNum;
@@ -2159,17 +2159,17 @@ namespace DualDuct {
         static constexpr auto Format_102("! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,<Outlet Node>,<Inlet "
                                          "Node Type>,<AirLoopHVAC Name>");
 
-        if (!allocated(dd_airterminal))
+        if (!allocated(state.dataDualDuct->dd_airterminal))
             return; // Autodesk Bug: Can arrive here with Damper unallocated (SimulateDualDuct not yet called) with NumDDAirTerminal either set >0 or
                     // uninitialized
 
         // Report Dual Duct Dampers to BND File
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", Format_100);
-        print(state.files.bnd, " #Dual Duct Damper Connections,{}\n", NumDDAirTerminal * 2);
+        print(state.files.bnd, " #Dual Duct Damper Connections,{}\n", state.dataDualDuct->NumDDAirTerminal * 2);
         print(state.files.bnd, "{}\n", Format_102);
 
-        for (int Count1 = 1; Count1 <= NumDDAirTerminal; ++Count1) {
+        for (int Count1 = 1; Count1 <= state.dataDualDuct->NumDDAirTerminal; ++Count1) {
 
             // Determine if this damper is connected to a supply air path
             int Found = 0;
@@ -2178,10 +2178,10 @@ namespace DualDuct {
                 SupplyAirPathNum = Count2;
                 Found = 0;
                 for (int Count3 = 1; Count3 <= state.dataZoneEquip->SupplyAirPath(Count2).NumOutletNodes; ++Count3) {
-                    if (dd_airterminal(Count1).HotAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
-                    if (dd_airterminal(Count1).ColdAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
-                    if (dd_airterminal(Count1).OAInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
-                    if (dd_airterminal(Count1).RecircAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
+                    if (state.dataDualDuct->dd_airterminal(Count1).HotAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
+                    if (state.dataDualDuct->dd_airterminal(Count1).ColdAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
+                    if (state.dataDualDuct->dd_airterminal(Count1).OAInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
+                    if (state.dataDualDuct->dd_airterminal(Count1).RecircAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
                 }
                 if (Found != 0) break;
             }
@@ -2197,10 +2197,10 @@ namespace DualDuct {
                     if (SupplyAirPathNum != 0) {
                         if (state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).InletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
                     } else {
-                        if (dd_airterminal(Count1).HotAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
-                        if (dd_airterminal(Count1).ColdAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
-                        if (dd_airterminal(Count1).OAInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
-                        if (dd_airterminal(Count1).RecircAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (state.dataDualDuct->dd_airterminal(Count1).HotAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (state.dataDualDuct->dd_airterminal(Count1).ColdAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (state.dataDualDuct->dd_airterminal(Count1).OAInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (state.dataDualDuct->dd_airterminal(Count1).RecircAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
                     }
                 }
                 if (Found != 0) break;
@@ -2208,51 +2208,52 @@ namespace DualDuct {
             if (Found == 0) ChrName = "**Unknown**";
 
             std::string DamperType;
-            if (dd_airterminal(Count1).DamperType == DualDuct_ConstantVolume) {
-                DamperType = cCMO_DDConstantVolume;
-            } else if (dd_airterminal(Count1).DamperType == DualDuct_VariableVolume) {
-                DamperType = cCMO_DDVariableVolume;
-            } else if (dd_airterminal(Count1).DamperType == DualDuct_OutdoorAir) {
-                DamperType = cCMO_DDVarVolOA;
+            if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::ConstantVolume) {
+                DamperType = state.dataDualDuct->cCMO_DDConstantVolume;
+            } else if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::VariableVolume) {
+                DamperType = state.dataDualDuct->cCMO_DDVariableVolume;
+            } else if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::OutdoorAir) {
+                DamperType = state.dataDualDuct->cCMO_DDVarVolOA;
             } else {
                 DamperType = "Invalid/Unknown";
             }
 
-            if ((dd_airterminal(Count1).DamperType == DualDuct_ConstantVolume) || (dd_airterminal(Count1).DamperType == DualDuct_VariableVolume)) {
+            if ((state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::ConstantVolume) ||
+                (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::VariableVolume)) {
                 print(state.files.bnd,
                       " Dual Duct Damper,{},{},{},{},{},Hot Air,{}\n",
                       Count1,
                       DamperType,
-                      dd_airterminal(Count1).Name,
-                      state.dataLoopNodes->NodeID(dd_airterminal(Count1).HotAirInletNodeNum),
-                      state.dataLoopNodes->NodeID(dd_airterminal(Count1).OutletNodeNum),
+                      state.dataDualDuct->dd_airterminal(Count1).Name,
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).HotAirInletNodeNum),
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
 
                 print(state.files.bnd,
                       " Dual Duct Damper,{},{},{},{},{},Cold Air,{}\n",
                       Count1,
                       DamperType,
-                      dd_airterminal(Count1).Name,
-                      state.dataLoopNodes->NodeID(dd_airterminal(Count1).ColdAirInletNodeNum),
-                      state.dataLoopNodes->NodeID(dd_airterminal(Count1).OutletNodeNum),
+                      state.dataDualDuct->dd_airterminal(Count1).Name,
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).ColdAirInletNodeNum),
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
 
-            } else if (dd_airterminal(Count1).DamperType == DualDuct_OutdoorAir) {
+            } else if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::OutdoorAir) {
                 print(state.files.bnd,
                       "Dual Duct Damper, {},{},{},{},{},Outdoor Air,{}\n",
                       Count1,
                       DamperType,
-                      dd_airterminal(Count1).Name,
-                      state.dataLoopNodes->NodeID(dd_airterminal(Count1).OAInletNodeNum),
-                      state.dataLoopNodes->NodeID(dd_airterminal(Count1).OutletNodeNum),
+                      state.dataDualDuct->dd_airterminal(Count1).Name,
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).OAInletNodeNum),
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
                 print(state.files.bnd,
                       "Dual Duct Damper, {},{},{},{},{},Recirculated Air,{}\n",
                       Count1,
                       DamperType,
-                      dd_airterminal(Count1).Name,
-                      state.dataLoopNodes->NodeID(dd_airterminal(Count1).RecircAirInletNodeNum),
-                      state.dataLoopNodes->NodeID(dd_airterminal(Count1).OutletNodeNum),
+                      state.dataDualDuct->dd_airterminal(Count1).Name,
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).RecircAirInletNodeNum),
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
             }
         }
@@ -2296,14 +2297,14 @@ namespace DualDuct {
         //    GetDualDuctInputFlag=.FALSE.
         //  END IF
 
-        if (GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
-            NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);
-            RecircIsUsedARR.allocate(NumDualDuctVarVolOA);
-            DamperNamesARR.allocate(NumDualDuctVarVolOA);
-            if (NumDualDuctVarVolOA > 0) {
-                for (DamperIndex = 1; DamperIndex <= NumDualDuctVarVolOA; ++DamperIndex) {
+        if (state.dataDualDuct->GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
+            state.dataDualDuct->NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
+            RecircIsUsedARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
+            DamperNamesARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
+            if (state.dataDualDuct->NumDualDuctVarVolOA > 0) {
+                for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolOA; ++DamperIndex) {
 
-                    CurrentModuleObject = cCMO_DDVarVolOA;
+                    CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
 
                     inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
@@ -2325,10 +2326,10 @@ namespace DualDuct {
                     }
                 }
             }
-            GetDualDuctOutdoorAirRecircUseFirstTimeOnly = false;
+            state.dataDualDuct->GetDualDuctOutdoorAirRecircUseFirstTimeOnly = false;
         }
 
-        DamperIndex = UtilityRoutines::FindItemInList(CompName, DamperNamesARR, NumDualDuctVarVolOA);
+        DamperIndex = UtilityRoutines::FindItemInList(CompName, DamperNamesARR, state.dataDualDuct->NumDualDuctVarVolOA);
         if (DamperIndex > 0) {
             RecircIsUsed = RecircIsUsedARR(DamperIndex);
         }

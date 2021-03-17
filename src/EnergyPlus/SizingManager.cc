@@ -939,7 +939,7 @@ namespace EnergyPlus::SizingManager {
                             state.dataSize->VpzClgByZone(termUnitSizingIndex) =
                                 DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
 
-                            if (DualDuct::dd_airterminal(dualDuctATUNum).DamperType == DualDuct::DualDuct_ConstantVolume) {
+                            if (DualDuct::dd_airterminal(dualDuctATUNum).DamperType == DualDuct::DualDuctDamper::ConstantVolume) {
                                 airLoopHeatingMaximumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                                 airLoopHeatingMinimumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                                 state.dataSize->VpzMinClgByZone(termUnitSizingIndex) =
