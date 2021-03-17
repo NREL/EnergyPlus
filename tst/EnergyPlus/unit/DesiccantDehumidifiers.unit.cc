@@ -2814,7 +2814,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
 
     SimulationManager::GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;
@@ -3994,7 +3994,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
 
     SimulationManager::GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;
@@ -5412,7 +5412,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
 
     SimulationManager::GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;
@@ -6655,7 +6655,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
 
     SimulationManager::GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;

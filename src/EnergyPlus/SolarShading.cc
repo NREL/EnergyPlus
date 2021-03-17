@@ -4808,7 +4808,7 @@ namespace EnergyPlus::SolarShading {
         ++NumDetShadowCombs_Calls;
 #endif
 
-        ShadowComb.dimension(state.dataSurface->TotSurfaces, ShadowingCombinations{}); // Set all elements to default constructed state
+        state.dataShadowComb->ShadowComb.dimension(state.dataSurface->TotSurfaces, ShadowingCombinations{}); // Set all elements to default constructed state
 
         CastingSurface.dimension(state.dataSurface->TotSurfaces, false);
 
@@ -5066,28 +5066,28 @@ namespace EnergyPlus::SolarShading {
             }
 
             // Put this into the ShadowComb data structure
-            ShadowComb(GRSNR).UseThisSurf = true;
-            ShadowComb(GRSNR).NumGenSurf = NGSS;
-            ShadowComb(GRSNR).NumBackSurf = NBKS;
-            ShadowComb(GRSNR).NumSubSurf = NSBS;
+            state.dataShadowComb->ShadowComb(GRSNR).UseThisSurf = true;
+            state.dataShadowComb->ShadowComb(GRSNR).NumGenSurf = NGSS;
+            state.dataShadowComb->ShadowComb(GRSNR).NumBackSurf = NBKS;
+            state.dataShadowComb->ShadowComb(GRSNR).NumSubSurf = NSBS;
             MaxDim = max(MaxDim, NGSS, NBKS, NSBS);
 
-            ShadowComb(GRSNR).GenSurf.allocate({0, ShadowComb(GRSNR).NumGenSurf});
-            ShadowComb(GRSNR).GenSurf(0) = 0;
-            if (ShadowComb(GRSNR).NumGenSurf > 0) {
-                ShadowComb(GRSNR).GenSurf({1, ShadowComb(GRSNR).NumGenSurf}) = GSS({1, NGSS});
+            state.dataShadowComb->ShadowComb(GRSNR).GenSurf.allocate({0, state.dataShadowComb->ShadowComb(GRSNR).NumGenSurf});
+            state.dataShadowComb->ShadowComb(GRSNR).GenSurf(0) = 0;
+            if (state.dataShadowComb->ShadowComb(GRSNR).NumGenSurf > 0) {
+                state.dataShadowComb->ShadowComb(GRSNR).GenSurf({1, state.dataShadowComb->ShadowComb(GRSNR).NumGenSurf}) = GSS({1, NGSS});
             }
 
-            ShadowComb(GRSNR).BackSurf.allocate({0, ShadowComb(GRSNR).NumBackSurf});
-            ShadowComb(GRSNR).BackSurf(0) = 0;
-            if (ShadowComb(GRSNR).NumBackSurf > 0) {
-                ShadowComb(GRSNR).BackSurf({1, ShadowComb(GRSNR).NumBackSurf}) = BKS({1, NBKS});
+            state.dataShadowComb->ShadowComb(GRSNR).BackSurf.allocate({0, state.dataShadowComb->ShadowComb(GRSNR).NumBackSurf});
+            state.dataShadowComb->ShadowComb(GRSNR).BackSurf(0) = 0;
+            if (state.dataShadowComb->ShadowComb(GRSNR).NumBackSurf > 0) {
+                state.dataShadowComb->ShadowComb(GRSNR).BackSurf({1, state.dataShadowComb->ShadowComb(GRSNR).NumBackSurf}) = BKS({1, NBKS});
             }
 
-            ShadowComb(GRSNR).SubSurf.allocate({0, ShadowComb(GRSNR).NumSubSurf});
-            ShadowComb(GRSNR).SubSurf(0) = 0;
-            if (ShadowComb(GRSNR).NumSubSurf > 0) {
-                ShadowComb(GRSNR).SubSurf({1, ShadowComb(GRSNR).NumSubSurf}) = SBS({1, NSBS});
+            state.dataShadowComb->ShadowComb(GRSNR).SubSurf.allocate({0, state.dataShadowComb->ShadowComb(GRSNR).NumSubSurf});
+            state.dataShadowComb->ShadowComb(GRSNR).SubSurf(0) = 0;
+            if (state.dataShadowComb->ShadowComb(GRSNR).NumSubSurf > 0) {
+                state.dataShadowComb->ShadowComb(GRSNR).SubSurf({1, state.dataShadowComb->ShadowComb(GRSNR).NumSubSurf}) = SBS({1, NSBS});
             }
 
         } // ...end of surfaces (GRSNR) DO loop
@@ -5121,12 +5121,12 @@ namespace EnergyPlus::SolarShading {
 
                 for (int HTSnum : state.dataSurface->AllSurfaceListReportOrder) {
                     *shd_stream << "==================================\n";
-                    if (ShadowComb(HTSnum).UseThisSurf) {
+                    if (state.dataShadowComb->ShadowComb(HTSnum).UseThisSurf) {
                         if (state.dataSurface->Surface(HTSnum).IsConvex) {
                             *shd_stream << "Surface=" << state.dataSurface->Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is convex.\n";
                         } else {
                             *shd_stream << "Surface=" << state.dataSurface->Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is non-convex.\n";
-                            if (ShadowComb(HTSnum).NumGenSurf > 0) {
+                            if (state.dataShadowComb->ShadowComb(HTSnum).NumGenSurf > 0) {
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(state, "DetermineShadowingCombinations: Surface=\"" + state.dataSurface->Surface(HTSnum).Name +
                                         "\" is a receiving surface and is non-convex.");
@@ -5139,18 +5139,18 @@ namespace EnergyPlus::SolarShading {
                     } else {
                         *shd_stream << "Surface=" << state.dataSurface->Surface(HTSnum).Name << " is not used as Receiving Surface in calculations.\n";
                     }
-                    *shd_stream << "Number of general casting surfaces=" << ShadowComb(HTSnum).NumGenSurf << '\n';
-                    for (NGSS = 1; NGSS <= ShadowComb(HTSnum).NumGenSurf; ++NGSS) {
-                        if (NGSS <= 10) *shd_stream << "..Surface=" << state.dataSurface->Surface(ShadowComb(HTSnum).GenSurf(NGSS)).Name << '\n';
-                        CastingSurface(ShadowComb(HTSnum).GenSurf(NGSS)) = true;
+                    *shd_stream << "Number of general casting surfaces=" << state.dataShadowComb->ShadowComb(HTSnum).NumGenSurf << '\n';
+                    for (NGSS = 1; NGSS <= state.dataShadowComb->ShadowComb(HTSnum).NumGenSurf; ++NGSS) {
+                        if (NGSS <= 10) *shd_stream << "..Surface=" << state.dataSurface->Surface(state.dataShadowComb->ShadowComb(HTSnum).GenSurf(NGSS)).Name << '\n';
+                        CastingSurface(state.dataShadowComb->ShadowComb(HTSnum).GenSurf(NGSS)) = true;
                     }
-                    *shd_stream << "Number of back surfaces=" << ShadowComb(HTSnum).NumBackSurf << '\n';
-                    for (NGSS = 1; NGSS <= min(10, ShadowComb(HTSnum).NumBackSurf); ++NGSS) {
-                        *shd_stream << "...Surface=" << state.dataSurface->Surface(ShadowComb(HTSnum).BackSurf(NGSS)).Name << '\n';
+                    *shd_stream << "Number of back surfaces=" << state.dataShadowComb->ShadowComb(HTSnum).NumBackSurf << '\n';
+                    for (NGSS = 1; NGSS <= min(10, state.dataShadowComb->ShadowComb(HTSnum).NumBackSurf); ++NGSS) {
+                        *shd_stream << "...Surface=" << state.dataSurface->Surface(state.dataShadowComb->ShadowComb(HTSnum).BackSurf(NGSS)).Name << '\n';
                     }
-                    *shd_stream << "Number of receiving sub surfaces=" << ShadowComb(HTSnum).NumSubSurf << '\n';
-                    for (NGSS = 1; NGSS <= min(10, ShadowComb(HTSnum).NumSubSurf); ++NGSS) {
-                        *shd_stream << "....Surface=" << state.dataSurface->Surface(ShadowComb(HTSnum).SubSurf(NGSS)).Name << '\n';
+                    *shd_stream << "Number of receiving sub surfaces=" << state.dataShadowComb->ShadowComb(HTSnum).NumSubSurf << '\n';
+                    for (NGSS = 1; NGSS <= min(10, state.dataShadowComb->ShadowComb(HTSnum).NumSubSurf); ++NGSS) {
+                        *shd_stream << "....Surface=" << state.dataSurface->Surface(state.dataShadowComb->ShadowComb(HTSnum).SubSurf(NGSS)).Name << '\n';
                     }
                 }
             }
@@ -5261,15 +5261,15 @@ namespace EnergyPlus::SolarShading {
 
         for (GRSNR = 1; GRSNR <= state.dataSurface->TotSurfaces; ++GRSNR) {
 
-            if (!ShadowComb(GRSNR).UseThisSurf) continue;
+            if (!state.dataShadowComb->ShadowComb(GRSNR).UseThisSurf) continue;
 
             state.dataSolarShading->SAREA(GRSNR) = 0.0;
 
-            NGSS = ShadowComb(GRSNR).NumGenSurf;
+            NGSS = state.dataShadowComb->ShadowComb(GRSNR).NumGenSurf;
             state.dataSolarShading->NGSSHC = 0;
-            NBKS = ShadowComb(GRSNR).NumBackSurf;
+            NBKS = state.dataShadowComb->ShadowComb(GRSNR).NumBackSurf;
             state.dataSolarShading->NBKSHC = 0;
-            NSBS = ShadowComb(GRSNR).NumSubSurf;
+            NSBS = state.dataShadowComb->ShadowComb(GRSNR).NumSubSurf;
             state.dataSolarShading->NRVLHC = 0;
             state.dataSolarShading->NSBSHC = 0;
             state.dataSolarShading->LOCHCA = 1;
@@ -5293,7 +5293,7 @@ namespace EnergyPlus::SolarShading {
                     state.dataSolarShading->SAREA(HTS) = state.dataSolarShading->penumbra->fetchPSSA(id) / state.dataSolarShading->CTHETA(HTS);
                     // SAREA(HTS) = penumbra->fetchPSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
                     for (int SS = 1; SS <= NSBS; ++SS) {
-                        auto HTSS = ShadowComb(HTS).SubSurf(SS);
+                        auto HTSS = state.dataShadowComb->ShadowComb(HTS).SubSurf(SS);
                         id = state.dataSurface->Surface(HTSS).PenumbraID;
                         if (id >= 0) {
                             // SAREA(HTSS) = buildingPSSF.at(id) / CTHETA(HTSS);
@@ -5416,7 +5416,7 @@ namespace EnergyPlus::SolarShading {
 
         for (I = 1; I <= NBKS; ++I) { // Loop through all back surfaces associated with the receiving surface
 
-            BackSurfaceNumber = ShadowComb(CurSurf).BackSurf(I);
+            BackSurfaceNumber = state.dataShadowComb->ShadowComb(CurSurf).BackSurf(I);
 
             if (state.dataSolarShading->CTHETA(BackSurfaceNumber) > -DataEnvironment::SunIsUpValue) continue; //-0.001) CYCLE ! go to next back surface since inside of this surface
             // cannot be in sun if the outside can be
@@ -5536,7 +5536,7 @@ namespace EnergyPlus::SolarShading {
         } else {
 
             int ExitLoopStatus(-1);
-            auto const &GenSurf(ShadowComb(CurSurf).GenSurf);
+            auto const &GenSurf(state.dataShadowComb->ShadowComb(CurSurf).GenSurf);
             auto const sunIsUp(DataEnvironment::SunIsUpValue);
             for (int I = 1; I <= NGSS; ++I) { // Loop through all shadowing surfaces...
 
@@ -5819,7 +5819,7 @@ namespace EnergyPlus::SolarShading {
                 if (state.dataSolarShading->penumbra) {
                     // Add back surfaces to array
                     std::vector<unsigned> pbBackSurfaces;
-                    for (auto bkSurfNum : ShadowComb(GRSNR).BackSurf) {
+                    for (auto bkSurfNum : state.dataShadowComb->ShadowComb(GRSNR).BackSurf) {
                         if (bkSurfNum == 0) continue;
                         if (state.dataSolarShading->CTHETA(bkSurfNum) < DataEnvironment::SunIsUpValue) {
                             pbBackSurfaces.push_back(state.dataSurface->Surface(bkSurfNum).PenumbraID);
@@ -5829,7 +5829,7 @@ namespace EnergyPlus::SolarShading {
                     //penumbra->renderInteriorScene({(unsigned)Surface(HTSS).PenumbraID}, pbBackSurfaces);
 
                     JBKS = 0;
-                    for (auto bkSurfNum : ShadowComb(GRSNR).BackSurf) {
+                    for (auto bkSurfNum : state.dataShadowComb->ShadowComb(GRSNR).BackSurf) {
                         if (bkSurfNum == 0) continue;
                         if (pssas[state.dataSurface->Surface(bkSurfNum).PenumbraID] > 0) {
                             ++JBKS;
@@ -7175,7 +7175,7 @@ namespace EnergyPlus::SolarShading {
                                 int BaseSurf = state.dataSurface->Surface(SurfNum).BaseSurf;  // Base surface number for current complex window
                                 // Get total number of back surfaces for current window (surface)
                                 // Note that it is organized by base surface
-                                int NBkSurf = ShadowComb(BaseSurf).NumBackSurf;
+                                int NBkSurf = state.dataShadowComb->ShadowComb(BaseSurf).NumBackSurf;
                                 if (!allocated(CFBoverlap)) {
                                     CFBoverlap.allocate(NBkSurf);
                                 }
@@ -7199,7 +7199,7 @@ namespace EnergyPlus::SolarShading {
 
                                 // Summarizing results
                                 for (int IBack = 1; IBack <= NBkSurf; ++IBack) {
-                                    int BackSurfaceNumber = ShadowComb(BaseSurf).BackSurf(IBack);
+                                    int BackSurfaceNumber = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(IBack);
                                     int ConstrNumBack = state.dataSurface->Surface(BackSurfaceNumber).Construction;
                                     // Do not perform any calculation if surface is scheduled for incoming solar radiation
                                     int SurfSolIncPtr = SurfaceScheduledSolarInc(state, BackSurfaceNumber, ConstrNumBack);
@@ -7845,7 +7845,7 @@ namespace EnergyPlus::SolarShading {
 
                 TBm = max(0.0, TBm);
 
-                int NumOfBackSurf = ShadowComb(BaseSurfNum).NumBackSurf;
+                int NumOfBackSurf = state.dataShadowComb->ShadowComb(BaseSurfNum).NumBackSurf;
 
                 if (state.dataHeatBal->SolarDistribution == FullInteriorExterior) {
                     for (int IBack = 1; IBack <= NumOfBackSurf; ++IBack) {
@@ -8336,7 +8336,7 @@ namespace EnergyPlus::SolarShading {
 
             for (I = 1; I <= NSBS; ++I) { // Do for all subsurfaces (sbs).
 
-                SBSNR = ShadowComb(CurSurf).SubSurf(I);
+                SBSNR = state.dataShadowComb->ShadowComb(CurSurf).SubSurf(I);
 
                 HTSS = SBSNR;
 
@@ -10596,8 +10596,6 @@ namespace EnergyPlus::SolarShading {
         using General::InterpSw;
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace DataViewFactorInformation;
-        using DataHeatBalSurface::SurfOpaqInitialDifSolInAbs;
-        using DataHeatBalSurface::SurfWinInitialDifSolInTrans;
         using namespace DataWindowEquivalentLayer;
 
         Real64 AbsInt;               // Tmp var for Inside surface short-wave absorptance
@@ -10646,14 +10644,14 @@ namespace EnergyPlus::SolarShading {
         int Lay;                                            // equivalent layer fenestration layer index
 
         // Init accumulators for absorbed diffuse solar for all surfaces for later heat balance calcs
-        SurfOpaqInitialDifSolInAbs = 0.0;
+        state.dataHeatBalSurf->SurfOpaqInitialDifSolInAbs = 0.0;
         state.dataHeatBal->SurfWinInitialDifSolwinAbs = 0.0;
 
         // Init accumulator for total reflected diffuse solar within each zone for interreflection calcs
         state.dataHeatBal->InitialZoneDifSolReflW = 0.0;
 
         // Init accumulator for transmitted diffuse solar for all surfaces for reporting
-        SurfWinInitialDifSolInTrans = 0.0;
+        state.dataHeatBalSurf->SurfWinInitialDifSolInTrans = 0.0;
 
         // Loop over all zones doing initial distribution of diffuse solar to interior heat transfer surfaces
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
@@ -10754,7 +10752,7 @@ namespace EnergyPlus::SolarShading {
                         DifSolarAbs = DifSolarAbsW * per_HTSurfaceArea;
 
                         // Accumulate absorbed diffuse solar [W/m2] on this surface for heat balance calcs
-                        SurfOpaqInitialDifSolInAbs(HeatTransSurfNum) += DifSolarAbs;
+                        state.dataHeatBalSurf->SurfOpaqInitialDifSolInAbs(HeatTransSurfNum) += DifSolarAbs;
 
                         // Reflected diffuse solar [W] = current window transmitted diffuse solar
                         //    * view factor from current (sending) window DifTransSurfNum to current (receiving) surface HeatTransSurfNum
@@ -10870,7 +10868,7 @@ namespace EnergyPlus::SolarShading {
 //                                ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
                                 // Accumulate transmitted diffuse solar for reporting
-                                SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
+                                state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
 
                             } else if (ShadeFlag == WinShadingType::SwitchableGlazing) { // Switchable glazing
                                 // Init accumulator for transmittance calc below
@@ -10915,7 +10913,7 @@ namespace EnergyPlus::SolarShading {
 //                                ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
                                 // Accumulate transmitted diffuse solar for reporting
-                                SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
+                                state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
 
                             } else if (ConstrNumSh != 0) {
                                 // Interior, exterior or between-glass shade, screen or blind in place
@@ -10999,7 +10997,7 @@ namespace EnergyPlus::SolarShading {
 //                                ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
                                 // Accumulate transmitted diffuse solar for reporting
-                                SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
+                                state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
                             } // End of shading flag check
 
                         } else {
@@ -11082,7 +11080,7 @@ namespace EnergyPlus::SolarShading {
 //                            WinDifSolarDistTransmittedTotl += DifSolarTransW;  // debug [W]
 //                            ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
                             // Accumulate transmitted diffuse solar for reporting
-                            SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
+                            state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
 
                         } // IF (SurfaceWindow(HeatTransSurfNum)%WindowModelType /= WindowEQLModel) THEN
 
@@ -11178,8 +11176,6 @@ namespace EnergyPlus::SolarShading {
         using General::InterpSw;
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace DataViewFactorInformation;
-        using DataHeatBalSurface::SurfOpaqInitialDifSolInAbs;
-        using DataHeatBalSurface::SurfWinInitialDifSolInTrans;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ConstrNumSh;             // Shaded construction number
@@ -11290,7 +11286,7 @@ namespace EnergyPlus::SolarShading {
                 DifSolarAbs = DifSolarAbsW / state.dataSurface->Surface(HeatTransSurfNum).Area;
 
                 // Accumulate absorbed diffuse solar [W/m2] on this surface for heat balance calcs
-                SurfOpaqInitialDifSolInAbs(HeatTransSurfNum) += DifSolarAbs;
+                state.dataHeatBalSurf->SurfOpaqInitialDifSolInAbs(HeatTransSurfNum) += DifSolarAbs;
 
                 // Reflected diffuse solar [W] = current window transmitted diffuse solar
                 //    * view factor from current (sending) window IntWinSurfNum to current (receiving) surface HeatTransSurfNum
@@ -11364,7 +11360,8 @@ namespace EnergyPlus::SolarShading {
                     //                    ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
                     // Accumulate transmitted diffuse solar for reporting
-                    SurfWinInitialDifSolInTrans(HeatTransSurfNum) += (DifSolarTransW / state.dataSurface->Surface(HeatTransSurfNum).Area);
+                    state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) +=
+                        (DifSolarTransW / state.dataSurface->Surface(HeatTransSurfNum).Area);
 
                     //-----------------------------------------------------------------------------------
                     // ADD TRANSMITTED DIFFUSE SOLAR THROUGH INTERIOR WINDOW TO ADJACENT ZONE
@@ -11427,7 +11424,8 @@ namespace EnergyPlus::SolarShading {
                     //					ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
                     // Accumulate transmitted diffuse solar for reporting
-                    SurfWinInitialDifSolInTrans(HeatTransSurfNum) += (DifSolarTransW / state.dataSurface->Surface(HeatTransSurfNum).Area);
+                    state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) +=
+                        (DifSolarTransW / state.dataSurface->Surface(HeatTransSurfNum).Area);
 
                 } else {
                     // Interior, exterior or between-glass shade, screen or blind in place
@@ -11512,7 +11510,8 @@ namespace EnergyPlus::SolarShading {
                     //                    ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
                     // Accumulate transmitted diffuse solar for reporting
-                    SurfWinInitialDifSolInTrans(HeatTransSurfNum) += (DifSolarTransW / state.dataSurface->Surface(HeatTransSurfNum).Area);
+                    state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(HeatTransSurfNum) +=
+                        (DifSolarTransW / state.dataSurface->Surface(HeatTransSurfNum).Area);
 
                 } // End of shading flag check
 
@@ -11657,7 +11656,7 @@ namespace EnergyPlus::SolarShading {
 
             for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) { // back surf loop
                 // BaseSurf = Surface(ISurf).BaseSurf
-                BackSurfaceNumber = ShadowComb(BaseSurf).BackSurf(KBkSurf);
+                BackSurfaceNumber = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
 
                 // Transform coordinates of back surface from general system to the
                 // plane of the receiving surface
@@ -11698,7 +11697,7 @@ namespace EnergyPlus::SolarShading {
             // from shadow on base surface.  Reson is that above shadowing algorithm is calculating shadow wihtout
             // influence of subsurfaces
             for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) { // back surf loop
-                BackSurfaceNumber = ShadowComb(BaseSurf).BackSurf(KBkSurf);
+                BackSurfaceNumber = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
                 // CurBaseSurf is Current base surface number for shadow overlap calcualtions
                 int CurBaseSurf = state.dataSurface->Surface(BackSurfaceNumber).BaseSurf;
                 if (CurBaseSurf != BackSurfaceNumber) {
@@ -11706,7 +11705,7 @@ namespace EnergyPlus::SolarShading {
                     // CurBackSurface is Current back surface number for base surface
                     int CurBackSurface = 0;
                     for (N = 1; N <= Window.NBkSurf; ++N) {
-                        if (ShadowComb(BaseSurf).BackSurf(N) == CurBaseSurf) {
+                        if (state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(N) == CurBaseSurf) {
                             CurBackSurface = N;
                             break;
                         }
@@ -11721,7 +11720,7 @@ namespace EnergyPlus::SolarShading {
             TotAOverlap = 0.0;
             TotARhoVisOverlap = 0.0;
             for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) { // back surf loop
-                BackSurfaceNumber = ShadowComb(BaseSurf).BackSurf(KBkSurf);
+                BackSurfaceNumber = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
                 IConst = state.dataSurface->Surface(BackSurfaceNumber).Construction;
                 InsideConLay = state.dataConstruction->Construct(IConst).TotLayers;
                 if (state.dataSurface->SurfWinWindowModelType(BackSurfaceNumber) == WindowBSDFModel) {

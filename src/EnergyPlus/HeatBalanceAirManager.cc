@@ -2715,6 +2715,10 @@ namespace EnergyPlus::HeatBalanceAirManager {
                         state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop) = ZoneMixingNum(Loop);
                     }
                 }
+                // flag zones used as both source and receiving zone
+                if (state.dataHeatBal->MassConservation(ZoneNum).NumSourceZonesMixingObject > 0 && state.dataHeatBal->MassConservation(ZoneNum).NumReceivingZonesMixingObject > 0) {
+                    state.dataHeatBal->MassConservation(ZoneNum).IsSourceAndReceivingZone = true;
+                }
             }
             if (allocated(ZoneMixingNum)) ZoneMixingNum.deallocate();
         }
@@ -2723,7 +2727,13 @@ namespace EnergyPlus::HeatBalanceAirManager {
         // and then proceeds to source zones
         Loop = 0;
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (!state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone) {
+            if (!state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone && !state.dataHeatBal->MassConservation(ZoneNum).IsSourceAndReceivingZone) {
+                Loop += 1;
+                state.dataHeatBalFanSys->ZoneReOrder(Loop) = ZoneNum;
+            }
+        }
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            if (state.dataHeatBal->MassConservation(ZoneNum).IsSourceAndReceivingZone) {
                 Loop += 1;
                 state.dataHeatBalFanSys->ZoneReOrder(Loop) = ZoneNum;
             }
@@ -2734,7 +2744,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
                 state.dataHeatBalFanSys->ZoneReOrder(Loop) = ZoneNum;
             }
         }
-
         cCurrentModuleObject = "ZoneCrossMixing";
         int inputCrossMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHeatBal->TotCrossMixing = inputCrossMixing + state.dataHeatBal->NumAirBoundaryMixing;
@@ -3754,7 +3763,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
             // Check for infiltration in zone which are only a mixing source zone
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if ((state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing && state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone) &&
-                    (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow)) {
+                    (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow)) {
                     if (state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr == 0) {
                         ShowSevereError(state, RoutineName + ": Infiltration object is not defined for zone = " + state.dataHeatBal->Zone(ZoneNum).Name);
                         ShowContinueError(state, "Zone air mass flow balance requires infiltration object for source zones of mixing objects");

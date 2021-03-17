@@ -645,14 +645,14 @@ namespace UnitHeater {
 
         for (UnitHeatNum = 1; UnitHeatNum <= state.dataUnitHeaters->NumOfUnitHeats; ++UnitHeatNum) {
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
                                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilTypeCh,
                                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                                                              DataAirSystems::objectVectorOOFanSystemModel,
                                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
             } else {
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
                                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilTypeCh,
                                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,

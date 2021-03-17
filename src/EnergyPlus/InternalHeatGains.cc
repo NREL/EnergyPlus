@@ -240,12 +240,9 @@ namespace InternalHeatGains {
         int Loop1;
         Real64 SchMin;
         Real64 SchMax;
-        static bool UsingThermalComfort(false);
         std::string liteName;
         int zonePt;
         Real64 mult;
-        static Real64 sumArea(0.0);
-        static Real64 sumPower(0.0);
         int ZoneNum;
         Real64 maxOccupLoad;
         std::string CurrentModuleObject;
@@ -256,7 +253,6 @@ namespace InternalHeatGains {
 
         // Formats
         static constexpr auto Format_720(" Zone Internal Gains Nominal, {},{:.2R},{:.1R},");
-
         static constexpr auto Format_722(" {} Internal Gains Nominal, {},{},{},{:.2R},{:.1R},");
         static constexpr auto Format_723("! <{} Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {{m2}},# Zone Occupants,{}");
         static constexpr auto Format_724(" {}, {}\n");
@@ -681,7 +677,7 @@ namespace InternalHeatGains {
                     }
 
                     if (NumAlpha > 6) { // Optional parameters present--thermal comfort data follows...
-                        UsingThermalComfort = false;
+                        state.dataInternalHeatGains->UsingThermalComfort = false;
                         if (NumAlpha > 20) {
                             lastOption = 20;
                         } else {
@@ -716,37 +712,37 @@ namespace InternalHeatGains {
 
                                 if (thermalComfortType == "FANGER") {
                                     state.dataHeatBal->People(Loop).Fanger = true;
-                                    UsingThermalComfort = true;
+                                    state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "PIERCE") {
                                     state.dataHeatBal->People(Loop).Pierce = true;
                                     state.dataHeatBal->AnyThermalComfortPierceModel = true;
-                                    UsingThermalComfort = true;
+                                    state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "KSU") {
                                     state.dataHeatBal->People(Loop).KSU = true;
                                     state.dataHeatBal->AnyThermalComfortKSUModel = true;
-                                    UsingThermalComfort = true;
+                                    state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVEASH55") {
                                     state.dataHeatBal->People(Loop).AdaptiveASH55 = true;
                                     state.dataHeatBal->AdaptiveComfortRequested_ASH55 = true;
-                                    UsingThermalComfort = true;
+                                    state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVECEN15251") {
                                     state.dataHeatBal->People(Loop).AdaptiveCEN15251 = true;
                                     state.dataHeatBal->AdaptiveComfortRequested_CEN15251 = true;
-                                    UsingThermalComfort = true;
+                                    state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "COOLINGEFFECTASH55") {
                                     state.dataHeatBal->People(Loop).CoolingEffectASH55 = true;
                                     state.dataHeatBal->AnyThermalComfortCoolingEffectModel = true;
-                                    UsingThermalComfort = true;
+                                    state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ANKLEDRAFTASH55") {
                                     state.dataHeatBal->People(Loop).AnkleDraftASH55 = true;
                                     state.dataHeatBal->AnyThermalComfortAnkleDraftModel = true;
-                                    UsingThermalComfort = true;
+                                    state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "") { // Blank input field--just ignore this
 
@@ -761,7 +757,7 @@ namespace InternalHeatGains {
                             }
                         }
 
-                        if (UsingThermalComfort) {
+                        if (state.dataInternalHeatGains->UsingThermalComfort) {
 
                             // Set the default value of MRTCalcType as 'ZoneAveraged'
                             state.dataHeatBal->People(Loop).MRTCalcType = ZoneAveraged;
@@ -1626,8 +1622,8 @@ namespace InternalHeatGains {
                     liteName = state.dataHeatBal->Lights(Loop).Name;
                     zonePt = state.dataHeatBal->Lights(Loop).ZonePtr;
                     mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier;
-                    sumArea += state.dataHeatBal->Zone(zonePt).FloorArea * mult;
-                    sumPower += state.dataHeatBal->Lights(Loop).DesignLevel * mult;
+                    state.dataInternalHeatGains->sumArea += state.dataHeatBal->Zone(zonePt).FloorArea * mult;
+                    state.dataInternalHeatGains->sumPower += state.dataHeatBal->Lights(Loop).DesignLevel * mult;
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtZone, liteName, state.dataHeatBal->Zone(zonePt).Name);
                     if (state.dataHeatBal->Zone(zonePt).FloorArea > 0.0) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, liteName, state.dataHeatBal->Lights(Loop).DesignLevel / state.dataHeatBal->Zone(zonePt).FloorArea, 4);
@@ -1643,13 +1639,17 @@ namespace InternalHeatGains {
             }     // Item = Number of Lights Objects
         }         // TotLights > 0 check
         // add total line to lighting summary table
-        if (sumArea > 0.0) {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, "Interior Lighting Total", sumPower / sumArea, 4); //** line 792
+        if (state.dataInternalHeatGains->sumArea > 0.0) {
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchInLtDens,
+                             "Interior Lighting Total",
+                             state.dataInternalHeatGains->sumPower / state.dataInternalHeatGains->sumArea,
+                             4); //** line 792
         } else {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, "Interior Lighting Total", DataPrecisionGlobals::constant_zero, 4);
         }
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, "Interior Lighting Total", sumArea);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, "Interior Lighting Total", sumPower);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, "Interior Lighting Total", state.dataInternalHeatGains->sumArea);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, "Interior Lighting Total", state.dataInternalHeatGains->sumPower);
 
         RepVarSet = true;
         CurrentModuleObject = "ElectricEquipment";
@@ -5304,11 +5304,8 @@ namespace InternalHeatGains {
         Real64 FractionConvected;  // For general lighting, fraction of heat from lights convected to zone air
         Real64 FractionReturnAir;  // For general lighting, fraction of heat from lights convected to zone's return air
         Real64 FractionRadiant;    // For general lighting, fraction of heat from lights to zone that is long wave
-
         Real64 ReturnPlenumTemp;  // Air temperature of a zone's return air plenum (C)
         Real64 pulseMultipler;    // use to create a pulse for the load component report computations
-        static Real64 curQL(0.0); // radiant value prior to adjustment for pulse for load component report
-        static Real64 adjQL(0.0); // radiant value including adjustment for pulse for load component report
 
         //  REAL(r64), ALLOCATABLE, SAVE, DIMENSION(:) :: QSA
 
@@ -5688,19 +5685,22 @@ namespace InternalHeatGains {
                 if (!state.dataGlobal->doLoadComponentPulseNow) {
                     state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                 } else {
-                    curQL = state.dataHeatBal->QL(radEnclosureNum);
+                    state.dataInternalHeatGains->curQL = state.dataHeatBal->QL(radEnclosureNum);
                     // for the loads component report during the special sizing run increase the radiant portion
                     // a small amount to create a "pulse" of heat that is used for the delayed loads
-                    adjQL = curQL +
+                    state.dataInternalHeatGains->adjQL =
+                        state.dataInternalHeatGains->curQL +
                             DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
                     // ITABSF is the Inside Thermal Absorptance
                     // TMULT is a multiplier for each zone
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = adjQL * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
+                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) =
+                        state.dataInternalHeatGains->adjQL * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                     // store the magnitude and time of the pulse
                     state.dataOutRptTab->radiantPulseTimestep(state.dataSize->CurOverallSimDay, zoneNum) = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                     state.dataOutRptTab->radiantPulseReceived(state.dataSize->CurOverallSimDay, SurfNum) =
-                            (adjQL - curQL) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum) * state.dataSurface->Surface(SurfNum).Area;
+                        (state.dataInternalHeatGains->adjQL - state.dataInternalHeatGains->curQL) * state.dataHeatBal->TMULT(radEnclosureNum) *
+                        state.dataHeatBal->ITABSF(SurfNum) * state.dataSurface->Surface(SurfNum).Area;
                 }
             }
         }

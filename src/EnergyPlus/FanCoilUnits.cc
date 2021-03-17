@@ -983,26 +983,26 @@ namespace FanCoilUnits {
 
         for (FanCoilNum = 1; FanCoilNum <= state.dataFanCoilUnits->NumFanCoils; ++FanCoilNum) {
             if (FanCoil(FanCoilNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                              FanCoil(FanCoilNum).CCoilName,
                                                              FanCoil(FanCoilNum).CCoilType,
                                                              FanCoil(FanCoilNum).FanName,
                                                              DataAirSystems::objectVectorOOFanSystemModel,
                                                              FanCoil(FanCoilNum).FanIndex);
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                              FanCoil(FanCoilNum).HCoilName,
                                                              FanCoil(FanCoilNum).HCoilType,
                                                              FanCoil(FanCoilNum).FanName,
                                                              DataAirSystems::objectVectorOOFanSystemModel,
                                                              FanCoil(FanCoilNum).FanIndex);
             } else {
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                              FanCoil(FanCoilNum).CCoilName,
                                                              FanCoil(FanCoilNum).CCoilType,
                                                              FanCoil(FanCoilNum).FanName,
                                                              DataAirSystems::structArrayLegacyFanModels,
                                                              FanCoil(FanCoilNum).FanIndex);
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                              FanCoil(FanCoilNum).HCoilName,
                                                              FanCoil(FanCoilNum).HCoilType,
                                                              FanCoil(FanCoilNum).FanName,
@@ -1387,7 +1387,7 @@ namespace FanCoilUnits {
         state.dataSize->DataFracOfAutosizedHeatingAirflow = 1.0;
         state.dataSize->DataFracOfAutosizedCoolingCapacity = 1.0;
         state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
-        
+
         auto &FanCoil(state.dataFanCoilUnits->FanCoil);
 
         CompType = FanCoil(FanCoilNum).UnitType;
@@ -2221,9 +2221,9 @@ namespace FanCoilUnits {
         Real64 HWFlowBypass; // hot water bypassed mass flow rate [kg/s]
         bool ColdFlowLocked; // if true cold water flow is locked
         bool HotFlowLocked;  // if true Hot water flow is locked
-        
+
         auto &Node(state.dataLoopNodes->Node);
-        
+
         // initialize local variables
         UnitOn = true;
         ControlNode = 0;

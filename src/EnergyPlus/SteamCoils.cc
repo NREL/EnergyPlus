@@ -803,7 +803,7 @@ namespace SteamCoils {
                 case DataAirSystems::structArrayLegacyFanModels: {
                     int SupFanNum = state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum;
                     if (SupFanNum > 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                      state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                                      "Coil:Heating:Steam",
                                                                      state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum).FanName,
@@ -815,7 +815,7 @@ namespace SteamCoils {
                 }
                 case DataAirSystems::objectVectorOOFanSystemModel: {
                     if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex >= 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(
+                        state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
                             state,
                             state.dataSteamCoils->SteamCoil(CoilNum).Name,
                             "Coil:Heating:Steam",
@@ -897,7 +897,7 @@ namespace SteamCoils {
         // save the design Steam volumetric flow rate for use by the Steam loop sizing algorithms
         RegisterPlantCompDesignFlow(state, state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum, state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate);
 
-        coilSelectionReportObj->setCoilHeatingCapacity(state,
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilHeatingCapacity(state,
                                                        state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                        "Coil:Heating:Steam",
                                                        DesCoilLoad,
@@ -909,25 +909,25 @@ namespace SteamCoils {
                                                        1.0,
                                                        -999.0,
                                                        -999.0);
-        coilSelectionReportObj->setCoilWaterFlowNodeNums(state, state.dataSteamCoils->SteamCoil(CoilNum).Name,
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterFlowNodeNums(state, state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                          "Coil:Heating:Steam",
                                                          state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate,
                                                          coilWasAutosized,
                                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
                                                          state.dataSteamCoils->SteamCoil(CoilNum).LoopNum);
-        coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(state, state.dataSteamCoils->SteamCoil(CoilNum).Name,
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(state, state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                                    "Coil:Heating:Steam",
                                                                    DesCoilLoad,
                                                                    coilWasAutosized,
                                                                    state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                                                    state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
                                                                    state.dataSteamCoils->SteamCoil(CoilNum).LoopNum);
-        coilSelectionReportObj->setCoilEntWaterTemp(state, state.dataSteamCoils->SteamCoil(CoilNum).Name, "Coil:Heating:Steam", TempSteamIn); // coil  report
-        coilSelectionReportObj->setCoilLvgWaterTemp(state, state.dataSteamCoils->SteamCoil(CoilNum).Name,
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntWaterTemp(state, state.dataSteamCoils->SteamCoil(CoilNum).Name, "Coil:Heating:Steam", TempSteamIn); // coil  report
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgWaterTemp(state, state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                     "Coil:Heating:Steam",
                                                     TempSteamIn - state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling);                                 // coil report
-        coilSelectionReportObj->setCoilWaterDeltaT(state, state.dataSteamCoils->SteamCoil(CoilNum).Name, "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling); // coil report
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterDeltaT(state, state.dataSteamCoils->SteamCoil(CoilNum).Name, "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling); // coil report
         state.dataSteamCoils->SteamCoil(CoilNum).DesCoilCapacity = DesCoilLoad;
         state.dataSteamCoils->SteamCoil(CoilNum).DesAirVolFlow = DesVolFlow;
         if (ErrorsFound) {
@@ -935,7 +935,7 @@ namespace SteamCoils {
         }
 
         // There is no standard rating for heating coils at this point, so fill with dummy flag values
-        coilSelectionReportObj->setRatedCoilConditions(state,
+        state.dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(state,
                                                        state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                        "Coil:Heating:Steam",
                                                        -999.0,

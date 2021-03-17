@@ -412,7 +412,7 @@ namespace EnergyPlus::SwimmingPool {
                 "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
             ErrorsFound = true;
             // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
-        } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel_CTF) {
+        } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) {
             ShowSevereError(state, state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and is attempting to use a non-CTF solution algorithm.  This is "
                             "not allowed.  Use the CTF solution algorithm for this surface.");
@@ -804,14 +804,15 @@ namespace EnergyPlus::SwimmingPool {
         this->EvapHeatLossRate = EvapEnergyLossPerArea * state.dataSurface->Surface(SurfNum).Area;
         // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
         // to the air directly and added to the zone air heat balance
-        Real64 LWsum =
-            (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + DataHeatBalSurface::SurfNetLWRadToSurf(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
+        Real64 LWsum = (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) +
+                        state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
              state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
              state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum)); // summation of all long-wavelenth radiation going to surface
         Real64 LWtotal = this->CurCoverLWRadFac * LWsum;      // total flux from long-wavelength radiation to surface
-        Real64 SWtotal = this->CurCoverSWRadFac * DataHeatBalSurface::SurfOpaqQRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
+        Real64 SWtotal =
+            this->CurCoverSWRadFac * state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
         this->RadConvertToConvect =
-            ((1.0 - this->CurCoverLWRadFac) * LWsum) + ((1.0 - this->CurCoverSWRadFac) * DataHeatBalSurface::SurfOpaqQRadSWInAbs(SurfNum));
+            ((1.0 - this->CurCoverLWRadFac) * LWsum) + ((1.0 - this->CurCoverSWRadFac) * state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum));
 
         // Heat gain from people (assumed to be all convective to pool water)
         Real64 PeopleGain =
@@ -822,7 +823,7 @@ namespace EnergyPlus::SwimmingPool {
             FluidProperties::GetSpecificHeatGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName); // specific heat of pool water
 
         Real64 TH22 =
-            DataHeatBalSurface::TH(2, 2, SurfNum); // inside surface temperature at the previous time step equals the old pool water temperature
+            state.dataHeatBalSurf->TH(2, 2, SurfNum); // inside surface temperature at the previous time step equals the old pool water temperature
         Real64 TInSurf =
             this->CurSetPtTemp; // Setpoint temperature for pool which is also the goal temperature and also the inside surface face temperature
         Real64 Tmuw = this->CurMakeupWaterTemp;                                // Inlet makeup water temperature
@@ -1028,7 +1029,7 @@ namespace EnergyPlus::SwimmingPool {
                 }
             }
 
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * DataHeatBalSurface::TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;
@@ -1052,7 +1053,7 @@ namespace EnergyPlus::SwimmingPool {
             int SurfNum = state.dataSwimmingPools->Pool(PoolNum).SurfacePtr; // surface number index
 
             // First transfer the surface inside temperature data to the current pool water temperature
-            state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp = DataHeatBalSurface::TH(2, 1, SurfNum);
+            state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp = state.dataHeatBalSurf->TH(2, 1, SurfNum);
 
             // Next calculate the amount of heating done by the plant loop
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(

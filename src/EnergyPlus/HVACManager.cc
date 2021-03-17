@@ -364,13 +364,13 @@ void ManageHVAC(EnergyPlusData &state)
             }
         }
 
-        DetectOscillatingZoneTemp(state);
-        UpdateZoneListAndGroupLoads(state);           // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
-        IceThermalStorage::UpdateIceFractions(state); // Update fraction of ice stored in TES
-        ManageWater(state);
-        // update electricity data for net, purchased, sold etc.
-        DummyLogical = false;
-        facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
+            DetectOscillatingZoneTemp(state);
+            UpdateZoneListAndGroupLoads(state); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
+            IceThermalStorage::UpdateIceFractions(state);          // Update fraction of ice stored in TES
+            ManageWater(state);
+            // update electricity data for net, purchased, sold etc.
+            DummyLogical = false;
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
 
         // Update the plant and condenser loop capacitance model temperature history.
         PlantManager::UpdateNodeThermalHistory(state);
@@ -724,13 +724,13 @@ void SimHVAC(EnergyPlusData &state)
         state.dataHVACMgr->SimHVACIterSetup = true;
     }
 
-    if (state.dataGlobal->ZoneSizingCalc) {
-        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
-        // need to call non zone equipment so water use zone gains can be included in sizing calcs
-        ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipmentFlag);
-        facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
-        return;
-    }
+        if (state.dataGlobal->ZoneSizingCalc) {
+            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
+            // need to call non zone equipment so water use zone gains can be included in sizing calcs
+            ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipmentFlag);
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+            return;
+        }
 
     // Before the HVAC simulation, reset control flags and specified flow
     // rates that might have been set by the set point and availability
@@ -1845,40 +1845,40 @@ void SimSelectedEquipment(EnergyPlusData &state,
         state.dataHVACMgr->MyEnvrnFlag2 = true;
     }
 
-    if (FirstHVACIteration) {
-        state.dataHVACMgr->RepIterAir = 0;
-        // Call AirflowNetwork simulation to calculate air flows and pressures
-        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-            ManageAirflowNetworkBalance(state, FirstHVACIteration);
-        }
-        ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
-        state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
-        SimAirLoops = true;     // Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
-        AirLoopsSimOnce = true; // air loops simulated once for this environment
-        ResetTerminalUnitFlowLimits(state);
-        state.dataHVACMgr->FlowMaxAvailAlreadyReset = true;
-        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
-        SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
-        ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
-        facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+        if (FirstHVACIteration) {
+            state.dataHVACMgr->RepIterAir = 0;
+            // Call AirflowNetwork simulation to calculate air flows and pressures
+            if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                ManageAirflowNetworkBalance(state, FirstHVACIteration);
+            }
+            ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+            state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
+            SimAirLoops = true;         // Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
+            AirLoopsSimOnce = true;     // air loops simulated once for this environment
+            ResetTerminalUnitFlowLimits(state);
+            state.dataHVACMgr->FlowMaxAvailAlreadyReset = true;
+            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+            SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
+            ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
 
         ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
 
-        state.dataErrTracking->AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
-        facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
-    } else {
-        state.dataHVACMgr->FlowResolutionNeeded = false;
-        while ((SimAirLoops || SimZoneEquipment) && (IterAir <= MaxAir)) {
-            ++IterAir; // Increment the iteration counter
-            // Call AirflowNetwork simulation to calculate air flows and pressures
-            ResimulateAirZone = false;
-            if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
-            }
-            if (SimAirLoops) {
-                ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
-                SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
-            }
+            state.dataErrTracking->AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+        } else {
+            state.dataHVACMgr->FlowResolutionNeeded = false;
+            while ((SimAirLoops || SimZoneEquipment) && (IterAir <= MaxAir)) {
+                ++IterAir; // Increment the iteration counter
+                // Call AirflowNetwork simulation to calculate air flows and pressures
+                ResimulateAirZone = false;
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
+                }
+                if (SimAirLoops) {
+                    ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+                    SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
+                }
 
             // make sure flow resolution gets done
             if (state.dataHVACMgr->FlowResolutionNeeded) {
@@ -1920,9 +1920,9 @@ void SimSelectedEquipment(EnergyPlusData &state,
             SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
         }
 
-        if (SimElecCircuits) {
-            facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
-        }
+            if (SimElecCircuits) {
+                state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+            }
 
         if (!SimPlantLoops) {
             // check to see if any air side component may have requested plant resim
@@ -1935,11 +1935,11 @@ void SimSelectedEquipment(EnergyPlusData &state,
             ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
         }
 
-        if (SimElecCircuits) {
-            facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+            if (SimElecCircuits) {
+                state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+            }
         }
     }
-}
 
 void ResetTerminalUnitFlowLimits(EnergyPlusData &state)
 {

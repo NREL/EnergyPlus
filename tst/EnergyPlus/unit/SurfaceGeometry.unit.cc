@@ -3899,19 +3899,19 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", state->dataSurface->Surface);
-    EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_EQ(DataSurfaces::iHeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
     EXPECT_TRUE(state->dataHeatBal->AnyCondFD);
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_10000", state->dataSurface->Surface);
-    EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_EQ(DataSurfaces::iHeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
     EXPECT_TRUE(state->dataHeatBal->AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_20000", state->dataSurface->Surface);
-    EXPECT_EQ(DataSurfaces::HeatTransferModel_HAMT, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_EQ(DataSurfaces::iHeatTransferModel::HAMT, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
     EXPECT_TRUE(state->dataHeatBal->AnyHAMT);
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_30000", state->dataSurface->Surface);
-    EXPECT_EQ(DataSurfaces::HeatTransferModel_CTF, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_EQ(DataSurfaces::iHeatTransferModel::CTF, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
     EXPECT_TRUE(state->dataHeatBal->AnyCTF);
 
     std::string const error_string = delimited_string({

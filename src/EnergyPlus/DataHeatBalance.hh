@@ -1054,10 +1054,13 @@ namespace DataHeatBalance {
                                      // AdjustReturnThenMixing, None)
         int InfiltrationTreatment;   // determines how infiltration is treated for zone mass balance
         int InfiltrationZoneType;    // specifies which types of zones allow infiltration to be changed
+        bool AdjustZoneMixingFlow; // used to adjust zone mixing air flows to enforce air flow balance
+        bool AdjustZoneInfiltrationFlow; // used to adjust zone infiltration air flows to enforce air flow balance
                                      // Note, unique global object
 
         // Default Constructor
-        ZoneAirMassFlowConservation() : EnforceZoneMassBalance(false), ZoneFlowAdjustment(0), InfiltrationTreatment(0), InfiltrationZoneType(0)
+        ZoneAirMassFlowConservation()
+            : EnforceZoneMassBalance(false), ZoneFlowAdjustment(0), InfiltrationTreatment(0), InfiltrationZoneType(0), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
         {
         }
     };
@@ -1075,6 +1078,7 @@ namespace DataHeatBalance {
         int NumSourceZonesMixingObject;        // number of zone mixing object references as a source zone
         int NumReceivingZonesMixingObject;     // number of zone mixing object references as a receiving zone
         bool IsOnlySourceZone;                 // true only if used only as a source zone in zone mixing object
+        bool IsSourceAndReceivingZone;         // true only if a zone is used as a source and receiving zone in zone mixing objects
         int InfiltrationPtr;                   // pointer to infiltration object
         Real64 InfiltrationMassFlowRate;       // infiltration added to enforced source zone mass balance, kg/s
         int IncludeInfilToZoneMassBal;         // not self-balanced, include infiltration in zone air mass balance
@@ -1086,7 +1090,7 @@ namespace DataHeatBalance {
         // Default Constructor
         ZoneMassConservationData()
             : ZonePtr(0), InMassFlowRate(0.0), ExhMassFlowRate(0.0), RetMassFlowRate(0.0), MixingMassFlowRate(0.0), MixingSourceMassFlowRate(0.0),
-              NumSourceZonesMixingObject(0), NumReceivingZonesMixingObject(0), IsOnlySourceZone(false), InfiltrationPtr(0),
+              NumSourceZonesMixingObject(0), NumReceivingZonesMixingObject(0), IsOnlySourceZone(false), IsSourceAndReceivingZone(false), InfiltrationPtr(0),
               InfiltrationMassFlowRate(0.0), IncludeInfilToZoneMassBal(0)
         {
         }
@@ -1943,7 +1947,7 @@ struct HeatBalanceData : BaseGlobalStruct
     int DefaultOutsideConvectionAlgo = 1;   // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
     int SolarDistribution = 0;              // Solar Distribution Algorithm
     int InsideSurfIterations = 0;           // Counts inside surface iterations
-    int OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF; // Global HeatBalanceAlgorithm setting
+    DataSurfaces::iHeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting
     // Flags for HeatTransfer Algorithms Used
     bool AllCTF = true;                  // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
     bool AnyCTF = false;                 // CTF used
@@ -2225,7 +2229,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->DefaultOutsideConvectionAlgo = 1;
         this->SolarDistribution = 0;
         this->InsideSurfIterations = 0;
-        this->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+        this->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
         this->AllCTF = true;
         this->AnyCTF = false;
         this->AnyEMPD = false;
