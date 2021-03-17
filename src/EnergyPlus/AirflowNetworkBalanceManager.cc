@@ -3081,7 +3081,7 @@ namespace AirflowNetworkBalanceManager {
             for (int i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfZones; ++i) {
                 if (state.dataAirflowNetwork->MultizoneZoneData(i).SingleSidedCpType == "ADVANCED") {
                     print(state.files.eio,
-                          "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCp), ");
+                          "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), ");
                     print(state.files.eio, "{}, ", state.dataAirflowNetwork->MultizoneZoneData(i).ZoneName);
                     for (unsigned j = 1; j <= state.dataAirflowNetwork->EPDeltaCP(i).WindDir.size() - 1; ++j) {
                         print(state.files.eio, "{:.2R},", state.dataAirflowNetwork->EPDeltaCP(i).WindDir(j));
