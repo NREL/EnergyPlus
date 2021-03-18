@@ -1358,7 +1358,7 @@ namespace EnergyPlus::OutputReportTabular {
         if (ort->WriteTabularFiles) {
             print(state.files.eio, "! <Tabular Report>,Style,Unit Conversion\n");
             if (AlphArray(1) != "HTML") {
-                ConvertCaseToLower(AlphArray(1), AlphArray(2));
+                ConvertCaseToLower(state, AlphArray(1), AlphArray(2));
                 AlphArray(1).erase(1);
                 AlphArray(1) += AlphArray(2).substr(1);
             }

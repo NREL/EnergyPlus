@@ -161,10 +161,6 @@ namespace ScheduleManager {
         // Uses the standard get routines in the InputProcessor.
 
         // Using/Aliasing
-        using DataStringGlobals::CharComma;
-        using DataStringGlobals::CharSemicolon;
-        using DataStringGlobals::CharSpace;
-        using DataStringGlobals::CharTab;
         using DataSystemVariables::CheckForActualFileName;
         using General::ProcessDateString;
 
@@ -505,7 +501,7 @@ namespace ScheduleManager {
             } else {
                 rowLimitCount = 365 * 24 * state.dataGlobal->NumOfTimeStepInHour;
             }
-            ColumnSep = CharComma;
+            ColumnSep = state.dataStrGlobals->CharComma;
             while (!LineIn.eof) { // end of file
                 LineIn = SchdFile.readLine();
                 ++rowCnt;
@@ -1694,14 +1690,14 @@ namespace ScheduleManager {
             }
 
             if (lAlphaBlanks(4) || UtilityRoutines::SameString(Alphas(4), "comma")) {
-                ColumnSep = CharComma;
+                ColumnSep = state.dataStrGlobals->CharComma;
                 Alphas(4) = "comma";
             } else if (UtilityRoutines::SameString(Alphas(4), "semicolon")) {
-                ColumnSep = CharSemicolon;
+                ColumnSep = state.dataStrGlobals->CharSemicolon;
             } else if (UtilityRoutines::SameString(Alphas(4), "tab")) {
-                ColumnSep = CharTab;
+                ColumnSep = state.dataStrGlobals->CharTab;
             } else if (UtilityRoutines::SameString(Alphas(4), "space")) {
-                ColumnSep = CharSpace;
+                ColumnSep = state.dataStrGlobals->CharSpace;
             } else {
                 ShowSevereError(state,
                                 RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(4) + " illegal value=\"" + Alphas(4) +

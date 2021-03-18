@@ -436,20 +436,22 @@ namespace UtilityRoutines {
 
         if (finalColumn) {
             std::fstream fsPerfLog;
-            if (!FileSystem::fileExists(DataStringGlobals::outputPerfLogFileName)) {
+            if (!FileSystem::fileExists(state.dataStrGlobals->outputPerfLogFileName)) {
                 if (state.files.outputControl.perflog) {
-                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFileName, std::fstream::out); // open file normally
                     if (!fsPerfLog) {
-                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
+                        ShowFatalError(
+                            state, "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFileName + "\" for output (write).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_headerRow << std::endl;
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
             } else {
                 if (state.files.outputControl.perflog) {
-                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFileName, std::fstream::app); // append to already existing file
                     if (!fsPerfLog) {
-                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
+                        ShowFatalError(
+                            state, "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFileName + "\" for output (append).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
@@ -895,7 +897,8 @@ namespace UtilityRoutines {
         return EXIT_SUCCESS;
     }
 
-    void ConvertCaseToUpper(std::string const &InputString, // Input string
+    void ConvertCaseToUpper(EnergyPlusData &state, 
+                            std::string const &InputString, // Input string
                             std::string &OutputString       // Output string (in UpperCase)
     )
     {
@@ -921,14 +924,15 @@ namespace UtilityRoutines {
         OutputString = InputString;
 
         for (std::string::size_type A = 0; A < len(InputString); ++A) {
-            std::string::size_type const B = index(LowerCase, InputString[A]);
+            std::string::size_type const B = index(state.dataStrGlobals->LowerCase, InputString[A]);
             if (B != std::string::npos) {
-                OutputString[A] = UpperCase[B];
+                OutputString[A] = state.dataStrGlobals->UpperCase[B];
             }
         }
     }
 
-    void ConvertCaseToLower(std::string const &InputString, // Input string
+    void ConvertCaseToLower(EnergyPlusData &state,
+                            std::string const &InputString, // Input string
                             std::string &OutputString       // Output string (in LowerCase)
     )
     {
@@ -954,9 +958,9 @@ namespace UtilityRoutines {
         OutputString = InputString;
 
         for (std::string::size_type A = 0; A < len(InputString); ++A) {
-            std::string::size_type const B = index(UpperCase, InputString[A]);
+            std::string::size_type const B = index(state.dataStrGlobals->UpperCase, InputString[A]);
             if (B != std::string::npos) {
-                OutputString[A] = LowerCase[B];
+                OutputString[A] = state.dataStrGlobals->LowerCase[B];
             }
         }
     }

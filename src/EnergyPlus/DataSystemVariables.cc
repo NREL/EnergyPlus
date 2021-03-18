@@ -86,9 +86,7 @@ namespace DataSystemVariables {
 
     // Using/Aliasing
     using DataStringGlobals::altpathChar;
-    using DataStringGlobals::CurrentWorkingFolder;
     using DataStringGlobals::pathChar;
-    using DataStringGlobals::ProgramPath;
 
     // Data
     // -only module should be available to other modules and routines.
@@ -181,7 +179,7 @@ namespace DataSystemVariables {
                 if (pos != std::string::npos) state.dataSysVars->envinputpath1.erase(pos + 1);
             }
             get_environment_variable(cInputPath2, state.dataSysVars->envinputpath2);
-            get_environment_variable(cProgramPath, ProgramPath);
+            get_environment_variable(cProgramPath, state.dataStrGlobals->ProgramPath);
             state.dataSysVars->firstTime = false;
         }
 
@@ -194,12 +192,12 @@ namespace DataSystemVariables {
 
         const std::array<std::pair<std::string, std::string>, 7> pathsToCheck = {{
             {InputFileName, "Current Working Directory"},
-            {DataStringGlobals::inputDirPathName + InputFileName, "IDF Directory"},
-            {DataStringGlobals::exeDirectory + InputFileName, "EnergyPlus Executable Directory"},
+            {state.dataStrGlobals->inputDirPathName + InputFileName, "IDF Directory"},
+            {state.dataStrGlobals->exeDirectory + InputFileName, "EnergyPlus Executable Directory"},
             {state.dataSysVars->envinputpath1 + InputFileName, "\"epin\" Environment Variable"},
             {state.dataSysVars->envinputpath2 + InputFileName, "\"input_path\" Environment Variable"},
-            {CurrentWorkingFolder + InputFileName, "INI File Directory"},
-            {ProgramPath + InputFileName, "\"program\", \"dir\" from INI File"}}
+            {state.dataStrGlobals->CurrentWorkingFolder + InputFileName, "INI File Directory"},
+            {state.dataStrGlobals->ProgramPath + InputFileName, "\"program\", \"dir\" from INI File"}}
         };
 
         std::size_t numPathsToNotTest = (state.dataSysVars->TestAllPaths) ? pathsToCheck.size()-2 : pathsToCheck.size();

@@ -4304,9 +4304,6 @@ namespace EnergyPlus::DaylightingManager {
         // Perform the GetInput function for the Output:IlluminanceMap
         // Glazer - June 2016 (moved from GetDaylightingControls)
         using namespace DataIPShortCuts;
-        using DataStringGlobals::CharComma;
-        using DataStringGlobals::CharSpace;
-        using DataStringGlobals::CharTab;
 
         Array1D_int ZoneMapCount;
         int MapNum;
@@ -4437,7 +4434,7 @@ namespace EnergyPlus::DaylightingManager {
 
             if (MapStyleIn == 0) {
                 cAlphaArgs(1) = "COMMA";
-                state.dataDaylightingData->MapColSep = CharComma; // comma
+                state.dataDaylightingData->MapColSep = state.dataStrGlobals->CharComma; // comma
             } else if (MapStyleIn == 1) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -4452,20 +4449,20 @@ namespace EnergyPlus::DaylightingManager {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
                 if (cAlphaArgs(1) == "COMMA") {
-                    state.dataDaylightingData->MapColSep = CharComma; // comma
+                    state.dataDaylightingData->MapColSep = state.dataStrGlobals->CharComma; // comma
                 } else if (cAlphaArgs(1) == "TAB") {
-                    state.dataDaylightingData->MapColSep = CharTab; // tab
+                    state.dataDaylightingData->MapColSep = state.dataStrGlobals->CharTab; // tab
                 } else if (cAlphaArgs(1) == "FIXED" || cAlphaArgs(1) == "SPACE") {
-                    state.dataDaylightingData->MapColSep = CharSpace; // space
+                    state.dataDaylightingData->MapColSep = state.dataStrGlobals->CharSpace; // space
                 } else {
-                    state.dataDaylightingData->MapColSep = CharComma; // comma
+                    state.dataDaylightingData->MapColSep = state.dataStrGlobals->CharComma; // comma
                     ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) +
                                      "\", Commas will be used to separate fields.");
                     cAlphaArgs(1) = "COMMA";
                 }
             }
             print(state.files.eio, "! <Daylighting:Illuminance Maps>,#Maps,Style\n");
-            ConvertCaseToLower(cAlphaArgs(1), cAlphaArgs(2));
+            ConvertCaseToLower(state, cAlphaArgs(1), cAlphaArgs(2));
             cAlphaArgs(1).erase(1);
             cAlphaArgs(1) += cAlphaArgs(2).substr(1);
             print(state.files.eio, "Daylighting:Illuminance Maps,{},{}\n", state.dataDaylightingData->TotIllumMaps, cAlphaArgs(1));
@@ -9323,11 +9320,6 @@ namespace EnergyPlus::DaylightingManager {
         // is placed on a temporary file and later (see CloseReportIllumMaps) coallesced into a single
         // output file.
 
-        // Using/Aliasing
-        using DataStringGlobals::CharComma;
-        using DataStringGlobals::CharSpace;
-        using DataStringGlobals::CharTab;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string String;
         int RefPt;
@@ -9372,10 +9364,10 @@ namespace EnergyPlus::DaylightingManager {
                 outputFile.ensure_open(state, "ReportIllumMap");
                 return outputFile;
             };
-            if (state.dataDaylightingData->MapColSep == CharTab) {
+            if (state.dataDaylightingData->MapColSep == state.dataStrGlobals->CharTab) {
                 if (!openMapFile(state.files.outputMapTabFileName).good()) return;
                 //                CommaDelimited = false; //Unused Set but never used
-            } else if (state.dataDaylightingData->MapColSep == CharComma) {
+            } else if (state.dataDaylightingData->MapColSep == state.dataStrGlobals->CharComma) {
                 if (!openMapFile(state.files.outputMapCsvFileName).good()) return;
                 //                CommaDelimited = true; //Unused Set but never used
             } else {
@@ -9513,17 +9505,12 @@ namespace EnergyPlus::DaylightingManager {
         // This subroutine "closes" out the created daylight illuminance maps by merging them
         // into the "eplusout.map" file.
 
-        // Using/Aliasing
-        using DataStringGlobals::CharComma;
-        using DataStringGlobals::CharSpace;
-        using DataStringGlobals::CharTab;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         if (state.dataDaylightingData->TotIllumMaps > 0) {
             // Write map header
-            if (state.dataDaylightingData->MapColSep == CharTab) {
+            if (state.dataDaylightingData->MapColSep == state.dataStrGlobals->CharTab) {
                 state.files.map.fileName = state.files.outputMapTabFileName;
-            } else if (state.dataDaylightingData->MapColSep == CharComma) {
+            } else if (state.dataDaylightingData->MapColSep == state.dataStrGlobals->CharComma) {
                 state.files.map.fileName = state.files.outputMapCsvFileName;
             } else {
                 state.files.map.fileName = state.files.outputMapTxtFileName;

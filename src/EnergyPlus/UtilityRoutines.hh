@@ -79,11 +79,13 @@ int EndEnergyPlus(EnergyPlusData &state);
 
 int FindUnitNumber(std::string const &FileName); // File name to be searched.
 
-void ConvertCaseToUpper(std::string const &InputString, // Input string
+void ConvertCaseToUpper(EnergyPlusData &state,
+                        std::string const &InputString, // Input string
                         std::string &OutputString       // Output string (in UpperCase)
 );
 
-void ConvertCaseToLower(std::string const &InputString, // Input string
+void ConvertCaseToLower(EnergyPlusData &state,
+                        std::string const &InputString, // Input string
                         std::string &OutputString       // Output string (in LowerCase)
 );
 

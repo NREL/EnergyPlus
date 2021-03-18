@@ -83,7 +83,7 @@ void displayMessage(T t, Args... args) // recursive variadic function
     displayMessage(args...);
 }
 
-bool checkVersionMatch(json const &epJSON)
+bool checkVersionMatch(EnergyPlusData &state, json const &epJSON)
 {
     auto it = epJSON.find("Version");
     if (it != epJSON.end()) {
@@ -92,7 +92,7 @@ bool checkVersionMatch(json const &epJSON)
             if (v.empty()) {
                 displayMessage("Input errors occurred and version ID was left blank, verify file version");
             } else {
-                std::string::size_type const lenVer(len(EnergyPlus::DataStringGlobals::MatchVersion));
+                std::string::size_type const lenVer(len(state.dataStrGlobals->MatchVersion));
                 int Which;
                 if ((lenVer > 0) && (EnergyPlus::DataStringGlobals::MatchVersion[lenVer - 1] == '0')) {
                     Which = static_cast<int>(index(v.substr(0, lenVer - 2), EnergyPlus::DataStringGlobals::MatchVersion.substr(0, lenVer - 2)));

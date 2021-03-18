@@ -97,9 +97,6 @@ namespace EnergyPlus::SizingManager {
     using namespace HeatBalanceManager;
     using namespace WeatherManager;
     using namespace DataSizing;
-    using DataStringGlobals::CharComma;
-    using DataStringGlobals::CharSpace;
-    using DataStringGlobals::CharTab;
 
     void ManageSizing(EnergyPlusData &state)
     {
@@ -230,9 +227,9 @@ namespace EnergyPlus::SizingManager {
             state.dataGlobal->ZoneSizingCalc = true;
             Available = true;
 
-            if (state.dataSize->SizingFileColSep == CharComma) {
+            if (state.dataSize->SizingFileColSep == state.dataStrGlobals->CharComma) {
                 state.files.zsz.fileName = state.files.outputZszCsvFileName;
-            } else if (state.dataSize->SizingFileColSep == CharTab) {
+            } else if (state.dataSize->SizingFileColSep == state.dataStrGlobals->CharTab) {
                 state.files.zsz.fileName = state.files.outputZszTabFileName;
             } else {
                 state.files.zsz.fileName = state.files.outputZszTxtFileName;
@@ -430,9 +427,9 @@ namespace EnergyPlus::SizingManager {
 
             state.dataGlobal->SysSizingCalc = true;
             Available = true;
-            if (state.dataSize->SizingFileColSep == CharComma) {
+            if (state.dataSize->SizingFileColSep == state.dataStrGlobals->CharComma) {
                 state.files.ssz.fileName = state.files.outputSszCsvFileName;
-            } else if (state.dataSize->SizingFileColSep == CharTab) {
+            } else if (state.dataSize->SizingFileColSep == state.dataStrGlobals->CharTab) {
                 state.files.ssz.fileName = state.files.outputSszTabFileName;
             } else {
                 state.files.ssz.fileName = state.files.outputSszTxtFileName;
@@ -2513,7 +2510,7 @@ namespace EnergyPlus::SizingManager {
 
         if (Temp == 0) {
             cAlphaArgs(1) = "Comma";
-            state.dataSize->SizingFileColSep = CharComma; // comma
+            state.dataSize->SizingFileColSep = state.dataStrGlobals->CharComma; // comma
         } else if (Temp == 1) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -2528,16 +2525,16 @@ namespace EnergyPlus::SizingManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (cAlphaArgs(1) == "COMMA") {
-                state.dataSize->SizingFileColSep = CharComma; // comma
+                state.dataSize->SizingFileColSep = state.dataStrGlobals->CharComma; // comma
                 cAlphaArgs(1) = "Comma";
             } else if (cAlphaArgs(1) == "TAB") {
-                state.dataSize->SizingFileColSep = CharTab; // tab
+                state.dataSize->SizingFileColSep = state.dataStrGlobals->CharTab; // tab
                 cAlphaArgs(1) = "Tab";
             } else if (cAlphaArgs(1) == "FIXED" || cAlphaArgs(1) == "SPACE") {
-                state.dataSize->SizingFileColSep = CharSpace; // space
+                state.dataSize->SizingFileColSep = state.dataStrGlobals->CharSpace; // space
                 cAlphaArgs(1) = "Space";
             } else {
-                state.dataSize->SizingFileColSep = CharComma; // comma
+                state.dataSize->SizingFileColSep = state.dataStrGlobals->CharComma; // comma
                 ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered value=\"" + cAlphaArgs(1) +
                                  "\", Commas will be used to separate fields.");
                 cAlphaArgs(1) = "Comma";
@@ -4012,9 +4009,6 @@ namespace EnergyPlus::SizingManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine writes one item of zone sizing data to the "eio" file..
-
-        // Using/Aliasing
-        using DataStringGlobals::VerString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

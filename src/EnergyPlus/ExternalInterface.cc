@@ -956,7 +956,6 @@ namespace EnergyPlus::ExternalInterface {
         using DataIPShortCuts::cNumericFieldNames;
         using DataIPShortCuts::rNumericArgs;
         using DataStringGlobals::altpathChar;
-        using DataStringGlobals::CurrentWorkingFolder;
         using DataStringGlobals::pathChar;
         using DataSystemVariables::CheckForActualFileName;
 

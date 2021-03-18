@@ -4601,7 +4601,7 @@ namespace HeatBalanceManager {
 
             std::string window5DataFileName;
             if (ConstructAlphas(1) == "") {
-                window5DataFileName = CurrentWorkingFolder + "Window5DataFile.dat";
+                window5DataFileName = state.dataStrGlobals->CurrentWorkingFolder + "Window5DataFile.dat";
             } else {
                 window5DataFileName = ConstructAlphas(1);
             }

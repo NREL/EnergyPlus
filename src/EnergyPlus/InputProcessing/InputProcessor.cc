@@ -252,9 +252,9 @@ void cleanEPJSON(json &epjson)
 
 void InputProcessor::processInput(EnergyPlusData &state)
 {
-    std::ifstream input_stream(DataStringGlobals::inputFileName, std::ifstream::in | std::ifstream::binary);
+    std::ifstream input_stream(state.dataStrGlobals->inputFileName, std::ifstream::in | std::ifstream::binary);
     if (!input_stream.is_open()) {
-        ShowFatalError(state, "Input file path " + DataStringGlobals::inputFileName + " not found");
+        ShowFatalError(state, "Input file path " + state.dataStrGlobals->inputFileName + " not found");
         return;
     }
 
@@ -286,7 +286,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 input_file.append(line + '\n');
             }
             if (input_file.empty()) {
-                ShowFatalError(state, "Failed to read input file: " + DataStringGlobals::inputFileName);
+                ShowFatalError(state, "Failed to read input file: " + state.dataStrGlobals->inputFileName);
                 return;
             }
 
@@ -298,7 +298,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 cleanEPJSON(epJSONClean);
                 input_file = epJSONClean.dump(4, ' ', false, json::error_handler_t::replace);
                 // input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
-                std::string convertedIDF(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON");
+                std::string convertedIDF(state.dataStrGlobals->outputDirPathName + state.dataStrGlobals->inputFileNameOnly + ".epJSON");
                 FileSystem::makeNativePath(convertedIDF);
                 std::ofstream convertedFS(convertedIDF, std::ofstream::out);
                 convertedFS << input_file << std::endl;
@@ -330,7 +330,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
     if (state.dataGlobal->isEpJSON && (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly)) {
         if (versionMatch) {
             std::string const encoded = idf_parser->encode(epJSON, schema);
-            std::string convertedEpJSON(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf");
+            std::string convertedEpJSON(state.dataStrGlobals->outputDirPathName + state.dataStrGlobals->inputFileNameOnly + ".idf");
             FileSystem::makeNativePath(convertedEpJSON);
             std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
             convertedFS << encoded << std::endl;
@@ -358,7 +358,6 @@ void InputProcessor::processInput(EnergyPlusData &state)
 
 bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
 {
-    using DataStringGlobals::MatchVersion;
     auto it = epJSON.find("Version");
     if (it != epJSON.end()) {
         for (auto const &version : it.value()) {
@@ -366,15 +365,15 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
             if (v.empty()) {
                 ShowWarningError(state, "Input errors occurred and version ID was left blank, verify file version");
             } else {
-                std::string::size_type const lenVer(len(MatchVersion));
+                std::string::size_type const lenVer(len(state.dataStrGlobals->MatchVersion));
                 int Which;
-                if ((lenVer > 0) && (MatchVersion[lenVer - 1] == '0')) {
-                    Which = static_cast<int>(index(v.substr(0, lenVer - 2), MatchVersion.substr(0, lenVer - 2)));
+                if ((lenVer > 0) && (state.dataStrGlobals->MatchVersion[lenVer - 1] == '0')) {
+                    Which = static_cast<int>(index(v.substr(0, lenVer - 2), state.dataStrGlobals->MatchVersion.substr(0, lenVer - 2)));
                 } else {
-                    Which = static_cast<int>(index(v, MatchVersion));
+                    Which = static_cast<int>(index(v, state.dataStrGlobals->MatchVersion));
                 }
                 if (Which != 0) {
-                    ShowWarningError(state, "Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
+                    ShowWarningError(state, "Version: in IDF=\"" + v + "\" not the same as expected=\"" + state.dataStrGlobals->MatchVersion + "\"");
                     return false;
                 }
             }
@@ -1091,7 +1090,7 @@ void InputProcessor::rangeCheck(EnergyPlusData &state,
     }
 
     if (Error) {
-        ConvertCaseToUpper(ErrorLevel, ErrorString);
+        ConvertCaseToUpper(state, ErrorLevel, ErrorString);
         Message1 = WhatObjectString;
         if (present(WhatObjectName)) Message1 += "=\"" + WhatObjectName + "\", out of range data";
         Message2 = "Out of range value field=" + WhatFieldString;

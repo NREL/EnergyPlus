@@ -663,7 +663,8 @@ namespace CommandLineInterface {
     //     Rewinding is a big performance hit and should be avoided if possible
     //     Case-insensitive comparison is much faster than converting strings to upper or lower case
     //     Each strip and case conversion is a heap hit and should be avoided if possible
-    void ReadINIFile(InputFile &inputFile,               // Unit number of the opened INI file
+    void ReadINIFile(EnergyPlusData &state,
+                     InputFile &inputFile,               // Unit number of the opened INI file
                      std::string const &Heading,         // Heading for the parameters ('[heading]')
                      std::string const &KindofParameter, // Kind of parameter to be found (String)
                      std::string &DataOut                // Output from the retrieval
@@ -733,7 +734,7 @@ namespace CommandLineInterface {
             if (readResult.data.empty()) { continue; } // Ignore Blank Lines
 
             std::string LINEOut;
-            ConvertCaseToLower(readResult.data, LINEOut); // Turn line into lower case
+            ConvertCaseToLower(state, readResult.data, LINEOut); // Turn line into lower case
             //        LINE=LINEOut
 
             if (!has(LINEOut, Heading)) continue;
@@ -754,7 +755,7 @@ namespace CommandLineInterface {
 
                 if (line.empty()) continue; // Ignore Blank Lines
 
-                ConvertCaseToLower(line, LINEOut); // Turn line into lower case
+                ConvertCaseToLower(state, line, LINEOut); // Turn line into lower case
                 //         LINE=LINEOut
 
                 ILB = index(LINEOut, '[');
