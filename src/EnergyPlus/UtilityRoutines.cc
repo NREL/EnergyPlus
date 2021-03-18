@@ -1587,9 +1587,6 @@ namespace UtilityRoutines {
         // If arguments OutUnit1 and/or OutUnit2 are present the
         // error message is written to these as well and the standard one.
 
-        using DataStringGlobals::IDDVerString;
-        using DataStringGlobals::VerString;
-
         auto *err_stream = []() -> std::ostream *{
             // NOTE: this is called in too many places to justify changing the interface right now,
             // so we are using the Singleton (not ideal)
@@ -1602,7 +1599,7 @@ namespace UtilityRoutines {
 
 
         if (state.dataUtilityRoutines->outputErrorHeader && err_stream) {
-            *err_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
+            *err_stream << "Program Version," << state.dataStrGlobals->VerString << ',' << state.dataStrGlobals->IDDVerString << '\n';
             state.dataUtilityRoutines->outputErrorHeader = false;
         }
 

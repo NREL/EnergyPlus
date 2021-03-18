@@ -1219,13 +1219,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataStringGlobals::CharComma;
-        using DataStringGlobals::CharSpace;
-        using DataStringGlobals::CharTab;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CurrentModuleObject("OutputControl:Table:Style");
@@ -1256,7 +1249,7 @@ namespace EnergyPlus::OutputReportTabular {
             AlphArray(1) = "COMMA";
             ort->numStyles = 1;
             ort->TableStyle(1) = iTableStyle::Comma;
-            ort->del(1) = CharComma; // comma
+            ort->del(1) = state.dataStrGlobals->CharComma; // comma
             ort->unitsStyle = iUnitsStyle::None;
         } else if (NumTabularStyle == 1) {
             inputProcessor->getObjectItem(state,
@@ -1275,64 +1268,64 @@ namespace EnergyPlus::OutputReportTabular {
             if (UtilityRoutines::SameString(AlphArray(1), "Comma")) {
                 ort->numStyles = 1;
                 ort->TableStyle(1) = iTableStyle::Comma;
-                ort->del(1) = CharComma; // comma
+                ort->del(1) = state.dataStrGlobals->CharComma; // comma
             } else if (UtilityRoutines::SameString(AlphArray(1), "Tab")) {
                 ort->numStyles = 1;
                 ort->TableStyle(1) = iTableStyle::Tab;
-                ort->del(1) = CharTab; // tab
+                ort->del(1) = state.dataStrGlobals->CharTab; // tab
             } else if (UtilityRoutines::SameString(AlphArray(1), "Fixed")) {
                 ort->numStyles = 1;
                 ort->TableStyle(1) = iTableStyle::Fixed;
-                ort->del(1) = CharSpace; // space
+                ort->del(1) = state.dataStrGlobals->CharSpace; // space
             } else if (UtilityRoutines::SameString(AlphArray(1), "HTML")) {
                 ort->numStyles = 1;
                 ort->TableStyle(1) = iTableStyle::HTML;
-                ort->del(1) = CharSpace; // space - this is not used much for HTML output
+                ort->del(1) = state.dataStrGlobals->CharSpace; // space - this is not used much for HTML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "XML")) {
                 ort->numStyles = 1;
                 ort->TableStyle(1) = iTableStyle::XML;
-                ort->del(1) = CharSpace; // space - this is not used much for XML output
+                ort->del(1) = state.dataStrGlobals->CharSpace; // space - this is not used much for XML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "CommaAndHTML")) {
                 ort->numStyles = 2;
                 ort->TableStyle(1) = iTableStyle::Comma;
-                ort->del(1) = CharComma; // comma
+                ort->del(1) = state.dataStrGlobals->CharComma; // comma
                 ort->TableStyle(2) = iTableStyle::HTML;
-                ort->del(2) = CharSpace; // space - this is not used much for HTML output
+                ort->del(2) = state.dataStrGlobals->CharSpace; // space - this is not used much for HTML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "CommaAndXML")) {
                 ort->numStyles = 2;
                 ort->TableStyle(1) = iTableStyle::Comma;
-                ort->del(1) = CharComma; // comma
+                ort->del(1) = state.dataStrGlobals->CharComma; // comma
                 ort->TableStyle(2) = iTableStyle::XML;
-                ort->del(2) = CharSpace; // space - this is not used much for XML output
+                ort->del(2) = state.dataStrGlobals->CharSpace; // space - this is not used much for XML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "TabAndHTML")) {
                 ort->numStyles = 2;
                 ort->TableStyle(1) = iTableStyle::Tab;
-                ort->del(1) = CharTab; // tab
+                ort->del(1) = state.dataStrGlobals->CharTab; // tab
                 ort->TableStyle(2) = iTableStyle::HTML;
-                ort->del(2) = CharSpace; // space - this is not used much for HTML output
+                ort->del(2) = state.dataStrGlobals->CharSpace; // space - this is not used much for HTML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "XMLandHTML")) {
                 ort->numStyles = 2;
                 ort->TableStyle(1) = iTableStyle::XML;
-                ort->del(1) = CharSpace; // space - this is not used much for XML output
+                ort->del(1) = state.dataStrGlobals->CharSpace; // space - this is not used much for XML output
                 ort->TableStyle(2) = iTableStyle::HTML;
-                ort->del(2) = CharSpace; // space - this is not used much for HTML output
+                ort->del(2) = state.dataStrGlobals->CharSpace; // space - this is not used much for HTML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "All")) {
                 ort->numStyles = 5;
                 ort->TableStyle(1) = iTableStyle::Comma;
-                ort->del(1) = CharComma; // comma
+                ort->del(1) = state.dataStrGlobals->CharComma; // comma
                 ort->TableStyle(2) = iTableStyle::Tab;
-                ort->del(2) = CharTab; // tab
+                ort->del(2) = state.dataStrGlobals->CharTab; // tab
                 ort->TableStyle(3) = iTableStyle::Fixed;
-                ort->del(3) = CharSpace; // space
+                ort->del(3) = state.dataStrGlobals->CharSpace; // space
                 ort->TableStyle(4) = iTableStyle::HTML;
-                ort->del(4) = CharSpace; // space - this is not used much for HTML output
+                ort->del(4) = state.dataStrGlobals->CharSpace; // space - this is not used much for HTML output
                 ort->TableStyle(5) = iTableStyle::XML;
-                ort->del(5) = CharSpace; // space - this is not used much for XML output
+                ort->del(5) = state.dataStrGlobals->CharSpace; // space - this is not used much for XML output
             } else {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + AlphArray(1) + "\". Commas will be used.");
                 ort->numStyles = 1;
                 ort->TableStyle(1) = iTableStyle::Comma;
-                ort->del(1) = CharComma; // comma
+                ort->del(1) = state.dataStrGlobals->CharComma; // comma
                 AlphArray(1) = "COMMA";
             }
             // MonthlyUnitConversion
@@ -1349,7 +1342,7 @@ namespace EnergyPlus::OutputReportTabular {
         } else if (NumTabularStyle > 1) {
             ShowWarningError(state, CurrentModuleObject + ": Only one instance of this object is allowed. Commas will be used.");
             ort->TableStyle = iTableStyle::Comma;
-            ort->del = std::string(1, CharComma); // comma
+            ort->del = std::string(1, state.dataStrGlobals->CharComma); // comma
             AlphArray(1) = "COMMA";
             ort->unitsStyle = iUnitsStyle::None;
             AlphArray(2) = "None";
@@ -1405,9 +1398,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataStringGlobals::CharComma;
-        using DataStringGlobals::CharSpace;
-        using DataStringGlobals::CharTab;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CurrentModuleObject("Output:Table:SummaryReports");
@@ -2985,9 +2975,6 @@ namespace EnergyPlus::OutputReportTabular {
         //   the output is in a CSV file if it is comma delimited otherwise
         //   it is in a TXT file.
 
-        // Using/Aliasing
-        using DataStringGlobals::VerString;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iStyle;
         std::string curDel;
@@ -3002,8 +2989,9 @@ namespace EnergyPlus::OutputReportTabular {
                 curDel = ort->del(iStyle);
                 if (ort->TableStyle(iStyle) == iTableStyle::Comma) {
                     DisplayString(state, "Writing tabular output file results using comma format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblCsvFileName, state.files.outputControl.tabular);
-                    tbl_stream << "Program Version:" << curDel << VerString << '\n';
+                    std::ofstream &tbl_stream =
+                        open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblCsvFileName, state.files.outputControl.tabular);
+                    tbl_stream << "Program Version:" << curDel << state.dataStrGlobals->VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:" << curDel << state.dataHeatBal->BuildingName << '\n';
@@ -3015,8 +3003,9 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (ort->TableStyle(iStyle) == iTableStyle::Tab) {
                     DisplayString(state, "Writing tabular output file results using tab format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTabFileName, state.files.outputControl.tabular);
-                    tbl_stream << "Program Version" << curDel << VerString << '\n';
+                    std::ofstream &tbl_stream =
+                        open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTabFileName, state.files.outputControl.tabular);
+                    tbl_stream << "Program Version" << curDel << state.dataStrGlobals->VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:" << curDel << state.dataHeatBal->BuildingName << '\n';
@@ -3028,7 +3017,8 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (ort->TableStyle(iStyle) == iTableStyle::HTML) {
                     DisplayString(state, "Writing tabular output file results using HTML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblHtmFileName, state.files.outputControl.tabular);
+                    std::ofstream &tbl_stream =
+                        open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblHtmFileName, state.files.outputControl.tabular);
                     tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                     tbl_stream << "<html>\n";
                     tbl_stream << "<head>\n";
@@ -3047,7 +3037,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "<body>\n";
                     tbl_stream << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>\n";
                     tbl_stream << "<a name=top></a>\n";
-                    tbl_stream << "<p>Program Version:<b>" << VerString << "</b></p>\n";
+                    tbl_stream << "<p>Program Version:<b>" << state.dataStrGlobals->VerString << "</b></p>\n";
                     tbl_stream << "<p>Tabular Output Report in Format: <b>HTML</b></p>\n";
                     tbl_stream << "<p>Building: <b>" << state.dataHeatBal->BuildingName << "</b></p>\n";
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
@@ -3061,13 +3051,14 @@ namespace EnergyPlus::OutputReportTabular {
                                << "</b></p>\n";
                 } else if (ort->TableStyle(iStyle) == iTableStyle::XML) {
                     DisplayString(state, "Writing tabular output file results using XML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblXmlFileName, state.files.outputControl.tabular);
+                    std::ofstream &tbl_stream =
+                        open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFileName, state.files.outputControl.tabular);
                     tbl_stream << "<?xml version=\"1.0\"?>\n";
                     tbl_stream << "<EnergyPlusTabularReports>\n";
                     tbl_stream << "  <state.dataHeatBal->BuildingName>" << state.dataHeatBal->BuildingName << "</state.dataHeatBal->BuildingName>\n";
                     tbl_stream << "  <EnvironmentName>" << state.dataEnvrn->EnvironmentName << "</EnvironmentName>\n";
                     tbl_stream << "  <WeatherFileLocationTitle>" << state.dataEnvrn->WeatherFileLocationTitle << "</WeatherFileLocationTitle>\n";
-                    tbl_stream << "  <ProgramVersion>" << VerString << "</ProgramVersion>\n";
+                    tbl_stream << "  <ProgramVersion>" << state.dataStrGlobals->VerString << "</ProgramVersion>\n";
                     tbl_stream << "  <SimulationTimestamp>\n";
                     tbl_stream << "    <Date>\n";
                     tbl_stream << "      " << std::setw(4) << ort->td(1) << '-' << std::setfill('0') << std::setw(2) << ort->td(2) << '-' << std::setw(2)
@@ -3081,8 +3072,9 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else {
                     DisplayString(state, "Writing tabular output file results using text format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTxtFileName, state.files.outputControl.tabular);
-                    tbl_stream << "Program Version: " << VerString << '\n';
+                    std::ofstream &tbl_stream =
+                        open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTxtFileName, state.files.outputControl.tabular);
+                    tbl_stream << "Program Version: " << state.dataStrGlobals->VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:        " << state.dataHeatBal->BuildingName << '\n';
@@ -3858,26 +3850,6 @@ namespace EnergyPlus::OutputReportTabular {
         //          DistrictCooling
         //          DistrictHeating
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataStringGlobals::CharComma;
-        using DataStringGlobals::CharSpace;
-        using DataStringGlobals::CharTab;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iResource;
         int kEndUseSub;
@@ -4018,26 +3990,8 @@ namespace EnergyPlus::OutputReportTabular {
         //          sourceTypeNames(11)='OtherFuel1'
         //          sourceTypeNames(12)='OtherFuel2'
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataStringGlobals::CharComma;
-        using DataStringGlobals::CharSpace;
-        using DataStringGlobals::CharTab;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iResource;
@@ -4137,27 +4091,9 @@ namespace EnergyPlus::OutputReportTabular {
         //          DistrictCooling
         //          DistrictHeating
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataStringGlobals::CharComma;
-        using DataStringGlobals::CharSpace;
-        using DataStringGlobals::CharTab;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iResource;
@@ -10369,7 +10305,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using DataHeatBalance::ZoneData;
-        using DataStringGlobals::VerString;
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
@@ -10580,7 +10515,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 tableBody = "";
 
-                tableBody(1, 1) = VerString;                                             // program
+                tableBody(1, 1) = state.dataStrGlobals->VerString;                       // program
                 tableBody(1, 2) = state.dataEnvrn->EnvironmentName;                      // runperiod name
                 tableBody(1, 3) = state.dataEnvrn->WeatherFileLocationTitle;             // weather
                 tableBody(1, 4) = RealToStr(state.dataEnvrn->Latitude, 2);               // latitude
@@ -14678,8 +14613,6 @@ namespace EnergyPlus::OutputReportTabular {
         // PURPOSE OF THIS SUBROUTINE:
         //   Write the first few lines of each report with headers to the output
         //   file for tabular reports.
-        // Using/Aliasing
-        using DataStringGlobals::VerString;
 
         std::string const modifiedReportName(reportName + (averageOrSum == OutputProcessor::StoreType::Summed ? " per second" : ""));
         auto &ort(state.dataOutRptTab);
