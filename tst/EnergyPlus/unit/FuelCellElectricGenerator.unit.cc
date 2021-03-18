@@ -1026,6 +1026,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
 // Modified from previous GaseousConstituents fuel supply model to use LiquidGeneric fuel type
 TEST_F(EnergyPlusFixture, FuelCellTest_Zero_Cp_Fix)
 {
+    // state->clear_state();
 
     std::string const idf_objects = delimited_string({
 
@@ -1736,10 +1737,14 @@ TEST_F(EnergyPlusFixture, FuelCellTest_Zero_Cp_Fix)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_FALSE(has_err_output());
+    bool process_err(false);
+    process_err = has_err_output(true);
+    EXPECT_FALSE(process_err);
 
     SimulationManager::ManageSimulation(*state);
-    EXPECT_TRUE(has_err_output(true));
+    bool simulation_err(false);
+    simulation_err = has_err_output(false);
+    EXPECT_TRUE(simulation_err);
 
     auto &generatorController = state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0];
     EXPECT_EQ(GeneratorType::FuelCell, generatorController->compGenTypeOf_Num);
