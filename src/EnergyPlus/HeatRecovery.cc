@@ -116,15 +116,8 @@ namespace HeatRecovery {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    Real64 const KELVZERO(273.16);
-    Real64 const SMALL(1.e-10);
 
     // Heat exchanger performance data type
-    int const BALANCEDHX_PERFDATATYPE1(1);
-
-    namespace {
-        bool MyOneTimeAllocate(true);
-    }
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -146,17 +139,8 @@ namespace HeatRecovery {
 
     // External function calls
 
-    // Object Data
-    std::unordered_map<std::string, std::string> HeatExchangerUniqueNames;
-
     // Functions
-
-    void clear_state()
-    {
-        MyOneTimeAllocate = true;
-        HeatExchangerUniqueNames.clear();
-    }
-
+    
     void SimHeatRecovery(EnergyPlusData &state,
                          std::string const &CompName,             // name of the heat exchanger unit
                          bool const FirstHVACIteration,           // TRUE if 1st HVAC simulation of system timestep
@@ -336,7 +320,7 @@ namespace HeatRecovery {
 
         // allocate the data array
         state.dataHeatRecovery->ExchCond.allocate(state.dataHeatRecovery->NumHeatExchangers);
-        HeatExchangerUniqueNames.reserve(state.dataHeatRecovery->NumHeatExchangers);
+        state.dataHeatRecovery->HeatExchangerUniqueNames.reserve(state.dataHeatRecovery->NumHeatExchangers);
         state.dataHeatRecovery->CheckEquipName.dimension(state.dataHeatRecovery->NumHeatExchangers, true);
         state.dataHeatRecovery->HeatExchCondNumericFields.allocate(state.dataHeatRecovery->NumHeatExchangers);
 
@@ -366,7 +350,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = cNumericFieldNames;
 
-            GlobalNames::VerifyUniqueInterObjectName(state, HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataHeatRecovery->HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
             state.dataHeatRecovery->ExchCond(ExchNum).Name = cAlphaArgs(1);
             state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_FLATPLATE;
@@ -449,7 +433,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = cNumericFieldNames;
 
-            GlobalNames::VerifyUniqueInterObjectName(state, HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataHeatRecovery->HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
             state.dataHeatRecovery->ExchCond(ExchNum).Name = cAlphaArgs(1);
             state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
@@ -582,7 +566,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = cNumericFieldNames;
 
-            GlobalNames::VerifyUniqueInterObjectName(state, HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataHeatRecovery->HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
             state.dataHeatRecovery->ExchCond(ExchNum).Name = cAlphaArgs(1);
             state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_DESICCANT_BALANCED;
@@ -1247,7 +1231,7 @@ namespace HeatRecovery {
         Real64 CpAir;  // heat capacity of air
         // of humidity ratio and temperature
         //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool MyOneTimeAllocate( true );
+        // static bool state.dataHeatRecovery->MyOneTimeAllocate( true );
         ////////////////////////////////////////////////////////////////////////////////////
         int ErrStat;            // error status returned by CalculateNTUfromEpsAndZ
         bool FatalError;        // fatal error flag
@@ -1255,12 +1239,12 @@ namespace HeatRecovery {
         Real64 Z;               // Min/max flow ratio
         //  LOGICAL,SAVE        :: ZoneEquipmentListChecked = .FALSE.  ! True after the Zone Equipment List has been checked for items
 
-        if (MyOneTimeAllocate) {
+        if (state.dataHeatRecovery->MyOneTimeAllocate) {
             state.dataHeatRecovery->MySetPointTest.allocate(state.dataHeatRecovery->NumHeatExchangers);
             state.dataHeatRecovery->MySizeFlag.allocate(state.dataHeatRecovery->NumHeatExchangers);
             state.dataHeatRecovery->MySetPointTest = true;
             state.dataHeatRecovery->MySizeFlag = true;
-            MyOneTimeAllocate = false;
+            state.dataHeatRecovery->MyOneTimeAllocate = false;
         }
 
         if (!state.dataGlobal->SysSizingCalc && state.dataHeatRecovery->MySizeFlag(ExchNum)) {

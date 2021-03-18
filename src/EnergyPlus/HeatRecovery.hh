@@ -68,11 +68,11 @@ namespace HeatRecovery {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    extern Real64 const KELVZERO;
-    extern Real64 const SMALL;
+    Real64 constexpr KELVZERO = 273.16;
+    Real64 constexpr SMALL = 1.e-10;
 
     // Heat exchanger performance data type
-    extern int const BALANCEDHX_PERFDATATYPE1;
+    int constexpr BALANCEDHX_PERFDATATYPE1 = 1;
 
     // Heat exchanger configurations
     int constexpr Counter_Flow = 1;
@@ -507,8 +507,6 @@ namespace HeatRecovery {
 
     // Functions
 
-    void clear_state();
-
     void SimHeatRecovery(EnergyPlusData &state, std::string const &CompName,                 // name of the heat exchanger unit
                          bool const FirstHVACIteration,               // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                              // Pointer to Component
@@ -691,6 +689,8 @@ namespace HeatRecovery {
 } // namespace HeatRecovery
 
 struct HeatRecoveryData : BaseGlobalStruct {
+
+    bool MyOneTimeAllocate = true;
     // Object Data
     int NumHeatExchangers = 0;         // number of heat exchangers
     int NumAirToAirPlateExchs = 0;     // number of air to air plate heat exchangers
@@ -705,6 +705,10 @@ struct HeatRecoveryData : BaseGlobalStruct {
     bool CalledFromParentObject = true; // Indicates that HX is called from parent object (this object is not on a branch)
     Array1D_bool CheckEquipName;
 
+
+    std::unordered_map<std::string, std::string> HeatExchangerUniqueNames;
+
+
     // static variables
     Array1D_bool MySetPointTest;
     Array1D_bool MySizeFlag;
@@ -716,6 +720,8 @@ struct HeatRecoveryData : BaseGlobalStruct {
 
     void clear_state() override
     {
+        MyOneTimeAllocate = true;
+        HeatExchangerUniqueNames.clear();
         NumHeatExchangers = 0;
         NumAirToAirPlateExchs = 0;
         NumAirToAirGenericExchs = 0;
