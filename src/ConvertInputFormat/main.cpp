@@ -50,6 +50,7 @@
 #include <omp.h>
 #endif
 
+#include "EnergyPlus/Data/EnergyPlusData.hh"
 #include "EnergyPlus/DataStringGlobals.hh"
 #include "EnergyPlus/FileSystem.hh"
 #include "EnergyPlus/InputProcessing/EmbeddedEpJSONSchema.hh"
@@ -83,7 +84,7 @@ void displayMessage(T t, Args... args) // recursive variadic function
     displayMessage(args...);
 }
 
-bool checkVersionMatch(EnergyPlusData &state, json const &epJSON)
+bool checkVersionMatch(EnergyPlus::EnergyPlusData &state, json const &epJSON)
 {
     auto it = epJSON.find("Version");
     if (it != epJSON.end()) {
@@ -94,13 +95,13 @@ bool checkVersionMatch(EnergyPlusData &state, json const &epJSON)
             } else {
                 std::string::size_type const lenVer(len(state.dataStrGlobals->MatchVersion));
                 int Which;
-                if ((lenVer > 0) && (EnergyPlus::DataStringGlobals::MatchVersion[lenVer - 1] == '0')) {
-                    Which = static_cast<int>(index(v.substr(0, lenVer - 2), EnergyPlus::DataStringGlobals::MatchVersion.substr(0, lenVer - 2)));
+                if ((lenVer > 0) && (state.dataStrGlobals->MatchVersion[lenVer - 1] == '0')) {
+                    Which = static_cast<int>(index(v.substr(0, lenVer - 2), state.dataStrGlobals->MatchVersion.substr(0, lenVer - 2)));
                 } else {
-                    Which = static_cast<int>(index(v, EnergyPlus::DataStringGlobals::MatchVersion));
+                    Which = static_cast<int>(index(v, state.dataStrGlobals->MatchVersion));
                 }
                 if (Which != 0) {
-                    displayMessage("Version: in IDF=\"" + v + "\" not the same as expected=\"" + EnergyPlus::DataStringGlobals::MatchVersion + "\"");
+                    displayMessage("Version: in IDF=\"" + v + "\" not the same as expected=\"" + state.dataStrGlobals->MatchVersion + "\"");
                     return false;
                 }
             }
@@ -147,7 +148,7 @@ void cleanEPJSON(json &epjson)
     }
 }
 
-bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, std::string outputDirectory, std::string & outputTypeStr)
+bool processInput(EnergyPlus::EnergyPlusData &state, std::string const &inputFilePath, json const &schema, OutputTypes outputType, std::string outputDirectory, std::string & outputTypeStr)
 {
     auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
     auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
@@ -254,7 +255,7 @@ bool processInput(std::string const &inputFilePath, json const &schema, OutputTy
 
     bool is_valid = validation->validate(epJSON);
     bool hasErrors = processErrors(idf_parser, validation);
-    bool versionMatch = checkVersionMatch(epJSON);
+    bool versionMatch = checkVersionMatch(state, epJSON);
 
     if (!is_valid || hasErrors) {
         displayMessage("Errors occurred when validating input file. Preceding condition(s) cause termination.");
@@ -322,7 +323,7 @@ std::vector<std::string> parse_input_paths(std::string const &input_paths_file)
     return input_paths;
 }
 
-int main(int argc, const char *argv[])
+int main(EnergyPlus::EnergyPlusData &state, int argc, const char *argv[])
 {
 
     ez::ezOptionParser opt;
@@ -395,7 +396,7 @@ int main(int argc, const char *argv[])
     }
 
     if (opt.isSet("-v")) {
-        displayMessage(EnergyPlus::DataStringGlobals::VerString);
+        displayMessage(state.dataStrGlobals->VerString);
         exit(EXIT_SUCCESS);
     }
 
@@ -502,7 +503,7 @@ int main(int argc, const char *argv[])
     {
 #pragma omp for
         for (int i = 0; i < number_files; ++i) {
-            bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr);
+            bool successful = processInput(state, files[i], schema, outputType, output_directory, outputTypeStr);
 #pragma omp atomic
             ++fileCount;
             if (successful) {

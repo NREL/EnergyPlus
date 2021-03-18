@@ -66,27 +66,12 @@ namespace DataStringGlobals {
     extern std::string outputErrFileName;
 
 
-
-
-
     // MODULE PARAMETER DEFINITIONS:
 
     extern std::string const NL; // Platform newline
     extern char const pathChar;
     extern char const altpathChar;
 
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-
-    // Functions
-    void clear_state();
 
 } // namespace DataStringGlobals
 
@@ -146,6 +131,31 @@ struct DataStringGlobalsData : BaseGlobalStruct {
     char const CharSemicolon = ';';         // semicolon
     char const CharTab = '\t';              // tab
     char const CharSpace = ' ';             // space
+
+    #ifdef _WIN32
+    std::string const NL = "\r\n"; // Platform newline
+    #else
+    std::string const NL = "\n"; // Platform newline
+    #endif
+
+    #ifdef _WIN32
+    char const pathChar = '\\';
+    char const altpathChar = '/';
+    #elif __linux__
+    char const pathChar = '/';
+    char const altpathChar = '\\';
+    #elif __unix__
+    char const pathChar = '/';
+    char const altpathChar = '\\';
+    #elif __posix__
+    char const pathChar = '/';
+    char const altpathChar = '\\';
+    #elif __APPLE__
+    char const pathChar('/');
+    char const altpathChar('\\');
+    #else
+    #error "Invalid platform detection in DataStringGlobals."
+    #endif
 
     void clear_state() override
     {

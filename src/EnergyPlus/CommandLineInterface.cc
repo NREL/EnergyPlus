@@ -113,7 +113,7 @@ namespace CommandLineInterface {
         // Define options
         ezOptionParser opt;
 
-        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state);
+        opt.overview = state.dataStrGlobals->VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state);
 
         opt.syntax = "energyplus [options] [input-file]";
 
@@ -168,15 +168,16 @@ namespace CommandLineInterface {
         opt.getUsage(usage);
 
         // Set path of EnergyPlus program path
-        exeDirectory = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+        state.dataStrGlobals->exeDirectory = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
 
         opt.get("-w")->getString(state.files.inputWeatherFileName.fileName);
 
-        opt.get("-i")->getString(inputIddFileName);
+        opt.get("-i")->getString(state.dataStrGlobals->inputIddFileName);
 
-        if (!opt.isSet("-i") && !legacyMode) inputIddFileName = exeDirectory + inputIddFileName;
+        if (!opt.isSet("-i") && !legacyMode)
+            state.dataStrGlobals->inputIddFileName = state.dataStrGlobals->exeDirectory + state.dataStrGlobals->inputIddFileName;
 
-        opt.get("-d")->getString(outDirPathName);
+        opt.get("-d")->getString(state.dataStrGlobals->outDirPathName);
 
         state.dataGlobal->runReadVars = opt.isSet("-r");
 
@@ -202,7 +203,7 @@ namespace CommandLineInterface {
         }
 
         if (opt.isSet("-v")) {
-            DisplayString(state, VerString);
+            DisplayString(state, state.dataStrGlobals->VerString);
             if (eplusRunningViaAPI) {
                 // we need another return code to let runEnergyPlusAsLibrary know it should not try to run anything
                 return static_cast<int>(ReturnCodes::SuccessButHelper);
@@ -214,16 +215,16 @@ namespace CommandLineInterface {
         if (opt.lastArgs.size() == 1) {
             for (size_type i = 0; i < opt.lastArgs.size(); ++i) {
                 std::string const &arg(*opt.lastArgs[i]);
-                inputFileName = arg;
+                state.dataStrGlobals->inputFileName = arg;
             }
         }
-        if (opt.lastArgs.size() == 0) inputFileName = "in.idf";
+        if (opt.lastArgs.size() == 0) state.dataStrGlobals->inputFileName = "in.idf";
 
         // Convert all paths to native paths
-        FileSystem::makeNativePath(inputFileName);
+        FileSystem::makeNativePath(state.dataStrGlobals->inputFileName);
         FileSystem::makeNativePath(state.files.inputWeatherFileName.fileName);
-        FileSystem::makeNativePath(inputIddFileName);
-        FileSystem::makeNativePath(outDirPathName);
+        FileSystem::makeNativePath(state.dataStrGlobals->inputIddFileName);
+        FileSystem::makeNativePath(state.dataStrGlobals->outDirPathName);
 
         std::vector<std::string> badOptions;
         if (opt.lastArgs.size() > 1u) {
@@ -257,10 +258,10 @@ namespace CommandLineInterface {
             }
         }
 
-        inputFileNameOnly = FileSystem::removeFileExtension(FileSystem::getFileName(inputFileName));
-        inputDirPathName = FileSystem::getParentDirectoryPath(inputFileName);
+        state.dataStrGlobals->inputFileNameOnly = FileSystem::removeFileExtension(FileSystem::getFileName(state.dataStrGlobals->inputFileName));
+        state.dataStrGlobals->inputDirPathName = FileSystem::getParentDirectoryPath(state.dataStrGlobals->inputFileName);
 
-        auto inputFileExt = FileSystem::getFileExtension(inputFileName);
+        auto inputFileExt = FileSystem::getFileExtension(state.dataStrGlobals->inputFileName);
         std::transform(inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper);
 
         // TODO: figure out better logic for determining input file type
@@ -304,15 +305,15 @@ namespace CommandLineInterface {
 
         if (opt.isSet("-d")) {
             // Add the trailing path character if necessary
-            if (outDirPathName[outDirPathName.size() - 1] != pathChar) {
-                outDirPathName += pathChar;
+            if (state.dataStrGlobals->outDirPathName[state.dataStrGlobals->outDirPathName.size() - 1] != pathChar) {
+                state.dataStrGlobals->outDirPathName += pathChar;
             }
 
             // Create directory if it doesn't already exist
-            FileSystem::makeDirectory(outDirPathName);
+            FileSystem::makeDirectory(state.dataStrGlobals->outDirPathName);
         }
 
-        outputDirPathName = outDirPathName;
+        state.dataStrGlobals->outputDirPathName = state.dataStrGlobals->outDirPathName;
 
         // File naming scheme
         std::string outputFilePrefix;
@@ -320,9 +321,9 @@ namespace CommandLineInterface {
             std::string prefixOutName;
             opt.get("-p")->getString(prefixOutName);
             FileSystem::makeNativePath(prefixOutName);
-            outputFilePrefix = outDirPathName + prefixOutName;
+            outputFilePrefix = state.dataStrGlobals->outDirPathName + prefixOutName;
         } else {
-            outputFilePrefix = outDirPathName + "eplus";
+            outputFilePrefix = state.dataStrGlobals->outDirPathName + "eplus";
         }
 
         std::string suffixType;
@@ -435,22 +436,22 @@ namespace CommandLineInterface {
         state.files.mdd.fileName = outputFilePrefix + normalSuffix + ".mdd";
         state.files.mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
         state.files.rdd.fileName = outputFilePrefix + normalSuffix + ".rdd";
-        outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
+        state.dataStrGlobals->outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         state.files.dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
-        outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
+        state.dataStrGlobals->outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
         state.files.edd.fileName = outputFilePrefix + normalSuffix + ".edd";
-        outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
+        state.dataStrGlobals->outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
         state.files.sln.fileName = outputFilePrefix + normalSuffix + ".sln";
         state.files.sci.fileName = outputFilePrefix + normalSuffix + ".sci";
         state.files.wrl.fileName = outputFilePrefix + normalSuffix + ".wrl";
-        outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
+        state.dataStrGlobals->outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
         state.files.debug.fileName = outputFilePrefix + normalSuffix + ".dbg";
-        outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
-        outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
-        outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
-        outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
-        outputTblTxtFileName = outputFilePrefix + tableSuffix + ".txt";
-        outputTblXmlFileName = outputFilePrefix + tableSuffix + ".xml";
+        state.dataStrGlobals->outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
+        state.dataStrGlobals->outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
+        state.dataStrGlobals->outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
+        state.dataStrGlobals->outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
+        state.dataStrGlobals->outputTblTxtFileName = outputFilePrefix + tableSuffix + ".txt";
+        state.dataStrGlobals->outputTblXmlFileName = outputFilePrefix + tableSuffix + ".xml";
         state.files.outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
         state.files.outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
         state.files.outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
@@ -460,19 +461,19 @@ namespace CommandLineInterface {
         state.files.outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
         state.files.outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
         state.files.outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
-        outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
+        state.dataStrGlobals->outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
         state.files.shade.fileName = outputFilePrefix + shdSuffix + ".csv";
         if (suffixType == "L" || suffixType == "l") {
-            outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
+            state.dataStrGlobals->outputSqliteErrFileName = state.dataStrGlobals->outDirPathName + sqliteSuffix + ".err";
         } else {
-            outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
+            state.dataStrGlobals->outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
         }
         state.files.screenCsv.fileName = outputFilePrefix + screenSuffix + ".csv";
         state.files.delightIn.fileName = "eplusout.delightin";
-        outputDelightOutFileName = "eplusout.delightout";
+        state.dataStrGlobals->outputDelightOutFileName = "eplusout.delightout";
         state.files.iniFile.fileName = "Energy+.ini";
         state.files.inStatFileName.fileName = weatherFilePathWithoutExtension + ".stat";
-        eplusADSFileName = inputDirPathName + "eplusADS.inp";
+        state.dataStrGlobals->eplusADSFileName = state.dataStrGlobals->inputDirPathName + "eplusADS.inp";
 
         // Readvars files
         state.files.csv.fileName = outputFilePrefix + normalSuffix + ".csv";
