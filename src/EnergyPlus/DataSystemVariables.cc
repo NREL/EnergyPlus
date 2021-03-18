@@ -75,19 +75,6 @@ namespace DataSystemVariables {
     // This data-only module is a repository for system (such as environment) variables that are set
     // before a run or set of runs.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    using DataStringGlobals::altpathChar;
-    using DataStringGlobals::pathChar;
-
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
@@ -175,7 +162,7 @@ namespace DataSystemVariables {
             state.files.audit.ensure_open(state, "CheckForActualFileName", state.files.outputControl.audit);
             get_environment_variable(cInputPath1, state.dataSysVars->envinputpath1);
             if (!state.dataSysVars->envinputpath1.empty()) {
-                pos = index(state.dataSysVars->envinputpath1, pathChar, true); // look backwards for pathChar
+                pos = index(state.dataSysVars->envinputpath1, state.dataStrGlobals->pathChar, true); // look backwards for pathChar
                 if (pos != std::string::npos) state.dataSysVars->envinputpath1.erase(pos + 1);
             }
             get_environment_variable(cInputPath2, state.dataSysVars->envinputpath2);
@@ -186,7 +173,7 @@ namespace DataSystemVariables {
         FileFound = false;
         CheckedFileName.clear();
         InputFileName = originalInputFileName;
-        FileSystem::makeNativePath(InputFileName);
+        FileSystem::makeNativePath(state, InputFileName);
 
         std::vector<std::pair<std::string, std::string>> pathsChecked;
 
@@ -210,7 +197,7 @@ namespace DataSystemVariables {
                 return;
             } else {
                 std::pair <std::string,std::string> currentPath(
-                        FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)),
+                    FileSystem::getParentDirectoryPath(state, FileSystem::getAbsolutePath(pathsToCheck[i].first)),
                         pathsToCheck[i].second);
                 bool found = false;
                 for(auto path: pathsChecked){

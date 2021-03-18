@@ -138,7 +138,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
         }
 
         ss.dir = format("{}/{} {:.2R} {}",
-                        FileSystem::getAbsolutePath(DataStringGlobals::outDirPathName),
+                        FileSystem::getAbsolutePath(state.dataStrGlobals->outDirPathName),
                         state.dataSurface->Surface(floorSurface).Name,
                         ground.foundation.foundationDepth,
                         constructionName);

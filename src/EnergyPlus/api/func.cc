@@ -63,7 +63,7 @@ void initializeFunctionalAPI(EnergyPlusState) {
 }
 
 const char * apiVersionFromEPlus(EnergyPlusState) {
-    return EnergyPlus::DataStringGlobals::PythonAPIVersion.c_str();
+    return state->dataStrGlobals->PythonAPIVersion.c_str();
 }
 
 void registerErrorCallback(EnergyPlusState state, std::function<void(EnergyPlus::Error, const std::string &)> f) {

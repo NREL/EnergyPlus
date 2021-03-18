@@ -56,12 +56,12 @@ namespace FileSystem {
 
     extern std::string const exeExtension;
 
-    void makeNativePath(std::string &path);
+    void makeNativePath(EnergyPlusData &state, std::string &path);
 
-    std::string getFileName(std::string const &filePath);
+    std::string getFileName(EnergyPlusData &state, std::string const &filePath);
 
     // Returns the parent directory of a path, with the trailing pathChar included
-    std::string getParentDirectoryPath(std::string const &filePath);
+    std::string getParentDirectoryPath(EnergyPlusData &state, std::string const &filePath);
 
     std::string getAbsolutePath(std::string const &filePath);
 
@@ -73,7 +73,7 @@ namespace FileSystem {
     // Turns a/b/c.txt.idf into a/b/c.txt
     std::string removeFileExtension(std::string const &fileName);
 
-    void makeDirectory(std::string const &directoryPath);
+    void makeDirectory(EnergyPlusData &state, std::string const &directoryPath);
 
     bool pathExists(std::string const &path);
 

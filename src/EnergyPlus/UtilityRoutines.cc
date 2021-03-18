@@ -918,9 +918,6 @@ namespace UtilityRoutines {
         // scans the whole input string.  If it finds a character in the lower
         // case alphabet, it makes an appropriate substitution.
 
-        // Using/Aliasing
-        using namespace DataStringGlobals;
-
         OutputString = InputString;
 
         for (std::string::size_type A = 0; A < len(InputString); ++A) {
@@ -951,9 +948,6 @@ namespace UtilityRoutines {
         // code.  It works by storing the upper and lower case alphabet.  It
         // scans the whole input string.  If it finds a character in the lower
         // case alphabet, it makes an appropriate substitution.
-
-        // Using/Aliasing
-        using namespace DataStringGlobals;
 
         OutputString = InputString;
 
@@ -1074,7 +1068,6 @@ namespace UtilityRoutines {
         // METHODOLOGY EMPLOYED:
         // Calls ShowErrorMessage utility routine.
 
-        using namespace DataStringGlobals;
         using namespace DataErrorTracking;
         int Loop;
 
@@ -1116,7 +1109,6 @@ namespace UtilityRoutines {
         // METHODOLOGY EMPLOYED:
         // Calls ShowErrorMessage utility routine.
 
-        using namespace DataStringGlobals;
         using namespace DataErrorTracking;
 
         int Loop;
@@ -1270,7 +1262,6 @@ namespace UtilityRoutines {
         // METHODOLOGY EMPLOYED:
         // Calls ShowErrorMessage utility routine.
 
-        using namespace DataStringGlobals;
         using namespace DataErrorTracking;
         int Loop;
 
@@ -1308,7 +1299,6 @@ namespace UtilityRoutines {
         // Calls ShowErrorMessage utility routine.
 
         // Using/Aliasing
-        using namespace DataStringGlobals;
         using namespace DataErrorTracking;
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
@@ -1349,7 +1339,6 @@ namespace UtilityRoutines {
         // Calls StoreRecurringErrorMessage utility routine.
 
         // Using/Aliasing
-        using namespace DataStringGlobals;
         using namespace DataErrorTracking;
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -1404,7 +1393,6 @@ namespace UtilityRoutines {
         // Calls StoreRecurringErrorMessage utility routine.
 
         // Using/Aliasing
-        using namespace DataStringGlobals;
         using namespace DataErrorTracking;
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -1459,7 +1447,6 @@ namespace UtilityRoutines {
         // Calls StoreRecurringErrorMessage utility routine.
 
         // Using/Aliasing
-        using namespace DataStringGlobals;
         using namespace DataErrorTracking;
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -1511,7 +1498,6 @@ namespace UtilityRoutines {
         // of occurrences and optional tracking of associated min, max, and sum values
 
         // Using/Aliasing
-        using namespace DataStringGlobals;
         using namespace DataErrorTracking;
         // If Index is zero, then assign next available index and reallocate array
         if (ErrorMsgIndex == 0) {

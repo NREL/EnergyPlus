@@ -4191,15 +4191,6 @@ namespace HeatBalanceManager {
         // from the input file--all other portions of the Construct derived
         // type are set during the initializations.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace DataStringGlobals;
-
         // If UniqueConstructionNames size, then input has already been gotten
         if (state.dataHeatBalMgr->UniqueConstructNames.size()) return;
 
@@ -6251,7 +6242,6 @@ namespace HeatBalanceManager {
         // associated materials) corresponding to the second glazing system is created.
 
         // Using/Aliasing
-        using namespace DataStringGlobals;
         using DataSystemVariables::CheckForActualFileName;
         using General::POLYF; // POLYF       ! Polynomial in cosine of angle of incidence
 
@@ -7226,20 +7216,6 @@ namespace HeatBalanceManager {
         // and creates a construction (concrete + insulation) used in the heat transfer calculation.
         // This subroutine only gets called once in the GetConstructionData subroutine
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace DataStringGlobals;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
         // ASHRAE Handbook Fundamental 2005
         // Thermal resistance of the inside air film, m2.K/W. Average of 0.14 (heat flow up) and 0.11 (heat flow down)
         Real64 const Rfilm_in(0.125);
@@ -7874,29 +7850,6 @@ namespace HeatBalanceManager {
         // of the slave thermochromic constructions.
         // This subroutine only gets called once in the GetHeatBalanceInput subroutine
         //  after materials, constructions and building geometry data are read.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Using/Aliasing
-        using namespace DataStringGlobals;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

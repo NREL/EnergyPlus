@@ -311,7 +311,7 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
 
     // Add common objects that will trigger a warning if not present
     if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {
-        inputProcessor->epJSON["Version"] = {{"", {{"idf_order", 0}, {"version_identifier", DataStringGlobals::MatchVersion}}}};
+        inputProcessor->epJSON["Version"] = {{"", {{"idf_order", 0}, {"version_identifier", state->dataStrGlobals->MatchVersion}}}};
     }
     if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
         inputProcessor->epJSON["Building"] = {{"Bldg",
@@ -362,20 +362,20 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     return successful_processing;
 }
 
-bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
+bool EnergyPlusFixture::process_idd(EnergyPlusData &state, std::string const &idd, bool &errors_found)
 {
 
     std::unique_ptr<std::istream> idd_stream;
     if (!idd.empty()) {
         idd_stream = std::unique_ptr<std::istringstream>(new std::istringstream(idd));
     } else {
-        static auto const exeDirectory = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+        static auto const exeDirectory = FileSystem::getParentDirectoryPath(state, FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
         static auto idd_location = exeDirectory + "Energy+.schema.epJSON";
         static auto file_exists = FileSystem::fileExists(idd_location);
 
         if (!file_exists) {
             // Energy+.schema.epJSON is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
-            idd_location = FileSystem::getParentDirectoryPath(exeDirectory) + "Energy+.schema.epJSON";
+            idd_location = FileSystem::getParentDirectoryPath(state, exeDirectory) + "Energy+.schema.epJSON";
             file_exists = FileSystem::fileExists(idd_location);
         }
 

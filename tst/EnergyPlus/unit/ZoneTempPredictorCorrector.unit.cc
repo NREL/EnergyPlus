@@ -80,7 +80,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace DataStringGlobals;
 using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;

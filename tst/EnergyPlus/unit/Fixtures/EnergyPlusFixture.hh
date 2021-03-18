@@ -142,7 +142,7 @@ protected:
         return is_valid;
     }
 
-    // This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any
+    // This function creates a string based on a vector of string inputs that is delimited by state.dataStrGlobals->NL by default, but any
     // delimiter can be passed in to this function. This allows for cross platform output string comparisons.
     std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = "\n");
 
@@ -251,7 +251,7 @@ protected:
     // if it makes sense for the unit test to continue after returning from function.
     // This will add the required objects if not specified: Version, Building, GlobalGeometryRules
     // Will return false if no errors found and true if errors found
-    bool process_idf(std::string const &idf_snippet, bool use_assertions = true);
+    bool process_idf(EnergyPlusData &state, std::string const &idf_snippet, bool use_assertions = true);
 
     // This is a helper function to easily compare an expected IDF data structure with the actual IDFRecords data structure
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -284,7 +284,7 @@ private:
     // if it makes sense for the unit test to continue after retrning from function.
     // Will return false if no errors found and true if errors found
 
-    static bool process_idd(std::string const &idd, bool &errors_found);
+    static bool process_idd(EnergyPlusData &state, std::string const &idd, bool &errors_found);
 
     // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
     std::ostringstream *json_stream;

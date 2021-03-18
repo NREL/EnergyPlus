@@ -395,13 +395,13 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
         // we'll need the program directory for a few things so get it once here at the top and sanitize it
         std::string programPath = FileSystem::getAbsolutePath(FileSystem::getProgramPath());
-        std::string programDir = FileSystem::getParentDirectoryPath(programPath);
+        std::string programDir = FileSystem::getParentDirectoryPath(state, programPath);
         std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
 
         // I think we need to set the python path before initializing the library
         // make this relative to the binary
-        std::string pathToPythonPackages = sanitizedProgramDir + DataStringGlobals::pathChar + "python_standard_lib";
-        FileSystem::makeNativePath(pathToPythonPackages);
+        std::string pathToPythonPackages = sanitizedProgramDir + state.dataStrGlobals->pathChar + "python_standard_lib";
+        FileSystem::makeNativePath(state, pathToPythonPackages);
         wchar_t *a = Py_DecodeLocale(pathToPythonPackages.c_str(), nullptr);
         Py_SetPath(a);
         Py_SetPythonHome(a);
@@ -415,7 +415,7 @@ namespace EnergyPlus::PluginManagement {
 
         // we also need to set an extra import path to find some dynamic library loading stuff, again make it relative to the binary
         std::string pathToDynLoad = sanitizedProgramDir + "python_standard_lib/lib-dynload";
-        FileSystem::makeNativePath(pathToDynLoad);
+        FileSystem::makeNativePath(state, pathToDynLoad);
         std::string libDirDynLoad = PluginManager::sanitizedPath(pathToDynLoad);
         PluginManager::addToPythonPath(state, libDirDynLoad, false);
 

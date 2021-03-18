@@ -257,7 +257,7 @@ namespace AirflowNetwork {
         /*
         if (LIST >= 5) {
             Unit11 = GetNewUnitNumber();
-            ObjexxFCL::gio::open(Unit11, DataStringGlobals::eplusADSFileName);
+            ObjexxFCL::gio::open(Unit11, state.dataStrGlobals->eplusADSFileName);
             for (i = 1; i <= NetworkNumOfNodes; ++i) {
                 ObjexxFCL::gio::write(Unit11, Format_901) << i << state.dataAirflowNetwork->AirflowNetworkNodeData(i).NodeTypeNum << state.dataAirflowNetwork->AirflowNetworkNodeData(i).NodeHeight << TZ(i)
                                                << PZ(i);

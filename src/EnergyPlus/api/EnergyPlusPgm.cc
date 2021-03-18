@@ -263,12 +263,12 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
     epStartTime("EntireRun=");
 #endif
 
-    DataStringGlobals::CurrentDateTime = CreateCurrentDateTimeString();
+    state.dataStrGlobals->CurrentDateTime = CreateCurrentDateTimeString();
 
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion(state.dataStrGlobals->VerString);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setStartDateTimeStamp(state.dataStrGlobals->CurrentDateTime.substr(5));
 
-    DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
+    state.dataStrGlobals->VerString += "," + state.dataStrGlobals->CurrentDateTime;
 
     DataSystemVariables::processEnvironmentVariables(state);
 
@@ -285,7 +285,7 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
     state.dataSysVars->TestAllPaths = true;
 
     DisplayString(state, "EnergyPlus Starting");
-    DisplayString(state, DataStringGlobals::VerString);
+    DisplayString(state, state.dataStrGlobals->VerString);
 
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();
@@ -323,7 +323,7 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
             DisplayString(state, "Couldn't change directory; aborting EnergyPlus");
             return EXIT_FAILURE;
         }
-        DataStringGlobals::ProgramPath = filepath + DataStringGlobals::pathChar;
+        state.dataStrGlobals->ProgramPath = filepath + state.dataStrGlobals->pathChar;
         int dummy_argc = 1;
         const char *dummy_argv[1] = {"energyplus"};
         CommandLineInterface::ProcessArgs(state, dummy_argc, dummy_argv);

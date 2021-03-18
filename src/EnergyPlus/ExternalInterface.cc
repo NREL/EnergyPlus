@@ -955,10 +955,7 @@ namespace EnergyPlus::ExternalInterface {
         using DataIPShortCuts::cCurrentModuleObject;
         using DataIPShortCuts::cNumericFieldNames;
         using DataIPShortCuts::rNumericArgs;
-        using DataStringGlobals::altpathChar;
-        using DataStringGlobals::pathChar;
         using DataSystemVariables::CheckForActualFileName;
-
         using RuntimeLanguageProcessor::FindEMSVariable;
         using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
         using ScheduleManager::GetDayScheduleIndex;
@@ -998,7 +995,7 @@ namespace EnergyPlus::ExternalInterface {
 
             // post process as needed in case these are used later
             state.dataExternalInterface->FMURootWorkingFolder = "tmp-fmus";
-            state.dataExternalInterface->FMURootWorkingFolder += pathChar; // getStringFromCharArray( FMUWorkingFolderCharArr );
+            state.dataExternalInterface->FMURootWorkingFolder += state.dataStrGlobals->pathChar; // getStringFromCharArray( FMUWorkingFolderCharArr );
 
             // Get and store the names of all FMUs in EnergyPlus data structure
             strippedFileName.allocate(state.dataExternalInterface->NumFMUObjects);
@@ -1025,11 +1022,11 @@ namespace EnergyPlus::ExternalInterface {
                 CheckForActualFileName(state, cAlphaArgs(1), fileExist, tempFullFileName, contextString);
 
                 if (fileExist) {
-                    pos = index(state.dataExternalInterface->FMU(Loop).Name, pathChar, true); // look backwards
+                    pos = index(state.dataExternalInterface->FMU(Loop).Name, state.dataStrGlobals->pathChar, true); // look backwards
                     if (pos != std::string::npos) {
                         strippedFileName(Loop) = state.dataExternalInterface->FMU(Loop).Name.substr(pos + 1);
                     } else {                                            // pos == 0, look for alt path char
-                        pos = index(state.dataExternalInterface->FMU(Loop).Name, altpathChar, true); // look backwards
+                        pos = index(state.dataExternalInterface->FMU(Loop).Name, state.dataStrGlobals->altpathChar, true); // look backwards
                         if (pos != std::string::npos) {
                             strippedFileName(Loop) = state.dataExternalInterface->FMU(Loop).Name.substr(pos + 1);
                         } else {

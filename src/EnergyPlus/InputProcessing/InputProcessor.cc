@@ -299,7 +299,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 input_file = epJSONClean.dump(4, ' ', false, json::error_handler_t::replace);
                 // input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
                 std::string convertedIDF(state.dataStrGlobals->outputDirPathName + state.dataStrGlobals->inputFileNameOnly + ".epJSON");
-                FileSystem::makeNativePath(convertedIDF);
+                FileSystem::makeNativePath(state, convertedIDF);
                 std::ofstream convertedFS(convertedIDF, std::ofstream::out);
                 convertedFS << input_file << std::endl;
             }
@@ -331,7 +331,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
         if (versionMatch) {
             std::string const encoded = idf_parser->encode(epJSON, schema);
             std::string convertedEpJSON(state.dataStrGlobals->outputDirPathName + state.dataStrGlobals->inputFileNameOnly + ".idf");
-            FileSystem::makeNativePath(convertedEpJSON);
+            FileSystem::makeNativePath(state, convertedEpJSON);
             std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
             convertedFS << encoded << std::endl;
         } else {

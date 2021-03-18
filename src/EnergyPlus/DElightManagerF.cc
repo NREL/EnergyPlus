@@ -130,7 +130,6 @@ namespace DElightManagerF {
         using namespace DataHeatBalance;   // Gives access to Building, Zone and Lights data
         using namespace DataEnvironment;   // Gives access to Site data
         using namespace DataSurfaces;      // Gives access to Surface data
-        using namespace DataStringGlobals; // Gives access to Program Path and Current Time/Date
         using InternalHeatGains::CheckLightsReplaceableMinMaxForZone;
         using InternalHeatGains::GetDesignLightingLevelForZone;
 

@@ -67,6 +67,7 @@
 #endif
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 
@@ -80,27 +81,27 @@ namespace FileSystem {
     std::string const exeExtension;
 #endif
 
-    void makeNativePath(std::string &path)
+    void makeNativePath(EnergyPlusData &state, std::string &path)
     {
-        std::replace(path.begin(), path.end(), DataStringGlobals::altpathChar, DataStringGlobals::pathChar);
+        std::replace(path.begin(), path.end(), state.dataStrGlobals->altpathChar, state.dataStrGlobals->pathChar);
     }
 
-    std::string getFileName(std::string const &filePath)
+    std::string getFileName(EnergyPlusData &state, std::string const &filePath)
     {
-        int pathCharPosition = filePath.find_last_of(DataStringGlobals::pathChar);
+        int pathCharPosition = filePath.find_last_of(state.dataStrGlobals->pathChar);
         return filePath.substr(pathCharPosition + 1, filePath.size() - 1);
     }
 
-    std::string getParentDirectoryPath(std::string const &path)
+    std::string getParentDirectoryPath(EnergyPlusData &state, std::string const &path)
     {
         std::string tempPath = path;
-        if (path.at(path.size() - 1) == DataStringGlobals::pathChar) tempPath = path.substr(0, path.size() - 1);
+        if (path.at(path.size() - 1) == state.dataStrGlobals->pathChar) tempPath = path.substr(0, path.size() - 1);
 
-        int pathCharPosition = tempPath.find_last_of(DataStringGlobals::pathChar);
+        int pathCharPosition = tempPath.find_last_of(state.dataStrGlobals->pathChar);
         tempPath = tempPath.substr(0, pathCharPosition + 1);
 
         // If empty, then current dir, but with trailing separator too: eg `./`
-        if (tempPath == "") tempPath = {'.',DataStringGlobals:: pathChar};
+        if (tempPath == "") tempPath = {'.',state.dataStrGlobals-> pathChar};
 
         return tempPath;
     }
@@ -128,7 +129,7 @@ namespace FileSystem {
 
         std::string pathTail;
         std::string currentDir = ".";
-        std::string currentDirWithSep = currentDir + DataStringGlobals::pathChar;
+        std::string currentDirWithSep = currentDir + state.dataStrGlobals->pathChar;
         if ((parentPath == currentDir || parentPath == currentDirWithSep) && path.find(currentDirWithSep) == std::string::npos)
             // If parent path is the current directory and the original path does not already contain
             // the current directory in the string, then leave the path tail as-is.
@@ -144,7 +145,7 @@ namespace FileSystem {
             if (pathTail.size() == 0)
                 return absoluteParentPath;
             else
-                return absoluteParentPath + DataStringGlobals::pathChar + pathTail;
+                return absoluteParentPath + state.dataStrGlobals->pathChar + pathTail;
 
         } else {
             std::cout << "ERROR: Could not resolve path for " + path + "." << std::endl;
@@ -192,7 +193,7 @@ namespace FileSystem {
         return fileName.substr(0, extensionPosition);
     }
 
-    void makeDirectory(std::string const &directoryPath)
+    void makeDirectory(EnergyPlusData &state, std::string const &directoryPath)
     {
         // Create a directory if doesn't already exist
         if (pathExists(directoryPath)) { // path already exists
@@ -201,7 +202,7 @@ namespace FileSystem {
                 std::exit(EXIT_FAILURE);
             }
         } else { // directory does not already exist
-            std::string parentDirectoryPath = getParentDirectoryPath(directoryPath);
+            std::string parentDirectoryPath = getParentDirectoryPath(state, directoryPath);
             if (!pathExists(parentDirectoryPath)) {
                 std::cout << "ERROR: " + getAbsolutePath(parentDirectoryPath) + " is not a directory." << std::endl;
                 std::exit(EXIT_FAILURE);

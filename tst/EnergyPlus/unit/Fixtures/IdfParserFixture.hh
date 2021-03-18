@@ -78,7 +78,7 @@ protected:
     {
     }
 
-    // This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any
+    // This function creates a string based on a vector of string inputs that is delimited by state.dataStrGlobals->NL by default, but any
     // delimiter can be passed in to this funciton. This allows for cross platform output string comparisons.
     std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = "\n")
     {
