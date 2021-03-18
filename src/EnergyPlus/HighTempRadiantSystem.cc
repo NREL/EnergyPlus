@@ -128,19 +128,7 @@ namespace HighTempRadiantSystem {
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HighTempRadiantSystem
 
-    bool GetInputFlag(true);
-    bool firstTime(true); // For one-time initializations
-    bool MyEnvrnFlag(true);
-    bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
-
     // Functions
-    void clear_state()
-    {
-        GetInputFlag = true;
-        firstTime = true;
-        MyEnvrnFlag = true;
-        ZoneEquipmentListChecked = false;
-    }
 
     void SimHighTempRadiantSystem(EnergyPlusData &state,
                                   std::string const &CompName,   // name of the low temperature radiant system
@@ -170,11 +158,11 @@ namespace HighTempRadiantSystem {
         int RadSysNum;         // Radiant system number/index in local derived types
 
 
-        if (GetInputFlag) {
+        if (state.dataHighTempRadSys->GetInputFlag) {
             ErrorsFoundInGet = false;
             GetHighTempRadiantSystem(state, ErrorsFoundInGet);
             if (ErrorsFoundInGet) ShowFatalError(state, "GetHighTempRadiantSystem: Errors found in input.  Preceding condition(s) cause termination.");
-            GetInputFlag = false;
+            state.dataHighTempRadSys->GetInputFlag = false;
         }
 
         // Find the correct ZoneHVAC:HighTemperatureRadiant
@@ -674,7 +662,7 @@ namespace HighTempRadiantSystem {
         int Loop;
 
 
-        if (firstTime) {
+        if (state.dataHighTempRadSys->firstTime) {
             state.dataHighTempRadSys->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataHighTempRadSys->QHTRadSource.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, 0.0);
             state.dataHighTempRadSys->QHTRadSrcAvg.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, 0.0);
@@ -682,12 +670,12 @@ namespace HighTempRadiantSystem {
             state.dataHighTempRadSys->LastSysTimeElapsed.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, 0.0);
             state.dataHighTempRadSys->LastTimeStepSys.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, 0.0);
             state.dataHighTempRadSys->MySizeFlag.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, true);
-            firstTime = false;
+            state.dataHighTempRadSys->firstTime = false;
         }
 
         // need to check all units to see if they are on Zone Equipment List or issue warning
-        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
+        if (!state.dataHighTempRadSys->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
+            state.dataHighTempRadSys->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++Loop) {
                 if (CheckZoneEquipmentList(state, "ZoneHVAC:HighTemperatureRadiant", state.dataHighTempRadSys->HighTempRadSys(Loop).Name)) continue;
                 ShowSevereError(state, "InitHighTempRadiantSystem: Unit=[ZoneHVAC:HighTemperatureRadiant," + state.dataHighTempRadSys->HighTempRadSys(Loop).Name +
@@ -701,17 +689,17 @@ namespace HighTempRadiantSystem {
             state.dataHighTempRadSys->MySizeFlag(RadSysNum) = false;
         }
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataHighTempRadSys->MyEnvrnFlag) {
             state.dataHighTempRadSys->ZeroSourceSumHATsurf = 0.0;
             state.dataHighTempRadSys->QHTRadSource = 0.0;
             state.dataHighTempRadSys->QHTRadSrcAvg = 0.0;
             state.dataHighTempRadSys->LastQHTRadSrc = 0.0;
             state.dataHighTempRadSys->LastSysTimeElapsed = 0.0;
             state.dataHighTempRadSys->LastTimeStepSys = 0.0;
-            MyEnvrnFlag = false;
+            state.dataHighTempRadSys->MyEnvrnFlag = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            state.dataHighTempRadSys->MyEnvrnFlag = true;
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step

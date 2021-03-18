@@ -152,7 +152,6 @@ namespace HighTempRadiantSystem {
     };
 
     // Functions
-    void clear_state();
 
     void SimHighTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -207,6 +206,11 @@ struct HighTempRadiantSystemData : BaseGlobalStruct {
     Array1D<HighTempRadiantSystem::HighTempRadiantSystemData> HighTempRadSys;
     Array1D<HighTempRadiantSystem::HighTempRadSysNumericFieldData> HighTempRadSysNumericFields;
 
+    bool GetInputFlag = true;
+    bool firstTime = true; // For one-time initializations
+    bool MyEnvrnFlag = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+
     void clear_state() override
     {
         NumOfHighTempRadSys = 0;
@@ -221,6 +225,11 @@ struct HighTempRadiantSystemData : BaseGlobalStruct {
 
         HighTempRadSys.clear();
         HighTempRadSysNumericFields.clear();
+
+        GetInputFlag = true;
+        firstTime = true;
+        MyEnvrnFlag = true;
+        ZoneEquipmentListChecked = false;
     }
 };
 
