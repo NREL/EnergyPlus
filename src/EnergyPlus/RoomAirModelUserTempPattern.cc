@@ -97,10 +97,6 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
 
     // Functions
 
-
-    void clear_state() {
-    }
-
     void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 

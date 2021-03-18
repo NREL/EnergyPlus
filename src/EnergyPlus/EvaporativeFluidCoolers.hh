@@ -283,8 +283,6 @@ namespace EvaporativeFluidCoolers {
 
     void GetEvapFluidCoolerInput(EnergyPlusData &state);
 
-    void clear_state();
-
 } // namespace EvaporativeFluidCoolers
 
 struct EvaporativeFluidCoolersData : BaseGlobalStruct {

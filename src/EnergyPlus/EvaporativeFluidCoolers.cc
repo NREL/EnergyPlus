@@ -2564,10 +2564,6 @@ namespace EvaporativeFluidCoolers {
         }
     }
 
-    void clear_state()
-    {
-    }
-
 } // namespace EvaporativeFluidCoolers
 
 } // namespace EnergyPlus
