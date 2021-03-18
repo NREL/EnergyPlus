@@ -411,8 +411,8 @@ namespace EnergyPlus::SimAirServingZones {
         state.dataAirLoop->AirLoopFlow.allocate(NumPrimaryAirSys);
         state.dataConvergeParams->AirLoopConvergence.allocate(NumPrimaryAirSys);
         state.dataSize->UnitarySysEqSizing.allocate(NumPrimaryAirSys);
-        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
             state.dataAirLoop->AirLoopAFNInfo.allocate(NumPrimaryAirSys);
         }
 
@@ -2088,6 +2088,17 @@ namespace EnergyPlus::SimAirServingZones {
                     state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / SumZoneDesFlow;
                 } else {
                     state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio = 1.0;
+                }
+            }
+
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
+                // sets design supply air flow rate in the ZoneEquipConfig struct for use with zone air mass balance
+                for (int returnNum = 1; returnNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++returnNum) {
+                    int airLoop = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(returnNum);
+                    if (airLoop > 0) {
+                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).AirLoopDesSupply = state.dataAirLoop->AirLoopFlow(airLoop).DesSupply;
+                    }
                 }
             }
         }

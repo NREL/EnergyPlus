@@ -593,7 +593,7 @@ namespace EnergyPlus::Fans {
 
             if (NumAlphas > 8 && !lAlphaFieldBlanks(9)) {
 
-                if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) {
+                if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) {
                     // do not include adjusted for "balanced" exhaust flow in the zone total return calculation
                     ShowWarningError(state,
                                      RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9) +
@@ -2320,7 +2320,7 @@ namespace EnergyPlus::Fans {
 
         if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
             state.dataLoopNodes->Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
-            if (AirflowNetwork::AirflowNetworkNumOfExhFan == 0) {
+            if (state.dataAirflowNetwork->AirflowNetworkNumOfExhFan == 0) {
                 UnbalExhMassFlow = Fan(FanNum).InletAirMassFlowRate;
                 if (Fan(FanNum).BalancedFractSchedNum > 0) {
                     BalancedExhMassFlow = UnbalExhMassFlow * GetCurrentScheduleValue(state, Fan(FanNum).BalancedFractSchedNum);
