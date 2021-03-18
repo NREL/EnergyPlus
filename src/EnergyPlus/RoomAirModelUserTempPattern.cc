@@ -96,12 +96,9 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
     using namespace DataRoomAirModel;
 
     // Functions
-    bool MyOneTimeFlag(true); // one time setup flag
-    bool MyOneTimeFlag2(true);
+
 
     void clear_state() {
-        MyOneTimeFlag = true;
-        MyOneTimeFlag2 = true;
     }
 
     void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
@@ -165,12 +162,12 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
+        Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
         int SurfNum;                     // do loop counter
 
-        if (MyOneTimeFlag) {
+        if (state.dataRoomAirModelTempPattern->MyOneTimeFlag) {
             MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
-            MyOneTimeFlag = false;
+            state.dataRoomAirModelTempPattern->MyOneTimeFlag = false;
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
@@ -438,11 +435,11 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         Real64 thisZeta;                     // non-dimensional height
         Real64 DeltaHeight;                  // height difference in m
         Real64 tempDeltaTai;                 // temporary temperature difference
-        static Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
+        Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
 
-        if (MyOneTimeFlag2) {
+        if (state.dataRoomAirModelTempPattern->MyOneTimeFlag2) {
             SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init
-            MyOneTimeFlag2 = false;
+            state.dataRoomAirModelTempPattern->MyOneTimeFlag2 = false;
         }
 
         if (SetupOutputFlag(ZoneNum)) {

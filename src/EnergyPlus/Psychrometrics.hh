@@ -145,9 +145,8 @@ namespace Psychrometrics {
     // na
 
     // MODULE VARIABLE DEFINITIONS:
-    extern std::string String;
-    extern bool ReportErrors;
-    extern Array1D_int iPsyErrIndex; // Number of times error occurred
+
+extern Array1D_int iPsyErrIndex; // Number of times error occurred
 #ifdef EP_psych_stats
     extern Array1D<Int64> NumTimesCalled;
     extern Array1D_int NumIterations;
@@ -1397,8 +1396,13 @@ namespace Psychrometrics {
 struct PsychrometricsData : BaseGlobalStruct
 {
 
+    std::string String;
+    bool ReportErrors = true;
+
     void clear_state() override
     {
+        String = "";
+        ReportErrors = true;
     }
 };
 

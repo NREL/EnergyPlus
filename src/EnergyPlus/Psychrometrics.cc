@@ -162,8 +162,6 @@ namespace Psychrometrics {
     // na
 
     // MODULE VARIABLE DEFINITIONS:
-    std::string String;
-    bool ReportErrors(true);
     Array1D_int iPsyErrIndex(NumPsychMonitors, 0); // Number of times error occurred
 #ifdef EP_psych_stats
     Array1D<Int64> NumTimesCalled(NumPsychMonitors, 0);
@@ -176,8 +174,6 @@ namespace Psychrometrics {
 
     void clear_state()
     {
-        String = "";
-        ReportErrors = true;
         iPsyErrIndex = Array1D_int(NumPsychMonitors, 0);
 #ifdef EP_psych_stats
         NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
@@ -341,14 +337,14 @@ namespace Psychrometrics {
         if (RHValue > 1.01) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbRhovLBnd0C) == 0) {
-                    String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
+                    state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, String);
+                    ShowContinueError(state, state.dataPsychrometrics->String);
                     ShowContinueError(state, "Relative Humidity being reset to 100.0%");
                 }
                 ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C)",
@@ -362,14 +358,14 @@ namespace Psychrometrics {
         } else if (RHValue < -0.05) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbRhovLBnd0C) == 0) {
-                    String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
+                    state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, String);
+                    ShowContinueError(state, state.dataPsychrometrics->String);
                     ShowContinueError(state, "Relative Humidity being reset to 1%");
                 }
                 ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C)",
@@ -572,16 +568,16 @@ namespace Psychrometrics {
             if (W <= -0.0001) {
                 if (!state.dataGlobal->WarmupFlag) {
                     if (iPsyErrIndex(iPsyTwbFnTdbWPb2) == 0) {
-                        String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Pressure= {:.2T}", TDB, W, Patm);
+                        state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Pressure= {:.2T}", TDB, W, Patm);
                         ShowWarningMessage(state, "Entered Humidity Ratio invalid (PsyTwbFnTdbWPb)");
                         if (!CalledFrom.empty()) {
                             ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                         } else {
                             ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                         }
-                        ShowContinueError(state, String);
-                        String = format("Humidity Ratio= {:.4T}", W);
-                        ShowContinueError(state, String + " ... Humidity Ratio set to .00001");
+                        ShowContinueError(state, state.dataPsychrometrics->String);
+                        state.dataPsychrometrics->String = format("Humidity Ratio= {:.4T}", W);
+                        ShowContinueError(state, state.dataPsychrometrics->String + " ... Humidity Ratio set to .00001");
                     }
                     ShowRecurringWarningErrorAtEnd(state,
                         "Entered Humidity Ratio invalid (PsyTwbFnTdbWPb)", iPsyErrIndex(iPsyTwbFnTdbWPb2), W, W, _, "[]", "[]");
@@ -700,16 +696,16 @@ namespace Psychrometrics {
         if (V <= -0.01) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyVFnTdbWPb) == 0) {
-                    String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Pressure= {:.2T}", TDB, w, PB);
+                    state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Pressure= {:.2T}", TDB, w, PB);
                     ShowWarningMessage(state, "Calculated Specific Volume out of range (PsyVFnTdbWPb)");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, String);
-                    String = format("Calculated Volume= {:.3T}", V);
-                    ShowContinueError(state, String + " ... Since Calculated Volume < 0.0, it is set to .83");
+                    ShowContinueError(state, state.dataPsychrometrics->String);
+                    state.dataPsychrometrics->String = format("Calculated Volume= {:.3T}", V);
+                    ShowContinueError(state, state.dataPsychrometrics->String + " ... Since Calculated Volume < 0.0, it is set to .83");
                 }
                 ShowRecurringWarningErrorAtEnd(state,
                     "Calculated Specific Volume out of range (PsyVFnTdbWPb)", iPsyErrIndex(iPsyVFnTdbWPb), V, V, _, "m3/kg", "m3/kg");
@@ -729,16 +725,16 @@ namespace Psychrometrics {
         if (W < -0.0001) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbH) == 0) {
-                    String = format(" Dry-Bulb= {:.2T} Enthalpy= {:.3T}", TDB, H);
+                    state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Enthalpy= {:.3T}", TDB, H);
                     ShowWarningMessage(state, "Calculated Humidity Ratio invalid (PsyWFnTdbH)");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, String);
-                    String = format("Calculated Humidity Ratio= {:.4T}", W);
-                    ShowContinueError(state, String + " ... Humidity Ratio set to .00001");
+                    ShowContinueError(state, state.dataPsychrometrics->String);
+                    state.dataPsychrometrics->String = format("Calculated Humidity Ratio= {:.4T}", W);
+                    ShowContinueError(state, state.dataPsychrometrics->String + " ... Humidity Ratio set to .00001");
                 }
                 ShowRecurringWarningErrorAtEnd(state, "Calculated Humidity Ratio invalid (PsyWFnTdbH)", iPsyErrIndex(iPsyWFnTdbH), W, W, _, "[]", "[]");
             }
@@ -884,18 +880,18 @@ namespace Psychrometrics {
     )
     {
         if (TWB > (TDB + 0.01)) {
-            if (ReportErrors && !state.dataGlobal->WarmupFlag) {
+            if (state.dataPsychrometrics->ReportErrors && !state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbTwbPb) == 0) {
-                    String = format(" Dry-Bulb= {:.2T} Pressure= {:.2T}", TDB, PB);
+                    state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Pressure= {:.2T}", TDB, PB);
                     ShowWarningMessage(state, "Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, String);
-                    String = format("Calculated Wet-Bulb= {:.2T}", TWB);
-                    ShowContinueError(state, String + " ... Since Dry Bulb < Wet Bulb, Wet Bulb set = to Dry Bulb");
+                    ShowContinueError(state, state.dataPsychrometrics->String);
+                    state.dataPsychrometrics->String = format("Calculated Wet-Bulb= {:.2T}", TWB);
+                    ShowContinueError(state, state.dataPsychrometrics->String + " ... Since Dry Bulb < Wet Bulb, Wet Bulb set = to Dry Bulb");
                 }
                 ShowRecurringWarningErrorAtEnd(state,
                     "Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)", iPsyErrIndex(iPsyWFnTdbTwbPb), TWB, TWB, _, "C", "C");
@@ -915,18 +911,18 @@ namespace Psychrometrics {
     {
 
         if (W < 0.0) {
-            if (ReportErrors && !state.dataGlobal->WarmupFlag) {
+            if (state.dataPsychrometrics->ReportErrors && !state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbTwbPb2) == 0) {
-                    String = format(" Dry-Bulb= {:.2T} Wet-Bulb= {:.2T} Pressure= {:.2T}", TDB, TWB, PB);
+                    state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Wet-Bulb= {:.2T} Pressure= {:.2T}", TDB, TWB, PB);
                     ShowWarningMessage(state, "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, String);
-                    String = format("Calculated Humidity Ratio= {:.4T}, will recalculate Humidity Ratio", W);
-                    ShowContinueError(state, String + " using Relative Humidity .01% (and Dry-Bulb and Pressure as shown)");
+                    ShowContinueError(state, state.dataPsychrometrics->String);
+                    state.dataPsychrometrics->String = format("Calculated Humidity Ratio= {:.4T}, will recalculate Humidity Ratio", W);
+                    ShowContinueError(state, state.dataPsychrometrics->String + " using Relative Humidity .01% (and Dry-Bulb and Pressure as shown)");
                 }
                 ShowRecurringWarningErrorAtEnd(state,
                     "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)", iPsyErrIndex(iPsyWFnTdbTwbPb2), W, W, _, "[]", "[]");
@@ -954,10 +950,10 @@ namespace Psychrometrics {
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    String = format(" Dry-bulb={:.2T} Wet-Bulb (WB)= {:.2T} Pressure= {:.2T} Humidity Ratio={:.3T}", TDB, TWB, PB, W);
-                    ShowContinueError(state, String);
-                    String = format(" Calculated Dew Point Temperature (DPT)= {:.2T}; Since DPT > WB, DPT will be set to WB", TDP);
-                    ShowContinueError(state, String);
+                    state.dataPsychrometrics->String = format(" Dry-bulb={:.2T} Wet-Bulb (WB)= {:.2T} Pressure= {:.2T} Humidity Ratio={:.3T}", TDB, TWB, PB, W);
+                    ShowContinueError(state, state.dataPsychrometrics->String);
+                    state.dataPsychrometrics->String = format(" Calculated Dew Point Temperature (DPT)= {:.2T}; Since DPT > WB, DPT will be set to WB", TDP);
+                    ShowContinueError(state, state.dataPsychrometrics->String);
                 }
                 ShowRecurringWarningErrorAtEnd(state,
                     "Calculated Dew Point Temperature being reset (PsyTdpFnTdbTwbPb)", iPsyErrIndex(iPsyTdpFnTdbTwbPb), TDP, TDP, _, "C", "C");
@@ -1035,8 +1031,8 @@ namespace Psychrometrics {
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    String = format(" Enthalpy={:.5T} Pressure= {:.2T}", HH, PB);
-                    ShowContinueError(state, String);
+                    state.dataPsychrometrics->String = format(" Enthalpy={:.5T} Pressure= {:.2T}", HH, PB);
+                    ShowContinueError(state, state.dataPsychrometrics->String);
                     FlagError = true;
                 }
                 ShowRecurringWarningErrorAtEnd(state, "Enthalpy out of range (PsyTsatFnHPb)", iPsyErrIndex(iPsyTsatFnHPb), HH, HH, _, "J/kg", "J/kg");
@@ -1122,8 +1118,8 @@ namespace Psychrometrics {
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    String = format(" Enthalpy={:.5T} Pressure= {:.2T}", HH, PB);
-                    ShowContinueError(state, format("{} Last T={:.2T}", String, T));
+                    state.dataPsychrometrics->String = format(" Enthalpy={:.5T} Pressure= {:.2T}", HH, PB);
+                    ShowContinueError(state, format("{} Last T={:.2T}", state.dataPsychrometrics->String, T));
                 }
 #endif
             }
@@ -1144,14 +1140,14 @@ namespace Psychrometrics {
         if (RHValue > 1.01) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbRhov) == 0) {
-                    String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
+                    state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhov) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, String);
+                    ShowContinueError(state, state.dataPsychrometrics->String);
                     ShowContinueError(state, "Relative Humidity being reset to 100.0 %");
                 }
                 ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhov)",
@@ -1165,14 +1161,14 @@ namespace Psychrometrics {
         } else if (RHValue < -0.05) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbRhov) == 0) {
-                    String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
+                    state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhov) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, String);
+                    ShowContinueError(state, state.dataPsychrometrics->String);
                     ShowContinueError(state, "Relative Humidity being reset to 1%");
                 }
                 ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhov)",
@@ -1198,14 +1194,14 @@ namespace Psychrometrics {
         if (RHValue > 1.01) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbWPb) == 0) {
-                    String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Calculated Relative Humidity [%]= {:.2T}", TDB, W, RHValue * 100.0);
+                    state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Calculated Relative Humidity [%]= {:.2T}", TDB, W, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbWPb) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, String);
+                    ShowContinueError(state, state.dataPsychrometrics->String);
                     ShowContinueError(state, "Relative Humidity being reset to 100.0%");
                 }
                 ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbWPb)",
@@ -1219,14 +1215,14 @@ namespace Psychrometrics {
         } else if (RHValue < -0.05) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbWPb) == 0) {
-                    String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Calculated Relative Humidity [%]= {:.2T}", TDB, W, RHValue * 100.0);
+                    state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Calculated Relative Humidity [%]= {:.2T}", TDB, W, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbWPb) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, String);
+                    ShowContinueError(state, state.dataPsychrometrics->String);
                     ShowContinueError(state, "Relative Humidity being reset to 1%");
                 }
                 ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbWPb)",
@@ -1252,16 +1248,16 @@ namespace Psychrometrics {
     {
         if (!state.dataGlobal->WarmupFlag) {
             if (iPsyErrIndex(iPsyWFnTdpPb) == 0) {
-                String = format(" Dew-Point= {:.2T} Barometric Pressure= {:.2T}", TDP, PB);
+                state.dataPsychrometrics->String = format(" Dew-Point= {:.2T} Barometric Pressure= {:.2T}", TDP, PB);
                 ShowWarningMessage(state, "Calculated partial vapor pressure is greater than the barometric pressure, so that calculated humidity ratio is invalid (PsyWFnTdpPb).");
                 if (!CalledFrom.empty()) {
                     ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                 } else {
                     ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                 }
-                ShowContinueError(state, String);
-                String = format("Instead, calculated Humidity Ratio at {:.1T} ({} degree less) = {:.4T}", TDP - DeltaT, static_cast<int>(DeltaT), W);
-                ShowContinueError(state, String + " will be used. Simulation continues.");
+                ShowContinueError(state, state.dataPsychrometrics->String);
+                state.dataPsychrometrics->String = format("Instead, calculated Humidity Ratio at {:.1T} ({} degree less) = {:.4T}", TDP - DeltaT, static_cast<int>(DeltaT), W);
+                ShowContinueError(state, state.dataPsychrometrics->String + " will be used. Simulation continues.");
             }
             ShowRecurringWarningErrorAtEnd(state, "Entered Humidity Ratio invalid (PsyWFnTdpPb)", iPsyErrIndex(iPsyWFnTdpPb), W, W, _, "[]", "[]");
         }
@@ -1280,16 +1276,16 @@ namespace Psychrometrics {
         if (W <= -0.0001) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbRhPb) == 0) {
-                    String = format(" Dry-Bulb= {:.2T} Relative Humidity [%]= {:.2T} Pressure= {:.2T}", TDB, RH * 100.0, PB);
+                    state.dataPsychrometrics->String = format(" Dry-Bulb= {:.2T} Relative Humidity [%]= {:.2T} Pressure= {:.2T}", TDB, RH * 100.0, PB);
                     ShowWarningMessage(state, "Calculated Humidity Ratio is invalid (PsyWFnTdbRhPb)");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, String);
-                    String = format("Calculated Humidity Ratio= {:.4T}", W);
-                    ShowContinueError(state, String + " ... Humidity Ratio set to .00001");
+                    ShowContinueError(state, state.dataPsychrometrics->String);
+                    state.dataPsychrometrics->String = format("Calculated Humidity Ratio= {:.4T}", W);
+                    ShowContinueError(state, state.dataPsychrometrics->String + " ... Humidity Ratio set to .00001");
                 }
                 ShowRecurringWarningErrorAtEnd(state,
                     "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)", iPsyErrIndex(iPsyWFnTdbRhPb), W, W, _, "[]", "[]");

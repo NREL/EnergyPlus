@@ -62,6 +62,7 @@ namespace RoomAirModelUserTempPattern {
     // Data
     // MODULE PARAMETER DEFINITIONS:
 
+
     // MODULE DERIVED TYPE DEFINITIONS:
 
     // INTERFACE BLOCK SPECIFICATIONS:
@@ -118,11 +119,16 @@ namespace RoomAirModelUserTempPattern {
 
 } // namespace RoomAirModelUserTempPattern
 
-struct RoomAirModelUserTempPatternData : BaseGlobalStruct {
+struct RoomAirModelUserTempPatternData : BaseGlobalStruct
+{
+    bool MyOneTimeFlag = true; // one time setup flag
+    bool MyOneTimeFlag2 = true;
 
     void clear_state() override
     {
 
+        MyOneTimeFlag = true;
+        MyOneTimeFlag2 = true;
     }
 };
 
