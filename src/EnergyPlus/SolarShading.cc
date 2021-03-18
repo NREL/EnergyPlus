@@ -928,8 +928,8 @@ namespace EnergyPlus::SolarShading {
         }
 
         DisplayString(state, "Initializing Zone and Enclosure Report Variables");
-        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
-            auto &thisEnclosureName = DataViewFactorInformation::ZoneSolarInfo(enclosureNum).Name;
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            auto &thisEnclosureName = state.dataViewFactor->ZoneSolarInfo(enclosureNum).Name;
             SetupOutputVariable(state, "Zone Windows Total Transmitted Solar Radiation Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBal->ZoneTransSolar(enclosureNum),
@@ -2898,8 +2898,8 @@ namespace EnergyPlus::SolarShading {
         }
         state.dataSolarShading->ISABSF = 0.0;
 
-        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
-            auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
 
             AreaSum = 0.0;
             TestFractSum = 0.0;
@@ -6000,14 +6000,14 @@ namespace EnergyPlus::SolarShading {
             }
         }
 
-        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
             // Solar entering a zone as beam or diffuse radiation, originating as beam solar incident on exterior windows)/(Beam normal solar) [W/(W/m2)]
             Real64 BTOTZone = 0.0;
             // Beam radiation from exterior windows absorbed in a zone or transmitted through
             Real64 BABSZone = 0.0;
 
             // Loop over exterior surfaces in this zone
-            auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+            auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
             // delete values from previous timestep
             if (state.dataHeatBal->AnyBSDF) state.dataSurface->SurfWinACFOverlap = 0.0;
 
@@ -7623,7 +7623,7 @@ namespace EnergyPlus::SolarShading {
 
         // Add interior window contribution to EnclSolDB
 
-        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
             state.dataSurface->EnclSolDB(enclosureNum) += state.dataSurface->EnclSolDBIntWin(enclosureNum);
             state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclosureNum) = state.dataSurface->EnclSolDBIntWin(enclosureNum) * state.dataEnvrn->BeamSolarRad;
             state.dataHeatBal->ZoneBmSolFrIntWinsRepEnergy(enclosureNum) = state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
@@ -7718,7 +7718,7 @@ namespace EnergyPlus::SolarShading {
         state.dataSurface->SurfOpaqAI = 0.0;
         state.dataSurface->SurfOpaqAO = 0.0;
 
-        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
 
             Real64 BABSZone = 0;
             Real64 BTOTZone = 0;
@@ -7728,7 +7728,7 @@ namespace EnergyPlus::SolarShading {
             state.dataHeatBal->ZoneDifSolFrExtWinsRep(enclosureNum) = 0;
             state.dataHeatBal->ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = 0;
             state.dataHeatBal->ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = 0;
-            auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+            auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
 
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window) continue;
@@ -10653,8 +10653,8 @@ namespace EnergyPlus::SolarShading {
         state.dataHeatBalSurf->SurfWinInitialDifSolInTrans = 0.0;
 
         // Loop over all zones doing initial distribution of diffuse solar to interior heat transfer surfaces
-        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
-            auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
+            auto & thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
             // Init Zone accumulators for debugging
 //            ZoneDifSolarTrans = 0.0;
 //            ZoneDifSolarDistAbsorbedTotl = 0.0;
@@ -10703,7 +10703,7 @@ namespace EnergyPlus::SolarShading {
                     int const enclosureNum = state.dataSurface->Surface(HeatTransSurfNum).SolarEnclIndex; // index for ZoneSolarInfo
                     int const DTenclSurfNum = state.dataSurface->Surface(DifTransSurfNum).SolarEnclSurfIndex; // Window surface index for ZoneSolarInfo.SurfacePtr and F arrays
 
-                    ViewFactor = DataViewFactorInformation::ZoneSolarInfo(enclosureNum).F(HTenclosureSurfNum, DTenclSurfNum);
+                    ViewFactor = state.dataViewFactor->ZoneSolarInfo(enclosureNum).F(HTenclosureSurfNum, DTenclSurfNum);
                     // debug ViewFactorTotal
 //                    ViewFactorTotal += ViewFactor; // debug
 
@@ -11228,7 +11228,7 @@ namespace EnergyPlus::SolarShading {
         ViewFactorTotal = 0.0;
         WinDifSolarTrans = IntWinDifSolarTransW;
 
-        auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(IntWinEnclosureNum));
+        auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(IntWinEnclosureNum));
         // Loop over all heat transfer surfaces in the current zone that might receive diffuse solar
         Real64 InitialZoneDifSolReflW_zone(0.0);
         for (int const HeatTransSurfNum : thisEnclosure.SurfacePtr) {
@@ -11242,7 +11242,7 @@ namespace EnergyPlus::SolarShading {
             int enclosureNum = state.dataSurface->Surface(HeatTransSurfNum).SolarEnclIndex; // index for ZoneSolarInfo
             int IntWinEnclSurfNum = state.dataSurface->Surface(IntWinSurfNum).SolarEnclSurfIndex; // Window surface index for ZoneSolarInfo.SurfacePtr and F arrays
 
-            ViewFactor = DataViewFactorInformation::ZoneSolarInfo(enclosureNum).F(HTenclosureSurfNum, IntWinEnclSurfNum);
+            ViewFactor = state.dataViewFactor->ZoneSolarInfo(enclosureNum).F(HTenclosureSurfNum, IntWinEnclSurfNum);
             // debug ViewFactorTotal
             ViewFactorTotal += ViewFactor; // debug
 
