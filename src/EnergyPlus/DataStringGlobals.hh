@@ -66,51 +66,15 @@ namespace DataStringGlobals {
     extern std::string outputErrFileName;
 
 
-    extern std::string outputMddFileName;
-    extern std::string outputRddFileName;
-    extern std::string outputShdFileName;
-    extern std::string outputTblCsvFileName;
-    extern std::string outputTblHtmFileName;
-    extern std::string outputTblTabFileName;
-    extern std::string outputTblTxtFileName;
-    extern std::string outputTblXmlFileName;
-    extern std::string inputFileName;
-    extern std::string inputIddFileName;
-    extern std::string inputEpJSONSchemaFileName;
-    extern std::string outputAdsFileName;
-    extern std::string outputGLHEFileName;
-    extern std::string outputDelightOutFileName;
-    extern std::string outputIperrFileName;
-    extern std::string outputPerfLogFileName;
-    extern std::string outputSqlFileName;
-    extern std::string outputSqliteErrFileName;
-    extern std::string eplusADSFileName;
-    extern std::string outputCsvFileName;
-    extern std::string outputMtrCsvFileName;
-    extern std::string outputRvauditFileName;
 
-    extern std::string weatherFileNameOnly;
-    extern std::string idfDirPathName;
-    extern std::string outDirPathName;
-    extern std::string idfFileNameOnly;
-    extern std::string inputDirPathName;
-    extern std::string outputDirPathName;
-    extern std::string inputFileNameOnly;
-    extern std::string exeDirectory;
+
 
     // MODULE PARAMETER DEFINITIONS:
-    extern std::string const UpperCase;
-    extern std::string const LowerCase;
-    extern std::string const AccentedUpperCase;
-    extern std::string const AccentedLowerCase;
-    extern std::string const AllCase;
+
     extern std::string const NL; // Platform newline
     extern char const pathChar;
     extern char const altpathChar;
-    extern char const CharComma;     // comma
-    extern char const CharSemicolon; // semicolon
-    extern char const CharTab;       // tab
-    extern char const CharSpace;     // space
+
 
     // DERIVED TYPE DEFINITIONS
     // na
@@ -119,15 +83,7 @@ namespace DataStringGlobals {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    extern std::string ProgramPath;          // Path for Program from INI file
-    extern std::string CurrentWorkingFolder; // Current working directory for run
-    extern std::string FullName;             // Full name of file to open, including path
-    extern std::string IDDVerString;         // Version information from the IDD (line 1)
-    extern std::string VerString;            // String that represents version information
-    extern std::string MatchVersion;         // String to be matched by Version object
-    extern std::string CurrentDateTime;      // For printing current date and time at start of run
 
-    extern std::string PythonAPIVersion;
 
     // Functions
     void clear_state();
@@ -136,9 +92,102 @@ namespace DataStringGlobals {
 
 struct DataStringGlobalsData : BaseGlobalStruct {
 
+    std::string outputMddFileName = "eplusout.mdd";
+    std::string outputRddFileName = "eplusout.rdd";
+    std::string outputShdFileName = "eplusout.shd";
+    std::string outputTblCsvFileName = "eplustbl.csv";
+    std::string outputTblHtmFileName = "eplustbl.htm";
+    std::string outputTblTabFileName = "eplustbl.tab";
+    std::string outputTblTxtFileName = "eplustbl.txt";
+    std::string outputTblXmlFileName = "eplustbl.xml";
+    std::string outputAdsFileName = "eplusADS.out";
+    std::string outputGLHEFileName = "eplusout.glhe";
+    std::string outputDelightOutFileName = "eplusout.delightout";
+    std::string outputIperrFileName = "eplusout.iperr";
+    std::string outputPerfLogFileName = "eplusout_perflog.csv";
+    std::string outputSqlFileName = "eplusout.sql";
+    std::string outputSqliteErrFileName = "eplussqlite.err";
+    std::string outputCsvFileName = "eplusout.csv";
+    std::string outputMtrCsvFileName = "eplusmtr.csv";
+    std::string outputRvauditFileName = "eplusout.rvaudit";
+
+    std::string eplusADSFileName;
+    std::string idfFileNameOnly;
+    std::string idfDirPathName;
+    std::string outDirPathName;
+    std::string inputFileNameOnly;
+    std::string inputDirPathName;
+    std::string outputDirPathName;
+    std::string exeDirectory;
+    std::string inputFileName;
+    std::string inputIddFileName;
+    std::string inputEpJSONSchemaFileName;
+    std::string FullName;               // Full name of file to open, including path
+    std::string weatherFileNameOnly;
+    std::string ProgramPath;          // Path for Program from INI file
+    std::string CurrentWorkingFolder; // Current working directory for run
+    std::string CurrentDateTime;      // For printing current date and time at start of run
+    std::string IDDVerString;         // Version information from the IDD (line 1)
+
+    std::string VerString = "EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}";
+    // String that represents version information
+    std::string MatchVersion = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}";
+    // String to be matched by Version object
+    std::string PythonAPIVersion = "${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}";
+    // API version string to be matched when using the Python API
+    
+    std::string const UpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ";
+    std::string const LowerCase = "abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý";
+    std::string const AccentedUpperCase = "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ";
+    std::string const AccentedLowerCase = "àáâãäåæçèéêëìíîïðñòóôõöøùúûüý";
+    std::string const AllCase = "àáâãäåæçèéêëìíîïðñòóôõöøùúûüýÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    char const CharComma = ',';             // comma
+    char const CharSemicolon = ';';         // semicolon
+    char const CharTab = '\t';              // tab
+    char const CharSpace = ' ';             // space
+
     void clear_state() override
     {
-
+        this->outputMddFileName = "eplusout.mdd";
+        this->outputRddFileName = "eplusout.rdd";
+        this->outputShdFileName = "eplusout.shd";
+        this->outputTblCsvFileName = "eplustbl.csv";
+        this->outputTblHtmFileName = "eplustbl.htm";
+        this->outputTblTabFileName = "eplustbl.tab";
+        this->outputTblTxtFileName = "eplustbl.txt";
+        this->outputTblXmlFileName = "eplustbl.xml";
+        this->outputAdsFileName = "eplusADS.out";
+        this->outputGLHEFileName = "eplusout.glhe";
+        this->outputDelightOutFileName = "eplusout.delightout";
+        this->outputIperrFileName = "eplusout.iperr";
+        this->outputPerfLogFileName = "eplusout_perflog.csv";
+        this->outputSqlFileName = "eplusout.sql";
+        this->outputSqliteErrFileName = "eplussqlite.err";
+        this->outputCsvFileName = "eplusout.csv";
+        this->outputMtrCsvFileName = "eplusmtr.csv";
+        this->outputRvauditFileName = "eplusout.rvaudit";
+        this->eplusADSFileName.clear();
+        this->idfFileNameOnly.clear();
+        this->idfDirPathName.clear();
+        this->outDirPathName.clear();
+        this->inputFileNameOnly.clear();
+        this->inputDirPathName.clear();
+        this->outputDirPathName.clear();
+        this->exeDirectory.clear();
+        this->inputFileName.clear();
+        this->inputIddFileName.clear();
+        this->inputEpJSONSchemaFileName.clear();
+        this->FullName.clear();
+        this->weatherFileNameOnly.clear();
+        this->ProgramPath.clear();
+        this->CurrentWorkingFolder.clear();
+        this->CurrentDateTime.clear();
+        this->IDDVerString.clear();
+        this->VerString = "EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}";
+        this->MatchVersion = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}";
+        this->PythonAPIVersion = "${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}";
+        
     }
 };
 
