@@ -83,11 +83,11 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, 1) = 1;
     state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, 2) = 2;
 
-    AirflowNetwork::MultizoneSurfaceData.allocate(MaxSurf);
-    AirflowNetwork::MultizoneSurfaceData(1).SurfNum = 6;
-    AirflowNetwork::MultizoneSurfaceData(1).OpenFactor = 1.;
-    AirflowNetwork::MultizoneSurfaceData(2).SurfNum = 9;
-    AirflowNetwork::MultizoneSurfaceData(2).OpenFactor = 1.;
+    state->dataAirflowNetwork->MultizoneSurfaceData.allocate(MaxSurf);
+    state->dataAirflowNetwork->MultizoneSurfaceData(1).SurfNum = 6;
+    state->dataAirflowNetwork->MultizoneSurfaceData(1).OpenFactor = 1.;
+    state->dataAirflowNetwork->MultizoneSurfaceData(2).SurfNum = 9;
+    state->dataAirflowNetwork->MultizoneSurfaceData(2).OpenFactor = 1.;
 
     state->dataSurface->Surface.allocate(10);
     state->dataSurface->Surface(6).Zone = 1;
@@ -114,24 +114,24 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     state->dataHeatBal->Zone(1).Volume = 996.75300003839993;
     state->dataHeatBal->Zone(1).FloorArea = 297.28972800000003;
 
-    AirflowNetwork::AirflowNetworkLinkSimu.allocate(1);
-    AirflowNetwork::AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu.allocate(1);
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
 
     state->dataEnvrn->WindDir = 271.66666666666669;
 
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
 
-    AirflowNetwork::AirflowNetworkLinkageData.allocate(2);
-    AirflowNetwork::AirflowNetworkLinkageData(1).CompNum = 1;
-    AirflowNetwork::AirflowNetworkLinkageData(2).CompNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData.allocate(2);
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(1).CompNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(2).CompNum = 1;
 
-    AirflowNetwork::AirflowNetworkCompData.allocate(3);
-    AirflowNetwork::AirflowNetworkCompData(1).TypeNum = 1;
-    AirflowNetwork::AirflowNetworkCompData(1).CompTypeNum = 1;
-    AirflowNetwork::AirflowNetworkCompData(2).TypeNum = 1;
-    AirflowNetwork::AirflowNetworkCompData(2).CompTypeNum = 3;
-    AirflowNetwork::AirflowNetworkCompData(3).TypeNum = 2;
-    AirflowNetwork::AirflowNetworkCompData(3).CompTypeNum = 2;
+    state->dataAirflowNetwork->AirflowNetworkCompData.allocate(3);
+    state->dataAirflowNetwork->AirflowNetworkCompData(1).TypeNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkCompData(1).CompTypeNum = AirflowNetwork::iComponentTypeNum::DOP;
+    state->dataAirflowNetwork->AirflowNetworkCompData(2).TypeNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkCompData(2).CompTypeNum = AirflowNetwork::iComponentTypeNum::SCR;
+    state->dataAirflowNetwork->AirflowNetworkCompData(3).TypeNum = 2;
+    state->dataAirflowNetwork->AirflowNetworkCompData(3).CompTypeNum = AirflowNetwork::iComponentTypeNum::SOP;
 
     state->dataRoomAirMod->SurfParametersCVDV.allocate(2);
     state->dataRoomAirMod->SurfParametersCVDV(1).Width = 22.715219999999999;
@@ -141,15 +141,15 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
 
     state->dataRoomAirMod->CVJetRecFlows.allocate({0, MaxSurf}, 1);
 
-    DataUCSDSharedData::PosZ_Wall.allocate(2);
-    DataUCSDSharedData::PosZ_Wall(1) = 1;
-    DataUCSDSharedData::PosZ_Wall(2) = 4;
+    state->dataUCSDShared->PosZ_Wall.allocate(2);
+    state->dataUCSDShared->PosZ_Wall(1) = 1;
+    state->dataUCSDShared->PosZ_Wall(2) = 4;
 
-    DataUCSDSharedData::APos_Wall.allocate(12);
-    DataUCSDSharedData::APos_Wall(1) = 5;
-    DataUCSDSharedData::APos_Wall(2) = 7;
-    DataUCSDSharedData::APos_Wall(3) = 8;
-    DataUCSDSharedData::APos_Wall(4) = 10;
+    state->dataUCSDShared->APos_Wall.allocate(12);
+    state->dataUCSDShared->APos_Wall(1) = 5;
+    state->dataUCSDShared->APos_Wall(2) = 7;
+    state->dataUCSDShared->APos_Wall(3) = 8;
+    state->dataUCSDShared->APos_Wall(4) = 10;
 
     state->dataRoomAirMod->Droom.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->Droom(1) = 13.631070390838719;

@@ -64,6 +64,7 @@ namespace EnergyPlus {
 struct AirLoopHVACDOASData;
 struct AirSystemsData;
 struct AirflowNetworkBalanceManagerData;
+struct AirflowNetworkData;
 struct AutoSizingBaseData;
 struct BSDFWindowData;
 struct BaseSizerWithFanHeatInputsData;
@@ -312,6 +313,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
     std::unique_ptr<AirSystemsData> dataAirSystemsData;
     std::unique_ptr<AirflowNetworkBalanceManagerData> dataAirflowNetworkBalanceManager;
+    std::unique_ptr<AirflowNetworkData> dataAirflowNetwork;
     std::unique_ptr<AutoSizingBaseData> dataAutoSizingBase;
     std::unique_ptr<BSDFWindowData> dataBSDFWindow;
     std::unique_ptr<BaseSizerWithFanHeatInputsData> dataBaseSizerFanHeatInputs;

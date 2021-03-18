@@ -111,8 +111,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     // Zone
     surface.Zone = 1;
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    DataMoistureBalance::RhoVaporAirIn.allocate(1);
-    DataMoistureBalance::HMassConvInFD.allocate(1);
+    state->dataMstBal->RhoVaporAirIn.allocate(1);
+    state->dataMstBal->HMassConvInFD.allocate(1);
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 20.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0061285406810457849;
@@ -132,8 +132,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     state->dataEnvrn->OutBaroPress = 101325.;
     state->dataMstBalEMPD->RVSurface(1) = 0.007077173214149593;
     state->dataMstBalEMPD->RVSurfaceOld(1) = state->dataMstBalEMPD->RVSurface(1);
-    DataMoistureBalance::HMassConvInFD(1) = 0.0016826898264131584;
-    DataMoistureBalance::RhoVaporAirIn(1) = 0.0073097913062508896;
+    state->dataMstBal->HMassConvInFD(1) = 0.0016826898264131584;
+    state->dataMstBal->RhoVaporAirIn(1) = 0.0073097913062508896;
     state->dataMstBalEMPD->RVSurfLayer(1) = 0.007038850125652322;
     state->dataMstBalEMPD->RVDeepLayer(1) = 0.0051334905162138695;
     state->dataMstBalEMPD->RVdeepOld(1) = 0.0051334905162138695;
@@ -154,7 +154,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 
     // Clean up
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    DataMoistureBalance::RhoVaporAirIn.deallocate();
+    state->dataMstBal->RhoVaporAirIn.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
@@ -236,8 +236,8 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     // Zone
     surface.Zone = 1;
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    DataMoistureBalance::RhoVaporAirIn.allocate(1);
-    DataMoistureBalance::HMassConvInFD.allocate(1);
+    state->dataMstBal->RhoVaporAirIn.allocate(1);
+    state->dataMstBal->HMassConvInFD.allocate(1);
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 20.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0061285406810457849;
@@ -257,8 +257,8 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     state->dataEnvrn->OutBaroPress = 101325.;
     state->dataMstBalEMPD->RVSurface(1) = 0.007077173214149593;
     state->dataMstBalEMPD->RVSurfaceOld(1) = state->dataMstBalEMPD->RVSurface(1);
-    DataMoistureBalance::HMassConvInFD(1) = 0.0016826898264131584;
-    DataMoistureBalance::RhoVaporAirIn(1) = 0.0073097913062508896;
+    state->dataMstBal->HMassConvInFD(1) = 0.0016826898264131584;
+    state->dataMstBal->RhoVaporAirIn(1) = 0.0073097913062508896;
     state->dataMstBalEMPD->RVSurfLayer(1) = 0.007038850125652322;
     state->dataMstBalEMPD->RVDeepLayer(1) = 0.0051334905162138695;
     state->dataMstBalEMPD->RVdeepOld(1) = 0.0051334905162138695;
@@ -279,7 +279,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 
     // Clean up
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    DataMoistureBalance::RhoVaporAirIn.deallocate();
+    state->dataMstBal->RhoVaporAirIn.deallocate();
 }
 TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
 {
@@ -326,8 +326,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     int zoneNum = 1;
     surface.Zone = 1;
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate( zoneNum );
-    DataMoistureBalance::RhoVaporAirIn.allocate( surfNum );
-    DataMoistureBalance::HMassConvInFD.allocate( surfNum );
+    state->dataMstBal->RhoVaporAirIn.allocate( surfNum );
+    state->dataMstBal->HMassConvInFD.allocate( surfNum );
     state->dataHeatBalFanSys->MAT.allocate( zoneNum );
     state->dataHeatBalFanSys->MAT( zoneNum ) = 20.0;
     state->dataHeatBalFanSys->ZoneAirHumRat( zoneNum ) = 0.0061285406810457849;
@@ -348,8 +348,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     state->dataEnvrn->OutBaroPress = 101325.;
     state->dataMstBalEMPD->RVSurface(surfNum) = 0.0070277983586713262;
     state->dataMstBalEMPD->RVSurfaceOld(surfNum) = state->dataMstBalEMPD->RVSurface( surfNum );
-    DataMoistureBalance::HMassConvInFD(surfNum) = 0.0016826898264131584;
-    DataMoistureBalance::RhoVaporAirIn(surfNum) = 0.0073097913062508896;
+    state->dataMstBal->HMassConvInFD(surfNum) = 0.0016826898264131584;
+    state->dataMstBal->RhoVaporAirIn(surfNum) = 0.0073097913062508896;
     state->dataMstBalEMPD->RVSurfLayer(surfNum) = 0.0070277983586713262;
     state->dataMstBalEMPD->RVDeepLayer(surfNum) = 0.0051402944814058216;
     state->dataMstBalEMPD->RVdeepOld(surfNum) = 0.0051402944814058216;
