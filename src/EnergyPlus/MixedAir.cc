@@ -2977,7 +2977,7 @@ namespace EnergyPlus::MixedAir {
                                         airloopName);
 
                     SetupOutputVariable(state, "Air System Outdoor Air Limiting Factor",
-                                        OutputProcessor::Unit::W,
+                                        OutputProcessor::Unit::None,
                                         loopOAController.OALimitingFactor,
                                         "System",
                                         "Average",
