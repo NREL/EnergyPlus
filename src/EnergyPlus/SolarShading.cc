@@ -9245,7 +9245,7 @@ namespace EnergyPlus::SolarShading {
                 }
             } // End of surface loop
             for (int ISurf = firstSurfWin; ISurf <= lastSurfWin; ++ISurf) {
-//                if (!ANY_BLIND(state.dataSurface->SurfWinShadingFlag(ISurf))) continue;
+                if (!ANY_BLIND(state.dataSurface->SurfWinShadingFlag(ISurf))) continue;
 //                int BlNum = state.dataSurface->SurfWinBlindNumber(ISurf);
                 if (!state.dataSurface->SurfWinMovableSlats(ISurf)) continue;
                 Real64 SlatAng = state.dataSurface->SurfWinSlatAngThisTS(ISurf);
@@ -9255,6 +9255,10 @@ namespace EnergyPlus::SolarShading {
                 Real64 SlatsAngIndex = 1 + int(SlatAng * DeltaAng_inv);
                 state.dataSurface->SurfWinSlatsAngIndex(ISurf) = SlatsAngIndex;
                 state.dataSurface->SurfWinSlatsAngInterpFac(ISurf) = (SlatAng - DeltaAng * (SlatsAngIndex - 1)) * DeltaAng_inv;
+                // TODO: floating point error is causing the result diff
+//                double test1 = state.dataSurface->SurfWinSlatsAngInterpFac(ISurf);
+//                double test2 = (SlatAng - DeltaAng * (SlatsAngIndex - 1)) / DeltaAng;
+//                assert(std::abs(test1 - test2) < 10e-17);
             }
         }
 
