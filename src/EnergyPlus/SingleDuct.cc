@@ -2241,16 +2241,16 @@ namespace EnergyPlus::SingleDuct {
         if (FirstHVACIteration) {
             // The first time through set the mass flow rate to the Max
             if ((state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                if (!(AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-                      AirflowNetwork::AirflowNetworkFanActivated)) {
+                if (!(state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+                      state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
                     state.dataLoopNodes->Node(InletNode).MassFlowRate = this->AirMassFlowRateMax;
                 }
             } else {
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
             }
             if ((state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                if (!(AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-                      AirflowNetwork::AirflowNetworkFanActivated)) {
+                if (!(state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+                      state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
                     if (this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
                         if (this->NoOAFlowInputFromUser) {
                             state.dataLoopNodes->Node(InletNode).MassFlowRate = this->AirMassFlowRateMax;
@@ -2272,8 +2272,8 @@ namespace EnergyPlus::SingleDuct {
             }
 
             if ((state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                if (!(AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-                      AirflowNetwork::AirflowNetworkFanActivated)) {
+                if (!(state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+                      state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
                     state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = this->AirMassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
                 }
             } else {
@@ -3299,9 +3299,9 @@ namespace EnergyPlus::SingleDuct {
             MassFlow = max(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
             MassFlow = min(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
 
-            if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-                AirflowNetwork::AirflowNetworkFanActivated && AirflowNetwork::VAVTerminalRatio > 0.0) {
-                MassFlow *= AirflowNetwork::VAVTerminalRatio;
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+                state.dataAirflowNetwork->AirflowNetworkFanActivated && state.dataAirflowNetwork->VAVTerminalRatio > 0.0) {
+                MassFlow *= state.dataAirflowNetwork->VAVTerminalRatio;
                 if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
                     MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
                 }
@@ -3335,9 +3335,9 @@ namespace EnergyPlus::SingleDuct {
             }
 
             // the AirflowNetwork model overrids the mass flow rate value
-            if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-                AirflowNetwork::AirflowNetworkFanActivated && AirflowNetwork::VAVTerminalRatio > 0.0) {
-                MassFlow *= AirflowNetwork::VAVTerminalRatio;
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+                state.dataAirflowNetwork->AirflowNetworkFanActivated && state.dataAirflowNetwork->VAVTerminalRatio > 0.0) {
+                MassFlow *= state.dataAirflowNetwork->VAVTerminalRatio;
                 if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
                     MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
                 }
@@ -3438,9 +3438,9 @@ namespace EnergyPlus::SingleDuct {
             MassFlow = min(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
             MassFlow = max(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
 
-            if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-                AirflowNetwork::AirflowNetworkFanActivated && AirflowNetwork::VAVTerminalRatio > 0.0) {
-                MassFlow *= AirflowNetwork::VAVTerminalRatio;
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+                state.dataAirflowNetwork->AirflowNetworkFanActivated && state.dataAirflowNetwork->VAVTerminalRatio > 0.0) {
+                MassFlow *= state.dataAirflowNetwork->VAVTerminalRatio;
                 if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
                     MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
                 }
