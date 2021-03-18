@@ -4282,8 +4282,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHVACGlobals::EvapCooled;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::WaterCooled;
-        using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
-        using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
 
@@ -4303,8 +4301,8 @@ namespace EnergyPlus::OutputReportTabular {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
                 state.dataCondenserLoopTowers->towers(iCooler).Qactual * TimeStepSysSec + state.dataCondenserLoopTowers->towers(iCooler).FanEnergy + state.dataCondenserLoopTowers->towers(iCooler).BasinHeaterConsumption;
         }
-        for (int iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
-            state.dataHeatBal->SysTotalHVACRejectHeatLoss += SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
+        for (int iCooler = 1; iCooler <= state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers; ++iCooler) {
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataEvapFluidCoolers->SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + state.dataEvapFluidCoolers->SimpleEvapFluidCooler(iCooler).FanEnergy;
         }
         for (auto &cooler : state.dataFluidCoolers->SimpleFluidCooler) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
