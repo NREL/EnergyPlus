@@ -230,3 +230,57 @@ Input 5 & Fourth independent variable & Only used if table has four or more inde
 Input 6 & Fifth independent variable & Only used if table has five independent variables \tabularnewline
 \bottomrule
 \end{longtable}
+
+\subsection{Built-in Weather Data Functions}\label{built-in-weather-data-functions}
+
+EnergyPlus sets up 24 hours of weather data for Today and Tomorrow during DesignDay setup or based on incoming data from the weather file (epw). This data is used as the basis for setting the environment variables for a given zone timestep in WeatherManager::SetCurrentWeather. This data can be useful for predictive control or for setting Weather Data actuator overrides based on the incoming weather data using the BeginZoneTimestepBeforeSetCurrentWeather calling point.
+
+Table~\ref{table:built-in-function-for-weather-data} describes a set of built-in functions to access this weather data. For all of these functions, the first argument is the hour (from 0 to 23) and the second argument is the zone timestep number (from 1 to number of timesteps per hour). To access the current timestep use internal variables ``Hour''' and ``TimeStepNum'':
+\begin{lstlisting}
+@TodayBeamSolarRad Hour TimeStepNum,
+\end{lstlisting}
+
+% table 9
+\begin{longtable}[c]{p{2.25in}p{2.75in}p{1.0in}}
+\caption{Built-in Functions for Accessing Today and Tomorrow Weather Data \label{table:built-in-function-for-weather-data}} \tabularnewline
+\toprule
+Function Name & Description & Units \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Built-in Psychrometric Functions for Erl} \tabularnewline
+\toprule
+Function Name & Description & Units \tabularnewline
+\midrule
+\endhead
+
+@TodayIsRain & Rain indicator, 1.0 = raining &  \tabularnewline
+@TodayIsSnow & Snow indicator, 1.0 = snow on ground &  \tabularnewline
+@TodayOutDryBulbTemp & Outdoor dry-bulb temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TodayOutDewPointTemp & Outdoor dewpoint temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TodayOutBaroPress & Outdoor barometric pressure & \si{pascal} \tabularnewline
+@TodayOutRelHum & Outdoor relative humidity & \si{percent} \tabularnewline
+@TodayWindSpeed & Wind speed & \si{\meter\per\second} \tabularnewline
+@TodayWindDir & Wind direction (N = 0, E = 90, S = 180, W = 270) & degrees \tabularnewline
+@TodaySkyTemp & Sky temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TodayHorizIRSky & Horizontal infrared radiation rate per area & \si{W\per\meter\squared} \tabularnewline
+@TodayBeamSolarRad & Direct normal solar irradiance & \si{W\per\meter\squared} \tabularnewline
+@TodayDifSolarRad & Diffuse horizontal solar irradiance & \si{W\per\meter\squared} \tabularnewline
+@TodayAlbedo & Ratio of ground reflected solar to global horizontal irradiance (unused) & dimensionless \tabularnewline
+@TodayLiquidPrecip & Liquid precipitation depth & \si{\mm} \tabularnewline
+@TomorrowIsRain & Rain indicator, 1.0 = raining &  \tabularnewline
+@TomorrowIsSnow & Snow indicator, 1.0 = snow on ground &  \tabularnewline
+@TomorrowOutDryBulbTemp & Outdoor dry-bulb temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TomorrowOutDewPointTemp & Outdoor dewpoint temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TomorrowOutBaroPress & Outdoor barometric pressure & \si{pascal} \tabularnewline
+@TomorrowOutRelHum & Outdoor relative humidity & \si{percent} \tabularnewline
+@TomorrowWindSpeed & Wind speed & \si{\meter\per\second} \tabularnewline
+@TomorrowWindDir & Wind direction (N = 0, E = 90, S = 180, W = 270) & degrees \tabularnewline
+@TomorrowSkyTemp & Sky temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TomorrowHorizIRSky & Horizontal infrared radiation rate per area & \si{W\per\meter\squared} \tabularnewline
+@TomorrowBeamSolarRad & Direct normal solar irradiance & \si{W\per\meter\squared} \tabularnewline
+@TomorrowDifSolarRad & Diffuse horizontal solar irradiance & \si{W\per\meter\squared} \tabularnewline
+@TomorrowAlbedo & Ratio of ground reflected solar to global horizontal irradiance (unused) & dimensionless \tabularnewline
+@TomorrowLiquidPrecip & Liquid precipitation depth & \si{\mm} \tabularnewline
+\bottomrule
+\end{longtable}

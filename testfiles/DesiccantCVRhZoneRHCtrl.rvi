@@ -33,18 +33,18 @@ DETAILED COOLING COIL,Cooling Coil Total Cooling Rate
 DESICCANT 1,Dehumidifier Removed Water Mass
 DESICCANT 1,Dehumidifier Removed Water Mass Flow Rate
 DESICCANT 1,Dehumidifier Part Load Ratio
-DESICCANT 1,Dehumidifier Electric Power
-DESICCANT 1,Dehumidifier Electric Energy
+DESICCANT 1,Dehumidifier Electricity Rate
+DESICCANT 1,Dehumidifier Electricity Energy
 DESICCANT 1,Dehumidifier Regeneration Specific Energy
 DESICCANT 1,Dehumidifier Regeneration Rate
 DESICCANT 1,Dehumidifier Regeneration Energy
 DESICCANT 1,Dehumidifier Regeneration Air Speed
 DESICCANT 1,Dehumidifier Regeneration Air Mass Flow Rate
 DESICCANT 1,Dehumidifier Process Air Mass Flow Rate
-DESICCANT REGEN COIL,Heating Coil Gas Rate
-SUPPLY FAN 1,Fan Electric Power
+DESICCANT REGEN COIL,Heating Coil NaturalGas Rate
+SUPPLY FAN 1,Fan Electricity Rate
 SUPPLY FAN 1,Fan Rise in Air Temperature
-DESICCANT REGEN FAN,Fan Electric Power
+DESICCANT REGEN FAN,Fan Electricity Rate
 DESICCANT REGEN FAN,Fan Rise in Air Temperature
 OUTSIDE AIR INLET NODE,System Node Temperature
 OUTSIDE AIR INLET NODE,System Node Mass Flow Rate

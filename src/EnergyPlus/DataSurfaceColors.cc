@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,15 +46,12 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DataSurfaceColors {
+namespace EnergyPlus::DataSurfaceColors {
 
     // Module containing the data dealing with the coloring of surfaces for
     // various outputs (such as DXF)
@@ -69,93 +66,9 @@ namespace DataSurfaceColors {
     // Contain the data for surface colors and user settings for DXF and possibly
     // other surface reporting.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    int const NumColors(15);
-    int const ColorNo_Text(1);
-    int const ColorNo_Wall(2);
-    int const ColorNo_Window(3);
-    int const ColorNo_GlassDoor(4);
-    int const ColorNo_Door(5);
-    int const ColorNo_Floor(6);
-    int const ColorNo_Roof(7);
-    int const ColorNo_ShdDetBldg(8);
-    int const ColorNo_ShdDetFix(9);
-    int const ColorNo_ShdAtt(10);
-    int const ColorNo_PV(11);
-    int const ColorNo_TDDDome(12);
-    int const ColorNo_TDDDiffuser(13);
-    int const ColorNo_DaylSensor1(14);
-    int const ColorNo_DaylSensor2(15);
-
-    Array1D_int const defaultcolorno(NumColors, {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5}); // text | wall | window | glassdoor |
-                                                                                                                 // door | floor | roof | detached
-                                                                                                                 // building shade (moves with
-                                                                                                                 // building) | detached building
-                                                                                                                 // fixed | attached building shading
-                                                                                                                 // | PV | TDD:Dome | TDD:Diffuser |
-                                                                                                                 // Daylight Sensor 1 | Daylight
-                                                                                                                 // Sensor 2
-
-    Array1D_string const colorkeys(NumColors,
-                                   {"Text",
-                                    "Walls",
-                                    "Windows",
-                                    "GlassDoors",
-                                    "Doors",
-                                    "Roofs",
-                                    "Floors",
-                                    "DetachedBuildingShades",
-                                    "DetachedFixedShades",
-                                    "AttachedBuildingShades",
-                                    "Photovoltaics",
-                                    "TubularDaylightDomes",
-                                    "TubularDaylightDiffusers",
-                                    "DaylightReferencePoint1",
-                                    "DaylightReferencePoint2"});
-
-    Array1D_int const colorkeyptr(NumColors,
-                                  {ColorNo_Text,
-                                   ColorNo_Wall,
-                                   ColorNo_Window,
-                                   ColorNo_GlassDoor,
-                                   ColorNo_Door,
-                                   ColorNo_Floor,
-                                   ColorNo_Roof,
-                                   ColorNo_ShdDetBldg,
-                                   ColorNo_ShdDetFix,
-                                   ColorNo_ShdAtt,
-                                   ColorNo_PV,
-                                   ColorNo_TDDDome,
-                                   ColorNo_TDDDiffuser,
-                                   ColorNo_DaylSensor1,
-                                   ColorNo_DaylSensor2});
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    Array1D_int DXFcolorno(NumColors, defaultcolorno);
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Functions
-
-    bool MatchAndSetColorTextString(std::string const &String,      // string to be matched
+    bool MatchAndSetColorTextString(EnergyPlusData &state, std::string const &String,      // string to be matched
                                     int const SetValue,             // value to be used for the color
-                                    Optional_string_const ColorType // for now, must be DXF
+                                    std::string const & ColorType // for now, must be DXF
     )
     {
 
@@ -165,32 +78,18 @@ namespace DataSurfaceColors {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // Return value
-        bool WasSet;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int found;
-
-        WasSet = false;
-        found = UtilityRoutines::FindItem(String, colorkeys, NumColors);
-
+        bool WasSet = false;
+        int found = UtilityRoutines::FindItem(String, state.dataSurfColor->colorkeys, NumColors);
         if (found != 0) {
-            if (present(ColorType)) {
-                if (ColorType() == "DXF") {
-                    DXFcolorno(colorkeyptr(found)) = SetValue;
-                    WasSet = true;
-                } else {
-                }
-            } else {
-                DXFcolorno(colorkeyptr(found)) = SetValue;
+            if (ColorType == "DXF") {
+                state.dataSurfColor->DXFcolorno(state.dataSurfColor->colorkeyptr(found)) = SetValue;
                 WasSet = true;
             }
         }
-
         return WasSet;
     }
 
-    void SetUpSchemeColors(std::string const &SchemeName, Optional_string_const ColorType)
+    void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType)
     {
 
         // SUBROUTINE INFORMATION:
@@ -210,28 +109,25 @@ namespace DataSurfaceColors {
         // the alphas and numerics required to process the Report:SurfaceColorScheme object.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const CurrentModuleObject("OutputControl:SurfaceColorScheme");
+        constexpr auto CurrentModuleObject("OutputControl:SurfaceColorScheme");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas;
-        int numNumbers;
-        int numptr;
-        int numargs;
-        int status;
-        Array1D_string cAlphas;
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
-        Array1D_bool lAlphaBlanks;
-        Array1D_bool lNumericBlanks;
-        Array1D<Real64> rNumerics;
+        state.dataSurfColor->DXFcolorno = state.dataSurfColor->defaultcolorno;
 
-        DXFcolorno = defaultcolorno;
         // first see if there is a scheme name
-        numptr = inputProcessor->getObjectItemNum(CurrentModuleObject, SchemeName);
-
+        int numptr = inputProcessor->getObjectItemNum(state, CurrentModuleObject, SchemeName);
         if (numptr > 0) {
 
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, numargs, NumAlphas, numNumbers);
+            int NumAlphas;
+            int numNumbers;
+            int numargs;
+            int status;
+            Array1D_string cAlphas;
+            Array1D_string cAlphaFields;
+            Array1D_string cNumericFields;
+            Array1D_bool lAlphaBlanks;
+            Array1D_bool lNumericBlanks;
+            Array1D<Real64> rNumerics;
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, numargs, NumAlphas, numNumbers);
 
             cAlphas.allocate(NumAlphas);
             cAlphaFields.allocate(NumAlphas);
@@ -243,7 +139,8 @@ namespace DataSurfaceColors {
             cAlphas({1, NumAlphas}) = "";
             rNumerics({1, numNumbers}) = 0.0;
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           numptr,
                                           cAlphas,
                                           NumAlphas,
@@ -258,29 +155,19 @@ namespace DataSurfaceColors {
                 numptr = rNumerics(numargs); // set to integer
                 if (lNumericBlanks(numargs)) {
                     if (!lAlphaBlanks(numargs + 1)) {
-                        ShowWarningError("SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
+                        ShowWarningError(state, "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
                                          cAlphas(numargs + 1) + ", " + cNumericFields(numargs) + " was blank.  Default color retained.");
                     }
                     continue;
                 }
-                if (!MatchAndSetColorTextString(cAlphas(numargs + 1), numptr, ColorType)) {
-                    ShowWarningError("SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
+                if (!MatchAndSetColorTextString(state, cAlphas(numargs + 1), numptr, ColorType)) {
+                    ShowWarningError(state, "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
                                      cAlphas(numargs + 1) + ", is invalid.  No color set.");
                 }
             }
-
-            cAlphas.deallocate();
-            cAlphaFields.deallocate();
-            lAlphaBlanks.deallocate();
-            rNumerics.deallocate();
-            cNumericFields.deallocate();
-            lNumericBlanks.deallocate();
-
         } else {
-            ShowWarningError("SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used.");
+            ShowWarningError(state, "SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used.");
         }
     }
-
-} // namespace DataSurfaceColors
 
 } // namespace EnergyPlus

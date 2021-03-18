@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,14 +53,13 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -68,15 +67,12 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace RoomAirModelUserTempPattern {
+namespace EnergyPlus::RoomAirModelUserTempPattern {
 
     // MODULE INFORMATION:
     //       AUTHOR         Brent Griffith
@@ -96,44 +92,19 @@ namespace RoomAirModelUserTempPattern {
     // user defined temperature pattern roomair modeling.
     // See DataRoomAir.cc for variable declarations
 
-    // REFERENCES:
-    // none
-
-    // OTHER NOTES:
-    // na
-
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::DisplayExtraWarnings;
     using namespace DataRoomAirModel;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
-
-    // MODULE DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // see DataRoomAir
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE TempDistSimMgr
-
-    // main subsroutine
-
-    // get input routines are in RoomAirManager.cc
-
-    // Routines for transferring data between Heat Balance and Air model domains
-
-    // Routines for actual calculations in TempDist model
-
-    // MODULE SUBROUTINES:
-
     // Functions
+    bool MyOneTimeFlag(true); // one time setup flag
+    bool MyOneTimeFlag2(true);
 
-    void ManageUserDefinedPatterns(int const ZoneNum) // index number for the specified zone
+    void clear_state() {
+        MyOneTimeFlag = true;
+        MyOneTimeFlag2 = true;
+    }
+
+    void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -148,44 +119,21 @@ namespace RoomAirModelUserTempPattern {
         // METHODOLOGY EMPLOYED:
         // calls subroutines
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // FLOW:
-
         // transfer data from surface domain to air domain for the specified zone
-        InitTempDistModel(ZoneNum);
+        InitTempDistModel(state, ZoneNum);
 
-        GetSurfHBDataForTempDistModel(ZoneNum);
+        GetSurfHBDataForTempDistModel(state, ZoneNum);
 
         // perform TempDist model calculations
-        CalcTempDistModel(ZoneNum);
+        CalcTempDistModel(state, ZoneNum);
 
         // transfer data from air domain back to surface domain for the specified zone
-        SetSurfHBDataForTempDistModel(ZoneNum);
+        SetSurfHBDataForTempDistModel(state, ZoneNum);
     }
 
     //****************************************************
 
-    void InitTempDistModel(int const ZoneNum) // index number for the specified zone
+    void InitTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -204,9 +152,6 @@ namespace RoomAirModelUserTempPattern {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
-        using DataGlobals::NumOfZones;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -221,33 +166,32 @@ namespace RoomAirModelUserTempPattern {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
-        static bool MyOneTimeFlag(true); // one time setup flag
         int SurfNum;                     // do loop counter
 
         if (MyOneTimeFlag) {
-            MyEnvrnFlag.dimension(NumOfZones, true);
+            MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
             MyOneTimeFlag = false;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
-            AirPatternZoneInfo(ZoneNum).TairMean = 23.0;
-            AirPatternZoneInfo(ZoneNum).Tstat = 23.0;
-            AirPatternZoneInfo(ZoneNum).Tleaving = 23.0;
-            AirPatternZoneInfo(ZoneNum).Texhaust = 23.0;
-            AirPatternZoneInfo(ZoneNum).Gradient = 0.0;
-            for (SurfNum = 1; SurfNum <= AirPatternZoneInfo(ZoneNum).totNumSurfs; ++SurfNum) {
-                AirPatternZoneInfo(ZoneNum).Surf(SurfNum).TadjacentAir = 23.0;
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean = 23.0;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = 23.0;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = 23.0;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = 23.0;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient = 0.0;
+            for (SurfNum = 1; SurfNum <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++SurfNum) {
+                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(SurfNum).TadjacentAir = 23.0;
             }
             MyEnvrnFlag(ZoneNum) = false;
         }
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag(ZoneNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(ZoneNum) = true;
 
         // init report variable
-        AirPatternZoneInfo(ZoneNum).Gradient = 0.0;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient = 0.0;
     }
 
-    void GetSurfHBDataForTempDistModel(int const ZoneNum) // index number for the specified zone
+    void GetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -264,45 +208,22 @@ namespace RoomAirModelUserTempPattern {
         // METHODOLOGY EMPLOYED:
         // use ZT from DataHeatBalFanSys
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZT;
-        using DataHeatBalFanSys::ZTAV;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // unused    INTEGER    :: thisZoneInfo
 
         // intialize in preperation for calculations
-        AirPatternZoneInfo(ZoneNum).Tstat = MAT(ZoneNum);
-        AirPatternZoneInfo(ZoneNum).Tleaving = MAT(ZoneNum);
-        AirPatternZoneInfo(ZoneNum).Texhaust = MAT(ZoneNum);
-        for (auto &e : AirPatternZoneInfo(ZoneNum).Surf)
-            e.TadjacentAir = MAT(ZoneNum);
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataHeatBalFanSys->MAT(ZoneNum);
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataHeatBalFanSys->MAT(ZoneNum);
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataHeatBalFanSys->MAT(ZoneNum);
+        for (auto &e : state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf)
+            e.TadjacentAir = state.dataHeatBalFanSys->MAT(ZoneNum);
 
         // the only input this method needs is the zone MAT or ZT or ZTAV  ?  (original was ZT)
-        AirPatternZoneInfo(ZoneNum).TairMean = MAT(ZoneNum); // this is lagged from previous corrector result
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean = state.dataHeatBalFanSys->MAT(ZoneNum); // this is lagged from previous corrector result
     }
 
     //*****************************************************************************************
 
-    void CalcTempDistModel(int const ZoneNum) // index number for the specified zone
+    void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -325,59 +246,51 @@ namespace RoomAirModelUserTempPattern {
         Real64 AvailTest;
         int CurntPatternKey;
         int CurPatrnID;
-        // unused    INTEGER    :: thisZoneInfoSurf
-        // unused    INTEGER    :: lowSideID
-        // unused    INTEGER    :: highSideID
-        // unused    REAL(r64)  :: thisZeta
-        // unused    REAL(r64)  :: lowSideZeta
-        // unused    REAL(r64)  :: hiSideZeta
-        // unused    REAL(r64)  :: fractBtwn
-        // unused    REAL(r64)  :: tmpDeltaTai
 
         // first determine availability
-        AvailTest = GetCurrentScheduleValue(AirPatternZoneInfo(ZoneNum).AvailSchedID);
+        AvailTest = GetCurrentScheduleValue(state, state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID);
 
-        if ((AvailTest != 1.0) || (!AirPatternZoneInfo(ZoneNum).IsUsed)) {
+        if ((AvailTest != 1.0) || (!state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).IsUsed)) {
             // model not to be used. Use complete mixing method
 
-            AirPatternZoneInfo(ZoneNum).Tstat = AirPatternZoneInfo(ZoneNum).TairMean;
-            AirPatternZoneInfo(ZoneNum).Tleaving = AirPatternZoneInfo(ZoneNum).TairMean;
-            AirPatternZoneInfo(ZoneNum).Texhaust = AirPatternZoneInfo(ZoneNum).TairMean;
-            for (auto &e : AirPatternZoneInfo(ZoneNum).Surf)
-                e.TadjacentAir = AirPatternZoneInfo(ZoneNum).TairMean;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
+            for (auto &e : state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf)
+                e.TadjacentAir = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
 
             return;
 
         } else { // choose pattern and call subroutine
 
-            CurntPatternKey = GetCurrentScheduleValue(AirPatternZoneInfo(ZoneNum).PatternSchedID);
+            CurntPatternKey = GetCurrentScheduleValue(state, state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).PatternSchedID);
 
-            CurPatrnID = FindNumberInList(CurntPatternKey, RoomAirPattern, &TemperaturePatternStruct::PatrnID);
+            CurPatrnID = FindNumberInList(CurntPatternKey, state.dataRoomAirMod->RoomAirPattern, &TemperaturePatternStruct::PatrnID);
 
             if (CurPatrnID == 0) {
                 // throw error here ? way to test schedules before getting to this point?
-                ShowFatalError("User defined room air pattern index not found: " + std::to_string(CurntPatternKey));
+                ShowFatalError(state, format("User defined room air pattern index not found: {}", CurntPatternKey));
                 return;
             }
 
             {
-                auto const SELECT_CASE_var(RoomAirPattern(CurPatrnID).PatternMode);
+                auto const SELECT_CASE_var(state.dataRoomAirMod->RoomAirPattern(CurPatrnID).PatternMode);
 
-                if (SELECT_CASE_var == ConstGradTempPattern) {
+                if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::ConstGradTempPattern) {
 
-                    FigureConstGradPattern(CurPatrnID, ZoneNum);
+                    FigureConstGradPattern(state, CurPatrnID, ZoneNum);
 
-                } else if (SELECT_CASE_var == TwoGradInterpPattern) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::TwoGradInterpPattern) {
 
-                    FigureTwoGradInterpPattern(CurPatrnID, ZoneNum);
+                    FigureTwoGradInterpPattern(state, CurPatrnID, ZoneNum);
 
-                } else if (SELECT_CASE_var == NonDimenHeightPattern) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::NonDimenHeightPattern) {
 
-                    FigureHeightPattern(CurPatrnID, ZoneNum);
+                    FigureHeightPattern(state, CurPatrnID, ZoneNum);
 
-                } else if (SELECT_CASE_var == SurfMapTempPattern) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::SurfMapTempPattern) {
 
-                    FigureSurfMapPattern(CurPatrnID, ZoneNum);
+                    FigureSurfMapPattern(state, CurPatrnID, ZoneNum);
 
                 } else {
                     // should not come here
@@ -387,7 +300,7 @@ namespace RoomAirModelUserTempPattern {
         } // availability control construct
     }
 
-    void FigureSurfMapPattern(int const PattrnID, int const ZoneNum)
+    void FigureSurfMapPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -404,48 +317,33 @@ namespace RoomAirModelUserTempPattern {
         // delta Tai's to current mean air temp
         // on a surface by surface basis
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::FindNumberInList;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Tmean;
         int found;
         int i;
 
-        Tmean = AirPatternZoneInfo(ZoneNum).TairMean;
+        Tmean = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
 
-        for (i = 1; i <= AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
+        for (i = 1; i <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
             // cycle through zone surfaces and look for match
             found = FindNumberInList(
-                AirPatternZoneInfo(ZoneNum).Surf(i).SurfID, RoomAirPattern(PattrnID).MapPatrn.SurfID, RoomAirPattern(PattrnID).MapPatrn.NumSurfs);
+                    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).SurfID, state.dataRoomAirMod->RoomAirPattern(PattrnID).MapPatrn.SurfID, state.dataRoomAirMod->RoomAirPattern(PattrnID).MapPatrn.NumSurfs);
             if (found != 0) { // if surf is in map then assign, else give it MAT
-                AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = RoomAirPattern(PattrnID).MapPatrn.DeltaTai(found) + Tmean;
+                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = state.dataRoomAirMod->RoomAirPattern(PattrnID).MapPatrn.DeltaTai(found) + Tmean;
             } else {
-                AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = Tmean;
+                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = Tmean;
             }
         }
 
-        AirPatternZoneInfo(ZoneNum).Tstat = RoomAirPattern(PattrnID).DeltaTstat + Tmean;
-        AirPatternZoneInfo(ZoneNum).Tleaving = RoomAirPattern(PattrnID).DeltaTleaving + Tmean;
-        AirPatternZoneInfo(ZoneNum).Texhaust = RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTstat + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTleaving + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
     }
 
-    void FigureHeightPattern(int const PattrnID, int const ZoneNum)
+    void FigureHeightPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -460,25 +358,8 @@ namespace RoomAirModelUserTempPattern {
         // METHODOLOGY EMPLOYED:
         // treat profile as lookup table and interpolate
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
         using FluidProperties::FindArrayIndex;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Tmean;
@@ -492,42 +373,42 @@ namespace RoomAirModelUserTempPattern {
         Real64 tmpDeltaTai;
 
         tmpDeltaTai = 0.0;
-        Tmean = AirPatternZoneInfo(ZoneNum).TairMean;
+        Tmean = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
 
-        for (i = 1; i <= AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
+        for (i = 1; i <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
 
-            thisZeta = AirPatternZoneInfo(ZoneNum).Surf(i).Zeta;
-            lowSideID = FindArrayIndex(thisZeta, RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn);
+            thisZeta = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).Zeta;
+            lowSideID = FindArrayIndex(thisZeta, state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn);
             highSideID = lowSideID + 1;
             if (lowSideID == 0) lowSideID = 1; // protect against array bounds
 
-            lowSideZeta = RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn(lowSideID);
-            if (highSideID <= isize(RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn)) {
-                hiSideZeta = RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn(highSideID);
+            lowSideZeta = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn(lowSideID);
+            if (highSideID <= isize(state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn)) {
+                hiSideZeta = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn(highSideID);
             } else { // trap array bounds
                 hiSideZeta = lowSideZeta;
             }
             if ((hiSideZeta - lowSideZeta) != 0.0) {
                 fractBtwn = (thisZeta - lowSideZeta) / (hiSideZeta - lowSideZeta);
-                tmpDeltaTai = RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID) +
-                              fractBtwn * (RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(highSideID) -
-                                           RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID));
+                tmpDeltaTai = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID) +
+                              fractBtwn * (state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(highSideID) -
+                                      state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID));
 
             } else { // would divide by zero, using low side value
 
-                tmpDeltaTai = RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID);
+                tmpDeltaTai = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID);
             }
 
-            AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = tmpDeltaTai + Tmean;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = tmpDeltaTai + Tmean;
 
         } // surfaces in this zone
 
-        AirPatternZoneInfo(ZoneNum).Tstat = RoomAirPattern(PattrnID).DeltaTstat + Tmean;
-        AirPatternZoneInfo(ZoneNum).Tleaving = RoomAirPattern(PattrnID).DeltaTleaving + Tmean;
-        AirPatternZoneInfo(ZoneNum).Texhaust = RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTstat + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTleaving + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
     }
 
-    void FigureTwoGradInterpPattern(int const PattrnID, int const ZoneNum)
+    void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -544,28 +425,7 @@ namespace RoomAirModelUserTempPattern {
         // based on user selected mode.
         // calculations vary by mode
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
-        using DataHeatBalance::SNLoadCoolRate;
-        using DataHeatBalance::SNLoadHeatRate;
-        using DataHeatBalance::Zone;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Tmean;                        // MAT deg C
@@ -579,127 +439,126 @@ namespace RoomAirModelUserTempPattern {
         Real64 DeltaHeight;                  // height difference in m
         Real64 tempDeltaTai;                 // temporary temperature difference
         static Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
-        static bool MyOneTimeFlag(true);
 
-        if (MyOneTimeFlag) {
-            SetupOutputFlag.dimension(NumOfZones, true); // init
-            MyOneTimeFlag = false;
+        if (MyOneTimeFlag2) {
+            SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init
+            MyOneTimeFlag2 = false;
         }
 
         if (SetupOutputFlag(ZoneNum)) {
-            SetupOutputVariable("Room Air Zone Vertical Temperature Gradient",
+            SetupOutputVariable(state, "Room Air Zone Vertical Temperature Gradient",
                                 OutputProcessor::Unit::K_m,
-                                AirPatternZoneInfo(ZoneNum).Gradient,
+                                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient,
                                 "HVAC",
                                 "State",
-                                AirPatternZoneInfo(ZoneNum).ZoneName);
+                                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneName);
 
             SetupOutputFlag(ZoneNum) = false;
         }
 
-        Tmean = AirPatternZoneInfo(ZoneNum).TairMean;
+        Tmean = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
 
         // determine gradient depending on mode
         {
-            auto const SELECT_CASE_var(RoomAirPattern(PattrnID).TwoGradPatrn.InterpolationMode);
+            auto const SELECT_CASE_var(state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.InterpolationMode);
 
-            if (SELECT_CASE_var == OutdoorDryBulbMode) {
+            if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode) {
 
-                Grad = OutdoorDryBulbGrad(Zone(ZoneNum).OutDryBulbTemp,
-                                          RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale,
-                                          RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient,
-                                          RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale,
-                                          RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
+                Grad = OutdoorDryBulbGrad(state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp,
+                                          state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale,
+                                          state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient,
+                                          state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale,
+                                          state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
 
-            } else if (SELECT_CASE_var == ZoneAirTempMode) {
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::ZoneAirTempMode) {
 
-                if (Tmean >= RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale) {
-                    Grad = RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
+                if (Tmean >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale) {
+                    Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 
-                } else if (Tmean <= RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) {
+                } else if (Tmean <= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) {
 
-                    Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
+                    Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
                 } else { // interpolate
-                    if ((RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale - RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) ==
+                    if ((state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) ==
                         0.0) {
                         // bad user input, trapped during get input
-                        Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
+                        Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
                     } else {
 
-                        Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient +
-                               ((Tmean - RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) /
-                                (RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale -
-                                 RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale)) *
-                                   (RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient - RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
+                        Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient +
+                               ((Tmean - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) /
+                                (state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale -
+                                        state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale)) *
+                                   (state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
                     }
                 }
 
-            } else if (SELECT_CASE_var == DeltaOutdoorZone) {
-                DeltaT = Zone(ZoneNum).OutDryBulbTemp - Tmean;
-                if (DeltaT >= RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale) {
-                    Grad = RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone) {
+                DeltaT = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp - Tmean;
+                if (DeltaT >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale) {
+                    Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 
-                } else if (DeltaT <= RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) {
+                } else if (DeltaT <= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) {
 
-                    Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
+                    Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
                 } else { // interpolate
-                    if ((RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale - RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) ==
+                    if ((state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) ==
                         0.0) {
                         // bad user input, trapped during get input
-                        Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
+                        Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
                     } else {
 
-                        Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient +
-                               ((DeltaT - RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) /
-                                (RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale -
-                                 RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale)) *
-                                   (RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient - RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
+                        Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient +
+                               ((DeltaT - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale) /
+                                (state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale -
+                                        state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale)) *
+                                   (state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
                     }
                 }
 
-            } else if (SELECT_CASE_var == SensibleCoolingMode) {
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode) {
 
-                CoolLoad = SNLoadCoolRate(ZoneNum);
-                if (CoolLoad >= RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
-                    Grad = RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
+                CoolLoad = state.dataHeatBal->SNLoadCoolRate(ZoneNum);
+                if (CoolLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
+                    Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 
-                } else if (CoolLoad <= RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) {
+                } else if (CoolLoad <= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) {
 
-                    Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
+                    Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
                 } else { // interpolate
-                    if ((RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale -
-                         RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) == 0.0) {
-                        Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
+                    if ((state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale -
+                            state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) == 0.0) {
+                        Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
                     } else {
 
-                        Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient +
-                               ((CoolLoad - RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) /
-                                (RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale -
-                                 RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale)) *
-                                   (RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient - RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
+                        Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient +
+                               ((CoolLoad - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) /
+                                (state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale -
+                                        state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale)) *
+                                   (state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
                     }
                 }
 
-            } else if (SELECT_CASE_var == SensibleHeatingMode) {
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode) {
 
-                HeatLoad = SNLoadHeatRate(ZoneNum);
-                if (HeatLoad >= RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
-                    Grad = RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
+                HeatLoad = state.dataHeatBal->SNLoadHeatRate(ZoneNum);
+                if (HeatLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
+                    Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 
-                } else if (HeatLoad <= RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) {
+                } else if (HeatLoad <= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) {
 
-                    Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
+                    Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
                 } else { // interpolate
-                    if ((RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale -
-                         RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) == 0.0) {
-                        Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
+                    if ((state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale -
+                            state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) == 0.0) {
+                        Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient;
                     } else {
 
-                        Grad = RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient +
-                               ((HeatLoad - RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) /
-                                (RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale -
-                                 RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale)) *
-                                   (RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient - RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
+                        Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient +
+                               ((HeatLoad - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale) /
+                                (state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale -
+                                        state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundHeatRateScale)) *
+                                   (state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
                     }
                 }
             }
@@ -707,24 +566,24 @@ namespace RoomAirModelUserTempPattern {
 
         ZetaTmean = 0.5; // by definition,
 
-        for (i = 1; i <= AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
-            thisZeta = AirPatternZoneInfo(ZoneNum).Surf(i).Zeta;
+        for (i = 1; i <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
+            thisZeta = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).Zeta;
 
-            DeltaHeight = -1.0 * (ZetaTmean - thisZeta) * AirPatternZoneInfo(ZoneNum).ZoneHeight;
+            DeltaHeight = -1.0 * (ZetaTmean - thisZeta) * state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneHeight;
 
             tempDeltaTai = DeltaHeight * Grad;
 
-            AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = tempDeltaTai + Tmean;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = tempDeltaTai + Tmean;
         }
 
-        AirPatternZoneInfo(ZoneNum).Tstat =
-            -1.0 * (0.5 * AirPatternZoneInfo(ZoneNum).ZoneHeight - RoomAirPattern(PattrnID).TwoGradPatrn.TstatHeight) * Grad + Tmean;
-        AirPatternZoneInfo(ZoneNum).Tleaving =
-            -1.0 * (0.5 * AirPatternZoneInfo(ZoneNum).ZoneHeight - RoomAirPattern(PattrnID).TwoGradPatrn.TleavingHeight) * Grad + Tmean;
-        AirPatternZoneInfo(ZoneNum).Texhaust =
-            -1.0 * (0.5 * AirPatternZoneInfo(ZoneNum).ZoneHeight - RoomAirPattern(PattrnID).TwoGradPatrn.TexhaustHeight) * Grad + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat =
+            -1.0 * (0.5 * state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneHeight - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.TstatHeight) * Grad + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving =
+            -1.0 * (0.5 * state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneHeight - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.TleavingHeight) * Grad + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust =
+            -1.0 * (0.5 * state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneHeight - state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.TexhaustHeight) * Grad + Tmean;
 
-        AirPatternZoneInfo(ZoneNum).Gradient = Grad;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient = Grad;
     }
     Real64 OutdoorDryBulbGrad(Real64 DryBulbTemp, // Zone(ZoneNum).OutDryBulbTemp
                               Real64 UpperBound,  // RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale
@@ -753,7 +612,7 @@ namespace RoomAirModelUserTempPattern {
         return Grad;
     }
 
-    void FigureConstGradPattern(int const PattrnID, int const ZoneNum)
+    void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -762,32 +621,6 @@ namespace RoomAirModelUserTempPattern {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
         Real64 Tmean;        // MAT
         int i;               // loop counter
         Real64 Grad;         // vertical temperature gradient
@@ -796,26 +629,26 @@ namespace RoomAirModelUserTempPattern {
         Real64 DeltaHeight;  // temporary height difference
         Real64 tempDeltaTai; // temporary Delta Tai
 
-        Tmean = AirPatternZoneInfo(ZoneNum).TairMean;
-        Grad = RoomAirPattern(PattrnID).GradPatrn.Gradient;
+        Tmean = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
+        Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).GradPatrn.Gradient;
 
         ZetaTmean = 0.5; // by definition,
 
-        for (i = 1; i <= AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
-            thisZeta = AirPatternZoneInfo(ZoneNum).Surf(i).Zeta;
-            DeltaHeight = -1.0 * (ZetaTmean - thisZeta) * AirPatternZoneInfo(ZoneNum).ZoneHeight;
+        for (i = 1; i <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
+            thisZeta = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).Zeta;
+            DeltaHeight = -1.0 * (ZetaTmean - thisZeta) * state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneHeight;
             tempDeltaTai = DeltaHeight * Grad;
-            AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = tempDeltaTai + Tmean;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = tempDeltaTai + Tmean;
         }
 
-        AirPatternZoneInfo(ZoneNum).Tstat = RoomAirPattern(PattrnID).DeltaTstat + Tmean;
-        AirPatternZoneInfo(ZoneNum).Tleaving = RoomAirPattern(PattrnID).DeltaTleaving + Tmean;
-        AirPatternZoneInfo(ZoneNum).Texhaust = RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTstat + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTleaving + Tmean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
     }
 
     //*****************************************************************************************
 
-    Real64 FigureNDheightInZone(int const thisHBsurf) // index in main Surface array
+    Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // index in main Surface array
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Griffith
@@ -831,35 +664,14 @@ namespace RoomAirModelUserTempPattern {
         // use ceiling height from Zone structure
         // non dimensionalize surface's centroid's Z value
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
-        using DataErrorTracking::TotalRoomAirPatternTooHigh;
-        using DataErrorTracking::TotalRoomAirPatternTooLow;
-        using DataHeatBalance::Zone;
-        using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_Floor;
-        using DataSurfaces::SurfaceClass_Wall;
         using DataVectorTypes::Vector;
-        using General::RoundSigDigits;
 
         // Return value
         Real64 FigureNDheightInZone;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 const TolValue(0.0001);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int thisZone;
@@ -879,8 +691,8 @@ namespace RoomAirModelUserTempPattern {
         Real64 Z2;
 
         // Get the centroid height for the surface
-        Zcm = Surface(thisHBsurf).Centroid.z;
-        thisZone = Surface(thisHBsurf).Zone;
+        Zcm = state.dataSurface->Surface(thisHBsurf).Centroid.z;
+        thisZone = state.dataSurface->Surface(thisHBsurf).Zone;
 
         // this next Do block is copied from SurfaceGeometry.cc with modification for just floor Z
         // used find floor z.
@@ -889,23 +701,23 @@ namespace RoomAirModelUserTempPattern {
         ZMax = 0.0;
         ZMin = 0.0;
         Count = 0;
-        for (SurfNum = Zone(thisZone).SurfaceFirst; SurfNum <= Zone(thisZone).SurfaceLast; ++SurfNum) {
-            if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+        for (SurfNum = state.dataHeatBal->Zone(thisZone).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(thisZone).HTSurfaceLast; ++SurfNum) {
+            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Floor) {
                 // Use Average Z for surface, more important for roofs than floors...
                 ++FloorCount;
-                Z1 = minval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
-                Z2 = maxval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
+                Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+                Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
                 ZFlrAvg += (Z1 + Z2) / 2.0;
             }
-            if (Surface(SurfNum).Class == SurfaceClass_Wall) {
+            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Wall) {
                 // Use Wall calculation in case no floor in zone
                 ++Count;
                 if (Count == 1) {
-                    ZMax = Surface(SurfNum).Vertex(1).z;
+                    ZMax = state.dataSurface->Surface(SurfNum).Vertex(1).z;
                     ZMin = ZMax;
                 }
-                ZMax = max(ZMax, maxval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z));
-                ZMin = min(ZMin, minval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z));
+                ZMax = max(ZMax, maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
+                ZMin = min(ZMin, minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
             }
         }
         if (FloorCount > 0.0) {
@@ -914,32 +726,32 @@ namespace RoomAirModelUserTempPattern {
             ZFlrAvg = ZMin;
         }
         ZoneZorig = ZFlrAvg; // Z floor  [M]
-        ZoneCeilHeight = Zone(thisZone).CeilingHeight;
+        ZoneCeilHeight = state.dataHeatBal->Zone(thisZone).CeilingHeight;
 
         // first check if some basic things are reasonable
 
-        SurfMinZ = minval(Surface(thisHBsurf).Vertex, &Vector::z);
-        SurfMaxZ = maxval(Surface(thisHBsurf).Vertex, &Vector::z);
+        SurfMinZ = minval(state.dataSurface->Surface(thisHBsurf).Vertex, &Vector::z);
+        SurfMaxZ = maxval(state.dataSurface->Surface(thisHBsurf).Vertex, &Vector::z);
 
         if (SurfMinZ < (ZoneZorig - TolValue)) {
-            if (DisplayExtraWarnings) {
-                ShowWarningError("RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-                ShowContinueError("too low surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError("**** Average floor height of zone is: " + RoundSigDigits(ZoneZorig, 3));
-                ShowContinueError("**** Surface minimum height is: " + RoundSigDigits(SurfMinZ, 3));
+            if (state.dataGlobal->DisplayExtraWarnings) {
+                ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
+                ShowContinueError(state, "too low surface: " + state.dataSurface->Surface(thisHBsurf).Name + " in zone: " + state.dataHeatBal->Zone(thisZone).Name);
+                ShowContinueError(state, format("**** Average floor height of zone is: {:.3R}", ZoneZorig));
+                ShowContinueError(state, format("**** Surface minimum height is: {:.3R}", SurfMinZ));
             } else {
-                ++TotalRoomAirPatternTooLow;
+                ++state.dataErrTracking->TotalRoomAirPatternTooLow;
             }
         }
 
         if (SurfMaxZ > (ZoneZorig + ZoneCeilHeight + TolValue)) {
-            if (DisplayExtraWarnings) {
-                ShowWarningError("RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-                ShowContinueError(" too high surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError("**** Average Ceiling height of zone is: " + RoundSigDigits((ZoneZorig + ZoneCeilHeight), 3));
-                ShowContinueError("**** Surface Maximum height is: " + RoundSigDigits(SurfMaxZ, 3));
+            if (state.dataGlobal->DisplayExtraWarnings) {
+                ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
+                ShowContinueError(state, " too high surface: " + state.dataSurface->Surface(thisHBsurf).Name + " in zone: " + state.dataHeatBal->Zone(thisZone).Name);
+                ShowContinueError(state, format("**** Average Ceiling height of zone is: {:.3R}", (ZoneZorig + ZoneCeilHeight)));
+                ShowContinueError(state, format("**** Surface Maximum height is: {:.3R}", SurfMaxZ));
             } else {
-                ++TotalRoomAirPatternTooHigh;
+                ++state.dataErrTracking->TotalRoomAirPatternTooHigh;
             }
         }
 
@@ -958,7 +770,7 @@ namespace RoomAirModelUserTempPattern {
 
     //***************************************************
 
-    void SetSurfHBDataForTempDistModel(int const ZoneNum) // index number for the specified zone
+    void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -975,24 +787,10 @@ namespace RoomAirModelUserTempPattern {
         // sets values in Heat balance variables
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
-        using DataGlobals::ZoneSizingCalc;
-        using DataHeatBalance::RefrigCaseCredit;
-        using DataHeatBalance::TempEffBulkAir;
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::SysDepZoneLoads;
-        using DataHeatBalFanSys::TempTstatAir;
-        using DataHeatBalFanSys::TempZoneThermostatSetPoint;
-        using DataHeatBalFanSys::ZoneLatentGain;
-        using DataHeatBalFanSys::ZT;
         using DataHVACGlobals::RetTempMax;
         using DataHVACGlobals::RetTempMin;
-        using DataLoopNode::Node;
         using DataSurfaces::AdjacentAirTemp;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
-        using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceWindow;
         using DataSurfaces::ZoneMeanAirTemp;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using InternalHeatGains::SumAllReturnAirLatentGains;
@@ -1020,10 +818,10 @@ namespace RoomAirModelUserTempPattern {
         Real64 ZoneMult;
         Real64 SumRetAirLatentGainRate;
 
-        // FLOW:
 
-        SurfFirst = Zone(ZoneNum).SurfaceFirst;
-        SurfLast = Zone(ZoneNum).SurfaceLast;
+
+        SurfFirst = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst;
+        SurfLast = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
 
         // set air system leaving node conditions
         // this is not so easy.  THis task is normally done in CalcZoneLeavingConditions
@@ -1031,49 +829,53 @@ namespace RoomAirModelUserTempPattern {
         //  Need to revisit how to best implement this. Ended up taking code from CalcZoneLeavingConditions
         //  ZoneNum is already equal to ActualZoneNum , changed block of source
 
-        if (AirPatternZoneInfo(ZoneNum).ZoneNodeID != 0) {
+        if (state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneNodeID != 0) {
             // the zone system node should get the conditions leaving the zone (but before return air heat gains are added).
-            Node(AirPatternZoneInfo(ZoneNum).ZoneNodeID).Temp = AirPatternZoneInfo(ZoneNum).Tleaving;
+            state.dataLoopNodes->Node(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneNodeID).Temp =
+                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving;
         }
 
-        int zoneEquipNum = Zone(ZoneNum).ZoneEqNum;
-        for (int nodeCount = 1; nodeCount <= DataZoneEquipment::ZoneEquipConfig(zoneEquipNum).NumReturnNodes; ++nodeCount) {
+        int zoneEquipNum = state.dataHeatBal->Zone(ZoneNum).ZoneEqNum;
+        for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).NumReturnNodes; ++nodeCount) {
             // BEGIN BLOCK of code from CalcZoneLeavingConditions*********************************
-            int ReturnNode = DataZoneEquipment::ZoneEquipConfig(zoneEquipNum).ReturnNode(nodeCount);
-            ZoneNode = AirPatternZoneInfo(ZoneNum).ZoneNodeID;
-            ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+            int ReturnNode = state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).ReturnNode(nodeCount);
+            ZoneNode = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneNodeID;
+            ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
             // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
             // Add sensible heat gain from refrigerated cases with under case returns
-            SumAllReturnAirConvectionGains(ZoneNum, QRetAir, ReturnNode);
+            SumAllReturnAirConvectionGains(state, ZoneNum, QRetAir, ReturnNode);
 
-            CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
+            CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
 
             // Need to add the energy to the return air from lights and from airflow windows. Where the heat
             // is added depends on if there is system flow or not.  If there is system flow the heat is added
             // to the Zone Return Node.  If there is no system flow then the heat is added back to the zone in the
             // Correct step through the SysDepZoneLoads variable.
 
-            MassFlowRA = Node(ReturnNode).MassFlowRate / ZoneMult;
-            TempZoneAir = AirPatternZoneInfo(ZoneNum).Tleaving; // key difference from
+            MassFlowRA = state.dataLoopNodes->Node(ReturnNode).MassFlowRate / ZoneMult;
+            TempZoneAir = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving; // key difference from
             TempRetAir = TempZoneAir;
             WinGapFlowToRA = 0.0;
             WinGapTtoRA = 0.0;
             WinGapFlowTtoRA = 0.0;
 
-            if (DataZoneEquipment::ZoneEquipConfig(zoneEquipNum).ZoneHasAirFlowWindowReturn) {
-                for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                    if (SurfaceWindow(SurfNum).AirflowThisTS > 0.0 &&
-                        SurfaceWindow(SurfNum).AirflowDestination == AirFlowWindow_Destination_ReturnAir) {
-                        FlowThisTS = PsyRhoAirFnPbTdbW(OutBaroPress, SurfaceWindow(SurfNum).TAirflowGapOutlet, Node(ZoneNode).HumRat) *
-                                     SurfaceWindow(SurfNum).AirflowThisTS * Surface(SurfNum).Width;
+            if (state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).ZoneHasAirFlowWindowReturn) {
+                for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+                    if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
+                        state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                        FlowThisTS = PsyRhoAirFnPbTdbW(state,
+                                                       state.dataEnvrn->OutBaroPress,
+                                                       state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
+                                                       state.dataLoopNodes->Node(ZoneNode).HumRat) *
+                            state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
                         WinGapFlowToRA += FlowThisTS;
-                        WinGapFlowTtoRA += FlowThisTS * SurfaceWindow(SurfNum).TAirflowGapOutlet;
+                        WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
                     }
                 }
             }
             if (WinGapFlowToRA > 0.0) WinGapTtoRA = WinGapFlowTtoRA / WinGapFlowToRA;
 
-            if (!Zone(ZoneNum).NoHeatToReturnAir) {
+            if (!state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
                 if (MassFlowRA > 0.0) {
                     if (WinGapFlowToRA > 0.0) {
                         // Add heat-to-return from window gap airflow
@@ -1083,94 +885,95 @@ namespace RoomAirModelUserTempPattern {
                             // All of return air comes from flow through airflow windows
                             TempRetAir = WinGapTtoRA;
                             // Put heat from window airflow that exceeds return air flow into zone air
-                            SysDepZoneLoads(ZoneNum) += (WinGapFlowToRA - MassFlowRA) * CpAir * (WinGapTtoRA - TempZoneAir);
+                            state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += (WinGapFlowToRA - MassFlowRA) * CpAir * (WinGapTtoRA - TempZoneAir);
                         }
                     }
                     // Add heat-to-return from lights
                     TempRetAir += QRetAir / (MassFlowRA * CpAir);
                     if (TempRetAir > RetTempMax) {
-                        Node(ReturnNode).Temp = RetTempMax;
-                        if (!ZoneSizingCalc) {
-                            SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMax);
+                        state.dataLoopNodes->Node(ReturnNode).Temp = RetTempMax;
+                        if (!state.dataGlobal->ZoneSizingCalc) {
+                            state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMax);
                         }
                     } else if (TempRetAir < RetTempMin) {
-                        Node(ReturnNode).Temp = RetTempMin;
-                        if (!ZoneSizingCalc) {
-                            SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
+                        state.dataLoopNodes->Node(ReturnNode).Temp = RetTempMin;
+                        if (!state.dataGlobal->ZoneSizingCalc) {
+                            state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
                         }
                     } else {
-                        Node(ReturnNode).Temp = TempRetAir;
+                        state.dataLoopNodes->Node(ReturnNode).Temp = TempRetAir;
                     }
                 } else { // No return air flow
                     // Assign all heat-to-return from window gap airflow to zone air
-                    if (WinGapFlowToRA > 0.0) SysDepZoneLoads(ZoneNum) += WinGapFlowToRA * CpAir * (WinGapTtoRA - TempZoneAir);
+                    if (WinGapFlowToRA > 0.0) state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += WinGapFlowToRA * CpAir * (WinGapTtoRA - TempZoneAir);
                     // Assign all heat-to-return from lights to zone air
-                    if (QRetAir > 0.0) SysDepZoneLoads(ZoneNum) += QRetAir;
-                    Node(ReturnNode).Temp = Node(ZoneNode).Temp;
+                    if (QRetAir > 0.0) state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += QRetAir;
+                    state.dataLoopNodes->Node(ReturnNode).Temp = state.dataLoopNodes->Node(ZoneNode).Temp;
                 }
             } else {
-                Node(ReturnNode).Temp = Node(ZoneNode).Temp;
+                state.dataLoopNodes->Node(ReturnNode).Temp = state.dataLoopNodes->Node(ZoneNode).Temp;
             }
 
             // Update the rest of the Return Air Node conditions, if the return air system exists!
-            Node(ReturnNode).Press = Node(ZoneNode).Press;
+            state.dataLoopNodes->Node(ReturnNode).Press = state.dataLoopNodes->Node(ZoneNode).Press;
 
-            H2OHtOfVap = PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ReturnNode).Temp);
-            RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
+            H2OHtOfVap = PsyHgAirFnWTdb(state.dataLoopNodes->Node(ZoneNode).HumRat, state.dataLoopNodes->Node(ReturnNode).Temp);
+            RhoAir = PsyRhoAirFnPbTdbW(
+                state, state.dataEnvrn->OutBaroPress, state.dataLoopNodes->Node(ReturnNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat);
 
             // Include impact of under case returns for refrigerated display cases when updateing return node
             // humidity ratio
-            if (!Zone(ZoneNum).NoHeatToReturnAir) {
+            if (!state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
                 if (MassFlowRA > 0) {
-                    SumAllReturnAirLatentGains(ZoneNum, SumRetAirLatentGainRate, ReturnNode);
-                    Node(ReturnNode).HumRat = Node(ZoneNode).HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
+                    SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                    state.dataLoopNodes->Node(ReturnNode).HumRat =
+                        state.dataLoopNodes->Node(ZoneNode).HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
                 } else {
                     // If no mass flow rate exists, include the latent HVAC case credit with the latent Zone case credit
-                    Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
-                    RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
+                    state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
+                    state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
-                    SumAllReturnAirLatentGains(ZoneNum, SumRetAirLatentGainRate, 0);
-                    ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
+                    SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, 0);
+                    state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
                 }
             } else {
-                Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
-                RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
+                state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
+                state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
-                SumAllReturnAirLatentGains(ZoneNum, SumRetAirLatentGainRate, ReturnNode);
-                ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
+                SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
             }
 
-            Node(ReturnNode).Enthalpy = PsyHFnTdbW(Node(ReturnNode).Temp, Node(ReturnNode).HumRat);
+            state.dataLoopNodes->Node(ReturnNode).Enthalpy =
+                PsyHFnTdbW(state.dataLoopNodes->Node(ReturnNode).Temp, state.dataLoopNodes->Node(ReturnNode).HumRat);
 
             // END BLOCK of code from CalcZoneLeavingConditions*********************************
         }
 
         // set exhaust node leaving temp if present
-        if (allocated(AirPatternZoneInfo(ZoneNum).ExhaustAirNodeID)) {
-            auto const &APZoneInfo(AirPatternZoneInfo(ZoneNum));
+        if (allocated(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ExhaustAirNodeID)) {
+            auto const &APZoneInfo(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum));
             auto const &EANodeID(APZoneInfo.ExhaustAirNodeID);
             Real64 const Texhaust(APZoneInfo.Texhaust);
             for (int i = 1, ie = EANodeID.u(); i <= ie; ++i) {
-                Node(EANodeID(i)).Temp = Texhaust;
+                state.dataLoopNodes->Node(EANodeID(i)).Temp = Texhaust;
             }
         }
 
         // set thermostat reading for air system .
-        TempTstatAir(ZoneNum) = AirPatternZoneInfo(ZoneNum).Tstat;
+        state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat;
 
         // set results for all surface
         for (int i = SurfFirst, j = 1; i <= SurfLast; ++i, ++j) {
-            TempEffBulkAir(i) = AirPatternZoneInfo(ZoneNum).Surf(j).TadjacentAir;
+            state.dataHeatBal->TempEffBulkAir(i) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(j).TadjacentAir;
         }
 
         // set flag for reference air temperature mode
         for (int i = SurfFirst; i <= SurfLast; ++i) {
-            Surface(i).TAirRef = AdjacentAirTemp;
+            state.dataSurface->Surface(i).TAirRef = AdjacentAirTemp;
         }
     }
 
     //*****************************************************************************************
-
-} // namespace RoomAirModelUserTempPattern
 
 } // namespace EnergyPlus

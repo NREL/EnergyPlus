@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,8 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
 #include <EnergyPlus/DXFEarClipping.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -79,27 +77,9 @@ namespace DXFEarClipping {
     // Methodology employed:
     // Ear clipping has turned out to be the simplest, most robust technique.
 
-    // References:
-    // na
-
-    // Other notes:
-    // na
-
-    // Use statements:
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
-    using DataGlobals::Pi;
-    using DataGlobals::RadToDeg;
-    using DataGlobals::TwoPi;
 
-    // Data
-
-    // Derived type definitions:
-    // na
-
-    // Module variable declarations:
-    // na
     bool trackit(false);
     // Subroutine specifications for module <module_name>:
 
@@ -162,7 +142,7 @@ namespace DXFEarClipping {
             }
         }
 
-        if (std::abs(anglesum - TwoPi) <= epsilon) {
+        if (std::abs(anglesum - DataGlobalConstants::TwoPi) <= epsilon) {
             InPolygon = true;
         }
 
@@ -181,13 +161,14 @@ namespace DXFEarClipping {
         return rModulus;
     }
 
-    int Triangulate(int const nsides, // number of sides to polygon
+    int Triangulate(EnergyPlusData &state,
+                    int const nsides, // number of sides to polygon
                     Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,       // surface tilt angle
                     std::string const &surfname, // surface name (for error messages)
-                    int const surfclass          // surface class
+                    DataSurfaces::SurfaceClass surfclass          // surface class
     )
     {
 
@@ -202,19 +183,9 @@ namespace DXFEarClipping {
         // of 3D vertices, nsides, to a returned set (as possible) of triangles -- noted
         // by vertex numbers.
 
-        // Methodology employed:
-        // <Description>
-
-        // References:
-        // na
-
-        // Use statements:
         // Using/Aliasing
-        using DataGlobals::DisplayExtraWarnings;
         using DataSurfaces::cSurfaceClass;
-        using DataSurfaces::SurfaceClass_Floor;
-        using DataSurfaces::SurfaceClass_Overhang;
-        using DataSurfaces::SurfaceClass_Roof;
+        using DataSurfaces::SurfaceClass;
 
         // Return value
         int Triangulate;
@@ -222,17 +193,8 @@ namespace DXFEarClipping {
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
 
-        // Locals
-        // Subroutine argument definitions:
-
-        // Subroutine parameter definitions:
+       // Subroutine parameter definitions:
         Real64 const point_tolerance(0.00001);
-
-        // Interface block specifications:
-        // na
-
-        // Derived type definitions:
-        // na
 
         // Subroutine local variable declarations:
         bool errFlag;
@@ -242,27 +204,20 @@ namespace DXFEarClipping {
         Array1D_int c_vertices(nsides);
         Array2D_int earvert(nsides, 3);
         Array1D_bool removed(nsides);
-        // unused  type(Vector_2d), dimension(3) :: testtri
-        // unused  type(Vector_2d) :: point
         Array1D_int earverts(3);
         Array1D<Real64> xvt(nsides);
         Array1D<Real64> yvt(nsides);
         Array1D<Real64> zvt(nsides);
 
-        // unused  integer k
         int ntri;
-        // unused  logical inpoly
         int nvertcur;
         int ncount;
         int svert;
         int mvert;
         int evert;
-        // unused  integer tvert
         int nears;
         int nrangles;
         int ncverts;
-        // unused  double precision :: ang
-        // unused  double precision :: val
         std::string line;
         static int errcount(0);
 
@@ -277,7 +232,7 @@ namespace DXFEarClipping {
         //  else
         //    trackit=.FALSE.
         //  endif
-        if (surfclass == SurfaceClass_Floor || surfclass == SurfaceClass_Roof || surfclass == SurfaceClass_Overhang) {
+        if (surfclass == SurfaceClass::Floor || surfclass == SurfaceClass::Roof || surfclass == SurfaceClass::Overhang) {
             CalcRfFlrCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);
             for (svert = 1; svert <= nsides; ++svert) {
                 for (mvert = svert + 1; mvert <= nsides; ++mvert) {
@@ -312,23 +267,23 @@ namespace DXFEarClipping {
         evert = 3;
         removed = false;
         while (nvertcur > 3) {
-            generate_ears(OutputFiles::getSingleton(), nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
+            generate_ears(state, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
             if (!any_gt(ears, 0)) {
-                ShowWarningError("DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
+                ShowWarningError(state, "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");
                 ++errcount;
-                if (errcount == 1 && !DisplayExtraWarnings) {
-                    ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
+                if (errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                    ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
-                if (DisplayExtraWarnings) {
-                    ShowMessage(format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowMessage(state, format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
 
                     for (int j = 1; j <= nsides; ++j) {
-                        ShowMessage(format(" side={} ({:.1R},{:.1R},{:.1R})",j,polygon(j).x,polygon(j).y, polygon(j).z));
+                        ShowMessage(state, format(" side={} ({:.1R},{:.1R},{:.1R})",j,polygon(j).x,polygon(j).y, polygon(j).z));
                     }
-                    ShowMessage(format(" number of triangles found={:12}", ncount));
+                    ShowMessage(state, format(" number of triangles found={:12}", ncount));
                     for (int j = 1; j <= nrangles; ++j) {
-                        ShowMessage(format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * RadToDeg));
+                        ShowMessage(state, format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * DataGlobalConstants::RadToDeg));
                     }
                 }
                 break; // while loop
@@ -396,14 +351,8 @@ namespace DXFEarClipping {
         // (XA,YA) to (XB,YB) to (XC,YC).  The interior is to the
         // left of the two directed edges.
 
-        // Methodology employed:
-        // <Description>
-
         // References:
         // Geometry Tools for Computer Graphics
-
-        // Use statements:
-        // na
 
         // Return value
         Real64 angle; // the angle, between 0 and 2*PI.
@@ -414,12 +363,6 @@ namespace DXFEarClipping {
 
         // Function parameter definitions:
         Real64 const epsilon(0.0000001);
-
-        // Interface block specifications:
-        // na
-
-        // Derived type definitions:
-        // na
 
         // Function local variable declarations:
         Real64 t;
@@ -445,7 +388,7 @@ namespace DXFEarClipping {
         angle = std::acos(t);
 
         if (x2 * y1 - y2 * x1 < 0.0E+00) {
-            angle = 2.0E+00 * Pi - angle;
+            angle = 2.0E+00 * DataGlobalConstants::Pi - angle;
         }
 
         return angle;
@@ -474,25 +417,11 @@ namespace DXFEarClipping {
         // M Shimrat, Position of Point Relative to Polygon, ACM Algorithm 112,
         // Communications of the ACM, Volume 5, Number 8, page 434, August 1962.
 
-        // Use statements:
-        // na
-
         // Return value
         bool inside; // return value, true=inside, false = not inside
 
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
-
-        // Locals
-        // Function argument definitions:
-
-        // Function parameter definitions:
-
-        // Interface block specifications:
-        // na
-
-        // Derived type definitions:
-        // na
 
         // Function local variable declarations:
         int i;
@@ -518,7 +447,7 @@ namespace DXFEarClipping {
         return inside;
     }
 
-    void generate_ears(OutputFiles &outputFiles,
+    void generate_ears(EnergyPlusData &state,
                        int const nvert, // number of vertices in polygon
                        Array1D<Vector_2d> &vertex,
                        Array1D_int &ears,       // number of ears possible (dimensioned to nvert)
@@ -550,9 +479,6 @@ namespace DXFEarClipping {
         // clipping for triangulation is described in Chapter 13 on Polygon Partitioning.  Also
         // described in a small article "Triangulation by Ear Clipping", David Eberly, http://www.geometrictools.com
 
-        // Use statements:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(vertex, nvert);
         EP_SIZE_CHECK(ears, nvert);
@@ -561,17 +487,6 @@ namespace DXFEarClipping {
         EP_SIZE_CHECK(removed, nvert);
         EP_SIZE_CHECK(earvert, 3);
         EP_SIZE_CHECK(rangles, nvert);
-
-        // Locals
-        // Subroutine argument definitions:
-
-        // Subroutine parameter definitions:
-
-        // Interface block specifications:
-        // na
-
-        // Derived type definitions:
-        // na
 
         // Subroutine local variable declarations:
         int svert;   // starting vertex
@@ -623,7 +538,7 @@ namespace DXFEarClipping {
 
             ang = angle_2dvector(vertex(svert).x, vertex(svert).y, vertex(mvert).x, vertex(mvert).y, vertex(evert).x, vertex(evert).y);
 
-            if (ang > Pi) { // sufficiently close to 180 degrees.
+            if (ang > DataGlobalConstants::Pi) { // sufficiently close to 180 degrees.
                 ++nrverts;
                 r_vertices(nrverts) = mvert;
                 rangles(nrverts) = ang;
@@ -664,7 +579,7 @@ namespace DXFEarClipping {
                     earvert(3) = evert;
                 }
                 if (trackit) {
-                    print(outputFiles.debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
+                    print(state.files.debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
                 }
             }
         }
@@ -673,7 +588,7 @@ namespace DXFEarClipping {
     void CalcWallCoordinateTransformation(int const nsides,
                                           Array1D<Vector> &polygon,
                                           Real64 const surfazimuth,
-                                          Real64 const EP_UNUSED(surftilt), // unused1208
+                                          [[maybe_unused]] Real64 const surftilt, // unused1208
                                           Array1D<Real64> &xvt,
                                           Array1D<Real64> &yvt,
                                           Array1D<Real64> &zvt)
@@ -692,29 +607,11 @@ namespace DXFEarClipping {
         // Methodology employed:
         // Standard angle rotation
 
-        // References:
-        // na
-
-        // Use statements:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
         EP_SIZE_CHECK(xvt, nsides);
         EP_SIZE_CHECK(yvt, nsides);
         EP_SIZE_CHECK(zvt, nsides);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // Subroutine parameter definitions:
-        // na
-
-        // Interface block specifications
-        // na
-
-        // Derived type definitions
-        // na
 
         // Subroutine local variable declarations:
 
@@ -723,7 +620,7 @@ namespace DXFEarClipping {
         Real64 const alpha = surfazimuth;
 
         Real64 const alpha180 = 180.0 - alpha; // amount to rotate
-        Real64 const alphrad = alpha180 / RadToDeg;
+        Real64 const alphrad = alpha180 / DataGlobalConstants::RadToDeg;
         Real64 const cos_alphrad = std::cos(alphrad);
         Real64 const sin_alphrad = std::sin(alphrad);
 
@@ -736,7 +633,7 @@ namespace DXFEarClipping {
 
     void CalcRfFlrCoordinateTransformation(int const nsides,
                                            Array1D<Vector> &polygon,
-                                           Real64 const EP_UNUSED(surfazimuth), // unused1208
+                                           [[maybe_unused]] Real64 const surfazimuth, // unused1208
                                            Real64 const surftilt,
                                            Array1D<Real64> &xvt,
                                            Array1D<Real64> &yvt,
@@ -756,34 +653,16 @@ namespace DXFEarClipping {
         // Methodology employed:
         // Standard angle rotation
 
-        // References:
-        // na
-
-        // Use statements:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
         EP_SIZE_CHECK(xvt, nsides);
         EP_SIZE_CHECK(yvt, nsides);
         EP_SIZE_CHECK(zvt, nsides);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // Subroutine parameter definitions:
-        // na
-
-        // Interface block specifications
-        // na
-
-        // Derived type definitions
-        // na
-
         // Subroutine local variable declarations:
 
         Real64 const alpha = -surftilt;
-        Real64 const alphrad = alpha / RadToDeg;
+        Real64 const alphrad = alpha / DataGlobalConstants::RadToDeg;
         Real64 const cos_alphrad = std::cos(alphrad);
         Real64 const sin_alphrad = std::sin(alphrad);
 
@@ -794,7 +673,7 @@ namespace DXFEarClipping {
         }
     }
 
-    void reorder(int &EP_UNUSED(nvert)) // unused1208
+    void reorder([[maybe_unused]] int &nvert) // unused1208
     {
 
         // Locals

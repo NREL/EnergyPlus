@@ -1,24 +1,13 @@
+set(SRC sqlite3.h sqlite3.c)
 
-IF ( MSVC ) # visual c++ (VS 2013)
-    ADD_DEFINITIONS("-W0")
-    ADD_CXX_DEBUG_DEFINITIONS("/fp:fast") # override fp:strict in debug builds
+add_library(sqlite ${SRC})
 
-ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
-    ADD_DEFINITIONS("-w")
-ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
-    ADD_DEFINITIONS("/W0")
-ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
-    ADD_DEFINITIONS("-w")
-ENDIF () # COMPILER TYPE
-
-SET(SRC 
-  sqlite3.h
-  sqlite3.c
-) 
-
-if (UNIX)
-  ADD_DEFINITIONS( " -fPIC " )
-endif()
-
-ADD_LIBRARY( sqlite ${SRC} )
-
+if(MSVC) # visual c++ (VS 2013)
+  target_compile_options(sqlite PRIVATE -W0)                                                
+elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")# g++/Clang
+  target_compile_options(sqlite PRIVATE -w)
+elseif(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  target_compile_options(sqlite PRIVATE /W0)
+elseif(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  target_compile_options(sqlite PRIVATE -w)
+endif() # COMPILER TYPE

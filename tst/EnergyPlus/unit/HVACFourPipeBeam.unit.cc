@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/AirTerminalUnit.hh>
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -63,8 +64,8 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -211,43 +212,42 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
 
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 3;
     bool ErrorsFound = false;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode("Zone 1 Node",
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode(*state, "Zone 1 Node",
                                                                                          ErrorsFound,
                                                                                          "Zone",
                                                                                          "BeamTest",
-                                                                                         DataLoopNode::NodeType_Air,
-                                                                                         DataLoopNode::NodeConnectionType_ZoneNode,
+                                                                                         DataLoopNode::NodeFluidType::Air,
+                                                                                         DataLoopNode::NodeConnectionType::ZoneNode,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent,
                                                                                          "Test zone node");
 
-    DataDefineEquip::NumAirDistUnits = 1;
-    DataDefineEquip::AirDistUnit.allocate(1);
-    DataDefineEquip::AirDistUnit(1).EquipName(1) =
+    state->dataDefineEquipment->NumAirDistUnits = 1;
+    state->dataDefineEquipment->AirDistUnit.allocate(1);
+    state->dataDefineEquipment->AirDistUnit(1).EquipName(1) =
         "PERIMETER_TOP_ZN_4 4PIPE BEAM"; // needs to be uppercased, or item will not be found at line 2488 in IP
-    DataDefineEquip::AirDistUnit(1).OutletNodeNum = 3;
+    state->dataDefineEquipment->AirDistUnit(1).OutletNodeNum = 3;
 
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr = FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(
-        DataDefineEquip::SingleDuctConstVolFourPipeBeam, DataDefineEquip::AirDistUnit(1).EquipName(1));
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr = FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1));
 
     // EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->name, "PERIMETER_TOP_ZN_4 4PIPE BEAM");
 
-    EXPECT_EQ(2, DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat(1).InNode);
+    EXPECT_EQ(2, state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat(1).InNode);
 
-    EXPECT_EQ(3, DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat(1).OutNode);
+    EXPECT_EQ(3, state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat(1).OutNode);
     // EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->aDUNum, 1 );
 }
 
@@ -1715,30 +1715,30 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(*state);
 
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    state->dataGlobal->BeginSimFlag = true;
+    SimulationManager::GetProjectData(*state);
 
-    OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    OutputReportPredefined::SetPredefinedTables(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
-    PlantManager::CheckIfAnyPlant();
-    createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
-    DataGlobals::DoingSizing = true;
-    SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
-    DataGlobals::KickOffSimulation = true;
+    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
+    PlantManager::CheckIfAnyPlant(*state);
+    createFacilityElectricPowerServiceObject(*state);
+    BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
+    state->dataGlobal->DoingSizing = true;
+    SizingManager::ManageSizing(*state);
+    state->dataGlobal->DoingSizing = false;
+    state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
-    TestAirPathIntegrity(state, state.outputFiles, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
-    SimulationManager::SetupSimulation(state, ErrorsFound);
-    DataGlobals::KickOffSimulation = false;
+    WeatherManager::ResetEnvironmentCounter(*state);
+    TestAirPathIntegrity(*state, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
+    SimulationManager::SetupSimulation(*state, ErrorsFound);
+    state->dataGlobal->KickOffSimulation = false;
 
     DataHVACGlobals::SimZoneEquipmentFlag = true;
     DataHVACGlobals::SimNonZoneEquipmentFlag = false;
@@ -1748,94 +1748,94 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     bool FirstHVACIteration = true;
 
     // PlantManager::InitializeLoops( FirstHVACIteration );
-    PlantUtilities::SetAllFlowLocks(DataPlant::FlowUnlocked);
+    PlantUtilities::SetAllFlowLocks(*state, DataPlant::iFlowLock::Unlocked);
     // first run with a sensible cooling load of 5000 W and cold supply air
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
 
     // indexes values has been changed according to new input_processor output
     // node indexes may be viewed in NodeID array
-    DataLoopNode::Node(14).Temp = 14.0;    // chilled water inlet node
-    DataLoopNode::Node(40).HumRat = 0.008; // zone node
-    DataLoopNode::Node(40).Temp = 24.0;    // zone node
-    DataLoopNode::Node(44).HumRat = 0.008; // primary air inlet node
+    state->dataLoopNodes->Node(14).Temp = 14.0;    // chilled water inlet node
+    state->dataLoopNodes->Node(40).HumRat = 0.008; // zone node
+    state->dataLoopNodes->Node(40).Temp = 24.0;    // zone node
+    state->dataLoopNodes->Node(44).HumRat = 0.008; // primary air inlet node
 
-    DataLoopNode::Node(44).Temp = 12.8; // primary air inlet node
-    DataLoopNode::Node(38).Temp = 45.0; // hot water inlet node
-    // DataLoopNode::Node( 44 ).Temp = 12.8; // primary air inlet node
-    // DataLoopNode::Node( 38 ).Temp = 45.0; // hot water inlet node
+    state->dataLoopNodes->Node(44).Temp = 12.8; // primary air inlet node
+    state->dataLoopNodes->Node(38).Temp = 45.0; // hot water inlet node
+    // state->dataLoopNodes->Node( 44 ).Temp = 12.8; // primary air inlet node
+    // state->dataLoopNodes->Node( 38 ).Temp = 45.0; // hot water inlet node
 
     Real64 NonAirSysOutput = 0.0;
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(state, FirstHVACIteration, NonAirSysOutput);
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
-    EXPECT_NEAR(DataLoopNode::Node(1).MassFlowRate, 0.36165246721684446, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(15).Temp, 17.835648923740127, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(15).MassFlowRate, 0.053404403026239548, 0.00001);
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(39).Temp, 45.0);
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(39).MassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, 0.36165246721684446, 0.00001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(15).Temp, 17.835648923740127, 0.00001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(15).MassFlowRate, 0.053404403026239548, 0.00001);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).Temp, 45.0);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).MassFlowRate, 0.0);
 
     EXPECT_NEAR(NonAirSysOutput, -857.50347269476481, 0.01);
 
     // next run with a sensible heating load of 5000 W and cold supply air
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
 
-    DataLoopNode::Node(40).Temp = 21.0; // zone node
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(state, FirstHVACIteration, NonAirSysOutput);
+    state->dataLoopNodes->Node(40).Temp = 21.0; // zone node
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);
-    EXPECT_NEAR(DataLoopNode::Node(39).Temp, 31.815031821344689, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(39).MassFlowRate, 0.14660727634539222, 0.00001);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(15).Temp, 14.0);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(15).MassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(39).Temp, 31.815031821344689, 0.00001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(39).MassFlowRate, 0.14660727634539222, 0.00001);
 
     EXPECT_NEAR(NonAirSysOutput, 8079.991302700485, 0.01);
 
     // next run with cooling load and neutral supply air
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
 
-    DataLoopNode::Node(14).Temp = 14.0;    // chilled water inlet node
-    DataLoopNode::Node(40).HumRat = 0.008; // zone node
-    DataLoopNode::Node(40).Temp = 24.0;    // zone node
-    DataLoopNode::Node(44).HumRat = 0.008; // primary air inlet node
-    DataLoopNode::Node(44).Temp = 22.0;    // primary air inlet node
-    DataLoopNode::Node(38).Temp = 45.0;    // hot water inlet node
+    state->dataLoopNodes->Node(14).Temp = 14.0;    // chilled water inlet node
+    state->dataLoopNodes->Node(40).HumRat = 0.008; // zone node
+    state->dataLoopNodes->Node(40).Temp = 24.0;    // zone node
+    state->dataLoopNodes->Node(44).HumRat = 0.008; // primary air inlet node
+    state->dataLoopNodes->Node(44).Temp = 22.0;    // primary air inlet node
+    state->dataLoopNodes->Node(38).Temp = 45.0;    // hot water inlet node
 
     NonAirSysOutput = 0.0;
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(state, FirstHVACIteration, NonAirSysOutput);
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
-    EXPECT_NEAR(DataLoopNode::Node(15).Temp, 18.549803918626715, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(15).MassFlowRate, 0.22613768427540518, 0.00001);
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(39).Temp, 45.0);
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(39).MassFlowRate, 0.0);
-    // EXPECT_NEAR( DataLoopNode::Node( 15 ).Temp, 18.027306264618733, 0.00001 );
-    // EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.25614844309380103, 0.00001 );
-    // EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
-    // EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
+    EXPECT_NEAR(state->dataLoopNodes->Node(15).Temp, 18.549803918626715, 0.00001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(15).MassFlowRate, 0.22613768427540518, 0.00001);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).Temp, 45.0);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).MassFlowRate, 0.0);
+    // EXPECT_NEAR( state->dataLoopNodes->Node( 15 ).Temp, 18.027306264618733, 0.00001 );
+    // EXPECT_NEAR( state->dataLoopNodes->Node( 15 ).MassFlowRate, 0.25614844309380103, 0.00001 );
+    // EXPECT_DOUBLE_EQ( state->dataLoopNodes->Node( 39 ).Temp, 45.0 );
+    // EXPECT_DOUBLE_EQ( state->dataLoopNodes->Node( 39 ).MassFlowRate, 0.0 );
 
     EXPECT_NEAR(NonAirSysOutput, -4307.106339390215, 0.01);
 
     // next run with heating load and neutral supply air
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
 
-    DataLoopNode::Node(40).Temp = 21.0; // zone node
+    state->dataLoopNodes->Node(40).Temp = 21.0; // zone node
 
     NonAirSysOutput = 0.0;
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(state, FirstHVACIteration, NonAirSysOutput);
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);
-    EXPECT_NEAR(DataLoopNode::Node(39).Temp, 32.784497823408309, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(39).MassFlowRate, 0.091412175315718339, 0.00001);
-    // EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0 );
-    // EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 );
-    // EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 33.836239364981424, 0.00001 );
-    // EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.10040605035467959, 0.00001 );
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(15).Temp, 14.0);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(15).MassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(39).Temp, 32.784497823408309, 0.00001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(39).MassFlowRate, 0.091412175315718339, 0.00001);
+    // EXPECT_DOUBLE_EQ( state->dataLoopNodes->Node( 15 ).Temp, 14.0 );
+    // EXPECT_DOUBLE_EQ( state->dataLoopNodes->Node( 15 ).MassFlowRate, 0.0 );
+    // EXPECT_NEAR( state->dataLoopNodes->Node( 39 ).Temp, 33.836239364981424, 0.00001 );
+    // EXPECT_NEAR( state->dataLoopNodes->Node( 39 ).MassFlowRate, 0.10040605035467959, 0.00001 );
 
     EXPECT_NEAR(NonAirSysOutput, 4667.5787189210605, 0.01);
 }
@@ -3289,29 +3289,29 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(*state);
 
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    state->dataGlobal->BeginSimFlag = true;
+    SimulationManager::GetProjectData(*state);
 
-    OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    OutputReportPredefined::SetPredefinedTables(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
-    PlantManager::CheckIfAnyPlant();
-    createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
-    DataGlobals::DoingSizing = true;
-    SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
-    DataGlobals::KickOffSimulation = true;
+    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
+    PlantManager::CheckIfAnyPlant(*state);
+    createFacilityElectricPowerServiceObject(*state);
+    BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
+    state->dataGlobal->DoingSizing = true;
+    SizingManager::ManageSizing(*state);
+    state->dataGlobal->DoingSizing = false;
+    state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(*state);
 
-    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(state, ErrorsFound));
+    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(*state, ErrorsFound));
 }
 
 } // namespace EnergyPlus

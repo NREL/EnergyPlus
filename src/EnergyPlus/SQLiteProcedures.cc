@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,24 +45,24 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// ObjexxFCL Headers
+// C++ headers
+#include <sstream>
+#include <stdexcept>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
-#include "SQLiteProcedures.hh"
-#include "DataEnvironment.hh"
-#include "DataGlobals.hh"
-#include "DataHeatBalance.hh"
-#include "DataRoomAirModel.hh"
-#include "DataStringGlobals.hh"
-#include "General.hh"
-#include "InputProcessing/InputProcessor.hh"
-#include "ScheduleManager.hh"
-#include "UtilityRoutines.hh"
-
-#include <sstream>
-#include <stdexcept>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -82,26 +82,54 @@ const int SQLite::UnitsId = 6;
 
 std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase()
+std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
 {
+    if (!state.files.outputControl.sqlite) {
+        return nullptr;
+    }
     try {
-        int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound("Output:SQLite");
+        int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound(state, "Output:SQLite");
         bool writeOutputToSQLite = false;
         bool writeTabularDataToSQLite = false;
 
-        if (numberOfSQLiteObjects == 1) {
+        if (numberOfSQLiteObjects == 0) {
+            state.files.outputControl.sqlite = false;
+            return nullptr;
+        } else if (numberOfSQLiteObjects == 1) {
             Array1D_string alphas(5);
             int numAlphas;
             Array1D<Real64> numbers(2);
             int numNumbers;
             int status;
 
-            inputProcessor->getObjectItem("Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
+            auto &sql_ort(state.dataOutRptTab);
+
+            inputProcessor->getObjectItem(state, "Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
             if (numAlphas > 0) {
                 std::string option = alphas(1);
                 if (UtilityRoutines::SameString(option, "SimpleAndTabular")) {
                     writeTabularDataToSQLite = true;
                     writeOutputToSQLite = true;
+
+                    if (numAlphas > 1) {
+                        std::string option2 = alphas(2);
+                        if (UtilityRoutines::SameString(option2, "None")) {
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::None;
+                        } else if (UtilityRoutines::SameString(option2, "JtoKWH")) {
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
+                        } else if (UtilityRoutines::SameString(option2, "JtoMJ")) {
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoMJ;
+                        } else if (UtilityRoutines::SameString(option2, "JtoGJ")) {
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoGJ;
+                        } else if (UtilityRoutines::SameString(option2, "InchPound")) {
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+                        } else { // (UtilityRoutines::SameString(option2, "UseOutputControlTableStyles")) {
+                            // Jan 2021 Note: Since here we do not know weather sql_ort->unitsStyle has been processed or not,
+                            // the value "NotFound" is used for the option "UseOutputControlTableStyles" at this point; 
+                            // This will be updated again and got concretely assigned first thing in OutputReportTabular::WriteTabularReports().
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;  // sql_ort->unitsStyle;
+                        } 
+                    }
                 } else if (UtilityRoutines::SameString(option, "Simple")) {
                     writeOutputToSQLite = true;
                 }
@@ -115,78 +143,78 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase()
                                                   writeOutputToSQLite,
                                                   writeTabularDataToSQLite));
     } catch (const std::runtime_error &error) {
-        ShowFatalError(error.what());
+        ShowFatalError(state, error.what());
         return nullptr;
     }
 }
 
-void CreateSQLiteZoneExtendedOutput()
+void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
 {
     if (sqlite && sqlite->writeOutputToSQLite()) {
-        for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-            sqlite->addZoneData(zoneNum, DataHeatBalance::Zone(zoneNum));
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            sqlite->addZoneData(zoneNum, state.dataHeatBal->Zone(zoneNum));
         }
-        for (int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
-            sqlite->addZoneListData(listNum, DataHeatBalance::ZoneList(listNum));
+        for (int listNum = 1; listNum <= state.dataHeatBal->NumOfZoneLists; ++listNum) {
+            sqlite->addZoneListData(listNum, state.dataHeatBal->ZoneList(listNum));
         }
-        for (int groupNum = 1; groupNum <= DataHeatBalance::NumOfZoneGroups; ++groupNum) {
-            sqlite->addZoneGroupData(groupNum, DataHeatBalance::ZoneGroup(groupNum));
+        for (int groupNum = 1; groupNum <= state.dataHeatBal->NumOfZoneGroups; ++groupNum) {
+            sqlite->addZoneGroupData(groupNum, state.dataHeatBal->ZoneGroup(groupNum));
         }
-        for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules;
+        for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(state); scheduleNumber <= numberOfSchedules;
              ++scheduleNumber) {
             sqlite->addScheduleData(scheduleNumber,
-                                    ScheduleManager::GetScheduleName(scheduleNumber),
-                                    ScheduleManager::GetScheduleType(scheduleNumber),
-                                    ScheduleManager::GetScheduleMinValue(scheduleNumber),
-                                    ScheduleManager::GetScheduleMaxValue(scheduleNumber));
+                                    ScheduleManager::GetScheduleName(state, scheduleNumber),
+                                    ScheduleManager::GetScheduleType(state, scheduleNumber),
+                                    ScheduleManager::GetScheduleMinValue(state, scheduleNumber),
+                                    ScheduleManager::GetScheduleMaxValue(state, scheduleNumber));
         }
-        for (int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
-            auto const &surface = DataSurfaces::Surface(surfaceNumber);
+        for (int surfaceNumber = 1; surfaceNumber <= state.dataSurface->TotSurfaces; ++surfaceNumber) {
+            auto const &surface = state.dataSurface->Surface(surfaceNumber);
             sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
-        for (int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum) {
-            sqlite->addMaterialData(materialNum, dataMaterial.Material(materialNum));
+        for (int materialNum = 1; materialNum <= state.dataHeatBal->TotMaterials; ++materialNum) {
+            sqlite->addMaterialData(materialNum, state.dataMaterial->Material(materialNum));
         }
-        for (int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
-            auto const &construction = dataConstruction.Construct(constructNum);
+        for (int constructNum = 1; constructNum <= state.dataHeatBal->TotConstructs; ++constructNum) {
+            auto const &construction = state.dataConstruction->Construct(constructNum);
             if (construction.TotGlassLayers == 0) {
                 sqlite->addConstructionData(constructNum, construction, construction.UValue);
             } else {
-                sqlite->addConstructionData(constructNum, construction, DataHeatBalance::NominalU(constructNum));
+                sqlite->addConstructionData(constructNum, construction, state.dataHeatBal->NominalU(constructNum));
             }
         }
-        for (int lightNum = 1; lightNum <= DataHeatBalance::TotLights; ++lightNum) {
-            sqlite->addNominalLightingData(lightNum, DataHeatBalance::Lights(lightNum));
+        for (int lightNum = 1; lightNum <= state.dataHeatBal->TotLights; ++lightNum) {
+            sqlite->addNominalLightingData(lightNum, state.dataHeatBal->Lights(lightNum));
         }
-        for (int peopleNum = 1; peopleNum <= DataHeatBalance::TotPeople; ++peopleNum) {
-            sqlite->addNominalPeopleData(peopleNum, DataHeatBalance::People(peopleNum));
+        for (int peopleNum = 1; peopleNum <= state.dataHeatBal->TotPeople; ++peopleNum) {
+            sqlite->addNominalPeopleData(peopleNum, state.dataHeatBal->People(peopleNum));
         }
-        for (int elecEquipNum = 1; elecEquipNum <= DataHeatBalance::TotElecEquip; ++elecEquipNum) {
-            sqlite->addNominalElectricEquipmentData(elecEquipNum, DataHeatBalance::ZoneElectric(elecEquipNum));
+        for (int elecEquipNum = 1; elecEquipNum <= state.dataHeatBal->TotElecEquip; ++elecEquipNum) {
+            sqlite->addNominalElectricEquipmentData(elecEquipNum, state.dataHeatBal->ZoneElectric(elecEquipNum));
         }
-        for (int gasEquipNum = 1; gasEquipNum <= DataHeatBalance::TotGasEquip; ++gasEquipNum) {
-            sqlite->addNominalGasEquipmentData(gasEquipNum, DataHeatBalance::ZoneGas(gasEquipNum));
+        for (int gasEquipNum = 1; gasEquipNum <= state.dataHeatBal->TotGasEquip; ++gasEquipNum) {
+            sqlite->addNominalGasEquipmentData(gasEquipNum, state.dataHeatBal->ZoneGas(gasEquipNum));
         }
-        for (int steamEquipNum = 1; steamEquipNum <= DataHeatBalance::TotStmEquip; ++steamEquipNum) {
-            sqlite->addNominalSteamEquipmentData(steamEquipNum, DataHeatBalance::ZoneSteamEq(steamEquipNum));
+        for (int steamEquipNum = 1; steamEquipNum <= state.dataHeatBal->TotStmEquip; ++steamEquipNum) {
+            sqlite->addNominalSteamEquipmentData(steamEquipNum, state.dataHeatBal->ZoneSteamEq(steamEquipNum));
         }
-        for (int hWEquipNum = 1; hWEquipNum <= DataHeatBalance::TotHWEquip; ++hWEquipNum) {
-            sqlite->addNominalHotWaterEquipmentData(hWEquipNum, DataHeatBalance::ZoneHWEq(hWEquipNum));
+        for (int hWEquipNum = 1; hWEquipNum <= state.dataHeatBal->TotHWEquip; ++hWEquipNum) {
+            sqlite->addNominalHotWaterEquipmentData(hWEquipNum, state.dataHeatBal->ZoneHWEq(hWEquipNum));
         }
-        for (int otherEquipNum = 1; otherEquipNum <= DataHeatBalance::TotOthEquip; ++otherEquipNum) {
-            sqlite->addNominalOtherEquipmentData(otherEquipNum, DataHeatBalance::ZoneOtherEq(otherEquipNum));
+        for (int otherEquipNum = 1; otherEquipNum <= state.dataHeatBal->TotOthEquip; ++otherEquipNum) {
+            sqlite->addNominalOtherEquipmentData(otherEquipNum, state.dataHeatBal->ZoneOtherEq(otherEquipNum));
         }
-        for (int bBHeatNum = 1; bBHeatNum <= DataHeatBalance::TotBBHeat; ++bBHeatNum) {
-            sqlite->addNominalBaseboardData(bBHeatNum, DataHeatBalance::ZoneBBHeat(bBHeatNum));
+        for (int bBHeatNum = 1; bBHeatNum <= state.dataHeatBal->TotBBHeat; ++bBHeatNum) {
+            sqlite->addNominalBaseboardData(bBHeatNum, state.dataHeatBal->ZoneBBHeat(bBHeatNum));
         }
-        for (int infilNum = 1; infilNum <= DataHeatBalance::TotInfiltration; ++infilNum) {
-            sqlite->addInfiltrationData(infilNum, DataHeatBalance::Infiltration(infilNum));
+        for (int infilNum = 1; infilNum <= state.dataHeatBal->TotInfiltration; ++infilNum) {
+            sqlite->addInfiltrationData(infilNum, state.dataHeatBal->Infiltration(infilNum));
         }
-        for (int ventNum = 1; ventNum <= DataHeatBalance::TotVentilation; ++ventNum) {
-            sqlite->addVentilationData(ventNum, DataHeatBalance::Ventilation(ventNum));
+        for (int ventNum = 1; ventNum <= state.dataHeatBal->TotVentilation; ++ventNum) {
+            sqlite->addVentilationData(ventNum, state.dataHeatBal->Ventilation(ventNum));
         }
-        for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-            sqlite->addRoomAirModelData(zoneNum, DataRoomAirModel::AirModel(zoneNum));
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            sqlite->addRoomAirModelData(zoneNum, state.dataRoomAirMod->AirModel(zoneNum));
         }
 
         sqlite->createZoneExtendedOutput();
@@ -328,6 +356,13 @@ void SQLite::sqliteCommit()
 {
     if (m_writeOutputToSQLite) {
         sqliteExecuteCommand("COMMIT;");
+    }
+}
+
+void SQLite::sqliteRollback()
+{
+    if (m_writeOutputToSQLite) {
+        sqliteExecuteCommand("ROLLBACK;");
     }
 }
 
@@ -1151,12 +1186,12 @@ void SQLite::initializeTabularDataTable()
 
     sqliteExecuteCommand(sql);
 
-    sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(ReportNameId) + ",'ReportName');");
-    sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(ReportForStringId) + ",'ReportForString');");
-    sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(TableNameId) + ",'TableName');");
-    sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(RowNameId) + ",'RowName');");
-    sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(ColumnNameId) + ",'ColumnName');");
-    sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(UnitsId) + ",'Units');");
+    sqliteExecuteCommand(format("INSERT INTO StringTypes VALUES({},'ReportName');", ReportNameId));
+    sqliteExecuteCommand(format("INSERT INTO StringTypes VALUES({},'ReportForString');", ReportForStringId));
+    sqliteExecuteCommand(format("INSERT INTO StringTypes VALUES({},'TableName');", TableNameId));
+    sqliteExecuteCommand(format("INSERT INTO StringTypes VALUES({},'RowName');", RowNameId));
+    sqliteExecuteCommand(format("INSERT INTO StringTypes VALUES({},'ColumnName');", ColumnNameId));
+    sqliteExecuteCommand(format("INSERT INTO StringTypes VALUES({},'Units');", UnitsId));
 
     const std::string sql2 = "CREATE TABLE Strings ( "
                              "StringIndex INTEGER PRIMARY KEY, "
@@ -1501,7 +1536,7 @@ void SQLite::createSQLiteReportDataRecord(int const recordIndex,
 }
 
 void SQLite::createSQLiteTimeIndexRecord(int const reportingInterval,
-                                         int const EP_UNUSED(recordIndex),
+                                         [[maybe_unused]] int const recordIndex,
                                          int const cumlativeSimulationDays,
                                          int const curEnvirNum,
                                          int const simulationYear,
@@ -2058,14 +2093,14 @@ void SQLite::createZoneExtendedOutput()
 
 void SQLite::createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
                                                  const std::string &environmentName,
-                                                 const int kindOfSim,
+                                                 const DataGlobalConstants::KindOfSim kindOfSim,
                                                  const int simulationIndex)
 {
     if (m_writeOutputToSQLite) {
         sqliteBindInteger(m_environmentPeriodInsertStmt, 1, curEnvirNum);
         sqliteBindForeignKey(m_environmentPeriodInsertStmt, 2, simulationIndex);
         sqliteBindText(m_environmentPeriodInsertStmt, 3, environmentName);
-        sqliteBindInteger(m_environmentPeriodInsertStmt, 4, kindOfSim);
+        sqliteBindInteger(m_environmentPeriodInsertStmt, 4, static_cast<int>(kindOfSim));
 
         sqliteStepCommand(m_environmentPeriodInsertStmt);
         sqliteResetCommand(m_environmentPeriodInsertStmt);
@@ -2421,8 +2456,8 @@ bool SQLite::RoomAirModel::insertIntoSQLite(sqlite3_stmt *insertStmt)
 {
     sqliteBindInteger(insertStmt, 1, number);
     sqliteBindText(insertStmt, 2, airModelName);
-    sqliteBindInteger(insertStmt, 3, airModelType);
-    sqliteBindInteger(insertStmt, 4, tempCoupleScheme);
+    sqliteBindInteger(insertStmt, 3, static_cast<int>(airModelType));
+    sqliteBindInteger(insertStmt, 4, static_cast<int>(tempCoupleScheme));
     sqliteBindLogical(insertStmt, 5, simAirModel);
 
     int rc = sqliteStepCommand(insertStmt);
@@ -2740,12 +2775,12 @@ bool SQLiteProcedures::sqliteWithinTransaction()
 
 // int SQLiteProcedures::sqliteClearBindings(sqlite3_stmt * stmt)
 // {
-// 	return sqlite3_clear_bindings(stmt);
+//     return sqlite3_clear_bindings(stmt);
 // }
 
 // int SQLiteProcedures::sqliteFinalizeCommand(sqlite3_stmt * stmt)
 // {
-// 	return sqlite3_finalize(stmt);
+//     return sqlite3_finalize(stmt);
 // }
 
 } // namespace EnergyPlus

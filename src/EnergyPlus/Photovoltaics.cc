@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,8 +55,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -108,41 +108,28 @@ namespace Photovoltaics {
     //  A newer model with more involved input has been developed by Sandia National Lab (SNL) by David King.
     //  The TRNSYS type180 model include the use of numerical routines to minimize a multivariate function
 
-    // REFERENCES:
-
-    // OTHER NOTES: none
-
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataPhotovoltaics;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::BeginSimFlag;
-    using DataGlobals::EndEnvrnFlag;
-    using DataGlobals::KelvinConv;
-    using DataGlobals::SecInHour;
     using DataHVACGlobals::TimeStepSys;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    //   see DataPhotovoltaics.cc
-
     Array1D_bool CheckEquipName;
-    static bool GetInputFlag(true); // one time get input flag
+    bool GetInputFlag(true); // one time get input flag
+    bool MyOneTimeFlag(true);
+    bool firstTime(true);
 
     void clear_state() {
         CheckEquipName.clear();
         GetInputFlag = true;
+        MyOneTimeFlag = true;
+        firstTime = true;
     }
 
-    void SimPVGenerator(int const EP_UNUSED(GeneratorType), // type of Generator !unused1208
-                        std::string const &GeneratorName,   // user specified name of Generator
+    void SimPVGenerator(EnergyPlusData &state,
+                        [[maybe_unused]] GeneratorType const GeneratorType, // type of Generator !unused1208
+                        std::string const &GeneratorName,                   // user specified name of Generator
                         int &GeneratorIndex,
-                        bool const RunFlag,            // is PV ON or OFF as determined by schedules in ElecLoadCenter
-                        Real64 const EP_UNUSED(PVLoad) // electrical load on the PV (not really used... PV models assume "full on" !unused1208
+                        bool const RunFlag,                  // is PV ON or OFF as determined by schedules in ElecLoadCenter
+                        [[maybe_unused]] Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
     )
     {
 
@@ -157,34 +144,38 @@ namespace Photovoltaics {
         // This subroutine is in charge of all the rest of the subroutines contained
         // in this module. provides common entry point for all the models
 
-        // Using/Aliasing
-        using General::TrimSigDigits;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PVnum;                      // index of unit in PV array for Equivalent one-diode model
 
         // Get PV data from input file
         if (GetInputFlag) {
-            GetPVInput(); // for all three types of models
+            GetPVInput(state); // for all three types of models
             GetInputFlag = false;
         }
 
         if (GeneratorIndex == 0) {
             PVnum = UtilityRoutines::FindItemInList(GeneratorName, PVarray);
             if (PVnum == 0) {
-                ShowFatalError("SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators " + GeneratorName);
+                ShowFatalError(state, "SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators " + GeneratorName);
             }
             GeneratorIndex = PVnum;
         } else {
             PVnum = GeneratorIndex;
             if (PVnum > NumPVs || PVnum < 1) {
-                ShowFatalError("SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits(PVnum) +
-                               ", Number of PVs=" + TrimSigDigits(NumPVs) + ", Generator name=" + GeneratorName);
+                ShowFatalError(state,
+                               format("SimPhotovoltaicGenerator: Invalid GeneratorIndex passed={}, Number of PVs={}, Generator name={}",
+                                      PVnum,
+                                      NumPVs,
+                                      GeneratorName));
             }
             if (CheckEquipName(PVnum)) {
                 if (GeneratorName != PVarray(PVnum).Name) {
-                    ShowFatalError("SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits(PVnum) +
-                                   ", Generator name=" + GeneratorName + ", stored PV Name for that index=" + PVarray(PVnum).Name);
+                    ShowFatalError(
+                        state,
+                        format("SimPhotovoltaicGenerator: Invalid GeneratorIndex passed={}, Generator name={}, stored PV Name for that index={}",
+                               PVnum,
+                               GeneratorName,
+                               PVarray(PVnum).Name));
                 }
                 CheckEquipName(PVnum) = false;
             }
@@ -195,30 +186,30 @@ namespace Photovoltaics {
 
             if (SELECT_CASE_var == iSimplePVModel) {
 
-                CalcSimplePV(PVnum, RunFlag);
+                CalcSimplePV(state, PVnum);
 
             } else if (SELECT_CASE_var == iTRNSYSPVModel) {
                 // 'PhotovoltaicPeformance:EquivalentOne-Diode' (aka. 5-parameter TRNSYS type 180 model)
 
-                InitTRNSYSPV(PVnum);
+                InitTRNSYSPV(state, PVnum);
 
-                CalcTRNSYSPV(PVnum, RunFlag);
+                CalcTRNSYSPV(state, PVnum, RunFlag);
 
             } else if (SELECT_CASE_var == iSandiaPVModel) {
                 // 'PhotovoltaicPerformance:Sandia' (aka. King model, Sandia Nat. Labs.)
 
-                CalcSandiaPV(PVnum, RunFlag);
+                CalcSandiaPV(state, PVnum, RunFlag);
 
             } else {
 
-                ShowFatalError("Specified generator model type not found for PV generator = " + GeneratorName);
+                ShowFatalError(state, "Specified generator model type not found for PV generator = " + GeneratorName);
             }
         }
 
-        ReportPV(PVnum);
+        ReportPV(state, PVnum);
     }
 
-    void GetPVGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator !unused1208
+    void GetPVGeneratorResults([[maybe_unused]] GeneratorType const GeneratorType, // type of Generator !unused1208
                                int const GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy
@@ -235,28 +226,8 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // provide a "get" method to collect results for individual electic load centers.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using PhotovoltaicThermalCollectors::GetPVTThermalPowerProduction;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         GeneratorPower = PVarray(GeneratorIndex).Report.DCPower;
         GeneratorEnergy = PVarray(GeneratorIndex).Report.DCEnergy;
@@ -272,7 +243,7 @@ namespace Photovoltaics {
 
     // *************
 
-    void GetPVInput()
+    void GetPVInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -292,10 +263,8 @@ namespace Photovoltaics {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataGlobals::KelvinConv;
-        using DataSurfaces::Surface;
         using namespace DataHeatBalance;
-        using General::RoundSigDigits;
+
         using ScheduleManager::GetScheduleIndex;
         using TranspiredCollector::GetTranspiredCollectorIndex;
 
@@ -306,7 +275,7 @@ namespace Photovoltaics {
         int NumAlphas; // Number of PV Array parameter alpha names being passed
         int NumNums;   // Number of PV Array numeric parameters are being passed
         int IOStat;
-        static bool ErrorsFound(false); // if errors detected in input
+        bool ErrorsFound(false); // if errors detected in input
         int ThisParamObj;
         int dupPtr;
 
@@ -316,13 +285,13 @@ namespace Photovoltaics {
         Array1D<SNLModuleParamsStuct> tmpSNLModuleParams;          // temporary, for processing input data
 
         // count how many photovoltaic arrays of different types are in the .idf
-        NumPVs = inputProcessor->getNumObjectsFound(cPVGeneratorObjectName);
-        NumSimplePVModuleTypes = inputProcessor->getNumObjectsFound(cPVSimplePerfObjectName);
-        Num1DiodePVModuleTypes = inputProcessor->getNumObjectsFound(cPVEquiv1DiodePerfObjectName);
-        NumSNLPVModuleTypes = inputProcessor->getNumObjectsFound(cPVSandiaPerfObjectName);
+        NumPVs = inputProcessor->getNumObjectsFound(state, cPVGeneratorObjectName);
+        NumSimplePVModuleTypes = inputProcessor->getNumObjectsFound(state, cPVSimplePerfObjectName);
+        Num1DiodePVModuleTypes = inputProcessor->getNumObjectsFound(state, cPVEquiv1DiodePerfObjectName);
+        NumSNLPVModuleTypes = inputProcessor->getNumObjectsFound(state, cPVSandiaPerfObjectName);
 
         if (NumPVs <= 0) {
-            ShowSevereError("Did not find any " + cPVGeneratorObjectName);
+            ShowSevereError(state, "Did not find any " + cPVGeneratorObjectName);
             return;
         }
 
@@ -331,7 +300,8 @@ namespace Photovoltaics {
 
         cCurrentModuleObject = cPVGeneratorObjectName;
         for (PVnum = 1; PVnum <= NumPVs; ++PVnum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           PVnum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -342,40 +312,40 @@ namespace Photovoltaics {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             PVarray(PVnum).Name = cAlphaArgs(1);
 
             PVarray(PVnum).SurfaceName = cAlphaArgs(2);
-            PVarray(PVnum).SurfacePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Surface);
+            PVarray(PVnum).SurfacePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataSurface->Surface);
             // required-surface
             if (lAlphaFieldBlanks(2)) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                ShowContinueError("Surface name cannot be blank");
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                ShowContinueError(state, "Surface name cannot be blank");
                 ErrorsFound = true;
             }
             if (PVarray(PVnum).SurfacePtr == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                 ErrorsFound = true;
             } else {
                 // Found one -- make sure has right parameters for PV
                 SurfNum = PVarray(PVnum).SurfacePtr;
-                Surface(SurfNum).IsPV = true;
+                state.dataSurface->Surface(SurfNum).IsPV = true;
 
-                if (!Surface(SurfNum).ExtSolar) {
-                    ShowWarningError("Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                    ShowContinueError("Surface is not exposed to solar, check surface bounday condition");
+                if (!state.dataSurface->Surface(SurfNum).ExtSolar) {
+                    ShowWarningError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                    ShowContinueError(state, "Surface is not exposed to solar, check surface bounday condition");
                 }
-                PVarray(PVnum).Zone = GetPVZone(PVarray(PVnum).SurfacePtr);
+                PVarray(PVnum).Zone = GetPVZone(state, PVarray(PVnum).SurfacePtr);
 
                 // check surface orientation, warn if upside down
-                if ((Surface(SurfNum).Tilt < -95.0) || (Surface(SurfNum).Tilt > 95.0)) {
-                    ShowWarningError("Suspected input problem with " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                    ShowContinueError("Surface used for solar collector faces down");
-                    ShowContinueError("Surface tilt angle (degrees from ground outward normal) = " + RoundSigDigits(Surface(SurfNum).Tilt, 2));
+                if ((state.dataSurface->Surface(SurfNum).Tilt < -95.0) || (state.dataSurface->Surface(SurfNum).Tilt > 95.0)) {
+                    ShowWarningError(state, "Suspected input problem with " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                    ShowContinueError(state, "Surface used for solar collector faces down");
+                    ShowContinueError(state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", state.dataSurface->Surface(SurfNum).Tilt));
                 }
             }
 
@@ -388,14 +358,14 @@ namespace Photovoltaics {
                 PVarray(PVnum).PVModelType = iSandiaPVModel;
             } else { // throw error, did not find module performance type
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                    ShowContinueError("Field cannot be blank");
+                    ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                    ShowContinueError(state, "Field cannot be blank");
                     ErrorsFound = true;
                 } else {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                    ShowContinueError("Did not recognize entry");
+                    ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                    ShowContinueError(state, "Did not recognize entry");
                     ErrorsFound = true;
                 }
             }
@@ -416,14 +386,14 @@ namespace Photovoltaics {
                 PVarray(PVnum).CellIntegrationMode = iPVTSolarCollectorCellIntegration;
             } else {
                 if (lAlphaFieldBlanks(5)) {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                    ShowContinueError("Field cannot be blank");
+                    ShowSevereError(state, "Invalid " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                    ShowContinueError(state, "Field cannot be blank");
                     ErrorsFound = true;
                 } else {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                    ShowContinueError("Did not recognize entry");
+                    ShowSevereError(state, "Invalid " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                    ShowContinueError(state, "Did not recognize entry");
                     ErrorsFound = true;
                 }
             }
@@ -444,21 +414,21 @@ namespace Photovoltaics {
                     if (dupPtr != 0) dupPtr += PVnum; // to correct for shortened array in find item
                     if (dupPtr != 0) {
                         if (PVarray(dupPtr).CellIntegrationMode == iSurfaceOutsideFaceCellIntegration) {
-                            ShowSevereError(cCurrentModuleObject + ": problem detected with multiple PV arrays.");
-                            ShowContinueError("When using IntegratedSurfaceOutsideFace heat transfer mode, only one PV array can be coupled");
-                            ShowContinueError("Both " + PVarray(PVnum).Name + " and " + PVarray(dupPtr).Name + " are using surface " +
+                            ShowSevereError(state, cCurrentModuleObject + ": problem detected with multiple PV arrays.");
+                            ShowContinueError(state, "When using IntegratedSurfaceOutsideFace heat transfer mode, only one PV array can be coupled");
+                            ShowContinueError(state, "Both " + PVarray(PVnum).Name + " and " + PVarray(dupPtr).Name + " are using surface " +
                                               PVarray(PVnum).SurfaceName);
                             ErrorsFound = true;
                         } else if (PVarray(dupPtr).CellIntegrationMode == iTranspiredCollectorCellIntegration) {
-                            ShowSevereError(cCurrentModuleObject + ": problem detected with multiple PV arrays.");
-                            ShowContinueError("When using IntegratedTranspiredCollector heat transfer mode, only one PV array can be coupled");
-                            ShowContinueError("Both " + PVarray(PVnum).Name + " and " + PVarray(dupPtr).Name +
+                            ShowSevereError(state, cCurrentModuleObject + ": problem detected with multiple PV arrays.");
+                            ShowContinueError(state, "When using IntegratedTranspiredCollector heat transfer mode, only one PV array can be coupled");
+                            ShowContinueError(state, "Both " + PVarray(PVnum).Name + " and " + PVarray(dupPtr).Name +
                                               " are using UTSC surface = " + PVarray(PVnum).SurfaceName);
                             ErrorsFound = true;
                         } else if (PVarray(dupPtr).CellIntegrationMode == iExteriorVentedCavityCellIntegration) {
-                            ShowSevereError(cCurrentModuleObject + ": problem detected with multiple PV arrays.");
-                            ShowContinueError("When using IntegratedExteriorVentedCavity heat transfer mode, only one PV array can be coupled");
-                            ShowContinueError("Both " + PVarray(PVnum).Name + " and " + PVarray(dupPtr).Name +
+                            ShowSevereError(state, cCurrentModuleObject + ": problem detected with multiple PV arrays.");
+                            ShowContinueError(state, "When using IntegratedExteriorVentedCavity heat transfer mode, only one PV array can be coupled");
+                            ShowContinueError(state, "Both " + PVarray(PVnum).Name + " and " + PVarray(dupPtr).Name +
                                               " are using exterior vented surface = " + PVarray(PVnum).SurfaceName);
                             ErrorsFound = true;
                         }
@@ -471,7 +441,8 @@ namespace Photovoltaics {
             tmpSimpleModuleParams.allocate(NumSimplePVModuleTypes);
             cCurrentModuleObject = cPVSimplePerfObjectName;
             for (ModNum = 1; ModNum <= NumSimplePVModuleTypes; ++ModNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               ModNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -482,7 +453,7 @@ namespace Photovoltaics {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
                 tmpSimpleModuleParams(ModNum).Name = cAlphaArgs(1);
@@ -494,24 +465,24 @@ namespace Photovoltaics {
                     tmpSimpleModuleParams(ModNum).EfficencyInputMode = ScheduledEfficiency;
                 } else {
                     if (lAlphaFieldBlanks(2)) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                        ShowContinueError("Field cannot be blank");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                        ShowContinueError(state, "Field cannot be blank");
                         ErrorsFound = true;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                        ShowContinueError("Did not recognize entry");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                        ShowContinueError(state, "Did not recognize entry");
                         ErrorsFound = true;
                     }
                 }
                 tmpSimpleModuleParams(ModNum).PVEfficiency = rNumericArgs(2);
 
-                tmpSimpleModuleParams(ModNum).EffSchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                tmpSimpleModuleParams(ModNum).EffSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if ((tmpSimpleModuleParams(ModNum).EffSchedPtr == 0) && (tmpSimpleModuleParams(ModNum).EfficencyInputMode == ScheduledEfficiency)) {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                    ShowContinueError("Did not find schedule");
+                    ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                    ShowContinueError(state, "Did not find schedule");
                     ErrorsFound = true;
                 }
             }
@@ -521,7 +492,8 @@ namespace Photovoltaics {
             tmpTNRSYSModuleParams.allocate(Num1DiodePVModuleTypes);
             cCurrentModuleObject = cPVEquiv1DiodePerfObjectName;
             for (ModNum = 1; ModNum <= Num1DiodePVModuleTypes; ++ModNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               ModNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -532,7 +504,7 @@ namespace Photovoltaics {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
                 tmpTNRSYSModuleParams(ModNum).Name = cAlphaArgs(1);
@@ -542,14 +514,14 @@ namespace Photovoltaics {
                     tmpTNRSYSModuleParams(ModNum).CellType = AmorphousSiPVCells;
                 } else {
                     if (lAlphaFieldBlanks(2)) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                        ShowContinueError("Field cannot be blank");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                        ShowContinueError(state, "Field cannot be blank");
                         ErrorsFound = true;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                        ShowContinueError("Did not recognize entry");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                        ShowContinueError(state, "Did not recognize entry");
                         ErrorsFound = true;
                     }
                 }
@@ -561,14 +533,14 @@ namespace Photovoltaics {
                 tmpTNRSYSModuleParams(ModNum).ShuntResistance = rNumericArgs(5);
                 tmpTNRSYSModuleParams(ModNum).RefIsc = rNumericArgs(6);
                 tmpTNRSYSModuleParams(ModNum).RefVoc = rNumericArgs(7);
-                tmpTNRSYSModuleParams(ModNum).RefTemperature = rNumericArgs(8) + KelvinConv;
+                tmpTNRSYSModuleParams(ModNum).RefTemperature = rNumericArgs(8) + DataGlobalConstants::KelvinConv;
                 tmpTNRSYSModuleParams(ModNum).RefInsolation = rNumericArgs(9);
                 tmpTNRSYSModuleParams(ModNum).Imp = rNumericArgs(10);
                 tmpTNRSYSModuleParams(ModNum).Vmp = rNumericArgs(11);
                 tmpTNRSYSModuleParams(ModNum).TempCoefIsc = rNumericArgs(12);
                 tmpTNRSYSModuleParams(ModNum).TempCoefVoc = rNumericArgs(13);
-                tmpTNRSYSModuleParams(ModNum).NOCTAmbTemp = rNumericArgs(14) + KelvinConv;
-                tmpTNRSYSModuleParams(ModNum).NOCTCellTemp = rNumericArgs(15) + KelvinConv;
+                tmpTNRSYSModuleParams(ModNum).NOCTAmbTemp = rNumericArgs(14) + DataGlobalConstants::KelvinConv;
+                tmpTNRSYSModuleParams(ModNum).NOCTCellTemp = rNumericArgs(15) + DataGlobalConstants::KelvinConv;
                 tmpTNRSYSModuleParams(ModNum).NOCTInsolation = rNumericArgs(16);
                 tmpTNRSYSModuleParams(ModNum).HeatLossCoef = rNumericArgs(17);
                 tmpTNRSYSModuleParams(ModNum).HeatCapacity = rNumericArgs(18);
@@ -580,7 +552,8 @@ namespace Photovoltaics {
             cCurrentModuleObject = cPVSandiaPerfObjectName;
             for (ModNum = 1; ModNum <= NumSNLPVModuleTypes; ++ModNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               ModNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -591,7 +564,7 @@ namespace Photovoltaics {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
 
@@ -652,10 +625,10 @@ namespace Photovoltaics {
 
                         // do one-time setups on input data
                         PVarray(PVnum).SimplePVModule.AreaCol =
-                            Surface(PVarray(PVnum).SurfacePtr).Area * PVarray(PVnum).SimplePVModule.ActiveFraction;
+                            state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).Area * PVarray(PVnum).SimplePVModule.ActiveFraction;
                     } else {
-                        ShowSevereError("Invalid PV performance object name of " + PVarray(PVnum).PerfObjName);
-                        ShowContinueError("Entered in " + cPVGeneratorObjectName + " = " + PVarray(PVnum).Name);
+                        ShowSevereError(state, "Invalid PV performance object name of " + PVarray(PVnum).PerfObjName);
+                        ShowContinueError(state, "Entered in " + cPVGeneratorObjectName + " = " + PVarray(PVnum).Name);
                         ErrorsFound = true;
                     }
 
@@ -665,8 +638,8 @@ namespace Photovoltaics {
                     if (ThisParamObj > 0) {
                         PVarray(PVnum).TRNSYSPVModule = tmpTNRSYSModuleParams(ThisParamObj); // entire structure assignment
                     } else {
-                        ShowSevereError("Invalid PV performance object name of " + PVarray(PVnum).PerfObjName);
-                        ShowContinueError("Entered in " + cPVGeneratorObjectName + " = " + PVarray(PVnum).Name);
+                        ShowSevereError(state, "Invalid PV performance object name of " + PVarray(PVnum).PerfObjName);
+                        ShowContinueError(state, "Entered in " + cPVGeneratorObjectName + " = " + PVarray(PVnum).Name);
                         ErrorsFound = true;
                     }
 
@@ -676,21 +649,22 @@ namespace Photovoltaics {
                     if (ThisParamObj > 0) {
                         PVarray(PVnum).SNLPVModule = tmpSNLModuleParams(ThisParamObj); // entire structure assignment
                     } else {
-                        ShowSevereError("Invalid PV performance object name of " + PVarray(PVnum).PerfObjName);
-                        ShowContinueError("Entered in " + cPVGeneratorObjectName + " = " + PVarray(PVnum).Name);
+                        ShowSevereError(state, "Invalid PV performance object name of " + PVarray(PVnum).PerfObjName);
+                        ShowContinueError(state, "Entered in " + cPVGeneratorObjectName + " = " + PVarray(PVnum).Name);
                         ErrorsFound = true;
                     }
                 }
             }
 
             // set up report variables CurrentModuleObject='Photovoltaics'
-            SetupOutputVariable("Generator Produced DC Electric Power",
+            SetupOutputVariable(state,
+                                "Generator Produced DC Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 PVarray(PVnum).Report.DCPower,
                                 "System",
                                 "Average",
                                 PVarray(PVnum).Name);
-            SetupOutputVariable("Generator Produced DC Electric Energy",
+            SetupOutputVariable(state, "Generator Produced DC Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 PVarray(PVnum).Report.DCEnergy,
                                 "System",
@@ -701,7 +675,7 @@ namespace Photovoltaics {
                                 "Photovoltaics",
                                 _,
                                 "Plant");
-            SetupOutputVariable("Generator PV Array Efficiency",
+            SetupOutputVariable(state, "Generator PV Array Efficiency",
                                 OutputProcessor::Unit::None,
                                 PVarray(PVnum).Report.ArrayEfficiency,
                                 "System",
@@ -710,19 +684,19 @@ namespace Photovoltaics {
 
             // CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
             if ((PVarray(PVnum).PVModelType == iTRNSYSPVModel) || (PVarray(PVnum).PVModelType == iSandiaPVModel)) {
-                SetupOutputVariable("Generator PV Cell Temperature",
+                SetupOutputVariable(state, "Generator PV Cell Temperature",
                                     OutputProcessor::Unit::C,
                                     PVarray(PVnum).Report.CellTemp,
                                     "System",
                                     "Average",
                                     PVarray(PVnum).Name);
-                SetupOutputVariable("Generator PV Short Circuit Current",
+                SetupOutputVariable(state, "Generator PV Short Circuit Current",
                                     OutputProcessor::Unit::A,
                                     PVarray(PVnum).Report.ArrayIsc,
                                     "System",
                                     "Average",
                                     PVarray(PVnum).Name);
-                SetupOutputVariable("Generator PV Open Circuit Voltage",
+                SetupOutputVariable(state, "Generator PV Open Circuit Voltage",
                                     OutputProcessor::Unit::V,
                                     PVarray(PVnum).Report.ArrayVoc,
                                     "System",
@@ -733,22 +707,22 @@ namespace Photovoltaics {
             // do some checks and setup
             if (PVarray(PVnum).PVModelType == iSurfaceOutsideFaceCellIntegration) {
                 // check that surface is HeatTransfer and a Construction with Internal Source was used
-                if (!Surface(PVarray(PVnum).SurfacePtr).HeatTransSurf) {
-                    ShowSevereError("Must use a surface with heat transfer for IntegratedSurfaceOutsideFace mode in " + PVarray(PVnum).Name);
+                if (!state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).HeatTransSurf) {
+                    ShowSevereError(state, "Must use a surface with heat transfer for IntegratedSurfaceOutsideFace mode in " + PVarray(PVnum).Name);
                     ErrorsFound = true;
-                } else if (!dataConstruction.Construct(Surface(PVarray(PVnum).SurfacePtr).Construction).SourceSinkPresent) {
-                    ShowSevereError("Must use a surface with internal source construction for IntegratedSurfaceOutsideFace mode in " +
+                } else if (!state.dataConstruction->Construct(state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).Construction).SourceSinkPresent) {
+                    ShowSevereError(state, "Must use a surface with internal source construction for IntegratedSurfaceOutsideFace mode in " +
                                     PVarray(PVnum).Name);
                     ErrorsFound = true;
                 }
             }
 
             if (PVarray(PVnum).CellIntegrationMode == iTranspiredCollectorCellIntegration) {
-                GetTranspiredCollectorIndex(PVarray(PVnum).SurfacePtr, PVarray(PVnum).UTSCPtr);
+                GetTranspiredCollectorIndex(state, PVarray(PVnum).SurfacePtr, PVarray(PVnum).UTSCPtr);
             }
 
             if (PVarray(PVnum).CellIntegrationMode == iExteriorVentedCavityCellIntegration) {
-                GetExtVentedCavityIndex(PVarray(PVnum).SurfacePtr, PVarray(PVnum).ExtVentCavPtr);
+                GetExtVentedCavityIndex(state, PVarray(PVnum).SurfacePtr, PVarray(PVnum).ExtVentCavPtr);
             }
 
             if (PVarray(PVnum).CellIntegrationMode == iPVTSolarCollectorCellIntegration) {
@@ -757,11 +731,11 @@ namespace Photovoltaics {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in getting photovoltaic input");
+            ShowFatalError(state, "Errors found in getting photovoltaic input");
         }
     }
 
-    int GetPVZone(int const SurfNum)
+    int GetPVZone(EnergyPlusData &state, int const SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -770,16 +744,12 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // Get the zone number for this PV array for use when zone multipliers are applied
 
-        using DataGlobals::NumOfZones;
-        using DataHeatBalance::Zone;
-        using DataSurfaces::Surface;
-
         int GetPVZone(0);
 
         if (SurfNum > 0) {
-            GetPVZone = Surface(SurfNum).Zone;
+            GetPVZone = state.dataSurface->Surface(SurfNum).Zone;
             if (GetPVZone == 0) { // might need to get the zone number from the name
-                GetPVZone = UtilityRoutines::FindItemInList(Surface(SurfNum).ZoneName, Zone, NumOfZones);
+                GetPVZone = UtilityRoutines::FindItemInList(state.dataSurface->Surface(SurfNum).ZoneName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             }
         }
 
@@ -788,9 +758,7 @@ namespace Photovoltaics {
 
     // **************************************
 
-    void CalcSimplePV(int const thisPV,
-                      bool const EP_UNUSED(RunFlag) // unused1208
-    )
+    void CalcSimplePV(EnergyPlusData &state, int const thisPV)
     {
 
         // SUBROUTINE INFORMATION:
@@ -802,42 +770,17 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // calculate the electricity production using a simple PV model
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Using/Aliasing
-        using DataGlobals::SecInHour;
-        using DataHeatBalance::QRadSWOutIncident;
         using DataHVACGlobals::TimeStepSys;
-        using DataSurfaces::Surface;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ThisSurf; // working index ptr to Surface arrays
         Real64 Eff;   // working variable for solar electric efficiency
-        // unused1208    REAL(r64) :: ArrayEnergy !working variable for PV energy this system time step
-        // first get surface index to use as a pointer
 
         ThisSurf = PVarray(thisPV).SurfacePtr;
 
-        if (QRadSWOutIncident(ThisSurf) > MinIrradiance) {
+        if (state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) > MinIrradiance) {
 
             // get efficiency
             {
@@ -849,24 +792,24 @@ namespace Photovoltaics {
 
                 } else if (SELECT_CASE_var == ScheduledEfficiency) { // get from schedule
 
-                    Eff = GetCurrentScheduleValue(PVarray(thisPV).SimplePVModule.EffSchedPtr);
+                    Eff = GetCurrentScheduleValue(state, PVarray(thisPV).SimplePVModule.EffSchedPtr);
                     PVarray(thisPV).SimplePVModule.PVEfficiency = Eff;
 
                 } else {
                     Eff = 0.0; // Suppress uninitialized warning
-                    ShowSevereError("caught bad Mode in Generator:Photovoltaic:Simple use FIXED or SCHEDULED efficiency mode");
+                    ShowSevereError(state, "caught bad Mode in Generator:Photovoltaic:Simple use FIXED or SCHEDULED efficiency mode");
                 }
             }
 
             PVarray(thisPV).Report.DCPower =
                 PVarray(thisPV).SimplePVModule.AreaCol * Eff *
-                QRadSWOutIncident(ThisSurf); // active solar cellsurface net area | solar conversion efficiency | solar incident
+                        state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf); // active solar cellsurface net area | solar conversion efficiency | solar incident
 
             // store sink term in appropriate place for surface heat transfer itegration
             PVarray(thisPV).SurfaceSink = PVarray(thisPV).Report.DCPower;
 
             // array energy, power * timestep
-            PVarray(thisPV).Report.DCEnergy = PVarray(thisPV).Report.DCPower * (TimeStepSys * SecInHour);
+            PVarray(thisPV).Report.DCEnergy = PVarray(thisPV).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour);
             PVarray(thisPV).Report.ArrayEfficiency = Eff;
         } else { // not enough incident solar, zero things out
 
@@ -877,7 +820,7 @@ namespace Photovoltaics {
         }
     }
 
-    void ReportPV(int const PVnum)
+    void ReportPV(EnergyPlusData &state, int const PVnum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -889,47 +832,42 @@ namespace Photovoltaics {
         // collect statements that assign to variables tied to output variables
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::QPVSysSource;
-        using DataSurfaces::Surface;
         using TranspiredCollector::SetUTSCQdotSource;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int thisZone; // working index for zones
 
-        PVarray(PVnum).Report.DCEnergy = PVarray(PVnum).Report.DCPower * (TimeStepSys * SecInHour);
+        PVarray(PVnum).Report.DCEnergy = PVarray(PVnum).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour);
 
         // add check for multiplier.  if surface is attached to a zone that is on a multiplier
         // then PV production should be multiplied out as well
 
         thisZone = PVarray(PVnum).Zone;
         if (thisZone != 0) { // might need to apply multiplier
-            PVarray(PVnum).Report.DCEnergy *= (Zone(thisZone).Multiplier * Zone(thisZone).ListMultiplier);
-            PVarray(PVnum).Report.DCPower *= (Zone(thisZone).Multiplier * Zone(thisZone).ListMultiplier);
+            PVarray(PVnum).Report.DCEnergy *= (state.dataHeatBal->Zone(thisZone).Multiplier * state.dataHeatBal->Zone(thisZone).ListMultiplier);
+            PVarray(PVnum).Report.DCPower *= (state.dataHeatBal->Zone(thisZone).Multiplier * state.dataHeatBal->Zone(thisZone).ListMultiplier);
         }
 
         {
             auto const SELECT_CASE_var(PVarray(PVnum).CellIntegrationMode);
             // SurfaceSink is not multiplied...
             if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                QPVSysSource(PVarray(PVnum).SurfacePtr) = -1.0 * PVarray(PVnum).SurfaceSink;
+                state.dataHeatBalFanSys->QPVSysSource(PVarray(PVnum).SurfacePtr) = -1.0 * PVarray(PVnum).SurfaceSink;
 
             } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
-                SetUTSCQdotSource(PVarray(PVnum).UTSCPtr, -1.0 * PVarray(PVnum).SurfaceSink);
+                SetUTSCQdotSource(state, PVarray(PVnum).UTSCPtr, -1.0 * PVarray(PVnum).SurfaceSink);
 
             } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
-                SetVentedModuleQdotSource(PVarray(PVnum).ExtVentCavPtr, -1.0 * PVarray(PVnum).SurfaceSink);
+                SetVentedModuleQdotSource(state, PVarray(PVnum).ExtVentCavPtr, -1.0 * PVarray(PVnum).SurfaceSink);
 
             } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
-                // CALL SetPVTQdotSource(PVarray(PVNum)%ExtVentCavPtr,  -1 * PVarray(PVNum)%SurfaceSink )
             }
         }
     }
 
     // *************
 
-    void CalcSandiaPV(int const PVnum,   // ptr to current PV system
+    void CalcSandiaPV(EnergyPlusData &state, int const PVnum,   // ptr to current PV system
                       bool const RunFlag // controls if generator is scheduled *ON*
     )
     {
@@ -957,43 +895,21 @@ namespace Photovoltaics {
         //    integrated photovoltaics. Solar 2002, Sunrise on the Reliable Energy Economy, June 15-19, 2002 Reno, NV
 
         // Using/Aliasing
-        using DataEnvironment::Elevation;
-        using DataEnvironment::SOLCOS;
-        using DataGlobals::DegToRadians;
-        using DataHeatBalance::CosIncidenceAngle;
-        using DataHeatBalance::QRadSWOutIncident;
-        using DataHeatBalance::QRadSWOutIncidentBeam;
-        using DataHeatBalSurface::TempSurfOut;
-        using DataSurfaces::Surface;
         using TranspiredCollector::GetUTSCTsColl;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ThisSurf; // working variable for indexing surfaces
-        // unused1208    INTEGER :: thisMod  ! working variable for indexing module parameters
         Real64 Ee;
 
         ThisSurf = PVarray(PVnum).SurfacePtr;
 
         //   get input from elsewhere in Energyplus for the current point in the simulation
-        PVarray(PVnum).SNLPVinto.IcBeam = QRadSWOutIncidentBeam(ThisSurf);                                  //(W/m2)from DataHeatBalance
-        PVarray(PVnum).SNLPVinto.IcDiffuse = QRadSWOutIncident(ThisSurf) - QRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
-        PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(CosIncidenceAngle(ThisSurf)) / DegToRadians;    // (deg) from dataHeatBalance
-        PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(SOLCOS(3)) / DegToRadians;                         //(degrees),
-        PVarray(PVnum).SNLPVinto.Tamb = Surface(ThisSurf).OutDryBulbTemp;                                   //(deg. C)
-        PVarray(PVnum).SNLPVinto.WindSpeed = Surface(ThisSurf).WindSpeed;                                   // (m/s)
-        PVarray(PVnum).SNLPVinto.Altitude = Elevation;                                                      // from DataEnvironment via USE
+        PVarray(PVnum).SNLPVinto.IcBeam = state.dataHeatBal->SurfQRadSWOutIncidentBeam(ThisSurf);                                  //(W/m2)from DataHeatBalance
+        PVarray(PVnum).SNLPVinto.IcDiffuse = state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) - state.dataHeatBal->SurfQRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
+        PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(state.dataHeatBal->SurfCosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians;    // (deg) from dataHeatBalance
+        PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians;                         //(degrees),
+        PVarray(PVnum).SNLPVinto.Tamb = state.dataSurface->Surface(ThisSurf).OutDryBulbTemp;                                   //(deg. C)
+        PVarray(PVnum).SNLPVinto.WindSpeed = state.dataSurface->Surface(ThisSurf).WindSpeed;                                   // (m/s)
+        PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                                                      // from DataEnvironment via USE
 
         if (((PVarray(PVnum).SNLPVinto.IcBeam + PVarray(PVnum).SNLPVinto.IcDiffuse) > MinIrradiance) && (RunFlag)) {
 
@@ -1020,7 +936,7 @@ namespace Photovoltaics {
 
                 } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
                     // get back-of-module temperature from elsewhere in EnergyPlus
-                    PVarray(PVnum).SNLPVCalc.Tback = TempSurfOut(PVarray(PVnum).SurfacePtr);
+                    PVarray(PVnum).SNLPVCalc.Tback = state.dataHeatBalSurf->SurfTempOut(PVarray(PVnum).SurfacePtr);
 
                     PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
                                                                             PVarray(PVnum).SNLPVinto.IcBeam,
@@ -1029,7 +945,7 @@ namespace Photovoltaics {
                                                                             PVarray(PVnum).SNLPVModule.DT0);
 
                 } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
-                    GetUTSCTsColl(PVarray(PVnum).UTSCPtr, PVarray(PVnum).SNLPVCalc.Tback);
+                    GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, PVarray(PVnum).SNLPVCalc.Tback);
 
                     PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
                                                                             PVarray(PVnum).SNLPVinto.IcBeam,
@@ -1038,7 +954,7 @@ namespace Photovoltaics {
                                                                             PVarray(PVnum).SNLPVModule.DT0);
 
                 } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
-                    GetExtVentedCavityTsColl(PVarray(PVnum).ExtVentCavPtr, PVarray(PVnum).SNLPVCalc.Tback);
+                    GetExtVentedCavityTsColl(state, PVarray(PVnum).ExtVentCavPtr, PVarray(PVnum).SNLPVCalc.Tback);
 
                     PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
                                                                             PVarray(PVnum).SNLPVinto.IcBeam,
@@ -1050,7 +966,7 @@ namespace Photovoltaics {
                     // add calls to PVT models here
 
                 } else {
-                    ShowSevereError("Sandia PV Simulation Temperature Modeling Mode Error in " + PVarray(PVnum).Name);
+                    ShowSevereError(state, "Sandia PV Simulation Temperature Modeling Mode Error in " + PVarray(PVnum).Name);
                 }
             }
 
@@ -1187,7 +1103,7 @@ namespace Photovoltaics {
     // ********************
     // begin routines for Equivalent one-diode model by Bradley/Ulleberg
 
-    void InitTRNSYSPV(int const PVnum) // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
+    void InitTRNSYSPV(EnergyPlusData &state, int const PVnum) // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1202,39 +1118,11 @@ namespace Photovoltaics {
         // simulation initializations and start of timestep initializations. The structure of the
         // subroutine was taken from InitBaseboard.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
-        using DataGlobals::HourOfDay;
-        using DataGlobals::SecInHour;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
-        using DataHeatBalance::QRadSWOutIncident;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataSurfaces::Surface;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
         static Array1D_bool MyEnvrnFlag;
         Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 
@@ -1246,28 +1134,28 @@ namespace Photovoltaics {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(PVnum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(PVnum)) {
 
-            PVarray(PVnum).TRNSYSPVcalc.CellTempK = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + KelvinConv;
-            PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + KelvinConv;
+            PVarray(PVnum).TRNSYSPVcalc.CellTempK = state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+            PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
             MyEnvrnFlag(PVnum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(PVnum) = true;
         }
 
         // Do the beginning of every time step initializations
-        TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
         if (PVarray(PVnum).TRNSYSPVcalc.TimeElapsed != TimeElapsed) {
             // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
             PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = PVarray(PVnum).TRNSYSPVcalc.CellTempK;
             PVarray(PVnum).TRNSYSPVcalc.TimeElapsed = TimeElapsed;
         }
 
-        if (any_gt(QRadSWOutIncident, 0.0)) {
+        if (any_gt(state.dataHeatBal->SurfQRadSWOutIncident, 0.0)) {
             //  Determine the amount of radiation incident on each PV
-            PVarray(PVnum).TRNSYSPVcalc.Insolation = QRadSWOutIncident(PVarray(PVnum).SurfacePtr); //[W/m2]
+            PVarray(PVnum).TRNSYSPVcalc.Insolation = state.dataHeatBal->SurfQRadSWOutIncident(PVarray(PVnum).SurfacePtr); //[W/m2]
         } else {
             PVarray(PVnum).TRNSYSPVcalc.Insolation = 0.0;
         }
@@ -1275,7 +1163,8 @@ namespace Photovoltaics {
 
     // *************
 
-    void CalcTRNSYSPV(int const PVnum,   // BTG added intent
+    void CalcTRNSYSPV(EnergyPlusData &state,
+                      int const PVnum,   // BTG added intent
                       bool const RunFlag // BTG added intent    !flag tells whether the PV is ON or OFF
     )
     {
@@ -1291,40 +1180,14 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the PV performance.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataGlobals::MinutesPerTimeStep;
-        using DataGlobals::SecInHour;
-        using DataSurfaces::Surface;
-        //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
-        using DataHeatBalance::Zone;
-        using DataHeatBalSurface::TempSurfOut;
         using TranspiredCollector::GetUTSCTsColl;
 
-        // Locals
-        // SUBROUTINE FUNCTION DECLARATIONS:
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const EPS(0.001);
         Real64 const ERR(0.001);
         Real64 const MinInsolation(30.0);
         int const KMAX(100);
         Real64 const EtaIni(0.10); // initial value of eta
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Real64 PVTimeStep; // internal timestep (in seconds) for cell temperature mode 3
         Real64 DummyErr;
         Real64 ETA;
@@ -1355,12 +1218,11 @@ namespace Photovoltaics {
         int K;
         Real64 CellTemp(0.0); // cell temperature in Kelvin
         Real64 CellTempC;     // cell temperature in degrees C
-        static bool firstTime(true);
         // unused1208  INTEGER :: thisZone
 
         // if the cell temperature mode is 2, convert the timestep to seconds
         if (firstTime && PVarray(PVnum).CellIntegrationMode == iDecoupledUllebergDynamicCellIntegration) {
-            PVTimeStep = double(MinutesPerTimeStep) * 60.0; // Seconds per time step
+            PVTimeStep = double(state.dataGlobal->MinutesPerTimeStep) * 60.0; // Seconds per time step
         }
         firstTime = false;
 
@@ -1368,7 +1230,7 @@ namespace Photovoltaics {
         ShuntResistance = PVarray(PVnum).TRNSYSPVModule.ShuntResistance;
 
         // convert ambient temperature from C to K
-        Tambient = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + KelvinConv;
+        Tambient = state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
 
         if ((PVarray(PVnum).TRNSYSPVcalc.Insolation > MinInsolation) && (RunFlag)) {
 
@@ -1402,13 +1264,13 @@ namespace Photovoltaics {
                                 (1.0 -
                                  std::exp(-PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep));
                     } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                        CellTemp = TempSurfOut(PVarray(PVnum).SurfacePtr) + KelvinConv;
+                        CellTemp = state.dataHeatBalSurf->SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
                     } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
-                        GetUTSCTsColl(PVarray(PVnum).UTSCPtr, CellTemp);
-                        CellTemp += KelvinConv;
+                        GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, CellTemp);
+                        CellTemp += DataGlobalConstants::KelvinConv;
                     } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
-                        GetExtVentedCavityTsColl(PVarray(PVnum).ExtVentCavPtr, CellTemp);
-                        CellTemp += KelvinConv;
+                        GetExtVentedCavityTsColl(state, PVarray(PVnum).ExtVentCavPtr, CellTemp);
+                        CellTemp += DataGlobalConstants::KelvinConv;
                     } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
                         // get PVT model result for cell temp..
                     }
@@ -1440,21 +1302,21 @@ namespace Photovoltaics {
 
                 //   NEWTON --> ISC  (STARTVALUE: ISCG1 - BASED ON IL=ISC)
                 ISCG1 = IL;
-                NEWTON(ISC, FUN, FI, ISC, constant_zero, IO, IL, SeriesResistance, AA, ISCG1, EPS);
+                NEWTON(state, ISC, FUN, FI, ISC, DataPrecisionGlobals::constant_zero, IO, IL, SeriesResistance, AA, ISCG1, EPS);
 
                 //   NEWTON --> VOC  (STARTVALUE: VOCG1 - BASED ON IM=0.0)
                 VOCG1 = (std::log(IL / IO) + 1.0) * AA;
-                NEWTON(VOC, FUN, FV, constant_zero, VOC, IO, IL, SeriesResistance, AA, VOCG1, EPS);
+                NEWTON(state, VOC, FUN, FV, DataPrecisionGlobals::constant_zero, VOC, IO, IL, SeriesResistance, AA, VOCG1, EPS);
 
                 //  maximum power point tracking
 
                 //   SEARCH --> VM AT MAXIMUM POWER POINT
                 VLEFT = 0.0;
                 VRIGHT = VOC;
-                SEARCH(VLEFT, VRIGHT, VM, K, IO, IL, SeriesResistance, AA, EPS, KMAX);
+                SEARCH(state, VLEFT, VRIGHT, VM, K, IO, IL, SeriesResistance, AA, EPS, KMAX);
 
                 //   POWER --> IM & PM AT MAXIMUM POWER POINT
-                POWER(IO, IL, SeriesResistance, AA, EPS, IM, VM, PM);
+                POWER(state, IO, IL, SeriesResistance, AA, EPS, IM, VM, PM);
 
                 // calculate overall PV module efficiency
                 ETA = PM / PVarray(PVnum).TRNSYSPVcalc.Insolation / PVarray(PVnum).TRNSYSPVModule.Area;
@@ -1475,13 +1337,13 @@ namespace Photovoltaics {
                                (PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
                                    std::exp(-PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep);
                 } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                    CellTemp = TempSurfOut(PVarray(PVnum).SurfacePtr) + KelvinConv;
+                    CellTemp = state.dataHeatBalSurf->SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
                 } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
-                    GetUTSCTsColl(PVarray(PVnum).UTSCPtr, CellTemp);
-                    CellTemp += KelvinConv;
+                    GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, CellTemp);
+                    CellTemp += DataGlobalConstants::KelvinConv;
                 } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
-                    GetExtVentedCavityTsColl(PVarray(PVnum).ExtVentCavPtr, CellTemp);
-                    CellTemp += KelvinConv;
+                    GetExtVentedCavityTsColl(state, PVarray(PVnum).ExtVentCavPtr, CellTemp);
+                    CellTemp += DataGlobalConstants::KelvinConv;
                 } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
                     // get PVT model result for cell temp.. //Bug CellTemp not set but used below
                 } else {
@@ -1499,7 +1361,7 @@ namespace Photovoltaics {
         }
 
         // convert cell temperature back to C
-        CellTempC = CellTemp - KelvinConv;
+        CellTempC = CellTemp - DataGlobalConstants::KelvinConv;
 
         // calculate array based outputs (so far, the outputs are module based
         IA = PVarray(PVnum).NumSeriesNParall * IM;
@@ -1525,7 +1387,8 @@ namespace Photovoltaics {
         PVarray(PVnum).SurfaceSink = PA;
     }
 
-    void POWER(Real64 const IO,   // passed in from CalcPV
+    void POWER(EnergyPlusData &state,
+               Real64 const IO,   // passed in from CalcPV
                Real64 const IL,   // passed in from CalcPV
                Real64 const RSER, // passed in from CalcPV
                Real64 const AA,   // passed in from CalcPV
@@ -1545,42 +1408,19 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the power produced by the PV.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE FUNCTION DECLARATIONS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 IG1;
 
         // NEWTON --> II (STARTVALUE: IG1 BASED ON SIMPLIFIED I(I,V) EQUATION)
         IG1 = IL - IO * std::exp(VV / AA - 1.0);
-        NEWTON(II, FUN, FI, II, VV, IO, IL, RSER, AA, IG1, EPS);
+        NEWTON(state, II, FUN, FI, II, VV, IO, IL, RSER, AA, IG1, EPS);
         PP = II * VV;
     }
 
-    void NEWTON(Real64 &XX,
-                std::function<Real64(Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
-                std::function<Real64(Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
+    void NEWTON(EnergyPlusData &state,
+                Real64 &XX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
                 Real64 const &II, // Autodesk Aliased to XX in some calls
                 Real64 const &VV, // Autodesk Aliased to XX in some calls
                 Real64 const IO,
@@ -1600,26 +1440,6 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine uses the Newton-Raphson method to solve a non linear equation with one variable.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int COUNT;
         Real64 ERR;
@@ -1630,13 +1450,13 @@ namespace Photovoltaics {
         ERR = 1.0;
         while ((ERR > EPS) && (COUNT <= 10)) {
             X0 = XX;
-            XX -= FXX(II, VV, IL, IO, RSER, AA) / DER(II, VV, IO, RSER, AA);
+            XX -= FXX(state, II, VV, IL, IO, RSER, AA) / DER(state, II, VV, IO, RSER, AA);
             ++COUNT;
             ERR = std::abs((XX - X0) / X0);
         }
     }
 
-    void SEARCH(Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX)
+    void SEARCH(EnergyPlusData &state, Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1652,31 +1472,16 @@ namespace Photovoltaics {
         // 1. a subroutine "POWER" is called in order to calculate the power output of the PV module
         // 2. the negative of the power of the PV module is taken so that the optimum can be found.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         //   /1/ MATHEWS, JOHN H.  NUMERICAL METHODS:  FORTRAN PROGRAMS. 1992, PP 413.
         //   /2/ NUMERICAL METHODS FOR MATHEMATICS, SCIENCE AND ENGINEERING, 2ND EDITION,
         //       PRENTICE HALL, NEW JERSEY, 1992.
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const DELTA(1.e-3);
         Real64 const EPSILON(1.e-3);
         static Real64 const RONE((std::sqrt(5.0) - 1.0) / 2.0);
         static Real64 const RTWO(RONE * RONE);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 C;
@@ -1691,15 +1496,15 @@ namespace Photovoltaics {
         Real64 PM;
 
         H = B - A;
-        POWER(IO, IL, RSER, AA, EPS, IM, A, PM);
+        POWER(state, IO, IL, RSER, AA, EPS, IM, A, PM);
         YA = -1.0 * PM;
-        POWER(IO, IL, RSER, AA, EPS, IM, B, PM);
+        POWER(state, IO, IL, RSER, AA, EPS, IM, B, PM);
         YB = -1.0 * PM;
         C = A + RTWO * H;
         D = A + RONE * H;
-        POWER(IO, IL, RSER, AA, EPS, IM, C, PM);
+        POWER(state, IO, IL, RSER, AA, EPS, IM, C, PM);
         YC = -1.0 * PM;
-        POWER(IO, IL, RSER, AA, EPS, IM, D, PM);
+        POWER(state, IO, IL, RSER, AA, EPS, IM, D, PM);
         YD = -1.0 * PM;
         K = 1;
         while (std::abs(YB - YA) > EPSILON || H > DELTA) {
@@ -1710,7 +1515,7 @@ namespace Photovoltaics {
                 YD = YC;
                 H = B - A;
                 C = A + RTWO * H;
-                POWER(IO, IL, RSER, AA, EPS, IM, C, PM);
+                POWER(state, IO, IL, RSER, AA, EPS, IM, C, PM);
                 YC = -1.0 * PM;
             } else {
                 A = C;
@@ -1719,7 +1524,7 @@ namespace Photovoltaics {
                 YC = YD;
                 H = B - A;
                 D = A + RONE * H;
-                POWER(IO, IL, RSER, AA, EPS, IM, D, PM);
+                POWER(state, IO, IL, RSER, AA, EPS, IM, D, PM);
                 YD = -1.0 * PM;
             }
             ++K;
@@ -1737,7 +1542,7 @@ namespace Photovoltaics {
         }
     }
 
-    Real64 FUN(Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA)
+    Real64 FUN(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
 
         // FUNCTION INFORMATION:
@@ -1750,48 +1555,24 @@ namespace Photovoltaics {
         // This function is based on the current-voltage characteristic of the PV module and is of the
         // form f(I,V)=0
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using General::RoundSigDigits;
-
         // Return value
         Real64 FUN(0.0);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (((VV + II * RSER) / AA) < 700.0) {
             FUN = II - IL + IO * (std::exp((VV + II * RSER) / AA) - 1.0) - ((VV + II * RSER) / ShuntResistance);
         } else {
-            ShowSevereError("EquivalentOneDiode Photovoltaic model failed to find maximum power point");
-            ShowContinueError("Numerical solver failed trying to take exponential of too large a number");
-            ShowContinueError("Check input data in " + cPVEquiv1DiodePerfObjectName);
-            ShowContinueError("VV (voltage) = " + RoundSigDigits(VV, 5));
-            ShowContinueError("II (current) = " + RoundSigDigits(II, 5));
-            ShowFatalError("FUN: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
+            ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
+            ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
+            ShowContinueError(state, "Check input data in " + cPVEquiv1DiodePerfObjectName);
+            ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
+            ShowContinueError(state, format("II (current) = {:.5R}", II));
+            ShowFatalError(state, "FUN: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
         }
 
         return FUN;
     }
 
-    Real64 FI(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
+    Real64 FI(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
 
         // FUNCTION INFORMATION:
@@ -1807,44 +1588,24 @@ namespace Photovoltaics {
         // the function is based on the current voltage characteristic of the PV module and is of
         // the form dF(I,V)/dI=0
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using General::RoundSigDigits;
-
         // Return value
         Real64 FI(0.0);
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
         if (((VV + II * RSER) / AA) < 700.0) {
             FI = 1.0 + IO * std::exp((VV + II * RSER) / AA) * RSER / AA + (RSER / ShuntResistance);
         } else {
-            ShowSevereError("EquivalentOneDiode Photovoltaic model failed to find maximum power point");
-            ShowContinueError("Numerical solver failed trying to take exponential of too large a number");
-            ShowContinueError("Check input data in " + cPVEquiv1DiodePerfObjectName);
-            ShowContinueError("VV (voltage) = " + RoundSigDigits(VV, 5));
-            ShowContinueError("II (current) = " + RoundSigDigits(II, 5));
-            ShowFatalError("FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
+            ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
+            ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
+            ShowContinueError(state, "Check input data in " + cPVEquiv1DiodePerfObjectName);
+            ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
+            ShowContinueError(state, format("II (current) = {:.5R}", II));
+            ShowFatalError(state, "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
         }
 
         return FI;
     }
 
-    Real64 FV(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
+    Real64 FV(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
 
         // FUNCTION INFORMATION:
@@ -1860,39 +1621,18 @@ namespace Photovoltaics {
         // the function is based on the current voltage characteristic of the PV module and is of
         // the form dF(I,V)/dV=0
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using General::RoundSigDigits;
-
         // Return value
         Real64 FV(0.0);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (((VV + II * RSER) / AA) < 700.0) {
             FV = IO * std::exp((VV + II * RSER) / AA) / AA + (1.0 / ShuntResistance);
         } else {
-            ShowSevereError("EquivalentOneDiode Photovoltaic model failed to find maximum power point");
-            ShowContinueError("Numerical solver failed trying to take exponential of too large a number");
-            ShowContinueError("Check input data in " + cPVEquiv1DiodePerfObjectName);
-            ShowContinueError("VV (voltage) = " + RoundSigDigits(VV, 5));
-            ShowContinueError("II (current) = " + RoundSigDigits(II, 5));
-            ShowFatalError("FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
+            ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
+            ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
+            ShowContinueError(state, "Check input data in " + cPVEquiv1DiodePerfObjectName);
+            ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
+            ShowContinueError(state, format("II (current) = {:.5R}", II));
+            ShowFatalError(state, "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
         }
 
         return FV;
@@ -1933,25 +1673,8 @@ namespace Photovoltaics {
         //   Solar 2002, Sunrise on the Reliable Energy Economy,
         //   June 15-19, 2002, Reno, NV.
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaModuleTemperature;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         Real64 E; // total irradiance working variable
 
@@ -1992,25 +1715,8 @@ namespace Photovoltaics {
         //   Solar 2002, Sunrise on the Reliable Energy Economy,
         //   June 15-19, 2002, Reno, NV.
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaTcellFromTmodule;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         Real64 E; // total irradiance working variable
 
@@ -2052,26 +1758,9 @@ namespace Photovoltaics {
         //   Solar 2002, Sunrise on the Reliable Energy Economy,
         //   June 15-19, 2002, Reno, NV.
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaCellTemperature;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
         Real64 E; // irradiance working variable
         Real64 Tm;
 
@@ -2101,32 +1790,8 @@ namespace Photovoltaics {
         // PURPOSE OF THIS FUNCTION:
         // Returns "effective irradiance", used in calculation of Imp, Voc, Ix, Ixx
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaEffectiveIrradiance;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         SandiaEffectiveIrradiance = Isc / (1.0 + aIsc * (Tc - 25.0)) / Isc0;
 
@@ -2148,35 +1813,11 @@ namespace Photovoltaics {
         // PURPOSE OF THIS FUNCTION:
         // Returns absolute air mass
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataGlobals::DegToRadians;
-
         // Return value
         Real64 AbsoluteAirMass;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (SolZen < 89.9) {
-            Real64 const AM(1.0 / (std::cos(SolZen * DegToRadians) + 0.5057 * std::pow(96.08 - SolZen, -1.634)));
+            Real64 const AM(1.0 / (std::cos(SolZen * DataGlobalConstants::DegToRadians) + 0.5057 * std::pow(96.08 - SolZen, -1.634)));
             AbsoluteAirMass = std::exp(-0.0001184 * Altitude) * AM;
         } else {
             Real64 const AM(36.32); // evaluated above at SolZen = 89.9 issue #5528
@@ -2215,25 +1856,8 @@ namespace Photovoltaics {
         //   Solar 2002, Sunrise on the Reliable Energy Economy,
         //   June 15-19, 2002, Reno, NV.
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaF1;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         Real64 const F1(a0 + a1 * AMa + a2 * pow_2(AMa) + a3 * pow_3(AMa) + a4 * pow_4(AMa));
 
@@ -2266,32 +1890,14 @@ namespace Photovoltaics {
         // PURPOSE OF THIS FUNCTION:
         // C Returns Sandia F2 function
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // REFERENCES:
         // Equation (9) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
         //   predicted performance of building integrated photovoltaics,
         //   Solar 2002, Sunrise on the Reliable Energy Economy,
         //   June 15-19, 2002, Reno, NV.
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaF2;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 F2; // working variable for function result
@@ -2326,34 +1932,14 @@ namespace Photovoltaics {
         // PURPOSE OF THIS FUNCTION:
         // Returns current at maximum power point (A)
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // REFERENCES:
         // Equation (3) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
         //   predicted performance of building integrated photovoltaics,
         //   Solar 2002, Sunrise on the Reliable Energy Economy,
         //   June 15-19, 2002, Reno, NV.
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaImp;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         SandiaImp = Imp0 * (C0 * Ee + C1 * pow_2(Ee)) * (1.0 + aImp * (Tc - 25));
         // why hardwire T0 at 25.0?  can this change? seems okay, fewer args
@@ -2381,35 +1967,14 @@ namespace Photovoltaics {
         // PURPOSE OF THIS FUNCTION:
         // Returns Short-Circuit Current
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // REFERENCES:
         // Equation (1) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
         //   predicted performance of building integrated photovoltaics,
         //   Solar 2002, Sunrise on the Reliable Energy Economy,
         //   June 15-19, 2002, Reno, NV.
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaIsc;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         // SandiaIsc=Isc0*((Ibc*F1*F2+fd*Idc)/1000.0)*(1.0+aIsc*(Tc-25.0))
         // Barkers original (above) changed to match publish eq. (1) in reference
@@ -2440,31 +2005,11 @@ namespace Photovoltaics {
         // PURPOSE OF THIS FUNCTION:
         // Returns current "Ix" at V=0.5*Voc (A)
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // REFERENCES:
         // Equation 9 in King et al. nov 20003
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaIx;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         SandiaIx = Ix0 * (C4 * Ee + C5 * pow_2(Ee)) * (1.0 + ((aIsc + aImp) / 2.0 * (Tc - 25.0)));
 
@@ -2490,32 +2035,11 @@ namespace Photovoltaics {
         // PURPOSE OF THIS FUNCTION:
         // Returns current "Ix" at V=0.5*(Voc+Vmp) (A)
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // REFERENCES:
         // Equation 10 in King et al nov. 2003
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaIxx;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         SandiaIxx = Ixx0 * (C6 * Ee + C7 * pow_2(Ee)) * (1.0 + aImp * (Tc - 25.0));
 
@@ -2550,32 +2074,15 @@ namespace Photovoltaics {
         // REFERENCES:
         // Equation 4 in King et al Nov. 2003
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaVmp;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         Real64 dTc;
         Real64 BVmpEe;
 
         if (Ee > 0.0) {
             // following is equation 8 in King et al. nov. 2003
-            dTc = DiodeFactor * ((1.38066e-23 * (Tc + KelvinConv)) / 1.60218e-19);
+            dTc = DiodeFactor * ((1.38066e-23 * (Tc + DataGlobalConstants::KelvinConv)) / 1.60218e-19);
 
             BVmpEe = BVmp0 + mBVmp * (1.0 - Ee);
 
@@ -2607,38 +2114,14 @@ namespace Photovoltaics {
         // PURPOSE OF THIS FUNCTION:
         // Returns Open-Circuit Voltage (V)
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 SandiaVoc;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         Real64 dTc;    // working variable
         Real64 BVocEe; // working variable
 
         if (Ee > 0.0) {
-            dTc = DiodeFactor * ((1.38066e-23 * (Tc + KelvinConv)) / 1.60218e-19);
+            dTc = DiodeFactor * ((1.38066e-23 * (Tc + DataGlobalConstants::KelvinConv)) / 1.60218e-19);
             BVocEe = BVoc0 + mBVoc * (1.0 - Ee);
 
             SandiaVoc = Voc0 + NcellSer * dTc * std::log(Ee) + BVocEe * (Tc - 25.0);
@@ -2649,7 +2132,8 @@ namespace Photovoltaics {
         return SandiaVoc;
     }
 
-    void SetVentedModuleQdotSource(int const VentModNum,
+    void SetVentedModuleQdotSource(EnergyPlusData &state,
+                                   int const VentModNum,
                                    Real64 const QSource // source term in Watts
     )
     {
@@ -2666,31 +2150,13 @@ namespace Photovoltaics {
         // METHODOLOGY EMPLOYED:
         // update derived type with new data , turn power into W/m2
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSurfaces;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        ExtVentedCavity(VentModNum).QdotSource = QSource / ExtVentedCavity(VentModNum).ProjArea;
+        state.dataSurface->ExtVentedCavity(VentModNum).QdotSource = QSource / state.dataSurface->ExtVentedCavity(VentModNum).ProjArea;
     }
 
-    void GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex)
+    void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2706,11 +2172,6 @@ namespace Photovoltaics {
         // mine Surface derived type for correct index/number of surface
         // mine  ExtVentedCavity derived type that has the surface.
 
-        // Using/Aliasing
-        using DataSurfaces::ExtVentedCavity;
-        using DataSurfaces::Surface;
-        using DataSurfaces::TotExtVentCav;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CavNum;   // temporary
         int ThisSurf; // temporary
@@ -2719,14 +2180,14 @@ namespace Photovoltaics {
 
         if (SurfacePtr == 0) {
             // should be trapped already
-            ShowFatalError("Invalid surface passed to GetExtVentedCavityIndex");
+            ShowFatalError(state, "Invalid surface passed to GetExtVentedCavityIndex");
         }
 
         CavNum = 0;
         Found = false;
-        for (thisCav = 1; thisCav <= TotExtVentCav; ++thisCav) {
-            for (ThisSurf = 1; ThisSurf <= ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
-                if (SurfacePtr == ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
+        for (thisCav = 1; thisCav <= state.dataSurface->TotExtVentCav; ++thisCav) {
+            for (ThisSurf = 1; ThisSurf <= state.dataSurface->ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
+                if (SurfacePtr == state.dataSurface->ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
                     Found = true;
                     CavNum = thisCav;
                 }
@@ -2734,15 +2195,15 @@ namespace Photovoltaics {
         }
 
         if (!Found) {
-            ShowFatalError("Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " +
-                           Surface(SurfacePtr).Name);
+            ShowFatalError(state, "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " +
+                           state.dataSurface->Surface(SurfacePtr).Name);
         } else {
 
             VentCavIndex = CavNum;
         }
     }
 
-    void GetExtVentedCavityTsColl(int const VentModNum, Real64 &TsColl)
+    void GetExtVentedCavityTsColl(EnergyPlusData &state, int const VentModNum, Real64 &TsColl)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2757,28 +2218,8 @@ namespace Photovoltaics {
         // METHODOLOGY EMPLOYED:
         // access derived type
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Using/Aliasing
-        using DataSurfaces::ExtVentedCavity;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        TsColl = ExtVentedCavity(VentModNum).Tbaffle;
+        TsColl = state.dataSurface->ExtVentedCavity(VentModNum).Tbaffle;
     }
 
     // -------------------------------------------------------------------------------

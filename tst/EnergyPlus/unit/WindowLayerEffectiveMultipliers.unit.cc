@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,18 +51,19 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 #include <EnergyPlus/TarcogShading.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::TarcogShading;
 using namespace EnergyPlus::TARCOGParams;
 
-TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_0_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlind_0_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, horizontal venetian blind 0 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
@@ -93,9 +94,8 @@ TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_0_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_0_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_0_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, vertical venetian blind 0 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
@@ -126,9 +126,8 @@ TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_0_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_45_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlind_45_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, horizontal venetian blind 45 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
@@ -159,9 +158,8 @@ TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_45_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_45_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_45_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, vertical venetian blind 45 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
@@ -192,9 +190,8 @@ TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_45_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessOtherShades)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessOtherShades)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, other shades.");
     {
         int const nlayer = 1;
         Real64 const width = 1;

@@ -810,6 +810,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    END IF
                  END IF
 
+             CASE('OUTPUT:TABLE:SUMMARYREPORTS')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 CurField = 0
+                 DO TempArgsNum=1,CurArgs,1
+                   ! Skip blank fields
+                   IF (.NOT. InArgs(TempArgsNum) == Blank) THEN
+                     CurField = CurField + 1
+                     OutArgs(CurField) = InArgs(TempArgsNum)
+                   END IF
+                 END DO
+                 IF (CurField < CurArgs) THEN
+                   Nodiff=.false.
+                   CurArgs = CurField
+                 END IF
+
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)

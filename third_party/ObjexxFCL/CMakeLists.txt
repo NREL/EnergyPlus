@@ -84,9 +84,7 @@ set(src
   src/ObjexxFCL/ArrayS.hh
   src/ObjexxFCL/ArrayTail.fwd.hh
   src/ObjexxFCL/ArrayTail.hh
-  src/ObjexxFCL/Backspace.cc
-  src/ObjexxFCL/Backspace.hh
-  src/ObjexxFCL/BArray.cc
+        src/ObjexxFCL/BArray.cc
   src/ObjexxFCL/BArray.fwd.hh
   src/ObjexxFCL/BArray.hh
   src/ObjexxFCL/bit.hh
@@ -98,9 +96,7 @@ set(src
   src/ObjexxFCL/CArrayA.hh
   src/ObjexxFCL/CArrayP.fwd.hh
   src/ObjexxFCL/CArrayP.hh
-  src/ObjexxFCL/char.constants.cc
-  src/ObjexxFCL/char.constants.hh
-  src/ObjexxFCL/char.functions.cc
+        src/ObjexxFCL/char.functions.cc
   src/ObjexxFCL/char.functions.hh
   src/ObjexxFCL/Chunk.hh
   src/ObjexxFCL/ChunkExponent.hh
@@ -117,19 +113,7 @@ set(src
   src/ObjexxFCL/environment.hh
   src/ObjexxFCL/floops.hh
   src/ObjexxFCL/Fmath.hh
-  src/ObjexxFCL/fmt.cc
-  src/ObjexxFCL/fmt.hh
-  src/ObjexxFCL/fmt.manipulators.hh
-  src/ObjexxFCL/Format.cc
-  src/ObjexxFCL/Format.hh
-  src/ObjexxFCL/FormattedIO.hh
-  src/ObjexxFCL/gio.cc
-  src/ObjexxFCL/gio.hh
-  src/ObjexxFCL/gio_Fmt.fwd.hh
-  src/ObjexxFCL/gio_Fmt.hh
-  src/ObjexxFCL/GlobalStreams.cc
-  src/ObjexxFCL/GlobalStreams.hh
-  src/ObjexxFCL/Index.cc
+        src/ObjexxFCL/Index.cc
   src/ObjexxFCL/Index.fwd.hh
   src/ObjexxFCL/Index.hh
   src/ObjexxFCL/IndexRange.cc
@@ -139,12 +123,7 @@ set(src
   src/ObjexxFCL/IndexSlice.fwd.hh
   src/ObjexxFCL/IndexSlice.hh
   src/ObjexxFCL/InitializerSentinel.hh
-  src/ObjexxFCL/Inquire.cc
-  src/ObjexxFCL/Inquire.hh
-  src/ObjexxFCL/IOFlags.cc
-  src/ObjexxFCL/IOFlags.fwd.hh
-  src/ObjexxFCL/IOFlags.hh
-  src/ObjexxFCL/MArray.all.fwd.hh
+        src/ObjexxFCL/MArray.all.fwd.hh
   src/ObjexxFCL/MArray.all.hh
   src/ObjexxFCL/MArray.functions.hh
   src/ObjexxFCL/MArray.fwd.hh
@@ -175,34 +154,21 @@ set(src
   src/ObjexxFCL/Omit.hh
   src/ObjexxFCL/Optional.fwd.hh
   src/ObjexxFCL/Optional.hh
-  src/ObjexxFCL/Print.cc
-  src/ObjexxFCL/Print.fwd.hh
-  src/ObjexxFCL/Print.hh
-  src/ObjexxFCL/ProxySentinel.hh
+        src/ObjexxFCL/ProxySentinel.hh
   src/ObjexxFCL/random.cc
   src/ObjexxFCL/random.hh
-  src/ObjexxFCL/Read.cc
-  src/ObjexxFCL/Read.fwd.hh
-  src/ObjexxFCL/Read.hh
-  src/ObjexxFCL/Reference.fwd.hh
+        src/ObjexxFCL/Reference.fwd.hh
   src/ObjexxFCL/Reference.hh
   src/ObjexxFCL/Required.fwd.hh
   src/ObjexxFCL/Required.hh
-  src/ObjexxFCL/Rewind.cc
-  src/ObjexxFCL/Rewind.hh
-  src/ObjexxFCL/rvalue_cast.hh
+        src/ObjexxFCL/rvalue_cast.hh
   src/ObjexxFCL/sbyte.fwd.hh
   src/ObjexxFCL/sbyte.hh
   src/ObjexxFCL/SetWrapper.fwd.hh
   src/ObjexxFCL/SetWrapper.hh
   src/ObjexxFCL/Sticky.fwd.hh
   src/ObjexxFCL/Sticky.hh
-  src/ObjexxFCL/Stream.cc
-  src/ObjexxFCL/stream.functions.cc
-  src/ObjexxFCL/stream.functions.hh
-  src/ObjexxFCL/Stream.fwd.hh
-  src/ObjexxFCL/Stream.hh
-  src/ObjexxFCL/string.constants.cc
+        src/ObjexxFCL/string.constants.cc
   src/ObjexxFCL/string.constants.hh
   src/ObjexxFCL/string.functions.cc
   src/ObjexxFCL/string.functions.hh
@@ -243,8 +209,7 @@ set( test_src
   tst/unit/Array6S.unit.cc
   tst/unit/ArrayInitializer.unit.cc
   tst/unit/ArrayS.unit.cc
-  tst/unit/Backspace.unit.cc
-  tst/unit/bit.unit.cc
+        tst/unit/bit.unit.cc
   tst/unit/byte.unit.cc
   tst/unit/CArray.unit.cc
   tst/unit/CArrayA.unit.cc
@@ -258,10 +223,7 @@ set( test_src
   tst/unit/environment.unit.cc
   tst/unit/floops.unit.cc
   tst/unit/Fmath.unit.cc
-  tst/unit/fmt.unit.cc
-  tst/unit/gio.unit.cc
-  tst/unit/GlobalStreams.unit.cc
-  tst/unit/Index.unit.cc
+        tst/unit/Index.unit.cc
   tst/unit/IndexRange.unit.cc
   tst/unit/IndexSlice.unit.cc
   tst/unit/main.cc
@@ -276,15 +238,12 @@ set( test_src
   tst/unit/numeric.unit.cc
   tst/unit/ObjexxFCL.unit.hh
   tst/unit/Optional.unit.cc
-  tst/unit/Print.unit.cc
-  tst/unit/random.unit.cc
-  tst/unit/Read.unit.cc
-  tst/unit/Reference.Optional.unit.cc
+        tst/unit/random.unit.cc
+        tst/unit/Reference.Optional.unit.cc
   tst/unit/Reference.unit.cc
   tst/unit/Required.unit.cc
   tst/unit/Sticky.unit.cc
-  tst/unit/Stream.unit.cc
-  tst/unit/string.functions.unit.cc
+        tst/unit/string.functions.unit.cc
   tst/unit/time.unit.cc
   tst/unit/TypeTraits.unit.cc
   tst/unit/ubyte.unit.cc

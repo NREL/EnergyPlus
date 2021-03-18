@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,7 +49,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -104,6 +106,60 @@ TEST_F(EnergyPlusFixture, BBConvergeCheckTest)
     MinFlow = 0.9999999;
     FunctionResult = BBConvergeCheck(SimCompNum, MaxFlow, MinFlow);
     EXPECT_TRUE(FunctionResult);
+}
+
+TEST_F(EnergyPlusFixture, CalcComponentSensibleLatentOutputTest)
+{
+
+    Real64 MassFlowRate(0.0);
+    Real64 CoilInletTemp(0.0);
+    Real64 CoilOutletTemp(0.0);
+    Real64 CoilInletHumRat(0.0);
+    Real64 CoilOutletHumRat(0.0);
+    Real64 totaloutput(0.0);
+    Real64 sensibleoutput(0.0);
+    Real64 latentoutput(0.0);
+    Real64 results_totaloutput(0.0);
+    Real64 results_sensibleoutput(0.0);
+    Real64 results_latentoutput(0.0);
+
+    // test 1: zero flow
+    MassFlowRate = 0.0;
+    CalcComponentSensibleLatentOutput(
+        MassFlowRate, CoilOutletTemp, CoilOutletHumRat, CoilInletTemp, CoilInletHumRat, sensibleoutput, latentoutput, totaloutput);
+    EXPECT_DOUBLE_EQ(results_totaloutput, totaloutput);
+    EXPECT_DOUBLE_EQ(results_sensibleoutput, sensibleoutput);
+    EXPECT_DOUBLE_EQ(results_latentoutput, latentoutput);
+    // test 2: cooling
+    MassFlowRate = 1.0;
+    CoilInletTemp = 24.0;
+    CoilOutletTemp = 12.0;
+    CoilInletHumRat = 0.00850;
+    CoilOutletHumRat = 0.00750;
+    results_totaloutput =
+        MassFlowRate * (Psychrometrics::PsyHFnTdbW(CoilOutletTemp, CoilOutletHumRat) - Psychrometrics::PsyHFnTdbW(CoilInletTemp, CoilInletHumRat));
+    results_sensibleoutput = MassFlowRate * (1.00484e3 + min(CoilInletHumRat, CoilOutletHumRat) * 1.85895e3) * (CoilOutletTemp - CoilInletTemp);
+    results_latentoutput = results_totaloutput - results_sensibleoutput;
+    CalcComponentSensibleLatentOutput(
+        MassFlowRate, CoilOutletTemp, CoilOutletHumRat, CoilInletTemp, CoilInletHumRat, sensibleoutput, latentoutput, totaloutput);
+    EXPECT_DOUBLE_EQ(results_totaloutput, totaloutput);
+    EXPECT_DOUBLE_EQ(results_sensibleoutput, sensibleoutput);
+    EXPECT_DOUBLE_EQ(results_latentoutput, latentoutput);
+    // test 3: heating
+    MassFlowRate = 1.0;
+    CoilInletTemp = 20.0;
+    CoilOutletTemp = 32.0;
+    CoilInletHumRat = 0.00750;
+    CoilOutletHumRat = 0.00750;
+    results_totaloutput =
+        MassFlowRate * (Psychrometrics::PsyHFnTdbW(CoilOutletTemp, CoilOutletHumRat) - Psychrometrics::PsyHFnTdbW(CoilInletTemp, CoilInletHumRat));
+    results_sensibleoutput = MassFlowRate * (1.00484e3 + min(CoilInletHumRat, CoilOutletHumRat) * 1.85895e3) * (CoilOutletTemp - CoilInletTemp);
+    results_latentoutput = results_totaloutput - results_sensibleoutput;
+    CalcComponentSensibleLatentOutput(
+        MassFlowRate, CoilOutletTemp, CoilOutletHumRat, CoilInletTemp, CoilInletHumRat, sensibleoutput, latentoutput, totaloutput);
+    EXPECT_DOUBLE_EQ(results_totaloutput, totaloutput);
+    EXPECT_DOUBLE_EQ(results_sensibleoutput, sensibleoutput);
+    EXPECT_NEAR(results_latentoutput, latentoutput, 1.0E-10);
 }
 
 } // namespace EnergyPlus

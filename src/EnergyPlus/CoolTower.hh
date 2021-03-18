@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,14 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
-struct CoolTowerData;
+struct EnergyPlusData;
 
 namespace CoolTower {
 
@@ -136,31 +136,31 @@ namespace CoolTower {
         }
     };
 
-    void ManageCoolTower(CoolTowerData &dataCoolTower);
+    void ManageCoolTower(EnergyPlusData &state);
 
-    void GetCoolTower(CoolTowerData &dataCoolTower);
+    void GetCoolTower(EnergyPlusData &state);
 
-    void CalcCoolTower(CoolTowerData &dataCoolTower);
+    void CalcCoolTower(EnergyPlusData &state);
 
-    void UpdateCoolTower(CoolTowerData &dataCoolTower);
+    void UpdateCoolTower(EnergyPlusData &state);
 
-    void ReportCoolTower(CoolTowerData &dataCoolTower);
+    void ReportCoolTower(EnergyPlusData &state);
 
 } // namespace CoolTower
 
-struct CoolTowerData : BaseGlobalStruct {
+    struct CoolTowerData : BaseGlobalStruct {
 
-    bool GetInputFlag = true;
-    int NumCoolTowers = 0;
-    Array1D<CoolTower::CoolTowerParams> CoolTowerSys;
+        bool GetInputFlag = true;
+        int NumCoolTowers = 0;
+        Array1D<CoolTower::CoolTowerParams> CoolTowerSys;
 
-    void clear_state() override
-    {
-        GetInputFlag = true;
-        NumCoolTowers = 0;
-        CoolTowerSys.deallocate();
-    }
-};
+        void clear_state() override
+        {
+            this->GetInputFlag = true;
+            this->NumCoolTowers = 0;
+            this->CoolTowerSys.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

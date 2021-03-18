@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,9 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -66,30 +64,6 @@ namespace DataIPShortCuts {
     // to create them. These will be passed in rather than filled by the GetObject
     // routines automatically.  The field names are used for error messages. They are
     // dimensioned to the max alpha/numeric found in the IDD.
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
 
     // MODULE VARIABLE DECLARATIONS:
     Array1D_string cAlphaFieldNames;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,11 +54,11 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SortAndStringUtilities;
@@ -66,8 +66,6 @@ using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, SortAndStringUtilitiesTest_Basic)
 {
-    ShowMessage("Begin Test: SortAndStringUtilitiesTest, Basic");
-
     Array1D_string Alphas({"ZEBRA", "LION", "RACOON", "BOA", "LEMUR"});
     Array1D_int iAlphas(5);
     SetupAndSort(Alphas, iAlphas);

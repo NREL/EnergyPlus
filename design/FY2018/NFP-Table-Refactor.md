@@ -683,9 +683,9 @@ Select 1000 GridPoints in the defined region. Interpolate and time.
 
 Of the structures and methods/functions existing in EnergyPlus, only two will be used for the refactor:
 
-1. `PerfCurve`: The global array (of `PerfomanceCurveData`) of "curve" data.
+1. `PerfCurve`: The global array (of `PerformanceCurveData`) of "curve" data.
 
-    - The `PerfomanceCurveData` will be modified to point to new RectangularGridInterpolator class object.
+    - The `PerformanceCurveData` will be modified to point to new RectangularGridInterpolator class object.
 
 2. `CurveValue`: The global method to evaluate "curves".
 

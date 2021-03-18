@@ -1,4 +1,4 @@
-\section{Group -- Air Distribution Equipment}\label{group-air-distribution-equipment}
+\section{Group -- Zone HVAC Air Loop Terminal Units}\label{group-zone-HVAC-air-loop-terminal-units}
 
 The systems described in the Air Distribution Units (ADU's) are shown below. A variety of air terminal units are available for connecting air systems to thermal zones. These single description ADU's contain the reference to the components and the actual controls in one block of input. The idea is that the control volume is drawn tightly around the controls and loosely around the components. This allows complex interactions to take place between all of the components that respond to the Zone Thermostatic Control output. The coils that are referenced in the ADU's are explained fully in the ``Coils'' section of this manual.
 
@@ -994,6 +994,8 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
 
 \begin{itemize}
 \item
+  HVAC,Average,Zone Air Terminal Primary Damper Position {[]}
+\item
   HVAC,Average,Zone Air Terminal Heating Rate {[}W{]}
 \item
   HVAC,Sum,Zone Air Terminal Heating Energy {[}J{]}
@@ -1004,6 +1006,10 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
 \item
   HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
+
+\paragraph{Zone Air Terminal Primary Damper Position {[]}}\label{zone-air-terminal-series-piu-primary-damper-position}
+
+This output is the variable air volume primary damper position required to meet the zone load. This is the average value over the frequency being reported. The damper position is defined as the terminal unit primary air mass flow rate divided by the terminal unit's maximum primary air mass flow rate.
 
 \paragraph{Zone Air Terminal Heating Rate {[}W{]}}\label{zone-air-terminal-heating-rate-w}
 
@@ -1156,16 +1162,22 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
 
 \begin{itemize}
 \item
+  HVAC,Average,Zone Air Terminal Primary Damper Position {[]}
+\item
   HVAC,Average,Zone Air Terminal Heating Rate {[}W{]}
 \item
   HVAC,Sum,Zone Air Terminal Heating Energy {[}J{]}
 \item
   HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
 \item
-  HVAC,Sum, Zone Air Terminal Sensible Cooling Energy {[}J{]}
+  HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
 \item
   HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
+
+\paragraph{Zone Air Terminal Primary Damper Position {[]}}\label{zone-air-terminal-parallel-piu-primary-damper-position}
+
+This output is the variable air volume primary damper position required to meet the zone load. This is the average value over the frequency being reported. The damper position is defined as the terminal unit primary air mass flow rate divided by the terminal unit's maximum primary air mass flow rate.
 
 \paragraph{Zone Air Terminal Heating Rate {[}W{]}}\label{zone-air-terminal-heating-rate-w-1}
 

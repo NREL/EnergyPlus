@@ -13,7 +13,7 @@
 ! 7/27/00 -- Restored 4-pane cases (had been set to 3-pane)
 ! 8/21/01 -- Add new fields to Material:WindowShade (FW)
 
-  Version,9.4;
+  Version,9.5;
 
   Timestep,4;
 
@@ -38,7 +38,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name

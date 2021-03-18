@@ -11,7 +11,7 @@ application development.  It provides a simple, platform-independent API for
 creating windows, contexts and surfaces, reading input, handling events, etc.
 
 GLFW natively supports Windows, macOS and Linux and other Unix-like systems.  On
-Linux both X11 and Wayland is supported.
+Linux both X11 and Wayland are supported.
 
 GLFW is licensed under the [zlib/libpng
 license](http://www.glfw.org/license.html).
@@ -88,7 +88,7 @@ in the documentation for more information.
 GLFW itself depends only on the headers and libraries for your window system.
 
 The (experimental) Wayland backend also depends on the `extra-cmake-modules`
-package, which is used to generated Wayland protocol headers.
+package, which is used to generate Wayland protocol headers.
 
 The examples and test programs depend on a number of tiny libraries.  These are
 located in the `deps/` directory.
@@ -118,7 +118,16 @@ information on what to include when reporting a bug.
 
 ## Changelog
 
-User-visible changes since the last release.
+ - [Win32] Bugfix: Super key was not released after Win+V hotkey (#1622)
+ - [Win32] Bugfix: `glfwGetKeyName` could access out of bounds and return an
+   invalid pointer
+ - [Win32] Bugfix: Some synthetic key events were reported as `GLFW_KEY_UNKNOWN`
+   (#1623)
+ - [Cocoa] Added support for `VK_EXT_metal_surface` (#1619)
+ - [Cocoa] Added locating the Vulkan loader at runtime in an application bundle
+ - [X11] Bugfix: `glfwFocusWindow` could terminate on older WMs or without a WM
+ - [X11] Bugfix: Creating an undecorated window could fail with BadMatch (#1620)
+ - [X11] Bugfix: Querying a disconnected monitor could segfault (#1602)
 
 
 ## Contact
@@ -127,7 +136,7 @@ On [glfw.org](http://www.glfw.org/) you can find the latest version of GLFW, as
 well as news, documentation and other information about the project.
 
 If you have questions related to the use of GLFW, we have a
-[forum](http://discourse.glfw.org/), and the `#glfw` IRC channel on
+[forum](https://discourse.glfw.org/), and the `#glfw` IRC channel on
 [Freenode](http://freenode.net/).
 
 If you have a bug to report, a patch to submit or a feature you'd like to
@@ -157,6 +166,7 @@ skills.
  - blanco
  - Kyle Brenneman
  - Rok Breulj
+ - Kai Burjack
  - Martin Capitanio
  - David Carlier
  - Arturo Castro
@@ -189,6 +199,8 @@ skills.
  - Mário Freitas
  - GeO4d
  - Marcus Geelnard
+ - Charles Giessen
+ - Ryan C. Gordon
  - Stephen Gowen
  - Kovid Goyal
  - Eloi Marín Gratacós
@@ -200,6 +212,7 @@ skills.
  - Lucas Hinderberger
  - Paul Holden
  - Warren Hu
+ - Charles Huber
  - IntellectualKitty
  - Aaron Jacobs
  - Erik S. V. Jansson
@@ -208,17 +221,24 @@ skills.
  - Cem Karan
  - Osman Keskin
  - Josh Kilmer
+ - Byunghoon Kim
  - Cameron King
  - Peter Knut
  - Christoph Kubisch
  - Yuri Kunde Schlesner
+ - Rokas Kupstys
  - Konstantin Käfer
  - Eric Larson
+ - Francis Lecavalier
  - Robin Leffmann
  - Glenn Lewis
  - Shane Liesegang
+ - Anders Lindqvist
+ - Leon Linhart
  - Eyal Lotem
  - Aaron Loucks
+ - Luflosi
+ - lukect
  - Tristam MacDonald
  - Hans Mackowiak
  - Дмитри Малышев
@@ -231,6 +251,7 @@ skills.
  - Jonathan Mercier
  - Marcel Metz
  - Liam Middlebrook
+ - Ave Milia
  - Jonathan Miller
  - Kenneth Miller
  - Bruce Mitchener
@@ -258,9 +279,13 @@ skills.
  - Cyril Pichard
  - Keith Pitt
  - Stanislav Podgorskiy
+ - Konstantin Podsvirov
  - Nathan Poirier
  - Alexandre Pretyman
+ - Pablo Prietz
  - przemekmirek
+ - pthom
+ - Guillaume Racicot
  - Philip Rideout
  - Eddie Ringle
  - Max Risuhin
@@ -309,6 +334,7 @@ skills.
  - Jay Weisskopf
  - Frank Wille
  - Ryogo Yoshimura
+ - Lukas Zanner
  - Andrey Zholos
  - Santi Zupancic
  - Jonas Ådahl

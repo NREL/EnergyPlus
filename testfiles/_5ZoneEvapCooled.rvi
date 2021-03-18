@@ -9,9 +9,9 @@ Cooling Coil Total Cooling Rate
 Cooling Coil Sensible Cooling Rate
 Plant Supply Side Cooling Demand Rate
 Plant Supply Side Heating Demand Rate
-Boiler Gas Rate
+Boiler NaturalGas Rate
 Boiler Heating Rate
-Chiller Electric Power
+Chiller Electricity Rate
 Chiller Evaporator Cooling Rate
 Chiller Evaporator Inlet Temperature
 Chiller Evaporator Outlet Temperature
@@ -20,7 +20,7 @@ Chiller Condenser Heat Transfer Rate
 Chiller Condenser Inlet Temperature
 Chiller Condenser Outlet Temperature
 Chiller Condenser Mass Flow Rate
-Chiller Basin Heater Electric Power
+Chiller Basin Heater Electricity Rate
 Pump Mass Flow Rate
 Pump Outlet Temperature
 0

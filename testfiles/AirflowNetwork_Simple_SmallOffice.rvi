@@ -11,8 +11,8 @@ Zone Infiltration Sensible Heat Gain Energy
 Zone Ventilation Sensible Heat Loss Energy
 Zone Ventilation Sensible Heat Gain Energy
 AFN Linkage Node 1 to Node 2 Mass Flow Rate
-Heating Coil Gas Rate
-Cooling Coil Electric Power
+Heating Coil NaturalGas Rate
+Cooling Coil Electricity Rate
 Zone Air Temperature
 Zone Air System Sensible Heating Energy
 Zone Air System Sensible Cooling Energy

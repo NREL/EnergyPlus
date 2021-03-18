@@ -21,7 +21,6 @@
 #include <ObjexxFCL/ArrayS.hh>
 #include <ObjexxFCL/ArrayTail.hh>
 #include <ObjexxFCL/CArrayA.hh>
-#include <ObjexxFCL/fmt.hh>
 #include <ObjexxFCL/InitializerSentinel.hh>
 #include <ObjexxFCL/MArray.hh>
 #include <ObjexxFCL/ProxySentinel.hh>

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,14 +52,16 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataAirSystems {
 
@@ -411,22 +413,33 @@ namespace DataAirSystems {
         }
     };
 
-    // Object Data
-    extern Array1D<DefinePrimaryAirSystem> PrimaryAirSystem;
-    extern Array1D<ConnectionPoint> DemandSideConnect;               // Connections between loops
-    extern Array1D<ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
-    extern Array1D<ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
-    extern Array1D<ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
-    extern Array1D<ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
-    extern Array1D<ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
-    extern Array1D<ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
-
-    // Functions
-    void clear_state();
-
     Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow);
 
 } // namespace DataAirSystems
+
+    struct AirSystemsData : BaseGlobalStruct {
+
+        Array1D<DataAirSystems::DefinePrimaryAirSystem> PrimaryAirSystems;
+        Array1D<DataAirSystems::ConnectionPoint> DemandSideConnect;               // Connections between loops
+        Array1D<DataAirSystems::ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
+        Array1D<DataAirSystems::ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
+        Array1D<DataAirSystems::ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
+        Array1D<DataAirSystems::ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
+        Array1D<DataAirSystems::ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
+        Array1D<DataAirSystems::ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
+
+        void clear_state() override
+        {
+            this->PrimaryAirSystems.deallocate();
+            this->DemandSideConnect.deallocate();
+            this->ZoneCompToPlant.deallocate();
+            this->ZoneSubCompToPlant.deallocate();
+            this->ZoneSubSubCompToPlant.deallocate();
+            this->AirSysCompToPlant.deallocate();
+            this->AirSysSubCompToPlant.deallocate();
+            this->AirSysSubSubCompToPlant.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

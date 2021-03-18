@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,29 +52,20 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace GeneratorDynamicsManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    void SetupGeneratorControlStateManager(EnergyPlusData &state, int const GenNum); // index of generator to setup
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // Functions
-
-    void SetupGeneratorControlStateManager(int const GenNum); // index of generator to setup
-
-    void ManageGeneratorControlState(int const GeneratorType,           // type of Generator
+    void ManageGeneratorControlState(EnergyPlusData &state,
+                                     GeneratorType const GeneratorType,           // type of Generator
                                      std::string const &GeneratorName,  // user specified name of Generator
                                      int const GeneratorNum,            // Generator number
                                      bool const RunFlagElectCenter,     // TRUE when Generator operating per electric load center request
@@ -82,13 +73,13 @@ namespace GeneratorDynamicsManager {
                                      Real64 const ElecLoadRequest,      // Generator Electrical power demand
                                      Real64 const ThermalLoadRequest,   // cogenerator Thermal power demand
                                      Real64 &ElecLoadProvided,          // power allowed
-                                     int &OperatingMode,                // operating mode
+                                     DataGenerators::OperatingMode &OperatingMode,                // operating mode
                                      Real64 &PLRforSubtimestepStartUp,  // part load ratio for switch to normal from start up
                                      Real64 &PLRforSubtimestepShutDown, // part load ratio for switch from cool down to other
                                      bool const FirstHVACIteration      // True is this is first HVAC iteration
     );
 
-    void ManageGeneratorFuelFlow(int const GeneratorType,          // type of Generator
+    void ManageGeneratorFuelFlow(EnergyPlusData &state, GeneratorType const GeneratorType,          // type of Generator
                                  std::string const &GeneratorName, // user specified name of Generator
                                  int const GeneratorNum,           // Generator number
                                  bool const RunFlag,               // TRUE when Generator operating
@@ -98,7 +89,8 @@ namespace GeneratorDynamicsManager {
                                  bool &ConstrainedDecreasingMdot   // true if request was altered because of fuel rate of change down
     );
 
-    Real64 FuncDetermineCWMdotForInternalFlowControl(int const GeneratorNum, // ID of generator
+    Real64 FuncDetermineCWMdotForInternalFlowControl(EnergyPlusData &state,
+                                                     int const GeneratorNum, // ID of generator
                                                      Real64 const Pnetss,    // power net steady state
                                                      Real64 const TcwIn      // temperature of cooling water at inlet
     );

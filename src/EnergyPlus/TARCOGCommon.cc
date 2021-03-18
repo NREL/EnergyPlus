@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,7 +51,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 
@@ -70,22 +69,6 @@ namespace TARCOGCommon {
     // PURPOSE OF THIS MODULE:
     // A module which contains common TARCOG functions and subroutines
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
-    // Functions
-
     bool IsShadingLayer(int const layertype)
     {
 
@@ -102,9 +85,7 @@ namespace TARCOGCommon {
         // Height - glazing system height
 
         // Using/Aliasing
-        using DataGlobals::PiOvr2;
         using namespace TARCOGParams;
-        // use TARCOGGassesParams
 
         // Return value
         Real64 LDSumMax;
@@ -115,10 +96,10 @@ namespace TARCOGCommon {
 
         LDSumMax = 0.0;
         for (i = 1; i <= mmax; i += 2) {
-            Real64 const sin_i(std::sin(i * PiOvr2));
+            Real64 const sin_i(std::sin(i * DataGlobalConstants::PiOvr2));
             Real64 const pow_i_W(pow_2(i / Width));
             for (j = 1; j <= nmax; j += 2) {
-                LDSumMax += (sin_i * std::sin(j * PiOvr2)) / (i * j * pow_2(pow_i_W + pow_2(j / Height)));
+                LDSumMax += (sin_i * std::sin(j * DataGlobalConstants::PiOvr2)) / (i * j * pow_2(pow_i_W + pow_2(j / Height)));
             } // do j = 1, nmax, 2
         }     // do i = 1, mmax, 2
 
@@ -132,15 +113,13 @@ namespace TARCOGCommon {
         // Height - glazing system height
 
         // Using/Aliasing
-        using DataGlobals::Pi;
         using namespace TARCOGParams;
-        // use TARCOGGassesParams
 
         // Return value
         Real64 LDSumMean;
 
         // Locals
-        static Real64 const Pi_squared(Pi * Pi);
+        Real64 constexpr Pi_squared(DataGlobalConstants::Pi * DataGlobalConstants::Pi);
         int i;
         int j;
 
@@ -195,7 +174,6 @@ namespace TARCOGCommon {
     {
 
         // Using/Aliasing
-        using DataGlobals::StefanBoltzmann;
         using namespace TARCOGParams;
 
         // Locals
@@ -238,7 +216,7 @@ namespace TARCOGCommon {
             }
 
             // second row
-            a(k, k + 1) = emis(front) * StefanBoltzmann * pow_3(theta(front));
+            a(k, k + 1) = emis(front) * DataGlobalConstants::StefanBoltzmann * pow_3(theta(front));
             a(k + 1, k + 1) = -1.0;
             if (i != 1) {
                 a(k - 2, k + 1) = rir(front);
@@ -249,7 +227,7 @@ namespace TARCOGCommon {
 
             // third row
             a(k + 2, k + 2) = -1.0;
-            a(k + 3, k + 2) = emis(back) * StefanBoltzmann * pow_3(theta(back));
+            a(k + 3, k + 2) = emis(back) * DataGlobalConstants::StefanBoltzmann * pow_3(theta(back));
             if (i != 1) {
                 a(k - 2, k + 2) = tir(front);
             }
@@ -329,8 +307,8 @@ namespace TARCOGCommon {
     {
 
         // Locals
-        static int const NMAX(500);
-        static Array1D<Real64> vv(NMAX);
+        int constexpr NMAX(500);
+        static Array1D<Real64> vv(NMAX);  // TODO: Make this a state variable
 
         Real64 const TINY(1.0e-20);
 
@@ -399,9 +377,6 @@ namespace TARCOGCommon {
 
     void lubksb(Array2A<Real64> const a, int const n, const Array1D_int &indx, Array1D<Real64> &b)
     {
-        //***********************************************************************
-        //***********************************************************************
-
         // Argument array dimensioning
         a.dim(n, n);
         EP_SIZE_CHECK(indx, n);
@@ -440,15 +415,7 @@ namespace TARCOGCommon {
 
     Real64 pos(Real64 const x)
     {
-        //***********************************************************************
-        //***********************************************************************
-
-        // Return value
-        Real64 pos;
-
-        pos = (x + std::abs(x)) / 2.0;
-
-        return pos;
+        return (x + std::abs(x)) / 2.0;
     }
 
 } // namespace TARCOGCommon

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,8 +67,10 @@ namespace FileSystem {
 
     std::string getProgramPath();
 
+    // For `a/b/c.txt.idf` it returns `idf` (anything after last dot, not including the dot)
     std::string getFileExtension(std::string const &fileName);
 
+    // Turns a/b/c.txt.idf into a/b/c.txt
     std::string removeFileExtension(std::string const &fileName);
 
     void makeDirectory(std::string const &directoryPath);
