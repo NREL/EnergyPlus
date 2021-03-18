@@ -58,105 +58,12 @@ namespace DataHVACGlobals {
     // PURPOSE OF THIS MODULE:
     // This data-only module is a repository for HVAC variables which are considered
     // to be "global" in nature in EnergyPlus.
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // OTHER NOTES:
-
-    // Using/Aliasing
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    Real64 const SmallTempDiff(1.0E-5);
-    Real64 const SmallMassFlow(0.001);
-    Real64 const VerySmallMassFlow(1.0E-30);
-    Real64 const SmallLoad(1.0);
-    Real64 const TempControlTol(0.1); // temperature control tolerance for packaged equip. [deg C]
-    Real64 const SmallAirVolFlow(0.001);
-    Real64 const SmallWaterVolFlow(1.0E-9);
-    Real64 const BlankNumeric(-99999.0);      // indicates numeric input field was blank
-    Real64 const RetTempMax(60.0);            // maximum return air temperature [deg C]
-    Real64 const RetTempMin(-30.0);           // minimum return air temperature [deg C]
-    Real64 const DesCoilHWInletTempMin(46.0); // minimum heating water coil water inlet temp for UA sizing only. [deg C]
-
-    // Number of Sizing types from list below
-    int const NumOfSizingTypes(35); // number of sizing types, should be paired with the list in Autosizing/Base.hh
-
-    // Sizing types
-    int const CoolingAirflowSizing(1);                               // request sizing for cooling air flow rate
-    int const CoolingWaterDesWaterInletTempSizing(6);                // request sizing for cooling water coil inlet water temp
-    int const HeatingAirflowSizing(14);                              // request sizing for heating air flow rate
-    int const SystemAirflowSizing(16);                               // request sizing for system air flow rate
-    int const CoolingCapacitySizing(17);                             // request sizing for cooling capacity
-    int const HeatingCapacitySizing(18);                             // request sizing for heating capacity
-    int const SystemCapacitySizing(21);                              // request sizing for system capacity
-    int const AutoCalculateSizing(25);                               // identifies an autocalulate input
-
-    // Condenser Type (using same numbering scheme as for chillers)
-    int const AirCooled(1);   // Air-cooled condenser
-    int const WaterCooled(2); // Water-cooled condenser
-    int const EvapCooled(3);  // Evaporatively-cooled condenser
-    int const WaterHeater(4); // Condenser heats water (e.g., in water heater tank)
-
-    // The following parameters are used for system availability status
-    int const NoAction(0);
-    int const ForceOff(1);
-    int const CycleOn(2);
-    int const CycleOnZoneFansOnly(3);
-    // The following parameters describe the setpoint types in TempControlType(ActualZoneNum)
-    int const SingleHeatingSetPoint(1);
-    int const SingleCoolingSetPoint(2);
-    int const SingleHeatCoolSetPoint(3);
-    int const DualSetPointWithDeadBand(4);
-    // parameters describing air duct type
-    int const Main(1);
-    int const Cooling(2);
-    int const Heating(3);
-    int const Other(4);
-    int const RAB(5);
-    // parameters describing fan types
-    int const NumAllFanTypes(6);
-
-    // fan types
-    int const FanType_SimpleConstVolume(1);
-    int const FanType_SimpleVAV(2);
-    int const FanType_SimpleOnOff(3);
-    int const FanType_ZoneExhaust(4);
-    int const FanType_ComponentModel(5);
-    int const FanType_SystemModelObject(6);
-
-    // Fan Minimum Flow Fraction Input Method
-    int const MinFrac(1);
-    int const FixedMin(2);
-    // Fan mode
-    int const CycFanCycCoil(1);  // Cycling fan, cycling coil = 1
-    int const ContFanCycCoil(2); // Continuous fan, cycling coil = 2
-    // Fan placement
-    int const BlowThru(1); // fan before coil
-    int const DrawThru(2); // fan after coil
-    // OA Controller Heat Recovery Bypass Control Types
-    int const BypassWhenWithinEconomizerLimits(0);   // heat recovery controlled by economizer limits
-    int const BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode
-
+    
     Array1D_string const
         cFanTypes(NumAllFanTypes,
                   {"Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"});
 
-    // parameters describing unitary systems
-    int const NumUnitarySystemTypes(7);
-    // Furnace/Unitary System Types
-    int const Furnace_HeatOnly(1);
-    int const Furnace_HeatCool(2);
-    int const UnitarySys_HeatOnly(3);
-    int const UnitarySys_HeatCool(4);
-    int const UnitarySys_HeatPump_AirToAir(5);
-    int const UnitarySys_HeatPump_WaterToAir(6);
-    int const UnitarySys_AnyCoilType(7);
+    
     Array1D_string const cFurnaceTypes(NumUnitarySystemTypes,
                                        {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
                                         "AirLoopHVAC:Unitary:Furnace:HeatCool",
@@ -166,57 +73,6 @@ namespace DataHVACGlobals {
                                         "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
                                         "AirLoopHVAC:UnitarySystem"});
 
-    // parameters describing coil types
-    int const NumAllCoilTypes(37);
-
-    int const CoilDX_CoolingSingleSpeed(1);
-    int const CoilDX_HeatingEmpirical(2);
-    int const CoilDX_CoolingTwoSpeed(3);
-    int const CoilDX_CoolingHXAssisted(4);
-    int const CoilDX_CoolingTwoStageWHumControl(5);
-    int const CoilDX_HeatPumpWaterHeaterPumped(6);
-    int const CoilDX_HeatPumpWaterHeaterWrapped(7);
-    int const CoilDX_MultiSpeedCooling(8);
-    int const CoilDX_MultiSpeedHeating(9);
-
-    int const Coil_HeatingGasOrOtherFuel(10);
-    int const Coil_HeatingGas_MultiStage(11);
-    int const Coil_HeatingElectric(12);
-    int const Coil_HeatingElectric_MultiStage(13);
-    int const Coil_HeatingDesuperheater(14);
-
-    int const Coil_CoolingWater(15);
-    int const Coil_CoolingWaterDetailed(16);
-    int const Coil_HeatingWater(17);
-    int const Coil_HeatingSteam(18);
-    int const CoilWater_CoolingHXAssisted(19);
-
-    int const Coil_CoolingWaterToAirHP(20);
-    int const Coil_HeatingWaterToAirHP(21);
-    int const Coil_CoolingWaterToAirHPSimple(22);
-    int const Coil_HeatingWaterToAirHPSimple(23);
-    int const CoilVRF_Cooling(24);
-    int const CoilVRF_Heating(25);
-
-    int const Coil_UserDefined(26);
-    int const CoilDX_PackagedThermalStorageCooling(27);
-
-    int const Coil_CoolingWaterToAirHPVSEquationFit(28);
-    int const Coil_HeatingWaterToAirHPVSEquationFit(29);
-    int const Coil_CoolingAirToAirVariableSpeed(30);
-    int const Coil_HeatingAirToAirVariableSpeed(31);
-    int const CoilDX_HeatPumpWaterHeaterVariableSpeed(32);
-
-    int const CoilVRF_FluidTCtrl_Cooling(33);
-    int const CoilVRF_FluidTCtrl_Heating(34);
-
-    int const CoilDX_Cooling(35);
-//    int const CoilDX_SubcoolReheat(36);
-    int const CoilDX_CurveFit_Speed(37);
-
-    int const coilNormalMode = 0;        // Normal operation mode
-    int const coilEnhancedMode = 1;      // Enhanced operation mode
-    int const coilSubcoolReheatMode = 2; // SubcoolReheat operation mode
 
     Array1D_string const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",
@@ -335,93 +191,23 @@ namespace DataHVACGlobals {
                                             "",
                                             ""});
 
-    // Water to air HP coil types
-    int const WatertoAir_Simple(1);
-    int const WatertoAir_ParEst(2);
-    int const WatertoAir_VarSpeedEquationFit(3);
-    int const WatertoAir_VarSpeedLooUpTable(4);
-
-    // Water to Air HP Water Flow Mode
-    int const WaterCycling(1);  // water flow cycles with compressor
-    int const WaterConstant(2); // water flow is constant
-    int const
-        WaterConstantOnDemand(3); // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
-
-    // parameters describing coil performance types
-    int const CoilPerfDX_CoolBypassEmpirical(100);
-
-    // Airflow per total capacity range (Regular DX coils)
-    Real64 const MaxRatedVolFlowPerRatedTotCap1(0.00006041); // m3/s per watt = 450 cfm/ton
-    Real64 const MinRatedVolFlowPerRatedTotCap1(0.00004027); // m3/s per watt = 300 cfm/ton
-    Real64 const MaxHeatVolFlowPerRatedTotCap1(0.00008056);  // m3/s per watt = 600 cfm/ton
-    Real64 const MaxCoolVolFlowPerRatedTotCap1(0.00006713);  // m3/s per watt = 500 cfm/ton
-    Real64 const MinOperVolFlowPerRatedTotCap1(0.00002684);  // m3/s per watt = 200 cfm/ton
-
-    // 100% DOAS DX coils Airflow per total capacity ratio
-    Real64 const MaxRatedVolFlowPerRatedTotCap2(0.00003355); // m3/s per watt = 250 cfm/ton
-    Real64 const MinRatedVolFlowPerRatedTotCap2(0.00001677); // m3/s per watt = 125 cfm/ton
-    Real64 const MaxHeatVolFlowPerRatedTotCap2(0.00004026);  // m3/s per watt = 300 cfm/ton
-    Real64 const MaxCoolVolFlowPerRatedTotCap2(0.00004026);  // m3/s per watt = 300 cfm/ton
-    Real64 const MinOperVolFlowPerRatedTotCap2(0.00001342);  // m3/s per watt = 100 cfm/ton
-
     Array1D<Real64> MaxRatedVolFlowPerRatedTotCap(2, {MaxRatedVolFlowPerRatedTotCap1, MaxRatedVolFlowPerRatedTotCap2});
     Array1D<Real64> MinRatedVolFlowPerRatedTotCap(2, {MinRatedVolFlowPerRatedTotCap1, MinRatedVolFlowPerRatedTotCap2});
     Array1D<Real64> MaxHeatVolFlowPerRatedTotCap(2, {MaxHeatVolFlowPerRatedTotCap1, MaxHeatVolFlowPerRatedTotCap2});
     Array1D<Real64> MaxCoolVolFlowPerRatedTotCap(2, {MaxCoolVolFlowPerRatedTotCap1, MaxCoolVolFlowPerRatedTotCap2});
     Array1D<Real64> MinOperVolFlowPerRatedTotCap(2, {MinOperVolFlowPerRatedTotCap1, MinOperVolFlowPerRatedTotCap2});
 
-    // dx coil type (DXCT)
-    int const RegularDXCoil(1); // Regular DX coils or mixed air dx coils
-    int const DOASDXCoil(2);    // 100% DOAS DX coils
     int DXCT(1);                // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
-
-    // Parameters describing Heat Exchanger types
-    int const NumHXTypes(3);
-
-    int const HX_AIRTOAIR_FLATPLATE(1);
-    int const HX_AIRTOAIR_GENERIC(2);
-    int const HX_DESICCANT_BALANCED(3);
-
+    
     Array1D_string const
         cHXTypes(NumHXTypes,
                  {"HeatExchanger:AirToAir:FlatPlate", "HeatExchanger:AirToAir:SensibleAndLatent", "HeatExchanger:Desiccant:BalancedFlow"});
 
-    // Parameters describing air terminal mixers
-    int const NumATMixerTypes(2);
-
-    int const No_ATMixer(0);
-    int const ATMixer_InletSide(1);
-    int const ATMixer_SupplySide(2);
-
     Array1D_string const cATMixerTypes(NumATMixerTypes, {"AirTerminal:SingleDuct:InletSideMixer", "AirTerminal:SingleDuct:SupplySideMixer"});
-    bool const ATMixerExists(true);
-
-    // Parameters describing variable refrigerant flow terminal unit types
-    int const NumVRFTUTypes(1);
-
-    int const VRFTUType_ConstVolume(1);
 
     Array1D_string const cVRFTUTypes(NumVRFTUTypes, std::string("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"));
 
-    // VRF Heating Performance Curve Temperature Type
-    int const NumVRFHeatingPerformanceOATTypes(2);
-    int const WetBulbIndicator(1);
-    int const DryBulbIndicator(2);
-
     Array1D_string const cVRFHeatingPerformanceOATTypes(NumVRFHeatingPerformanceOATTypes, {"WetBulbTemperature", "DryBulbTemperature"});
-
-    // parameter concerning the amount of change in zone temperature is needed
-    // for oscillation of zone temperature to be detected.
-    Real64 const OscillateMagnitude(0.15);
-
-    // Parameters for HVACSystemRootFindingAlgorithm
-    int const Bisection(2);
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // MODULE VARIABLE DECLARATIONS:
 
     bool FirstTimeStepSysFlag(false); // Set to true at the start of each sub-time step
 
@@ -492,8 +278,6 @@ namespace DataHVACGlobals {
     bool SimNonZoneEquipmentFlag;          // True when non-zone equipment components need to be (re)simulated
     bool ZoneMassBalanceHVACReSim;         // True when zone air mass flow balance and air loop needs (re)simulated
     int MinAirLoopIterationsAfterFirst(1); // minimum number of HVAC iterations after FirstHVACIteration
-
-    int const NumZoneHVACTerminalTypes(38);
 
     Array1D_string const ZoneHVACTerminalTypes(NumZoneHVACTerminalTypes,
                                                {"ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
@@ -574,45 +358,6 @@ namespace DataHVACGlobals {
                                                   "AirTerminal:SingleDuct:ConstantVolume:CooledBeam",
                                                   "AirTerminal:DualDuct:VAV:OutdoorAir",
                                                   "AirLoopHVACReturnAir"});
-
-    int const ZoneEquipTypeOf_VariableRefrigerantFlow(1);
-    int const ZoneEquipTypeOf_EnergyRecoveryVentilator(2);
-    int const ZoneEquipTypeOf_FourPipeFanCoil(3);
-    int const ZoneEquipTypeOf_OutdoorAirUnit(4);
-    int const ZoneEquipTypeOf_PackagedTerminalAirConditioner(5);
-    int const ZoneEquipTypeOf_PackagedTerminalHeatPump(6);
-    int const ZoneEquipTypeOf_UnitHeater(7);
-    int const ZoneEquipTypeOf_UnitVentilator(8);
-    int const ZoneEquipTypeOf_VentilatedSlab(9);
-    int const ZoneEquipTypeOf_WaterToAirHeatPump(10);
-    int const ZoneEquipTypeOf_WindowAirConditioner(11);
-    int const ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric(12);
-    int const ZoneEquipTypeOf_BaseboardRadiantConvectiveWater(13);
-    int const ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam(14);
-    int const ZoneEquipTypeOf_BaseboardConvectiveElectric(15);
-    int const ZoneEquipTypeOf_BaseboardConvectiveWater(16);
-    int const ZoneEquipTypeOf_HighTemperatureRadiant(17);
-    int const ZoneEquipTypeOf_DehumidifierDX(18);
-    int const ZoneEquipTypeOf_IdealLoadsAirSystem(19);
-    int const ZoneEquipTypeOf_RefrigerationChillerSet(20);
-    int const ZoneEquipTypeOf_HybridUnitaryAirConditioners(21);
-    int const ZoneEquipTypeOf_FanZoneExhaust(22);
-    int const ZoneEquipTypeOf_WaterHeaterHeatPump(23);
-    int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume(24);
-    int const ZoneEquipTypeOf_AirTerminalDualDuctVAV(25);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat(26);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat(27);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat(28);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat(29);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat(30);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat(31);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction(32);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan(33);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat(34);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat(35);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam(36);
-    int const ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir(37);
-    int const ZoneEquipTypeOf_AirLoopHVACReturnAir(38);
 
     // Object Data
     Array1D<ZoneCompTypeData> ZoneComp;
