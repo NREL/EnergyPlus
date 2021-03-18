@@ -124,11 +124,15 @@ struct RoomAirModelUserTempPatternData : BaseGlobalStruct
     bool MyOneTimeFlag = true; // one time setup flag
     bool MyOneTimeFlag2 = true;
 
+    Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
+    Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
+
     void clear_state() override
     {
-
         MyOneTimeFlag = true;
         MyOneTimeFlag2 = true;
+        MyEnvrnFlag.clear();
+        SetupOutputFlag.clear();
     }
 };
 

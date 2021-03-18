@@ -162,15 +162,14 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
         int SurfNum;                     // do loop counter
 
         if (state.dataRoomAirModelTempPattern->MyOneTimeFlag) {
-            MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
+            state.dataRoomAirModelTempPattern->MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
             state.dataRoomAirModelTempPattern->MyOneTimeFlag = false;
         }
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataRoomAirModelTempPattern->MyEnvrnFlag(ZoneNum)) {
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean = 23.0;
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = 23.0;
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = 23.0;
@@ -179,10 +178,10 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
             for (SurfNum = 1; SurfNum <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++SurfNum) {
                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(SurfNum).TadjacentAir = 23.0;
             }
-            MyEnvrnFlag(ZoneNum) = false;
+            state.dataRoomAirModelTempPattern->MyEnvrnFlag(ZoneNum) = false;
         }
 
-        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(ZoneNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) state.dataRoomAirModelTempPattern->MyEnvrnFlag(ZoneNum) = true;
 
         // init report variable
         state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient = 0.0;
@@ -435,14 +434,13 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         Real64 thisZeta;                     // non-dimensional height
         Real64 DeltaHeight;                  // height difference in m
         Real64 tempDeltaTai;                 // temporary temperature difference
-        Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
 
         if (state.dataRoomAirModelTempPattern->MyOneTimeFlag2) {
-            SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init
+            state.dataRoomAirModelTempPattern->SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init
             state.dataRoomAirModelTempPattern->MyOneTimeFlag2 = false;
         }
 
-        if (SetupOutputFlag(ZoneNum)) {
+        if (state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum)) {
             SetupOutputVariable(state, "Room Air Zone Vertical Temperature Gradient",
                                 OutputProcessor::Unit::K_m,
                                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient,
@@ -450,7 +448,7 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
                                 "State",
                                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneName);
 
-            SetupOutputFlag(ZoneNum) = false;
+            state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum) = false;
         }
 
         Tmean = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
