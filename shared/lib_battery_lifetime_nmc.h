@@ -133,6 +133,12 @@ protected:
 
     double runQneg();
 
+    /// compute lifetime degradation coefficients for current time step
+    void integrateDegParams(double dt_day, double DOD, double T_battery);
+
+    /// Integrate degradation from QLi and Qneg over one day, resets `x_dt` values
+    void integrateDegLoss(double DOD, double T_battery);
+
     void initialize();
 };
 

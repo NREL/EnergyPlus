@@ -150,62 +150,77 @@ double lifetime_nmc_t::runQneg() {
     return state->nmc_li_neg->q_relative_neg;
 }
 
-void lifetime_nmc_t::runLifetimeModels(size_t lifetimeIndex, bool charge_changed, double prev_DOD, double DOD,
-                                       double T_battery) {
-    double q_last = state->q_relative;
-
-    // update day age of battery
-    state->day_age_of_battery += params->dt_hr / (double)util::hours_per_day;
-    auto ts_per_day = (size_t)(util::hours_per_day / params->dt_hr);
-
-    // convert battery temperature to Kelvin
-    T_battery += 273.15;
-    if (charge_changed)
-        cycle_model->rainflow(prev_DOD);
-
-    // update DOD_max if DOD > old DOD_max
-    if (DOD > state->nmc_li_neg->DOD_max)
-        state->nmc_li_neg->DOD_max = DOD;
-
+void lifetime_nmc_t::integrateDegParams(double dt_day, double DOD, double T_battery) {
     //compute open circuit and negative electrode voltage as function of SOC
     double SOC = 0.01 * (100 - DOD);
     double DOD_max = state->nmc_li_neg->DOD_max * 0.01;
     double U_neg = calculate_Uneg(SOC);
     double V_oc = calculate_Voc(SOC);
 
-    // compute lifetime degradation coefficients for current time step,
     // multiply by timestep in days and populate corresponding vectors
-    double dt_day = (1. / 24) * params->dt_hr;
     double b1_dt_el = b1_ref * exp(-(Ea_b1 / Rug) * (1. / T_battery - 1. / T_ref))
-        * exp((alpha_a_b1 * F / Rug) * (U_neg / T_battery - Uneg_ref / T_ref))
-        * exp(gamma * pow(DOD_max, beta_b1)) * dt_day;
+                      * exp((alpha_a_b1 * F / Rug) * (U_neg / T_battery - Uneg_ref / T_ref))
+                      * exp(gamma * pow(DOD_max, beta_b1)) * dt_day;
     double b2_dt_el = b2_ref * exp(-(Ea_b_2 / Rug) * (1. / T_battery - 1. / T_ref)) * dt_day;
     double b3_dt_el = b3_ref * exp(-(Ea_b3 / Rug) * (1. / T_battery - 1. / T_ref))
-        * exp((alpha_a_b3 * F / Rug) * (V_oc / T_battery - V_ref / T_ref))
-        * (1 + theta * DOD_max) * dt_day;
+                      * exp((alpha_a_b3 * F / Rug) * (V_oc / T_battery - V_ref / T_ref))
+                      * (1 + theta * DOD_max) * dt_day;
+
     state->nmc_li_neg->b1_dt += b1_dt_el;
     state->nmc_li_neg->b2_dt += b2_dt_el;
     state->nmc_li_neg->b3_dt += b3_dt_el;
-    state->nmc_li_neg->cum_dt += dt_day;
 
     // computations for q_neg
     double c2_dt_el = c2_ref * exp(-(Ea_c2 / Rug) * (1. / T_battery - 1. / T_ref))
-        * pow(0.01 * state->nmc_li_neg->DOD_max, beta_c2) * dt_day;
+                      * pow(0.01 * state->nmc_li_neg->DOD_max, beta_c2) * dt_day;
     double c0_dt_el = c0_ref * exp(-Ea_c0_ref / Rug * (1 / T_battery - 1 / T_ref)) * dt_day;
     state->nmc_li_neg->c0_dt += c0_dt_el;
     state->nmc_li_neg->c2_dt += c2_dt_el;
 
-    // Run capacity degradation model after every 24 hours
-    if (fabs(state->nmc_li_neg->cum_dt - 1.) < 1e-7) {
-        state->nmc_li_neg->q_relative_li = runQli(T_battery);
-        state->nmc_li_neg->q_relative_neg = runQneg();
-        state->q_relative = fmin(state->nmc_li_neg->q_relative_li, state->nmc_li_neg->q_relative_neg);
+    state->nmc_li_neg->cum_dt += dt_day;
+}
 
-        // reset DOD_max for cycle tracking
-        state->nmc_li_neg->cum_dt = 0;
-        if (state->n_cycles - state->nmc_li_neg->n_cycles_prev_day > 0)
-            state->nmc_li_neg->DOD_max = DOD;
-        state->nmc_li_neg->n_cycles_prev_day = state->n_cycles;
+void lifetime_nmc_t::integrateDegLoss(double DOD, double T_battery) {
+    state->nmc_li_neg->q_relative_li = runQli(T_battery);
+    state->nmc_li_neg->q_relative_neg = runQneg();
+    state->q_relative = fmin(state->nmc_li_neg->q_relative_li, state->nmc_li_neg->q_relative_neg);
+
+    // reset DOD_max for cycle tracking
+    state->nmc_li_neg->cum_dt = 0;
+    if (state->n_cycles - state->nmc_li_neg->n_cycles_prev_day > 0)
+        state->nmc_li_neg->DOD_max = DOD;
+    state->nmc_li_neg->n_cycles_prev_day = state->n_cycles;
+}
+
+void lifetime_nmc_t::runLifetimeModels(size_t _, bool charge_changed, double prev_DOD, double DOD,
+                                       double T_battery) {
+    double q_last = state->q_relative;
+    // convert battery temperature to Kelvin
+    T_battery += 273.15;
+    if (charge_changed)
+        cycle_model->rainflow(prev_DOD);
+
+    double dt_day = (1. / (double)util::hours_per_day) * params->dt_hr;
+    // Run capacity degradation model after every 24 hours
+    double new_cum_dt = state->nmc_li_neg->cum_dt + dt_day;
+    if (new_cum_dt > 1 + 1e-7) {
+        double dt_day_to_end_of_day = 1 - state->nmc_li_neg->cum_dt;
+        double DOD_at_end_of_day = (DOD - prev_DOD) / dt_day * dt_day_to_end_of_day + prev_DOD;
+        state->nmc_li_neg->DOD_max = fmax(DOD_at_end_of_day, state->nmc_li_neg->DOD_max);
+        state->day_age_of_battery += dt_day_to_end_of_day;
+
+        integrateDegParams(dt_day_to_end_of_day, DOD_at_end_of_day, T_battery);
+        integrateDegLoss(DOD_at_end_of_day, T_battery);
+
+        dt_day = new_cum_dt - 1;
+    }
+
+    state->nmc_li_neg->DOD_max = fmax(DOD, state->nmc_li_neg->DOD_max);
+    state->day_age_of_battery += dt_day;
+    integrateDegParams(dt_day, DOD, T_battery);
+
+    if (fabs(state->nmc_li_neg->cum_dt - 1.) < 1e-7) {
+        integrateDegLoss(DOD, T_battery);
     }
 
     state->q_relative = fmin(state->q_relative, q_last);

@@ -682,8 +682,8 @@ TEST_F(lib_battery_lifetime_nmc_test, CyclingCRateMinuteTimestep) {
 
 /// There's less accuracy since the degradation coefficients from the first day are lost when doing computation on day 2
 TEST_F(lib_battery_lifetime_nmc_test, CyclingEveryTwoDays) {
-    size_t day = 0;
     double T = 25.15;
+    size_t day = 0;
     while (day < 87) {
         for (size_t i = 0; i < 48; i++) {
             size_t idx = day * 48 + i;
@@ -704,5 +704,95 @@ TEST_F(lib_battery_lifetime_nmc_test, CyclingEveryTwoDays) {
     EXPECT_EQ(state.n_cycles, 43);
     EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 103.29, 1);
     EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 100.6, 0.5);
+    EXPECT_NEAR(state.day_age_of_battery, 88, 1e-3);
+}
+
+/** Test focusing on how different time steps affect the integration of a day's degradation in the NMC life model.
+ * The integration of degradation is done at the end of each day when the elapsed time, `cum_dt` is exactly 1.
+ * Check that if a simulation step has a timestep large enough that `cum_dt` passes from <1 to >1, that the effects
+ * on lifetime are the same by breaking that timestep up and accruing the degradation and `cum_dt` correctly
+ **/
+TEST_F(lib_battery_lifetime_nmc_test, IrregularTimeStep) {
+    double T = 35.15;
+    auto state = model->get_state();
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 106.213, 1);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 100.6, 0.5);
+
+    auto b_params = std::make_shared<lifetime_params>(model->get_params());
+    b_params->dt_hr = 0.5;
+    auto b_state = std::make_shared<lifetime_state>(model->get_state());
+    auto subhourly_model = std::unique_ptr<lifetime_nmc_t>(new lifetime_nmc_t(b_params, b_state));
+
+
+    // run hourly
+    size_t day = 0;
+    while (day < 87) {
+        size_t idx = 0;
+        while (idx < 48) {
+            size_t i = idx % 24;
+            if (i == 0)
+                model->runLifetimeModels(idx, false, 50, 70, T);
+            else if (i == 1)
+                model->runLifetimeModels(idx, true, 70, 30, T);
+            else if (i == 3)
+                model->runLifetimeModels(idx, true, 30, 50, T);
+            else
+                model->runLifetimeModels(idx, false, 50, 50, T);
+            idx += 1;
+        }
+        day += 2;
+    }
+    state = model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 87);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 105.966, 1e-3);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 103.829, 1e-3);
+    EXPECT_NEAR(state.day_age_of_battery, 88, 1e-3);
+
+    printf("\n");
+    // run 30min timesteps for 23.5 hours then hourly for 24, then 1 0.5 hr time idx
+    day = 0;
+    while (day < 87) {
+        size_t idx = 0;
+        while (idx < (size_t) (23.5 * 2)) {
+            size_t i = idx;
+            if (i <= 1)
+                subhourly_model->runLifetimeModels(idx, false, 50, 70, T);
+            else if (i <= 3)
+                subhourly_model->runLifetimeModels(idx, i == 2, 70, 30, T);
+            else if (i == 6 || i == 7)
+                subhourly_model->runLifetimeModels(idx, i == 6, 30, 50, T);
+            else
+                subhourly_model->runLifetimeModels(idx, false, 50, 50, T);
+            idx += 1;
+        }
+
+        b_params->dt_hr = 1;
+        b_state = std::make_shared<lifetime_state>(subhourly_model->get_state());
+        subhourly_model = std::unique_ptr<lifetime_nmc_t>(new lifetime_nmc_t(b_params, b_state));
+        idx = 0;
+        while (idx < 24) {
+            size_t i = idx % 24;
+            if (i == 0)
+                subhourly_model->runLifetimeModels(idx, false, 50, 70, T);
+            else if (i == 1)
+                subhourly_model->runLifetimeModels(idx, true, 70, 30, T);
+            else if (i == 3)
+                subhourly_model->runLifetimeModels(idx, true, 30, 50, T);
+            else
+                subhourly_model->runLifetimeModels(idx, false, 50, 50, T);
+            idx += 1;
+        }
+        b_params->dt_hr = 0.5;
+        b_state = std::make_shared<lifetime_state>(subhourly_model->get_state());
+        subhourly_model = std::unique_ptr<lifetime_nmc_t>(new lifetime_nmc_t(b_params, b_state));
+        subhourly_model->runLifetimeModels(idx, false, 50, 50, T);
+        day += 2;
+    }
+    state = subhourly_model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 87);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 105.965, 1e-3);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 103.829, 1e-3);
     EXPECT_NEAR(state.day_age_of_battery, 88, 1e-3);
 }
