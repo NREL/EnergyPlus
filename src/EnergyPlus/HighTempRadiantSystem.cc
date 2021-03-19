@@ -1153,8 +1153,8 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1374,7 +1374,7 @@ namespace HighTempRadiantSystem {
         // This subroutine simply produces output for the high temperature radiant system.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         if (HighTempRadSys(RadSysNum).HeaterType == Gas) {
             HighTempRadSys(RadSysNum).GasPower = QHTRadSource(RadSysNum) / HighTempRadSys(RadSysNum).CombustionEffic;

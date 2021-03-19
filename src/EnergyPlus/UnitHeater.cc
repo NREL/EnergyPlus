@@ -685,8 +685,8 @@ namespace UnitHeater {
         // Using/Aliasing
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -1381,8 +1381,8 @@ namespace UnitHeater {
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataHVACGlobals::FanType_SimpleOnOff;
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataZoneEquipment::UnitHeater_Num;
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
@@ -1678,8 +1678,8 @@ namespace UnitHeater {
 
         // Using/Aliasing
         using DataHVACGlobals::FanType_SimpleOnOff;
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataZoneEquipment::UnitHeater_Num;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
@@ -1904,7 +1904,7 @@ namespace UnitHeater {
         // Needs description, as appropriate.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatEnergy = state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
         state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecEnergy = state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour;

@@ -127,10 +127,6 @@ namespace HVACMultiSpeedHeatPump {
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
     using DataHVACGlobals::DrawThru;
-    using DataHVACGlobals::DXElecCoolingPower;
-    using DataHVACGlobals::DXElecHeatingPower;
-    using DataHVACGlobals::ElecHeatingCoilPower;
-    using DataHVACGlobals::OnOffFanPartLoadFraction;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
@@ -269,11 +265,11 @@ namespace HVACMultiSpeedHeatPump {
         Real64 SaveMassFlowRate; // saved inlet air mass flow rate [kg/s]
 
         // zero the fan, DX coils, and supplemental electric heater electricity consumption
-        DXElecHeatingPower = 0.0;
-        DXElecCoolingPower = 0.0;
+        state.dataHVACGlobal->DXElecHeatingPower = 0.0;
+        state.dataHVACGlobal->DXElecCoolingPower = 0.0;
         state.dataHVACMultiSpdHP->SaveCompressorPLR = 0.0;
-        ElecHeatingCoilPower = 0.0;
-        DataHVACGlobals::SuppHeatingCoilPower = 0.0;
+        state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
+        state.dataHVACGlobal->SuppHeatingCoilPower = 0.0;
 
         auto &MSHeatPump(state.dataHVACMultiSpdHP->MSHeatPump);
 
@@ -299,7 +295,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
 
-        OnOffFanPartLoadFraction = 1.0;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
 
         SaveMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         if (!FirstHVACIteration && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil && QZnReq < 0.0 && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive) {
@@ -424,8 +420,8 @@ namespace HVACMultiSpeedHeatPump {
                                                  MSHeatPump(MSHeatPumpNum).AuxOffCyclePower * (1.0 - state.dataHVACMultiSpdHP->SaveCompressorPLR);
         Real64 locFanElecPower = 0.0;
         locFanElecPower = Fans::GetFanPower(state, MSHeatPump(MSHeatPumpNum).FanNum);
-        MSHeatPump(MSHeatPumpNum).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower +
-                                              DataHVACGlobals::SuppHeatingCoilPower + MSHeatPump(MSHeatPumpNum).AuxElecPower;
+        MSHeatPump(MSHeatPumpNum).ElecPower = locFanElecPower + state.dataHVACGlobal->DXElecCoolingPower + state.dataHVACGlobal->DXElecHeatingPower + state.dataHVACGlobal->ElecHeatingCoilPower +
+                state.dataHVACGlobal->SuppHeatingCoilPower + MSHeatPump(MSHeatPumpNum).AuxElecPower;
     }
 
     //******************************************************************************
@@ -4068,7 +4064,7 @@ namespace HVACMultiSpeedHeatPump {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4119,7 +4115,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
-        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
     }
 
     void MSHPHeatRecovery(EnergyPlusData &state, int const MSHeatPumpNum) // Number of the current electric MSHP being simulated

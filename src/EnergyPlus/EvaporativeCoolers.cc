@@ -878,7 +878,7 @@ namespace EvaporativeCoolers {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::DoSetPointTest;
+        auto & DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3333,7 +3333,7 @@ namespace EvaporativeCoolers {
         // Needs description, as appropriate.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
@@ -3865,7 +3865,7 @@ namespace EvaporativeCoolers {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -4330,11 +4330,11 @@ namespace EvaporativeCoolers {
                                             false,
                                             ZoneEvapUnit(UnitNum).FanIndex,
                                             _,
-                                            DataHVACGlobals::ZoneCompTurnFansOn,
-                                            DataHVACGlobals::ZoneCompTurnFansOff);
+                                            state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                            state.dataHVACGlobal->ZoneCompTurnFansOff);
             } else {
                 HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
-                    state, _, DataHVACGlobals::ZoneCompTurnFansOn, DataHVACGlobals::ZoneCompTurnFansOff, _);
+                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             }
         }
 
@@ -4352,11 +4352,11 @@ namespace EvaporativeCoolers {
                                             false,
                                             ZoneEvapUnit(UnitNum).FanIndex,
                                             _,
-                                            DataHVACGlobals::ZoneCompTurnFansOn,
-                                            DataHVACGlobals::ZoneCompTurnFansOff);
+                                            state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                            state.dataHVACGlobal->ZoneCompTurnFansOff);
             } else {
                 HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
-                    state, _, DataHVACGlobals::ZoneCompTurnFansOn, DataHVACGlobals::ZoneCompTurnFansOff, _);
+                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             }
         }
 
@@ -4477,8 +4477,8 @@ namespace EvaporativeCoolers {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
         using TempSolveRoot::SolveRoot;
 
@@ -4603,8 +4603,8 @@ namespace EvaporativeCoolers {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
         // Return value
         Real64 Residual;
@@ -4684,7 +4684,7 @@ namespace EvaporativeCoolers {
         // update output variables for the zone evap unit
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNodeNum;

@@ -256,7 +256,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown)
 {
     state->dataGlobal->TimeStepZone = 1.0;
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
 
 
     state->dataOutputProcessor->NumEnergyMeters = 2;

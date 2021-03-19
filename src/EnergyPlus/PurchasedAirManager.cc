@@ -2209,7 +2209,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                             if (SupplyMassFlowRate > OAMassFlowRate) {
                                 EconoOn = true;
                                 OAMassFlowRate = SupplyMassFlowRate;
-                                PurchAir(PurchAirNum).TimeEconoActive = TimeStepSys;
+                                PurchAir(PurchAirNum).TimeEconoActive = state.dataHVACGlobal->TimeStepSys;
                             }
                         }
                     }
@@ -3010,7 +3010,7 @@ void CalcPurchAirMixedAir(EnergyPlusData &state,
         }
         // Calculate heat recovery if active
         if (HeatRecOn) {
-            PurchAir(PurchAirNum).TimeHtRecActive = TimeStepSys;
+            PurchAir(PurchAirNum).TimeHtRecActive = state.dataHVACGlobal->TimeStepSys;
             OAAfterHtRecTemp = OAInletTemp + PurchAir(PurchAirNum).HtRecSenEff * (RecircTemp - OAInletTemp);
             if (PurchAir(PurchAirNum).HtRecType == HeatRecovery::Enthalpy)
                 OAAfterHtRecHumRat = OAInletHumRat + PurchAir(PurchAirNum).HtRecLatEff * (RecircHumRat - OAInletHumRat);
@@ -3109,7 +3109,7 @@ void ReportPurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     // Calculate values of report variables, if necessary.
 
     // Using/Aliasing
-    using DataHVACGlobals::TimeStepSys;
+    auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
 

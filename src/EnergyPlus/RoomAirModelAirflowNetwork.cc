@@ -621,8 +621,7 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
-        using DataHVACGlobals::UseZoneTimeStepHistory;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using Psychrometrics::PsyHgAirFnWTdb;
         using Psychrometrics::PsyRhFnTdbWPb;
 
@@ -647,7 +646,7 @@ namespace RoomAirModelAirflowNetwork {
 
         auto &ThisRAFNNode(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode));
 
-        if (UseZoneTimeStepHistory) {
+        if (state.dataHVACGlobal->UseZoneTimeStepHistory) {
             NodeTempX1 = ThisRAFNNode.AirTempX1;
             NodeTempX2 = ThisRAFNNode.AirTempX2;
             NodeTempX3 = ThisRAFNNode.AirTempX3;

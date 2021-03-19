@@ -153,8 +153,8 @@ namespace HVACFan {
             m_objTurnFansOff = zoneCompTurnFansOff;
         } else {
             // Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
-            m_objTurnFansOn = DataHVACGlobals::TurnFansOn;
-            m_objTurnFansOff = DataHVACGlobals::TurnFansOff;
+            m_objTurnFansOn = state.dataHVACGlobal->TurnFansOn;
+            m_objTurnFansOff = state.dataHVACGlobal->TurnFansOff;
         }
         if (present(pressureRise) && present(massFlowRate1) && present(runTimeFraction1) && present(massFlowRate2) && present(runTimeFraction2) &&
             present(pressureRise2)) {
@@ -178,7 +178,7 @@ namespace HVACFan {
 
         update(state);
 
-        report();
+        report(state);
     }
 
     void FanSystem::init(EnergyPlusData &state)
@@ -685,7 +685,7 @@ namespace HVACFan {
         localFlowRatio.resize(2, 0.0);
         localRunTimeFrac.resize(2, 1.0);
 
-        if (DataHVACGlobals::NightVentOn) {
+        if (state.dataHVACGlobal->NightVentOn) {
             // assume if non-zero inputs for night data then this fan is to be used with that data
             if (m_nightVentPressureDelta > 0.0) {
                 localPressureRise[0] = m_nightVentPressureDelta;
@@ -806,19 +806,19 @@ namespace HVACFan {
 
                 case SpeedControlMethod::Discrete: {
                     //
-                    if (DataHVACGlobals::OnOffFanPartLoadFraction <= 0.0) {
-                        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+                    if (state.dataHVACGlobal->OnOffFanPartLoadFraction <= 0.0) {
+                        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
                     }
-                    if (DataHVACGlobals::OnOffFanPartLoadFraction < 0.7) {
-                        DataHVACGlobals::OnOffFanPartLoadFraction = 0.7; // a warning message is already issued from the DX coils or gas heating coil
+                    if (state.dataHVACGlobal->OnOffFanPartLoadFraction < 0.7) {
+                        state.dataHVACGlobal->OnOffFanPartLoadFraction = 0.7; // a warning message is already issued from the DX coils or gas heating coil
                     }
                     if (localUseFlowRatiosAndRunTimeFracs) {
                         // Use flow ratios and runtimefractions pass from parent (allows fan to cycle at a specified speed)
                         Real64 locRunTimeFraction(0.0);
-                        if (DataHVACGlobals::OnOffFanPartLoadFraction >= 1.0) {
+                        if (state.dataHVACGlobal->OnOffFanPartLoadFraction >= 1.0) {
                             locRunTimeFraction = localRunTimeFrac[mode];
                         } else {
-                            locRunTimeFraction = max(0.0, min(1.0, localRunTimeFrac[mode] / DataHVACGlobals::OnOffFanPartLoadFraction));
+                            locRunTimeFraction = max(0.0, min(1.0, localRunTimeFrac[mode] / state.dataHVACGlobal->OnOffFanPartLoadFraction));
                         }
                         Real64 locFlowRatio = localFlowRatio[mode]; // Current mode flow rate / max flow rate
                         Real64 locLowSpeedFanRunTimeFrac = 0.0;
@@ -874,10 +874,10 @@ namespace HVACFan {
                         Real64 locFanRunTimeFraction(0.0);
                         Real64 locLowSpeedFanRunTimeFrac = 0.0;
                         Real64 locHiSpeedFanRunTimeFrac = 0.0;
-                        if (DataHVACGlobals::OnOffFanPartLoadFraction >= 1.0) {
+                        if (state.dataHVACGlobal->OnOffFanPartLoadFraction >= 1.0) {
                             locFanRunTimeFraction = localFlowFraction;
                         } else {
-                            locFanRunTimeFraction = max(0.0, min(1.0, localFlowFraction / DataHVACGlobals::OnOffFanPartLoadFraction));
+                            locFanRunTimeFraction = max(0.0, min(1.0, localFlowFraction / state.dataHVACGlobal->OnOffFanPartLoadFraction));
                         }
                         if (m_numSpeeds == 1) { // CV or OnOff
                             localFanTotEff = m_fanTotalEff;
@@ -943,7 +943,7 @@ namespace HVACFan {
 
                     Real64 localFlowFractionForPower = max(m_minPowerFlowFrac, locFlowRatio);
                     Real64 localPowerFraction(0.0);
-                    if (DataHVACGlobals::NightVentOn) {
+                    if (state.dataHVACGlobal->NightVentOn) {
                         localPowerFraction = 1.0; // not sure why, but legacy fan had this for night ventilation
                     } else {
                         localPowerFraction = CurveManager::CurveValue(state, powerModFuncFlowFractionCurveIndex, localFlowFractionForPower);
@@ -1032,7 +1032,7 @@ namespace HVACFan {
             m_qdotConvZone = powerLossToZone * (1.0 - m_zoneRadFract);
             m_qdotRadZone = powerLossToZone * m_zoneRadFract;
         }
-        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0; // reset to 1
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // reset to 1
     }
 
     void FanSystem::update(EnergyPlusData &state) const // does not change state of object, only update elsewhere
@@ -1079,9 +1079,9 @@ namespace HVACFan {
         }
     }
 
-    void FanSystem::report()
+    void FanSystem::report(EnergyPlusData &state)
     {
-        m_fanEnergy = m_fanPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        m_fanEnergy = m_fanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         m_deltaTemp = m_outletAirTemp - m_inletAirTemp;
     }
 

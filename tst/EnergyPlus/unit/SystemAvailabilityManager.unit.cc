@@ -203,7 +203,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state->dataHeatBal->ZoneList(1).Zone(2) = 2;
     state->dataHeatBal->ZoneList(1).Zone(3) = 3;
 
-    DataHVACGlobals::NumPrimaryAirSys = 3;
+    state->dataHVACGlobal->NumPrimaryAirSys = 3;
     state->dataAirLoop->PriAirSysAvailMgr.allocate(3);
     state->dataAirLoop->PriAirSysAvailMgr(1).NumAvailManagers = 1;
     state->dataAirLoop->PriAirSysAvailMgr(2).NumAvailManagers = 1;

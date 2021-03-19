@@ -336,7 +336,7 @@ namespace HeatRecovery {
 
         UpdateHeatRecovery(state, HeatExchNum);
 
-        ReportHeatRecovery(HeatExchNum);
+        ReportHeatRecovery(state, HeatExchNum);
     }
 
     void GetHeatRecoveryInput(EnergyPlusData &state)
@@ -1526,7 +1526,7 @@ namespace HeatRecovery {
             } else if (SELECT_CASE_var == HX_DESICCANT_BALANCED) {
 
                 if (MySetPointTest(ExchNum)) {
-                    if (!state.dataGlobal->SysSizingCalc && DoSetPointTest) {
+                    if (!state.dataGlobal->SysSizingCalc && state.dataHVACGlobal->DoSetPointTest) {
                         if (!CalledFromParentObject) {
                             if (state.dataLoopNodes->Node(ExchCond(ExchNum).SecOutletNode).HumRatMax == SensedNodeFlagValue) {
                                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -3231,7 +3231,7 @@ namespace HeatRecovery {
         }
     }
 
-    void ReportHeatRecovery(int const ExNum) // number of the current heat exchanger being simulated
+    void ReportHeatRecovery(EnergyPlusData &state, int const ExNum) // number of the current heat exchanger being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -3250,8 +3250,7 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::AirToAirHXElecPower;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3277,7 +3276,7 @@ namespace HeatRecovery {
         ExchCond(ExNum).LatCoolingEnergy = ExchCond(ExNum).LatCoolingRate * ReportingConstant;
         ExchCond(ExNum).TotCoolingEnergy = ExchCond(ExNum).TotCoolingRate * ReportingConstant;
 
-        AirToAirHXElecPower = ExchCond(ExNum).ElecUseRate;
+        state.dataHVACGlobal->AirToAirHXElecPower = ExchCond(ExNum).ElecUseRate;
     }
 
     Real64 SafeDiv(Real64 const a, Real64 const b)
@@ -3674,8 +3673,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -4023,8 +4022,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -4370,8 +4369,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -4538,8 +4537,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -4707,8 +4706,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         using Psychrometrics::PsyRhFnTdbWPb;
@@ -4894,8 +4893,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         using Psychrometrics::PsyRhFnTdbWPb;
@@ -5075,8 +5074,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // Locals

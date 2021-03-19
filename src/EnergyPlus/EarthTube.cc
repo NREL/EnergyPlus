@@ -717,7 +717,7 @@ namespace EnergyPlus::EarthTube {
         // PURPOSE OF THIS SUBROUTINE: This subroutine fills remaining report variables.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneLoop;     // Counter for the # of zones (nz)

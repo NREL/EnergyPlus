@@ -110,7 +110,6 @@ namespace Photovoltaics {
 
     // Using/Aliasing
     using namespace DataPhotovoltaics;
-    using DataHVACGlobals::TimeStepSys;
 
     Array1D_bool CheckEquipName;
     bool GetInputFlag(true); // one time get input flag
@@ -771,7 +770,7 @@ namespace Photovoltaics {
         // calculate the electricity production using a simple PV model
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -837,7 +836,7 @@ namespace Photovoltaics {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int thisZone; // working index for zones
 
-        PVarray(PVnum).Report.DCEnergy = PVarray(PVnum).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour);
+        PVarray(PVnum).Report.DCEnergy = PVarray(PVnum).Report.DCPower * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
 
         // add check for multiplier.  if surface is attached to a zone that is on a multiplier
         // then PV production should be multiplied out as well
@@ -1119,8 +1118,7 @@ namespace Photovoltaics {
         // subroutine was taken from InitBaseboard.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyEnvrnFlag;

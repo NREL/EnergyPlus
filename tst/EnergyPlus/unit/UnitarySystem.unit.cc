@@ -276,7 +276,7 @@ public:
         state->dataSize->SysSizPeakDDNum(1).TotCoolPeakDD = 1;
         state->dataSize->FinalSysSizing.allocate(1);
         state->dataSize->FinalZoneSizing.allocate(1);
-        DataHVACGlobals::NumPrimaryAirSys = 1;
+        state->dataHVACGlobal->NumPrimaryAirSys = 1;
         state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
         state->dataAirLoop->AirLoopControlInfo.allocate(1);
         Psychrometrics::InitializePsychRoutines();
@@ -287,7 +287,7 @@ public:
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
 
-        DataHVACGlobals::NumPrimaryAirSys = 0;
+        state->dataHVACGlobal->NumPrimaryAirSys = 0;
         Psychrometrics::cached_Twb.clear();
         Psychrometrics::cached_Psat.clear();
     }
@@ -3668,7 +3668,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
 
     Real64 OnOffAirFlowRatio; // This is a return value
     Real64 PartLoadRatio(1.0);
-    DataHVACGlobals::TurnFansOn = true; // enable fan to run
+    state->dataHVACGlobal->TurnFansOn = true; // enable fan to run
 
     thisSys.m_MultiOrVarSpeedHeatCoil = true;
     thisSys.m_MultiOrVarSpeedCoolCoil = true;
@@ -6081,10 +6081,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
 
     // compare fan RTF with fan PLR and global PLF
     Real64 FanPLR = state->dataLoopNodes->Node(InletNode).MassFlowRate / state->dataFans->Fan(1).MaxAirMassFlowRate;
-    Real64 FanRTF = FanPLR / DataHVACGlobals::OnOffFanPartLoadFraction;
+    Real64 FanRTF = FanPLR / state->dataHVACGlobal->OnOffFanPartLoadFraction;
     EXPECT_DOUBLE_EQ(FanRTF, FanPLR);
     EXPECT_DOUBLE_EQ(FanRTF, state->dataFans->Fan(1).FanRuntimeFraction);
-    EXPECT_DOUBLE_EQ(DataHVACGlobals::OnOffFanPartLoadFraction, 1.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACGlobal->OnOffFanPartLoadFraction, 1.0);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -1000.0; // cooling load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -1000.0;
@@ -6131,7 +6131,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     FanPLR = state->dataLoopNodes->Node(InletNode).MassFlowRate / state->dataFans->Fan(1).MaxAirMassFlowRate;
     // blow thru fan resets OnOffFanPartLoadFraction = 1 so other equipment not using PLF are not affected. OnOffFanPartLoadFraction = 1 here.
     // Unitary System also sets OnOffFanPartLoadFraction = 1 (see end of ReportUnitarySystem) so this variable will = 1
-    EXPECT_EQ(1.0, DataHVACGlobals::OnOffFanPartLoadFraction);
+    EXPECT_EQ(1.0, state->dataHVACGlobal->OnOffFanPartLoadFraction);
     EXPECT_GT(state->dataFans->Fan(1).FanRuntimeFraction, FanPLR);
 }
 
@@ -10199,7 +10199,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
 
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
@@ -15734,7 +15734,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTest) {
-    DataHVACGlobals::TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
     state->dataLoopNodes->Node.allocate(2);
     UnitarySys thisSys;
     thisSys.AirInNode = 1;
@@ -15744,9 +15744,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     thisSys.m_ControlType = UnitarySys::ControlType::Setpoint;
     state->dataUnitarySystems->unitarySys.push_back(thisSys);
     Real64 onElectricEnergy =
-            thisSys.m_AncillaryOnPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            thisSys.m_AncillaryOnPower * state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     Real64 offElectricEnergy =
-            thisSys.m_AncillaryOffPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            thisSys.m_AncillaryOffPower * state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoSpeed;
     thisSys.m_HeatingCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
@@ -15811,8 +15811,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     // switch on-off power values, should have opposite results but uses same code
     thisSys.m_AncillaryOnPower = 50.0;
     thisSys.m_AncillaryOffPower = 100.0;
-    onElectricEnergy = thisSys.m_AncillaryOnPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-    offElectricEnergy = thisSys.m_AncillaryOffPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    onElectricEnergy = thisSys.m_AncillaryOnPower * state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    offElectricEnergy = thisSys.m_AncillaryOffPower * state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     thisSys.m_LastMode = state->dataUnitarySystems->CoolingMode;
     thisSys.m_HeatingPartLoadFrac = 0.0;
     state->dataUnitarySystems->HeatingLoad = false;

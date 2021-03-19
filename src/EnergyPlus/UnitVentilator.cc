@@ -1214,8 +1214,8 @@ namespace UnitVentilator {
 
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
@@ -2532,8 +2532,8 @@ namespace UnitVentilator {
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataHVACGlobals::FanType_SimpleOnOff;
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataZoneEquipment::UnitVentilator_Num;
         using General::SolveRoot;
         using HeatingCoils::CheckHeatingCoilSchedule;
@@ -3272,8 +3272,8 @@ namespace UnitVentilator {
         // simulation.  Other than that, the subroutine is very straightforward.
 
         using DataHVACGlobals::FanType_SimpleOnOff;
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataZoneEquipment::UnitVentilator_Num;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -3337,7 +3337,7 @@ namespace UnitVentilator {
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             } else {
-                DataHVACGlobals::OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
+                state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
                 HVACFan::fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
 
@@ -3678,7 +3678,7 @@ namespace UnitVentilator {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         state.dataUnitVentilators->UnitVent(UnitVentNum).HeatEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
         state.dataUnitVentilators->UnitVent(UnitVentNum).SensCoolEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).SensCoolPower * TimeStepSys * DataGlobalConstants::SecInHour;

@@ -1959,7 +1959,7 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
         }
 
         // convert power to energy and instantaneous use to use over the time step
-        RptConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        RptConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->CoolingEnergy = this->CoolingLoad * RptConstant;
         this->TowerEnergy = this->TowerLoad * RptConstant;
         this->ThermalEnergy = this->ThermalEnergyUseRate * RptConstant;
@@ -1998,7 +1998,7 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
         }
 
         // convert power to energy and instantaneous use to use over the time step
-        RptConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        RptConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->HeatingEnergy = this->HeatingLoad * RptConstant;
         this->ThermalEnergy = this->ThermalEnergyUseRate * RptConstant;
         this->HeatThermalEnergy = this->HeatThermalEnergyUseRate * RptConstant;

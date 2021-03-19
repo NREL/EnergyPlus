@@ -155,7 +155,7 @@ namespace SystemAvailabilityManager {
 
         InitSysAvailManagers(state);
 
-        for (PriAirSysNum = 1; PriAirSysNum <= NumPrimaryAirSys; ++PriAirSysNum) { // loop over the primary air systems
+        for (PriAirSysNum = 1; PriAirSysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++PriAirSysNum) { // loop over the primary air systems
 
             PreviousStatus = state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus; // Save the previous status for differential thermostat
             state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus = NoAction;       // initialize the availability to "take no action"
@@ -200,7 +200,7 @@ namespace SystemAvailabilityManager {
 
         } // end of primary air system loop
 
-        for (PlantNum = 1; PlantNum <= NumPlantLoops; ++PlantNum) {
+        for (PlantNum = 1; PlantNum <= state.dataHVACGlobal->NumPlantLoops; ++PlantNum) {
 
             PreviousStatus = state.dataPlnt->PlantAvailMgr(PlantNum).AvailStatus; // Save the previous status for differential thermostat
             state.dataPlnt->PlantAvailMgr(PlantNum).AvailStatus = NoAction;       // Initialize the availability to "take no action"
@@ -3677,7 +3677,7 @@ namespace SystemAvailabilityManager {
 
         for (SysAvailNum = 1; SysAvailNum <= state.dataHVACGlobal->NumHybridVentSysAvailMgrs; ++SysAvailNum) {
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
-                for (PriAirSysNum = 1; PriAirSysNum <= NumPrimaryAirSys; ++PriAirSysNum) {
+                for (PriAirSysNum = 1; PriAirSysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++PriAirSysNum) {
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum == PriAirSysNum) CalcHybridVentSysAvailMgr(state, SysAvailNum, PriAirSysNum);
                 }
             } else {
@@ -4278,7 +4278,7 @@ namespace SystemAvailabilityManager {
                     }
                 }
                 // Check air loop number
-                for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
+                for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
                     if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName)) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum = AirLoopNum;
                     }
@@ -4370,7 +4370,7 @@ namespace SystemAvailabilityManager {
             }
 
             // Ensure an airloop name is not used more than once in the hybrid ventilation control objects
-            for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
+            for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
                 AirLoopCount = 0;
                 for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
                     if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName)) {
@@ -4426,8 +4426,8 @@ namespace SystemAvailabilityManager {
             MyEnvrnFlag = true;
         }
         // check minimum operation time
-        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
-        if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
+        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
+        if (CurrentEndTime > CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= TimeStepSysLast) {
             for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == state.dataSystemAvailabilityManager->HybridVentCtrl_NoAction) {
                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeOperDuration = 0.0;
@@ -4447,7 +4447,7 @@ namespace SystemAvailabilityManager {
                 }
             }
         }
-        TimeStepSysLast = TimeStepSys;
+        TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
         CurrentEndTimeLast = CurrentEndTime;
     }
 

@@ -543,7 +543,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
-    DataHVACGlobals::NumPrimaryAirSys = 3;
+    state->dataHVACGlobal->NumPrimaryAirSys = 3;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(3);
     state->dataAirLoop->AirLoopFlow.allocate(3);
 
@@ -656,7 +656,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
     }
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
 
@@ -777,7 +777,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
-    DataHVACGlobals::NumPrimaryAirSys = 3;
+    state->dataHVACGlobal->NumPrimaryAirSys = 3;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(3);
     state->dataAirLoop->AirLoopFlow.allocate(3);
 
@@ -3323,9 +3323,9 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
 
     // set number of airloops
-    DataHVACGlobals::NumPrimaryAirSys = 2;
-    state->dataAirSystemsData->PrimaryAirSystems.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataAirLoop->AirLoopFlow.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataHVACGlobal->NumPrimaryAirSys = 2;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataAirLoop->AirLoopFlow.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     // set airloops design supply air flow rate to 1.0
     state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.0;
     state->dataAirLoop->AirLoopFlow(2).DesSupply = 1.0;
@@ -3588,9 +3588,9 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
 
     // set number of airloops
-    DataHVACGlobals::NumPrimaryAirSys = 2;
-    state->dataAirSystemsData->PrimaryAirSystems.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataAirLoop->AirLoopFlow.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataHVACGlobal->NumPrimaryAirSys = 2;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataAirLoop->AirLoopFlow.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     // set airloops design supply air flow rate to 1.0
     state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.0;
     state->dataAirLoop->AirLoopFlow(2).DesSupply = 1.0;
@@ -3855,9 +3855,9 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
 
     // set number of airloops
-    DataHVACGlobals::NumPrimaryAirSys = 2;
-    state->dataAirSystemsData->PrimaryAirSystems.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataAirLoop->AirLoopFlow.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataHVACGlobal->NumPrimaryAirSys = 2;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataAirLoop->AirLoopFlow.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     // set airloops design supply air flow rate to 1.0
     state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.0;
     state->dataAirLoop->AirLoopFlow(2).DesSupply = 1.0;
@@ -4170,9 +4170,9 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wSourceAndReceivingZone)
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
     }
     // set number of airloops
-    DataHVACGlobals::NumPrimaryAirSys = 1;
-    state->dataAirSystemsData->PrimaryAirSystems.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataAirLoop->AirLoopFlow.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataAirLoop->AirLoopFlow.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     // set airloops design supply air flow rate to 1.0
     state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.0;
     // set airloop numbers, single airloop serves all zones

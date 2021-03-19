@@ -1736,8 +1736,8 @@ namespace EnergyPlus::General {
         // time step.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Return value
         std::string OutputString;
@@ -1975,8 +1975,8 @@ namespace EnergyPlus::General {
         // external calculation.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Return value
         int ActualTimeMin; // calculated Minute for reporting
@@ -2065,8 +2065,8 @@ namespace EnergyPlus::General {
         // This routine returns the time in seconds at the end of the current HVAC step.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Return value
         Real64 GetCurrentHVACTime;
@@ -2096,7 +2096,7 @@ namespace EnergyPlus::General {
         // This routine returns the time in seconds at the beginning of the current HVAC step.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
 
         // Return value
         Real64 GetPreviousHVACTime;

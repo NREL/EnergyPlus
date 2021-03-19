@@ -128,8 +128,6 @@ namespace AirflowNetworkBalanceManager {
     using DataHVACGlobals::FanType_SimpleOnOff;
     using DataHVACGlobals::FanType_SimpleVAV;
     using DataHVACGlobals::FanType_ZoneExhaust;
-    using DataHVACGlobals::OnOffFanPartLoadFraction;
-    using DataHVACGlobals::SysTimeElapsed;
     using DataSurfaces::cExtBoundCondition;
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::OtherSideCoefNoCalcExt;
@@ -169,7 +167,7 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine performs simulation of air distribution system.
 
         // Using/Aliasing
-        using DataHVACGlobals::TurnFansOn;
+        auto & TurnFansOn = state.dataHVACGlobal->TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
 
         // Locals
@@ -4757,7 +4755,7 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine initializes variables of additional zone loads caused by ADS.
 
         // USE STATEMENTS:
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -4978,7 +4976,7 @@ namespace AirflowNetworkBalanceManager {
                 e.TotalGC = 0.0;
 
         // Occupant ventilation control
-        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + AirflowNetworkBalanceManager::SysTimeElapsed;
+        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
         if (CurrentEndTime > state.dataAirflowNetworkBalanceManager->CurrentEndTimeLast && TimeStepSys >= state.dataAirflowNetworkBalanceManager->TimeStepSysLast) {
             for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces; ++i) {
                 if (i > state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces - state.dataAirflowNetwork->NumOfLinksIntraZone) continue;
@@ -5688,7 +5686,6 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine performs simulations of nodal pressures and linkage airflows.
 
         // Using/Aliasing
-        using DataHVACGlobals::TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
         using General::SolveRoot;
 
@@ -6657,7 +6654,7 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine performs AirflowNetwork thermal simulations.
 
         // USE STATEMENTS:
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -7920,9 +7917,8 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine reports outputs of air distribution systems
 
         // Using/Aliasing
-        using DataHVACGlobals::NumPrimaryAirSys;
-        using DataHVACGlobals::TimeStepSys;
-        using DataHVACGlobals::TurnFansOn;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         auto &Zone(state.dataHeatBal->Zone);
 
@@ -8611,9 +8607,7 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine update variables used in the AirflowNetwork model.
 
         // Using/Aliasing
-        using DataHVACGlobals::NumPrimaryAirSys;
-        using DataHVACGlobals::TimeStepSys;
-        using DataHVACGlobals::TurnFansOn;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
         using DataHVACGlobals::VerySmallMassFlow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -9474,7 +9468,7 @@ namespace AirflowNetworkBalanceManager {
         using MixedAir::GetOAMixerReliefNodeNumber;
         using SingleDuct::GetHVACSingleDuctSysIndex;
         using namespace DataLoopNode;
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
         using DXCoils::SetDXCoilAirLoopNumber;
         using Fans::SetFanAirLoopNumber;
         using HeatingCoils::SetHeatingCoilAirLoopNumber;
@@ -10933,7 +10927,7 @@ namespace AirflowNetworkBalanceManager {
         // This function outputs air change per hour in a given zone
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Return value
         Real64 ACH; // Zone air change rate [ACH]
@@ -10964,7 +10958,7 @@ namespace AirflowNetworkBalanceManager {
         using BranchNodeConnections::GetChildrenData;
         using BranchNodeConnections::GetNumChildren;
         using BranchNodeConnections::IsParentObject;
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
         using SingleDuct::GetHVACSingleDuctSysIndex;
 
         // Return value

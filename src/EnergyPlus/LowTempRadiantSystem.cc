@@ -5113,8 +5113,8 @@ namespace LowTempRadiantSystem {
         // added.  If the system time step elapsed is different, then we just need to add the new values to the running average.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
@@ -5750,7 +5750,7 @@ namespace LowTempRadiantSystem {
         auto &Zone(state.dataHeatBal->Zone);
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 
@@ -5796,7 +5796,7 @@ namespace LowTempRadiantSystem {
         auto &Zone(state.dataHeatBal->Zone);
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
 
         auto constexpr routineName("ReportConstantFlowSystem");
@@ -5868,7 +5868,7 @@ namespace LowTempRadiantSystem {
         auto &Zone(state.dataHeatBal->Zone);
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 

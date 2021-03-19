@@ -1138,7 +1138,7 @@ namespace UnitarySystems {
         this->m_IterationCounter += 1;
 
         if (this->m_MySetPointCheckFlag) {
-            if (!state.dataGlobal->SysSizingCalc && DataHVACGlobals::DoSetPointTest) {
+            if (!state.dataGlobal->SysSizingCalc && state.dataHVACGlobal->DoSetPointTest) {
 
                 if (this->m_CoolCoilExists) {
                     int ControlNode = this->m_SystemCoolControlNodeNum;
@@ -3416,7 +3416,7 @@ namespace UnitarySystems {
 
                 if (!ZoneEquipmentFound) {
                     // check if the UnitarySystem is connected to an air loop
-                    for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
+                    for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
                         for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                             for (int CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
@@ -9694,7 +9694,7 @@ namespace UnitarySystems {
                 this->m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
             } else {
                 this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
-                DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+                state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
             }
         }
 
@@ -10395,7 +10395,7 @@ namespace UnitarySystems {
             FanOn = true;
         }
         if (ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0 &&
-            ((FanOn || DataHVACGlobals::TurnFansOn) && !DataHVACGlobals::TurnFansOff)) {
+            ((FanOn || state.dataHVACGlobal->TurnFansOn) && !state.dataHVACGlobal->TurnFansOff)) {
             if (this->m_ControlType == ControlType::Setpoint) {
                 // set point based equipment should use VAV terminal units to set the flow.
                 // zone equipment needs to set flow since no other device regulates flow (ZoneHVAC /= AirLoopEquipment)
@@ -10525,7 +10525,7 @@ namespace UnitarySystems {
             }
 
             // If blow thru fan is used, the fan must be simulated after coil sets OnOffFanPartLoadFraction
-            if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru && DataHVACGlobals::OnOffFanPartLoadFraction < 1.0) {
+            if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     HVACFan::fanObjs[this->m_FanIndex]->simulate(
                         state, _, _, _, _, state.dataUnitarySystems->m_massFlow1, state.dataUnitarySystems->m_runTimeFraction1, state.dataUnitarySystems->m_massFlow2, state.dataUnitarySystems->m_runTimeFraction2, _);
@@ -10569,7 +10569,7 @@ namespace UnitarySystems {
             }
 
             // If blow thru fan is used, the fan must be simulated after coil sets OnOffFanPartLoadFraction
-            if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru && DataHVACGlobals::OnOffFanPartLoadFraction < 1.0) {
+            if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     HVACFan::fanObjs[this->m_FanIndex]->simulate(
                         state, _, _, _, _, state.dataUnitarySystems->m_massFlow1, state.dataUnitarySystems->m_runTimeFraction1, state.dataUnitarySystems->m_massFlow2, state.dataUnitarySystems->m_runTimeFraction2, _);
@@ -10907,7 +10907,7 @@ namespace UnitarySystems {
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
 
                 if (PartLoadRatio > 0.0 && this->m_WSHPRuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-                    DataHVACGlobals::OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
+                    state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
                 }
 
                 WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
@@ -10931,7 +10931,7 @@ namespace UnitarySystems {
                 this->heatPumpRunFrac(PartLoadRatio, errFlag, this->m_WSHPRuntimeFrac);
 
                 if (PartLoadRatio > 0.0 && this->m_WSHPRuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-                    DataHVACGlobals::OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
+                    state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
                 }
 
                 WaterToAirHeatPump::SimWatertoAirHP(state,
@@ -11124,7 +11124,7 @@ namespace UnitarySystems {
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) {
 
                 if (PartLoadRatio > 0.0 && this->m_WSHPRuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-                    DataHVACGlobals::OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
+                    state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
                 }
 
                 WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
@@ -11147,7 +11147,7 @@ namespace UnitarySystems {
                 this->heatPumpRunFrac(PartLoadRatio, errFlag, this->m_WSHPRuntimeFrac);
 
                 if (PartLoadRatio > 0.0 && this->m_WSHPRuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-                    DataHVACGlobals::OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
+                    state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
                 }
 
                 WaterToAirHeatPump::SimWatertoAirHP(state,
@@ -13892,7 +13892,7 @@ namespace UnitarySystems {
         auto &OASysEqSizing(state.dataSize->OASysEqSizing);
         auto &CurOASysNum(state.dataSize->CurOASysNum);
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         Real64 SensibleOutput = 0.0; // sensible output rate, {W}
         Real64 LatentOutput = 0.0;   // latent output rate, {W}
@@ -14024,7 +14024,7 @@ namespace UnitarySystems {
                 if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
                     this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_CycRatio) * ReportingConstant;
                 }
-                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
+                elecCoolingPower = state.dataHVACGlobal->DXElecCoolingPower;
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling) ||
                        ((SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) && (this->m_NumOfSpeedCooling > 1))) {
@@ -14040,7 +14040,7 @@ namespace UnitarySystems {
                 if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
                     this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
                 }
-                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
+                elecCoolingPower = state.dataHVACGlobal->DXElecCoolingPower;
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWater || SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterDetailed) {
 
@@ -14085,7 +14085,7 @@ namespace UnitarySystems {
                 if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
                     this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
                 }
-                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
+                elecCoolingPower = state.dataHVACGlobal->DXElecCoolingPower;
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_UserDefined || SELECT_CASE_var == DataHVACGlobals::CoilWater_CoolingHXAssisted ||
                        SELECT_CASE_var == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
                 if (state.dataUnitarySystems->CoolingLoad) {
@@ -14106,7 +14106,7 @@ namespace UnitarySystems {
                 if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
                     this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
                 }
-                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
+                elecCoolingPower = state.dataHVACGlobal->DXElecCoolingPower;
             }
         }
 
@@ -14126,7 +14126,7 @@ namespace UnitarySystems {
                 if (this->m_LastMode == state.dataUnitarySystems->HeatingMode) {
                     this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
                 }
-                elecHeatingPower = DataHVACGlobals::DXElecHeatingPower;
+                elecHeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGas_MultiStage) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric_MultiStage)) {
@@ -14142,7 +14142,7 @@ namespace UnitarySystems {
                     this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
                 }
 
-                elecHeatingPower = DataHVACGlobals::ElecHeatingCoilPower;
+                elecHeatingPower = state.dataHVACGlobal->ElecHeatingCoilPower;
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::CoilDX_HeatingEmpirical) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHP) ||
@@ -14159,7 +14159,7 @@ namespace UnitarySystems {
                     this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
                 }
 
-                elecHeatingPower = DataHVACGlobals::DXElecHeatingPower;
+                elecHeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_UserDefined) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater)) {
@@ -14183,7 +14183,7 @@ namespace UnitarySystems {
                 if (this->m_LastMode == state.dataUnitarySystems->HeatingMode) {
                     this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
                 }
-                elecHeatingPower = DataHVACGlobals::ElecHeatingCoilPower;
+                elecHeatingPower = state.dataHVACGlobal->ElecHeatingCoilPower;
             }
         }
 
@@ -14194,7 +14194,7 @@ namespace UnitarySystems {
         if (this->m_SuppCoilExists) {
             auto const SELECT_CASE_var(this->m_HeatingCoilType_Num);
             if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) {
-                suppHeatingPower = DataHVACGlobals::SuppHeatingCoilPower;
+                suppHeatingPower = state.dataHVACGlobal->SuppHeatingCoilPower;
             }
         }
 
@@ -14234,7 +14234,7 @@ namespace UnitarySystems {
         }
 
         // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
-        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
         state.dataSize->ZoneEqUnitarySys = false;
     }
 
@@ -14251,7 +14251,7 @@ namespace UnitarySystems {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const routineName("UnitarySystemHeatRecovery");
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         int HeatRecInNode = this->m_HeatRecoveryInletNodeNum;
         int HeatRecOutNode = this->m_HeatRecoveryOutletNodeNum;
@@ -15703,9 +15703,9 @@ namespace UnitarySystems {
         thisSys.heatPumpRunFrac(PartLoadRatio, errFlag, RuntimeFrac);
 
         if (RuntimeFrac > 0.0 && thisSys.m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-            DataHVACGlobals::OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
+            state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
         } else {
-            DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+            state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
         }
 
         thisSys.m_CompPartLoadRatio = PartLoadRatio;
@@ -15865,9 +15865,9 @@ namespace UnitarySystems {
         thisSys.heatPumpRunFrac(PartLoadRatio, errFlag, RuntimeFrac);
 
         if (RuntimeFrac > 0.0 && thisSys.m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-            DataHVACGlobals::OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
+            state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
         } else {
-            DataHVACGlobals::OnOffFanPartLoadFraction = 1;
+            state.dataHVACGlobal->OnOffFanPartLoadFraction = 1;
         }
 
         thisSys.m_CompPartLoadRatio = PartLoadRatio;
@@ -16130,9 +16130,9 @@ namespace UnitarySystems {
                        this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP) {
                 this->heatPumpRunFrac(PartLoadRatio, errFlag, RuntimeFrac);
                 if (RuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) { // was DataHVACGlobals::ContFanCycCoil
-                    DataHVACGlobals::OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
+                    state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
                 } else {
-                    DataHVACGlobals::OnOffFanPartLoadFraction = 1;
+                    state.dataHVACGlobal->OnOffFanPartLoadFraction = 1;
                 }
                 this->m_CompPartLoadRatio = PartLoadRatio;
                 this->m_WSHPRuntimeFrac = RuntimeFrac;
@@ -16161,9 +16161,9 @@ namespace UnitarySystems {
                 if (RuntimeFrac > 0.0 &&
                     this->m_FanOpMode ==
                         DataHVACGlobals::CycFanCycCoil) { // was DataHVACGlobals::ContFanCycCoil, maybe file an issue or see if it fixes some
-                    DataHVACGlobals::OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
+                    state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
                 } else {
-                    DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+                    state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
                 }
                 this->m_CompPartLoadRatio = PartLoadRatio;
                 this->m_WSHPRuntimeFrac = RuntimeFrac;

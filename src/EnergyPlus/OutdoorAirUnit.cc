@@ -1041,10 +1041,9 @@ namespace OutdoorAirUnit {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::ShortenTimeStepSys;
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
@@ -1351,7 +1350,7 @@ namespace OutdoorAirUnit {
             state.dataLoopNodes->Node(OutNode).Enthalpy = state.dataLoopNodes->Node(OutsideAirNode).Enthalpy;
         }
         // These initializations only need to be done once at the start of the iterations...
-        if (FirstHVACIteration || ShortenTimeStepSys) {
+        if (FirstHVACIteration || state.dataHVACGlobal->ShortenTimeStepSys) {
             // Initialize the outside air conditions...
             state.dataLoopNodes->Node(OutsideAirNode).Temp = state.dataLoopNodes->Node(OutsideAirNode).OutAirDryBulb;
             state.dataLoopNodes->Node(OutsideAirNode).HumRat = state.dataEnvrn->OutHumRat;
@@ -1637,8 +1636,8 @@ namespace OutdoorAirUnit {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using HeatingCoils::CheckHeatingCoilSchedule;
         using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -2587,7 +2586,7 @@ namespace OutdoorAirUnit {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         auto & OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);
         OutAirUnit(OAUnitNum).TotHeatingEnergy = OutAirUnit(OAUnitNum).TotHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;

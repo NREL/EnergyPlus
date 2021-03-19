@@ -316,7 +316,7 @@ namespace EnergyPlus::WaterThermalTanks {
             this->CalcDesuperheaterWaterHeater(state, FirstHVACIteration);
         }
         this->UpdateWaterThermalTank(state);
-        this->ReportWaterThermalTank();
+        this->ReportWaterThermalTank(state);
         // reset the caller loop num to mimic what was happening in PlantLoopEquip
         this->callerLoopNum = 0;
     }
@@ -434,7 +434,7 @@ namespace EnergyPlus::WaterThermalTanks {
 
         Tank.CalcHeatPumpWaterHeater(state, FirstHVACIteration);
         Tank.UpdateWaterThermalTank(state);
-        Tank.ReportWaterThermalTank();
+        Tank.ReportWaterThermalTank(state);
 
         this->HeatPumpAirInletNode = InletNodeSav;
         this->HeatPumpAirOutletNode = OutletNodeSav;
@@ -5956,11 +5956,11 @@ namespace EnergyPlus::WaterThermalTanks {
             {
                 auto const SELECT_CASE_var(state.dataWaterThermalTanks->HPWaterHeater(HPNum).CrankcaseTempIndicator);
                 if (SELECT_CASE_var == CrankTempEnum::Zone) {
-                    DataHVACGlobals::HPWHCrankcaseDBTemp = state.dataHeatBalFanSys->MAT(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempZone);
+                    state.dataHVACGlobal->HPWHCrankcaseDBTemp = state.dataHeatBalFanSys->MAT(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempZone);
                 } else if (SELECT_CASE_var == CrankTempEnum::Exterior) {
-                    DataHVACGlobals::HPWHCrankcaseDBTemp = state.dataEnvrn->OutDryBulbTemp;
+                    state.dataHVACGlobal->HPWHCrankcaseDBTemp = state.dataEnvrn->OutDryBulbTemp;
                 } else if (SELECT_CASE_var == CrankTempEnum::Schedule) {
-                    DataHVACGlobals::HPWHCrankcaseDBTemp = ScheduleManager::GetCurrentScheduleValue(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).CrankcaseTempSchedule);
+                    state.dataHVACGlobal->HPWHCrankcaseDBTemp = ScheduleManager::GetCurrentScheduleValue(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).CrankcaseTempSchedule);
                 }
             }
 
@@ -6052,9 +6052,9 @@ namespace EnergyPlus::WaterThermalTanks {
 
             //   Curve objects in DXCoils::CalcHPWHDXCoil will use inlet conditions to HPWH not inlet air conditions to DX Coil
             //   HPWHInletDBTemp and HPWHInletWBTemp are DataHVACGlobals to pass info to HPWHDXCoil
-            DataHVACGlobals::HPWHInletDBTemp = HPInletDryBulbTemp;
-            DataHVACGlobals::HPWHInletWBTemp =
-                Psychrometrics::PsyTwbFnTdbWPb(state, DataHVACGlobals::HPWHInletDBTemp, HPInletHumRat, state.dataEnvrn->OutBaroPress);
+            state.dataHVACGlobal->HPWHInletDBTemp = HPInletDryBulbTemp;
+            state.dataHVACGlobal->HPWHInletWBTemp =
+                Psychrometrics::PsyTwbFnTdbWPb(state, state.dataHVACGlobal->HPWHInletDBTemp, HPInletHumRat, state.dataEnvrn->OutBaroPress);
 
             // initialize flow rates at speed levels for variable-speed HPWH
             if ((state.dataWaterThermalTanks->HPWaterHeater(HPNum).bIsIHP) && (0 == state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed)) // use SCWH coil represents
@@ -6206,7 +6206,7 @@ namespace EnergyPlus::WaterThermalTanks {
         static std::string const RoutineName("CalcWaterThermalTankMixed");
 
 
-        Real64 TimeElapsed_loc = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        Real64 TimeElapsed_loc = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
 
         if (this->TimeElapsed != TimeElapsed_loc) {
             // The simulation has advanced to the next system DataGlobals::TimeStep.  Save conditions from the end of the previous system
@@ -6263,7 +6263,7 @@ namespace EnergyPlus::WaterThermalTanks {
             Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, TankTemp_loc, this->waterIndex, RoutineName);
         }
 
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         Real64 TimeRemaining = SecInTimeStep;
         int CycleOnCount_loc = 0;
         int MaxCycles = SecInTimeStep;
@@ -7089,10 +7089,10 @@ namespace EnergyPlus::WaterThermalTanks {
         const Real64 &nTankNodes = this->Nodes;
 
         // Fraction of the current hour that has elapsed (h)
-        const Real64 TimeElapsed_loc = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        const Real64 TimeElapsed_loc = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
 
         // Seconds in one DataGlobals::TimeStep (s)
-        const Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        const Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // Advance tank simulation to the next system DataGlobals::TimeStep, if applicable
         if (this->TimeElapsed != TimeElapsed_loc) {
@@ -7876,7 +7876,7 @@ namespace EnergyPlus::WaterThermalTanks {
         int WaterOutletNode = DesupHtr.WaterOutletNode;
 
         // store first iteration tank temperature and desuperheater mode of operation
-        if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && DesupHtr.FirstTimeThroughFlag) {
+        if (FirstHVACIteration && !state.dataHVACGlobal->ShortenTimeStepSys && DesupHtr.FirstTimeThroughFlag) {
             // Save conditions from end of previous system timestep
             // Every iteration that does not advance time should reset to these values
             this->SavedTankTemp = this->TankTemp;
@@ -7935,7 +7935,7 @@ namespace EnergyPlus::WaterThermalTanks {
         }         // validsourcetype
 
         DesupHtr.OffCycParaFuelRate = DesupHtr.OffCycParaLoad;
-        DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // check that water heater tank cut-in temp is greater than desuperheater cut-in temp
         Real64 desupHtrSetPointTemp = DesupHtr.SetPointTemp;
@@ -8302,14 +8302,14 @@ namespace EnergyPlus::WaterThermalTanks {
             DesupHtr.HeaterRate = 0.0;
         }
 
-        DesupHtr.HeaterEnergy = DesupHtr.HeaterRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        DesupHtr.HeaterEnergy = DesupHtr.HeaterRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         DesupHtr.DesuperheaterPLR = partLoadRatio;
         DesupHtr.OnCycParaFuelRate = DesupHtr.OnCycParaLoad * partLoadRatio;
-        DesupHtr.OnCycParaFuelEnergy = DesupHtr.OnCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        DesupHtr.OnCycParaFuelEnergy = DesupHtr.OnCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         DesupHtr.OffCycParaFuelRate = DesupHtr.OffCycParaLoad * (1 - partLoadRatio);
-        DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         DesupHtr.PumpPower = DesupHtr.PumpElecPower * (partLoadRatio);
-        DesupHtr.PumpEnergy = DesupHtr.PumpPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        DesupHtr.PumpEnergy = DesupHtr.PumpPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // Update used waste heat (just in case multiple users of waste heat use same source)
         if (DesupHtr.ValidSourceType) {
@@ -8399,7 +8399,7 @@ namespace EnergyPlus::WaterThermalTanks {
 
         // store first iteration tank temperature and HP mode of operation
         // this code can be called more than once with FirstHVACIteration = .TRUE., use FirstTimeThroughFlag to control save
-        if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && HeatPump.FirstTimeThroughFlag) {
+        if (FirstHVACIteration && !state.dataHVACGlobal->ShortenTimeStepSys && HeatPump.FirstTimeThroughFlag) {
             this->SavedTankTemp = this->TankTemp;
             HeatPump.SaveMode = HeatPump.Mode;
             HeatPump.SaveWHMode = this->Mode;
@@ -8414,8 +8414,8 @@ namespace EnergyPlus::WaterThermalTanks {
         //    simulate only water heater tank if HP inlet air temperature is below minimum temperature for HP compressor operation
         //    if the tank maximum temperature limit is less than the HPWH set point temp, disable HPWH
         if (AvailSchedule == 0.0 || (HPSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp ||
-            DataHVACGlobals::HPWHInletDBTemp < HeatPump.MinAirTempForHPOperation ||
-            DataHVACGlobals::HPWHInletDBTemp > HeatPump.MaxAirTempForHPOperation || HPSetPointTemp >= this->TankTempLimit ||
+            state.dataHVACGlobal->HPWHInletDBTemp < HeatPump.MinAirTempForHPOperation ||
+            state.dataHVACGlobal->HPWHInletDBTemp > HeatPump.MaxAirTempForHPOperation || HPSetPointTemp >= this->TankTempLimit ||
             (!HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime && this->TypeNum == DataPlant::TypeOf_WtrHeaterMixed &&
              this->SavedMode == state.dataWaterThermalTanks->heatMode) ||
             (!HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime && this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified &&
@@ -8593,7 +8593,7 @@ namespace EnergyPlus::WaterThermalTanks {
             //   If HPWH compressor is available and unit is off for another reason, off-cycle parasitics are calculated
             if (AvailSchedule != 0) {
                 HeatPump.OffCycParaFuelRate = HeatPump.OffCycParaLoad * (1.0 - state.dataWaterThermalTanks->hpPartLoadRatio);
-                HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             }
 
             //   Warn if HPWH compressor cut-in temperature is less than the water heater tank's set point temp
@@ -9528,9 +9528,9 @@ namespace EnergyPlus::WaterThermalTanks {
 
         HeatPump.HeatingPLR = state.dataWaterThermalTanks->hpPartLoadRatio;
         HeatPump.OnCycParaFuelRate = HeatPump.OnCycParaLoad * state.dataWaterThermalTanks->hpPartLoadRatio;
-        HeatPump.OnCycParaFuelEnergy = HeatPump.OnCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        HeatPump.OnCycParaFuelEnergy = HeatPump.OnCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         HeatPump.OffCycParaFuelRate = HeatPump.OffCycParaLoad * (1.0 - state.dataWaterThermalTanks->hpPartLoadRatio);
-        HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
             HeatPump.ControlTempAvg = this->TankTempAvg;
             HeatPump.ControlTempFinal = this->TankTemp;
@@ -11338,7 +11338,7 @@ namespace EnergyPlus::WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::ReportWaterThermalTank()
+    void WaterThermalTankData::ReportWaterThermalTank(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11347,7 +11347,7 @@ namespace EnergyPlus::WaterThermalTanks {
         //       MODIFIED       na
         //       RE-ENGINEERED  Feb 2004, PGE
 
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         this->UnmetEnergy = this->UnmetRate * SecInTimeStep;
         this->LossEnergy = this->LossRate * SecInTimeStep;
@@ -11413,12 +11413,12 @@ namespace EnergyPlus::WaterThermalTanks {
 
             Real64 TotalDrawMass = 0.243402 * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp); // 64.3 gal * rho
             Real64 DrawMass = TotalDrawMass / 6.0;                                               // 6 equal draws
-            Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             Real64 DrawMassFlowRate = DrawMass / SecInTimeStep;
             Real64 FuelEnergy_loc = 0.0;
             FirstTimeFlag = true;
 
-            int TimeStepPerHour = int(1.0 / DataHVACGlobals::TimeStepSys);
+            int TimeStepPerHour = int(1.0 / state.dataHVACGlobal->TimeStepSys);
             // Simulate 24 hour test
             for (int Step = 1; Step <= TimeStepPerHour * 24; ++Step) {
 
@@ -11473,9 +11473,9 @@ namespace EnergyPlus::WaterThermalTanks {
                     }
 
                     //       initialize temperatures for HPWH DX Coil heating capacity and COP curves
-                    DataHVACGlobals::HPWHInletDBTemp = this->AmbientTemp;
-                    DataHVACGlobals::HPWHInletWBTemp =
-                        Psychrometrics::PsyTwbFnTdbWPb(state, DataHVACGlobals::HPWHInletDBTemp, AmbientHumRat, state.dataEnvrn->OutBaroPress);
+                    state.dataHVACGlobal->HPWHInletDBTemp = this->AmbientTemp;
+                    state.dataHVACGlobal->HPWHInletWBTemp =
+                        Psychrometrics::PsyTwbFnTdbWPb(state, state.dataHVACGlobal->HPWHInletDBTemp, AmbientHumRat, state.dataEnvrn->OutBaroPress);
 
                     //       set up full air flow on DX coil inlet node
                     if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).InletAirMixerNode > 0) {
@@ -11503,7 +11503,7 @@ namespace EnergyPlus::WaterThermalTanks {
                         }
                     }
 
-                    DataHVACGlobals::HPWHCrankcaseDBTemp = this->AmbientTemp;
+                    state.dataHVACGlobal->HPWHCrankcaseDBTemp = this->AmbientTemp;
 
                     if (UtilityRoutines::SameString(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") ||
                         (state.dataWaterThermalTanks->HPWaterHeater(HPNum).bIsIHP)) {
@@ -11670,7 +11670,7 @@ namespace EnergyPlus::WaterThermalTanks {
                     }
 
                     if (FirstTimeFlag) {
-                        RatedDXCoilTotalCapacity = DataHVACGlobals::DXCoilTotalCapacity;
+                        RatedDXCoilTotalCapacity = state.dataHVACGlobal->DXCoilTotalCapacity;
                         FirstTimeFlag = false;
                     }
 

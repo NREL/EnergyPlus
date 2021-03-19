@@ -92,7 +92,6 @@ namespace EnergyPlus::DisplacementVentMgr {
     using namespace DataSurfaces;
     using namespace DataRoomAirModel;
     using ConvectionCoefficients::CalcDetailedHcInForDVModel;
-    using DataHVACGlobals::SysTimeElapsed;
 
     void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
@@ -489,8 +488,8 @@ namespace EnergyPlus::DisplacementVentMgr {
         using namespace DataHeatBalFanSys;
         using namespace DataEnvironment;
         using namespace DataHeatBalance;
-        using DataHVACGlobals::TimeStepSys;
-        using DataHVACGlobals::UseZoneTimeStepHistory;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        auto &UseZoneTimeStepHistory = state.dataHVACGlobal->UseZoneTimeStepHistory;
         using InternalHeatGains::SumInternalConvectionGainsByTypes;
         using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
         using Psychrometrics::PsyCpAirFnW;

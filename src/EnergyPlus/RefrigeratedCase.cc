@@ -9012,7 +9012,7 @@ namespace EnergyPlus::RefrigeratedCase {
             } else { // using UseSysTimeStep as a flag for a chiller system
 
                 // Used to determine whether the system time step is a repetition
-                Real64 MyStepStartTime = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+                Real64 MyStepStartTime = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
                 if (std::abs(MyStepStartTime - MyStepStartTimeSaved) < MySmallNumber) {
                     // If the time step is repeated, need to return to correct values at start of time step
                     if (state.dataRefrigCase->NumSimulationRefrigAirChillers > 0) {
@@ -9489,7 +9489,7 @@ namespace EnergyPlus::RefrigeratedCase {
         // To report compressor rack variables
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
-        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
+        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
 
         this->RackCompressorPower = state.dataRefrigCase->TotalCompressorPower;
         this->RackElecConsumption = state.dataRefrigCase->TotalCompressorPower * LocalTimeStep * DataGlobalConstants::SecInHour;
@@ -10379,7 +10379,7 @@ namespace EnergyPlus::RefrigeratedCase {
         auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
-        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
+        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
 
         // Cascade condenser assumes a constant approach delta T (Tcond - Tevap), not f(load)
 
@@ -10802,7 +10802,7 @@ namespace EnergyPlus::RefrigeratedCase {
         auto &WalkIn(state.dataRefrigCase->WalkIn);
 
         int LocalTimeStep = state.dataGlobal->TimeStepZone;
-        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
+        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
 
         //  Do transcritical CO2 refrigeration system loop outside of iterative solution to initialize time step and
         //  calculate case and and walk-ins (that won't change during balance of refrigeration system iterations)
@@ -11215,7 +11215,7 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 TotalLoadFromSystems;         // total heat rejection load from all systems served by this condenser [W]
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
-        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
+        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
 
         // Initialize this condenser for this time step
         state.dataRefrigCase->TotalCondenserPumpPower = 0.0;
@@ -11588,7 +11588,7 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 TotalLoadFromThisSystem(0.0); // Total heat rejection load from the detailed system identified in subroutine call [W]
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
-        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
+        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
 
         // Initialize this gas cooler for this time step
         ActualFanPower = 0.0;
@@ -11768,7 +11768,7 @@ namespace EnergyPlus::RefrigeratedCase {
         auto &Compressor(state.dataRefrigCase->Compressor);
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
-        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
+        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
         Real64 const LocalTimeStepSec(LocalTimeStep * DataGlobalConstants::SecInHour);
 
         int CondID = this->CondenserNum(1);
@@ -12148,7 +12148,7 @@ namespace EnergyPlus::RefrigeratedCase {
         auto &GasCooler(state.dataRefrigCase->GasCooler);
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
-        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
+        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
 
         // Determine refrigerating capacity needed
         // Load due to previously unmet low temperature compressor loads (transcritical system)
@@ -12495,7 +12495,7 @@ namespace EnergyPlus::RefrigeratedCase {
         auto &Subcooler(state.dataRefrigCase->Subcooler);
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
-        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
+        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
 
         // HCaseIn has to be recalculated as the starting point for the subcoolers here because
         //  of the multiple number of iterations through this subroutine and because Tcondense is evolving.
@@ -13813,7 +13813,7 @@ namespace EnergyPlus::RefrigeratedCase {
         auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
-        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
+        if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
 
         {
             auto const SELECT_CASE_var(this->FluidType);
@@ -14309,7 +14309,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 System(SystemID).InsuffCapWarn);
 
             DeRateFactor = AvailableTotalLoad / InitialTotalLoad;
-            Real64 const time_step_sec(DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+            Real64 const time_step_sec(state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
             for (int CoilIndex = 1; CoilIndex <= NumCoils; ++CoilIndex) {
                 int CoilID = System(SystemID).CoilNum(CoilIndex);
                 auto &warehouse_coil(WarehouseCoil(CoilID));
@@ -14626,7 +14626,7 @@ namespace EnergyPlus::RefrigeratedCase {
             // FROST:  keep track of frost build up on evaporator coil
             //         avoid accumulation during warm-up to avoid reverse dd test problem
             if (!state.dataGlobal->WarmupFlag) {
-                FrostChangekg = (WaterRemovRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+                FrostChangekg = (WaterRemovRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
                 this->KgFrost += FrostChangekg;
             }
 
@@ -14644,7 +14644,7 @@ namespace EnergyPlus::RefrigeratedCase {
         //                     a certain temperature (such as when there's no load and no ice)
         if ((DefrostSchedule > 0.0) && (this->DefrostType != iDefrostType::None) && (this->DefrostType != iDefrostType::OffCycle)) {
             DefrostLoad = DefrostCap * DefrostSchedule; // Part of the defrost that is a heat load on the zone (W)
-            Real64 DefrostEnergy = DefrostLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour; // Joules
+            Real64 DefrostEnergy = DefrostLoad * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // Joules
             Real64 StartFrostKg = this->KgFrost; // frost load at start of time step (kg of ice)
 
             if (this->DefrostControlType == iDefrostCtrlType::TempTerm) {
@@ -14671,7 +14671,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     // Reduce defrost heat load on walkin by amount of ice melted during time step
                     FrostChangekg = min(AvailDefrostEnergy / IceMeltEnthalpy, StartFrostKg);
                     if (FrostChangekg < StartFrostKg) {
-                        DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataHVACGlobals::TimeStepSys / DataGlobalConstants::SecInHour;
+                        DefrostLoad -= FrostChangekg * IceMeltEnthalpy / state.dataHVACGlobal->TimeStepSys / DataGlobalConstants::SecInHour;
                         if (!state.dataGlobal->WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
                         // DefrostSchedule not changed because ice not all melted, temp term not triggered
                     } else { // all frost melted during time step, so need to terminate defrost
@@ -14680,11 +14680,11 @@ namespace EnergyPlus::RefrigeratedCase {
                         Real64 DefrostEnergyNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) /
                                                      this->DefEnergyFraction; // Joules - energy needed including E unavail to melt ice
                         DefrostSchedule =
-                            min(DefrostSchedule, (DefrostEnergyNeeded / (DefrostCap * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour)));
+                            min(DefrostSchedule, (DefrostEnergyNeeded / (DefrostCap * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour)));
                         // reduce heat load on warehouse by energy put into ice melting
                         // Defrost load that actually goes to melting ice (W)
                         Real64 DefrostRateNeeded =
-                            (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+                            (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
                         DefrostLoad = max(0.0, (DefrostSchedule * DefrostCap - DefrostRateNeeded));
                         this->IceTemp = this->TEvapDesign;
                     } // frost melted during time step less than amount of ice at start
@@ -14701,7 +14701,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 // Reduce defrost heat load on the zone by amount of ice melted during time step
                 // But DefrostSchedule not changed
                 FrostChangekg = max(0.0, min((DefrostEnergy / IceMeltEnthalpy), StartFrostKg));
-                DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataHVACGlobals::TimeStepSys / DataGlobalConstants::SecInHour;
+                DefrostLoad -= FrostChangekg * IceMeltEnthalpy / state.dataHVACGlobal->TimeStepSys / DataGlobalConstants::SecInHour;
                 if (!state.dataGlobal->WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
             } // Temperature termination vs. time-clock control type
 
@@ -14715,7 +14715,7 @@ namespace EnergyPlus::RefrigeratedCase {
         // ReportWarehouseCoil(CoilID)
         this->ThermalDefrostPower = DefrostLoad;
         if (this->DefrostType == iDefrostType::Elec) {
-            this->ElecDefrostConsumption = DefrostCap * DefrostSchedule * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            this->ElecDefrostConsumption = DefrostCap * DefrostSchedule * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             this->ElecDefrostPower = DefrostCap * DefrostSchedule;
         } else {
             this->ElecDefrostConsumption = 0.0;
@@ -14727,22 +14727,22 @@ namespace EnergyPlus::RefrigeratedCase {
         // LatentLoadServed is positive for latent heat removed from zone
         // SensLoadFromZone positive for heat REMOVED from zone, switch when do credit to zone
         this->SensCreditRate = SensLoadFromZone;
-        this->SensCreditEnergy = SensLoadFromZone * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->SensCreditEnergy = SensLoadFromZone * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->LatCreditRate = latLoadServed;
-        this->LatCreditEnergy = latLoadServed * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->LatCreditEnergy = latLoadServed * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->LatKgPerS_ToZone = WaterRemovRate;
         this->TotalCoolingLoad = CoilCapTotal;
-        this->TotalCoolingEnergy = CoilCapTotal * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->TotalCoolingEnergy = CoilCapTotal * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->SensCoolingEnergyRate = SensLoadGross;
-        this->SensCoolingEnergy = SensLoadGross * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->SensCoolingEnergy = SensLoadGross * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->SensHeatRatio = SHR;
         this->ElecFanPower = FanPowerActual;
-        this->ElecFanConsumption = FanPowerActual * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ElecFanConsumption = FanPowerActual * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->ElecHeaterPower = HeaterLoad;
-        this->ElecHeaterConsumption = HeaterLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ElecHeaterConsumption = HeaterLoad * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         this->TotalElecPower = FanPowerActual + HeaterLoad + this->ElecDefrostPower;
-        this->TotalElecConsumption = this->TotalElecPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->TotalElecConsumption = this->TotalElecPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (this->SensCreditRate >= 0.0) {
             this->ReportSensCoolCreditRate = this->SensCreditRate;
@@ -14751,8 +14751,8 @@ namespace EnergyPlus::RefrigeratedCase {
             this->ReportSensCoolCreditRate = 0.0;
             this->ReportHeatingCreditRate = -this->SensCreditRate;
         }
-        this->ReportSensCoolCreditEnergy = this->ReportSensCoolCreditRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->ReportHeatingCreditEnergy = this->ReportHeatingCreditRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ReportSensCoolCreditEnergy = this->ReportSensCoolCreditRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ReportHeatingCreditEnergy = this->ReportHeatingCreditRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->ReportTotalCoolCreditRate = this->ReportSensCoolCreditRate + this->LatCreditRate;
         this->ReportTotalCoolCreditEnergy = this->ReportSensCoolCreditEnergy + this->LatCreditEnergy;
 

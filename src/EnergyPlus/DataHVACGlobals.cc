@@ -191,14 +191,6 @@ namespace DataHVACGlobals {
                                             "",
                                             ""});
 
-    Array1D<Real64> MaxRatedVolFlowPerRatedTotCap(2, {MaxRatedVolFlowPerRatedTotCap1, MaxRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinRatedVolFlowPerRatedTotCap(2, {MinRatedVolFlowPerRatedTotCap1, MinRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxHeatVolFlowPerRatedTotCap(2, {MaxHeatVolFlowPerRatedTotCap1, MaxHeatVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxCoolVolFlowPerRatedTotCap(2, {MaxCoolVolFlowPerRatedTotCap1, MaxCoolVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinOperVolFlowPerRatedTotCap(2, {MinOperVolFlowPerRatedTotCap1, MinOperVolFlowPerRatedTotCap2});
-
-    int DXCT(1);                // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
-    
     Array1D_string const
         cHXTypes(NumHXTypes,
                  {"HeatExchanger:AirToAir:FlatPlate", "HeatExchanger:AirToAir:SensibleAndLatent", "HeatExchanger:Desiccant:BalancedFlow"});
@@ -208,52 +200,6 @@ namespace DataHVACGlobals {
     Array1D_string const cVRFTUTypes(NumVRFTUTypes, std::string("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"));
 
     Array1D_string const cVRFHeatingPerformanceOATTypes(NumVRFHeatingPerformanceOATTypes, {"WetBulbTemperature", "DryBulbTemperature"});
-
-    bool FirstTimeStepSysFlag(false); // Set to true at the start of each sub-time step
-
-    Real64 TimeStepSys(0.0);                  // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
-    Real64 SysTimeElapsed(0.0);               // elapsed system time in zone timestep (hours)
-    Real64 FracTimeStepZone(0.0);             // System time step divided by the zone time step
-    bool ShortenTimeStepSys(false);           // Logical flag that triggers shortening of system time step
-    int NumOfSysTimeSteps(1);                 // for current zone time step, number of system timesteps inside  it
-    int NumOfSysTimeStepsLastZoneTimeStep(1); // previous zone time step, num of system timesteps inside
-    int LimitNumSysSteps(0);
-
-    bool UseZoneTimeStepHistory(true);    // triggers use of zone time step history, else system time step history, for ZTM1, ZTMx
-    int NumPlantLoops(0);                 // Number of plant loops specified in simulation
-    int NumCondLoops(0);                  // Number of condenser plant loops specified in simulation
-    int NumElecCircuits(0);               // Number of electric circuits specified in simulation
-    int NumGasMeters(0);                  // Number of gas meters specified in simulation
-    int NumPrimaryAirSys(0);              // Number of primary HVAC air systems
-    Real64 OnOffFanPartLoadFraction(1.0); // fan part-load fraction (Fan:OnOff)
-    Real64 DXCoilTotalCapacity(0.0);      // DX coil total cooling capacity (eio report var for HPWHs)
-    Real64 DXElecCoolingPower(0.0);       // Electric power consumed by DX cooling coil last DX simulation
-    Real64 DXElecHeatingPower(0.0);       // Electric power consumed by DX heating coil last DX simulation
-    Real64 ElecHeatingCoilPower(0.0);     // Electric power consumed by electric heating coil
-    Real64 SuppHeatingCoilPower(0.0);     // Electric power consumed by electric supplemental heating coil
-    Real64 AirToAirHXElecPower(0.0);      // Electric power consumed by Heat Exchanger:Air To Air (Generic or Flat Plate)
-    // from last simulation in HeatRecovery.cc
-    Real64 UnbalExhMassFlow(0.0);      // unbalanced zone exhaust from a zone equip component [kg/s]
-    Real64 BalancedExhMassFlow(0.0);   // balanced zone exhaust (declared as so by user)  [kg/s]
-    Real64 PlenumInducedMassFlow(0.0); // secondary air mass flow rate induced from a return plenum [kg/s]
-    bool TurnFansOn(false);            // If true overrides fan schedule and cycles fans on
-    bool TurnZoneFansOnlyOn(false); // If true overrides zone fan schedule and cycles fans on (currently used only by parallel powered induction unit)
-    bool TurnFansOff(false);        // If True overides fan schedule and TurnFansOn and forces fans off
-    bool ZoneCompTurnFansOn(false); // If true overrides fan schedule and cycles fans on
-    bool ZoneCompTurnFansOff(false); // If True overides fan schedule and TurnFansOn and forces fans off
-    bool SetPointErrorFlag(false);   // True if any needed setpoints not set; if true, program terminates
-    bool DoSetPointTest(false);      // True one time only for sensed node setpoint test
-    bool NightVentOn(false);         // set TRUE in SimAirServingZone if night ventilation is happening
-
-    int NumTempContComps(0);
-    Real64 HPWHInletDBTemp(0.0);     // Used by curve objects when calculating DX coil performance for HEAT PUMP:WATER HEATER
-    Real64 HPWHInletWBTemp(0.0);     // Used by curve objects when calculating DX coil performance for HEAT PUMP:WATER HEATER
-    Real64 HPWHCrankcaseDBTemp(0.0); // Used for HEAT PUMP:WATER HEATER crankcase heater ambient temperature calculations
-    bool AirLoopInit(false);         // flag for whether InitAirLoops has been called
-    bool AirLoopsSimOnce(false);     // True means that the air loops have been simulated once in this environment
-    bool GetAirPathDataDone(false);  // True means that air loops inputs have been processed
-
-
 
     Array1D_string const ZoneHVACTerminalTypes(NumZoneHVACTerminalTypes,
                                                {"ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
@@ -334,56 +280,6 @@ namespace DataHVACGlobals {
                                                   "AirTerminal:SingleDuct:ConstantVolume:CooledBeam",
                                                   "AirTerminal:DualDuct:VAV:OutdoorAir",
                                                   "AirLoopHVACReturnAir"});
-
-
-
-    // Clears the global data in DataHVACGlobals.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        DXCT = 1;
-        FirstTimeStepSysFlag = false;
-        TimeStepSys = 0.0;
-        SysTimeElapsed = 0.0;
-        FracTimeStepZone = 0.0;
-        ShortenTimeStepSys = false;
-        NumOfSysTimeSteps = 1;
-        NumOfSysTimeStepsLastZoneTimeStep = 1;
-        LimitNumSysSteps = 0;
-        UseZoneTimeStepHistory = true;
-        NumPlantLoops = 0;
-        NumCondLoops = 0;
-        NumElecCircuits = 0;
-        NumGasMeters = 0;
-        NumPrimaryAirSys = 0;
-        OnOffFanPartLoadFraction = 1.0;
-        DXCoilTotalCapacity = 0.0;
-        DXElecCoolingPower = 0.0;
-        DXElecHeatingPower = 0.0;
-        ElecHeatingCoilPower = 0.0;
-        SuppHeatingCoilPower = 0.0;
-        AirToAirHXElecPower = 0.0;
-        UnbalExhMassFlow = 0.0;
-        BalancedExhMassFlow = 0.0;
-        PlenumInducedMassFlow = 0.0;
-        TurnFansOn = false;
-        TurnZoneFansOnlyOn = false;
-        TurnFansOff = false;
-        ZoneCompTurnFansOn = false;
-        ZoneCompTurnFansOff = false;
-        SetPointErrorFlag = false;
-        DoSetPointTest = false;
-        NightVentOn = false;
-        NumTempContComps = 0;
-        HPWHInletDBTemp = 0.0;
-        HPWHInletWBTemp = 0.0;
-        HPWHCrankcaseDBTemp = 0.0;
-        AirLoopInit = false;
-        AirLoopsSimOnce = false;
-        GetAirPathDataDone = false;
-     
-
-    }
 
 } // namespace DataHVACGlobals
 

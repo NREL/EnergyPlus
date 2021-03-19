@@ -706,8 +706,8 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataHVACGlobals::DoSetPointTest;
-        using DataHVACGlobals::SetPointErrorFlag;
+        auto & DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
+        auto & SetPointErrorFlag = state.dataHVACGlobal->SetPointErrorFlag;
         using namespace DataLoopNode;
         using DataSurfaces::SurfaceData;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
@@ -825,7 +825,7 @@ namespace TranspiredCollector {
 
         // Using/Aliasing
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using DataSurfaces::SurfaceData;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;

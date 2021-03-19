@@ -288,10 +288,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         Real64 QSensUnitOutNoATM; // sensible unit output excluding air added by supply side air terminal mixer
 
         // zero the fan, DX coils, and supplemental electric heater electricity consumption
-        DXElecCoolingPower = 0.0;
-        DXElecHeatingPower = 0.0;
-        ElecHeatingCoilPower = 0.0;
-        SuppHeatingCoilPower = 0.0;
+        state.dataHVACGlobal->DXElecCoolingPower = 0.0;
+        state.dataHVACGlobal->DXElecHeatingPower = 0.0;
+        state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
+        state.dataHVACGlobal->SuppHeatingCoilPower = 0.0;
         state.dataPTHP->SaveCompressorPLR = 0.0;
         QLatReq = 0.0;
 
@@ -318,7 +318,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         }
 
-        OnOffFanPartLoadFraction = 1.0;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
 
         if (UnitOn) {
             if (state.dataPTHP->PTUnit(PTUnitNum).useVSCoilModel) {
@@ -402,7 +402,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         } else {
             locFanElecPower = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->fanPower();
         }
-        state.dataPTHP->PTUnit(PTUnitNum).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + SuppHeatingCoilPower;
+        state.dataPTHP->PTUnit(PTUnitNum).ElecPower = locFanElecPower + state.dataHVACGlobal->DXElecCoolingPower + state.dataHVACGlobal->DXElecHeatingPower + state.dataHVACGlobal->ElecHeatingCoilPower + state.dataHVACGlobal->SuppHeatingCoilPower;
     }
 
     void GetPTUnit(EnergyPlusData &state)
@@ -4294,7 +4294,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         if ((state.dataPTHP->PTUnit(PTUnitNum).OpMode == ContFanCycCoil || state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists) &&
             GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
-            ((GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff)) {
+            ((GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || state.dataHVACGlobal->ZoneCompTurnFansOn) && !state.dataHVACGlobal->ZoneCompTurnFansOff)) {
 
             if (state.dataPTHP->PTUnit(PTUnitNum).simASHRAEModel) state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio = 0.0; // check unit output at low fan speed
             SupHeaterLoad = 0.0;
@@ -5809,15 +5809,15 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // if blow through, simulate fan then coils
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == BlowThru) {
             if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents(state,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanIndex,
                                             state.dataPTHP->FanSpeedRatio,
-                                            ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                                            state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                            state.dataHVACGlobal->ZoneCompTurnFansOff);
             }
         }
 
@@ -6071,15 +6071,15 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // if draw through, simulate coils then fan
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == DrawThru) {
             if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents(state,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanIndex,
                                             state.dataPTHP->FanSpeedRatio,
-                                            ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                                            state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                            state.dataHVACGlobal->ZoneCompTurnFansOff);
             }
         }
         if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
@@ -6657,7 +6657,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         }
 
         if (GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
-            ((GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff)) {
+            ((GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || state.dataHVACGlobal->ZoneCompTurnFansOn) && !state.dataHVACGlobal->ZoneCompTurnFansOff)) {
 
             state.dataLoopNodes->Node(InletNode).MassFlowRate = AverageUnitMassFlow;
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
@@ -6722,7 +6722,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
 
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+        ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergy = state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergyRate * ReportingConstant;
         state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergy = state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergyRate * ReportingConstant;
         state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergy = state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergyRate * ReportingConstant;
@@ -6743,7 +6743,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         }
 
-        DataHVACGlobals::OnOffFanPartLoadFraction =
+        state.dataHVACGlobal->OnOffFanPartLoadFraction =
             1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
     }
 
@@ -7120,11 +7120,11 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         // zero the fan, DX coils, and supplemental electric heater electricity consumption
 
-        DXElecHeatingPower = 0.0;
-        DXElecCoolingPower = 0.0;
+        state.dataHVACGlobal->DXElecHeatingPower = 0.0;
+        state.dataHVACGlobal->DXElecCoolingPower = 0.0;
         state.dataPTHP->SaveCompressorPLR = 0.0;
-        ElecHeatingCoilPower = 0.0;
-        SuppHeatingCoilPower = 0.0;
+        state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
+        state.dataHVACGlobal->SuppHeatingCoilPower = 0.0;
 
         // initialize local variables
         UnitOn = true;
@@ -7164,7 +7164,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         }
 
-        OnOffFanPartLoadFraction = 1.0;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
 
         // compressor on
         CompOp = On;
@@ -8025,15 +8025,15 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // if blow through, simulate fan then coils
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == BlowThru) {
             if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents(state,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanIndex,
                                             state.dataPTHP->FanSpeedRatio,
-                                            ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                                            state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                            state.dataHVACGlobal->ZoneCompTurnFansOff);
             }
         }
 
@@ -8207,15 +8207,15 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // if draw through, simulate coils then fan
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == DrawThru) {
             if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->simulate(state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents(state,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             state.dataPTHP->PTUnit(PTUnitNum).FanIndex,
                                             state.dataPTHP->FanSpeedRatio,
-                                            ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                                            state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                            state.dataHVACGlobal->ZoneCompTurnFansOff);
             }
         }
 
@@ -8528,7 +8528,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         }
 
         if (GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
-            ((GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff)) {
+            ((GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || state.dataHVACGlobal->ZoneCompTurnFansOn) && !state.dataHVACGlobal->ZoneCompTurnFansOff)) {
 
             state.dataLoopNodes->Node(InletNode).MassFlowRate = AverageUnitMassFlow;
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;

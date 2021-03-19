@@ -102,7 +102,6 @@ namespace Humidifiers {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHVACGlobals::SetPointErrorFlag;
     using DataHVACGlobals::SmallMassFlow;
     using namespace ScheduleManager;
 
@@ -232,7 +231,7 @@ namespace Humidifiers {
 
         thisHum.UpdateHumidifier(state);
 
-        thisHum.ReportHumidifier();
+        thisHum.ReportHumidifier(state);
     }
 
     void GetHumidifierInput(EnergyPlusData &state)
@@ -617,7 +616,6 @@ namespace Humidifiers {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
         // Locals
@@ -642,7 +640,7 @@ namespace Humidifiers {
             MySizeFlag = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && state.dataHVACGlobal->DoSetPointTest) {
             if (AirOutNode > 0) {
                 if (state.dataLoopNodes->Node(AirOutNode).HumRatMin == SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -650,10 +648,10 @@ namespace Humidifiers {
                         ShowContinueError(state, "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at the "
                                           "humidifier outlet node.");
                         ShowContinueError(state, "  expecting it on Node=\"" + state.dataLoopNodes->NodeID(AirOutNode) + "\".");
-                        SetPointErrorFlag = true;
+                        state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
-                        CheckIfNodeSetPointManagedByEMS(state, AirOutNode, EMSManager::SPControlType::iHumidityRatioMinSetPoint, SetPointErrorFlag);
-                        if (SetPointErrorFlag) {
+                        CheckIfNodeSetPointManagedByEMS(state, AirOutNode, EMSManager::SPControlType::iHumidityRatioMinSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                        if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state, "Humidifiers: Missing humidity setpoint for " + HumidifierType(HumType_Code) + " = " + Name);
                             ShowContinueError(state, "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at "
                                               "the humidifier outlet node.");
@@ -1287,7 +1285,7 @@ namespace Humidifiers {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1359,7 +1357,7 @@ namespace Humidifiers {
         }
     }
 
-    void HumidifierData::ReportHumidifier() // number of the current humidifier being simulated
+    void HumidifierData::ReportHumidifier(EnergyPlusData &state) // number of the current humidifier being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -1371,29 +1369,8 @@ namespace Humidifiers {
         // PURPOSE OF THIS SUBROUTINE:
         // Fill remaining report variables
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         ElecUseEnergy = ElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour;
         WaterCons = WaterConsRate * TimeStepSys * DataGlobalConstants::SecInHour;

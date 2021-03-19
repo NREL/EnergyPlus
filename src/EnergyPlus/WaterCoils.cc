@@ -1004,7 +1004,7 @@ namespace EnergyPlus::WaterCoils {
             }
         }
 
-        if (state.dataWaterCoils->WaterCoilControllerCheckOneTimeFlag && (DataHVACGlobals::GetAirPathDataDone)) {
+        if (state.dataWaterCoils->WaterCoilControllerCheckOneTimeFlag && (state.dataHVACGlobal->GetAirPathDataDone)) {
             bool ErrorsFound = false;
             bool WaterCoilOnAirLoop = true;
             for (tempCoilNum = 1; tempCoilNum <= state.dataWaterCoils->NumWaterCoils; ++tempCoilNum) {
@@ -2464,7 +2464,7 @@ namespace EnergyPlus::WaterCoils {
                     state, state.dataPlnt->PlantLoop(state.dataSize->DataWaterLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp, state.dataPlnt->PlantLoop(state.dataSize->DataWaterLoopNum).FluidIndex, RoutineName);
                 if (state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad > 0.0) {
                     NomCapUserInp = true;
-                } else if (state.dataSize->CurSysNum > 0 && state.dataSize->CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
+                } else if (state.dataSize->CurSysNum > 0 && state.dataSize->CurSysNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
                     if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatingCapMethod == CapacityPerFloorArea) {
                         NomCapUserInp = true;
                     } else if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatingCapMethod == HeatingDesignCapacity &&
@@ -4780,7 +4780,7 @@ namespace EnergyPlus::WaterCoils {
                 }
             }
         }
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+        ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         // report the WaterCoil energy from this component
         state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilEnergy = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate * ReportingConstant;
         state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate * ReportingConstant;

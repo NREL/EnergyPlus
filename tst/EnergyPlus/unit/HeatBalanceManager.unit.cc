@@ -530,7 +530,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeInletNum(1) = 1;
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
-    NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).OASysExists = true;
@@ -573,7 +573,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataLoopNodes->Node.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
-    NumPrimaryAirSys = 0;
+    state->dataHVACGlobal->NumPrimaryAirSys = 0;
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)

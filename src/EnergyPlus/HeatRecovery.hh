@@ -581,7 +581,7 @@ namespace HeatRecovery {
 
     void UpdateHeatRecovery(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
 
-    void ReportHeatRecovery(int const ExNum); // number of the current heat exchanger being simulated
+    void ReportHeatRecovery(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
 
     Real64 SafeDiv(Real64 const a, Real64 const b);
 

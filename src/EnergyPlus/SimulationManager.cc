@@ -184,7 +184,7 @@ namespace SimulationManager {
         // hour loop, and a time step loop.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using BranchInputManager::ManageBranchInput;
         using BranchInputManager::TestBranchIntegrity;
         using BranchNodeConnections::CheckNodeConnections;
@@ -669,7 +669,6 @@ namespace SimulationManager {
         using namespace DataSystemVariables;
         auto &deviationFromSetPtThresholdClg = state.dataHVACGlobal->deviationFromSetPtThresholdClg;
         auto &deviationFromSetPtThresholdHtg = state.dataHVACGlobal->deviationFromSetPtThresholdHtg;
-        using DataHVACGlobals::LimitNumSysSteps;
 
         using namespace DataIPShortCuts;
 
@@ -971,7 +970,7 @@ namespace SimulationManager {
             ErrorsFound = true;
         }
 
-        LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / state.dataConvergeParams->MinTimeStepSys);
+        state.dataHVACGlobal->LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / state.dataConvergeParams->MinTimeStepSys);
 
         state.dataReportFlag->DebugOutput = false;
         state.dataReportFlag->EvenDuringWarmup = false;
@@ -1282,7 +1281,7 @@ namespace SimulationManager {
                             MinTimeStepSysOverrideValue = state.dataGlobal->MinutesPerTimeStep;
                         }
                         state.dataConvergeParams->MinTimeStepSys = MinTimeStepSysOverrideValue / 60.0;
-                        LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / state.dataConvergeParams->MinTimeStepSys);
+                        state.dataHVACGlobal->LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / state.dataConvergeParams->MinTimeStepSys);
                     }
                     if (overrideMaxZoneTempDiff) {
                         ShowWarningError(state,
@@ -2313,7 +2312,7 @@ namespace SimulationManager {
         //  Plant Loops
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", "! <# Plant Loops>,<Number of Plant Loops>");
-        print(state.files.bnd, " #Plant Loops,{}\n", NumPlantLoops);
+        print(state.files.bnd, " #Plant Loops,{}\n", state.dataHVACGlobal->NumPlantLoops);
         print(state.files.bnd,
               "{}\n",
               "! <Plant Loop>,<Plant Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>");
@@ -2333,7 +2332,7 @@ namespace SimulationManager {
         print(state.files.bnd,
               "{}\n",
               "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
-        for (int Count = 1; Count <= NumPlantLoops; ++Count) {
+        for (int Count = 1; Count <= state.dataHVACGlobal->NumPlantLoops; ++Count) {
             for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                 //  Plant Supply Side Loop
                 // Demandside and supplyside is parametrized in DataPlant
@@ -2459,7 +2458,7 @@ namespace SimulationManager {
         //  Condenser Loops
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", "! <# Condenser Loops>,<Number of Condenser Loops>");
-        print(state.files.bnd, " #Condenser Loops,{}\n", NumCondLoops);
+        print(state.files.bnd, " #Condenser Loops,{}\n", state.dataHVACGlobal->NumCondLoops);
         print(state.files.bnd,
               "{}\n",
               "! <Condenser Loop>,<Condenser Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>");
@@ -2481,7 +2480,7 @@ namespace SimulationManager {
               "{}\n",
               "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
 
-        for (int Count = NumPlantLoops + 1; Count <= state.dataPlnt->TotNumLoops; ++Count) {
+        for (int Count = state.dataHVACGlobal->NumPlantLoops + 1; Count <= state.dataPlnt->TotNumLoops; ++Count) {
             for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                 //  Plant Supply Side Loop
                 // Demandside and supplyside is parametrized in DataPlant
@@ -3034,7 +3033,6 @@ void Resimulate(EnergyPlusData &state,
     using HVACManager::SimHVAC;
     using RefrigeratedCase::ManageRefrigeratedCaseRacks;
     using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
-    using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
     using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
     using namespace ZoneEquipmentManager;
 
@@ -3064,11 +3062,11 @@ void Resimulate(EnergyPlusData &state,
 
     if (ResimHVAC) {
         // HVAC simulation
-        ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
-        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
+        ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         CalcAirFlowSimple(state, 0, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
-        ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
-        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
+        ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 
         ++state.dataDemandManager->DemandManagerHVACIterations;

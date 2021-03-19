@@ -390,7 +390,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
             }
         }
 
-        for (int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop) {
+        for (int airLoop = 1; airLoop <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoop) {
             state.dataAirLoop->AirLoopFlow(airLoop).SupFlow = 0.0;
             state.dataAirLoop->AirLoopFlow(airLoop).ZoneRetFlow = 0.0;
             state.dataAirLoop->AirLoopFlow(airLoop).SysRetFlow = 0.0;
@@ -1402,7 +1402,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // CallIndicator = 4 (EndZoneSizingCalc) write out results
 
         // Using/Aliasing
-        using DataHVACGlobals::FracTimeStepZone;
+        auto & FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
         using DataHVACGlobals::SmallMassFlow;
         using DataHVACGlobals::SmallTempDiff;
         using EMSManager::ManageEMS;
@@ -2690,6 +2690,10 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
             InitSystemOutputRequired(state, ActualZoneNum, FirstHVACIteration, true);
 
+            auto & TurnFansOn = state.dataHVACGlobal->TurnFansOn;
+            auto & TurnFansOff = state.dataHVACGlobal->TurnFansOff;
+            auto & TurnZoneFansOnlyOn = state.dataHVACGlobal->TurnZoneFansOnlyOn;
+
             // Air loop system availability manager status only applies to PIU and exhaust fans
             // Reset fan SAM operation flags for zone fans.
             TurnFansOn = false;
@@ -2698,9 +2702,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
             for (EquipTypeNum = 1; EquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ControlledZoneNum).NumOfEquipTypes; ++EquipTypeNum) {
 
-                UnbalExhMassFlow = 0.0;
-                BalancedExhMassFlow = 0.0;
-                PlenumInducedMassFlow = 0.0;
+                state.dataHVACGlobal->UnbalExhMassFlow = 0.0;
+                state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
+                state.dataHVACGlobal->PlenumInducedMassFlow = 0.0;
                 EquipPtr = state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipPtr;
                 SysOutputProvided = 0.0;
                 LatOutputProvided = 0.0;
@@ -2743,18 +2747,18 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     GetZoneEqAvailabilityManager(state, ZoneEquipTypeNum, ZoneCompNum, ErrorFlag);
 
                     if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == CycleOn) {
-                        ZoneCompTurnFansOn = true;
-                        ZoneCompTurnFansOff = false;
+                        state.dataHVACGlobal->ZoneCompTurnFansOn = true;
+                        state.dataHVACGlobal->ZoneCompTurnFansOff = false;
                     } else if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == ForceOff) {
-                        ZoneCompTurnFansOn = false;
-                        ZoneCompTurnFansOff = true;
+                        state.dataHVACGlobal->ZoneCompTurnFansOn = false;
+                        state.dataHVACGlobal->ZoneCompTurnFansOff = true;
                     } else {
-                        ZoneCompTurnFansOn = TurnFansOn;
-                        ZoneCompTurnFansOff = TurnFansOff;
+                        state.dataHVACGlobal->ZoneCompTurnFansOn = TurnFansOn;
+                        state.dataHVACGlobal->ZoneCompTurnFansOff = TurnFansOff;
                     }
                 } else {
-                    ZoneCompTurnFansOn = TurnFansOn;
-                    ZoneCompTurnFansOff = TurnFansOff;
+                    state.dataHVACGlobal->ZoneCompTurnFansOn = TurnFansOn;
+                    state.dataHVACGlobal->ZoneCompTurnFansOff = TurnFansOff;
                 }
 
                 {
@@ -3084,9 +3088,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 }
 
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneExh +=
-                    (UnbalExhMassFlow + BalancedExhMassFlow); // This is the total "exhaust" flow from equipment such as a zone exhaust fan
-                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneExhBalanced += BalancedExhMassFlow;
-                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).PlenumMassFlow += PlenumInducedMassFlow;
+                    (state.dataHVACGlobal->UnbalExhMassFlow + state.dataHVACGlobal->BalancedExhMassFlow); // This is the total "exhaust" flow from equipment such as a zone exhaust fan
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneExhBalanced += state.dataHVACGlobal->BalancedExhMassFlow;
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).PlenumMassFlow += state.dataHVACGlobal->PlenumInducedMassFlow;
 
                 // Store available capacities for load distribution calculations
                 if (FirstHVACIteration && (state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading)) {
@@ -3834,7 +3838,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // Mass continuity equation.
 
         using namespace DataRoomAirModel; // UCSD
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
         using DataHVACGlobals::SmallMassFlow;
         auto &ZoneMassBalanceHVACReSim = state.dataHVACGlobal->ZoneMassBalanceHVACReSim;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -3887,7 +3891,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         }
 
         // Set max OA flow and frac for systems which are all OA (no OASys)
-        for (int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop) {
+        for (int airLoop = 1; airLoop <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoop) {
             if (state.dataAirSystemsData->PrimaryAirSystems(airLoop).isAllOA) {
                 state.dataAirLoop->AirLoopFlow(airLoop).MaxOutAir = state.dataAirLoop->AirLoopFlow(airLoop).SupFlow;
                 state.dataAirLoop->AirLoopFlow(airLoop).OAFlow = state.dataAirLoop->AirLoopFlow(airLoop).SupFlow;
@@ -3898,7 +3902,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         do {
             if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
                 // These are also reset in ZoneEquipmentManager::InitZoneEquipment, reset again here for each zone mass balance iteration
-                for (int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop) {
+                for (int airLoop = 1; airLoop <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoop) {
                     state.dataAirLoop->AirLoopFlow(airLoop).ZoneRetFlow = 0.0;
                     state.dataAirLoop->AirLoopFlow(airLoop).SysRetFlow = 0.0;
                     state.dataAirLoop->AirLoopFlow(airLoop).ExcessZoneExhFlow = 0.0;
@@ -4613,7 +4617,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // to the air loop side, allowing for multiple return air nodes
 
         // Using/Aliasing
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
         using HVACInterfaceManager::UpdateHVACInterface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4662,7 +4666,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using CoolTower::ManageCoolTower;
         using DataHVACGlobals::CycleOn;
         using DataHVACGlobals::CycleOnZoneFansOnly;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using EarthTube::ManageEarthTube;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;

@@ -116,8 +116,6 @@ namespace WindowAC {
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
     using DataHVACGlobals::DrawThru;
-    using DataHVACGlobals::DXElecCoolingPower;
-    using DataHVACGlobals::OnOffFanPartLoadFraction;
     using DataHVACGlobals::SingleHeatingSetPoint;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
@@ -753,8 +751,8 @@ namespace WindowAC {
 
         using DataHVACGlobals::SmallLoad;
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::WindowAC_Num;
 
@@ -1141,7 +1139,7 @@ namespace WindowAC {
 
         // zero the DX coil electricity consumption
 
-        DXElecCoolingPower = 0.0;
+        state.dataHVACGlobal->DXElecCoolingPower = 0.0;
         // initialize local variables
         UnitOn = true;
         CoilOn = true;
@@ -1171,7 +1169,7 @@ namespace WindowAC {
             }
         }
 
-        OnOffFanPartLoadFraction = 1.0;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
 
         if (UnitOn && CoilOn) {
             HXUnitOn = false;
@@ -1224,7 +1222,7 @@ namespace WindowAC {
         } else {
             locFanElecPower = HVACFan::fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->fanPower();
         }
-        state.dataWindowAC->WindAC(WindACNum).ElecPower = locFanElecPower + DXElecCoolingPower;
+        state.dataWindowAC->WindAC(WindACNum).ElecPower = locFanElecPower + state.dataHVACGlobal->DXElecCoolingPower;
 
         PowerMet = QUnitOut;
         LatOutputProvided = LatentOutput;
@@ -1242,7 +1240,7 @@ namespace WindowAC {
         // PURPOSE OF THIS SUBROUTINE:
         // Fills some of the report variables for the window AC units
 
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         Real64 ReportingConstant;
 
@@ -1282,8 +1280,8 @@ namespace WindowAC {
         // METHODOLOGY EMPLOYED:
         // Simulates the unit components sequentially in the air flow direction.
 
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
+        auto & ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto & ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DXCoils::SimDXCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using MixedAir::SimOAMixer;

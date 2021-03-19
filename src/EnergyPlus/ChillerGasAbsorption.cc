@@ -1824,12 +1824,12 @@ namespace EnergyPlus::ChillerGasAbsorption {
         }
 
         // convert power to energy and instantaneous use to use over the time step
-        this->CoolingEnergy = this->CoolingLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->TowerEnergy = this->TowerLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->FuelEnergy = this->FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CoolFuelEnergy = this->CoolFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->ElectricEnergy = this->ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CoolElectricEnergy = this->CoolElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CoolingEnergy = this->CoolingLoad * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->TowerEnergy = this->TowerLoad * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->FuelEnergy = this->FuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CoolFuelEnergy = this->CoolFuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CoolElectricEnergy = this->CoolElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         if (this->CoolFuelUseRate != 0.0) {
             this->FuelCOP = this->CoolingLoad / this->CoolFuelUseRate;
         } else {
@@ -1855,11 +1855,11 @@ namespace EnergyPlus::ChillerGasAbsorption {
         }
 
         // convert power to energy and instantaneous use to use over the time step
-        this->HeatingEnergy = this->HeatingLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->FuelEnergy = this->FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->HeatFuelEnergy = this->HeatFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->ElectricEnergy = this->ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->HeatElectricEnergy = this->HeatElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->HeatingEnergy = this->HeatingLoad * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->FuelEnergy = this->FuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->HeatFuelEnergy = this->HeatFuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->HeatElectricEnergy = this->HeatElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
 } // namespace EnergyPlus

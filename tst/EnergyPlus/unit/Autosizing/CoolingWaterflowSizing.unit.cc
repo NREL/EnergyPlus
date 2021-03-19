@@ -266,7 +266,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
