@@ -480,6 +480,10 @@ struct PollutionModuleData : BaseGlobalStruct {
 
     void clear_state() override
     {
+        this->PollutionReportSetup = false;
+        this->GetInputFlagPollution = true;
+        this->NumEnvImpactFactors = 0;
+        this->NumFuelFactors = 0;
         this->Pollution = {
             PollutionModule::ComponentProps(PollutionModule::ElecPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
             PollutionModule::ComponentProps(PollutionModule::ElecPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
