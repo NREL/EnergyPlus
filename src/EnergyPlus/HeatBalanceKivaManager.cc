@@ -614,12 +614,23 @@ namespace EnergyPlus::HeatBalanceKivaManager {
                                                      Albedo,
                                                      LiquidPrecip);
 
-            kivaWeather.dryBulb.push_back(DryBulb);
-            kivaWeather.windSpeed.push_back(WindSpeed);
-
+            // Checks for missing value
+            if (DryBulb >= 99.9) {
+                DryBulb = state.dataWeatherManager->Missing.DryBulb;
+            }
+            if (DewPoint >= 99.9) {
+                DewPoint = state.dataWeatherManager->Missing.DewPoint;
+            }
+            if (WindSpeed >= 999.0) {
+                WindSpeed = state.dataWeatherManager->Missing.WindSpd;
+            }
             if (OpaqueSkyCover >= 99.0) {
                 OpaqueSkyCover = state.dataWeatherManager->Missing.OpaqSkyCvr;
             }
+
+            kivaWeather.dryBulb.push_back(DryBulb);
+            kivaWeather.windSpeed.push_back(WindSpeed);
+
             Real64 OSky = OpaqueSkyCover;
             Real64 TDewK = min(DryBulb, DewPoint) + DataGlobalConstants::KelvinConv;
             Real64 ESky =
