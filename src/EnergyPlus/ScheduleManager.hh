@@ -172,10 +172,6 @@ namespace ScheduleManager {
 
     // Functions
 
-    // Clears the global data in ScheduleManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
     void ProcessScheduleInput(EnergyPlusData &state);
 
     void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
@@ -346,6 +342,14 @@ struct ScheduleManagerData : BaseGlobalStruct
     bool ScheduleDSTSFileWarningIssued = false;
     bool ScheduleFileShadingProcessed = false; // This is false unless there is a Schedule:File:Shading object.
 
+    // These were within the namespace
+    bool CheckScheduleValueMinMaxRunOnceOnly = true;
+    bool DoScheduleReportingSetup = true;
+    // Object data
+    std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
+    std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
+    std::unordered_map<std::string, std::string> UniqueScheduleNames;
+
     // Object Data
     Array1D<ScheduleManager::ScheduleTypeData> ScheduleType; // Allowed Schedule Types
     Array1D<ScheduleManager::DayScheduleData> DaySchedule;   // Day Schedule Storage
@@ -358,6 +362,12 @@ struct ScheduleManagerData : BaseGlobalStruct
         NumDaySchedules = 0;
         NumWeekSchedules = 0;
         NumSchedules = 0;
+
+        CheckScheduleValueMinMaxRunOnceOnly = true;
+        UniqueDayScheduleNames.clear();
+        UniqueWeekScheduleNames.clear();
+        UniqueScheduleNames.clear();
+        DoScheduleReportingSetup = true;
 
         ScheduleInputProcessed = false;
         ScheduleDSTSFileWarningIssued = false;
