@@ -138,8 +138,6 @@ namespace HysteresisPhaseChange {
 
     void readAllHysteresisModels(EnergyPlusData &state);
 
-    void clear_state();
-
 } // namespace HysteresisPhaseChange
 
 struct HysteresisPhaseChangeData : BaseGlobalStruct {

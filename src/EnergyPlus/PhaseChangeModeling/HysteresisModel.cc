@@ -380,11 +380,6 @@ namespace HysteresisPhaseChange {
         }
     }
 
-    void clear_state()
-    {
-
-    }
-
 } // namespace HysteresisPhaseChange
 
 } // namespace EnergyPlus

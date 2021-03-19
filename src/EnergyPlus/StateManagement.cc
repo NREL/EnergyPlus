@@ -88,7 +88,6 @@
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
-#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -126,7 +125,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     Humidifiers::clear_state();
     HVACCooledBeam::clear_state();
     HVACFan::clearHVACFanObjects();
-    HysteresisPhaseChange::clear_state();
     LowTempRadiantSystem::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
