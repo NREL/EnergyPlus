@@ -320,6 +320,8 @@ struct PhotovoltaicStateData : BaseGlobalStruct {
     bool GetInputFlag = true; // one time get input flag
     bool MyOneTimeFlag = true;
     bool firstTime = true;
+    Real64 PVTimeStep; // internal timestep (in seconds) for cell temperature mode 3
+    static Array1D_bool MyEnvrnFlag;
 
     void clear_state() override
     {
@@ -327,6 +329,7 @@ struct PhotovoltaicStateData : BaseGlobalStruct {
         GetInputFlag = true;
         MyOneTimeFlag = true;
         firstTime = true;
+        MyEnvrnFlag.clear();
     }
 };
 
