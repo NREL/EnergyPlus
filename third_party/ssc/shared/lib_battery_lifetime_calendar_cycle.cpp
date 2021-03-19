@@ -57,7 +57,6 @@ lifetime_cycle_t::lifetime_cycle_t(std::shared_ptr<lifetime_params> params_ptr) 
 lifetime_cycle_t::lifetime_cycle_t(std::shared_ptr<lifetime_params> params_ptr, std::shared_ptr<lifetime_state> state_ptr) :
         params(std::move(params_ptr)),
         state(std::move(state_ptr)){
-    initialize();
 }
 
 lifetime_cycle_t::lifetime_cycle_t(const lifetime_cycle_t &rhs) {
@@ -382,7 +381,6 @@ lifetime_calendar_t::lifetime_calendar_t(std::shared_ptr<lifetime_params> params
         params(std::move(params_ptr)),
         state(std::move(state_ptr))
 {
-    initialize();
 }
 
 lifetime_calendar_t::lifetime_calendar_t(const lifetime_calendar_t &rhs) {
@@ -486,7 +484,9 @@ void lifetime_calendar_cycle_t::initialize() {
     if (params->cal_cyc->cycling_matrix.nrows() < 3 || params->cal_cyc->cycling_matrix.ncols() != 3)
         throw std::runtime_error("lifetime_cycle_t error: Battery lifetime matrix must have three columns and at least three rows");
     cycle_model = std::unique_ptr<lifetime_cycle_t>(new lifetime_cycle_t(params, state));
+    cycle_model->initialize();
     calendar_model = std::unique_ptr<lifetime_calendar_t>(new lifetime_calendar_t(params, state));
+    calendar_model->initialize();
     state->q_relative = fmin(state->cycle->q_relative_cycle, state->calendar->q_relative_calendar);
 }
 

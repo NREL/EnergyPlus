@@ -553,6 +553,10 @@ void battery_t::ChangeTimestep(double dt_hr) {
 
     auto old_hr = (double)state->last_idx * params->dt_hr;
     state->last_idx = (size_t)(old_hr / dt_hr);
+    if (fabs(old_hr / dt_hr - state->last_idx) > 1e-7)
+        throw std::runtime_error("battery_t dt_hr step size can only be changed to a higher step size when the current time step"
+                                 " is at a time step common to both the previous and new step size. For instance, if running"
+                                 " 30-min steps, step size can only be increased to 60-min step at the hour.");
 
     params->dt_hr = dt_hr;
     params->capacity->dt_hr = dt_hr;
