@@ -55,6 +55,9 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
               -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
+              -DPYTHON_EXECUTABLE="/opt/hostedtoolcache/Python/3.8.5/x64/bin/python3.8" \
+              -DPYTHON_INCLUDE_DIR="/opt/hostedtoolcache/Python/3.8.5/x64/include/python3.8m" \
+              -DPYTHON_LIBRARY="/opt/hostedtoolcache/Python/3.8.5/x64/lib/libpython3.8.so" \
               ../
 
     - name: Build Package
