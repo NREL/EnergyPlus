@@ -183,7 +183,6 @@ namespace Furnaces {
     static std::string const BlankString;
 
     auto constexpr fluidNameSteam("STEAM");
-    bool GetFurnaceInputFlag(true); // Logical to allow "GetInput" only once per simulation
 
     // DERIVED TYPE DEFINITIONS
 
@@ -205,10 +204,6 @@ namespace Furnaces {
     // Reporting routines for module
 
     // Object Data
-    std::unordered_map<std::string, std::string> UniqueFurnaceNames;
-    bool InitFurnaceMyOneTimeFlag = true; // one time allocation flag
-    bool FlowFracFlagReady = true;        // one time flag for calculating flow fraction through controlled zone
-    bool MyAirLoopPass = true;            // one time allocation flag
 
     // Utility routines for module
     // na
@@ -217,14 +212,6 @@ namespace Furnaces {
     //*************************************************************************
 
     // Functions
-    void clear_state()
-    {
-        GetFurnaceInputFlag = true;
-        UniqueFurnaceNames.clear();
-        InitFurnaceMyOneTimeFlag = true;
-        FlowFracFlagReady = true; // one time flag for calculating flow fraction through controlled zone
-        MyAirLoopPass = true;
-    }
 
     void SimFurnace(EnergyPlusData &state,
                     std::string const &FurnaceName,
@@ -279,10 +266,10 @@ namespace Furnaces {
         Real64 TempMassFlowRateMaxAvail;
 
         // Obtains and Allocates Furnace related parameters from input file
-        if (GetFurnaceInputFlag) { // First time subroutine has been entered
+        if (state.dataFurnaces->GetFurnaceInputFlag) { // First time subroutine has been entered
             // Get the furnace input
             GetFurnaceInput(state);
-            GetFurnaceInputFlag = false;
+            state.dataFurnaces->GetFurnaceInputFlag = false;
         }
 
         // Find the correct Furnace
@@ -913,7 +900,7 @@ namespace Furnaces {
         std::string IHPCoilName;        // IHP cooling coil name
         int IHPCoilIndex(0);            // IHP cooling coil id
 
-        GetFurnaceInputFlag = false;
+        state.dataFurnaces->GetFurnaceInputFlag = false;
         MaxNumbers = 0;
         MaxAlphas = 0;
 
@@ -964,7 +951,7 @@ namespace Furnaces {
 
         if (state.dataFurnaces->NumFurnaces > 0) {
             state.dataFurnaces->Furnace.allocate(state.dataFurnaces->NumFurnaces);
-            UniqueFurnaceNames.reserve(state.dataFurnaces->NumFurnaces);
+            state.dataFurnaces->UniqueFurnaceNames.reserve(state.dataFurnaces->NumFurnaces);
         }
         state.dataFurnaces->CheckEquipName.dimension(state.dataFurnaces->NumFurnaces, true);
 
@@ -1012,7 +999,7 @@ namespace Furnaces {
                                           cAlphaFields,
                                           cNumericFields);
 
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataFurnaces->UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
@@ -1559,7 +1546,7 @@ namespace Furnaces {
                                           cAlphaFields,
                                           cNumericFields);
 
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataFurnaces->UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
@@ -2765,7 +2752,7 @@ namespace Furnaces {
                                           cAlphaFields,
                                           cNumericFields);
 
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataFurnaces->UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatPump_AirToAir;
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
@@ -3687,7 +3674,7 @@ namespace Furnaces {
                                           cAlphaFields,
                                           cNumericFields);
 
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataFurnaces->UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatPump_WaterToAir;
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
@@ -4811,7 +4798,7 @@ namespace Furnaces {
 
         auto &Node(state.dataLoopNodes->Node);
 
-        if (InitFurnaceMyOneTimeFlag) {
+        if (state.dataFurnaces->InitFurnaceMyOneTimeFlag) {
             // initialize the environment and sizing flags
             state.dataFurnaces->MyEnvrnFlag.allocate(state.dataFurnaces->NumFurnaces);
             state.dataFurnaces->MySizeFlag.allocate(state.dataFurnaces->NumFurnaces);
@@ -4827,17 +4814,17 @@ namespace Furnaces {
             state.dataFurnaces->MyFanFlag = true;
             state.dataFurnaces->MyCheckFlag = true;
             state.dataFurnaces->MyFlowFracFlag = true;
-            InitFurnaceMyOneTimeFlag = false;
+            state.dataFurnaces->InitFurnaceMyOneTimeFlag = false;
             state.dataFurnaces->MyPlantScanFlag = true;
             state.dataFurnaces->MySuppCoilPlantScanFlag = true;
         }
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyAirLoopPass) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataFurnaces->MyAirLoopPass) {
             state.dataFurnaces->AirLoopPass = 0;
-            MyAirLoopPass = false;
+            state.dataFurnaces->MyAirLoopPass = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyAirLoopPass = true;
+            state.dataFurnaces->MyAirLoopPass = true;
         }
 
         ++state.dataFurnaces->AirLoopPass;
@@ -5204,27 +5191,27 @@ namespace Furnaces {
         // Find the number of zones (zone Inlet Nodes) attached to an air loop from the air loop number
         NumAirLoopZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
         if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && state.dataFurnaces->MyFlowFracFlag(FurnaceNum)) {
-            FlowFracFlagReady = true;
+            state.dataFurnaces->FlowFracFlagReady = true;
             for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
                 // zone inlet nodes for cooling
                 if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled > 0) {
                     if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) == -999) {
                         // the data structure for the zones inlet nodes has not been filled
-                        FlowFracFlagReady = false;
+                        state.dataFurnaces->FlowFracFlagReady = false;
                     }
                 }
                 // zone inlet nodes for heating
                 if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated > 0) {
                     if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex) == -999) {
                         // the data structure for the zones inlet nodes has not been filled
-                        FlowFracFlagReady = false;
+                        state.dataFurnaces->FlowFracFlagReady = false;
                     }
                 }
             }
         }
 
         if (state.dataFurnaces->MyFlowFracFlag(FurnaceNum)) {
-            if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && FlowFracFlagReady) {
+            if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && state.dataFurnaces->FlowFracFlagReady) {
                 SumOfMassFlowRateMax = 0.0; // initialize the sum of the maximum flows
                 for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
                     ZoneInletNodeNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);

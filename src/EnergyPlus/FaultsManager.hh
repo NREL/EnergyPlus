@@ -390,13 +390,14 @@ namespace FaultsManager {
 
     void CheckAndReadFaults(EnergyPlusData &state);
 
-    void clear_state();
-
     void SetFaultyCoilSATSensor(EnergyPlusData &state, std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex);
 
 } // namespace FaultsManager
 
 struct FaultsManagerData : BaseGlobalStruct {
+
+    bool RunFaultMgrOnceFlag = false; // True if CheckAndReadFaults is already done
+    bool ErrorsFound = false;         // True if errors detected in input
 
     bool AnyFaultsInModel = false;          // True if there are operational faults in the model
     int NumFaults = 0;                   // Number of faults (include multiple faults of same type) in the model
@@ -429,7 +430,8 @@ struct FaultsManagerData : BaseGlobalStruct {
 
     void clear_state() override
     {
-
+        RunFaultMgrOnceFlag = false;
+        ErrorsFound = false;
         AnyFaultsInModel = false;
         NumFaults = 0;
         NumFaultyEconomizer = 0;

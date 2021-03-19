@@ -70,7 +70,6 @@ namespace HeatBalanceManager {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    extern std::string CurrentModuleObject; // to assist in getting input
 
     // Subroutine Specifications for the Heat Balance Module
     // Driver Routines
@@ -242,6 +241,17 @@ namespace HeatBalanceManager {
 
 struct HeatBalanceMgrData : BaseGlobalStruct {
 
+    bool ManageHeatBalanceGetInputFlag = true;
+    bool DoReport = false;
+    bool ChangeSet = true; // Toggle for checking storm windows
+    bool FirstWarmupWrite = true;
+    bool WarmupConvergenceWarning = false;
+    bool SizingWarmupConvergenceWarning = false;
+    bool ReportWarmupConvergenceFirstWarmupWrite = true;
+
+    std::string CurrentModuleObject; // to assist in getting input
+    std::unordered_map<std::string, std::string> UniqueMaterialNames;
+    std::unordered_map<std::string, std::string> UniqueConstructNames;
 
     // Real Variables for the Heat Balance Simulation
     // Variables used to determine warmup convergence
@@ -276,6 +286,18 @@ struct HeatBalanceMgrData : BaseGlobalStruct {
 
     void clear_state() override
     {
+
+        ManageHeatBalanceGetInputFlag = true;
+        UniqueMaterialNames.clear();
+        UniqueConstructNames.clear();
+        DoReport = false;
+        ChangeSet = true;
+        FirstWarmupWrite = true;
+        WarmupConvergenceWarning = false;
+        SizingWarmupConvergenceWarning = false;
+        ReportWarmupConvergenceFirstWarmupWrite = true;
+
+        CurrentModuleObject = std::string();
         MaxCoolLoadPrevDay.clear();
         MaxCoolLoadZone.clear();
         MaxHeatLoadPrevDay.clear();

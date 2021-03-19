@@ -60,15 +60,12 @@
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
-#include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
@@ -80,14 +77,10 @@
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
-#include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
@@ -97,7 +90,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
-#include <EnergyPlus/ScheduleManager.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -114,23 +106,17 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataOutputs::clear_state();
     DataPhotovoltaics::clear_state();
     DataStringGlobals::clear_state();
-    DataSystemVariables::clear_state();
     DataViewFactorInformation::clear_state();
     DesiccantDehumidifiers::clear_state();
     DualDuct::clear_state();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeFluidCoolers::clear_state();
-    FaultsManager::clear_state();
     FluidProperties::clear_state();
-    Furnaces::clear_state();
     GroundTemperatureManager::clear_state();
     HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
-    HeatBalanceSurfaceManager::clear_state();
     HeatBalFiniteDiffManager::clear_state();
-    HeatRecovery::clear_state();
     HeatingCoils::clear_state();
-    HighTempRadiantSystem::clear_state();
     Humidifiers::clear_state();
     HVACCooledBeam::clear_state();
     HVACDuct::clear_state();
@@ -140,12 +126,10 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACSingleDuctInduc::clear_state();
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
-    LowTempRadiantSystem::clear_state();
     PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
     Psychrometrics::clear_state();
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelUserTempPattern::clear_state();
-    ScheduleManager::clear_state();
 }
