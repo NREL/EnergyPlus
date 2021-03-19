@@ -86,7 +86,6 @@
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
-#include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -140,7 +139,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACHXAssistedCoolingCoil::clear_state();
     HVACFan::clearHVACFanObjects();
     HVACSingleDuctInduc::clear_state();
-    HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
     LowTempRadiantSystem::clear_state();
     OutputReportTabular::clear_state(state);

@@ -5654,7 +5654,7 @@ namespace InternalHeatGains {
 
             SumAllInternalLatentGains(state, NZ, state.dataHeatBalFanSys->ZoneLatentGain(NZ));
             // Added for hybrid model
-            if (HybridModel::FlagHybridModel_PC) {
+            if (state.dataHybridModel->FlagHybridModel_PC) {
                 SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
             }
         }
@@ -6534,7 +6534,7 @@ namespace InternalHeatGains {
             if (ReSumLatentGains) {
                 SumAllInternalLatentGains(state, NZ, state.dataHeatBalFanSys->ZoneLatentGain(NZ));
                 // Added for the hybrid model
-                if (HybridModel::FlagHybridModel_PC) {
+                if (state.dataHybridModel->FlagHybridModel_PC) {
                     SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
                 }
             }

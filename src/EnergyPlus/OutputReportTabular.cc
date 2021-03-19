@@ -11001,7 +11001,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
 
                 //---- Hybrid Model: Internal Thermal Mass Sub-Table
-                if (FlagHybridModel_TM) {
+                if (state.dataHybridModel->FlagHybridModel_TM) {
                     rowHead.allocate(state.dataGlobal->NumOfZones);
                     NumOfCol = 2;
                     columnHead.allocate(NumOfCol);
@@ -11017,7 +11017,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                     for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                         rowHead(iZone) = Zone(iZone).Name;
-                        if (HybridModelZone(iZone).InternalThermalMassCalc_T) {
+                        if (state.dataHybridModel->HybridModelZone(iZone).InternalThermalMassCalc_T) {
                             tableBody(1, iZone) = "Yes";
                         } else {
                             tableBody(1, iZone) = "No";

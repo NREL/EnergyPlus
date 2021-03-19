@@ -199,9 +199,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    HybridModelZone.allocate(1);
-    HybridModelZone(1).InfiltrationCalc_C = false;
-    HybridModelZone(1).PeopleCountCalc_C = false;
+    state->dataHybridModel->HybridModelZone.allocate(1);
+    state->dataHybridModel->HybridModelZone(1).InfiltrationCalc_C = false;
+    state->dataHybridModel->HybridModelZone(1).PeopleCountCalc_C = false;
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
@@ -356,9 +356,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    HybridModelZone.allocate(1);
-    HybridModelZone(1).InfiltrationCalc_C = false;
-    HybridModelZone(1).PeopleCountCalc_C = false;
+    state->dataHybridModel->HybridModelZone.allocate(1);
+    state->dataHybridModel->HybridModelZone(1).InfiltrationCalc_C = false;
+    state->dataHybridModel->HybridModelZone(1).PeopleCountCalc_C = false;
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;

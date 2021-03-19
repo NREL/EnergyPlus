@@ -3594,7 +3594,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             CalcZoneSums(state, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, false);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
-            if (HybridModel::FlagHybridModel_PC) {
+            if (state.dataHybridModel->FlagHybridModel_PC) {
                 SumAllInternalConvectionGainsExceptPeople(state, ZoneNum, SumIntGainExceptPeople);
             }
 
@@ -4867,7 +4867,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             CalcZoneSums(state, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
-            if (HybridModel::FlagHybridModel_PC) {
+            if (state.dataHybridModel->FlagHybridModel_PC) {
                 SumAllInternalConvectionGainsExceptPeople(state, ZoneNum, SumIntGainExceptPeople);
             }
 
@@ -5010,8 +5010,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             }
 
             // Hybrid modeling start
-            if ((HybridModelZone(ZoneNum).InfiltrationCalc_T || HybridModelZone(ZoneNum).InternalThermalMassCalc_T ||
-                 HybridModelZone(ZoneNum).PeopleCountCalc_T) &&
+            if ((state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_T || state.dataHybridModel->HybridModelZone(ZoneNum).InternalThermalMassCalc_T ||
+                 state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_T) &&
                 (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
                 InverseModelTemperature(
                     state, ZoneNum, SumIntGain, SumIntGainExceptPeople, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, AirCap);
@@ -5454,7 +5454,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
         LatentGain = state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
 
-        if (HybridModelZone(ZoneNum).PeopleCountCalc_H) {
+        if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_H) {
             LatentGainExceptPeople = state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(ZoneNum) + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
         }
 
@@ -5538,7 +5538,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         }
 
         // HybridModel with measured humidity ratio begins
-        if ((HybridModelZone(ZoneNum).InfiltrationCalc_H || HybridModelZone(ZoneNum).PeopleCountCalc_H) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
+        if ((state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_H || state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_H) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
             InverseModelHumidity(state, ZoneNum, LatentGain, LatentGainExceptPeople, ZoneMassFlowRate, MoistureMassFlowRate, H2OHtOfVap, RhoAir);
         }
 
@@ -5685,27 +5685,27 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         Real64 ZoneMult;
 
         ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
-        state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredTemperatureSchedulePtr);
+        state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneMeasuredTemperatureSchedulePtr);
 
         // HM calculation only HM calculation period start
-        if (state.dataEnvrn->DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
+        if (state.dataEnvrn->DayOfYear >= state.dataHybridModel->HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= state.dataHybridModel->HybridModelZone(ZoneNum).HybridEndDayOfYear) {
             Real64 HMMultiplierAverage(1.0);
             Real64 MultpHM(1.0);
 
             state.dataHeatBalFanSys->ZT(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature; // Array1D<Real64> ZT -- Zone
                                                                  // Air Temperature Averaged over
                                                                  // the System Time Increment
-            if (HybridModelZone(ZoneNum).InfiltrationCalc_T && UseZoneTimeStepHistory) {
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_T && UseZoneTimeStepHistory) {
 
                 constexpr auto RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
 
-                if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
+                if (state.dataHybridModel->HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirTemperatureSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirTemperatureSchedulePtr);
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirHumidityRatioSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirHumidityRatioSchedulePtr);
                     // Calculate the air humidity ratio at supply air inlet.
                     Real64 CpAirInlet(0.0);
                     CpAirInlet = PsyCpAirFnW(state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio);
@@ -5747,7 +5747,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             } // Hybrid model infiltration calcualtion end
 
             // Hybrid modeling internal thermal mass calcualtion start
-            if (HybridModelZone(ZoneNum).InternalThermalMassCalc_T && SumSysMCpT == 0 && state.dataHeatBalFanSys->ZT(ZoneNum) != state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum) &&
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).InternalThermalMassCalc_T && SumSysMCpT == 0 && state.dataHeatBalFanSys->ZT(ZoneNum) != state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum) &&
                 UseZoneTimeStepHistory) { // HM calculation only when SumSysMCpT =0,
                                           // TimeStepZone (not @ TimeStepSys)
                 TempDepCoef = SumHA + SumMCp + SumSysMCp;
@@ -5806,7 +5806,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
                     // Calculate and store the multiplier average at the end of HM
                     // simulations
-                    if (state.dataEnvrn->DayOfYear == HybridModelZone(ZoneNum).HybridEndDayOfYear && state.dataGlobal->EndDayFlag) {
+                    if (state.dataEnvrn->DayOfYear == state.dataHybridModel->HybridModelZone(ZoneNum).HybridEndDayOfYear && state.dataGlobal->EndDayFlag) {
                         HMMultiplierAverage = state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSensHMSum / state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSensHMCountSum;
                         state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSensHMAverage = HMMultiplierAverage;
                     }
@@ -5814,17 +5814,17 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             } // Hybrid model internal thermal mass calcualtion end
 
             // Hybrid model people count calculation
-            if (HybridModelZone(ZoneNum).PeopleCountCalc_T && UseZoneTimeStepHistory) {
-                state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredTemperatureSchedulePtr);
-                state.dataHeatBal->Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_T && UseZoneTimeStepHistory) {
+                state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneMeasuredTemperatureSchedulePtr);
+                state.dataHeatBal->Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
                 state.dataHeatBal->Zone(ZoneNum).ZonePeopleSensibleHeatFraction =
-                    GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleSensibleFractionSchedulePtr);
+                    GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleSensibleFractionSchedulePtr);
                 state.dataHeatBal->Zone(ZoneNum).ZonePeopleRadiantHeatFraction =
-                    GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleRadiationFractionSchedulePtr);
+                    GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleRadiationFractionSchedulePtr);
 
                 FractionSensible = state.dataHeatBal->Zone(ZoneNum).ZonePeopleSensibleHeatFraction;
                 FractionRadiation = state.dataHeatBal->Zone(ZoneNum).ZonePeopleRadiantHeatFraction;
-                ActivityLevel = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
+                ActivityLevel = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
 
                 if (FractionSensible <= 0.0) {
                     FractionSensible = 0.6;
@@ -5840,13 +5840,13 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     ActivityLevel = 130.0;
                 }
 
-                if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
+                if (state.dataHybridModel->HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirTemperatureSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirTemperatureSchedulePtr);
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirHumidityRatioSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirHumidityRatioSchedulePtr);
 
                     // Calculate the air humidity ratio at supply air inlet.
                     Real64 CpAirInlet(0.0);
@@ -5926,19 +5926,19 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
 
         // Get measured zone humidity ratio
-        state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredHumidityRatioSchedulePtr);
+        state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneMeasuredHumidityRatioSchedulePtr);
 
-        if (state.dataEnvrn->DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
+        if (state.dataEnvrn->DayOfYear >= state.dataHybridModel->HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= state.dataHybridModel->HybridModelZone(ZoneNum).HybridEndDayOfYear) {
             state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio;
 
             // Hybrid Model calculate air infiltration rate
-            if (HybridModelZone(ZoneNum).InfiltrationCalc_H && UseZoneTimeStepHistory) {
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_H && UseZoneTimeStepHistory) {
                 // Conditionally calculate the time dependent and time independent terms
-                if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
+                if (state.dataHybridModel->HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirHumidityRatioSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirHumidityRatioSchedulePtr);
 
                     SumSysM_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
                     SumSysMHumRat_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio;
@@ -5977,12 +5977,12 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             }
 
             // Hybrid Model calculate people count
-            if (HybridModelZone(ZoneNum).PeopleCountCalc_H && UseZoneTimeStepHistory) {
-                state.dataHeatBal->Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_H && UseZoneTimeStepHistory) {
+                state.dataHeatBal->Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
                 state.dataHeatBal->Zone(ZoneNum).ZonePeopleSensibleHeatFraction =
-                    GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleSensibleFractionSchedulePtr);
+                    GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleSensibleFractionSchedulePtr);
                 state.dataHeatBal->Zone(ZoneNum).ZonePeopleRadiantHeatFraction =
-                    GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleRadiationFractionSchedulePtr);
+                    GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleRadiationFractionSchedulePtr);
 
                 FractionSensible = state.dataHeatBal->Zone(ZoneNum).ZonePeopleSensibleHeatFraction;
 
@@ -5996,11 +5996,11 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
                 // Conditionally calculate the humidity-dependent and humidity-independent
                 // terms.
-                if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
+                if (state.dataHybridModel->HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirHumidityRatioSchedulePtr);
+                        GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneSupplyAirHumidityRatioSchedulePtr);
 
                     SumSysM_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
                     SumSysMHumRat_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio;
