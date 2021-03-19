@@ -130,7 +130,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     }
 
     if (found && !ErrorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
 
         // Simulate
         thisModel->initAndSim(state);

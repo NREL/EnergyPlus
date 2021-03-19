@@ -7517,32 +7517,29 @@ namespace EnergyPlus::SimAirServingZones {
         // type and name that match components list in primary air loop or outside air systems.
 
         // USE STATEMENTS:
-        using HVACHXAssistedCoolingCoil::GetCoilsInputFlag;
         using HVACHXAssistedCoolingCoil::GetHXAssistedCoolingCoilInput;
-        using HVACHXAssistedCoolingCoil::HXAssistedCoil;
-        using HVACHXAssistedCoolingCoil::TotalNumHXAssistedCoils;
 
         // Return value
         bool CheckWaterCoilSystemIsOnAirLoopOASystem(false);
 
-        if (GetCoilsInputFlag) {
+        if (state.dataHVACAssistedCC->GetCoilsInputFlag) {
             // Get the HXAssistedCoolingCoil input
             GetHXAssistedCoolingCoilInput(state);
-            GetCoilsInputFlag = false;
+            state.dataHVACAssistedCC->GetCoilsInputFlag = false;
         }
 
         bool WaterCoilIsOnWaterCoilSystem = false;
         std::string CoilSystemName = CompName;
         int CoilSystemTypeNum = CompTypeNum;
 
-        if (HVACHXAssistedCoolingCoil::TotalNumHXAssistedCoils > 0) {
+        if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
             // check if the water coil is placed on 'CoilSystem:Cooling:Water:HeatExchangerAssisted' object
-            for (int HXASSCoilNum = 1; HXASSCoilNum <= HVACHXAssistedCoolingCoil::TotalNumHXAssistedCoils; ++HXASSCoilNum) {
-                std::string CompType = HXAssistedCoil(HXASSCoilNum).CoolingCoilType;
+            for (int HXASSCoilNum = 1; HXASSCoilNum <= state.dataHVACAssistedCC->TotalNumHXAssistedCoils; ++HXASSCoilNum) {
+                std::string CompType = state.dataHVACAssistedCC->HXAssistedCoil(HXASSCoilNum).CoolingCoilType;
                 if ((UtilityRoutines::SameString(CompType, "Coil:Cooling:Water") ||
                      UtilityRoutines::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry")) &&
-                    UtilityRoutines::SameString(CompName, HXAssistedCoil(HXASSCoilNum).CoolingCoilName)) {
-                    CoilSystemName = HXAssistedCoil(HXASSCoilNum).Name;
+                    UtilityRoutines::SameString(CompName, state.dataHVACAssistedCC->HXAssistedCoil(HXASSCoilNum).CoolingCoilName)) {
+                    CoilSystemName = state.dataHVACAssistedCC->HXAssistedCoil(HXASSCoilNum).Name;
                     CoilSystemTypeNum = SimAirServingZones::WaterCoil_CoolingHXAsst;
                     WaterCoilIsOnWaterCoilSystem = true;
                     break;

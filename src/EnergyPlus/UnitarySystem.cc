@@ -11764,7 +11764,7 @@ namespace UnitarySystems {
                                                                                         HXUnitOn,
                                                                                         _,
                                                                                         state.dataUnitarySystems->economizerFlag);
-                                    TempOutletTempDXCoil = HVACHXAssistedCoolingCoil::HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
+                                    TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
                                 }
                                 TempMinPLR = TempMaxPLR;
                                 while ((TempOutletTempDXCoil - DesOutTemp) < 0.0 && TempMinPLR >= 0.0) {
@@ -11782,7 +11782,7 @@ namespace UnitarySystems {
                                                                                         HXUnitOn,
                                                                                         _,
                                                                                         state.dataUnitarySystems->economizerFlag);
-                                    TempOutletTempDXCoil = HVACHXAssistedCoolingCoil::HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
+                                    TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
                                 }
                                 // Relax boundary slightly to assure a solution can be found using RegulaFalsi (i.e. one boundary may
                                 // be very near the desired result)
@@ -12003,7 +12003,7 @@ namespace UnitarySystems {
                         HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
                             state, CompName, FirstHVACIteration, state.dataUnitarySystems->On, PartLoadFrac, this->m_CoolingCoilIndex, FanOpMode, HXUnitOn, _, state.dataUnitarySystems->economizerFlag);
 
-                        OutletTempDXCoil = HVACHXAssistedCoolingCoil::HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
+                        OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
 
                         //               FullOutput will be different than the FullOutput determined above during sensible PLR calculations
                         FullOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
@@ -12175,7 +12175,7 @@ namespace UnitarySystems {
                                                                                             HXUnitOn,
                                                                                             _,
                                                                                             state.dataUnitarySystems->economizerFlag);
-                                        OutletHumRatDXCoil = HVACHXAssistedCoolingCoil::HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
+                                        OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
                                     }
                                     TempMinPLR = TempMaxPLR;
                                     while ((OutletHumRatDXCoil - TempOutletHumRatDXCoil) <= 0.0 && TempMinPLR >= 0.0) {
@@ -12194,7 +12194,7 @@ namespace UnitarySystems {
                                                                                             HXUnitOn,
                                                                                             _,
                                                                                             state.dataUnitarySystems->economizerFlag);
-                                        OutletHumRatDXCoil = HVACHXAssistedCoolingCoil::HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
+                                        OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
                                     }
                                     //                   tighter boundary of solution has been found, CALL RegulaFalsi a second time
                                     TempSolveRoot::SolveRoot(state,
@@ -14658,7 +14658,7 @@ namespace UnitarySystems {
             state.dataLoopNodes->Node(thisSys.CoolCoilFluidInletNode).MassFlowRate = thisSys.MaxCoolCoilFluidFlow * PartLoadRatio;
         }
         HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state, CoilIndex, FirstHVACIteration, state.dataUnitarySystems->On, PartLoadRatio, HXUnitOn, FanOpMode);
-        Real64 OutletAirTemp = HVACHXAssistedCoolingCoil::HXAssistedCoilOutletTemp(CoilIndex);
+        Real64 OutletAirTemp = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(CoilIndex);
         Residuum = Par[2] - OutletAirTemp;
         return Residuum;
     }
@@ -14697,7 +14697,7 @@ namespace UnitarySystems {
         int FanOpMode = int(Par[5]);
         HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(
             state, CoilIndex, FirstHVACIteration, state.dataUnitarySystems->On, PartLoadRatio, HXUnitOn, FanOpMode, _, state.dataUnitarySystems->economizerFlag);
-        Real64 OutletAirHumRat = HVACHXAssistedCoolingCoil::HXAssistedCoilOutletHumRat(CoilIndex);
+        Real64 OutletAirHumRat = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(CoilIndex);
         Residuum = Par[2] - OutletAirHumRat;
         return Residuum;
     }

@@ -161,7 +161,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     }
 
     if (found && !ErrorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
         ShowFatalError(state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach--Errors getting input for ground temperature model");

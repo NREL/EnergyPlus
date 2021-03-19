@@ -122,7 +122,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     write_ground_temps(state.files.eio, "Shallow", thisModel->surfaceGroundTemps);
 
     if (!thisModel->errorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
         ShowContinueError(state, "Site:GroundTemperature:Shallow--Errors getting input for ground temperature model");

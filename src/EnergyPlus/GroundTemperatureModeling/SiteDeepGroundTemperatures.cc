@@ -123,7 +123,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     write_ground_temps(state.files.eio, "Deep", thisModel->deepGroundTemps);
 
     if (!thisModel->errorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
         ShowContinueError(state, "Site:GroundTemperature:Deep--Errors getting input for ground temperature model");

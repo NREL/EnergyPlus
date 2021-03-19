@@ -130,7 +130,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     write_ground_temps(state.files.eio, "BuildingSurface", thisModel->buildingSurfaceGroundTemps);
 
     if (!thisModel->errorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
         ShowContinueError(state, "Site:GroundTemperature:BuildingSurface--Errors getting input for ground temperature model");

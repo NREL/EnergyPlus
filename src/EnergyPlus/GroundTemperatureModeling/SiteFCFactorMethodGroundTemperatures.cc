@@ -138,7 +138,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     }
 
     if (found && !thisModel->errorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
         ShowContinueError(state, "Site:GroundTemperature:FCFactorMethod--Errors getting input for ground temperature model");

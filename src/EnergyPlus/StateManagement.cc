@@ -69,14 +69,10 @@
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
-#include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
@@ -123,8 +119,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     ElectricBaseboardRadiator::clear_state();
     FaultsManager::clear_state();
     FluidProperties::clear_state();
-    Furnaces::clear_state();
-    GroundTemperatureManager::clear_state();
     HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
     HeatBalanceSurfaceManager::clear_state();
@@ -134,9 +128,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HighTempRadiantSystem::clear_state();
     Humidifiers::clear_state();
     HVACCooledBeam::clear_state();
-    HVACDuct::clear_state();
     HVACDXSystem::clear_state();
-    HVACHXAssistedCoolingCoil::clear_state();
     HVACFan::clearHVACFanObjects();
     HVACSingleDuctInduc::clear_state();
     HysteresisPhaseChange::clear_state();

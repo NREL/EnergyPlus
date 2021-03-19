@@ -75,12 +75,6 @@ namespace HVACHXAssistedCoolingCoil {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int TotalNumHXAssistedCoils;                // The total number of HXAssistedCoolingCoil compound objects
-    extern Array1D<Real64> HXAssistedCoilOutletTemp;   // Outlet temperature from this compound object
-    extern Array1D<Real64> HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
-    // PUBLIC so others can access this information
-    extern bool GetCoilsInputFlag; // Flag to allow input data to be retrieved from idf on first call to this subroutine
-    extern Array1D_bool CheckEquipName;
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
@@ -140,11 +134,8 @@ namespace HVACHXAssistedCoolingCoil {
     };
 
     // Object Data
-    extern Array1D<HXAssistedCoilParameters> HXAssistedCoil;
 
     // Functions
-
-    void clear_state();
 
     void SimHXAssistedCoolingCoil(EnergyPlusData &state, std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,         // FirstHVACIteration flag
@@ -275,9 +266,24 @@ namespace HVACHXAssistedCoolingCoil {
 
 struct HVACHXAssistedCoolingCoilData : BaseGlobalStruct {
 
+    int TotalNumHXAssistedCoils = 0;             // The total number of HXAssistedCoolingCoil compound objects
+    Array1D<Real64> HXAssistedCoilOutletTemp;   // Outlet temperature from this compound object
+    Array1D<Real64> HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
+    bool GetCoilsInputFlag = true; // Flag to allow input data to be retrieved from idf on first call to this subroutine
+    Array1D_bool CheckEquipName;
+    std::unordered_map<std::string, std::string> UniqueHXAssistedCoilNames;
+
+    Array1D<HVACHXAssistedCoolingCoil::HXAssistedCoilParameters> HXAssistedCoil;
+
     void clear_state() override
     {
-
+        this->UniqueHXAssistedCoilNames.clear();
+        this->HXAssistedCoil.deallocate();
+        this->TotalNumHXAssistedCoils = 0;
+        this->HXAssistedCoilOutletTemp.deallocate();
+        this->HXAssistedCoilOutletHumRat.deallocate();
+        this->GetCoilsInputFlag = true;
+        this->CheckEquipName.deallocate();
     }
 };
 
