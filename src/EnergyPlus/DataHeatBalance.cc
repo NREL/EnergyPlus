@@ -785,7 +785,6 @@ namespace EnergyPlus::DataHeatBalance {
         int NewConstrNum; // Reverse Construction Number
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static Array1D_int LayerPoint(Construction::MaxLayersInConstruct, 0); // Pointer array which refers back to
         int nLayer;
         int Loop;
         bool Found;
@@ -798,10 +797,10 @@ namespace EnergyPlus::DataHeatBalance {
 
         state.dataConstruction->Construct(ConstrNum).IsUsed = true;
         nLayer = 0;
-        LayerPoint = 0;
+        state.dataConstruction->LayerPoint = 0;
         for (Loop = state.dataConstruction->Construct(ConstrNum).TotLayers; Loop >= 1; --Loop) {
             ++nLayer;
-            LayerPoint(nLayer) = state.dataConstruction->Construct(ConstrNum).LayerPoint(Loop);
+            state.dataConstruction->LayerPoint(nLayer) = state.dataConstruction->Construct(ConstrNum).LayerPoint(Loop);
         }
 
         // now, got thru and see if there is a match already....
@@ -809,7 +808,7 @@ namespace EnergyPlus::DataHeatBalance {
         for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
             Found = true;
             for (nLayer = 1; nLayer <= Construction::MaxLayersInConstruct; ++nLayer) {
-                if (state.dataConstruction->Construct(Loop).LayerPoint(nLayer) != LayerPoint(nLayer)) {
+                if (state.dataConstruction->Construct(Loop).LayerPoint(nLayer) != state.dataConstruction->LayerPoint(nLayer)) {
                     Found = false;
                     break;
                 }
@@ -836,9 +835,9 @@ namespace EnergyPlus::DataHeatBalance {
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).Name = "iz-" + state.dataConstruction->Construct(ConstrNum).Name;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
             for (nLayer = 1; nLayer <= Construction::MaxLayersInConstruct; ++nLayer) {
-                state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint(nLayer) = LayerPoint(nLayer);
-                if (LayerPoint(nLayer) != 0) {
-                    state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) += state.dataHeatBal->NominalR(LayerPoint(nLayer));
+                state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint(nLayer) = state.dataConstruction->LayerPoint(nLayer);
+                if (state.dataConstruction->LayerPoint(nLayer) != 0) {
+                    state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) += state.dataHeatBal->NominalR(state.dataConstruction->LayerPoint(nLayer));
                 }
             }
 
@@ -1413,11 +1412,11 @@ namespace EnergyPlus::DataHeatBalance {
         using DataSurfaces::ExternalEnvironment;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int loopSurfNum(0); // surface index
-        static int ConstrNum(0);   // construction index
-        static int NumLayers(0);   // number of material layers in a construction
-        static int Layer(0);       // construction material layer index
-        static int MaterNum(0);    // construction material index
+        int loopSurfNum(0); // surface index
+        int ConstrNum(0);   // construction index
+        int NumLayers(0);   // number of material layers in a construction
+        int Layer(0);       // construction material layer index
+        int MaterNum(0);    // construction material index
 
         for (loopSurfNum = 1; loopSurfNum <= state.dataSurface->TotSurfaces; ++loopSurfNum) {
 

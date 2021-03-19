@@ -480,7 +480,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     // Surface temps are 20C
     for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
-        DataHeatBalSurface::TH(2, 1, surf) = 20.0;
+        state->dataHeatBalSurf->TH(2, 1, surf) = 20.0;
     }
 
     // Case 1 - Zone air warmer than surfaces
@@ -597,7 +597,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataSurface->Surface.allocate( 1 );
     state->dataConstruction->Construct.allocate( 1 );
     state->dataHeatBal->Zone.allocate( 1 );
-    DataLoopNode::Node.allocate( 1 );
+    state->dataLoopNodes->Node.allocate( 1 );
 
     state->dataSurface->Surface( SurfNum ).Zone = 1;
     state->dataSurface->Surface( SurfNum ).Construction = 1;
@@ -607,12 +607,12 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataHeatBal->Zone( 1 ).Multiplier = 1.0;
     state->dataHeatBal->Zone( 1 ).ListMultiplier = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataLoopNode::Node( 1 ).Temp = 20.0;
+    state->dataLoopNodes->Node(1).Temp = 20.0;
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
     for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
-        DataHeatBalSurface::TH(2, 1, surf) = 20.0;
+        state->dataHeatBalSurf->TH(2, 1, surf) = 20.0;
     }
 
     state->dataHeatBalFanSys->MAT.allocate(1);
@@ -622,7 +622,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     // Case 1 - Low ACH (should default to CalcASHRAETARPNatural)
     Real64 ACH = 0.25;
     state->dataHeatBal->Zone( 1 ).Volume = 125.0;
-    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * state->dataHeatBal->Zone( 1 ).Volume * ACH;
+    state->dataLoopNodes->Node( 1 ).MassFlowRate = 1.17653/3600.0 * state->dataHeatBal->Zone( 1 ).Volume * ACH;
 
 
     // Test 1: Floor Diffuser Model
@@ -630,7 +630,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface( SurfNum ).CosTilt = -1;
 
-    HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface( SurfNum ).CosTilt);
+    HcExpectedValue =
+        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( state->dataSurface->Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
@@ -641,7 +642,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface( SurfNum ).CosTilt = 1;
 
-    HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface( SurfNum ).CosTilt);
+    HcExpectedValue =
+        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( state->dataSurface->Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
@@ -652,7 +654,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface( SurfNum ).CosTilt = 0;
 
-    HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface( SurfNum ).CosTilt);
+    HcExpectedValue =
+        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( state->dataSurface->Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
@@ -662,7 +665,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     // Case 2 - High ACH
     ACH = 3.1;
     state->dataHeatBal->Zone( 1 ).Volume = 125.0;
-    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * state->dataHeatBal->Zone( 1 ).Volume * ACH;
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.17653 / 3600.0 * state->dataHeatBal->Zone(1).Volume * ACH;
 
     // Test 1: Floor Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserFloor;
@@ -770,15 +773,15 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
     Real64 ZoneNode = state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
 
     // Test 1: Node not allocated, returns a zero ACH
-    if (allocated(DataLoopNode::Node)) DataLoopNode::Node.deallocate();
+    if (allocated(state->dataLoopNodes->Node)) state->dataLoopNodes->Node.deallocate();
     ACHExpected = 0.0;
     ACHAnswer = CalcZoneSystemACH(*state, ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
 
     // Test 2: Node now allocated, needs to return a proper ACH
-    DataLoopNode::Node.allocate(state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber);
-    DataLoopNode::Node(ZoneNode).Temp = 20.0;
-    DataLoopNode::Node(ZoneNode).MassFlowRate = 0.2;
+    state->dataLoopNodes->Node.allocate(state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber);
+    state->dataLoopNodes->Node(ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(ZoneNode).MassFlowRate = 0.2;
     ACHExpected = 6.11506;
     ACHAnswer = CalcZoneSystemACH(*state, ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
@@ -1592,14 +1595,14 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataHeatBalSurface::TempSurfInTmp.allocate(6);
-    DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
-    DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
-    DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(*state, DataHeatBalSurface::TempSurfInTmp);
+    state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
+    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
+    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
+    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->TempSurfInTmp);
 
     int algorithm_identifier;
 
@@ -1707,7 +1710,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
     algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonUnstableHorizontalOrTilt);
 
-    DataHeatBalSurface::TempSurfInTmp.deallocate();
+    state->dataHeatBalSurf->TempSurfInTmp.deallocate();
 }
 
 
@@ -1832,14 +1835,14 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataHeatBalSurface::TempSurfInTmp.allocate(6);
-    DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
-    DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
-    DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(*state, DataHeatBalSurface::TempSurfInTmp);
+    state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
+    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
+    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
+    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->TempSurfInTmp);
     ConvectionCoefficients::GetUserConvectionCoefficients(*state);
 
     int algorithm_identifier;
@@ -1948,7 +1951,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
     algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonUnstableHorizontalOrTilt);
 
-    DataHeatBalSurface::TempSurfInTmp.deallocate();
+    state->dataHeatBalSurf->TempSurfInTmp.deallocate();
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)

@@ -59,6 +59,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -76,9 +77,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace Fans {
+namespace EnergyPlus::Fans {
     // Module containing the fan simulation routines
 
     // MODULE INFORMATION:
@@ -93,12 +92,6 @@ namespace Fans {
     // To encapsulate the data and algorithms required to
     // manage the Fan System Component
 
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataHVACGlobals::BalancedExhMassFlow;
@@ -126,44 +119,6 @@ namespace Fans {
     using Psychrometrics::PsyTdbFnHW;
     using namespace ScheduleManager;
 
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of this module should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool MyOneTimeFlag(true);             // used for allocation in Init
-        bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
-
-        Array1D_bool MySizeFlag;
-        Array1D_bool MyEnvrnFlag;
-        Array1D_bool CheckEquipName;
-    } // namespace
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Utility routines for module
-
-    // Object Data
-    Array1D<FanEquipConditions> Fan;
-    std::unordered_map<std::string, std::string> UniqueFanNames;
-    Array1D<NightVentPerfData> NightVentPerf;
-    Array1D<FanNumericFieldData> FanNumericFields;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
     void SimulateFanComponents(EnergyPlusData &state,
                                std::string const &CompName,
                                bool const FirstHVACIteration,
@@ -184,12 +139,10 @@ namespace Fans {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages Fan component simulation.
 
-        // Using/Aliasing
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanNum; // current fan number
 
-
+        auto & Fan(state.dataFans->Fan);
 
         // Obtains and Allocates fan related parameters from input file
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -212,7 +165,7 @@ namespace Fans {
                                       state.dataFans->NumFans,
                                       CompName));
             }
-            if (CheckEquipName(FanNum)) {
+            if (state.dataFans->CheckEquipName(FanNum)) {
                 if (!CompName.empty() && CompName != Fan(FanNum).FanName) {
                     ShowFatalError(state,
                                    format("SimulateFanComponents: Invalid CompIndex passed={}, Fan name={}, stored Fan Name for that index={}",
@@ -220,7 +173,7 @@ namespace Fans {
                                           CompName,
                                           Fan(FanNum).FanName));
                 }
-                CheckEquipName(FanNum) = false;
+                state.dataFans->CheckEquipName(FanNum) = false;
             }
         }
 
@@ -280,9 +233,6 @@ namespace Fans {
         // PURPOSE OF THIS SUBROUTINE:
         // Obtains input data for fans and stores it in fan data structures
 
-        // METHODOLOGY EMPLOYED:
-        // Uses "Get" routines to read in data.
-
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
@@ -318,6 +268,11 @@ namespace Fans {
         int NumParams;
         int MaxAlphas;
         int MaxNumbers;
+
+        auto & Fan(state.dataFans->Fan);
+        auto & FanNumericFields(state.dataFans->FanNumericFields);
+        auto & UniqueFanNames(state.dataFans->UniqueFanNames);
+        auto & NightVentPerf(state.dataFans->NightVentPerf);
 
         state.dataFans->GetFanInputFlag = false;
 
@@ -374,7 +329,7 @@ namespace Fans {
             FanNumericFields.allocate(state.dataFans->NumFans);
             UniqueFanNames.reserve(state.dataFans->NumFans);
         }
-        CheckEquipName.dimension(state.dataFans->NumFans, true);
+        state.dataFans->CheckEquipName.dimension(state.dataFans->NumFans, true);
 
         for (SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum) {
             FanNum = SimpFanNum;
@@ -425,9 +380,9 @@ namespace Fans {
             Fan(FanNum).MinAirFlowRate = 0.0;
 
             Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 4) {
                 Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(5);
@@ -508,9 +463,9 @@ namespace Fans {
                 ShowContinueError(state, "For " + cCurrentModuleObject + ", Fan=" + cAlphaArgs(1));
             }
             Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 5) {
                 Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(6);
@@ -579,9 +534,9 @@ namespace Fans {
             }
 
             Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
                 Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(5);
@@ -637,18 +592,31 @@ namespace Fans {
             }
 
             if (NumAlphas > 8 && !lAlphaFieldBlanks(9)) {
-                Fan(FanNum).BalancedFractSchedNum = GetScheduleIndex(state, cAlphaArgs(9));
-                if (Fan(FanNum).BalancedFractSchedNum == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " entered =" + cAlphaArgs(9) + " for " +
-                                    cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                    ErrorsFound = true;
-                } else if (Fan(FanNum).BalancedFractSchedNum > 0) {
-                    if (!CheckScheduleValueMinMax(state, Fan(FanNum).BalancedFractSchedNum, ">=", 0.0, "<=", 1.0)) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " for " + cAlphaFieldNames(1) +
-                                        '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Error found in " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
-                        ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
+
+                if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) {
+                    // do not include adjusted for "balanced" exhaust flow in the zone total return calculation
+                    ShowWarningError(state,
+                                     RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9) +
+                                         " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                    ShowContinueError(state, "When zone air mass flow balance is enforced, this input field should be left blank.");
+                    ShowContinueError(state, "This schedule will be ignored in the simulation.");
+                    Fan(FanNum).BalancedFractSchedNum = 0;
+                } else {
+                    Fan(FanNum).BalancedFractSchedNum = GetScheduleIndex(state, cAlphaArgs(9));
+                    if (Fan(FanNum).BalancedFractSchedNum == 0) {
+                        ShowSevereError(state,
+                                        RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " entered =" + cAlphaArgs(9) +
+                                            " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
+                    } else if (Fan(FanNum).BalancedFractSchedNum > 0) {
+                        if (!CheckScheduleValueMinMax(state, Fan(FanNum).BalancedFractSchedNum, ">=", 0.0, "<=", 1.0)) {
+                            ShowSevereError(state,
+                                            RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " for " + cAlphaFieldNames(1) +
+                                                '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "Error found in " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
+                            ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
+                            ErrorsFound = true;
+                        }
                     }
                 }
             } else {
@@ -711,9 +679,9 @@ namespace Fans {
             Fan(FanNum).MinAirFlowRate = 0.0;
 
             Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
                 Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex = GetCurveIndex(state, cAlphaArgs(5));
@@ -813,16 +781,16 @@ namespace Fans {
                                                          ErrorsFound,
                                                          cCurrentModuleObject,
                                                          cAlphaArgs(1),
-                                                         NodeType_Air,
-                                                         NodeConnectionType_Inlet,
+                                                         DataLoopNode::NodeFluidType::Air,
+                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                          1,
                                                          ObjectIsNotParent); // Air inlet node name
             Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state, cAlphaArgs(3),
                                                           ErrorsFound,
                                                           cCurrentModuleObject,
                                                           cAlphaArgs(1),
-                                                          NodeType_Air,
-                                                          NodeConnectionType_Outlet,
+                                                          DataLoopNode::NodeFluidType::Air,
+                                                          DataLoopNode::NodeConnectionType::Outlet,
                                                           1,
                                                           ObjectIsNotParent); // Air outlet node name
 
@@ -904,14 +872,14 @@ namespace Fans {
                     ShowSevereError(state, "GetFanInput, duplicate fan inlet node names, must be unique for fans.");
                     ShowContinueError(state, "Fan=" + Fan(FanNum).FanType + ':' + Fan(FanNum).FanName + " and Fan=" + Fan(checkNum).FanType + ':' +
                                       Fan(checkNum).FanName + '.');
-                    ShowContinueError(state, "Inlet Node Name=\"" + NodeID(Fan(FanNum).InletNodeNum) + "\".");
+                    ShowContinueError(state, "Inlet Node Name=\"" + state.dataLoopNodes->NodeID(Fan(FanNum).InletNodeNum) + "\".");
                 }
                 if (Fan(FanNum).OutletNodeNum == Fan(checkNum).OutletNodeNum) {
                     ErrorsFound = true;
                     ShowSevereError(state, "GetFanInput, duplicate fan outlet node names, must be unique for fans.");
                     ShowContinueError(state, "Fan=" + Fan(FanNum).FanType + ':' + Fan(FanNum).FanName + " and Fan=" + Fan(checkNum).FanType + ':' +
                                       Fan(checkNum).FanName + '.');
-                    ShowContinueError(state, "Outlet Node Name=\"" + NodeID(Fan(FanNum).OutletNodeNum) + "\".");
+                    ShowContinueError(state, "Outlet Node Name=\"" + state.dataLoopNodes->NodeID(Fan(FanNum).OutletNodeNum) + "\".");
                 }
             }
         }
@@ -988,7 +956,7 @@ namespace Fans {
 
         bool anyRan;
         ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
-        MySizeFlag.dimension(state.dataFans->NumFans, true);
+        state.dataFans->MySizeFlag.dimension(state.dataFans->NumFans, true);
     }
 
     // End of Get Input subroutines for the HB Module
@@ -1024,18 +992,19 @@ namespace Fans {
         int OutNode;
         int Loop;
 
+        auto & Fan(state.dataFans->Fan);
+        auto & NightVentPerf(state.dataFans->NightVentPerf);
 
+        if (state.dataFans->MyOneTimeFlag) {
 
-        if (MyOneTimeFlag) {
+            state.dataFans->MyEnvrnFlag.dimension(state.dataFans->NumFans, true);
 
-            MyEnvrnFlag.dimension(state.dataFans->NumFans, true);
-
-            MyOneTimeFlag = false;
+            state.dataFans->MyOneTimeFlag = false;
         }
 
         // need to check all fans to see if they are on Zone Equipment List or issue warning
-        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
+        if (!state.dataFans->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
+            state.dataFans->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataFans->NumFans; ++Loop) {
                 if (!UtilityRoutines::SameString(Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
                 if (CheckZoneEquipmentList(state, Fan(Loop).FanType, Fan(Loop).FanName)) continue;
@@ -1044,7 +1013,7 @@ namespace Fans {
             }
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FanNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataFans->MySizeFlag(FanNum)) {
 
             SizeFan(state, FanNum);
             // Set the loop cycling flag
@@ -1054,11 +1023,11 @@ namespace Fans {
                 }
             }
 
-            MySizeFlag(FanNum) = false;
+            state.dataFans->MySizeFlag(FanNum) = false;
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(FanNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataFans->MyEnvrnFlag(FanNum)) {
 
             // For all Fan inlet nodes convert the Volume flow to a mass flow
             // unused0909    InNode = Fan(FanNum)%InletNodeNum
@@ -1081,7 +1050,7 @@ namespace Fans {
             }
 
             // Init the Node Control variables
-            Node(OutNode).MassFlowRateMax = Fan(FanNum).MaxAirMassFlowRate;
+            state.dataLoopNodes->Node(OutNode).MassFlowRateMax = Fan(FanNum).MaxAirMassFlowRate;
             // According to the IO Ref guide:
             // "Note that this field is only used to calculate the fan power.
             // This field does not enforce the system air flow rate during simulation"
@@ -1093,11 +1062,11 @@ namespace Fans {
             Fan(FanNum).PowerLossToAir = 0.0;
             Fan(FanNum).FanEnergy = 0.0;
 
-            MyEnvrnFlag(FanNum) = false;
+            state.dataFans->MyEnvrnFlag(FanNum) = false;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(FanNum) = true;
+            state.dataFans->MyEnvrnFlag(FanNum) = true;
         }
 
         // Do the Begin Day initializations
@@ -1115,14 +1084,16 @@ namespace Fans {
         InletNode = Fan(FanNum).InletNodeNum;
         OutletNode = Fan(FanNum).OutletNodeNum;
 
-        Fan(FanNum).MassFlowRateMaxAvail = min(Node(OutletNode).MassFlowRateMax, Node(InletNode).MassFlowRateMaxAvail);
+        Fan(FanNum).MassFlowRateMaxAvail =
+            min(state.dataLoopNodes->Node(OutletNode).MassFlowRateMax, state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
         Fan(FanNum).MassFlowRateMinAvail =
-            min(max(Node(OutletNode).MassFlowRateMin, Node(InletNode).MassFlowRateMinAvail), Node(InletNode).MassFlowRateMaxAvail);
+            min(max(state.dataLoopNodes->Node(OutletNode).MassFlowRateMin, state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail),
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
 
         // Load the node data in this section for the component simulation
         // First need to make sure that the MassFlowRate is between the max and min avail.
         if (Fan(FanNum).FanType_Num != FanType_ZoneExhaust) {
-            Fan(FanNum).InletAirMassFlowRate = min(Node(InletNode).MassFlowRate, Fan(FanNum).MassFlowRateMaxAvail);
+            Fan(FanNum).InletAirMassFlowRate = min(state.dataLoopNodes->Node(InletNode).MassFlowRate, Fan(FanNum).MassFlowRateMaxAvail);
             Fan(FanNum).InletAirMassFlowRate = max(Fan(FanNum).InletAirMassFlowRate, Fan(FanNum).MassFlowRateMinAvail);
         } else { // zone exhaust fans
             Fan(FanNum).MassFlowRateMaxAvail = Fan(FanNum).MaxAirMassFlowRate;
@@ -1138,9 +1109,9 @@ namespace Fans {
         }
 
         // Then set the other conditions
-        Fan(FanNum).InletAirTemp = Node(InletNode).Temp;
-        Fan(FanNum).InletAirHumRat = Node(InletNode).HumRat;
-        Fan(FanNum).InletAirEnthalpy = Node(InletNode).Enthalpy;
+        Fan(FanNum).InletAirTemp = state.dataLoopNodes->Node(InletNode).Temp;
+        Fan(FanNum).InletAirHumRat = state.dataLoopNodes->Node(InletNode).HumRat;
+        Fan(FanNum).InletAirEnthalpy = state.dataLoopNodes->Node(InletNode).Enthalpy;
     }
 
     void SizeFan(EnergyPlusData &state, int const FanNum)
@@ -1160,26 +1131,14 @@ namespace Fans {
         // METHODOLOGY EMPLOYED:
         // Obtains flow rates from the zone or system sizing arrays.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSizing;
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeFan: "); // include trailing blank space
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NVPerfNum;                     // Index to night ventialation performance object
@@ -1210,6 +1169,10 @@ namespace Fans {
         Real64 TempFlow;                   // autosized flow rate of fan [m3/s]
         int FieldNum = 2;                  // IDD numeric field number where input field description is found
         int NumFansSized = 0;              // counter used to deallocate temporary string array after all fans have been sized
+
+        auto & Fan(state.dataFans->Fan);
+        auto & FanNumericFields(state.dataFans->FanNumericFields);
+        auto & NightVentPerf(state.dataFans->NightVentPerf);
 
         if (Fan(FanNum).FanType_Num == FanType_ComponentModel) {
             FieldNum = 1;
@@ -1480,12 +1443,6 @@ namespace Fans {
         if (++NumFansSized == state.dataFans->NumFans) FanNumericFields.deallocate(); // remove temporary array for field names at end of sizing
     }
 
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
     void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     {
 
@@ -1507,21 +1464,6 @@ namespace Fans {
         // REFERENCES:
         // ASHRAE HVAC 2 Toolkit, page 2-3 (FANSIM)
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhoAir;
         Real64 DeltaPress; // [N/m2]
@@ -1529,11 +1471,12 @@ namespace Fans {
         Real64 MotInAirFrac;
         Real64 MotEff;
         Real64 MassFlow; // [kg/sec]
-        // unused0909      REAL(r64) Tin         ! [C]
-        // unused0909      REAL(r64) Win
         Real64 FanShaftPower; // power delivered to fan shaft
 
         int NVPerfNum;
+
+        auto & Fan(state.dataFans->Fan);
+        auto & NightVentPerf(state.dataFans->NightVentPerf);
 
         NVPerfNum = Fan(FanNum).NVPerfNum;
 
@@ -1640,21 +1583,6 @@ namespace Fans {
         // REFERENCES:
         // ASHRAE HVAC 2 Toolkit, page 2-3 (FANSIM)
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhoAir;
         Real64 DeltaPress; // [N/m2 = Pa]
@@ -1665,10 +1593,7 @@ namespace Fans {
         Real64 MotInAirFrac;
         Real64 MotEff;
         Real64 MassFlow; // [kg/sec]
-        // unused0909      REAL(r64) Tin         ! [C]
-        // unused0909      REAL(r64) Win
         Real64 PartLoadFrac;
-        // unused0909      REAL(r64) MaxFlowFrac   !Variable Volume Fan Max Flow Fraction [-]
         Real64 MinFlowFrac;                  // Variable Volume Fan Min Flow Fraction [-]
         static Real64 FlowFracForPower(0.0); // Variable Volume Fan Flow Fraction for power calcs[-]
         static Real64 FlowFracActual(0.0);   // actual VAV fan flow fraction
@@ -1686,6 +1611,9 @@ namespace Fans {
         // INLET VANE DAMPERS   0.35071223   0.30850535   -0.54137364   0.87198823  0.000
         // DISCHARGE DAMPERS    0.37073425   0.97250253   -0.34240761   0.000       0.000
         // VARIABLE SPEED MOTOR 0.0015302446 0.0052080574  1.1086242   -0.11635563  0.000
+
+        auto & Fan(state.dataFans->Fan);
+        auto & NightVentPerf(state.dataFans->NightVentPerf);
 
         NVPerfNum = Fan(FanNum).NVPerfNum;
         MaxAirFlowRate = Fan(FanNum).MaxAirFlowRate;
@@ -1857,35 +1785,21 @@ namespace Fans {
         // Using/Aliasing
         using CurveManager::CurveValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhoAir;
         Real64 DeltaPress; // [N/m2]
         Real64 FanEff;
         Real64 MassFlow;           // [kg/sec]
         Real64 MaxAirMassFlowRate; // [kg/sec]
-        // unused0909      REAL(r64) Tin         ! [C]
-        // unused0909      REAL(r64) Win
         Real64 PartLoadRatio;        // Ratio of actual mass flow rate to max mass flow rate
         Real64 FlowFrac;             // Actual Fan Flow Fraction = actual mass flow rate / max air mass flow rate
         Real64 FanShaftPower;        // power delivered to fan shaft
         Real64 SpeedRaisedToPower;   // Result of the speed ratio raised to the power of n (Curve object)
-        Real64 EffRatioAtSpeedRatio; // Efficeincy ratio at current speed ratio (Curve object)
+        Real64 EffRatioAtSpeedRatio; // Efficiency ratio at current speed ratio (Curve object)
         static int ErrCount(0);
 
-        // unused0909   Tin        = Fan(FanNum)%InletAirTemp
-        // unused0909   Win        = Fan(FanNum)%InletAirHumRat
+        auto & Fan(state.dataFans->Fan);
+
         MassFlow = Fan(FanNum).InletAirMassFlowRate;
         MaxAirMassFlowRate = Fan(FanNum).MaxAirMassFlowRate;
         DeltaPress = Fan(FanNum).DeltaPress;
@@ -2046,21 +1960,6 @@ namespace Fans {
         // REFERENCES:
         // ASHRAE HVAC 2 Toolkit, page 2-3 (FANSIM)
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhoAir;
         Real64 DeltaPress; // [N/m2]
@@ -2068,6 +1967,8 @@ namespace Fans {
         Real64 MassFlow;           // [kg/sec]
         Real64 Tin;                // [C]
         bool FanIsRunning = false; // There seems to be a missing else case below unless false is assumed
+
+        auto & Fan(state.dataFans->Fan);
 
         DeltaPress = Fan(FanNum).DeltaPress;
         if (Fan(FanNum).EMSFanPressureOverrideOn) DeltaPress = Fan(FanNum).EMSFanPressureValue;
@@ -2175,45 +2076,15 @@ namespace Fans {
         // Calculate air temperature rise due to fan (and belt+motor if in airstream) power entering air-handler airflow
         // Calculate output node conditions
 
-        // REFERENCES:
-        // TBD
-
         // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using namespace OutputReportPredefined;
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NVPerfNum;
 
         Real64 MaxAirMassFlowRate; // Fan Max mass airflow [kg/s]
-        // unused062011  REAL(r64) MinFlowFrac        ! Fan Min Volumetric airflow Fraction [-]
-        // unused062011  REAL(r64) FlowFrac           ! Fan Volumetric airflow Fraction [-]
-
-        // unused062011  REAL(r64) DeltaPress         ! Delta Pressure Across the Fan (Fan Static Pressure Rise) [N/m2 = Pa]
-        // unused062011  REAL(r64) FanAirPower        ! Air power for Fan being Simulated [W]
-        // unused062011  REAL(r64) FanSpd             ! Fan shaft rotational speed [rpm]
-        // unused062011  REAL(r64) FanTrq             ! Fan shaft torque [N-m]
-        // unused062011  REAL(r64) FanWheelEff        ! Fan efficiency (mechanical) [-]
-        // unused062011  REAL(r64) FanShaftPower      ! Shaft input power for Fan being Simulated [W]
-        // unused062011  REAL(r64) BeltEff            ! Belt efficiency (mechanical) [-]
-        // unused062011  REAL(r64) BeltInputPower     ! Belt input power for Fan being Simulated [W]
-        // unused062011  REAL(r64) MotEff             ! Fan motor efficiency [-]
-        // unused062011  REAL(r64) MotorInputPower    ! Motor input power for Fan being Simulated [W]
-        // unused062011  REAL(r64) VFDEff             ! VFD efficiency (electrical) [-]
-        // unused062011  REAL(r64) VFDInputPower      ! VFD input power for Fan being Simulated [W]
-        // unused062011  REAL(r64) FanEff             ! Fan total system efficiency (fan*belt*motor*VFD) [-]
         Real64 MotInAirFrac; // Fraction of fan power input to airstream
 
         // Local variables
@@ -2235,6 +2106,9 @@ namespace Fans {
         static Real64 VFDSpdRatio(0.0);    // Ratio of motor speed to motor max speed [-]
         static Real64 VFDOutPwrRatio(0.0); // Ratio of VFD output power to max VFD output power [-]
         Real64 FanEnthalpyChange;          // Air enthalpy change due to fan, belt, and motor losses [kJ/kg]
+
+        auto & NightVentPerf(state.dataFans->NightVentPerf);
+        auto & Fan(state.dataFans->Fan);
 
         // Get inputs for night ventilation option
         NVPerfNum = Fan(FanNum).NVPerfNum;
@@ -2407,12 +2281,6 @@ namespace Fans {
         }
     }
 
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the Fan Module
-    // *****************************************************************************
-
     void UpdateFan(EnergyPlusData &state, int const FanNum)
     {
 
@@ -2432,25 +2300,27 @@ namespace Fans {
         int OutletNode;
         int InletNode;
 
+        auto & Fan(state.dataFans->Fan);
+
         OutletNode = Fan(FanNum).OutletNodeNum;
         InletNode = Fan(FanNum).InletNodeNum;
 
         // Set the outlet air nodes of the fan
-        Node(OutletNode).MassFlowRate = Fan(FanNum).OutletAirMassFlowRate;
-        Node(OutletNode).Temp = Fan(FanNum).OutletAirTemp;
-        Node(OutletNode).HumRat = Fan(FanNum).OutletAirHumRat;
-        Node(OutletNode).Enthalpy = Fan(FanNum).OutletAirEnthalpy;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRate = Fan(FanNum).OutletAirMassFlowRate;
+        state.dataLoopNodes->Node(OutletNode).Temp = Fan(FanNum).OutletAirTemp;
+        state.dataLoopNodes->Node(OutletNode).HumRat = Fan(FanNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(OutletNode).Enthalpy = Fan(FanNum).OutletAirEnthalpy;
         // Set the outlet nodes for properties that just pass through & not used
-        Node(OutletNode).Quality = Node(InletNode).Quality;
-        Node(OutletNode).Press = Node(InletNode).Press;
+        state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
+        state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
 
         // Set the Node Flow Control Variables from the Fan Control Variables
-        Node(OutletNode).MassFlowRateMaxAvail = Fan(FanNum).MassFlowRateMaxAvail;
-        Node(OutletNode).MassFlowRateMinAvail = Fan(FanNum).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = Fan(FanNum).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = Fan(FanNum).MassFlowRateMinAvail;
 
         if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
-            Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
-            if (AirflowNetwork::AirflowNetworkNumOfExhFan == 0) {
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
+            if (state.dataAirflowNetwork->AirflowNetworkNumOfExhFan == 0) {
                 UnbalExhMassFlow = Fan(FanNum).InletAirMassFlowRate;
                 if (Fan(FanNum).BalancedFractSchedNum > 0) {
                     BalancedExhMassFlow = UnbalExhMassFlow * GetCurrentScheduleValue(state, Fan(FanNum).BalancedFractSchedNum);
@@ -2467,19 +2337,13 @@ namespace Fans {
         }
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(OutletNode).CO2 = Node(InletNode).CO2;
+            state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(OutletNode).GenContam = Node(InletNode).GenContam;
+            state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
         }
     }
-
-    //        End of Update subroutines for the Fan Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the Fan Module
-    // *****************************************************************************
 
     void ReportFan(EnergyPlusData &state, int const FanNum)
     {
@@ -2493,29 +2357,10 @@ namespace Fans {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the fans.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
+        auto & Fan(state.dataFans->Fan);
 
         Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
         Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
@@ -2526,12 +2371,6 @@ namespace Fans {
             }
         }
     }
-
-    //        End of Reporting subroutines for the Fan Module
-    // *****************************************************************************
-
-    // Beginning of Utility subroutines for the Fan Module
-    // *****************************************************************************
 
     void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType)
     {
@@ -2551,7 +2390,7 @@ namespace Fans {
             state.dataFans->GetFanInputFlag = false;
         }
 
-        FanIndex = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
+        FanIndex = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
         if (FanIndex == 0) {
             if (present(ThisObjectType)) {
                 ShowSevereError(state, ThisObjectType() + ", GetFanIndex: Fan not found=" + FanName);
@@ -2562,7 +2401,7 @@ namespace Fans {
         }
     }
 
-    void GetFanVolFlow(int const FanIndex, Real64 &FanVolFlow)
+    void GetFanVolFlow(EnergyPlusData &state, int const FanIndex, Real64 &FanVolFlow)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2575,38 +2414,14 @@ namespace Fans {
         // This subroutine gets the fan volumetric flow for use by zone equipment (e.g. Packaged Terminal Heat Pump)
         // Zone equipment must ensure that a properly sized fan is used to meet the maximum supply air flow rate
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (FanIndex == 0) {
             FanVolFlow = 0.0;
         } else {
-            FanVolFlow = Fan(FanIndex).MaxAirFlowRate;
+            FanVolFlow = state.dataFans->Fan(FanIndex).MaxAirFlowRate;
         }
     }
 
-    Real64 GetFanPower(int const FanIndex)
+    Real64 GetFanPower(EnergyPlusData &state, int const FanIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2618,34 +2433,10 @@ namespace Fans {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the fan power draw
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (FanIndex == 0) {
             return 0.0;
         } else {
-            return Fan(FanIndex).FanPower;
+            return state.dataFans->Fan(FanIndex).FanPower;
         }
     }
 
@@ -2670,6 +2461,8 @@ namespace Fans {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanIndex;
+
+        auto & Fan(state.dataFans->Fan);
 
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
             GetFanInput(state);
@@ -2716,6 +2509,8 @@ namespace Fans {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichFan;
+
+        auto & Fan(state.dataFans->Fan);
 
         // Obtains and Allocates fan related parameters from input file
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -2764,6 +2559,8 @@ namespace Fans {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichFan;
 
+        auto & Fan(state.dataFans->Fan);
+
         // Obtains and Allocates fan related parameters from input file
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
             GetFanInput(state);
@@ -2789,6 +2586,8 @@ namespace Fans {
     {
 
         int NodeNumber = 0; // returned outlet node of matched fan
+
+        auto & Fan(state.dataFans->Fan);
 
         // Obtains and Allocates fan related parameters from input file
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -2829,6 +2628,8 @@ namespace Fans {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichFan;
+
+        auto & Fan(state.dataFans->Fan);
 
         // Obtains and Allocates fan related parameters from input file
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -2872,6 +2673,8 @@ namespace Fans {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichFan;
 
+        auto & Fan(state.dataFans->Fan);
+
         // Obtains and Allocates fan related parameters from input file
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
             GetFanInput(state);
@@ -2913,6 +2716,8 @@ namespace Fans {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichFan;
+
+        auto & Fan(state.dataFans->Fan);
 
         // Obtains and Allocates fan related parameters from input file
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -2963,28 +2768,10 @@ namespace Fans {
         // information from the ZoneHVAC:EnergyRecoveryVentilator object.
         // This is an illustration of setting data from an outside source.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WhichFan; // index to generic HX
+
+        auto & Fan(state.dataFans->Fan);
 
         // Obtains and Allocates fan related parameters from input file
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -3013,7 +2800,7 @@ namespace Fans {
         }
     }
 
-    Real64 FanDesDT(EnergyPlusData &state,
+    [[maybe_unused]] Real64 FanDesDT(EnergyPlusData &state,
                     int const FanNum,                        // index of fan in Fan array
                     [[maybe_unused]] Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     )
@@ -3044,7 +2831,9 @@ namespace Fans {
         Real64 TotEff;       // fan design total efficiency
         Real64 MotEff;       // fan design motor efficiency
         Real64 MotInAirFrac; // fraction of motor in the air stream
-        //
+
+        auto & Fan(state.dataFans->Fan);
+
         if (FanNum == 0) {
             DesignDeltaT = 0.0;
         } else if (Fan(FanNum).FanType_Num != FanType_ComponentModel) {
@@ -3082,33 +2871,13 @@ namespace Fans {
         // Calculate the decrease of the fan air flow rate, given the fan curve
         // and the increase of fan pressure rise due to fouling air filters
 
-        // METHODOLOGY EMPLOYED:
-        // NA
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace CurveManager;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FanFaultyAirFlowRate; // Fan Volume Flow Rate in the Faulty Case [m3/sec]
         Real64 FanCalDeltaPress;     // Calculated Fan Delta Pressure for temp use [Pa]
         Real64 FanCalDeltaPresstemp; // Calculated Fan Delta Pressure for temp use [Pa]
-
-
 
         // Check whether the fan curve covers the design operational point of the fan
         FanCalDeltaPress = CurveValue(state, FanCurvePtr, FanDesignAirFlowRate);
@@ -3169,7 +2938,9 @@ namespace Fans {
         Real64 MotEff;       // fan design motor efficiency
         Real64 MotInAirFrac; // fraction of motor in the air stream
         Real64 FanPowerTot;  // total fan power consumption [W]
-        //
+
+        auto & Fan(state.dataFans->Fan);
+
         if (FanNum == 0) {
             DesignHeatGain = 0.0;
         } else if (Fan(FanNum).FanType_Num != FanType_ComponentModel) {
@@ -3180,9 +2951,9 @@ namespace Fans {
             FanPowerTot = (FanVolFlow * DeltaP) / TotEff;
             DesignHeatGain = MotEff * FanPowerTot + (FanPowerTot - MotEff * FanPowerTot) * MotInAirFrac;
         } else {
-            if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FanNum)) {
+            if (!state.dataGlobal->SysSizingCalc && state.dataFans->MySizeFlag(FanNum)) {
                 SizeFan(state, FanNum);
-                MySizeFlag(FanNum) = false;
+                state.dataFans->MySizeFlag(FanNum) = false;
             }
             DesignHeatGain = Fan(FanNum).FanShaftPower + (Fan(FanNum).MotorInputPower - Fan(FanNum).FanShaftPower) * Fan(FanNum).MotInAirFrac;
         }
@@ -3208,6 +2979,9 @@ namespace Fans {
         fanShaftPow = 0.0;
         motInPower = 0.0;
         fanCompModel = false;
+
+        auto & Fan(state.dataFans->Fan);
+
         if (fanIndex <= 0) {
             return;
         } else if (Fan(fanIndex).FanType_Num != FanType_ComponentModel) {
@@ -3216,9 +2990,9 @@ namespace Fans {
             totEff = Fan(fanIndex).FanEff;
             motInAirFrac = Fan(fanIndex).MotInAirFrac;
         } else {
-            if (!state.dataGlobal->SysSizingCalc && MySizeFlag(fanIndex)) {
+            if (!state.dataGlobal->SysSizingCalc && state.dataFans->MySizeFlag(fanIndex)) {
                 SizeFan(state, fanIndex);
-                MySizeFlag(fanIndex) = false;
+                state.dataFans->MySizeFlag(fanIndex) = false;
             }
             fanCompModel = true;
             fanShaftPow = Fan(fanIndex).FanShaftPower;
@@ -3227,30 +3001,9 @@ namespace Fans {
         }
     }
 
-    // Clears the global data in Fans.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
+    void SetFanAirLoopNumber(EnergyPlusData &state, int const FanIndex, int const AirLoopNum)
     {
-        MyOneTimeFlag = true;
-        ZoneEquipmentListChecked = false;
-
-        CheckEquipName.deallocate();
-        MySizeFlag.deallocate();
-        MyEnvrnFlag.deallocate();
-        Fan.deallocate();
-        NightVentPerf.deallocate();
-        FanNumericFields.deallocate();
-        UniqueFanNames.clear();
+        state.dataFans->Fan(FanIndex).AirLoopNum = AirLoopNum;
     }
-
-    void SetFanAirLoopNumber(int const FanIndex, int const AirLoopNum)
-    {
-        Fan(FanIndex).AirLoopNum = AirLoopNum;
-    }
-
-    // End of Utility subroutines for the Fan Module
-    // *****************************************************************************
-
-} // namespace Fans
 
 } // namespace EnergyPlus

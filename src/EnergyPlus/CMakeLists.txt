@@ -171,7 +171,6 @@ set(SRC
     DataDefineEquip.hh
     DataEnvironment.cc
     DataEnvironment.hh
-    DataErrorTracking.cc
     DataErrorTracking.hh
     DataGenerators.hh
     DataGlobalConstants.cc
@@ -183,33 +182,24 @@ set(SRC
     DataHVACGlobals.hh
     DataHVACSystems.hh
     DataHeatBalFanSys.hh
-    DataHeatBalSurface.cc
     DataHeatBalSurface.hh
     DataHeatBalance.cc
     DataHeatBalance.hh
     DataIPShortCuts.cc
     DataIPShortCuts.hh
-    DataLoopNode.cc
     DataLoopNode.hh
-    DataMoistureBalance.cc
     DataMoistureBalance.hh
-    DataMoistureBalanceEMPD.cc
     DataMoistureBalanceEMPD.hh
     DataOutputs.cc
     DataOutputs.hh
     DataPhotovoltaics.cc
     DataPhotovoltaics.hh
-    DataPrecisionGlobals.cc
     DataPrecisionGlobals.hh
-    DataReportingFlags.cc
     DataReportingFlags.hh
-    DataRoomAirModel.cc
     DataRoomAirModel.hh
-    DataRootFinder.cc
     DataRootFinder.hh
     DataRuntimeLanguage.cc
     DataRuntimeLanguage.hh
-    DataShadowingCombinations.cc
     DataShadowingCombinations.hh
     DataSizing.cc
     DataSizing.hh
@@ -225,13 +215,11 @@ set(SRC
     DataSystemVariables.hh
     DataTimings.cc
     DataTimings.hh
-    DataUCSDSharedData.cc
     DataUCSDSharedData.hh
     DataVectorTypes.hh
     DataViewFactorInformation.cc
     DataViewFactorInformation.hh
     DataWater.hh
-    DataWindowEquivalentLayer.cc
     DataWindowEquivalentLayer.hh
     DataZoneControls.hh
     DataZoneEnergyDemands.hh

@@ -614,7 +614,8 @@ namespace UnitarySystems {
                                Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to AVERAGE airflow over timestep
         );
 
-        void calculateCapacity(Real64 &SensOutput, // sensible output of AirloopHVAC:UnitarySystem
+        void calculateCapacity(EnergyPlusData &state,
+                               Real64 &SensOutput, // sensible output of AirloopHVAC:UnitarySystem
                                Real64 &LatOutput   // latent output of AirloopHVAC:UnitarySystem
         );
 

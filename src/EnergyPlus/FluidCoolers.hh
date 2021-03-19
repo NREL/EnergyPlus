@@ -174,7 +174,7 @@ namespace FluidCoolers {
 
         void update(EnergyPlusData &state);
 
-        void report(bool RunFlag);
+        void report(EnergyPlusData &state, bool RunFlag);
 
         bool validateSingleSpeedInputs(EnergyPlusData &state,
                                        std::string const &cCurrentModuleObject,

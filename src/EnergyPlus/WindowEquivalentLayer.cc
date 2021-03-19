@@ -139,10 +139,10 @@ namespace EnergyPlus::WindowEquivalentLayer {
         int ConstrNum; // Construction number
         int SurfNum;   // surface number
 
-        if (TotWinEquivLayerConstructs < 1) return;
-        if (!allocated(CFS)) CFS.allocate(TotWinEquivLayerConstructs);
-        if (!allocated(state.dataWindowEquivalentLayer->EQLDiffPropFlag)) state.dataWindowEquivalentLayer->EQLDiffPropFlag.allocate(TotWinEquivLayerConstructs);
-        if (!allocated(state.dataWindowEquivalentLayer->CFSDiffAbsTrans)) state.dataWindowEquivalentLayer->CFSDiffAbsTrans.allocate(2, CFSMAXNL + 1, TotWinEquivLayerConstructs);
+        if (state.dataWindowEquivLayer->TotWinEquivLayerConstructs < 1) return;
+        if (!allocated(state.dataWindowEquivLayer->CFS)) state.dataWindowEquivLayer->CFS.allocate(state.dataWindowEquivLayer->TotWinEquivLayerConstructs);
+        if (!allocated(state.dataWindowEquivalentLayer->EQLDiffPropFlag)) state.dataWindowEquivalentLayer->EQLDiffPropFlag.allocate(state.dataWindowEquivLayer->TotWinEquivLayerConstructs);
+        if (!allocated(state.dataWindowEquivalentLayer->CFSDiffAbsTrans)) state.dataWindowEquivalentLayer->CFSDiffAbsTrans.allocate(2, CFSMAXNL + 1, state.dataWindowEquivLayer->TotWinEquivLayerConstructs);
 
         state.dataWindowEquivalentLayer->EQLDiffPropFlag = true;
         state.dataWindowEquivalentLayer->CFSDiffAbsTrans = 0.0;
@@ -189,11 +189,13 @@ namespace EnergyPlus::WindowEquivalentLayer {
         int NumSLayers;                           // number of glazing and shade layers (non-gas layers)
         Array2D<Real64> SysAbs1(2, CFSMAXNL + 1); // layers absorptance and system transmittance
 
-        if (!allocated(CFSLayers)) CFSLayers.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
+        if (!allocated(state.dataWindowEquivLayer->CFSLayers)) state.dataWindowEquivLayer->CFSLayers.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
 
         sLayer = 0;
         gLayer = 0;
         EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
+
+        auto & CFS = state.dataWindowEquivLayer->CFS;
 
         CFS(EQLNum).Name = state.dataConstruction->Construct(ConstrNum).Name;
 
@@ -225,9 +227,9 @@ namespace EnergyPlus::WindowEquivalentLayer {
             if (state.dataMaterial->Material(MaterNum).Group == BlindEquivalentLayer) {
                 CFS(EQLNum).VBLayerPtr = sLayer;
                 if (state.dataMaterial->Material(MaterNum).SlatOrientation == Horizontal) {
-                    CFS(EQLNum).L(sLayer).LTYPE = ltyVBHOR;
+                    CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyVBHOR;
                 } else if (state.dataMaterial->Material(MaterNum).SlatOrientation == Vertical) {
-                    CFS(EQLNum).L(sLayer).LTYPE = ltyVBVER;
+                    CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyVBVER;
                 }
                 CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
                 CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
@@ -244,7 +246,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
                 CFS(EQLNum).L(sLayer).C = state.dataMaterial->Material(MaterNum).SlatCrown;
             } else if (state.dataMaterial->Material(MaterNum).Group == GlassEquivalentLayer) {
                 // glazing
-                CFS(EQLNum).L(sLayer).LTYPE = ltyGLAZE;
+                CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyGLAZE;
                 CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = state.dataMaterial->Material(MaterNum).ReflFrontBeamBeam;
                 CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBB = state.dataMaterial->Material(MaterNum).ReflBackBeamBeam;
                 CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
@@ -259,7 +261,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
                 CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = state.dataMaterial->Material(MaterNum).TausDiffDiff;
             } else if (state.dataMaterial->Material(MaterNum).Group == ShadeEquivalentLayer) {
                 // roller blind
-                CFS(EQLNum).L(sLayer).LTYPE = ltyROLLB;
+                CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyROLLB;
                 CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
                 CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
                 CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
@@ -269,7 +271,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
 
             } else if (state.dataMaterial->Material(MaterNum).Group == DrapeEquivalentLayer) {
                 // drapery fabric
-                CFS(EQLNum).L(sLayer).LTYPE = ltyDRAPE;
+                CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyDRAPE;
                 CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
                 CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
                 CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
@@ -285,7 +287,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
                 CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = -1.0;
             } else if (state.dataMaterial->Material(MaterNum).Group == ScreenEquivalentLayer) {
                 // insect screen
-                CFS(EQLNum).L(sLayer).LTYPE = ltyINSCRN;
+                CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyINSCRN;
                 CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
                 CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
                 CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
@@ -315,7 +317,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
                 // fills gas density and effective gap thickness
                 BuildGap(state, CFS(EQLNum).G(gLayer), CFS(EQLNum).G(gLayer).GTYPE, CFS(EQLNum).G(gLayer).TAS);
             } else {
-                CFS(EQLNum).L(sLayer).LTYPE = ltyNONE;
+                CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyNONE;
             }
             // beam beam transmittance is the same for front and back side
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB;
@@ -506,8 +508,8 @@ namespace EnergyPlus::WindowEquivalentLayer {
         Abs1 = 0.0;
         HCIN = 3.0; // Initial guess
         HCOUT = 15.0;
-        if (FS.L(1).LTYPE == ltyROLLB || FS.L(1).LTYPE == ltyDRAPE || FS.L(1).LTYPE == ltyINSCRN || FS.L(1).LTYPE == ltyVBHOR ||
-            FS.L(1).LTYPE == ltyVBVER) { // Exterior Roller Blind Present | Exterior Drape Fabric | Exterior Insect Screen Present | Exterior Venetian
+        if (FS.L(1).LTYPE == LayerType::ltyROLLB || FS.L(1).LTYPE == LayerType::ltyDRAPE || FS.L(1).LTYPE == LayerType::ltyINSCRN || FS.L(1).LTYPE == LayerType::ltyVBHOR ||
+            FS.L(1).LTYPE == LayerType::ltyVBVER) { // Exterior Roller Blind Present | Exterior Drape Fabric | Exterior Insect Screen Present | Exterior Venetian
                                          // Blind Present
             // Reduced convection coefficient due to external attachment
             HCOUT = 12.25;
@@ -521,7 +523,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         for (I = 1; I <= NL; ++I) {
             ASHWAT_OffNormalProperties(state, FS.L(I), IncA, VProfA, HProfA, SWP_ON(I));
         }
-        ASHWAT_Solar(FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1(1, {1, FS.NL + 1}), Abs1(2, {1, FS.NL + 1}));
+        ASHWAT_Solar(FS.NL, SWP_ON, state.dataWindowEquivLayer->SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1(1, {1, FS.NL + 1}), Abs1(2, {1, FS.NL + 1}));
         TransNormal = Abs1(1, NL + 1);
 
         // Calculate SHGC using net radiation method (ASHWAT Model)
@@ -620,13 +622,13 @@ namespace EnergyPlus::WindowEquivalentLayer {
             for (I = 1; I <= NL; ++I) {
                 ASHWAT_OffNormalProperties(state, FS.L(I), IncA, VProfA, HProfA, SWP_ON(I));
             }
-            ASHWAT_Solar(FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1(1, {1, FS.NL + 1}), Abs1(2, {1, FS.NL + 1}));
+            ASHWAT_Solar(FS.NL, SWP_ON, state.dataWindowEquivLayer->SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1(1, {1, FS.NL + 1}), Abs1(2, {1, FS.NL + 1}));
         } else {
             // diffuse
             Array1D<CFSSWP> const SWP_EL(
                 FS.L.ma(&CFSLAYER::SWP_EL)); // Autodesk:F2C++ Can't slice a member array so we create a temporary: Inefficient
-            ASHWAT_Solar(FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 1.0, 0.0, Abs1(1, {1, FS.NL + 1}));
-            ASHWAT_Solar(FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 0.0, 1.0, Abs1(2, {1, FS.NL + 1}));
+            ASHWAT_Solar(FS.NL, SWP_EL, state.dataWindowEquivLayer->SWP_ROOMBLK, 0.0, 1.0, 0.0, Abs1(1, {1, FS.NL + 1}));
+            ASHWAT_Solar(FS.NL, SWP_EL, state.dataWindowEquivLayer->SWP_ROOMBLK, 0.0, 0.0, 1.0, Abs1(2, {1, FS.NL + 1}));
             // CFSFenProp = LOK1 .AND. LOK2
         }
     }
@@ -654,7 +656,6 @@ namespace EnergyPlus::WindowEquivalentLayer {
         // uses the solar-thermal routine developed for ASHRAE RP-1311 (ASHWAT Model).
 
         using DataBSDFWindow::noCondition;
-        using DataLoopNode::Node;
         using General::InterpSw;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
@@ -704,7 +705,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
         Real64 NetIRHeatGainWindow; // net radiation gain from the window surface to the zone (W)
         Real64 ConvHeatGainWindow;  // net convection heat gain from inside surface of window to zone air (W)
-        int InSideLayerType;        // interior shade type
+        LayerType InSideLayerType;        // interior shade type
 
         int SrdSurfsNum;       // Surrounding surfaces list number
         int SrdSurfNum;        // Surrounding surface number DO loop counter
@@ -742,8 +743,9 @@ namespace EnergyPlus::WindowEquivalentLayer {
                     SumSysMCp = 0.0;
                     SumSysMCpT = 0.0;
                     for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                        NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                        MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                        NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        MassFlowRate =
+                            state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -786,8 +788,8 @@ namespace EnergyPlus::WindowEquivalentLayer {
                         SumSysMCp = 0.0;
                         SumSysMCpT = 0.0;
                         for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                            NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                            MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                            NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                            MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                             CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNumAdj));
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -852,8 +854,8 @@ namespace EnergyPlus::WindowEquivalentLayer {
         // Outdoor conditions
         TRMOUT = root_4(outir / DataGlobalConstants::StefanBoltzmann); // it is in Kelvin scale
         // indoor conditions
-        LWAbsIn = EffectiveEPSLB(CFS(EQLNum));  // windows inside face effective thermal emissivity
-        LWAbsOut = EffectiveEPSLF(CFS(EQLNum)); // windows outside face effective thermal emissivity
+        LWAbsIn = EffectiveEPSLB(state.dataWindowEquivLayer->CFS(EQLNum));  // windows inside face effective thermal emissivity
+        LWAbsOut = EffectiveEPSLF(state.dataWindowEquivLayer->CFS(EQLNum)); // windows outside face effective thermal emissivity
         SurfOutsideEmiss = LWAbsOut;
         // Indoor mean radiant temperature.
         // IR incident on window from zone surfaces and high-temp radiant sources
@@ -861,11 +863,11 @@ namespace EnergyPlus::WindowEquivalentLayer {
                 state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum) + state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
         TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
-        NL = CFS(EQLNum).NL;
+        NL = state.dataWindowEquivLayer->CFS(EQLNum).NL;
         QAllSWwinAbs({1, NL + 1}) = state.dataHeatBal->SurfWinQRadSWwinAbs({1, NL + 1}, SurfNum);
         //  Solve energy balance(s) for temperature at each node/layer and
         //  heat flux, including components, between each pair of nodes/layers
-        ASHWAT_ThermalCalc(state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, QAllSWwinAbs({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+        ASHWAT_ThermalCalc(state, state.dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, QAllSWwinAbs({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
 
         // effective surface temperature is set to surface temperature calculated
         // by the fenestration layers temperature solver
@@ -879,8 +881,8 @@ namespace EnergyPlus::WindowEquivalentLayer {
         state.dataSurface->SurfWinOtherConvHeatGain(SurfNum) = state.dataSurface->Surface(SurfNum).Area * QXConv;
         SurfOutsideTemp = T(1) - DataGlobalConstants::KelvinConv;
         // Various reporting calculations
-        InSideLayerType = CFS(EQLNum).L(NL).LTYPE;
-        if (InSideLayerType == ltyGLAZE) {
+        InSideLayerType = state.dataWindowEquivLayer->CFS(EQLNum).L(NL).LTYPE;
+        if (InSideLayerType == LayerType::ltyGLAZE) {
             ConvHeatFlowNatural = 0.0;
         } else {
             ConvHeatFlowNatural = state.dataSurface->Surface(SurfNum).Area * QOCFRoom;
@@ -897,7 +899,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
         state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
         state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
-        if (InSideLayerType == ltyGLAZE) {
+        if (InSideLayerType == LayerType::ltyGLAZE) {
             // no interior sade
             state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
         } else {
@@ -6343,7 +6345,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
 
         Real64 SlatADeg;
 
-        if (L.LTYPE == ltyVBHOR) {
+        if (L.LTYPE == LayerType::ltyVBHOR) {
             // horiz VB: enhanced convection at +/- 45 due to "pumping"
             SlatADeg = min(90.0, std::abs(L.PHI_DEG));
             ConvectionFactor = 1.0 + 0.2 * std::sin(2.0 * SlatADeg);
@@ -6766,17 +6768,17 @@ namespace EnergyPlus::WindowEquivalentLayer {
             // specular glazing
             // HBX note: ltyGZS here iff modelOption F=x; spectral cases elsewhere
             Specular_SWP(LSWP_ON, THETA);
-        } else if (L.LTYPE == ltyVBHOR) {
+        } else if (L.LTYPE == LayerType::ltyVBHOR) {
             OKAY = VB_SWP(state, L, LSWP_ON, OMEGA_V);
-        } else if (L.LTYPE == ltyVBVER) {
+        } else if (L.LTYPE == LayerType::ltyVBVER) {
             OKAY = VB_SWP(state, L, LSWP_ON, OMEGA_H);
-        } else if (L.LTYPE == ltyDRAPE) {
+        } else if (L.LTYPE == LayerType::ltyDRAPE) {
             OKAY = PD_SWP(state, L, LSWP_ON, OMEGA_V, OMEGA_H);
-        } else if (L.LTYPE == ltyROLLB) {
+        } else if (L.LTYPE == LayerType::ltyROLLB) {
             OKAY = RB_SWP(state, L, LSWP_ON, THETA);
-        } else if (L.LTYPE == ltyINSCRN) {
+        } else if (L.LTYPE == LayerType::ltyINSCRN) {
             OKAY = IS_SWP(state, L, LSWP_ON, THETA);
-        } else if (L.LTYPE == ltyNONE || L.LTYPE == ltyROOM) {
+        } else if (L.LTYPE == LayerType::ltyNONE || L.LTYPE == LayerType::ltyROOM) {
             // none or room: do nothing
         } else {
             // placeholder for add'l non-specular layers
@@ -7019,7 +7021,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         Real64 OPENNESS;
 
         RB_LWP = false;
-        if (L.LTYPE != ltyROLLB) return RB_LWP;
+        if (L.LTYPE != LayerType::ltyROLLB) return RB_LWP;
 
         OPENNESS = L.SWP_MAT.TAUSFBB;
 
@@ -7062,7 +7064,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         Real64 TAUX;
 
         RB_SWP = false;
-        if (L.LTYPE != ltyROLLB) return RB_SWP;
+        if (L.LTYPE != LayerType::ltyROLLB) return RB_SWP;
 
         DODIFFUSE = !present(THETA);
 
@@ -7108,7 +7110,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         Real64 TAULX;
 
         IS_LWP = false;
-        if (L.LTYPE != ltyINSCRN) return IS_LWP;
+        if (L.LTYPE != LayerType::ltyINSCRN) return IS_LWP;
 
         OPENNESS = L.SWP_MAT.TAUSFBB;
 
@@ -7150,7 +7152,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         Real64 TAUX;
 
         IS_SWP = false;
-        if (L.LTYPE != ltyINSCRN) return IS_SWP;
+        if (L.LTYPE != LayerType::ltyINSCRN) return IS_SWP;
 
         DODIFFUSE = !present(THETA);
 
@@ -7227,7 +7229,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         Real64 OPENNESS_FABRIC;
 
         PD_LWP = false;
-        if (L.LTYPE != ltyDRAPE) return PD_LWP;
+        if (L.LTYPE != LayerType::ltyDRAPE) return PD_LWP;
 
         OPENNESS_FABRIC = L.SWP_MAT.TAUSFBB;
 
@@ -7265,7 +7267,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         Real64 TAUX;
 
         PD_SWP = false;
-        if (!(L.LTYPE == ltyDRAPE)) return PD_SWP;
+        if (!(L.LTYPE == LayerType::ltyDRAPE)) return PD_SWP;
 
         DODIFFUSE = !(present(OHM_V_RAD) && present(OHM_H_RAD));
 
@@ -7536,7 +7538,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         if (IsVBLayer(L) && L.CNTRL != state.dataWindowEquivalentLayer->lscNONE) {
             if (THETA < 0.0 || THETA >= DataGlobalConstants::PiOvr2) {
                 OMEGA_DEG = -1.0; // diffuse only
-            } else if (L.LTYPE == ltyVBHOR) {
+            } else if (L.LTYPE == LayerType::ltyVBHOR) {
                 // horiz VB
                 OMEGA_DEG = state.dataWindowEquivalentLayer->RadiansToDeg * OMEGA_V;
             } else {
@@ -7583,18 +7585,18 @@ namespace EnergyPlus::WindowEquivalentLayer {
             L.PHI_DEG = 0.0; // phi, C, CNTRL are VB only
             L.C = 0.0;
             L.CNTRL = state.dataWindowEquivalentLayer->lscNONE;
-            if (L.LTYPE == ltyDRAPE) {
+            if (L.LTYPE == LayerType::ltyDRAPE) {
                 LOK = PD_LWP(state, L, L.LWP_EL);
                 DOK = PD_SWP(state, L, L.SWP_EL);           // SW diffuse
                 BOK = PD_SWP(state, L, L.SWP_EL, 0.0, 0.0); // SW properties w/ profile angs = 0
-            } else if (L.LTYPE == ltyINSCRN) {
+            } else if (L.LTYPE == LayerType::ltyINSCRN) {
                 LOK = IS_LWP(L, L.LWP_EL);      // LW
                 DOK = IS_SWP(state, L, L.SWP_EL);      // SW diffuse
                 BOK = IS_SWP(state, L, L.SWP_EL, 0.0); // SW beam w/ theta = 0
             } else {
                 L.S = 0.0; // geometry mbrs unused
                 L.W = 0.0;
-                if (L.LTYPE == ltyROLLB) {
+                if (L.LTYPE == LayerType::ltyROLLB) {
                     LOK = RB_LWP(L, L.LWP_EL);      // LW
                     DOK = RB_SWP(state, L, L.SWP_EL);      // SW diffuse
                     BOK = RB_SWP(state, L, L.SWP_EL, 0.0); // SW beam w/ theta = 0
@@ -7633,7 +7635,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         // Return value
         bool IsGZSLayer;
 
-        IsGZSLayer = L.LTYPE == ltyGZS;
+        IsGZSLayer = L.LTYPE == LayerType::ltyGZS;
         return IsGZSLayer;
     }
 
@@ -7652,7 +7654,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         // Return value
         bool IsGlazeLayerX;
 
-        IsGlazeLayerX = L.LTYPE == ltyGLAZE || IsGZSLayer(L);
+        IsGlazeLayerX = L.LTYPE == LayerType::ltyGLAZE || IsGZSLayer(L);
         return IsGlazeLayerX;
     }
 
@@ -7690,7 +7692,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         // Return value
         bool IsVBLayer;
 
-        IsVBLayer = L.LTYPE == ltyVBHOR || L.LTYPE == ltyVBVER;
+        IsVBLayer = L.LTYPE == LayerType::ltyVBHOR || L.LTYPE == LayerType::ltyVBVER;
         return IsVBLayer;
     }
 
@@ -7882,24 +7884,24 @@ namespace EnergyPlus::WindowEquivalentLayer {
         if (SWP.TAUSBBB < 0.0) SWP.TAUSBBB = SWP.TAUSFBB;
         if (SWP.TAUSBBD < 0.0) SWP.TAUSBBD = SWP.TAUSFBD;
 
-        if (L.LTYPE == ltyGLAZE) {
+        if (L.LTYPE == LayerType::ltyGLAZE) {
             // estimate diffuse properties if any < 0 or autocalculate
             if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
                 Specular_EstimateDiffuseProps(state, SWP);
             }
-        } else if (L.LTYPE == ltyVBHOR || L.LTYPE == ltyVBVER) {
+        } else if (L.LTYPE == LayerType::ltyVBHOR || L.LTYPE == LayerType::ltyVBVER) {
 
-        } else if (L.LTYPE == ltyDRAPE) {
+        } else if (L.LTYPE == LayerType::ltyDRAPE) {
             // estimate diffuse properties if any < 0
             if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
                 Fabric_EstimateDiffuseProps(state, SWP);
             }
-        } else if (L.LTYPE == ltyROLLB) {
+        } else if (L.LTYPE == LayerType::ltyROLLB) {
             // estimate diffuse properties if any < 0
             if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
                 OK = RB_SWP(state, L, SWP); // TODO RB
             }
-        } else if (L.LTYPE == ltyINSCRN) {
+        } else if (L.LTYPE == LayerType::ltyINSCRN) {
             if (SWP.TAUSFBB < 0.0) {
                 SWP.TAUSFBB = IS_OPENNESS(L.S, L.W);
                 if (SWP.TAUSBBB < 0.0) SWP.TAUSBBB = SWP.TAUSFBB;
@@ -7907,7 +7909,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
             if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
                 OK = IS_SWP(state, L, SWP); // TODO IS
             }
-        } else if (L.LTYPE == ltyNONE || L.LTYPE == ltyROOM) {
+        } else if (L.LTYPE == LayerType::ltyNONE || L.LTYPE == LayerType::ltyROOM) {
             // none or room: do nothing
         } else {
             ShowSevereError(state, RoutineName + L.Name + '.');
@@ -8122,6 +8124,8 @@ namespace EnergyPlus::WindowEquivalentLayer {
         int EQLNum;    // equivalent layer window construction index
         int ConstrNum; // construction index
 
+        auto & CFS = state.dataWindowEquivLayer->CFS;
+
         IncAng = 0.0; // Autodesk:Init Added to elim use uninitialized
         CFSAbs = 0.0;
         ProfAngHor = 0.0;
@@ -8133,9 +8137,9 @@ namespace EnergyPlus::WindowEquivalentLayer {
 
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
-                    if (CFS(EQLNum).L(Lay).LTYPE == ltyVBHOR) {
+                    if (CFS(EQLNum).L(Lay).LTYPE == LayerType::ltyVBHOR) {
                         ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
-                    } else if (CFS(EQLNum).L(Lay).LTYPE == ltyVBVER) {
+                    } else if (CFS(EQLNum).L(Lay).LTYPE == LayerType::ltyVBVER) {
                         ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                     }
                 }
@@ -8149,9 +8153,9 @@ namespace EnergyPlus::WindowEquivalentLayer {
             if (state.dataWindowEquivalentLayer->EQLDiffPropFlag(EQLNum)) {
                 for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                     if (IsVBLayer(CFS(EQLNum).L(Lay))) {
-                        if (CFS(EQLNum).L(Lay).LTYPE == ltyVBHOR) {
+                        if (CFS(EQLNum).L(Lay).LTYPE == LayerType::ltyVBHOR) {
                             ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
-                        } else if (CFS(EQLNum).L(Lay).LTYPE == ltyVBVER) {
+                        } else if (CFS(EQLNum).L(Lay).LTYPE == LayerType::ltyVBVER) {
                             ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                         }
                     }
@@ -8206,11 +8210,11 @@ namespace EnergyPlus::WindowEquivalentLayer {
         EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
 
         // calculate fenestration air-to-air U-value
-        CalcEQLWindowUvalue(state, CFS(EQLNum), UValue);
+        CalcEQLWindowUvalue(state, state.dataWindowEquivLayer->CFS(EQLNum), UValue);
         state.dataHeatBal->NominalU(ConstrNum) = UValue;
 
         // calculate the SHGC and Normal Transmittance
-        CalcEQLWindowSHGCAndTransNormal(state, CFS(EQLNum), SHGCSummer, TransNormal);
+        CalcEQLWindowSHGCAndTransNormal(state, state.dataWindowEquivLayer->CFS(EQLNum), SHGCSummer, TransNormal);
         state.dataConstruction->Construct(ConstrNum).SummerSHGC = SHGCSummer;
         state.dataConstruction->Construct(ConstrNum).SolTransNorm = TransNormal;
     }
@@ -8227,7 +8231,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         // Given the consruction number, returns the equivalent layer inside
         // face effective longwave emmisivity.
 
-        return EffectiveEPSLB(CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr));
+        return EffectiveEPSLB(state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr));
     }
 
     Real64 EQLWindowOutsideEffectiveEmiss(EnergyPlusData &state, int const ConstrNum)
@@ -8248,7 +8252,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         int EQLNum; // EQL Window object number
 
         EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
-        OutSideLWEmiss = EffectiveEPSLF(CFS(EQLNum));
+        OutSideLWEmiss = EffectiveEPSLF(state.dataWindowEquivLayer->CFS(EQLNum));
 
         return OutSideLWEmiss;
     }

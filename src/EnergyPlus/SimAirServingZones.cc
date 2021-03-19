@@ -275,7 +275,7 @@ namespace EnergyPlus::SimAirServingZones {
         using WaterCoils::GetCoilWaterInletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetAirPathData: ");
+        constexpr const char * RoutineName("GetAirPathData: ");
 
         auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
         auto &OutsideAirSys(state.dataAirLoop->OutsideAirSys);
@@ -411,8 +411,8 @@ namespace EnergyPlus::SimAirServingZones {
         state.dataAirLoop->AirLoopFlow.allocate(NumPrimaryAirSys);
         state.dataConvergeParams->AirLoopConvergence.allocate(NumPrimaryAirSys);
         state.dataSize->UnitarySysEqSizing.allocate(NumPrimaryAirSys);
-        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
             state.dataAirLoop->AirLoopAFNInfo.allocate(NumPrimaryAirSys);
         }
 
@@ -482,10 +482,10 @@ namespace EnergyPlus::SimAirServingZones {
             AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum.allocate(AirToZoneNodeInfo(AirSysNum).NumReturnNodes);
             // fill the return air node arrays with node numbers
             AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum(1) =
-                GetOnlySingleNode(state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsParent);
             if (!lAlphaBlanks(7)) {
                 AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = GetOnlySingleNode(state,
-                    Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                    Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsParent);
             } else {
                 // If no return path, set this to zero to trigger special handling when calling UpdateHVACInterface
                 AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = 0;
@@ -580,10 +580,10 @@ namespace EnergyPlus::SimAirServingZones {
                         NumNodes,
                         NodeNums,
                         ErrInList,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         CurrentModuleObject,
                         PrimaryAirSystems(AirSysNum).Name,
-                        NodeConnectionType_Inlet,
+                        DataLoopNode::NodeConnectionType::Inlet,
                         1,
                         ObjectIsParent,
                         _,
@@ -620,10 +620,10 @@ namespace EnergyPlus::SimAirServingZones {
                         NumNodes,
                         NodeNums,
                         ErrInList,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         CurrentModuleObject,
                         PrimaryAirSystems(AirSysNum).Name,
-                        NodeConnectionType_Outlet,
+                        DataLoopNode::NodeConnectionType::Outlet,
                         1,
                         ObjectIsParent,
                         _,
@@ -813,7 +813,7 @@ namespace EnergyPlus::SimAirServingZones {
             for (OutBranchNum = 1; OutBranchNum <= 3; ++OutBranchNum) {
                 PrimaryAirSystems(AirSysNum).OutletBranchNum(OutBranchNum) = 0;
                 if (OutBranchNum > PrimaryAirSystems(AirSysNum).NumOutletBranches) break;
-                MatchNodeName(OutBranchNum) = NodeID(AirToZoneNodeInfo(AirSysNum).AirLoopSupplyNodeNum(OutBranchNum));
+                MatchNodeName(OutBranchNum) = state.dataLoopNodes->NodeID(AirToZoneNodeInfo(AirSysNum).AirLoopSupplyNodeNum(OutBranchNum));
                 for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
                     if (AirToZoneNodeInfo(AirSysNum).AirLoopSupplyNodeNum(OutBranchNum) == PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumOut) {
                         PrimaryAirSystems(AirSysNum).OutletBranchNum(OutBranchNum) = BranchNum;
@@ -844,7 +844,7 @@ namespace EnergyPlus::SimAirServingZones {
                 if (PrimaryAirSystems(AirSysNum).InletBranchNum(InBranchNum) == 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", connection to zone.");
                     ShowContinueError(state, "No Connection found for Return Air from Zone");
-                    ShowContinueError(state, "Expected node name =\"" + NodeID(AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum(InBranchNum)) + "\".");
+                    ShowContinueError(state, "Expected node name =\"" + state.dataLoopNodes->NodeID(AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum(InBranchNum)) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -869,7 +869,8 @@ namespace EnergyPlus::SimAirServingZones {
                     ShowContinueError(state, "ConnectorList object=\"" + ConnectorListName + "\" not found in input.");
                 }
                 errFlag = false;
-                GetNumSplitterMixerInConntrList(state, "AirLoop", ConnectorListName, NumofSplitters, NumofMixers, errFlag);
+                GetNumSplitterMixerInConntrList(
+                    state, "AirLoop", ConnectorListName, state.dataLoopNodes->NumofSplitters, state.dataLoopNodes->NumofMixers, errFlag);
                 if (errFlag) {
                 }
             }
@@ -1335,7 +1336,7 @@ namespace EnergyPlus::SimAirServingZones {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found retrieving input for " + CurrentModuleObject + '.');
+            ShowFatalError(state, format("{}Errors found retrieving input for {}.",RoutineName,CurrentModuleObject));
         }
 
         for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
@@ -1727,7 +1728,7 @@ namespace EnergyPlus::SimAirServingZones {
                         // If the supply air path is not connected to either a heating or a cooling air distribution
                         // unit...we have a problem!
                         if (!FoundSupPathZoneConnect) {
-                            ShowSevereError(state, "Node " + NodeID(state.dataZoneEquip->SupplyAirPath(SupAirPathNum).OutletNode(SupAirPathOutNodeNum)) +
+                            ShowSevereError(state, "Node " + state.dataLoopNodes->NodeID(state.dataZoneEquip->SupplyAirPath(SupAirPathNum).OutletNode(SupAirPathOutNodeNum)) +
                                             " connects to no component");
                             ShowContinueError(state, "Occurs in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(SupAirPathNum).Name);
                             ShowContinueError(state, "Check the connection to a ZoneHVAC:EquipmentConnections object");
@@ -1818,7 +1819,7 @@ namespace EnergyPlus::SimAirServingZones {
 
                 if ((NumZonesCool + NumZonesHeat) == 0) {
                     ShowSevereError(state, "An outlet node in AirLoopHVAC=\"" + PrimaryAirSystems(AirLoopNum).Name + "\" is not connected to any zone");
-                    ShowContinueError(state, "Could not match ZoneEquipGroup Inlet Node=\"" + NodeID(ZoneSideNodeNum) +
+                    ShowContinueError(state, "Could not match ZoneEquipGroup Inlet Node=\"" + state.dataLoopNodes->NodeID(ZoneSideNodeNum) +
                                       "\" to any Supply Air Path or controlled zone");
                     ErrorsFound = true;
                 }
@@ -2091,12 +2092,23 @@ namespace EnergyPlus::SimAirServingZones {
                 state.dataAirLoop->AirLoopFlow(AirLoopNum).DesReturnFrac = PrimaryAirSystems(AirLoopNum).DesignReturnFlowFraction;
                 for (ZoneInSysIndex = 1; ZoneInSysIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZoneInSysIndex) {
                     TUInNode = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
-                    SumZoneDesFlow += Node(TUInNode).MassFlowRateMax;
+                    SumZoneDesFlow += state.dataLoopNodes->Node(TUInNode).MassFlowRateMax;
                 }
                 if (SumZoneDesFlow > VerySmallMassFlow) {
                     state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / SumZoneDesFlow;
                 } else {
                     state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio = 1.0;
+                }
+            }
+
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
+                // sets design supply air flow rate in the ZoneEquipConfig struct for use with zone air mass balance
+                for (int returnNum = 1; returnNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++returnNum) {
+                    int airLoop = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(returnNum);
+                    if (airLoop > 0) {
+                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).AirLoopDesSupply = state.dataAirLoop->AirLoopFlow(airLoop).DesSupply;
+                    }
                 }
             }
         }
@@ -2122,23 +2134,23 @@ namespace EnergyPlus::SimAirServingZones {
 
                         // Initialize the nodes to a standard set of initial conditions that will
                         //  change after the first iteration to a system value
-                        Node(NodeNum).Temp = 20.0;
-                        Node(NodeNum).HumRat = state.dataEnvrn->OutHumRat;
-                        Node(NodeNum).Enthalpy = PsyHFnTdbW(Node(NodeNum).Temp, Node(NodeNum).HumRat);
+                        state.dataLoopNodes->Node(NodeNum).Temp = 20.0;
+                        state.dataLoopNodes->Node(NodeNum).HumRat = state.dataEnvrn->OutHumRat;
+                        state.dataLoopNodes->Node(NodeNum).Enthalpy = PsyHFnTdbW(state.dataLoopNodes->Node(NodeNum).Temp, state.dataLoopNodes->Node(NodeNum).HumRat);
                         // set the node mass flow rates to the airloop max mass flow rate
-                        Node(NodeNum).MassFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
-                        Node(NodeNum).MassFlowRateMax = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
-                        Node(NodeNum).MassFlowRateMaxAvail = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
-                        Node(NodeNum).MassFlowRateMin = 0.0;
-                        Node(NodeNum).MassFlowRateSetPoint = 0.0;
-                        Node(NodeNum).MassFlowRateMinAvail = 0.0;
-                        Node(NodeNum).Press = state.dataEnvrn->StdBaroPress;
-                        Node(NodeNum).Quality = 0.0;
+                        state.dataLoopNodes->Node(NodeNum).MassFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
+                        state.dataLoopNodes->Node(NodeNum).MassFlowRateMax = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
+                        state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
+                        state.dataLoopNodes->Node(NodeNum).MassFlowRateMin = 0.0;
+                        state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = 0.0;
+                        state.dataLoopNodes->Node(NodeNum).MassFlowRateMinAvail = 0.0;
+                        state.dataLoopNodes->Node(NodeNum).Press = state.dataEnvrn->StdBaroPress;
+                        state.dataLoopNodes->Node(NodeNum).Quality = 0.0;
                         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                            Node(NodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
+                            state.dataLoopNodes->Node(NodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
                         }
                         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                            Node(NodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
+                            state.dataLoopNodes->Node(NodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
                         }
 
                     } // end of loop over nodes on each branch
@@ -2169,11 +2181,11 @@ namespace EnergyPlus::SimAirServingZones {
                 for (NodeIndex = 1; NodeIndex <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalNodes;
                      ++NodeIndex) { // loop over alll nodes on branch
                     NodeNum = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNum(NodeIndex);
-                    Node(NodeNum).MassFlowRateSetPoint = 0.0;
+                    state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = 0.0;
                     // Reset MassFlowRateMaxAvail at start of each HVAC simulation
                     if (FirstHVACIteration) {
-                        Node(NodeNum).MassFlowRateMaxAvail = Node(NodeNum).MassFlowRateMax;
-                        Node(NodeNum).MassFlowRateMinAvail = Node(NodeNum).MassFlowRateMin;
+                        state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(NodeNum).MassFlowRateMax;
+                        state.dataLoopNodes->Node(NodeNum).MassFlowRateMinAvail = state.dataLoopNodes->Node(NodeNum).MassFlowRateMin;
                     }
                 }
             }
@@ -2185,19 +2197,19 @@ namespace EnergyPlus::SimAirServingZones {
                 ZoneSideNodeNum = AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum);
 
                 if (!FirstHVACIteration) {
-                    MassFlowSet = Node(ZoneSideNodeNum).MassFlowRate;
+                    MassFlowSet = state.dataLoopNodes->Node(ZoneSideNodeNum).MassFlowRate;
                 } else { // first time through in each HVAC timestep, use loop design mass flow rates for required mass flows
                     MassFlowSet = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
                 }
                 // Need to make sure that flows are greater than zero
                 if (MassFlowSet >= 0.0) {
-                    Node(NodeNumOut).MassFlowRateSetPoint = MassFlowSet;
+                    state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint = MassFlowSet;
                 } else if (MassFlowSet < 0.0) {
-                    Node(NodeNumOut).MassFlowRateSetPoint = 0.0;
+                    state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint = 0.0;
                 }
 
-                if (Node(NodeNumOut).MassFlowRateSetPoint < MassFlowSetToler) {
-                    Node(NodeNumOut).MassFlowRateSetPoint = 0.0;
+                if (state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint < MassFlowSetToler) {
+                    state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint = 0.0;
                 }
 
                 // Pass the required mass flow upstream to the start of each outlet branch
@@ -2205,14 +2217,14 @@ namespace EnergyPlus::SimAirServingZones {
                     NodeNum = PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).NodeNum(BranchNodeIndex);
                     if (PrimaryAirSystems(AirLoopNum).OASysExists && (NodeNum == PrimaryAirSystems(AirLoopNum).OASysInletNodeNum)) {
                         // need to modify if OA relief and supply not balanced because of exhaust fans
-                        OAReliefDiff = Node(PrimaryAirSystems(AirLoopNum).OASysOutletNodeNum).MassFlowRate - Node(NodeNum).MassFlowRate;
+                        OAReliefDiff = state.dataLoopNodes->Node(PrimaryAirSystems(AirLoopNum).OASysOutletNodeNum).MassFlowRate - state.dataLoopNodes->Node(NodeNum).MassFlowRate;
                         if (OAReliefDiff > 0.0) {
-                            Node(NodeNum).MassFlowRateSetPoint = Node(NodeNumOut).MassFlowRateSetPoint - OAReliefDiff;
+                            state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint - OAReliefDiff;
                         } else {
-                            Node(NodeNum).MassFlowRateSetPoint = Node(NodeNumOut).MassFlowRateSetPoint;
+                            state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint;
                         }
                     } else {
-                        Node(NodeNum).MassFlowRateSetPoint = Node(NodeNumOut).MassFlowRateSetPoint;
+                        state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint;
                     }
                 } // end loop over branch nodes
 
@@ -2236,12 +2248,12 @@ namespace EnergyPlus::SimAirServingZones {
                     NodeNumIn = PrimaryAirSystems(AirLoopNum).Branch(InBranchNum).NodeNumIn;
 
                     // [DC/LBNL] Save previous mass flow rate
-                    MassFlowSaved = Node(NodeNumIn).MassFlowRate;
+                    MassFlowSaved = state.dataLoopNodes->Node(NodeNumIn).MassFlowRate;
 
-                    Node(NodeNumIn).MassFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
+                    state.dataLoopNodes->Node(NodeNumIn).MassFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
 
                     // [DC/LBNL] Detect if air mass flow rate has changed since last air loop simulation
-                    if (Node(NodeNumIn).MassFlowRate != MassFlowSaved) {
+                    if (state.dataLoopNodes->Node(NodeNumIn).MassFlowRate != MassFlowSaved) {
                         AirLoopControlInfo(AirLoopNum).NewFlowRateFlag = true;
                     }
 
@@ -2253,7 +2265,7 @@ namespace EnergyPlus::SimAirServingZones {
                 for (InNum = 1; InNum <= PrimaryAirSystems(AirLoopNum).NumInletBranches; ++InNum) {
                     InBranchNum = PrimaryAirSystems(AirLoopNum).InletBranchNum(InNum);
                     NodeNumIn = PrimaryAirSystems(AirLoopNum).Branch(InBranchNum).NodeNumIn;
-                    Node(NodeNumIn).MassFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply * state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac -
+                    state.dataLoopNodes->Node(NodeNumIn).MassFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply * state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac -
                                                    (state.dataAirLoop->AirLoopFlow(AirLoopNum).SupFlow - state.dataAirLoop->AirLoopFlow(AirLoopNum).SysRetFlow);
                 }
             }
@@ -2840,7 +2852,7 @@ namespace EnergyPlus::SimAirServingZones {
             for (int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystems(AirLoopNum).NumControllers; ++AirLoopControlNum) {
                 PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum) =
                     HVACControllers::GetControllerIndex(state, PrimaryAirSystems(AirLoopNum).ControllerName(AirLoopControlNum));
-                HVACControllers::ControllerProps(PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum)).AirLoopControllerIndex =
+                state.dataHVACControllers->ControllerProps(PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum)).AirLoopControllerIndex =
                     AirLoopControlNum;
             }
             // When using controllers, size air loop coils so ControllerProps (e.g., Min/Max Actuated) can be set
@@ -3111,7 +3123,7 @@ namespace EnergyPlus::SimAirServingZones {
         // if the controller can be locked out by the economizer operation and the economizer is active, leave the controller inactive
         if (AirLoopCheck) {
             if (AirLoopControlInfo(AirLoopNum).EconoActive) {
-                if (PrimaryAirSystems(AirLoopNum).CanBeLockedOutByEcono(HVACControllers::ControllerProps(ControllerIndex).AirLoopControllerIndex)) {
+                if (PrimaryAirSystems(AirLoopNum).CanBeLockedOutByEcono(state.dataHVACControllers->ControllerProps(ControllerIndex).AirLoopControllerIndex)) {
                     ControllerConvergedFlag = true;
                 }
             }
@@ -3133,7 +3145,7 @@ namespace EnergyPlus::SimAirServingZones {
                               BypassOAController);
 
             if (AirLoopCheck) {
-                PrimaryAirSystems(AirLoopNum).ControlConverged(HVACControllers::ControllerProps(ControllerIndex).AirLoopControllerIndex) =
+                PrimaryAirSystems(AirLoopNum).ControlConverged(state.dataHVACControllers->ControllerProps(ControllerIndex).AirLoopControllerIndex) =
                     ControllerConvergedFlag;
             }
 
@@ -3196,7 +3208,7 @@ namespace EnergyPlus::SimAirServingZones {
 
         // pass convergence of OA system water coils back to SolveAirLoopControllers via PrimaryAirSystem().ControlConverged flag
         if (AirLoopCheck) {
-            PrimaryAirSystems(AirLoopNum).ControlConverged(HVACControllers::ControllerProps(ControllerIndex).AirLoopControllerIndex) =
+            PrimaryAirSystems(AirLoopNum).ControlConverged(state.dataHVACControllers->ControllerProps(ControllerIndex).AirLoopControllerIndex) =
                 ControllerConvergedFlag;
             AirLoopControlInfo(AirLoopNum).ConvergedFlag = AirLoopControlInfo(AirLoopNum).ConvergedFlag && ControllerConvergedFlag;
         }
@@ -3664,44 +3676,44 @@ namespace EnergyPlus::SimAirServingZones {
                 // Pass node data through the splitter
                 for (OutletNum = 1; OutletNum <= PrimaryAirSystems(AirLoopNum).Splitter.TotalOutletNodes; ++OutletNum) {
                     OutletNodeNum = PrimaryAirSystems(AirLoopNum).Splitter.NodeNumOut(OutletNum);
-                    Node(OutletNodeNum).Temp = Node(InletNodeNum).Temp;
-                    Node(OutletNodeNum).HumRat = Node(InletNodeNum).HumRat;
-                    Node(OutletNodeNum).Enthalpy = Node(InletNodeNum).Enthalpy;
-                    Node(OutletNodeNum).Press = Node(InletNodeNum).Press;
-                    MassFlowRateSetSum += min(Node(OutletNodeNum).MassFlowRateSetPoint, Node(OutletNodeNum).MassFlowRateMaxAvail);
+                    state.dataLoopNodes->Node(OutletNodeNum).Temp = state.dataLoopNodes->Node(InletNodeNum).Temp;
+                    state.dataLoopNodes->Node(OutletNodeNum).HumRat = state.dataLoopNodes->Node(InletNodeNum).HumRat;
+                    state.dataLoopNodes->Node(OutletNodeNum).Enthalpy = state.dataLoopNodes->Node(InletNodeNum).Enthalpy;
+                    state.dataLoopNodes->Node(OutletNodeNum).Press = state.dataLoopNodes->Node(InletNodeNum).Press;
+                    MassFlowRateSetSum += min(state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateSetPoint, state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMaxAvail);
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        Node(OutletNodeNum).CO2 = Node(InletNodeNum).CO2;
+                        state.dataLoopNodes->Node(OutletNodeNum).CO2 = state.dataLoopNodes->Node(InletNodeNum).CO2;
                     }
                     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                        Node(OutletNodeNum).GenContam = Node(InletNodeNum).GenContam;
+                        state.dataLoopNodes->Node(OutletNodeNum).GenContam = state.dataLoopNodes->Node(InletNodeNum).GenContam;
                     }
                 }
                 if (!PrimaryAirSystems(AirLoopNum).RABExists) {
                     // set the outlet mass flows
                     for (OutletNum = 1; OutletNum <= PrimaryAirSystems(AirLoopNum).Splitter.TotalOutletNodes; ++OutletNum) {
                         OutletNodeNum = PrimaryAirSystems(AirLoopNum).Splitter.NodeNumOut(OutletNum);
-                        if (MassFlowRateSetSum < SmallMassFlow || Node(InletNodeNum).MassFlowRate < SmallMassFlow) {
-                            Node(OutletNodeNum).MassFlowRate = 0.0;
+                        if (MassFlowRateSetSum < SmallMassFlow || state.dataLoopNodes->Node(InletNodeNum).MassFlowRate < SmallMassFlow) {
+                            state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate = 0.0;
                         } else {
-                            Node(OutletNodeNum).MassFlowRate =
-                                Node(InletNodeNum).MassFlowRate *
-                                (min(Node(OutletNodeNum).MassFlowRateSetPoint, Node(OutletNodeNum).MassFlowRateMaxAvail) / MassFlowRateSetSum);
+                            state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate =
+                                state.dataLoopNodes->Node(InletNodeNum).MassFlowRate *
+                                (min(state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateSetPoint, state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMaxAvail) / MassFlowRateSetSum);
                         }
-                        Node(OutletNodeNum).MassFlowRateMaxAvail = Node(InletNodeNum).MassFlowRateMaxAvail;
-                        Node(OutletNodeNum).MassFlowRateMinAvail = 0.0;
+                        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail;
+                        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMinAvail = 0.0;
                     }
                 } else { // set the RAB flow rates
                     RABNodeNum = PrimaryAirSystems(AirLoopNum).RABSplitOutNode;
                     NonRABNodeNum = PrimaryAirSystems(AirLoopNum).OtherSplitOutNode;
                     if (AirLoopControlInfo(AirLoopNum).EconoActive) {
-                        Node(RABNodeNum).MassFlowRate = 0.0;
-                        Node(NonRABNodeNum).MassFlowRate = Node(InletNodeNum).MassFlowRate;
+                        state.dataLoopNodes->Node(RABNodeNum).MassFlowRate = 0.0;
+                        state.dataLoopNodes->Node(NonRABNodeNum).MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
                     } else {
-                        Node(RABNodeNum).MassFlowRate = Node(RABNodeNum).MassFlowRateSetPoint;
-                        Node(NonRABNodeNum).MassFlowRate = Node(InletNodeNum).MassFlowRate - Node(RABNodeNum).MassFlowRate;
-                        if (Node(NonRABNodeNum).MassFlowRate <= state.dataAirLoop->AirLoopFlow(AirLoopNum).MinOutAir) {
-                            Node(NonRABNodeNum).MassFlowRate = min(state.dataAirLoop->AirLoopFlow(AirLoopNum).MinOutAir, Node(InletNodeNum).MassFlowRate);
-                            Node(RABNodeNum).MassFlowRate = Node(InletNodeNum).MassFlowRate - Node(NonRABNodeNum).MassFlowRate;
+                        state.dataLoopNodes->Node(RABNodeNum).MassFlowRate = state.dataLoopNodes->Node(RABNodeNum).MassFlowRateSetPoint;
+                        state.dataLoopNodes->Node(NonRABNodeNum).MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate - state.dataLoopNodes->Node(RABNodeNum).MassFlowRate;
+                        if (state.dataLoopNodes->Node(NonRABNodeNum).MassFlowRate <= state.dataAirLoop->AirLoopFlow(AirLoopNum).MinOutAir) {
+                            state.dataLoopNodes->Node(NonRABNodeNum).MassFlowRate = min(state.dataAirLoop->AirLoopFlow(AirLoopNum).MinOutAir, state.dataLoopNodes->Node(InletNodeNum).MassFlowRate);
+                            state.dataLoopNodes->Node(RABNodeNum).MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate - state.dataLoopNodes->Node(NonRABNodeNum).MassFlowRate;
                         }
                     }
                 }
@@ -3715,49 +3727,49 @@ namespace EnergyPlus::SimAirServingZones {
                 // get the outlet mass flow rate and the outlet minavail mass flow rate
                 for (InletNum = 1; InletNum <= PrimaryAirSystems(AirLoopNum).Mixer.TotalInletNodes; ++InletNum) {
                     InletNodeNum = PrimaryAirSystems(AirLoopNum).Mixer.NodeNumIn(InletNum);
-                    MassFlowRateOut += Node(InletNodeNum).MassFlowRate;
-                    MassFlowRateMinAvailOut += Node(InletNodeNum).MassFlowRateMinAvail;
+                    MassFlowRateOut += state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
+                    MassFlowRateMinAvailOut += state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMinAvail;
                 }
                 // set the outlet mass flow
-                Node(OutletNodeNum).MassFlowRate = MassFlowRateOut;
-                Node(OutletNodeNum).MassFlowRateMinAvail = MassFlowRateMinAvailOut;
-                Node(OutletNodeNum).MassFlowRateMaxAvail = Node(OutletNodeNum).MassFlowRateMax;
+                state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate = MassFlowRateOut;
+                state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMinAvail = MassFlowRateMinAvailOut;
+                state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMax;
                 // calculate the outlet humidity ratio and enthalpy and pressure
                 if (MassFlowRateOut > 0.0) {
                     for (InletNum = 1; InletNum <= PrimaryAirSystems(AirLoopNum).Mixer.TotalInletNodes; ++InletNum) {
                         InletNodeNum = PrimaryAirSystems(AirLoopNum).Mixer.NodeNumIn(InletNum);
-                        OutletHumRat += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).HumRat) / MassFlowRateOut;
-                        OutletEnthalpy += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).Enthalpy) / MassFlowRateOut;
-                        OutletPress += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).Press) / MassFlowRateOut;
+                        OutletHumRat += (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * state.dataLoopNodes->Node(InletNodeNum).HumRat) / MassFlowRateOut;
+                        OutletEnthalpy += (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * state.dataLoopNodes->Node(InletNodeNum).Enthalpy) / MassFlowRateOut;
+                        OutletPress += (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * state.dataLoopNodes->Node(InletNodeNum).Press) / MassFlowRateOut;
                         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                            OutletCO2 += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).CO2) / MassFlowRateOut;
+                            OutletCO2 += (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * state.dataLoopNodes->Node(InletNodeNum).CO2) / MassFlowRateOut;
                         }
                         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                            OutletGC += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).GenContam) / MassFlowRateOut;
+                            OutletGC += (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * state.dataLoopNodes->Node(InletNodeNum).GenContam) / MassFlowRateOut;
                         }
                     }
                 } else {
                     InletNodeNum = PrimaryAirSystems(AirLoopNum).Mixer.NodeNumIn(1);
-                    OutletHumRat = Node(InletNodeNum).HumRat;
-                    OutletEnthalpy = Node(InletNodeNum).Enthalpy;
-                    OutletPress = Node(InletNodeNum).Press;
+                    OutletHumRat = state.dataLoopNodes->Node(InletNodeNum).HumRat;
+                    OutletEnthalpy = state.dataLoopNodes->Node(InletNodeNum).Enthalpy;
+                    OutletPress = state.dataLoopNodes->Node(InletNodeNum).Press;
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        OutletCO2 = Node(InletNodeNum).CO2;
+                        OutletCO2 = state.dataLoopNodes->Node(InletNodeNum).CO2;
                     }
                     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                        OutletGC = Node(InletNodeNum).GenContam;
+                        OutletGC = state.dataLoopNodes->Node(InletNodeNum).GenContam;
                     }
                 }
-                Node(OutletNodeNum).HumRat = OutletHumRat;
-                Node(OutletNodeNum).Enthalpy = OutletEnthalpy;
-                Node(OutletNodeNum).Press = OutletPress;
+                state.dataLoopNodes->Node(OutletNodeNum).HumRat = OutletHumRat;
+                state.dataLoopNodes->Node(OutletNodeNum).Enthalpy = OutletEnthalpy;
+                state.dataLoopNodes->Node(OutletNodeNum).Press = OutletPress;
                 // calculate the outlet temperature
-                Node(OutletNodeNum).Temp = PsyTdbFnHW(OutletEnthalpy, OutletHumRat);
+                state.dataLoopNodes->Node(OutletNodeNum).Temp = PsyTdbFnHW(OutletEnthalpy, OutletHumRat);
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    Node(OutletNodeNum).CO2 = OutletCO2;
+                    state.dataLoopNodes->Node(OutletNodeNum).CO2 = OutletCO2;
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    Node(OutletNodeNum).GenContam = OutletGC;
+                    state.dataLoopNodes->Node(OutletNodeNum).GenContam = OutletGC;
                 }
             }
         }
@@ -3807,23 +3819,23 @@ namespace EnergyPlus::SimAirServingZones {
         // Check for mass flow conservation on each branch. Set SysReSim to TRUE is mass flow not conserved.
         for (BranchNum = 1; BranchNum <= PrimaryAirSystems(SysNum).NumBranches; ++BranchNum) { // loop over branches in system
             // Initialize branch max avail mass flow to max avail mass flow at outlet node
-            BranchMassFlowMaxAvail = Node(PrimaryAirSystems(SysNum).Branch(BranchNum).NodeNumOut).MassFlowRateMaxAvail;
+            BranchMassFlowMaxAvail = state.dataLoopNodes->Node(PrimaryAirSystems(SysNum).Branch(BranchNum).NodeNumOut).MassFlowRateMaxAvail;
             for (NodeIndex = 1; NodeIndex <= PrimaryAirSystems(SysNum).Branch(BranchNum).TotalNodes; ++NodeIndex) { // loop over nodes on branch
                 // Get the new smallest max avail mass flow
                 NodeNum = PrimaryAirSystems(SysNum).Branch(BranchNum).NodeNum(NodeIndex);
-                BranchMassFlowMaxAvail = min(BranchMassFlowMaxAvail, Node(NodeNum).MassFlowRateMaxAvail);
+                BranchMassFlowMaxAvail = min(BranchMassFlowMaxAvail, state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail);
                 // Check for mass flow conservation on the branch
                 if (NodeIndex < PrimaryAirSystems(SysNum).Branch(BranchNum).TotalNodes) {
                     // Set ReSim flag to TRUE if mass flow not conserved on this branch
                     NodeNumNext = PrimaryAirSystems(SysNum).Branch(BranchNum).NodeNum(NodeIndex + 1);
                     if (NodeNum == PrimaryAirSystems(SysNum).OASysInletNodeNum) continue; // don't enforce mass balance across OA Sys
                     // Changeover bypass system connected to a plenum or mixer will need to include the bypass flow rate
-                    if (std::abs(Node(NodeNum).MassFlowRate - Node(NodeNumNext).MassFlowRate - state.dataAirLoop->AirLoopFlow(SysNum).BypassMassFlow) > SmallMassFlow)
+                    if (std::abs(state.dataLoopNodes->Node(NodeNum).MassFlowRate - state.dataLoopNodes->Node(NodeNumNext).MassFlowRate - state.dataAirLoop->AirLoopFlow(SysNum).BypassMassFlow) > SmallMassFlow)
                         SysReSim = true;
                 }
             } // end node loop
             // Store the minimum MassFlowMaxAvail for this branch on the branch inlet node (AirloopHVAC supply inlet node)
-            Node(PrimaryAirSystems(SysNum).Branch(BranchNum).NodeNumIn).MassFlowRateMaxAvail = BranchMassFlowMaxAvail;
+            state.dataLoopNodes->Node(PrimaryAirSystems(SysNum).Branch(BranchNum).NodeNumIn).MassFlowRateMaxAvail = BranchMassFlowMaxAvail;
         } // end branch loop
         // force resimulation for fan-cycling, nonsimple systems
         if (!AirLoopControlInfo(SysNum).Simple && AirLoopControlInfo(SysNum).CyclingFan) {
@@ -3837,10 +3849,10 @@ namespace EnergyPlus::SimAirServingZones {
             // Get sum of splitter outlet mass flows
             for (OutletNum = 1; OutletNum <= PrimaryAirSystems(SysNum).Splitter.TotalOutletNodes; ++OutletNum) {
                 OutletNodeNum = PrimaryAirSystems(SysNum).Splitter.NodeNumOut(OutletNum);
-                MassFlowRateOutSum += Node(OutletNodeNum).MassFlowRate;
+                MassFlowRateOutSum += state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate;
             }
             // Check whether sum of splitter outlet mass flows equals splitter inlet flow.
-            if (std::abs(MassFlowRateOutSum - Node(InletNodeNum).MassFlowRate) > SmallMassFlow) SysReSim = true;
+            if (std::abs(MassFlowRateOutSum - state.dataLoopNodes->Node(InletNodeNum).MassFlowRate) > SmallMassFlow) SysReSim = true;
         }
 
         //// Resimulate if the zone air mass flow conservation convergence critreon is not met
@@ -3852,7 +3864,7 @@ namespace EnergyPlus::SimAirServingZones {
             for (BranchNum = 1; BranchNum <= PrimaryAirSystems(SysNum).NumBranches; ++BranchNum) {                      // loop over branches in system
                 for (NodeIndex = 2; NodeIndex <= PrimaryAirSystems(SysNum).Branch(BranchNum).TotalNodes; ++NodeIndex) { // loop over nodes on branch
                     NodeNum = PrimaryAirSystems(SysNum).Branch(BranchNum).NodeNum(NodeIndex);
-                    Node(NodeNum).MassFlowRateMaxAvail = Node(PrimaryAirSystems(SysNum).Branch(BranchNum).NodeNumIn).MassFlowRateMaxAvail;
+                    state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(PrimaryAirSystems(SysNum).Branch(BranchNum).NodeNumIn).MassFlowRateMaxAvail;
                 }
             }
 
@@ -3863,16 +3875,16 @@ namespace EnergyPlus::SimAirServingZones {
                 InletNodeNum = PrimaryAirSystems(SysNum).Splitter.NodeNumIn;
                 for (OutletNum = 1; OutletNum <= PrimaryAirSystems(SysNum).Splitter.TotalOutletNodes; ++OutletNum) {
                     OutletNodeNum = PrimaryAirSystems(SysNum).Splitter.NodeNumOut(OutletNum);
-                    MassFlowRateOutSum += min(Node(OutletNodeNum).MassFlowRateMaxAvail, Node(OutletNodeNum).MassFlowRateSetPoint);
+                    MassFlowRateOutSum += min(state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMaxAvail, state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateSetPoint);
                 }
                 // set the splitter inlet Max Avail mass flow rate
-                if (Node(InletNodeNum).MassFlowRateMaxAvail > MassFlowRateOutSum + SmallMassFlow) {
-                    Node(InletNodeNum).MassFlowRateMaxAvail = MassFlowRateOutSum;
+                if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail > MassFlowRateOutSum + SmallMassFlow) {
+                    state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail = MassFlowRateOutSum;
                 }
                 // Pass the splitter inlet Max Avail mass flow rate upstream to the mixed air node
                 for (NodeIndex = PrimaryAirSystems(SysNum).Branch(InBranchNum).TotalNodes - 1; NodeIndex >= 1; --NodeIndex) {
                     NodeNum = PrimaryAirSystems(SysNum).Branch(InBranchNum).NodeNum(NodeIndex);
-                    Node(NodeNum).MassFlowRateMaxAvail = Node(InletNodeNum).MassFlowRateMaxAvail;
+                    state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail;
                     if (NodeNum == PrimaryAirSystems(SysNum).OASysOutletNodeNum) break;
                 }
             }
@@ -3881,7 +3893,7 @@ namespace EnergyPlus::SimAirServingZones {
             for (InBranchIndex = 1; InBranchIndex <= PrimaryAirSystems(SysNum).NumInletBranches; ++InBranchIndex) {
                 InBranchNum = PrimaryAirSystems(SysNum).InletBranchNum(InBranchIndex);
                 InNodeNum = PrimaryAirSystems(SysNum).Branch(InBranchNum).NodeNumIn;
-                Node(InNodeNum).MassFlowRate = min(Node(InNodeNum).MassFlowRate, Node(InNodeNum).MassFlowRateMaxAvail);
+                state.dataLoopNodes->Node(InNodeNum).MassFlowRate = min(state.dataLoopNodes->Node(InNodeNum).MassFlowRate, state.dataLoopNodes->Node(InNodeNum).MassFlowRateMaxAvail);
             }
         }
     }
@@ -6956,7 +6968,7 @@ namespace EnergyPlus::SimAirServingZones {
                 // }
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
                     for (J = 1; J <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++J) {
-                        static constexpr auto SSizeFmt12("{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}");
+                        constexpr const char * SSizeFmt12("{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}");
                         print(state.files.ssz,
                               SSizeFmt12,
                               SizingFileColSep,
@@ -7000,11 +7012,11 @@ namespace EnergyPlus::SimAirServingZones {
                         } else {
                             HourPrint = HourCounter - 1;
                         }
-                        static constexpr auto SSizeFmt20("{:02}:{:02}:00");
+                        constexpr const char * SSizeFmt20("{:02}:{:02}:00");
                         print(state.files.ssz, SSizeFmt20, HourPrint, Minutes);
                         for (I = 1; I <= NumPrimaryAirSys; ++I) {
                             for (J = 1; J <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++J) {
-                                static constexpr auto SSizeFmt22("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
+                                constexpr const char * SSizeFmt22("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
 
                                 print(state.files.ssz,
                                       SSizeFmt22,
@@ -7024,7 +7036,7 @@ namespace EnergyPlus::SimAirServingZones {
                     }
                 }
 
-                static constexpr auto SSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
+                constexpr const char * SSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
                 print(state.files.ssz, "Coinc Peak   ");
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
                     print(state.files.ssz,
@@ -7077,7 +7089,6 @@ namespace EnergyPlus::SimAirServingZones {
         using Psychrometrics::PsyHFnTdbW;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("UpdateSysSizingForScalableInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TempSize;           // autosized value
