@@ -196,7 +196,7 @@ namespace HVACDuct {
         int IOStatus;                   // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
-        cCurrentModuleObject = "state.dataHVACDuct->Duct";
+        cCurrentModuleObject = "Duct";
         state.dataHVACDuct->NumDucts = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHVACDuct->Duct.allocate(state.dataHVACDuct->NumDucts);
         state.dataHVACDuct->CheckEquipName.dimension(state.dataHVACDuct->NumDucts, true);
