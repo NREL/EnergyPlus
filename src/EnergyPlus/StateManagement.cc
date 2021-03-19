@@ -73,7 +73,6 @@
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -129,7 +128,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACCooledBeam::clear_state();
     HVACDXSystem::clear_state();
     HVACFan::clearHVACFanObjects();
-    HVACSingleDuctInduc::clear_state();
     HysteresisPhaseChange::clear_state();
     LowTempRadiantSystem::clear_state();
     OutputReportTabular::clear_state(state);

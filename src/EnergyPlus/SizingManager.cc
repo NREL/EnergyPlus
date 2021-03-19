@@ -1079,29 +1079,29 @@ namespace EnergyPlus::SizingManager {
 
                 // sum up heating and max flows for any four pipe induction units
                 // dual path for std 62.1
-                if (allocated(HVACSingleDuctInduc::IndUnit) && (HVACSingleDuctInduc::NumIndUnits > 0)) {
-                    for (int indUnitNum = 1; indUnitNum <= HVACSingleDuctInduc::NumIndUnits; ++indUnitNum) {
-                        if (AirLoopNum == HVACSingleDuctInduc::IndUnit(indUnitNum).AirLoopNum) {
-                            int termUnitSizingIndex = AirDistUnit(HVACSingleDuctInduc::IndUnit(indUnitNum).ADUNum).TermUnitSizingNum;
+                if (allocated(state.dataHVACSingleDuctInduc->IndUnit) && (state.dataHVACSingleDuctInduc->NumIndUnits > 0)) {
+                    for (int indUnitNum = 1; indUnitNum <= state.dataHVACSingleDuctInduc->NumIndUnits; ++indUnitNum) {
+                        if (AirLoopNum == state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).AirLoopNum) {
+                            int termUnitSizingIndex = AirDistUnit(state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).ADUNum).TermUnitSizingNum;
 
                             airLoopHeatingMaximumFlowRateSum +=
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                                state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             airLoopHeatingMinimumFlowRateSum +=
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
-                            airLoopMaxFlowRateSum += HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                                state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                            airLoopMaxFlowRateSum += state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             // store Std 62.1 values, CV system
                             state.dataSize->VpzClgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                                state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             state.dataSize->VpzMinClgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
-                            state.dataSize->VdzClgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
-                            state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
+                                state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                            state.dataSize->VdzClgByZone(termUnitSizingIndex) = state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).MaxTotAirVolFlow;
+                            state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).MaxTotAirVolFlow;
                             state.dataSize->VpzHtgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                                state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             state.dataSize->VpzMinHtgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
-                            state.dataSize->VdzHtgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
-                            state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
+                                state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                            state.dataSize->VdzHtgByZone(termUnitSizingIndex) = state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).MaxTotAirVolFlow;
+                            state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = state.dataHVACSingleDuctInduc->IndUnit(indUnitNum).MaxTotAirVolFlow;
                         }
                     }
                 }
