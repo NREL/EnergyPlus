@@ -136,13 +136,13 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemSca
     state->dataSize->CurZoneEqNum = 1;
 
     RadSysNum = 1;
-    HighTempRadSys.allocate(RadSysNum);
-    HighTempRadSysNumericFields.allocate(RadSysNum);
-    HighTempRadSysNumericFields(RadSysNum).FieldNames.allocate(1);
-    HighTempRadSys(RadSysNum).Name = "TESTSCALABLEFLAG";
-    HighTempRadSys(RadSysNum).ZonePtr = 1;
-    HighTempRadSys(RadSysNum).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
-    HighTempRadSys(RadSysNum).ScaledHeatingCapacity = 100.0;
+    state->dataHighTempRadSys->HighTempRadSys.allocate(RadSysNum);
+    state->dataHighTempRadSys->HighTempRadSysNumericFields.allocate(RadSysNum);
+    state->dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames.allocate(1);
+    state->dataHighTempRadSys->HighTempRadSys(RadSysNum).Name = "TESTSCALABLEFLAG";
+    state->dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr = 1;
+    state->dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+    state->dataHighTempRadSys->HighTempRadSys(RadSysNum).ScaledHeatingCapacity = 100.0;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
