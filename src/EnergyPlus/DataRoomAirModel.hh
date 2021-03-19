@@ -86,21 +86,21 @@ namespace DataRoomAirModel {
     };
 
     // Parameters to indicate type of air node, which is dependent on air models
-    extern int const InletAirNode;              // air node at inlet (for Mundt and Rees&Haves Models)
-    extern int const FloorAirNode;              // air node at floor (for Mundt and Rees&Haves Models)
-    extern int const ControlAirNode;            // air node at control point (for Mundt Model)
-    extern int const CeilingAirNode;            // air node at ceiling (for Mundt Model)
-    extern int const MundtRoomAirNode;          // air node for vertical walls (for Mundt Model)
-    extern int const ReturnAirNode;             // air node for return (for Mundt and Rees&Haves Models)
-    extern int const AirflowNetworkRoomAirNode; // air node for airflow network based room air model
-    extern int const PlumeAirNode1;             // air node for plume load (for Rees&Haves Model)
-    extern int const PlumeAirNode2;             // air node for plume load (for Rees&Haves Model)
-    extern int const PlumeAirNode3;             // air node for plume load (for Rees&Haves Model)
-    extern int const PlumeAirNode4;             // air node for plume load (for Rees&Haves Model)
-    extern int const RoomAirNode1;              // air node for vertical walls (for Rees&Haves Model)
-    extern int const RoomAirNode2;              // air node for vertical walls (for Rees&Haves Model)
-    extern int const RoomAirNode3;              // air node for vertical walls (for Rees&Haves Model)
-    extern int const RoomAirNode4;              // air node for vertical walls (for Rees&Haves Model)
+    int constexpr InletAirNode = 0;               // air node at inlet (for Mundt and Rees&Haves Models)
+    int constexpr FloorAirNode = 1;               // air node at floor (for Mundt and Rees&Haves Models)
+    int constexpr ControlAirNode = 2;             // air node at control point (for Mundt Model)
+    int constexpr CeilingAirNode = 3;             // air node at ceiling (for Mundt Model)
+    int constexpr MundtRoomAirNode = 4;           // air node for vertical walls (for Mundt Model)
+    int constexpr ReturnAirNode = 10;             // air node for return (for Mundt and Rees&Haves Models)
+    int constexpr AirflowNetworkRoomAirNode = 11; // air node for airflow network based room air model
+    int constexpr PlumeAirNode1 = 2;              // air node for plume load (for Rees&Haves Model)
+    int constexpr PlumeAirNode2 = 3;              // air node for plume load (for Rees&Haves Model)
+    int constexpr PlumeAirNode3 = 4;              // air node for plume load (for Rees&Haves Model)
+    int constexpr PlumeAirNode4 = 5;              // air node for plume load (for Rees&Haves Model)
+    int constexpr RoomAirNode1 = 6;               // air node for vertical walls (for Rees&Haves Model)
+    int constexpr RoomAirNode2 = 7;               // air node for vertical walls (for Rees&Haves Model)
+    int constexpr RoomAirNode3 = 8;               // air node for vertical walls (for Rees&Haves Model)
+    int constexpr RoomAirNode4 = 9;               // air node for vertical walls (for Rees&Haves Model)
 
     // user-defined pattern two gradient interpolation modes
     enum class UserDefinedPatternMode {

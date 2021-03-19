@@ -64,19 +64,14 @@ struct EnergyPlusData;
 
 namespace HVACMultiSpeedHeatPump {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
     // Heating coil types
-    extern int const MultiSpeedHeatingCoil; // COIL:DX:MultiSpeed:Heating
+    int constexpr MultiSpeedHeatingCoil(1); // COIL:DX:MultiSpeed:Heating
     // Cooling coil types
-    extern int const MultiSpeedCoolingCoil; // COIL:DX:MultiSpeed:Cooling
+    int constexpr MultiSpeedCoolingCoil(2); // COIL:DX:MultiSpeed:Cooling
     // Supplymental heating coil types
-    extern int const SuppHeatingCoilGas;  // Supplymental heating coil type: COIL:GAS:HEATING
-    extern int const SuppHeatingCoilElec; // Supplymental heating coil type: COIL:ELECTRIC:HEATING
-    extern int const SuppHeatingCoilRec;  // Supplymental heating coil type: COIL:ENGINEHEATRECOVERY:HEATING
+    int constexpr SuppHeatingCoilGas(1);  // Supplymental heating coil type: COIL:GAS:HEATING
+    int constexpr SuppHeatingCoilElec(2); // Supplymental heating coil type: COIL:ELECTRIC:HEATING
+    int constexpr SuppHeatingCoilRec(3);  // Supplymental heating coil type: COIL:ENGINEHEATRECOVERY:HEATING
 
     // Mode of operation
     enum class ModeOfOperation {
@@ -101,7 +96,7 @@ namespace HVACMultiSpeedHeatPump {
     struct MSHeatPumpData
     {
         // Members
-        //          Some variables in this type are arrays (dimension=MaxSpeed) to support the number of speeds
+        // Some variables in this type are arrays (dimension=MaxSpeed) to support the number of speeds
         std::string Name;                   // Name of the engine driven heat pump
         std::string AvaiSchedule;           // Availability Schedule name
         int AvaiSchedPtr;                   // Pointer to the correct schedule
@@ -280,14 +275,6 @@ namespace HVACMultiSpeedHeatPump {
         }
     };
 
-    // Object Data
-    extern Array1D<MSHeatPumpData> MSHeatPump;
-    extern Array1D<MSHeatPumpReportData> MSHeatPumpReport;
-
-    // Functions
-
-    void clear_state();
-
     void SimMSHeatPump(EnergyPlusData &state, std::string const &CompName,   // Name of the unitary engine driven heat pump system
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                        int const AirLoopNum,          // air loop index
@@ -396,9 +383,56 @@ namespace HVACMultiSpeedHeatPump {
 
 struct HVACMultiSpeedHeatPumpData : BaseGlobalStruct {
 
+    int NumMSHeatPumps = 0;     // Number of multi speed heat pumps
+    int AirLoopPass = 0;        // Number of air loop pass
+    Real64 TempSteamIn = 100.0; // steam coil steam inlet temperature
+
+    std::string CurrentModuleObject; // Object type for getting and error messages
+    Real64 CompOnMassFlow = 0.0;      // System air mass flow rate w/ compressor ON
+    Real64 CompOffMassFlow = 0.0;     // System air mass flow rate w/ compressor OFF
+    Real64 CompOnFlowRatio = 0.0;     // fan flow ratio when coil on
+    Real64 CompOffFlowRatio = 0.0;    // fan flow ratio when coil off
+    Real64 FanSpeedRatio = 0.0;       // fan speed ratio passed to on/off fan object
+    Real64 SupHeaterLoad = 0.0;       // load to be met by supplemental heater [W]
+    Real64 SaveLoadResidual = 0.0;    // Saved load residual used to check convergence
+    Real64 SaveCompressorPLR = 0.0;   // holds compressor PLR from active DX coil
+    Array1D_bool CheckEquipName;
+
+    // SUBROUTINE SPECIFICATIONS FOR MODULE
+
+    // Object Data
+    Array1D<HVACMultiSpeedHeatPump::MSHeatPumpData> MSHeatPump;
+    Array1D<HVACMultiSpeedHeatPump::MSHeatPumpReportData> MSHeatPumpReport;
+
+    bool GetInputFlag = true;      // Get input flag
+    bool FlowFracFlagReady = true; // one time flag for calculating flow fraction through controlled zone
+    int ErrCountCyc = 0;           // Counter used to minimize the occurrence of output warnings
+    int ErrCountVar = 0;           // Counter used to minimize the occurrence of output warnings
+
+    std::string HeatCoilName; // TODO: What's the best plan here?
+
     void clear_state() override
     {
-
+        this->NumMSHeatPumps = 0;
+        this->AirLoopPass = 0;
+        this->TempSteamIn = 100.0;
+        this->CurrentModuleObject = "";
+        this->CompOnMassFlow = 0.0;
+        this->CompOffMassFlow = 0.0;
+        this->CompOnFlowRatio = 0.0;
+        this->CompOffFlowRatio = 0.0;
+        this->FanSpeedRatio = 0.0;
+        this->SupHeaterLoad = 0.0;
+        this->SaveLoadResidual = 0.0;
+        this->SaveCompressorPLR = 0.0;
+        this->CheckEquipName.clear();
+        this->MSHeatPump.clear();
+        this->MSHeatPumpReport.clear();
+        this->GetInputFlag = true; // Get input flag
+        this->FlowFracFlagReady = true;
+        this->ErrCountCyc = 0;
+        this->ErrCountVar = 0;
+        this->HeatCoilName = "";
     }
 };
 

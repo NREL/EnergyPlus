@@ -103,30 +103,11 @@ namespace RoomAirModelAirflowNetwork {
     // Interact with Surface HB, internal gain, HVAC system and Airflow Network Domains
     // Do heat and moisture balance calculations on roomair nodes.
 
-    // REFERENCES:
-    // none
-
-    // OTHER NOTES:
-    // na
-
     // Using/Aliasing
     using namespace DataRoomAirModel;
     using namespace DataHeatBalSurface;
-    using namespace DataMoistureBalance;
     using namespace DataSurfaces;
     using namespace DataHeatBalance;
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    // MODULE DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // see DataRoomAir
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Object Data
     Array1D<RAFNData> RAFN;
@@ -580,17 +561,17 @@ namespace RoomAirModelAirflowNetwork {
         if (NodeNum > 0) {
             for (linkNum = 1; linkNum <= ThisRAFNNode.NumOfAirflowLinks; ++linkNum) {
                 Link = ThisRAFNNode.Link(linkNum).AirflowNetworkLinkSimuID;
-                if (AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[0] == NodeNum) { // incoming flow
-                    NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1];
-                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
-                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW2;
+                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[0] == NodeNum) { // incoming flow
+                    NodeIn = state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[1];
+                    ThisRAFNNode.Link(linkNum).TempIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).TZ;
+                    ThisRAFNNode.Link(linkNum).HumRatIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).WZ;
+                    ThisRAFNNode.Link(linkNum).MdotIn = state.dataAirflowNetwork->AirflowNetworkLinkSimu(Link).FLOW2;
                 }
-                if (AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1] == NodeNum) { // outgoing flow
-                    NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[0];
-                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
-                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW;
+                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[1] == NodeNum) { // outgoing flow
+                    NodeIn = state.dataAirflowNetwork->AirflowNetworkLinkageData(Link).NodeNums[0];
+                    ThisRAFNNode.Link(linkNum).TempIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).TZ;
+                    ThisRAFNNode.Link(linkNum).HumRatIn = state.dataAirflowNetwork->AirflowNetworkNodeSimu(NodeIn).WZ;
+                    ThisRAFNNode.Link(linkNum).MdotIn = state.dataAirflowNetwork->AirflowNetworkLinkSimu(Link).FLOW;
                 }
             }
 
@@ -1165,6 +1146,9 @@ namespace RoomAirModelAirflowNetwork {
                 if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SurfMask(SurfNum - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1)) continue;
             }
 
+            auto & HMassConvInFD = state.dataMstBal->HMassConvInFD;
+            auto & RhoVaporSurfIn = state.dataMstBal->RhoVaporSurfIn;
+            auto & RhoVaporAirIn = state.dataMstBal->RhoVaporAirIn;
             if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
                 UpdateHeatBalHAMT(state, SurfNum);
 

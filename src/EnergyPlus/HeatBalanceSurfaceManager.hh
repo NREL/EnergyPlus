@@ -81,7 +81,6 @@ namespace HeatBalanceSurfaceManager {
     // Reporting routines for module
 
     // Functions
-    void clear_state();
 
     void ManageSurfaceHeatBalance(EnergyPlusData &state);
 
@@ -209,6 +208,29 @@ struct HeatBalSurfMgr : BaseGlobalStruct {
     Real64 curQL = 0.0; // radiant value prior to adjustment for pulse for load component report
     Real64 adjQL = 0.0; // radiant value including adjustment for pulse for load component report
 
+    bool ManageSurfaceHeatBalancefirstTime = true;
+    bool InitSurfaceHeatBalancefirstTime = true;
+    bool ComputeIntSWAbsorpFactorsfirstTime = true; // First time through routine
+    bool UpdateThermalHistoriesFirstTimeFlag = true;
+    bool CalculateZoneMRTfirstTime = true; // Flag for first time calculations
+    bool reportThermalResilienceFirstTime = true;
+    bool reportVarHeatIndex = false;
+    bool reportVarHumidex = false;
+    bool hasPierceSET = true;
+    bool reportCO2ResilienceFirstTime = true;
+    bool reportVisualResilienceFirstTime = true;
+    std::vector<Real64> lowSETLongestHours;
+    std::vector<Real64> highSETLongestHours;
+    std::vector<int> lowSETLongestStart;
+    std::vector<int> highSETLongestStart;
+    bool calcHeatBalInsideSurfFirstTime = true;
+    bool calcHeatBalInsideSurfCTFOnlyFirstTime = true;
+    int calcHeatBalInsideSurfErrCount = 0;
+    int calcHeatBalInsideSurfErrPointer = 0;
+    int calcHeatBalInsideSurfWarmupErrCount = 0;
+    bool calcHeatBalInsideSurEnvrnFlag = true;
+    Array1D<Real64> RefAirTemp; // inside surface convection reference air temperatures
+
     void clear_state() override
     {
         QExt1.clear();
@@ -227,6 +249,29 @@ struct HeatBalSurfMgr : BaseGlobalStruct {
         FirstCalcZone.clear();
         curQL = 0.0;
         adjQL = 0.0;
+
+        ManageSurfaceHeatBalancefirstTime = true;
+        InitSurfaceHeatBalancefirstTime = true;
+        ComputeIntSWAbsorpFactorsfirstTime = true;
+        UpdateThermalHistoriesFirstTimeFlag = true;
+        CalculateZoneMRTfirstTime = true;
+        reportThermalResilienceFirstTime = true;
+        reportVarHeatIndex = false;
+        reportVarHumidex = false;
+        hasPierceSET = true;
+        reportCO2ResilienceFirstTime = true;
+        reportVisualResilienceFirstTime = true;
+        lowSETLongestHours.clear();
+        highSETLongestHours.clear();
+        lowSETLongestStart.clear();
+        highSETLongestStart.clear();
+        calcHeatBalInsideSurfFirstTime = true;
+        calcHeatBalInsideSurfCTFOnlyFirstTime = true;
+        calcHeatBalInsideSurfErrCount = 0;
+        calcHeatBalInsideSurfErrPointer = 0;
+        calcHeatBalInsideSurfWarmupErrCount = 0;
+        calcHeatBalInsideSurEnvrnFlag = true;
+        RefAirTemp.clear();
     }
 };
 

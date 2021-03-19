@@ -89,15 +89,13 @@ namespace DataSystemVariables {
                                 const std::string contextString = std::string()
     );
 
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
     void processEnvironmentVariables(EnergyPlusData &state);
 
 } // namespace DataSystemVariables
 
 struct SystemVarsData : BaseGlobalStruct
 {
+    bool firstTime = true;
 
     int const iASCII_CR = 13;   // endline value when just CR instead of CR/LF
     int const iUnicode_end = 0; // endline value when Unicode file
@@ -165,6 +163,8 @@ struct SystemVarsData : BaseGlobalStruct
         FullAnnualRun = false;
         DeveloperFlag = false;
         TimingFlag = false;
+
+        firstTime = true;
 
         SutherlandHodgman = true;
         SlaterBarsky = false;

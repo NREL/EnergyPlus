@@ -200,6 +200,32 @@ struct SimAirServingZonesData : BaseGlobalStruct {
     bool OutputSetupFlag = false;
     bool MyEnvrnFlag = true;
 
+    Array1D<Real64> EvBySysCool; // saved value of SysCoolingEv used in 62.1 tabular report
+    Array1D<Real64> EvBySysHeat; // saved value of SysHeatingEv used in 62.1 tabular report
+    Real64 Ep = 1.0;             // zone primary air fraction
+    Real64 Er = 0.0;             // zone secondary recirculation fraction
+    Real64 Fa = 1.0;             // temporary variable used in multi-path VRP calc
+    Real64 Fb = 1.0;             // temporary variable used in multi-path VRP calc
+    Real64 Fc = 1.0;             // temporary variable used in multi-path VRP calc
+    Real64 Xs = 1.0;             // uncorrected system outdoor air fraction
+    Real64 MinHeatingEvz = 1.0;  // minimum zone ventilation efficiency for heating (to be used as system efficiency)
+    Real64 MinCoolingEvz = 1.0;  // minimum zone ventilation efficiency for cooling (to be used as system efficiency)
+    Real64 ZoneOAFrac = 0.0;     // zone OA fraction
+    Real64 ZoneEz = 1.0;         // zone air distribution effectiveness
+    Real64 Vou = 0.0;            // Uncorrected outdoor air intake for all zones per ASHRAE std 62.1
+    Real64 Vot = 0.0;            // Required outdoor air intake at primary AHU per ASHRAE std 62.1
+
+    Array1D_int CtrlZoneNumsCool;
+    Array1D_int CtrlZoneNumsHeat;
+    Array1D_int ZoneInletNodesCool;
+    Array1D_int ZoneInletNodesHeat;
+    Array1D_int TermInletNodesCool;
+    Array1D_int TermInletNodesHeat;
+    Array1D_int TermUnitSizingNumsCool;
+    Array1D_int TermUnitSizingNumsHeat;
+    Array1D_int SupNode;
+    Array1D_int SupNodeType;
+
     void clear_state() override
     {
         this->GetAirLoopInputFlag = true;
@@ -210,6 +236,32 @@ struct SimAirServingZonesData : BaseGlobalStruct {
         this->InitAirLoopsBranchSizingFlag = true;
         this->OutputSetupFlag = false;
         this->MyEnvrnFlag = true;
+
+        this->EvBySysCool.clear();
+        this->EvBySysHeat.clear();
+        this->Ep = 1.0;
+        this->Er = 0.0;
+        this->Fa = 1.0;
+        this->Fb = 1.0;
+        this->Fc = 1.0;
+        this->Xs = 1.0;
+        this->MinHeatingEvz = 1.0;
+        this->MinCoolingEvz = 1.0;
+        this->ZoneOAFrac = 0.0;
+        this->ZoneEz = 1.0;
+        this->Vou = 0.0;
+        this->Vot = 0.0;
+
+        this->CtrlZoneNumsCool.clear();
+        this->CtrlZoneNumsHeat.clear();
+        this->ZoneInletNodesCool.clear();
+        this->ZoneInletNodesHeat.clear();
+        this->TermInletNodesCool.clear();
+        this->TermInletNodesHeat.clear();
+        this->TermUnitSizingNumsCool.clear();
+        this->TermUnitSizingNumsHeat.clear();
+        this->SupNode.clear();
+        this->SupNodeType.clear();
     }
 };
 

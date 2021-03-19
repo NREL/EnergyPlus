@@ -4059,7 +4059,7 @@ namespace SystemAvailabilityManager {
             }
 
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0 &&
-                AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                 ShowContinueError(state, "The simple airflow objects are used for natural ventilation calculation.");
                 ShowContinueError(state, "The Airflow Network model is not allowed to perform. Please set the control type = NoMultizoneOrDistribution");
@@ -4067,10 +4067,10 @@ namespace SystemAvailabilityManager {
             }
 
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr == 0) {
-                if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                     ShowContinueError(state, "The Airflow Network model is not available for Hybrid Ventilation Control.");
-                } else if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+                } else if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                     ShowContinueError(state, "Please check the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.");
                     ShowContinueError(state, "The suggested choices are MultizoneWithDistribution or MultizoneWithoutDistribution.");
@@ -4550,7 +4550,7 @@ namespace SystemAvailabilityManager {
                     ACH = 0.0;
                     HybridVentModeOA = true;
                     if (!state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
-                        if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                        if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                             HybridVentModeOA = false;
                         }
                     }
