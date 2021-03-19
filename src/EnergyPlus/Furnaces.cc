@@ -253,7 +253,7 @@ namespace Furnaces {
         Real64 H2OHtOfVap;        // Heat of vaporization of air
         int FurnaceInletNode;     // Inlet node to furnace or unitary system
         Real64 FurnaceSavMdot;    // saved furnace inlet air mass flow rate [m3/s]
-        static Real64 Dummy(0.0);
+        Real64 Dummy(0.0);
         int CompOp;               // compressor operation; 1=on, 0=off
         Real64 OnOffAirFlowRatio; // Ratio of compressor ON air flow to AVERAGE air flow over time step
         int FanOpMode;            // Fan operating mode (1=CycFanCycCoil, 2=ContFanCycCoil)
@@ -8015,7 +8015,7 @@ namespace Furnaces {
         int OpMode;                      // Mode of Operation (fan cycling = 1 or fan continuous = 2)
         static Real64 CoolPartLoadRatio; // Part load ratio (greater of sensible or latent part load ratio for cooling)
         static Real64 HeatPartLoadRatio; // Part load ratio (greater of sensible or latent part load ratio for cooling)
-        static Real64 Dummy(0.0);        // Dummy var. for generic calc. furnace output arg. (n/a for heat pump)
+        Real64 Dummy(0.0);               // Dummy var. for generic calc. furnace output arg. (n/a for heat pump)
         bool HumControl;                 // Logical flag signaling when dehumidification is required
         Real64 SuppHeatCoilLoad;         // Load passed to supplemental heater (W)
         Real64 CoolErrorToler;           // convergence tolerance used in cooling mode
