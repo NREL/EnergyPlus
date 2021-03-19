@@ -103,10 +103,10 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
-        static Real64 tmpCurrentTime(0.0);
-        static Real64 tmpMinutes(0.0);
-        static Real64 tmpHours(0.0);
-        static Real64 tmpCurEnvirNum(0.0);
+        Real64 tmpCurrentTime(0.0);
+        Real64 tmpMinutes(0.0);
+        Real64 tmpHours(0.0);
+        Real64 tmpCurEnvirNum(0.0);
         Array1D_int datevalues(8);
         // value(1)   Current year
         // value(2)   Current month
@@ -766,7 +766,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         int InstructionNum;
         int InstructionNum2;
         int ExpressionNum;
-        static int VariableNum;
+        int ESVariableNum;
         int WhileLoopExitCounter;      // to avoid infinite loop in While loop
         bool seriousErrorFound(false); // once it gets set true (inside EvaluateExpresssion) it will trigger a fatal (in WriteTrace)
 
@@ -792,12 +792,12 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordSet) {
 
                     ReturnValue = EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
-                    VariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                    if ((!state.dataRuntimeLang->ErlVariable(VariableNum).ReadOnly) && (!state.dataRuntimeLang->ErlVariable(VariableNum).Value.TrendVariable)) {
-                        state.dataRuntimeLang->ErlVariable(VariableNum).Value = ReturnValue;
-                    } else if (state.dataRuntimeLang->ErlVariable(VariableNum).Value.TrendVariable) {
-                        state.dataRuntimeLang->ErlVariable(VariableNum).Value.Number = ReturnValue.Number;
-                        state.dataRuntimeLang->ErlVariable(VariableNum).Value.Error = ReturnValue.Error;
+                    ESVariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                    if ((!state.dataRuntimeLang->ErlVariable(ESVariableNum).ReadOnly) && (!state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable)) {
+                        state.dataRuntimeLang->ErlVariable(ESVariableNum).Value = ReturnValue;
+                    } else if (state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable) {
+                        state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Number = ReturnValue.Number;
+                        state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Error = ReturnValue.Error;
                     }
 
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
