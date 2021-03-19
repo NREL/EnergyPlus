@@ -71,7 +71,6 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
@@ -126,7 +125,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HighTempRadiantSystem::clear_state();
     Humidifiers::clear_state();
     HVACCooledBeam::clear_state();
-    HVACDXSystem::clear_state();
     HVACFan::clearHVACFanObjects();
     HysteresisPhaseChange::clear_state();
     LowTempRadiantSystem::clear_state();
