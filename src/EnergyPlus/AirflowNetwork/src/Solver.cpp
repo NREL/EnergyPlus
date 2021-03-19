@@ -177,7 +177,7 @@ namespace AirflowNetwork {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
-        int j;
+        iComponentTypeNum j;
         int n;
 
         // Formats
@@ -187,8 +187,8 @@ namespace AirflowNetwork {
         // If multizone airflow is simulated only, the array size is allocated based on the multizone network.
 
 
-        NetworkNumOfLinks = AirflowNetworkNumOfLinks;
-        NetworkNumOfNodes = AirflowNetworkNumOfNodes;
+        NetworkNumOfLinks = state.dataAirflowNetwork->AirflowNetworkNumOfLinks;
+        NetworkNumOfNodes = state.dataAirflowNetwork->AirflowNetworkNumOfNodes;
 
         AFECTL.allocate(NetworkNumOfLinks);
         AFLOW2.allocate(NetworkNumOfLinks);
@@ -215,9 +215,9 @@ namespace AirflowNetwork {
         SUMF.allocate(NetworkNumOfNodes);
 
         n = 0;
-        for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
-            j = AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum;
-            if (j == CompTypeNum_DOP) {
+        for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfLinks; ++i) {
+            j = state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum;
+            if (j == iComponentTypeNum::DOP) {
                 ++n;
             }
         }
@@ -225,7 +225,7 @@ namespace AirflowNetwork {
         DpProf.allocate(n * (NrInt + 2));
         RhoProfF.allocate(n * (NrInt + 2));
         RhoProfT.allocate(n * (NrInt + 2));
-        DpL.allocate(AirflowNetworkNumOfLinks, 2);
+        DpL.allocate(state.dataAirflowNetwork->AirflowNetworkNumOfLinks, 2);
 
         PB = 101325.0;
         //   LIST = 5
@@ -243,9 +243,9 @@ namespace AirflowNetwork {
         for (i = 1; i <= NetworkNumOfNodes; ++i) {
             // TZ(i) = AirflowNetworkNodeSimu(i).TZ;
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
-            PZ(i) = AirflowNetworkNodeSimu(i).PZ;
-            properties[i].temperature = AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidityRatio = AirflowNetworkNodeSimu(i).WZ;
+            PZ(i) = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ;
+            properties[i].temperature = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ;
+            properties[i].humidityRatio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
 
@@ -259,45 +259,45 @@ namespace AirflowNetwork {
             Unit11 = GetNewUnitNumber();
             ObjexxFCL::gio::open(Unit11, DataStringGlobals::eplusADSFileName);
             for (i = 1; i <= NetworkNumOfNodes; ++i) {
-                ObjexxFCL::gio::write(Unit11, Format_901) << i << AirflowNetworkNodeData(i).NodeTypeNum << AirflowNetworkNodeData(i).NodeHeight << TZ(i)
+                ObjexxFCL::gio::write(Unit11, Format_901) << i << state.dataAirflowNetwork->AirflowNetworkNodeData(i).NodeTypeNum << state.dataAirflowNetwork->AirflowNetworkNodeData(i).NodeHeight << TZ(i)
                                                << PZ(i);
             }
             ObjexxFCL::gio::write(Unit11, Format_900) << 0;
             for (i = 1; i <= AirflowNetworkNumOfComps; ++i) {
-                j = AirflowNetworkCompData(i).TypeNum;
+                j = state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum;
                 {
-                    auto const SELECT_CASE_var(AirflowNetworkCompData(i).CompTypeNum);
+                    auto const SELECT_CASE_var(state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum);
                     if (SELECT_CASE_var == CompTypeNum_PLR) { //'PLR'  Power law component
-                        //              WRITE(Unit11,902) AirflowNetworkCompData(i)%CompNum,1,DisSysCompLeakData(j)%FlowCoef, &
+                        //              WRITE(Unit11,902) state.dataAirflowNetwork->AirflowNetworkCompData(i)%CompNum,1,DisSysCompLeakData(j)%FlowCoef, &
                         //                  DisSysCompLeakData(j)%FlowCoef,DisSysCompLeakData(j)%FlowCoef,DisSysCompLeakData(j)%FlowExpo
                     } else if (SELECT_CASE_var == CompTypeNum_SCR) { //'SCR'  Surface crack component
-                        ObjexxFCL::gio::write(Unit11, Format_902) << AirflowNetworkCompData(i).CompNum << 1 << MultizoneSurfaceCrackData(j).FlowCoef
+                        ObjexxFCL::gio::write(Unit11, Format_902) << state.dataAirflowNetwork->AirflowNetworkCompData(i).CompNum << 1 << MultizoneSurfaceCrackData(j).FlowCoef
                                                        << MultizoneSurfaceCrackData(j).FlowCoef << MultizoneSurfaceCrackData(j).FlowCoef
                                                        << MultizoneSurfaceCrackData(j).FlowExpo;
                     } else if (SELECT_CASE_var == CompTypeNum_DWC) { //'DWC' Duct component
-                        //              WRITE(Unit11,902) AirflowNetworkCompData(i)%CompNum,2,DisSysCompDuctData(j)%L,DisSysCompDuctData(j)%D, &
+                        //              WRITE(Unit11,902) state.dataAirflowNetwork->AirflowNetworkCompData(i)%CompNum,2,DisSysCompDuctData(j)%L,DisSysCompDuctData(j)%D, &
                         //                               DisSysCompDuctData(j)%A,DisSysCompDuctData(j)%Rough
                         //              WRITE(Unit11,903) DisSysCompDuctData(i)%TurDynCoef,DisSysCompDuctData(j)%LamFriCoef, &
                         //                               DisSysCompDuctData(j)%LamFriCoef,DisSysCompDuctData(j)%InitLamCoef
                         //           CASE (CompTypeNum_CVF) ! 'CVF' Constant volume fan component
-                        //              WRITE(Unit11,904) AirflowNetworkCompData(i)%CompNum,4,DisSysCompCVFData(j)%FlowRate
+                        //              WRITE(Unit11,904) state.dataAirflowNetwork->AirflowNetworkCompData(i)%CompNum,4,DisSysCompCVFData(j)%FlowRate
                     } else if (SELECT_CASE_var == CompTypeNum_EXF) { // 'EXF' Zone exhaust fan
-                        ObjexxFCL::gio::write(Unit11, Format_904) << AirflowNetworkCompData(i).CompNum << 4 << MultizoneCompExhaustFanData(j).FlowRate;
+                        ObjexxFCL::gio::write(Unit11, Format_904) << state.dataAirflowNetwork->AirflowNetworkCompData(i).CompNum << 4 << MultizoneCompExhaustFanData(j).FlowRate;
                     } else {
                     }
                 }
             }
             ObjexxFCL::gio::write(Unit11, Format_900) << 0;
             for (i = 1; i <= NetworkNumOfLinks; ++i) {
-                gio::write(Unit11, Format_910) << i << AirflowNetworkLinkageData(i).NodeNums[0] << AirflowNetworkLinkageData(i).NodeHeights[0]
-                                               << AirflowNetworkLinkageData(i).NodeNums[1] << AirflowNetworkLinkageData(i).NodeHeights[1]
-                                               << AirflowNetworkLinkageData(i).CompNum << 0 << 0;
+                gio::write(Unit11, Format_910) << i << state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0] << state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0]
+                                               << state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1] << state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1]
+                                               << state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum << 0 << 0;
             }
             ObjexxFCL::gio::write(Unit11, Format_900) << 0;
         }
         */
 
-        solver.setsky();
+        solver.setsky(state);
 
         // SETSKY figures out the IK stuff -- which is why E+ doesn't allocate AU until here
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
@@ -315,7 +315,7 @@ namespace AirflowNetwork {
         AU.allocate(IK(NetworkNumOfNodes + 1));
     }
 
-    void Solver::initialize()
+    void Solver::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -364,14 +364,14 @@ namespace AirflowNetwork {
         for (int i = 1; i <= NetworkNumOfNodes; ++i) {
             // TZ(i) = AirflowNetworkNodeSimu(i).TZ;
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
-            PZ(i) = AirflowNetworkNodeSimu(i).PZ;
-            properties[i].temperature = AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidityRatio = AirflowNetworkNodeSimu(i).WZ;
+            PZ(i) = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ;
+            properties[i].temperature = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ;
+            properties[i].humidityRatio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
     }
 
-    void Solver::setsky()
+    void Solver::setsky(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
@@ -422,10 +422,10 @@ namespace AirflowNetwork {
         }
         // Determine column heights.
         for (M = 1; M <= NetworkNumOfLinks; ++M) {
-            j = AirflowNetworkLinkageData(M).NodeNums[1];
+            j = state.dataAirflowNetwork->AirflowNetworkLinkageData(M).NodeNums[1];
             if (j == 0) continue;
             L = ID(j);
-            i = AirflowNetworkLinkageData(M).NodeNums[0];
+            i = state.dataAirflowNetwork->AirflowNetworkLinkageData(M).NodeNums[0];
             k = ID(i);
             N1 = std::abs(L - k);
             N2 = max(k, L);
@@ -492,16 +492,16 @@ namespace AirflowNetwork {
 
 
         // Initialize pressure for pressure control and for Initialization Type = LinearInitializationMethod
-        if ((AirflowNetworkSimu.InitFlag == 0) || (PressureSetFlag > 0 && AirflowNetworkFanActivated)) {
+        if ((state.dataAirflowNetwork->AirflowNetworkSimu.InitFlag == 0) || (state.dataAirflowNetwork->PressureSetFlag > 0 && state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
             for (n = 1; n <= NetworkNumOfNodes; ++n) {
-                if (AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = 0.0;
+                if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = 0.0;
             }
         }
         // Compute zone air properties.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
             properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
             // RHOZ(n) = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), TZ(n), WZ(n));
-            if (AirflowNetworkNodeData(n).ExtNodeNum > 0) {
+            if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).ExtNodeNum > 0) {
                 properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
                 properties[n].temperature = state.dataEnvrn->OutDryBulbTemp;
                 properties[n].humidityRatio = state.dataEnvrn->OutHumRat;
@@ -512,18 +512,18 @@ namespace AirflowNetwork {
         }
         // Compute stack pressures.
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
-            n = AirflowNetworkLinkageData(i).NodeNums[0];
-            m = AirflowNetworkLinkageData(i).NodeNums[1];
+            n = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0];
+            m = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1];
             if (AFLOW(i) > 0.0) {
-                PS(i) = 9.80 * (properties[n].density * (AirflowNetworkNodeData(n).NodeHeight - AirflowNetworkNodeData(m).NodeHeight) +
-                                AirflowNetworkLinkageData(i).NodeHeights[1] * (properties[m].density - properties[n].density));
+                PS(i) = 9.80 * (properties[n].density * (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeHeight - state.dataAirflowNetwork->AirflowNetworkNodeData(m).NodeHeight) +
+                                state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1] * (properties[m].density - properties[n].density));
             } else if (AFLOW(i) < 0.0) {
-                PS(i) = 9.80 * (properties[m].density * (AirflowNetworkNodeData(n).NodeHeight - AirflowNetworkNodeData(m).NodeHeight) +
-                                AirflowNetworkLinkageData(i).NodeHeights[0] * (properties[m].density - properties[n].density));
+                PS(i) = 9.80 * (properties[m].density * (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeHeight - state.dataAirflowNetwork->AirflowNetworkNodeData(m).NodeHeight) +
+                                state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0] * (properties[m].density - properties[n].density));
             } else {
                 PS(i) = 4.90 * ((properties[n].density + properties[m].density) *
-                                    (AirflowNetworkNodeData(n).NodeHeight - AirflowNetworkNodeData(m).NodeHeight) +
-                                (AirflowNetworkLinkageData(i).NodeHeights[0] + AirflowNetworkLinkageData(i).NodeHeights[1]) *
+                                    (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeHeight - state.dataAirflowNetwork->AirflowNetworkNodeData(m).NodeHeight) +
+                                (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0] + state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1]) *
                                     (properties[m].density - properties[n].density));
             }
         }
@@ -538,12 +538,12 @@ namespace AirflowNetwork {
         }
         //if (LIST >= 1) ObjexxFCL::gio::write(outputFile, Format_900);
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
-            n = AirflowNetworkLinkageData(i).NodeNums[0];
-            m = AirflowNetworkLinkageData(i).NodeNums[1];
+            n = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0];
+            m = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1];
             //if (LIST >= 1) {
             //    gio::write(outputFile, Format_901) << "Flow: " << i << n << m << AirflowNetworkLinkSimu(i).DP << AFLOW(i) << AFLOW2(i);
             //}
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_HOP) {
+            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::HOP) {
                 SUMAF(n) = SUMAF(n) - AFLOW(i);
                 SUMAF(m) += AFLOW(i);
             } else {
@@ -559,40 +559,40 @@ namespace AirflowNetwork {
             if (AFLOW2(i) != 0.0) {
             }
             if (AFLOW(i) > 0.0) {
-                AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
-                AirflowNetworkLinkSimu(i).FLOW2 = 0.0;
+                state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
+                state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = 0.0;
             } else {
-                AirflowNetworkLinkSimu(i).FLOW = 0.0;
-                AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
+                state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = 0.0;
+                state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
             }
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_HOP) {
+            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::HOP) {
                 if (AFLOW(i) > 0.0) {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
                 } else {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW2(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i) + AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i) + AFLOW2(i);
                 }
             }
-            if (AirflowNetworkLinkageData(i).DetOpenNum > 0) {
+            if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).DetOpenNum > 0) {
                 if (AFLOW2(i) != 0.0) {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
                 }
             }
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SOP && AFLOW2(i) != 0.0) {
+            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SOP && AFLOW2(i) != 0.0) {
                 if (AFLOW(i) >= 0.0) {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = std::abs(AFLOW2(i));
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = std::abs(AFLOW2(i));
                 } else {
-                    AirflowNetworkLinkSimu(i).FLOW = std::abs(AFLOW2(i));
-                    AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = std::abs(AFLOW2(i));
+                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
                 }
             }
         }
 
         for (i = 1; i <= NetworkNumOfNodes; ++i) {
-            AirflowNetworkNodeSimu(i).PZ = PZ(i);
+            state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ = PZ(i);
         }
     }
 
@@ -678,13 +678,13 @@ namespace AirflowNetwork {
             CEF(n) = 0.0;
         }
 
-        if (AirflowNetworkSimu.InitFlag != 1) {
+        if (state.dataAirflowNetwork->AirflowNetworkSimu.InitFlag != 1) {
             // Initialize node/zone pressure values by assuming only linear relationship between
             // airflows and pressure drops.
             LFLAG = true;
             solver.filjac(state, NNZE, LFLAG);
             for (n = 1; n <= NetworkNumOfNodes; ++n) {
-                if (AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = SUMF(n);
+                if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = SUMF(n);
             }
             // Data dump.
 //            if (LIST >= 3) {
@@ -704,7 +704,7 @@ namespace AirflowNetwork {
         }
         // Solve nonlinear airflow network equations by modified Newton's method.
 
-        while (ITER < AirflowNetworkSimu.MaxIteration) {
+        while (ITER < state.dataAirflowNetwork->AirflowNetworkSimu.MaxIteration) {
             LFLAG = false;
             ++ITER;
 //            if (LIST >= 2) {
@@ -725,14 +725,14 @@ namespace AirflowNetwork {
                 SSUMF += std::abs(SUMF(n));
                 SSUMAF += SUMAF(n);
                 if (CONVG == 1) {
-                    if (std::abs(SUMF(n)) <= AirflowNetworkSimu.AbsTol) continue;
-                    if (std::abs(SUMF(n) / SUMAF(n)) > AirflowNetworkSimu.RelTol) CONVG = 0;
+                    if (std::abs(SUMF(n)) <= state.dataAirflowNetwork->AirflowNetworkSimu.AbsTol) continue;
+                    if (std::abs(SUMF(n) / SUMAF(n)) > state.dataAirflowNetwork->AirflowNetworkSimu.RelTol) CONVG = 0;
                 }
             }
             ACC0 = ACC1;
             if (SSUMAF > 0.0) ACC1 = SSUMF / SSUMAF;
             if (CONVG == 1 && ITER > 1) return;
-            if (ITER >= AirflowNetworkSimu.MaxIteration) break;
+            if (ITER >= state.dataAirflowNetwork->AirflowNetworkSimu.MaxIteration) break;
             // Data dump.
 //            if (LIST >= 3) {
 //                DUMPVD("AD:", AD, NetworkNumOfNodes, outputFile);
@@ -756,11 +756,11 @@ namespace AirflowNetwork {
                 if (ITER > 2 && ACC1 > 0.5 * ACC0) ACCEL = 1;
             }
             for (n = 1; n <= NetworkNumOfNodes; ++n) {
-                if (AirflowNetworkNodeData(n).NodeTypeNum == 1) continue;
+                if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeTypeNum == 1) continue;
                 CEF(n) = 1.0;
                 if (ACCEL == 1) {
                     C = CCF(n) / PCF(n);
-                    if (C < AirflowNetworkSimu.ConvLimit) CEF(n) = 1.0 / (1.0 - C);
+                    if (C < state.dataAirflowNetwork->AirflowNetworkSimu.ConvLimit) CEF(n) = 1.0 / (1.0 - C);
                     C = CCF(n) * CEF(n);
                 } else {
                     //            IF (CCF(N) .EQ. 0.0d0) CCF(N)=TINY(CCF(N))  ! 1.0E-40
@@ -768,8 +768,8 @@ namespace AirflowNetwork {
                     PCF(n) = CCF(n);
                     C = CCF(n);
                 }
-                if (std::abs(C) > AirflowNetworkSimu.MaxPressure) {
-                    CEF(n) *= AirflowNetworkSimu.MaxPressure / std::abs(C);
+                if (std::abs(C) > state.dataAirflowNetwork->AirflowNetworkSimu.MaxPressure) {
+                    CEF(n) *= state.dataAirflowNetwork->AirflowNetworkSimu.MaxPressure / std::abs(C);
                     PZ(n) -= CCF(n) * CEF(n);
                 } else {
                     PZ(n) -= C;
@@ -778,7 +778,7 @@ namespace AirflowNetwork {
             // Data revision dump.
 //            if (LIST >= 2) {
 //                for (n = 1; n <= NetworkNumOfNodes; ++n) {
-//                    if (AirflowNetworkNodeData(n).NodeTypeNum == 0) {
+//                    if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeTypeNum == 0) {
 //                        print(outputFile, "Rev: {:5}{:3}{:14.6E} {:8.4F}{:24.14F}", n, SUMF(n), CCF(n), CEF(n), PZ(n));
 //                    }
 //                }
@@ -787,16 +787,16 @@ namespace AirflowNetwork {
 
         // Error termination.
         ShowSevereError(state, "Too many iterations (SOLVZP) in Airflow Network simulation");
-        ++AirflowNetworkSimu.ExtLargeOpeningErrCount;
-        if (AirflowNetworkSimu.ExtLargeOpeningErrCount < 2) {
+        ++state.dataAirflowNetwork->AirflowNetworkSimu.ExtLargeOpeningErrCount;
+        if (state.dataAirflowNetwork->AirflowNetworkSimu.ExtLargeOpeningErrCount < 2) {
             ShowWarningError(state, "AirflowNetwork: SOLVER, Changing values for initialization flag, Relative airflow convergence, Absolute airflow "
                              "convergence, Convergence acceleration limit or Maximum Iteration Number may solve the problem.");
             ShowContinueErrorTimeStamp(state, "");
-            ShowContinueError(state, "..Iterations=" + std::to_string(ITER) + ", Max allowed=" + std::to_string(AirflowNetworkSimu.MaxIteration));
+            ShowContinueError(state, "..Iterations=" + std::to_string(ITER) + ", Max allowed=" + std::to_string(state.dataAirflowNetwork->AirflowNetworkSimu.MaxIteration));
             ShowFatalError(state, "AirflowNetwork: SOLVER, The previous error causes termination.");
         } else {
             ShowRecurringWarningErrorAtEnd(state, "AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork simulation continues.",
-                                           AirflowNetworkSimu.ExtLargeOpeningErrIndex);
+                                           state.dataAirflowNetwork->AirflowNetworkSimu.ExtLargeOpeningErrIndex);
         }
     }
 
@@ -870,7 +870,7 @@ namespace AirflowNetwork {
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
             SUMF(n) = 0.0;
             SUMAF(n) = 0.0;
-            if (AirflowNetworkNodeData(n).NodeTypeNum == 1) {
+            if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeTypeNum == 1) {
                 AD(n) = 1.0;
             } else {
                 AD(n) = 0.0;
@@ -881,14 +881,14 @@ namespace AirflowNetwork {
         }
         //                              Set up the Jacobian matrix.
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
-            if (AirflowNetworkLinkageData(i).element == nullptr) {
+            if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).element == nullptr) {
                 continue;
             }
-            n = AirflowNetworkLinkageData(i).NodeNums[0];
-            int m = AirflowNetworkLinkageData(i).NodeNums[1];
+            n = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0];
+            int m = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1];
             //!!! Check array of DP. DpL is used for multizone air flow calculation only
             //!!! and is not for forced air calculation
-            if (i > NumOfLinksMultiZone) {
+            if (i > state.dataAirflowNetwork->NumOfLinksMultiZone) {
                 DP = PZ(n) - PZ(m) + PS(i) + PW(i);
             } else {
                 DP = PZ(n) - PZ(m) + DpL(i, 1) + PW(i);
@@ -896,55 +896,55 @@ namespace AirflowNetwork {
             Real64 multiplier = 1.0;
             Real64 control = 1.0;
             //if (LIST >= 4) ObjexxFCL::gio::write(outputFile, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
-            j = AirflowNetworkLinkageData(i).CompNum;
+            j = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum;
 
-            NF = AirflowNetworkLinkageData(i).element->calculate(state, LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
-            if (AirflowNetworkLinkageData(i).element->type() == ComponentType::CPD && DP != 0.0) {
-                DP = DisSysCompCPDData(AirflowNetworkCompData(j).TypeNum).DP;
+            NF = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).element->calculate(state, LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
+            if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).element->type() == ComponentType::CPD && DP != 0.0) {
+                DP = state.dataAirflowNetwork->DisSysCompCPDData(state.dataAirflowNetwork->AirflowNetworkCompData(j).TypeNum).DP;
             }
 
-            AirflowNetworkLinkSimu(i).DP = DP;
+            state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).DP = DP;
             AFLOW(i) = F[0];
             AFLOW2(i) = 0.0;
-            if (AirflowNetworkCompData(j).CompTypeNum == CompTypeNum_DOP) {
+            if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::DOP) {
                 AFLOW2(i) = F[1];
             }
             //if (LIST >= 3) ObjexxFCL::gio::write(outputFile, Format_901) << " NRi:" << i << n << M << AirflowNetworkLinkSimu(i).DP << F[0] << DF[0];
             FLAG = 1;
-            if (AirflowNetworkNodeData(n).NodeTypeNum == 0) {
+            if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeTypeNum == 0) {
                 ++FLAG;
                 X(1) = DF[0];
                 X(2) = -DF[0];
                 SUMF(n) += F[0];
                 SUMAF(n) += std::abs(F[0]);
             }
-            if (AirflowNetworkNodeData(m).NodeTypeNum == 0) {
+            if (state.dataAirflowNetwork->AirflowNetworkNodeData(m).NodeTypeNum == 0) {
                 FLAG += 2;
                 X(4) = DF[0];
                 X(3) = -DF[0];
                 SUMF(m) -= F[0];
                 SUMAF(m) += std::abs(F[0]);
             }
-            if (FLAG != 1) FILSKY(X, AirflowNetworkLinkageData(i).NodeNums, IK, AU, AD, FLAG);
+            if (FLAG != 1) FILSKY(X, state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums, IK, AU, AD, FLAG);
             if (NF == 1) continue;
             AFLOW2(i) = F[1];
             //if (LIST >= 3) ObjexxFCL::gio::write(outputFile, Format_901) << " NRj:" << i << n << m << AirflowNetworkLinkSimu(i).DP << F[1] << DF[1];
             FLAG = 1;
-            if (AirflowNetworkNodeData(n).NodeTypeNum == 0) {
+            if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeTypeNum == 0) {
                 ++FLAG;
                 X(1) = DF[1];
                 X(2) = -DF[1];
                 SUMF(n) += F[1];
                 SUMAF(n) += std::abs(F[1]);
             }
-            if (AirflowNetworkNodeData(m).NodeTypeNum == 0) {
+            if (state.dataAirflowNetwork->AirflowNetworkNodeData(m).NodeTypeNum == 0) {
                 FLAG += 2;
                 X(4) = DF[1];
                 X(3) = -DF[1];
                 SUMF(m) -= F[1];
                 SUMAF(m) += std::abs(F[1]);
             }
-            if (FLAG != 1) FILSKY(X, AirflowNetworkLinkageData(i).NodeNums, IK, AU, AD, FLAG);
+            if (FLAG != 1) FILSKY(X, state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums, IK, AU, AD, FLAG);
         }
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
@@ -1413,7 +1413,7 @@ namespace AirflowNetwork {
             }
             if (AD(k) - SUMD == 0.0) {
                 ShowSevereError(state, "AirflowNetworkSolver: L-U factorization in Subroutine FACSKY.");
-                ShowContinueError(state, "The denominator used in L-U factorizationis equal to 0.0 at node = " + AirflowNetworkNodeData(k).Name + '.');
+                ShowContinueError(state, "The denominator used in L-U factorizationis equal to 0.0 at node = " + state.dataAirflowNetwork->AirflowNetworkNodeData(k).Name + '.');
                 ShowContinueError(state,
                     "One possible cause is that this node may not be connected directly, or indirectly via airflow network connections ");
                 ShowContinueError(state,
@@ -1715,7 +1715,8 @@ namespace AirflowNetwork {
         print(UOUT, "\n");
     }
 
-    void PresProfile(int const il,                  // Linkage number
+    void PresProfile(EnergyPlusData &state,
+                     int const il,                  // Linkage number
                      int const Pprof,               // Opening number
                      Real64 const G,                // gravitation field strength [N/kg]
                      const Array1D<Real64> &DpF,    // Stack pressures at start heights of Layers
@@ -1819,13 +1820,13 @@ namespace AirflowNetwork {
         Interval = ActLh * OwnHeightFactor / NrInt;
 
         for (n = 1; n <= NrInt; ++n) {
-            hghtsF(n + 1) = AirflowNetworkLinkageData(il).NodeHeights[0] + Interval * (n - 0.5);
-            hghtsT(n + 1) = AirflowNetworkLinkageData(il).NodeHeights[1] + Interval * (n - 0.5);
+            hghtsF(n + 1) = state.dataAirflowNetwork->AirflowNetworkLinkageData(il).NodeHeights[0] + Interval * (n - 0.5);
+            hghtsT(n + 1) = state.dataAirflowNetwork->AirflowNetworkLinkageData(il).NodeHeights[1] + Interval * (n - 0.5);
         }
-        hghtsF(1) = AirflowNetworkLinkageData(il).NodeHeights[0];
-        hghtsT(1) = AirflowNetworkLinkageData(il).NodeHeights[1];
-        hghtsF(NrInt + 2) = AirflowNetworkLinkageData(il).NodeHeights[0] + ActLh * OwnHeightFactor;
-        hghtsT(NrInt + 2) = AirflowNetworkLinkageData(il).NodeHeights[1] + ActLh * OwnHeightFactor;
+        hghtsF(1) = state.dataAirflowNetwork->AirflowNetworkLinkageData(il).NodeHeights[0];
+        hghtsT(1) = state.dataAirflowNetwork->AirflowNetworkLinkageData(il).NodeHeights[1];
+        hghtsF(NrInt + 2) = state.dataAirflowNetwork->AirflowNetworkLinkageData(il).NodeHeights[0] + ActLh * OwnHeightFactor;
+        hghtsT(NrInt + 2) = state.dataAirflowNetwork->AirflowNetworkLinkageData(il).NodeHeights[1] + ActLh * OwnHeightFactor;
 
         lF = 1;
         lT = 1;
@@ -1854,7 +1855,7 @@ namespace AirflowNetwork {
             }
         }
 
-        zStF(1) = AirflowNetworkLinkageData(il).NodeHeights[0];
+        zStF(1) = state.dataAirflowNetwork->AirflowNetworkLinkageData(il).NodeHeights[0];
         i = 2;
         k = 1;
 
@@ -1870,8 +1871,8 @@ namespace AirflowNetwork {
             ++k;
         }
 
-        zStF(i) = AirflowNetworkLinkageData(il).NodeHeights[0] + ActLh * OwnHeightFactor; // Autodesk:BoundsViolation zStF(i) @ i>2
-        zStT(1) = AirflowNetworkLinkageData(il).NodeHeights[1];
+        zStF(i) = state.dataAirflowNetwork->AirflowNetworkLinkageData(il).NodeHeights[0] + ActLh * OwnHeightFactor; // Autodesk:BoundsViolation zStF(i) @ i>2
+        zStT(1) = state.dataAirflowNetwork->AirflowNetworkLinkageData(il).NodeHeights[1];
         i = 2;
         k = 1;
 
@@ -1887,7 +1888,7 @@ namespace AirflowNetwork {
             ++k;
         }
 
-        zStT(i) = AirflowNetworkLinkageData(il).NodeHeights[1] + ActLh * OwnHeightFactor; // Autodesk:BoundsViolation zStT(i) @ i>2
+        zStT(i) = state.dataAirflowNetwork->AirflowNetworkLinkageData(il).NodeHeights[1] + ActLh * OwnHeightFactor; // Autodesk:BoundsViolation zStT(i) @ i>2
 
         // Calculation of DpProf, RhoProfF, RhoProfT
         for (i = 1; i <= NrInt + 2; ++i) {
@@ -1959,14 +1960,14 @@ namespace AirflowNetwork {
         Real64 RhoL1; // Air density [kg/m3]
         Real64 RhoL2;
         Real64 Pbz;                                     // Pbarom at entrance level [Pa]
-        Array2D<Real64> RhoDrL(NumOfLinksMultiZone, 2); // dry air density on both sides of the link [kg/m3]
+        Array2D<Real64> RhoDrL(state.dataAirflowNetwork->NumOfLinksMultiZone, 2); // dry air density on both sides of the link [kg/m3]
         Real64 TempL1;                                  // Temp in From and To zone at link level [C]
         Real64 TempL2;
         //      REAL(r64) Tout ! outside temperature [C]
         Real64 Xhl1; // Humidity in From and To zone at link level [kg/kg]
         Real64 Xhl2;
         //      REAL(r64) Xhout ! outside humidity [kg/kg]
-        Array1D<Real64> Hfl(NumOfLinksMultiZone); // Own height factor for large (slanted) openings
+        Array1D<Real64> Hfl(state.dataAirflowNetwork->NumOfLinksMultiZone); // Own height factor for large (slanted) openings
         int Nl;                                   // number of links
 
         Array1D<Real64> DpF(2);
@@ -1996,7 +1997,7 @@ namespace AirflowNetwork {
         int To;
         int Fromz;
         int Toz;
-        int Ltyp;
+        iComponentTypeNum Ltyp;
         int i;
         int ll;
         int j;
@@ -2016,7 +2017,7 @@ namespace AirflowNetwork {
 
         Hfl = 1.0;
         Pbz = state.dataEnvrn->OutBaroPress;
-        Nl = NumOfLinksMultiZone;
+        Nl = state.dataAirflowNetwork->NumOfLinksMultiZone;
         OpenNum = 0;
         RhoLd(1) = 1.2;
         RhoLd(2) = 1.2;
@@ -2024,25 +2025,25 @@ namespace AirflowNetwork {
 
         for (i = 1; i <= Nl; ++i) {
             // Check surface tilt
-            if (i <= Nl - NumOfLinksIntraZone) { // Revised by L.Gu, on 9 / 29 / 10
-                if (AirflowNetworkLinkageData(i).DetOpenNum > 0 && state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).Tilt < 90) {
-                    Hfl(i) = state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SinTilt;
+            if (i <= Nl - state.dataAirflowNetwork->NumOfLinksIntraZone) { // Revised by L.Gu, on 9 / 29 / 10
+                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).DetOpenNum > 0 && state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).Tilt < 90) {
+                    Hfl(i) = state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).SinTilt;
                 }
             }
             // Initialisation
-            From = AirflowNetworkLinkageData(i).NodeNums[0];
-            To = AirflowNetworkLinkageData(i).NodeNums[1];
-            if (AirflowNetworkNodeData(From).EPlusZoneNum > 0 && AirflowNetworkNodeData(To).EPlusZoneNum > 0) {
+            From = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0];
+            To = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1];
+            if (state.dataAirflowNetwork->AirflowNetworkNodeData(From).EPlusZoneNum > 0 && state.dataAirflowNetwork->AirflowNetworkNodeData(To).EPlusZoneNum > 0) {
                 ll = 0;
-            } else if (AirflowNetworkNodeData(From).EPlusZoneNum == 0 && AirflowNetworkNodeData(To).EPlusZoneNum > 0) {
+            } else if (state.dataAirflowNetwork->AirflowNetworkNodeData(From).EPlusZoneNum == 0 && state.dataAirflowNetwork->AirflowNetworkNodeData(To).EPlusZoneNum > 0) {
                 ll = 1;
             } else {
                 ll = 3;
             }
 
-            Ltyp = AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum;
-            if (Ltyp == CompTypeNum_DOP) {
-                ActLh = MultizoneSurfaceData(i).Height;
+            Ltyp = state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum;
+            if (Ltyp == iComponentTypeNum::DOP) {
+                ActLh = state.dataAirflowNetwork->MultizoneSurfaceData(i).Height;
                 ActLOwnh = ActLh * 1.0;
             } else {
                 ActLh = 0.0;
@@ -2100,12 +2101,12 @@ namespace AirflowNetwork {
             if (Fromz == 0) ilayptr = 1;
             j = ilayptr;
             k = 1;
-            LClimb(state, G, RhoLd(1), AirflowNetworkLinkageData(i).NodeHeights[0], TempL1, Xhl1, DpF(k), Toz, PzTo, Pbz, RhoDrL(i, 1));
+            LClimb(state, G, RhoLd(1), state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0], TempL1, Xhl1, DpF(k), Toz, PzTo, Pbz, RhoDrL(i, 1));
             RhoL1 = RhoLd(1);
             // For large openings calculate the stack pressure difference profile and the
             // density profile within the the top- and the bottom- height of the large opening
             if (ActLOwnh > 0.0) {
-                HSt(k) = AirflowNetworkLinkageData(i).NodeHeights[0];
+                HSt(k) = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0];
                 RhoStF(k) = RhoL1;
                 ++k;
                 HSt(k) = 0.0;
@@ -2116,7 +2117,7 @@ namespace AirflowNetwork {
                 while (true) {
                     ilayptr = 0;
                     if (Fromz == 0) ilayptr = 9;
-                    if ((j > ilayptr) || (HSt(k) > AirflowNetworkLinkageData(i).NodeHeights[0])) break;
+                    if ((j > ilayptr) || (HSt(k) > state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0])) break;
                     j += 9;
                     HSt(k) = 0.0;
                     if (HSt(k - 1) < 0.0) HSt(k) = HSt(k - 1);
@@ -2127,7 +2128,7 @@ namespace AirflowNetwork {
                 while (true) {
                     ilayptr = 0;
                     if (Fromz == 0) ilayptr = 9;
-                    if ((j > ilayptr) || (HSt(k) >= (AirflowNetworkLinkageData(i).NodeHeights[0] + ActLOwnh)))
+                    if ((j > ilayptr) || (HSt(k) >= (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0] + ActLOwnh)))
                         break; // Autodesk:BoundsViolation HSt(k) @ k>2
                     T = TzFrom;
                     X = XhzFrom;
@@ -2139,7 +2140,7 @@ namespace AirflowNetwork {
                     if (HSt(k - 1) < 0.0) HSt(k) = HSt(k - 1); // Autodesk:BoundsViolation @ k>2
                 }
                 // Stack pressure difference and rho for top-height of the large opening
-                HSt(k) = AirflowNetworkLinkageData(i).NodeHeights[0] + ActLOwnh; // Autodesk:BoundsViolation k>2 poss
+                HSt(k) = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0] + ActLOwnh; // Autodesk:BoundsViolation k>2 poss
                 T = TzFrom;
                 X = XhzFrom;
                 LClimb(state, G, RhoStd, HSt(k), T, X, DpF(k), Fromz, PzFrom, Pbz, RhoDrDummi); // Autodesk:BoundsViolation k>2 poss
@@ -2156,13 +2157,13 @@ namespace AirflowNetwork {
             j = ilayptr;
             // Calculate Rho at link height only if we have large openings or layered zones.
             k = 1;
-            LClimb(state, G, RhoLd(2), AirflowNetworkLinkageData(i).NodeHeights[1], TempL2, Xhl2, DpT(k), Toz, PzTo, Pbz, RhoDrL(i, 2));
+            LClimb(state, G, RhoLd(2), state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1], TempL2, Xhl2, DpT(k), Toz, PzTo, Pbz, RhoDrL(i, 2));
             RhoL2 = RhoLd(2);
 
             // For large openings calculate the stack pressure difference profile and the
             // density profile within the the top- and the bottom- height of the large opening
             if (ActLOwnh > 0.0) {
-                HSt(k) = AirflowNetworkLinkageData(i).NodeHeights[1];
+                HSt(k) = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1];
                 RhoStT(k) = RhoL2;
                 ++k;
                 HSt(k) = 0.0;
@@ -2170,7 +2171,7 @@ namespace AirflowNetwork {
                 while (true) {
                     ilayptr = 0;
                     if (Toz == 0) ilayptr = 9;
-                    if ((j > ilayptr) || (HSt(k) > AirflowNetworkLinkageData(i).NodeHeights[1])) break;
+                    if ((j > ilayptr) || (HSt(k) > state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1])) break;
                     j += 9;
                     HSt(k) = 0.0;
                     if (HSt(k - 1) < 0.0) HSt(k) = HSt(k - 1);
@@ -2180,7 +2181,7 @@ namespace AirflowNetwork {
                 while (true) {
                     ilayptr = 0;
                     if (Toz == 0) ilayptr = 9;
-                    if ((j > ilayptr) || (HSt(k) >= (AirflowNetworkLinkageData(i).NodeHeights[1] + ActLOwnh)))
+                    if ((j > ilayptr) || (HSt(k) >= (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1] + ActLOwnh)))
                         break; // Autodesk:BoundsViolation Hst(k) @ k>2
                     T = TzTo;
                     X = XhzTo;
@@ -2192,7 +2193,7 @@ namespace AirflowNetwork {
                     if (HSt(k - 1) < 0.0) HSt(k) = HSt(k - 1); // Autodesk:BoundsViolation @ k>2
                 }
                 // Stack pressure difference and rho for top-height of the large opening
-                HSt(k) = AirflowNetworkLinkageData(i).NodeHeights[1] + ActLOwnh; // Autodesk:BoundsViolation k>2 poss
+                HSt(k) = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1] + ActLOwnh; // Autodesk:BoundsViolation k>2 poss
                 T = TzTo;
                 X = XhzTo;
                 LClimb(state, G, RhoStd, HSt(k), T, X, DpT(k), Toz, PzTo, Pbz, RhoDrDummi); // Autodesk:BoundsViolation k>2 poss
@@ -2204,12 +2205,12 @@ namespace AirflowNetwork {
             }
 
             // CALCULATE STACK PRESSURE FOR THE PATH ITSELF for different flow directions
-            H = double(AirflowNetworkLinkageData(i).NodeHeights[1]) - double(AirflowNetworkLinkageData(i).NodeHeights[0]);
+            H = double(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[1]) - double(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeHeights[0]);
             if (ll == 0 || ll == 3 || ll == 6) {
-                H -= AirflowNetworkNodeData(From).NodeHeight;
+                H -= state.dataAirflowNetwork->AirflowNetworkNodeData(From).NodeHeight;
             }
             if (ll < 3) {
-                H += AirflowNetworkNodeData(To).NodeHeight;
+                H += state.dataAirflowNetwork->AirflowNetworkNodeData(To).NodeHeight;
             }
 
             // IF AIR FLOWS from "From" to "To"
@@ -2222,9 +2223,9 @@ namespace AirflowNetwork {
             DpP = -psz(Pref, RhoLd(2), 0.0, 0.0, -H, G);
             DpL(i, 2) = (DpF(1) - DpT(1) + DpP);
 
-            if (Ltyp == CompTypeNum_DOP) {
+            if (Ltyp == iComponentTypeNum::DOP) {
                 Pprof = OpenNum * (NrInt + 2);
-                PresProfile(i, Pprof, G, DpF, DpT, BetaStF, BetaStT, RhoStF, RhoStT, From, To, ActLh, Hfl(i));
+                PresProfile(state, i, Pprof, G, DpF, DpT, BetaStF, BetaStT, RhoStF, RhoStT, From, To, ActLh, Hfl(i));
                 ++OpenNum;
             }
         }

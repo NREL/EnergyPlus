@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
 
     Psychrometrics::InitializePsychRoutines();
@@ -464,7 +464,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
@@ -501,7 +501,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     state->dataLoopNodes->Node.allocate(4);
     state->dataHeatBal->TempEffBulkAir.allocate(3);
-    DataHeatBalSurface::TempSurfInTmp.allocate(3);
+    state->dataHeatBalSurf->TempSurfInTmp.allocate(3);
 
     int surfNum1 = UtilityRoutines::FindItemInList("WALL", state->dataSurface->Surface);
     int surfNum2 = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
@@ -519,9 +519,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->Surface(surfNum1).SolarEnclIndex = 1;
     state->dataSurface->Surface(surfNum2).SolarEnclIndex = 1;
     state->dataSurface->Surface(surfNum3).SolarEnclIndex = 1;
-    DataHeatBalSurface::TempSurfInTmp(surfNum1) = 15.0;
-    DataHeatBalSurface::TempSurfInTmp(surfNum2) = 20.0;
-    DataHeatBalSurface::TempSurfInTmp(surfNum3) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(surfNum1) = 15.0;
+    state->dataHeatBalSurf->TempSurfInTmp(surfNum2) = 20.0;
+    state->dataHeatBalSurf->TempSurfInTmp(surfNum3) = 25.0;
     state->dataHeatBal->TempEffBulkAir(surfNum1) = 10.0;
     state->dataHeatBal->TempEffBulkAir(surfNum2) = 10.0;
     state->dataHeatBal->TempEffBulkAir(surfNum3) = 10.0;
@@ -574,15 +574,15 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->InsideFrameCondensationFlag.allocate(3);
     state->dataSurface->InsideDividerCondensationFlag.allocate(3);
 
-    DataHeatBalSurface::QdotConvOutRep.allocate(3);
-    DataHeatBalSurface::QdotConvOutRepPerArea.allocate(3);
-    DataHeatBalSurface::QConvOutReport.allocate(3);
-    DataHeatBalSurface::QdotRadOutRep.allocate(3);
-    DataHeatBalSurface::QdotRadOutRepPerArea.allocate(3);
-    DataHeatBalSurface::QRadOutReport.allocate(3);
-    DataHeatBalSurface::SurfQRadLWOutSrdSurfs.allocate(3);
-    DataHeatBalSurface::QAirExtReport.allocate(3);
-    DataHeatBalSurface::QHeatEmiReport.allocate(3);
+    state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
+    state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(3);
+    state->dataHeatBalSurf->QConvOutReport.allocate(3);
+    state->dataHeatBalSurf->QdotRadOutRep.allocate(3);
+    state->dataHeatBalSurf->QdotRadOutRepPerArea.allocate(3);
+    state->dataHeatBalSurf->QRadOutReport.allocate(3);
+    state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs.allocate(3);
+    state->dataHeatBalSurf->QAirExtReport.allocate(3);
+    state->dataHeatBalSurf->QHeatEmiReport.allocate(3);
 
     state->dataHeatBal->SurfQRadSWOutIncident = 0.0;
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
@@ -2688,7 +2688,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
@@ -2728,7 +2728,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     state->dataLoopNodes->Node.allocate(4);
     state->dataHeatBal->TempEffBulkAir.allocate(3);
-    DataHeatBalSurface::TempSurfInTmp.allocate(3);
+    state->dataHeatBalSurf->TempSurfInTmp.allocate(3);
 
     int surfNum1 = UtilityRoutines::FindItemInList("WALL", state->dataSurface->Surface);
     int surfNum2 = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
@@ -2746,9 +2746,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataSurface->Surface(surfNum1).SolarEnclIndex = 1;
     state->dataSurface->Surface(surfNum2).SolarEnclIndex = 1;
     state->dataSurface->Surface(surfNum3).SolarEnclIndex = 1;
-    DataHeatBalSurface::TempSurfInTmp(surfNum1) = 15.0;
-    DataHeatBalSurface::TempSurfInTmp(surfNum2) = 20.0;
-    DataHeatBalSurface::TempSurfInTmp(surfNum3) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(surfNum1) = 15.0;
+    state->dataHeatBalSurf->TempSurfInTmp(surfNum2) = 20.0;
+    state->dataHeatBalSurf->TempSurfInTmp(surfNum3) = 25.0;
     state->dataHeatBal->TempEffBulkAir(surfNum1) = 10.0;
     state->dataHeatBal->TempEffBulkAir(surfNum2) = 10.0;
     state->dataHeatBal->TempEffBulkAir(surfNum3) = 10.0;
@@ -2801,15 +2801,15 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataSurface->InsideFrameCondensationFlag.allocate(3);
     state->dataSurface->InsideDividerCondensationFlag.allocate(3);
 
-    DataHeatBalSurface::QdotConvOutRep.allocate(3);
-    DataHeatBalSurface::QdotConvOutRepPerArea.allocate(3);
-    DataHeatBalSurface::QConvOutReport.allocate(3);
-    DataHeatBalSurface::QdotRadOutRep.allocate(3);
-    DataHeatBalSurface::QdotRadOutRepPerArea.allocate(3);
-    DataHeatBalSurface::QRadOutReport.allocate(3);
-    DataHeatBalSurface::SurfQRadLWOutSrdSurfs.allocate(3);
-    DataHeatBalSurface::QAirExtReport.allocate(3);
-    DataHeatBalSurface::QHeatEmiReport.allocate(3);
+    state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
+    state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(3);
+    state->dataHeatBalSurf->QConvOutReport.allocate(3);
+    state->dataHeatBalSurf->QdotRadOutRep.allocate(3);
+    state->dataHeatBalSurf->QdotRadOutRepPerArea.allocate(3);
+    state->dataHeatBalSurf->QRadOutReport.allocate(3);
+    state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs.allocate(3);
+    state->dataHeatBalSurf->QAirExtReport.allocate(3);
+    state->dataHeatBalSurf->QHeatEmiReport.allocate(3);
 
     state->dataHeatBal->SurfQRadSWOutIncident = 0.0;
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
@@ -2829,8 +2829,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas(1))), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(surfNum2));
-    EXPECT_NEAR(-24.9342, DataHeatBalSurface::QHeatEmiReport(surfNum2),3);
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas(1))), state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(surfNum2));
+    EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->QHeatEmiReport(surfNum2),3);
 }
 TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 {

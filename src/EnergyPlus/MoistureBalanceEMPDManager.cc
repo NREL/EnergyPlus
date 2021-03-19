@@ -106,9 +106,6 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
     // Using/Aliasing
     using namespace DataHeatBalance;
     using namespace DataMoistureBalanceEMPD;
-    using DataMoistureBalance::HConvInFD;
-    using DataMoistureBalance::HMassConvInFD;
-    using DataMoistureBalance::RhoVaporAirIn;
 
     Real64 CalcDepthFromPeriod(EnergyPlusData &state,
                                Real64 const period,          // in seconds
@@ -155,7 +152,6 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataSurfaces::HeatTransferModel_EMPD;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;                       // IO Status when calling get input subroutine
@@ -260,7 +256,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!state.dataSurface->Surface(SurfNum).HeatTransSurf || state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window)
                 continue; // Heat transfer surface only and not a window
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD) continue;
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD) continue;
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
             if (state.dataMaterial->Material(MatNum).EMPDmu > 0.0 && state.dataSurface->Surface(SurfNum).Zone > 0) {
@@ -465,8 +461,8 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         auto const &surface(state.dataSurface->Surface(SurfNum));                 // input
         auto &rv_surface(state.dataMstBalEMPD->RVSurface(SurfNum));                  // output
         auto const &rv_surface_old(state.dataMstBalEMPD->RVSurfaceOld(SurfNum));     // input
-        auto const &h_mass_conv_in_fd(HMassConvInFD(SurfNum)); // input
-        auto const &rho_vapor_air_in(RhoVaporAirIn(SurfNum));  // input
+        auto const &h_mass_conv_in_fd(state.dataMstBal->HMassConvInFD(SurfNum)); // input
+        auto const &rho_vapor_air_in(state.dataMstBal->RhoVaporAirIn(SurfNum));  // input
         Real64 RHZone;
         Real64 mass_flux_surf_deep;
         Real64 mass_flux_surf_deep_max;

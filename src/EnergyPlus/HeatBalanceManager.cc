@@ -148,7 +148,6 @@ namespace HeatBalanceManager {
     using DataSurfaces::DividedLite;
     using DataSurfaces::FrameDividerProperties;
     using DataSurfaces::Suspended;
-    using DataWindowEquivalentLayer::TotWinEquivLayerConstructs;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
     using WindowComplexManager::CalculateBasisLength;
@@ -946,15 +945,15 @@ namespace HeatBalanceManager {
                 auto const SELECT_CASE_var(AlphaName(1));
                 // The default is CTF
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
 
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::EMPD;
                     state.dataHeatBal->AnyEMPD = true;
                     state.dataHeatBal->AllCTF = false;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CondFD;
                     state.dataHeatBal->AnyCondFD = true;
                     state.dataHeatBal->AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
@@ -970,7 +969,7 @@ namespace HeatBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::HAMT;
                     state.dataHeatBal->AnyHAMT = true;
                     state.dataHeatBal->AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
@@ -989,18 +988,18 @@ namespace HeatBalanceManager {
                     }
 
                 } else {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
                 }
             }
 
             if (NumNumber > 0) {
-                MaxSurfaceTempLimit = BuildingNumbers(1);
-                MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
-                if (MaxSurfaceTempLimit < MinSurfaceTempLimit) {
-                } else if (MaxSurfaceTempLimit < 0.0) {
-                    MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
-                    MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
+                state.dataHeatBalSurf->MaxSurfaceTempLimit = BuildingNumbers(1);
+                state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal = state.dataHeatBalSurf->MaxSurfaceTempLimit * 2.5;
+                if (state.dataHeatBalSurf->MaxSurfaceTempLimit < MinSurfaceTempLimit) {
+                } else if (state.dataHeatBalSurf->MaxSurfaceTempLimit < 0.0) {
+                    state.dataHeatBalSurf->MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
+                    state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal = state.dataHeatBalSurf->MaxSurfaceTempLimit * 2.5;
                 }
             }
 
@@ -1012,10 +1011,10 @@ namespace HeatBalanceManager {
             }
 
         } else {
-            state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+            state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
             state.dataHeatBal->AnyCTF = true;
-            MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
-            MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
+            state.dataHeatBalSurf->MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
+            state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal = state.dataHeatBalSurf->MaxSurfaceTempLimit * 2.5;
         }
 
         // algorithm input checks now deferred until surface properties are read in,
@@ -1222,30 +1221,31 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if (SELECT_CASE_var == "ADJUSTMIXINGONLY") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustMixingOnly;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustMixingOnly;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(1) = "AdjustMixingOnly";
                     } else if (SELECT_CASE_var == "ADJUSTRETURNONLY") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustReturnOnly;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustReturnOnly;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(1) = "AdjustReturnOnly";
                     } else if (SELECT_CASE_var == "ADJUSTMIXINGTHENRETURN") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustMixingThenReturn;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustMixingThenReturn;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(1) = "AdjustMixingThenReturn";
                     } else if (SELECT_CASE_var == "ADJUSTRETURNTHENMIXING") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustReturnThenMixing;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustReturnThenMixing;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(1) = "AdjustReturnThenMixing";
                     } else if (SELECT_CASE_var == "NONE") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = NoAdjustReturnAndMixing;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::NoAdjustReturnAndMixing;
                         AlphaName(1) = "None";
                     } else {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = NoAdjustReturnAndMixing;
+                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::NoAdjustReturnAndMixing;
                         AlphaName(1) = "None";
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = None");
                     }
                 }
+                if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow = true;
             }
             if (NumAlpha > 1) {
                 {
@@ -1303,6 +1303,7 @@ namespace HeatBalanceManager {
         } else {
             state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
         }
+        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow) state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow = true;
 
         constexpr const char * Format_732(
             "! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing and Return {{AdjustMixingOnly | AdjustReturnOnly | AdjustMixingThenReturn | AdjustReturnThenMixing | None}}, Adjust Zone Infiltration "
@@ -4272,12 +4273,12 @@ namespace HeatBalanceManager {
 
         state.dataBSDFWindow->TotComplexFenStates = inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
         TotWindow5Constructs = inputProcessor->getNumObjectsFound(state, "Construction:WindowDataFile");
-        TotWinEquivLayerConstructs = inputProcessor->getNumObjectsFound(state, "Construction:WindowEquivalentLayer");
+        state.dataWindowEquivLayer->TotWinEquivLayerConstructs = inputProcessor->getNumObjectsFound(state, "Construction:WindowEquivalentLayer");
 
         WConstructNames.allocate(TotWindow5Constructs);
 
         state.dataHeatBal->TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + totAirBoundaryConstructs +
-                        state.dataBSDFWindow->TotComplexFenStates + TotWinEquivLayerConstructs;
+                        state.dataBSDFWindow->TotComplexFenStates + state.dataWindowEquivLayer->TotWinEquivLayerConstructs;
 
         state.dataHeatBal->NominalRforNominalUCalculation.dimension(state.dataHeatBal->TotConstructs, 0.0);
         state.dataHeatBal->NominalU.dimension(state.dataHeatBal->TotConstructs, 0.0);
@@ -4507,7 +4508,7 @@ namespace HeatBalanceManager {
 
         ConstrNum = 0;
         CurrentModuleObject = "Construction:WindowEquivalentLayer";
-        for (Loop = 1; Loop <= TotWinEquivLayerConstructs; ++Loop) { // Loop through all constructs with Window EquivalentLayer ...
+        for (Loop = 1; Loop <= state.dataWindowEquivLayer->TotWinEquivLayerConstructs; ++Loop) { // Loop through all constructs with Window EquivalentLayer ...
 
             // Get the object names for each construction from the input processor
             inputProcessor->getObjectItem(state,
@@ -4582,8 +4583,8 @@ namespace HeatBalanceManager {
             state.dataConstruction->Construct(TotRegConstructs + ConstrNum).WindowTypeEQL = true;
         } // TotWinEquivLayerConstructs loop
 
-        TotWinEquivLayerConstructs = ConstrNum;
-        TotRegConstructs += TotWinEquivLayerConstructs;
+        state.dataWindowEquivLayer->TotWinEquivLayerConstructs = ConstrNum;
+        TotRegConstructs += state.dataWindowEquivLayer->TotWinEquivLayerConstructs;
         state.dataHeatBal->TotConstructs = TotRegConstructs;
         //-------------------------------------------------------------------------------
         ConstrNum = 0;
@@ -5986,8 +5987,9 @@ namespace HeatBalanceManager {
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
-                    state.dataHeatBal->SurfWinFenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
-                    state.dataHeatBal->SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempFront(1, SurfNum) = state.dataHeatBalSurf->TH(1, 1, SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) =
+                        state.dataHeatBalSurf->TH(2, 1, SurfNum);
                 }
             }
         }

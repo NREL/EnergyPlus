@@ -131,22 +131,6 @@ namespace EnergyPlus::PlantCondLoopOperation {
         // appropriate type of control algorithm (setpoint, load range based,
         // or uncontrolled) for the component
 
-        // METHODOLOGY EMPLOYED:
-        // na
-        // REFERENCES:
-        // na
-        // Using/Aliasing
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-        // DERIVED TYPE DEFINITIONS
-        // na
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int ListNum;    // DO loop index in PlantLoop()%LoopSide()%Branch()%Comp()%OpScheme()%EquipList(ListNum)
         int CurListNum; // Current list...= ListNum,  used for error checking only
         // Indices in PlantLoop.LoopSide.Branch.Comp data structure
@@ -753,7 +737,7 @@ CurrentModuleObject, PlantOpSchemeName);
         Array1D<Real64> NumArray;      // Numeric input items for object
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
+        int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
         //   certain object in the input file
         int Num;
         int NumEquipLists;
@@ -950,7 +934,7 @@ CurrentModuleObject, PlantOpSchemeName);
         Array1D<Real64> NumArray;      // Numeric input items for object
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
+        int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
         //   certain object in the input file
         int Num;
         int NumEquipLists;
@@ -1071,10 +1055,6 @@ CurrentModuleObject, PlantOpSchemeName);
         int IOStat;
         bool IsNotOK;
         std::string CurrentModuleObject;
-        static int TotNumLists(0);
-        static Array1D_string EquipListsNameList;
-        static Array1D<LoopType> EquipListsTypeList;
-        static Array1D_int EquipListsIndexList;
         int iIndex;
         bool firstblank;
 
@@ -1082,11 +1062,11 @@ CurrentModuleObject, PlantOpSchemeName);
             // assemble mapping between list names and indices one time
             PELists = inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
             CELists = inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
-            TotNumLists = PELists + CELists;
-            if (TotNumLists > 0) {
-                EquipListsNameList.allocate(TotNumLists);
-                EquipListsTypeList.allocate(TotNumLists);
-                EquipListsIndexList.allocate(TotNumLists);
+            state.dataPlantCondLoopOp->TotNumLists = PELists + CELists;
+            if (state.dataPlantCondLoopOp->TotNumLists > 0) {
+                state.dataPlantCondLoopOp->EquipListsNameList.allocate(state.dataPlantCondLoopOp->TotNumLists);
+                state.dataPlantCondLoopOp->EquipListsTypeList.allocate(state.dataPlantCondLoopOp->TotNumLists);
+                state.dataPlantCondLoopOp->EquipListsIndexList.allocate(state.dataPlantCondLoopOp->TotNumLists);
 
                 // First load PlantEquipmentList info
                 if (PELists > 0) {
@@ -1105,9 +1085,9 @@ CurrentModuleObject, PlantOpSchemeName);
                                                       lAlphaFieldBlanks,
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
-                        EquipListsNameList(iIndex) = cAlphaArgs(1);
-                        EquipListsTypeList(iIndex) = LoopType::Plant;
-                        EquipListsIndexList(iIndex) = Num;
+                        state.dataPlantCondLoopOp->EquipListsNameList(iIndex) = cAlphaArgs(1);
+                        state.dataPlantCondLoopOp->EquipListsTypeList(iIndex) = LoopType::Plant;
+                        state.dataPlantCondLoopOp->EquipListsIndexList(iIndex) = Num;
                         MachineNum = 2;
                         while (MachineNum <= NumAlphas) {
                             firstblank = false;
@@ -1152,9 +1132,9 @@ CurrentModuleObject, PlantOpSchemeName);
                                                       lAlphaFieldBlanks,
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
-                        EquipListsNameList(iIndex) = cAlphaArgs(1);
-                        EquipListsTypeList(iIndex) = LoopType::Condenser;
-                        EquipListsIndexList(iIndex) = Num;
+                        state.dataPlantCondLoopOp->EquipListsNameList(iIndex) = cAlphaArgs(1);
+                        state.dataPlantCondLoopOp->EquipListsTypeList(iIndex) = LoopType::Condenser;
+                        state.dataPlantCondLoopOp->EquipListsIndexList(iIndex) = Num;
                         MachineNum = 2;
                         while (MachineNum <= NumAlphas) {
                             firstblank = false;
@@ -1192,12 +1172,12 @@ CurrentModuleObject, PlantOpSchemeName);
 
         FoundIntendedList = false;
         // find name in set of possible list
-        for (Num = 1; Num <= TotNumLists; ++Num) {
-            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name, EquipListsNameList(Num))) {
+        for (Num = 1; Num <= state.dataPlantCondLoopOp->TotNumLists; ++Num) {
+            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name, state.dataPlantCondLoopOp->EquipListsNameList(Num))) {
                 FoundIntendedList = true;
                 // get object item for real this time
                 {
-                    auto const SELECT_CASE_var(EquipListsTypeList(Num));
+                    auto const SELECT_CASE_var(state.dataPlantCondLoopOp->EquipListsTypeList(Num));
                     if (SELECT_CASE_var == LoopType::Plant) {
                         CurrentModuleObject = "PlantEquipmentList";
                     } else if (SELECT_CASE_var == LoopType::Condenser) {
@@ -1206,7 +1186,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 }
                 inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
-                                              EquipListsIndexList(Num),
+                                              state.dataPlantCondLoopOp->EquipListsIndexList(Num),
                                               cAlphaArgs,
                                               NumAlphas,
                                               rNumericArgs,
@@ -1654,7 +1634,6 @@ CurrentModuleObject, PlantOpSchemeName);
         bool SchemeNameFound;        // Set to FALSE if a match of OpScheme object and OpScheme name is not found
         std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
         int StackMngrNum;            // local temporary for Erl program calling manager index
-        static bool lDummy;          // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
 
         SchemeNameFound = true;
 
@@ -1704,7 +1683,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                              state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name,
                                          "Distributed Load Rate",
                                          "[W]",
-                                         lDummy,
+                                         state.dataPlantCondLoopOp->lDummy,
                                          state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).EMSActuatorDispatchedLoadValue);
                         // TODO: I think this should be a sensor really
                         SetupEMSInternalVariable(state, "Component Remaining Current Demand Rate",
@@ -2677,34 +2656,19 @@ CurrentModuleObject, PlantOpSchemeName);
         // Components are machines on plant equipment operation lists.  Need to make adjustments to the
         // load dispatch to account for limits and floating capacities.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        //  USE EconomizerHeatExchanger,  ONLY: GetEconHeatExchangerCurrentCapacity
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("PlantCondLoopOperation:DistributePlantLoad");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 CurMassFlowRate(0.0);
-        static Real64 ToutLowLimit(0.0);
-        static Real64 ToutHiLimit(0.0);
-        static Real64 TinLowLimit(0.0);
-        static Real64 Tinlet(0.0);
-        static Real64 Tsensor(0.0);
-        static Real64 CurSpecHeat(0.0);
-        static Real64 QdotTmp(0.0);
-        static int ControlNodeNum(0);
+        Real64 CurMassFlowRate(0.0);
+        Real64 ToutLowLimit(0.0);
+        Real64 ToutHiLimit(0.0);
+        Real64 TinLowLimit(0.0);
+        Real64 Tinlet(0.0);
+        Real64 Tsensor(0.0);
+        Real64 CurSpecHeat(0.0);
+        Real64 QdotTmp(0.0);
+        int ControlNodeNum(0);
 
         auto &this_component(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
 
@@ -3266,7 +3230,7 @@ CurrentModuleObject, PlantOpSchemeName);
         std::string ActuatorType;
         std::string ActuatorName;
         std::string UniqueIDName;
-        static std::string Units("[on/off]");
+        static std::string const Units("[on/off]");
         // INTEGER                      :: NumAct
         int LoopNum;
         int LoopSideNum;

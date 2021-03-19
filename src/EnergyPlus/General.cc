@@ -71,9 +71,7 @@
 #define snprintf _snprintf
 #endif
 
-namespace EnergyPlus {
-
-namespace General {
+namespace EnergyPlus::General {
 
     // Module containing routines for general use
 
@@ -87,69 +85,12 @@ namespace General {
     // contains routines (most likely numeric) that may be needed in several parts
     // of EnergyPlus
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
     // Using/Aliasing
     using DataHVACGlobals::Bisection;
     using DataHVACGlobals::HVACSystemRootFinding;
 
-    // Data
-    // This module should not contain variables in the module sense as it is
-    // intended strictly to provide "interfaces" to routines used by other
-    // parts of the simulation.
-
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE General
-    // PUBLIC  SaveCompDesWaterFlow
-    // PUBLIC  ErfFunction
-
-    // Functions
-    bool GetReportInput(true);
-    bool SurfVert(false);
-    bool SurfDet(false);
-    bool SurfDetWVert(false);
-    bool DXFReport(false);
-    bool DXFWFReport(false);
-    bool VRMLReport(false);
-    bool CostInfo(false);
-    bool ViewFactorInfo(false);
-    bool Constructions(false);
-    bool Materials(false);
-    bool LineRpt(false);
-    bool VarDict(false);
-    bool EMSoutput(false);
-
-    void clear_state() {
-        GetReportInput = true;
-        SurfVert = false;
-        SurfDet = false;
-        SurfDetWVert = false;
-        DXFReport = false;
-        DXFWFReport = false;
-        VRMLReport = false;
-        CostInfo = false;
-        ViewFactorInfo = false;
-        Constructions = false;
-        Materials = false;
-        LineRpt = false;
-        VarDict = false;
-        EMSoutput = false;
-    }
 
     void SolveRoot(Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
@@ -179,11 +120,6 @@ namespace General {
         // REFERENCES:
         // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
         // 2nd edition, 1992. Page 347 ff.
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -356,11 +292,6 @@ namespace General {
         // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
         // 2nd edition, 1992. Page 347 ff.
 
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // = -2: f(x0) and f(x1) have the same sign
@@ -369,11 +300,6 @@ namespace General {
         // optional
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SMALL(1.e-10);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 X0;       // present 1st bound
@@ -535,24 +461,14 @@ namespace General {
         // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
         // 2nd edition, 1992. Page 347 ff.
 
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // = -2: f(x0) and f(x1) have the same sign
         // = -1: no convergence
         // >  0: number of iterations performed
-        // optional
+
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SMALL(1.e-10);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 X0;       // present 1st bound
@@ -677,24 +593,14 @@ namespace General {
         // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
         // 2nd edition, 1992. Page 347 ff.
 
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // = -2: f(x0) and f(x1) have the same sign
         // = -1: no convergence
         // >  0: number of iterations performed
-        // optional
+
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SMALL(1.e-10);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 X0;       // present 1st bound
@@ -855,24 +761,14 @@ namespace General {
         // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
         // 2nd edition, 1992. Page 347 ff.
 
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // = -2: f(x0) and f(x1) have the same sign
         // = -1: no convergence
         // >  0: number of iterations performed
-        // optional
+
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SMALL(1.e-10);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 X0;       // present 1st bound
@@ -982,33 +878,11 @@ namespace General {
         // For switchable glazing, calculates a weighted average of properties
         // A and B
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 InterpSw;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 locSwitchFac;
-        // bound SwitchFac
 
         locSwitchFac = min(SwitchFac, 1.0);
         locSwitchFac = max(locSwitchFac, 0.0);
@@ -1034,27 +908,14 @@ namespace General {
         // METHODOLOGY EMPLOYED:
         // Linear interpolation.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         // Return value
         Real64 InterpBlind;
 
         // Argument array dimensioning
         PropArray.dim(37);
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InterpFac; // Interpolation factor
@@ -1087,14 +948,8 @@ namespace General {
         // METHODOLOGY EMPLOYED:
         // Linear interpolation.
 
-        // REFERENCES:na
-
-        // Using/Aliasing
         // Return value
         Real64 InterpProfAng;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
@@ -1113,70 +968,6 @@ namespace General {
         }
         return InterpProfAng;
     }
-
-    //    Real64
-    //    InterpSlatAng(
-    //        Real64 const SlatAng, // Slat angle (rad)
-    //        bool const VarSlats, // True if slat angle is variable
-    //        Array1A< Real64 > const PropArray // Array of blind properties as function of slat angle
-    //    )
-    //    {
-    //
-    //        // SUBROUTINE INFORMATION:
-    //        //       AUTHOR         Fred Winkelmann
-    //        //       DATE WRITTEN   Dec 2001
-    //        //       MODIFIED       na
-    //        //       RE-ENGINEERED  na
-    //
-    //        // PURPOSE OF THIS SUBROUTINE:
-    //        // Does slat-angle interpolation of window blind solar-thermal properties that
-    //        // do not depend on profile angle
-    //
-    //        // METHODOLOGY EMPLOYED:
-    //        // Linear interpolation.
-    //
-    //        // REFERENCES:na
-    //
-    //        // USE STATEMENTS:
-    //        // Using/Aliasing
-    //        //        //        using DataSurfaces::MaxSlatAngs;
-    //
-    //        // Return value
-    //        Real64 InterpSlatAng;
-    //
-    //        // Argument array dimensioning
-    //        PropArray.dim( MaxSlatAngs );
-    //
-    //        // Locals
-    //        // FUNCTION ARGUMENT DEFINITIONS:
-    //
-    //        // FUNCTION PARAMETER DEFINITIONS:
-    //        Real64 const DeltaAng( Pi / ( double( MaxSlatAngs ) - 1.0 ) );
-    //
-    //        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    //        Real64 InterpFac; // Interpolation factor
-    //        int IBeta; // Slat angle index
-    //        Real64 SlatAng1;
-    //
-    //        if ( SlatAng > Pi || SlatAng < 0.0 ) {
-    //            //  InterpSlatAng = 0.0
-    //            //  RETURN
-    //            //END IF
-    //            SlatAng1 = min( max( SlatAng, 0.0 ), Pi );
-    //        } else {
-    //            SlatAng1 = SlatAng;
-    //        }
-    //
-    //        if ( VarSlats ) { // Variable-angle slats
-    //            IBeta = 1 + int( SlatAng1 / DeltaAng );
-    //            InterpFac = ( SlatAng1 - DeltaAng * ( IBeta - 1 ) ) / DeltaAng;
-    //            InterpSlatAng = PropArray( IBeta ) + InterpFac * ( PropArray( min( MaxSlatAngs, IBeta + 1 ) ) - PropArray( IBeta ) );
-    //        } else { // Fixed-angle slats or shade
-    //            InterpSlatAng = PropArray( 1 );
-    //        }
-    //
-    //        return InterpSlatAng;
-    //    }
 
     Real64 InterpSlatAng(Real64 const SlatAng,           // Slat angle (rad)
                          bool const VarSlats,            // True if slat angle is variable
@@ -1197,16 +988,11 @@ namespace General {
         // METHODOLOGY EMPLOYED:
         // Linear interpolation.
 
-        // REFERENCES:na
-
         // Using/Aliasing
         using DataSurfaces::MaxSlatAngs;
 
         // Return value
         Real64 InterpSlatAng;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
         static Real64 const DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
@@ -1218,9 +1004,6 @@ namespace General {
         Real64 SlatAng1;
 
         if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {
-            //  InterpSlatAng = 0.0
-            //  RETURN
-            // END IF
             SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
         } else {
             SlatAng1 = SlatAng;
@@ -1257,8 +1040,6 @@ namespace General {
         // METHODOLOGY EMPLOYED:
         // Linear interpolation.
 
-        // REFERENCES:na
-
         // Using/Aliasing
         using DataSurfaces::MaxSlatAngs;
 
@@ -1267,9 +1048,6 @@ namespace General {
 
         // Argument array dimensioning
         PropArray.dim(MaxSlatAngs, 37);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 const DeltaProfAng(DataGlobalConstants::Pi / 36.0);
@@ -1290,8 +1068,6 @@ namespace General {
         Real64 ProfAng1;
 
         if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0 || ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-            //  InterpProfSlatAng = 0.0
-            //  RETURN
             SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
 
             // This is not correct, fixed 2/17/2010
@@ -1344,17 +1120,8 @@ namespace General {
         // METHODOLOGY EMPLOYED:
         // Based on solar profile angle and slat geometry
 
-        // REFERENCES:na
-
-        // Using/Aliasing
         // Return value
         Real64 BlindBeamBeamTrans;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 fEdge;      // Slat edge correction factor
@@ -1404,35 +1171,11 @@ namespace General {
         // A(1)*X + A(2)*X^2 + A(3)*X^3 + A(4)*X^4 + A(5)*X^5 + A(6)*X^6
         // where X is the cosine of the angle of incidence (0.0 to 1.0)
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 POLYF;
 
         // Argument array dimensioning
         A.dim(6);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (X < 0.0 || X > 1.0) {
             POLYF = 0.0;
@@ -1470,186 +1213,6 @@ namespace General {
             POLYF = X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
         }
         return POLYF;
-    }
-
-    Real64 POLY1F(Real64 &X,         // independent variable
-                  Array1A<Real64> A, // array of polynomial coefficients
-                  int &N             // number of terms in polynomial
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         George N. Walton
-        //       DATE WRITTEN   May 1977
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function evaluates a polynomial of the form:
-        // POLY = A(1) + A(2)*X + A(3)*X**2 + ... + A(N)*X**(N-1)
-
-        // METHODOLOGY EMPLOYED:
-        // Uses Horner's Rule.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 POLY1F;
-
-        // Argument array dimensioning
-        A.dim(N);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int I;      // Loop parameter
-        Real64 SUM; // Temporary summation variable
-
-        SUM = A(N);
-        for (I = 2; I <= N; ++I) {
-            SUM = SUM * X + A(N - I + 1);
-        }
-
-        POLY1F = SUM;
-
-        return POLY1F;
-    }
-
-    Real64 POLY2F(Real64 &X,         // independent variable
-                  Array1A<Real64> A, // array of polynomial coefficients
-                  int &N             // number of terms in polynomial
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         George N. Walton
-        //       DATE WRITTEN   May 1977
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function evaluates a polynomial of the form:
-        // POLY = A(1)*X + A(2)*X**2 + ... + A(N)*X**N
-
-        // METHODOLOGY EMPLOYED:
-        // Uses Horner's Rule.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 POLY2F;
-
-        // Argument array dimensioning
-        A.dim(N);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int I;      // Loop parameter
-        Real64 SUM; // Temporary summation variable
-
-        SUM = A(N) * X;
-        for (I = 2; I <= N; ++I) {
-            SUM = X * (SUM + A(N - I + 1));
-        }
-
-        POLY2F = SUM;
-
-        return POLY2F;
-    }
-
-    std::string RemoveTrailingZeros(std::string const &InputString)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   September 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  July 2014, Performance and refinements, Stuart Mentzer
-
-        // PURPOSE OF THIS FUNCTION:
-        // Remove trailing zeroes from output strings.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        // na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const ED("ED");
-        static std::string const zero_string("0.");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        assert(!has_any_of(InputString, "ed"));       // Pre Not using lowercase exponent letter
-        assert(InputString == stripped(InputString)); // Pre Already stripped surrounding spaces
-
-        if (has(InputString, '.') && (!has_any_of(InputString, ED))) { // In +/-<digits>.<digits> format
-            std::string::size_type const pos(InputString.find_last_not_of('0'));
-            if (pos + 1 < InputString.length()) {
-                switch (pos) { // Handle [+/-].000... format
-                case 0u:       // .0*
-                    return zero_string;
-                case 1u:
-                    if (InputString[1] == '.') {
-                        char const c0(InputString[0]);
-                        if ((c0 == '+') || (c0 == '-')) {
-                            return zero_string;
-                        }
-                    }
-                    // fallthrough
-                default:
-                    return InputString.substr(0, InputString.find_last_not_of('0') + 1);
-                }
-            } else { // No trailing zeros
-                return InputString;
-            }
-        } else { // Not in +/-<digits>.<digits> format
-            return InputString;
-        }
     }
 
     std::string &strip_trailing_zeros(std::string &InputString)
@@ -1714,24 +1277,9 @@ namespace General {
         // Note that DataIn and SmoothedData should have the same size. This is the reponsibility
         // of the calling routine. NumItemsInAvg should be no bigger than the size of DataIn.
 
-        // REFERENCES:
-        // na.
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         DataIn.dim(NumDataItems);
         SmoothedData.dim(NumDataItems);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D<Real64> TempData(3 * NumDataItems); // a scratch array
@@ -1768,8 +1316,6 @@ namespace General {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine will process a date from a string and determine
         // the proper month and day for that date string.
-
-        // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FstNum;
@@ -2073,30 +1619,8 @@ namespace General {
         // This subroutine returns the appropriate Julian Day value for the input
         // Month and Day.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int JulianDay;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_int EndDayofMonth(12, {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
@@ -2135,26 +1659,8 @@ namespace General {
         // calculation, using an input JulianDay and returning
         // appropriate Month and Day.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_int const EndOfMonth({0, 12}, {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WMonth;
@@ -2203,26 +1709,8 @@ namespace General {
         // REFERENCES:
         // Adapted from BLAST BTWEEN function.
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool BetweenDates;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         BetweenDates = false; // Default case
 
@@ -2248,12 +1736,6 @@ namespace General {
         // This function creates the current time interval of the system
         // time step.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -2261,18 +1743,7 @@ namespace General {
         // Return value
         std::string OutputString;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-
         Real64 const FracToMin(60.0);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 ActualTimeS; // Start of current interval (HVAC time step)
@@ -2346,140 +1817,6 @@ namespace General {
         return c;
     }
 
-    // SUBROUTINE SaveCompDesWaterFlow(WaterInletNodeNum,DesWaterFlow)
-
-    //          ! SUBROUTINE INFORMATION:
-    //          !       AUTHOR         Fred Buhl
-    //          !       DATE WRITTEN   January 2004
-    //          !       MODIFIED       na
-    //          !       RE-ENGINEERED  na
-
-    //          ! PURPOSE OF THIS SUBROUTINE:
-    //          ! Save the design water flow rates of those components using water as an energy source
-    //          ! or sink in an array that can be accessed by the water loop managers for sizing calculations.
-
-    //          ! METHODOLOGY EMPLOYED:
-    //          ! The design flow rate is stored in a dynamic array along with the water inlet node number
-    //          ! (which is used by the water loops as a component identifier instead if name and type).
-
-    //          ! REFERENCES:
-    //          ! na
-
-    //          ! USE STATEMENTS:
-    //  USE DataSizing
-
-    //  IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
-
-    //          ! SUBROUTINE ARGUMENT DEFINITIONS:
-    //  INTEGER :: WaterInletNodeNum ! the component's water inlet node number (condenser side for water / water compoennts)
-    //  REAL(r64)    :: DesWaterFlow      ! the component's design water flow rate [m3/s]
-
-    //          ! SUBROUTINE PARAMETER DEFINITIONS:
-    //          ! na
-
-    //          ! INTERFACE BLOCK SPECIFICATIONS:
-    //          ! na
-
-    //          ! DERIVED TYPE DEFINITIONS:
-    //          ! na
-
-    //          ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    //  TYPE (CompDesWaterFlowData), ALLOCATABLE, DIMENSION(:) :: CompDesWaterFlow0 ! scratch array to store components'
-    //                                                                            ! design water flow rate
-    //  INTEGER :: WaterCompNum ! component do loop index
-
-    //  NumWaterComps = NumWaterComps + 1 ! increment the number of components that use water as a source of heat or coolth
-    //  ! save the existing data in a scratch array
-    //  IF (NumWaterComps > 1) THEN
-    //    ALLOCATE(CompDesWaterFlow0(NumWaterComps-1))
-    //    DO WaterCompNum=1,NumWaterComps-1
-    //      CompDesWaterFlow0(WaterCompNum)%SupNode = CompDesWaterFlow(WaterCompNum)%SupNode
-    //      CompDesWaterFlow0(WaterCompNum)%DesVolFlowRate = CompDesWaterFlow(WaterCompNum)%DesVolFlowRate
-    //    END DO
-    //    ! get rid of the old array
-    //    DEALLOCATE(CompDesWaterFlow)
-    //  END IF
-    //  ! allocate a new array
-    //  ALLOCATE(CompDesWaterFlow(NumWaterComps))
-    //  ! save the new data
-    //  CompDesWaterFlow(NumWaterComps)%SupNode = WaterInletNodeNum
-    //  CompDesWaterFlow(NumWaterComps)%DesVolFlowRate = DesWaterFlow
-    //  ! move the old data back from the scratch array
-    //  IF (NumWaterComps > 1) THEN
-    //    DO WaterCompNum=1,NumWaterComps-1
-    //      CompDesWaterFlow(WaterCompNum)%SupNode = CompDesWaterFlow0(WaterCompNum)%SupNode
-    //      CompDesWaterFlow(WaterCompNum)%DesVolFlowRate = CompDesWaterFlow0(WaterCompNum)%DesVolFlowRate
-    //    END DO
-    //    DEALLOCATE(CompDesWaterFlow0)
-    //  END IF
-
-    //  RETURN
-
-    // END SUBROUTINE SaveCompDesWaterFlow
-
-    void Invert3By3Matrix(EnergyPlusData &state,
-                          Array2A<Real64> const A, // Input 3X3 Matrix
-                          Array2A<Real64> InverseA // Output 3X3 Matrix - Inverse Of A
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   August 1976
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine computes the inverse of a 3x3 matrix by the
-        // cofactor method.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Argument array dimensioning
-        A.dim(3, 3);
-        InverseA.dim(3, 3);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Determinant; // Determinant of Matrix A
-
-        // Compute Determinant
-
-        Determinant = A(1, 1) * A(2, 2) * A(3, 3) + A(2, 1) * A(3, 2) * A(1, 3) + A(3, 1) * A(1, 2) * A(2, 3) - A(1, 1) * A(2, 3) * A(3, 2) -
-                      A(1, 2) * A(2, 1) * A(3, 3) - A(1, 3) * A(2, 2) * A(3, 1);
-
-        if (std::abs(Determinant) < .1E-12) {
-            ShowFatalError(state, "Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{state.files.eso});
-        }
-
-        // Compute Inverse
-
-        InverseA(1, 1) = (A(2, 2) * A(3, 3) - A(2, 3) * A(3, 2)) / Determinant;
-        InverseA(1, 2) = (A(1, 3) * A(3, 2) - A(1, 2) * A(3, 3)) / Determinant;
-        InverseA(1, 3) = (A(1, 2) * A(2, 3) - A(1, 3) * A(2, 2)) / Determinant;
-        InverseA(2, 1) = (A(2, 3) * A(3, 1) - A(2, 1) * A(3, 3)) / Determinant;
-        InverseA(2, 2) = (A(1, 1) * A(3, 3) - A(1, 3) * A(3, 1)) / Determinant;
-        InverseA(2, 3) = (A(1, 3) * A(2, 1) - A(1, 1) * A(2, 3)) / Determinant;
-        InverseA(3, 1) = (A(2, 1) * A(3, 2) - A(2, 2) * A(3, 1)) / Determinant;
-        InverseA(3, 2) = (A(1, 2) * A(3, 1) - A(1, 1) * A(3, 2)) / Determinant;
-        InverseA(3, 3) = (A(1, 1) * A(2, 2) - A(1, 2) * A(2, 1)) / Determinant;
-    }
-
     void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed back to the calling routine
                  Real64 const Tol, // Tolerance for Convergence
                  Real64 const X0,  // Current value of X
@@ -2502,35 +1839,14 @@ namespace General {
         // The subroutine tests for convergence and provides a new guess for the value of the
         // independent variable X.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         // Linear Correction based on the RegulaFalsi routine in EnergyPlus
-
-        // Using/Aliasing
-        // unused0909  use dataglobals, only: outputfiledebug
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        //                  Cnvg = 1:  Converged
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const small(1.e-9); // Small Number used to approximate zero
         Real64 const Perturb(0.1); // Perturbation applied to X to initialize iteration
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Real64 DY; // Linear fit result
-
-
 
         // Check for convergence by comparing change in X
         if (Iter != 1) {
@@ -2580,32 +1896,11 @@ namespace General {
         // items and returns the index of the item in the list, if
         // found.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int FindNumberInList;
 
         // Argument array dimensioning
         ListOfItems.dim(_);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;
@@ -2647,26 +1942,10 @@ namespace General {
         // from the packed single word.  This relies on 4 byte integer representation
         // as a minimum (capable of representing up to 2,147,483,647).
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // ((month*100 + day)*100 + hour)*100 + minute
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const DecMon(100 * 100 * 100);
         int const DecDay(100 * 100);
         int const DecHr(100);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TmpItem;
@@ -2696,9 +1975,6 @@ namespace General {
         // Could use the access to the minute as OP (OutputProcessor) does but uses
         // external calculation.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -2706,17 +1982,8 @@ namespace General {
         // Return value
         int ActualTimeMin; // calculated Minute for reporting
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 const FracToMin(60.0);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 ActualTimeS; // Start of current interval (HVAC time step)
@@ -2760,28 +2027,6 @@ namespace General {
         // from the packed single word.  This relies on 4 byte integer representation
         // as a minimum (capable of representing up to 2,147,483,647).
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // ((month*100 + day)*100 + hour)*100 + minute
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         Item = ((Month * 100 + Day) * 100 + Hour) * 100 + Minute;
     }
 
@@ -2797,32 +2042,8 @@ namespace General {
         // This subroutine uses an input logical and makes
         // an integer (true=1, false=0)
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int LogicalToInteger;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (Flag) {
             LogicalToInteger = 1;
@@ -2844,31 +2065,12 @@ namespace General {
         // PURPOSE OF THIS FUNCTION:
         // This routine returns the time in seconds at the end of the current HVAC step.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
         // Return value
         Real64 GetCurrentHVACTime;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // na
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 CurrentHVACTime;
@@ -2894,30 +2096,11 @@ namespace General {
         // PURPOSE OF THIS FUNCTION:
         // This routine returns the time in seconds at the beginning of the current HVAC step.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
 
         // Return value
         Real64 GetPreviousHVACTime;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // na
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 PreviousHVACTime;
@@ -2943,31 +2126,8 @@ namespace General {
         // This function creates the time stamp with the current time interval for the HVAC
         // time step.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Return value
         std::string OutputString;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         OutputString = CreateTimeIntervalString(GetPreviousHVACTime(state), GetCurrentHVACTime(state));
 
@@ -2989,28 +2149,6 @@ namespace General {
         // However, this function provides better accuracy for sub-minute time steps
         // by also showing information down to the 10th of a second.
         // Note that Time is expected to be specified in REAL(r64).
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Hours;      // Number of hours <= 24
@@ -3054,29 +2192,6 @@ namespace General {
         // time values specified in seconds.
         // Inspired by similar function CreateSysTimeIntervalString() in General.cc
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         std::string TimeStmpS; // Character representation of start of interval
         std::string TimeStmpE; // Character representation of end of interval
@@ -3104,26 +2219,6 @@ namespace General {
         // into a triplet { hours : minutes : seconds } such that
         // - minutes < 60
         // - seconds < 60
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int const MinToSec(60);
@@ -3185,7 +2280,7 @@ namespace General {
         static std::string VarDictOption1;
         static std::string VarDictOption2;
 
-        if (GetReportInput) {
+        if (state.dataGeneral->GetReportInput) {
 
             cCurrentModuleObject = "Output:Surfaces:List";
 
@@ -3208,24 +2303,24 @@ namespace General {
                     auto const SELECT_CASE_var(cAlphaArgs(1));
 
                     if (SELECT_CASE_var == "LINES") {
-                        LineRpt = true;
+                        state.dataGeneral->LineRpt = true;
                         LineRptOption1 = cAlphaArgs(2);
 
                     } else if (SELECT_CASE_var == "VERTICES") {
-                        SurfVert = true;
+                        state.dataGeneral->SurfVert = true;
 
                     } else if ((SELECT_CASE_var == "DETAILS") || (SELECT_CASE_var == "DETAILED") || (SELECT_CASE_var == "DETAIL")) {
-                        SurfDet = true;
+                        state.dataGeneral->SurfDet = true;
 
                     } else if ((SELECT_CASE_var == "DETAILSWITHVERTICES") || (SELECT_CASE_var == "DETAILVERTICES")) {
-                        SurfDetWVert = true;
+                        state.dataGeneral->SurfDetWVert = true;
 
                     } else if (SELECT_CASE_var == "COSTINFO") {
                         //   Custom case for reporting surface info for cost estimates (for first costs in opitimzing)
-                        CostInfo = true;
+                        state.dataGeneral->CostInfo = true;
 
                     } else if (SELECT_CASE_var == "VIEWFACTORINFO") { // actual reporting is in HeatBalanceIntRadExchange
-                        ViewFactorInfo = true;
+                        state.dataGeneral->ViewFactorInfo = true;
                         ViewRptOption1 = cAlphaArgs(2);
 
                     } else if (SELECT_CASE_var == "DECAYCURVESFROMCOMPONENTLOADSSUMMARY") { // Should the Radiant to Convective Decay Curves from the
@@ -3235,12 +2330,12 @@ namespace General {
                     } else if (SELECT_CASE_var == "") {
                         ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
                         ShowContinueError(state,
-                            " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
+                            R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
 
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state,
-                            " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
+                            R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
                     }
                 }
             }
@@ -3266,34 +2361,34 @@ namespace General {
                     auto const SELECT_CASE_var(cAlphaArgs(1));
 
                     if (SELECT_CASE_var == "DXF") {
-                        DXFReport = true;
+                        state.dataGeneral->DXFReport = true;
                         DXFOption1 = cAlphaArgs(2);
                         DXFOption2 = cAlphaArgs(3);
 
                     } else if (SELECT_CASE_var == "DXF:WIREFRAME") {
-                        DXFWFReport = true;
+                        state.dataGeneral->DXFWFReport = true;
                         DXFWFOption1 = cAlphaArgs(2);
                         DXFWFOption2 = cAlphaArgs(3);
 
                     } else if (SELECT_CASE_var == "VRML") {
-                        VRMLReport = true;
+                        state.dataGeneral->VRMLReport = true;
                         VRMLOption1 = cAlphaArgs(2);
                         VRMLOption2 = cAlphaArgs(3);
 
-                    } else if (SELECT_CASE_var == "") {
+                    } else if (SELECT_CASE_var.empty()) {
                         ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(state, " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
+                        ShowContinueError(state, R"( Legal values are: "DXF", "DXF:WireFrame", "VRML".)");
 
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(state, " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
+                        ShowContinueError(state, R"( Legal values are: "DXF", "DXF:WireFrame", "VRML".)");
                     }
                 }
             }
 
             RepNum = inputProcessor->getNumSectionsFound("Report Variable Dictionary");
             if (RepNum > 0) {
-                VarDict = true;
+                state.dataGeneral->VarDict = true;
                 VarDictOption1 = "REGULAR";
                 VarDictOption2 = "";
             }
@@ -3314,7 +2409,7 @@ namespace General {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                VarDict = true;
+                state.dataGeneral->VarDict = true;
                 VarDictOption1 = cAlphaArgs(1);
                 VarDictOption2 = cAlphaArgs(2);
             }
@@ -3335,15 +2430,15 @@ namespace General {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "CONSTRUCTIONS")) {
-                    Constructions = true;
+                    state.dataGeneral->Constructions = true;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(1), "MATERIALS")) {
-                    Materials = true;
+                    state.dataGeneral->Materials = true;
                 }
                 if (NumNames > 1) {
                     if (UtilityRoutines::SameString(cAlphaArgs(2), "CONSTRUCTIONS")) {
-                        Constructions = true;
+                        state.dataGeneral->Constructions = true;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(2), "MATERIALS")) {
-                        Materials = true;
+                        state.dataGeneral->Materials = true;
                     }
                 }
             }
@@ -3364,7 +2459,7 @@ namespace General {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                EMSoutput = true;
+                state.dataGeneral->EMSoutput = true;
 
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(1));
@@ -3379,14 +2474,14 @@ namespace General {
                         state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
                         state.dataRuntimeLang->OutputEMSActuatorAvailFull = true;
 
-                    } else if (SELECT_CASE_var == "") {
+                    } else if (SELECT_CASE_var.empty()) {
                         ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
                         state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
                         state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     }
@@ -3404,14 +2499,14 @@ namespace General {
                     } else if (SELECT_CASE_var == "VERBOSE") {
                         state.dataRuntimeLang->OutputEMSInternalVarsFull = true;
                         state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-                    } else if (SELECT_CASE_var == "") {
+                    } else if (SELECT_CASE_var.empty()) {
                         ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
                         state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
                         state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     }
@@ -3429,21 +2524,21 @@ namespace General {
                     } else if (SELECT_CASE_var == "VERBOSE") {
                         state.dataRuntimeLang->OutputFullEMSTrace = true;
                         state.dataRuntimeLang->OutputEMSErrors = true;
-                    } else if (SELECT_CASE_var == "") {
+                    } else if (SELECT_CASE_var.empty()) {
                         ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
+                        ShowContinueError(state, R"( Legal values are: "None", "ErrorsOnly", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSErrors = false;
                         state.dataRuntimeLang->OutputFullEMSTrace = false;
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
+                        ShowContinueError(state, R"( Legal values are: "None", "ErrorsOnly", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSErrors = false;
                         state.dataRuntimeLang->OutputFullEMSTrace = false;
                     }
                 }
             }
 
-            GetReportInput = false;
+            state.dataGeneral->GetReportInput = false;
         }
 
         // Process the Scan Request
@@ -3453,14 +2548,14 @@ namespace General {
             auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(reportName));
             if (SELECT_CASE_var == "CONSTRUCTIONS") {
                 if (present(ReportKey)) {
-                    if (UtilityRoutines::SameString(ReportKey, "Constructions")) DoReport = Constructions;
-                    if (UtilityRoutines::SameString(ReportKey, "Materials")) DoReport = Materials;
+                    if (UtilityRoutines::SameString(ReportKey, "Constructions")) DoReport = state.dataGeneral->Constructions;
+                    if (UtilityRoutines::SameString(ReportKey, "Materials")) DoReport = state.dataGeneral->Materials;
                 }
             } else if (SELECT_CASE_var == "VIEWFACTORINFO") {
-                DoReport = ViewFactorInfo;
+                DoReport = state.dataGeneral->ViewFactorInfo;
                 if (present(Option1)) Option1 = ViewRptOption1;
             } else if (SELECT_CASE_var == "VARIABLEDICTIONARY") {
-                DoReport = VarDict;
+                DoReport = state.dataGeneral->VarDict;
                 if (present(Option1)) Option1 = VarDictOption1;
                 if (present(Option2)) Option2 = VarDictOption2;
                 //    CASE ('SCHEDULES')
@@ -3470,33 +2565,33 @@ namespace General {
                 {
                     auto const SELECT_CASE_var1(UtilityRoutines::MakeUPPERCase(ReportKey)); // Autodesk:OPTIONAL ReportKey used without PRESENT check
                     if (SELECT_CASE_var1 == "COSTINFO") {
-                        DoReport = CostInfo;
+                        DoReport = state.dataGeneral->CostInfo;
                     } else if (SELECT_CASE_var1 == "DXF") {
-                        DoReport = DXFReport;
+                        DoReport = state.dataGeneral->DXFReport;
                         if (present(Option1)) Option1 = DXFOption1;
                         if (present(Option2)) Option2 = DXFOption2;
                     } else if (SELECT_CASE_var1 == "DXF:WIREFRAME") {
-                        DoReport = DXFWFReport;
+                        DoReport = state.dataGeneral->DXFWFReport;
                         if (present(Option1)) Option1 = DXFWFOption1;
                         if (present(Option2)) Option2 = DXFWFOption2;
                     } else if (SELECT_CASE_var1 == "VRML") {
-                        DoReport = VRMLReport;
+                        DoReport = state.dataGeneral->VRMLReport;
                         if (present(Option1)) Option1 = VRMLOption1;
                         if (present(Option2)) Option2 = VRMLOption2;
                     } else if (SELECT_CASE_var1 == "VERTICES") {
-                        DoReport = SurfVert;
+                        DoReport = state.dataGeneral->SurfVert;
                     } else if (SELECT_CASE_var1 == "DETAILS") {
-                        DoReport = SurfDet;
+                        DoReport = state.dataGeneral->SurfDet;
                     } else if (SELECT_CASE_var1 == "DETAILSWITHVERTICES") {
-                        DoReport = SurfDetWVert;
+                        DoReport = state.dataGeneral->SurfDetWVert;
                     } else if (SELECT_CASE_var1 == "LINES") {
-                        DoReport = LineRpt;
+                        DoReport = state.dataGeneral->LineRpt;
                         if (present(Option1)) Option1 = LineRptOption1;
                     } else {
                     }
                 }
             } else if (SELECT_CASE_var == "ENERGYMANAGEMENTSYSTEM") {
-                DoReport = EMSoutput;
+                DoReport = state.dataGeneral->EMSoutput;
             } else {
             }
         }
@@ -3525,29 +2620,6 @@ namespace General {
         // This routine checks "global" objects (that is, ones with ZoneList used in the name
         // specification) along with a specific name for the current object for length and duplication
         // with previous objects of that class.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         errFlag = false;
         std::string::size_type const ItemNameLength = len(ItemName);
@@ -3592,12 +2664,10 @@ namespace General {
                 results.push_back(substring);
             }
             if (*(string.end() - 1) == ',') { // Add an empty string if the last char is the delimiter
-                results.push_back(std::string());
+                results.emplace_back();
             }
         }
         return results;
     }
-
-} // namespace General
 
 } // namespace EnergyPlus

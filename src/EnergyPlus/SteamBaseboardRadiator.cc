@@ -1444,7 +1444,7 @@ namespace SteamBaseboardRadiator {
                 }
             }
 
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;
