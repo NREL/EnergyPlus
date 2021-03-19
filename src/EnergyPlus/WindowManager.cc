@@ -5999,7 +5999,6 @@ namespace WindowManager {
 
         // Using/Aliasing
         using General::BlindBeamBeamTrans;
-        using General::InterpBlind;
         using General::InterpProfSlatAng;
         using General::InterpSlatAng;
         using General::POLYF;
@@ -6784,7 +6783,6 @@ namespace WindowManager {
         using General::POLYF;
 
         using General::ScanForReports;
-        // InterpBlind ! Blind profile angle interpolation function
         using WindowComplexManager::CalcComplexWindowThermal;
         using WindowComplexManager::UpdateComplexWindows;
 

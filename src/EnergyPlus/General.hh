@@ -159,10 +159,6 @@ namespace General {
                     Real64 B          // Glazing property in fully switched state
     );
 
-    Real64 InterpBlind(Real64 ProfAng,           // Profile angle (rad)
-                       Array1A<Real64> PropArray // Array of blind properties
-    );
-
     Real64 InterpProfAng(Real64 ProfAng,           // Profile angle (rad)
                          Array1S<Real64> PropArray // Array of blind properties
     );

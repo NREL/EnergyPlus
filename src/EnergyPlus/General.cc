@@ -892,46 +892,6 @@ namespace EnergyPlus::General {
         return InterpSw;
     }
 
-    Real64 InterpBlind(Real64 const ProfAng,           // Profile angle (rad)
-                       Array1A<Real64> const PropArray // Array of blind properties
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Winkelmann
-        //       DATE WRITTEN   May 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Does profile-angle interpolation of window blind solar-thermal properties
-
-        // METHODOLOGY EMPLOYED:
-        // Linear interpolation.
-
-        // Return value
-        Real64 InterpBlind;
-
-        // Argument array dimensioning
-        PropArray.dim(37);
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 InterpFac; // Interpolation factor
-        int IAlpha;       // Profile angle index
-
-        if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-            InterpBlind = 0.0;
-        } else {
-            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);
-            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
-            InterpBlind = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
-        }
-        return InterpBlind;
-    }
-
     Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
                          Array1S<Real64> const PropArray // Array of blind properties
     )

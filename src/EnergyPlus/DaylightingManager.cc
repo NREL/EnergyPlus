@@ -380,7 +380,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
-        using General::BlindBeamBeamTrans;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;     // Zone number
@@ -709,7 +708,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
-        using General::BlindBeamBeamTrans;
         using General::SafeDivide;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -778,7 +776,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
-        using General::BlindBeamBeamTrans;
         using General::SafeDivide;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1156,7 +1153,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
-        using General::BlindBeamBeamTrans;
 
         using General::SafeDivide;
 
@@ -1569,7 +1565,6 @@ namespace EnergyPlus::DaylightingManager {
         // switch as need to serve both reference points and map points based on calledFrom
 
         // Using/Aliasing
-        using General::BlindBeamBeamTrans;
         using General::POLYF;
         using General::SafeDivide;
 
@@ -3075,8 +3070,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // METHODOLOGY EMPLOYED:
         // switch as need to serve both reference points and map points based on calledFrom
-
-        using General::BlindBeamBeamTrans;
         using General::POLYF;
 
         if (state.dataSurface->SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
@@ -3482,7 +3475,7 @@ namespace EnergyPlus::DaylightingManager {
                                 } else {
                                     SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                                 }
-                                TransBmBmMult(JB) = BlindBeamBeamTrans(
+                                TransBmBmMult(JB) = General::BlindBeamBeamTrans(
                                     ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                                 state.dataDaylightingManager->EDIRSUdisk(iHour, JB + 1) = RAYCOS(3) * TVISS * TransBmBmMult(JB) * ObTransDisk;
 
@@ -3650,7 +3643,7 @@ namespace EnergyPlus::DaylightingManager {
                                         } else {
                                             SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                                         }
-                                        TransBmBmMultRefl(JB) = BlindBeamBeamTrans(
+                                        TransBmBmMultRefl(JB) = General::BlindBeamBeamTrans(
                                             ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                                         state.dataDaylightingManager->EDIRSUdisk(iHour, JB + 1) += SunVecMir(3) * SpecReflectance * TVisRefl * TransBmBmMultRefl(JB);
 
@@ -7053,7 +7046,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
-        using General::BlindBeamBeamTrans;
         using General::InterpProfAng;
         using General::POLYF;
 
@@ -7565,7 +7557,6 @@ namespace EnergyPlus::DaylightingManager {
                         //         for TDDs because it is based on TVISBR which is correctly calculated for TDDs above.
 
                         ProfileAngle(state, IWin, U, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
-                        Real64 ProfAngTest = state.dataSurface->SurfWinProfileAng(IWin);
 
                         for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                             if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
@@ -7615,7 +7606,7 @@ namespace EnergyPlus::DaylightingManager {
                             }
                             TransBmBmMult(JB) =
                                 TVISBR *
-                                BlindBeamBeamTrans(ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
+                                General::BlindBeamBeamTrans(ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                         } // End of loop over slat angles
 
                     } else { // Diffusing glass
@@ -7814,7 +7805,7 @@ namespace EnergyPlus::DaylightingManager {
                             }
                             TransBmBmMult(JB) =
                                 TVISBSun *
-                                BlindBeamBeamTrans(ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
+                                General::BlindBeamBeamTrans(ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                         } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
 
                         if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
