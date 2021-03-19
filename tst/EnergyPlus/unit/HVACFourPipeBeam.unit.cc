@@ -1740,11 +1740,11 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
 
-    DataHVACGlobals::SimZoneEquipmentFlag = true;
-    DataHVACGlobals::SimNonZoneEquipmentFlag = false;
-    DataHVACGlobals::SimAirLoopsFlag = true;
-    DataHVACGlobals::SimPlantLoopsFlag = true;
-    DataHVACGlobals::SimElecCircuitsFlag = false;
+    state->dataHVACGlobal->SimZoneEquipmentFlag = true;
+    state->dataHVACGlobal->SimNonZoneEquipmentFlag = false;
+    state->dataHVACGlobal->SimAirLoopsFlag = true;
+    state->dataHVACGlobal->SimPlantLoopsFlag = true;
+    state->dataHVACGlobal->SimElecCircuitsFlag = false;
     bool FirstHVACIteration = true;
 
     // PlantManager::InitializeLoops( FirstHVACIteration );

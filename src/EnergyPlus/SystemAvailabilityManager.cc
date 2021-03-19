@@ -4255,7 +4255,6 @@ namespace SystemAvailabilityManager {
         auto &HybridVentSysAvailAirLoopNum = state.dataHVACGlobal->HybridVentSysAvailAirLoopNum;
         auto &HybridVentSysAvailActualZoneNum = state.dataHVACGlobal->HybridVentSysAvailActualZoneNum;
         auto &HybridVentSysAvailVentCtrl = state.dataHVACGlobal->HybridVentSysAvailVentCtrl;
-        auto &HybridVentSysAvailANCtrlStatus = state.dataHVACGlobal->HybridVentSysAvailANCtrlStatus;
         auto &HybridVentSysAvailMaster = state.dataHVACGlobal->HybridVentSysAvailMaster;
         auto &HybridVentSysAvailWindModifier = state.dataHVACGlobal->HybridVentSysAvailWindModifier;
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
