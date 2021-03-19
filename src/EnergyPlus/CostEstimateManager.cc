@@ -231,10 +231,6 @@ namespace CostEstimateManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the Cost Estimate based on inputs.
 
-        // Using/Aliasing
-        using DataPhotovoltaics::iSimplePVModel;
-        using DataPhotovoltaics::PVarray;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;            // do-loop counter for line items
         int ThisConstructID; // hold result of FindItem searching for Construct name
@@ -441,9 +437,9 @@ namespace CostEstimateManager {
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
                         if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                            thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, PVarray);
+                            thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataPhotovoltaic->PVarray);
                             if (thisPV > 0) {
-                                if (PVarray(thisPV).PVModelType != iSimplePVModel) {
+                                if (state.dataPhotovoltaic->PVarray(thisPV).PVModelType != DataPhotovoltaics::PVModel::Simple) {
                                     ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                                     "\", Generator:Photovoltaic, only available for model type PhotovoltaicPerformance:Simple");
                                     ErrorsFound = true;
@@ -486,10 +482,6 @@ namespace CostEstimateManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the Cost Estimate based on inputs.
-
-        // Using/Aliasing
-        using DataPhotovoltaics::iSimplePVModel;
-        using DataPhotovoltaics::PVarray;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;            // do-loop counter for line items
@@ -755,17 +747,20 @@ namespace CostEstimateManager {
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
                         if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                            thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, PVarray);
+                            thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
+                                                               state.dataPhotovoltaic->PVarray);
                             if (thisPV > 0) {
-                                ThisZoneID = UtilityRoutines::FindItem(state.dataSurface->Surface(PVarray(thisPV).SurfacePtr).ZoneName, Zone);
+                                ThisZoneID = UtilityRoutines::FindItem(
+                                    state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(thisPV).SurfacePtr).ZoneName, Zone);
                                 if (ThisZoneID == 0) {
                                     Multipliers = 1.0;
                                 } else {
                                     Multipliers = Zone(ThisZoneID).Multiplier * Zone(ThisZoneID).ListMultiplier;
                                 }
-                                if (PVarray(thisPV).PVModelType == iSimplePVModel) {
-                                    state.dataCostEstimateManager->CostLineItem(Item).Qty = 1000.0 * PVarray(thisPV).SimplePVModule.AreaCol *
-                                                             PVarray(thisPV).SimplePVModule.PVEfficiency * Multipliers / 1000.0;
+                                if (state.dataPhotovoltaic->PVarray(thisPV).PVModelType == DataPhotovoltaics::PVModel::Simple) {
+                                    state.dataCostEstimateManager->CostLineItem(Item).Qty =
+                                        1000.0 * state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.AreaCol *
+                                        state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.PVEfficiency * Multipliers / 1000.0;
                                 }
                                 state.dataCostEstimateManager->CostLineItem(Item).Units = "kW (rated)";
                                 state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap;

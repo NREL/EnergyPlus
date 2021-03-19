@@ -2144,7 +2144,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
     case GeneratorType::PV: {
         Photovoltaics::SimPVGenerator(state, GeneratorType::PV, name, generatorIndex, runFlag, myElecLoadRequest);
         Photovoltaics::GetPVGeneratorResults(
-            GeneratorType::PV, generatorIndex, dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd);
+            state, GeneratorType::PV, generatorIndex, dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd);
         electricPowerOutput = dCElectProdRate;
         thermalPowerOutput = thermProdRate;
         break;

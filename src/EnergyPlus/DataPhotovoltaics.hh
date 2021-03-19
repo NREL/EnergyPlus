@@ -60,18 +60,6 @@ namespace EnergyPlus {
 
 namespace DataPhotovoltaics {
 
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    
-    
-    
-    
-
     enum class PVModel
     {
         Unassigned,
@@ -111,12 +99,12 @@ namespace DataPhotovoltaics {
         std::string Name;       // name as identified in Sandia database
         Real64 AreaCol;         // effective area of solar collection
         Real64 ActiveFraction;  // fraction of parent surface that has active solar cells
-        int EfficencyInputMode; // to schedule or not
+        Efficiency EfficencyInputMode; // to schedule or not
         int EffSchedPtr;        // index pointer for efficiency schedule
         Real64 PVEfficiency;    // fixed or current PV efficiency
 
         // Default Constructor
-        SimplePVParamsStruct() : AreaCol(0.0), ActiveFraction(0.0), EfficencyInputMode(0), EffSchedPtr(0), PVEfficiency(0.0)
+        SimplePVParamsStruct() : AreaCol(0.0), ActiveFraction(0.0), EfficencyInputMode(Efficiency::Unassigned), EffSchedPtr(0), PVEfficiency(0.0)
         {
         }
     };
@@ -126,7 +114,7 @@ namespace DataPhotovoltaics {
         // Members
         std::string Name;
         int CellsInSeries;           // cells in series [-]
-        int CellType;                // type of PV cell (crystalline, amorphous )
+        SiPVCells CellType;                // type of PV cell (crystalline, amorphous )
         Real64 Area;                 // module area [m2]
         Real64 TauAlpha;             // tau alpha product at normal incidence [-]
         Real64 SemiConductorBandgap; // electron bandgap [eV]
@@ -147,7 +135,7 @@ namespace DataPhotovoltaics {
 
         // Default Constructor
         TRNSYSPVModuleParamsStruct()
-            : CellsInSeries(0), CellType(0), Area(0.0), TauAlpha(0.0), SemiConductorBandgap(0.0), ShuntResistance(0.0), RefIsc(0.0), RefVoc(0.0),
+            : CellsInSeries(0), CellType(SiPVCells::Unassigned), Area(0.0), TauAlpha(0.0), SemiConductorBandgap(0.0), ShuntResistance(0.0), RefIsc(0.0), RefVoc(0.0),
               RefTemperature(0.0), RefInsolation(0.0), Imp(0.0), Vmp(0.0), TempCoefIsc(0.0), TempCoefVoc(0.0), NOCTAmbTemp(0.0), NOCTCellTemp(0.0),
               NOCTInsolation(0.0), HeatLossCoef(0.0), HeatCapacity(0.0)
         {
@@ -314,8 +302,8 @@ namespace DataPhotovoltaics {
         std::string PerfObjName;
         int SurfacePtr;           // index for named surface
         int Zone;                 // index for zone (for getting any zone multipliers)
-        int PVModelType;          // type of performance modeling, Simple, TRNSYS or Equivalent 1-diode, or Sandia/King model
-        int CellIntegrationMode;  // how are PV cells integrated with other E+ modeling
+        PVModel PVModelType;          // type of performance modeling, Simple, TRNSYS or Equivalent 1-diode, or Sandia/King model
+        CellIntegration CellIntegrationMode;  // how are PV cells integrated with other E+ modeling
         Real64 NumModNSeries;     // number of modules in series in one string
         Real64 NumSeriesNParall;  // number of series strings in parallel
         int UTSCPtr;              // pointer to UTSC number for INTEGRATED TRANSPIRED COLLECTOR mode
@@ -334,7 +322,7 @@ namespace DataPhotovoltaics {
 
         // Default Constructor
         PVArrayStruct()
-            : SurfacePtr(0), Zone(0), PVModelType(0), CellIntegrationMode(0), NumModNSeries(1.0), NumSeriesNParall(1.0), UTSCPtr(0), ExtVentCavPtr(0),
+            : SurfacePtr(0), Zone(0), PVModelType(PVModel::Unassigned), CellIntegrationMode(CellIntegration::Unassigned), NumModNSeries(1.0), NumSeriesNParall(1.0), UTSCPtr(0), ExtVentCavPtr(0),
               PVTPtr(0), SurfaceSink(0.0)
         {
         }
