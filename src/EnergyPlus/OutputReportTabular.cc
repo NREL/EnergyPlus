@@ -170,12 +170,6 @@ namespace EnergyPlus::OutputReportTabular {
     using namespace DataHeatBalance;
     using namespace HybridModel;
 
-    // Functions
-    void clear_state(EnergyPlusData &state)
-    {
-        OutputReportTabular::ResetTabularReports(state);
-    }
-
     std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file)
     {
         std::ofstream &tbl_stream(*state.dataOutRptTab->TabularOutputFile(iStyle));
@@ -3316,7 +3310,7 @@ namespace EnergyPlus::OutputReportTabular {
                             }
                         }
                     }
-                    OutputReportTabularAnnual::AddAnnualTableOfContents(tbl_stream);
+                    OutputReportTabularAnnual::AddAnnualTableOfContents(state, tbl_stream);
                 }
                 // add entries specifically added using AddTOCEntry
                 for (iEntry = 1; iEntry <= ort->TOCEntriesCount; ++iEntry) {
@@ -15594,7 +15588,7 @@ namespace EnergyPlus::OutputReportTabular {
         // so that only last year is reported in tabular reports
         state.dataOutRptTab->gatherElapsedTimeBEPS = 0.0;
         ResetMonthlyGathering(state);
-        OutputReportTabularAnnual::ResetAnnualGathering();
+        OutputReportTabularAnnual::ResetAnnualGathering(state);
         ResetBinGathering(state);
         ResetBEPSGathering(state);
         ResetSourceEnergyEndUseGathering(state);
