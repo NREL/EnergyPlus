@@ -1046,6 +1046,13 @@ struct SetPointManagerData : BaseGlobalStruct {
     int NumReturnWaterResetHWSetPtMgrs = 0;  // number of hot-water return water reset setpoint managers
     int NumSchTESSetPtMgrs = 0;              // number of TES scheduled setpoint managers (created internally, not by user input)
 
+
+    int GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
+    int GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
+    int InitSetPointManagerTypeNum = 0;
+    int InitSetPointManagerNumChiller = 0;
+    int InitSetPointManagerTypeOf_Num = 0;
+
     bool ManagerOn = false;
     bool GetInputFlag = true; // First time, input is "gotten"
 
@@ -1161,6 +1168,12 @@ struct SetPointManagerData : BaseGlobalStruct {
         DCESPMCurrentLoad_Watts = 0.0;
         DCESPMCondInletTemp = 0.0;
         DCESPMEvapOutletTemp = 0.0;
+
+        GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
+        GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
+        InitSetPointManagerTypeNum = 0;
+        InitSetPointManagerNumChiller = 0;
+        InitSetPointManagerTypeOf_Num = 0;
 
         ManagerOn = false;
         GetInputFlag = true; // First time, input is "gotten"
