@@ -84,7 +84,6 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HeatRecovery.hh>
-#include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
@@ -135,7 +134,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HeatBalanceSurfaceManager::clear_state();
     HeatBalFiniteDiffManager::clear_state();
     HeatRecovery::clear_state();
-    HeatingCoils::clear_state();
     HighTempRadiantSystem::clear_state();
     Humidifiers::clear_state();
     HVACCooledBeam::clear_state();
