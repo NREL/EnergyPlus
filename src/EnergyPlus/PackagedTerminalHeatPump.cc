@@ -3711,15 +3711,18 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             state.dataPTHP->ZoneEquipmentListNotChecked = true;
         }
 
-        if (allocated(ZoneComp)) {
+        if (allocated(state.dataHVACGlobal->ZoneComp)) {
             PTObjectIndex = state.dataPTHP->PTUnit(PTUnitNum).PTObjectIndex;
             if (MyZoneEqFlag(PTUnitNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType).ZoneCompAvailMgrs(PTObjectIndex).AvailManagerListName =
+                state.dataHVACGlobal->ZoneComp(state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType)
+                    .ZoneCompAvailMgrs(PTObjectIndex)
+                    .AvailManagerListName =
                     state.dataPTHP->PTUnit(PTUnitNum).AvailManagerListName;
-                ZoneComp(state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType).ZoneCompAvailMgrs(PTObjectIndex).ZoneNum = ZoneNum;
+                state.dataHVACGlobal->ZoneComp(state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType).ZoneCompAvailMgrs(PTObjectIndex).ZoneNum = ZoneNum;
                 MyZoneEqFlag(PTUnitNum) = false;
             }
-            state.dataPTHP->PTUnit(PTUnitNum).AvailStatus = ZoneComp(state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType).ZoneCompAvailMgrs(PTObjectIndex).AvailStatus;
+            state.dataPTHP->PTUnit(PTUnitNum).AvailStatus =
+                state.dataHVACGlobal->ZoneComp(state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType).ZoneCompAvailMgrs(PTObjectIndex).AvailStatus;
         }
 
         if (MyPlantScanFlag(PTUnitNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -8421,6 +8424,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         int AirRelNode;                         // relief air node number in PTHP loop
         static Real64 AverageUnitMassFlow(0.0); // average supply air mass flow rate over time step
         static Real64 AverageOAMassFlow(0.0);   // average outdoor air mass flow rate over time step
+
+        auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
+        auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
 
         MSHPMassFlowRateLow = 0.0;  // Mass flow rate at low speed
         MSHPMassFlowRateHigh = 0.0; // Mass flow rate at high speed

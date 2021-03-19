@@ -667,8 +667,8 @@ namespace SimulationManager {
         // Using/Aliasing
         using DataStringGlobals::MatchVersion;
         using namespace DataSystemVariables;
-        using DataHVACGlobals::deviationFromSetPtThresholdClg;
-        using DataHVACGlobals::deviationFromSetPtThresholdHtg;
+        auto &deviationFromSetPtThresholdClg = state.dataHVACGlobal->deviationFromSetPtThresholdClg;
+        auto &deviationFromSetPtThresholdHtg = state.dataHVACGlobal->deviationFromSetPtThresholdHtg;
         using DataHVACGlobals::LimitNumSysSteps;
 
         using namespace DataIPShortCuts;

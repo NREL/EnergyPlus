@@ -3856,7 +3856,7 @@ namespace EnergyPlus::SimAirServingZones {
         }
 
         //// Resimulate if the zone air mass flow conservation convergence critreon is not met
-        if (ZoneMassBalanceHVACReSim) SysReSim = true;
+        if (state.dataHVACGlobal->ZoneMassBalanceHVACReSim) SysReSim = true;
 
         // If mass balance failed, resimulation is needed. Impose a mass balance for the new simulation.
         if (SysReSim) {

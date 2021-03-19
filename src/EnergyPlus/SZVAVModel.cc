@@ -73,7 +73,6 @@ namespace SZVAVModel {
 
     // Using/Aliasing
     using DataHVACGlobals::Bisection;
-    using DataHVACGlobals::HVACSystemRootFinding;
 
     // Data
     // This module should not contain variables in the module sense as it is

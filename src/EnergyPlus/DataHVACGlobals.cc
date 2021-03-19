@@ -253,31 +253,7 @@ namespace DataHVACGlobals {
     bool AirLoopsSimOnce(false);     // True means that the air loops have been simulated once in this environment
     bool GetAirPathDataDone(false);  // True means that air loops inputs have been processed
 
-    // Hybrid ventilation control part
-    int NumHybridVentSysAvailMgrs(0);               // Number of hybrid ventilation control
-    Array1D_int HybridVentSysAvailAirLoopNum;       // Airloop number in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailVentCtrl;         // Ventilation control action in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailActualZoneNum;    // Actual zone num in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailANCtrlStatus;     // AN control status in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailMaster;           // Master object name: Ventilation for simple; Zone name for AN
-    Array1D<Real64> HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
-    // For multispeed heat pump only
-    Real64 MSHPMassFlowRateLow(0.0);       // Mass flow rate at low speed
-    Real64 MSHPMassFlowRateHigh(0.0);      // Mass flow rate at high speed
-    Real64 MSHPWasteHeat(0.0);             // Waste heat
-    Real64 PreviousTimeStep(0.0);          // The time step length at the previous time step
-    bool ShortenTimeStepSysRoomAir(false); // Logical flag that triggers shortening of system time step
 
-    Real64 deviationFromSetPtThresholdHtg(-0.2); // heating threshold for reporting setpoint deviation
-    Real64 deviationFromSetPtThresholdClg(0.2);  // cooling threshold for reporting setpoint deviation
-
-    bool SimAirLoopsFlag;                  // True when the air loops need to be (re)simulated
-    bool SimElecCircuitsFlag;              // True when electic circuits need to be (re)simulated
-    bool SimPlantLoopsFlag;                // True when the main plant loops need to be (re)simulated
-    bool SimZoneEquipmentFlag;             // True when zone equipment components need to be (re)simulated
-    bool SimNonZoneEquipmentFlag;          // True when non-zone equipment components need to be (re)simulated
-    bool ZoneMassBalanceHVACReSim;         // True when zone air mass flow balance and air loop needs (re)simulated
-    int MinAirLoopIterationsAfterFirst(1); // minimum number of HVAC iterations after FirstHVACIteration
 
     Array1D_string const ZoneHVACTerminalTypes(NumZoneHVACTerminalTypes,
                                                {"ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
@@ -359,11 +335,7 @@ namespace DataHVACGlobals {
                                                   "AirTerminal:DualDuct:VAV:OutdoorAir",
                                                   "AirLoopHVACReturnAir"});
 
-    // Object Data
-    Array1D<ZoneCompTypeData> ZoneComp;
-    OptStartDataType OptStartData; // For optimum start
-    Array1D<ComponentSetPtData> CompSetPtEquip;
-    HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
+
 
     // Clears the global data in DataHVACGlobals.
     // Needed for unit tests, should not be normally called.
@@ -409,34 +381,8 @@ namespace DataHVACGlobals {
         AirLoopInit = false;
         AirLoopsSimOnce = false;
         GetAirPathDataDone = false;
-        NumHybridVentSysAvailMgrs = 0;
-        HybridVentSysAvailAirLoopNum.deallocate();
-        HybridVentSysAvailVentCtrl.deallocate();
-        HybridVentSysAvailActualZoneNum.deallocate();
-        HybridVentSysAvailANCtrlStatus.deallocate();
-        HybridVentSysAvailMaster.deallocate();
-        HybridVentSysAvailWindModifier.deallocate();
-        MSHPMassFlowRateLow = 0.0;
-        MSHPMassFlowRateHigh = 0.0;
-        MSHPWasteHeat = 0.0;
-        PreviousTimeStep = 0.0;
-        ShortenTimeStepSysRoomAir = false;
-        deviationFromSetPtThresholdHtg = -0.2;
-        deviationFromSetPtThresholdClg = 0.2;
-        SimAirLoopsFlag = true;
-        SimElecCircuitsFlag = true;
-        SimPlantLoopsFlag = true;
-        SimZoneEquipmentFlag = true;
-        SimNonZoneEquipmentFlag = true;
-        ZoneMassBalanceHVACReSim = true;
-        MinAirLoopIterationsAfterFirst = 1;
-        ZoneComp.deallocate();
-        CompSetPtEquip.deallocate();
-        OptStartData = OptStartDataType();
-        // unit test ZoneTempPredictorCorrector_ReportingTest fails without this next line. Next 2 lines are just to be thorough.
-        OptStartData.OptStartFlag.deallocate();
-        OptStartData.ActualZoneNum.deallocate();
-        OptStartData.OccStartTime.deallocate();
+     
+
     }
 
 } // namespace DataHVACGlobals

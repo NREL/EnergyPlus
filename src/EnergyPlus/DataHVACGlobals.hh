@@ -148,9 +148,7 @@ namespace DataHVACGlobals {
     int constexpr BypassWhenWithinEconomizerLimits(0); // heat recovery controlled by economizer limits
     int constexpr BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode
 
-    extern Array1D_string const cFanTypes;
-
-// parameters describing unitary systems
+    // parameters describing unitary systems
     int constexpr NumUnitarySystemTypes(7);
     // Furnace/Unitary System Types
     int constexpr Furnace_HeatOnly(1);
@@ -207,10 +205,6 @@ namespace DataHVACGlobals {
     int constexpr coilEnhancedMode = 1;      // Enhanced operation mode
     int constexpr coilSubcoolReheatMode = 2; // SubcoolReheat operation mode
 
-    extern Array1D_string const cAllCoilTypes;
-    extern Array1D_string const cCoolingCoilTypes;
-    extern Array1D_string const cHeatingCoilTypes;
-
     // Water to air HP coil types
     int constexpr WatertoAir_Simple(1);
     int constexpr WatertoAir_ParEst(2);
@@ -224,7 +218,7 @@ namespace DataHVACGlobals {
         WaterConstantOnDemand(3); // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
 
     // parameters describing coil performance types
-    int const CoilPerfDX_CoolBypassEmpirical(100);
+    int constexpr CoilPerfDX_CoolBypassEmpirical(100);
 
     // Airflow per total capacity range (Regular DX coils)
     Real64 constexpr MaxRatedVolFlowPerRatedTotCap1(0.00006041); // m3/s per watt = 450 cfm/ton
@@ -240,18 +234,10 @@ namespace DataHVACGlobals {
     Real64 constexpr MaxCoolVolFlowPerRatedTotCap2(0.00004026);  // m3/s per watt = 300 cfm/ton
     Real64 constexpr MinOperVolFlowPerRatedTotCap2(0.00001342);  // m3/s per watt = 100 cfm/ton
 
-    extern Array1D<Real64> MaxRatedVolFlowPerRatedTotCap;
-    extern Array1D<Real64> MinRatedVolFlowPerRatedTotCap;
-    extern Array1D<Real64> MaxHeatVolFlowPerRatedTotCap;
-    extern Array1D<Real64> MaxCoolVolFlowPerRatedTotCap;
-    extern Array1D<Real64> MinOperVolFlowPerRatedTotCap;
-
     // dx coil type (DXCT)
     int constexpr RegularDXCoil(1); // Regular DX coils or mixed air dx coils
     int constexpr DOASDXCoil(2);    // 100% DOAS DX coils
      
-    extern int DXCT;                // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
-
     // Parameters describing Heat Exchanger types
     int constexpr NumHXTypes(3);
 
@@ -259,29 +245,22 @@ namespace DataHVACGlobals {
     int constexpr HX_AIRTOAIR_GENERIC(2);
     int constexpr HX_DESICCANT_BALANCED(3);
 
-    extern Array1D_string const cHXTypes;
-
     // Parameters describing air terminal mixers
     int constexpr NumATMixerTypes(2);
     int constexpr No_ATMixer(0);
     int constexpr ATMixer_InletSide(1);
     int constexpr ATMixer_SupplySide(2);
 
-    extern Array1D_string const cATMixerTypes;
     bool constexpr ATMixerExists(true);
 
     // Parameters describing variable refrigerant flow terminal unit types
     int constexpr NumVRFTUTypes(1);
     int constexpr VRFTUType_ConstVolume(1);
 
-    extern Array1D_string const cVRFTUTypes;
-
     // VRF Heating Performance Curve Temperature Type
     int constexpr NumVRFHeatingPerformanceOATTypes(2);
     int constexpr WetBulbIndicator(1);
     int constexpr DryBulbIndicator(2);
-
-    extern Array1D_string const cVRFHeatingPerformanceOATTypes;
 
     // parameter concerning the amount of change in zone temperature is needed
     // for oscillation of zone temperature to be detected.
@@ -290,8 +269,64 @@ namespace DataHVACGlobals {
     // Parameters for HVACSystemRootFindingAlgorithm
     int constexpr Bisection(2);
 
-    // MODULE VARIABLE DECLARATIONS:
+    int constexpr NumZoneHVACTerminalTypes = 38;
+    int constexpr ZoneEquipTypeOf_VariableRefrigerantFlow(1);
+    int constexpr ZoneEquipTypeOf_EnergyRecoveryVentilator(2);
+    int constexpr ZoneEquipTypeOf_FourPipeFanCoil(3);
+    int constexpr ZoneEquipTypeOf_OutdoorAirUnit(4);
+    int constexpr ZoneEquipTypeOf_PackagedTerminalAirConditioner(5);
+    int constexpr ZoneEquipTypeOf_PackagedTerminalHeatPump(6);
+    int constexpr ZoneEquipTypeOf_UnitHeater(7);
+    int constexpr ZoneEquipTypeOf_UnitVentilator(8);
+    int constexpr ZoneEquipTypeOf_VentilatedSlab(9);
+    int constexpr ZoneEquipTypeOf_WaterToAirHeatPump(10);
+    int constexpr ZoneEquipTypeOf_WindowAirConditioner(11);
+    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric(12);
+    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveWater(13);
+    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam(14);
+    int constexpr ZoneEquipTypeOf_BaseboardConvectiveElectric(15);
+    int constexpr ZoneEquipTypeOf_BaseboardConvectiveWater(16);
+    int constexpr ZoneEquipTypeOf_HighTemperatureRadiant(17);
+    int constexpr ZoneEquipTypeOf_DehumidifierDX(18);
+    int constexpr ZoneEquipTypeOf_IdealLoadsAirSystem(19);
+    int constexpr ZoneEquipTypeOf_RefrigerationChillerSet(20);
+    int constexpr ZoneEquipTypeOf_HybridUnitaryAirConditioners(21);
+    int constexpr ZoneEquipTypeOf_FanZoneExhaust(22);
+    int constexpr ZoneEquipTypeOf_WaterHeaterHeatPump(23);
+    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume(24);
+    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctVAV(25);
+    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat(26);
+    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat(27);
+    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat(28);
+    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat(29);
+    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat(30);
+    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat(31);
+    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction(32);
+    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan(33);
+    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat(34);
+    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat(35);
+    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam(36);
+    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir(37);
+    int constexpr ZoneEquipTypeOf_AirLoopHVACReturnAir(38);
 
+    extern Array1D_string const cFanTypes;
+    extern Array1D_string const cAllCoilTypes;
+    extern Array1D_string const cCoolingCoilTypes;
+    extern Array1D_string const cHeatingCoilTypes;
+    extern Array1D_string const ccZoneHVACTerminalTypes;
+    extern Array1D_string const ZoneHVACTerminalTypes;
+    extern Array1D_string const cATMixerTypes;
+    extern Array1D_string const cVRFTUTypes;
+    extern Array1D_string const cVRFHeatingPerformanceOATTypes;
+    extern Array1D_string const cHXTypes;
+
+    extern Array1D<Real64> MaxRatedVolFlowPerRatedTotCap;
+    extern Array1D<Real64> MinRatedVolFlowPerRatedTotCap;
+    extern Array1D<Real64> MaxHeatVolFlowPerRatedTotCap;
+    extern Array1D<Real64> MaxCoolVolFlowPerRatedTotCap;
+    extern Array1D<Real64> MinOperVolFlowPerRatedTotCap;
+
+    extern int DXCT; // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
     extern bool FirstTimeStepSysFlag; // Set to true at the start of each sub-time step
 
     extern Real64 TimeStepSys;                    // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
@@ -335,75 +370,6 @@ namespace DataHVACGlobals {
     extern bool AirLoopInit;           // flag for whether InitAirLoops has been called
     extern bool AirLoopsSimOnce;       // True means that the air loops have been simulated once in this environment
     extern bool GetAirPathDataDone;    // True means that air loops inputs have been processed
-
-    // Hybrid ventilation control part
-    extern int NumHybridVentSysAvailMgrs;                  // Number of hybrid ventilation control
-    extern Array1D_int HybridVentSysAvailAirLoopNum;       // Airloop number in hybrid vent availability manager
-    extern Array1D_int HybridVentSysAvailVentCtrl;         // Ventilation control action in hybrid vent availability manager
-    extern Array1D_int HybridVentSysAvailActualZoneNum;    // Actual zone num in hybrid vent availability manager
-    extern Array1D_int HybridVentSysAvailANCtrlStatus;     // AN control status in hybrid vent availability manager
-    extern Array1D_int HybridVentSysAvailMaster;           // Master object name: Ventilation for simple; Zone name for AN
-    extern Array1D<Real64> HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
-    // For multispeed heat pump only
-    extern Real64 MSHPMassFlowRateLow;     // Mass flow rate at low speed
-    extern Real64 MSHPMassFlowRateHigh;    // Mass flow rate at high speed
-    extern Real64 MSHPWasteHeat;           // Waste heat
-    extern Real64 PreviousTimeStep;        // The time step length at the previous time step
-    extern bool ShortenTimeStepSysRoomAir; // Logical flag that triggers shortening of system time step
-
-    extern Real64 deviationFromSetPtThresholdHtg; // heating threshold for reporting setpoint deviation
-    extern Real64 deviationFromSetPtThresholdClg; // cooling threshold for reporting setpoint deviation
-
-    extern bool SimAirLoopsFlag;               // True when the air loops need to be (re)simulated
-    extern bool SimElecCircuitsFlag;           // True when electic circuits need to be (re)simulated
-    extern bool SimPlantLoopsFlag;             // True when the main plant loops need to be (re)simulated
-    extern bool SimZoneEquipmentFlag;          // True when zone equipment components need to be (re)simulated
-    extern bool SimNonZoneEquipmentFlag;       // True when non-zone equipment components need to be (re)simulated
-    extern bool ZoneMassBalanceHVACReSim;      // True when zone air mass flow balance and air loop needs (re)simulated
-    extern int MinAirLoopIterationsAfterFirst; // minimum number of HVAC iterations after FirstHVACIteration (must be at least 2 for sequenced loads
-                                               // to operate on air loops)
-
-    int constexpr NumZoneHVACTerminalTypes = 38;
-    extern Array1D_string const ccZoneHVACTerminalTypes;
-    extern Array1D_string const ZoneHVACTerminalTypes;
-    int constexpr ZoneEquipTypeOf_VariableRefrigerantFlow(1);
-    int constexpr ZoneEquipTypeOf_EnergyRecoveryVentilator(2);
-    int constexpr ZoneEquipTypeOf_FourPipeFanCoil(3);
-    int constexpr ZoneEquipTypeOf_OutdoorAirUnit(4);
-    int constexpr ZoneEquipTypeOf_PackagedTerminalAirConditioner(5);
-    int constexpr ZoneEquipTypeOf_PackagedTerminalHeatPump(6);
-    int constexpr ZoneEquipTypeOf_UnitHeater(7);
-    int constexpr ZoneEquipTypeOf_UnitVentilator(8);
-    int constexpr ZoneEquipTypeOf_VentilatedSlab(9);
-    int constexpr ZoneEquipTypeOf_WaterToAirHeatPump(10);
-    int constexpr ZoneEquipTypeOf_WindowAirConditioner(11);
-    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric(12);
-    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveWater(13);
-    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam(14);
-    int constexpr ZoneEquipTypeOf_BaseboardConvectiveElectric(15);
-    int constexpr ZoneEquipTypeOf_BaseboardConvectiveWater(16);
-    int constexpr ZoneEquipTypeOf_HighTemperatureRadiant(17);
-    int constexpr ZoneEquipTypeOf_DehumidifierDX(18);
-    int constexpr ZoneEquipTypeOf_IdealLoadsAirSystem(19);
-    int constexpr ZoneEquipTypeOf_RefrigerationChillerSet(20);
-    int constexpr ZoneEquipTypeOf_HybridUnitaryAirConditioners(21);
-    int constexpr ZoneEquipTypeOf_FanZoneExhaust(22);
-    int constexpr ZoneEquipTypeOf_WaterHeaterHeatPump(23);
-    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume(24);
-    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctVAV(25);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat(26);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat(27);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat(28);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat(29);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat(30);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat(31);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction(32);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan(33);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat(34);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat(35);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam(36);
-    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir(37);
-    int constexpr ZoneEquipTypeOf_AirLoopHVACReturnAir(38);
 
     struct ComponentSetPtData
     {
@@ -481,12 +447,6 @@ namespace DataHVACGlobals {
         }
     };
 
-    // Object Data
-    extern Array1D<ZoneCompTypeData> ZoneComp;
-    extern OptStartDataType OptStartData; // For optimum start
-    extern Array1D<ComponentSetPtData> CompSetPtEquip;
-    extern HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
-
     // Clears the global data in DataHVACGlobals.
     // Needed for unit tests, should not be normally called.
     void clear_state();
@@ -494,10 +454,69 @@ namespace DataHVACGlobals {
 } // namespace DataHVACGlobals
 
 struct HVACGlobalsData : BaseGlobalStruct {
+    // Object Data
+    Array1D<DataHVACGlobals::ZoneCompTypeData> ZoneComp;
+    DataHVACGlobals::OptStartDataType OptStartData; // For optimum start
+    Array1D<DataHVACGlobals::ComponentSetPtData> CompSetPtEquip;
+    DataHVACGlobals::HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
+
+    // Hybrid ventilation control part
+    int NumHybridVentSysAvailMgrs = 0;               // Number of hybrid ventilation control
+    Array1D_int HybridVentSysAvailAirLoopNum;       // Airloop number in hybrid vent availability manager
+    Array1D_int HybridVentSysAvailVentCtrl;         // Ventilation control action in hybrid vent availability manager
+    Array1D_int HybridVentSysAvailActualZoneNum;    // Actual zone num in hybrid vent availability manager
+    Array1D_int HybridVentSysAvailANCtrlStatus;     // AN control status in hybrid vent availability manager
+    Array1D_int HybridVentSysAvailMaster;           // Master object name: Ventilation for simple; Zone name for AN
+    Array1D<Real64> HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
+    // For multispeed heat pump only
+    Real64 MSHPMassFlowRateLow = 0.0;       // Mass flow rate at low speed
+    Real64 MSHPMassFlowRateHigh = 0.0;      // Mass flow rate at high speed
+    Real64 MSHPWasteHeat = 0.0;             // Waste heat
+    Real64 PreviousTimeStep = 0.0;          // The time step length at the previous time step
+    bool ShortenTimeStepSysRoomAir = false; // Logical flag that triggers shortening of system time step
+
+    Real64 deviationFromSetPtThresholdHtg = -0.2; // heating threshold for reporting setpoint deviation
+    Real64 deviationFromSetPtThresholdClg = 0.2;  // cooling threshold for reporting setpoint deviation
+
+    bool SimAirLoopsFlag;                  // True when the air loops need to be (re)simulated
+    bool SimElecCircuitsFlag;              // True when electic circuits need to be (re)simulated
+    bool SimPlantLoopsFlag;                // True when the main plant loops need to be (re)simulated
+    bool SimZoneEquipmentFlag;             // True when zone equipment components need to be (re)simulated
+    bool SimNonZoneEquipmentFlag;          // True when non-zone equipment components need to be (re)simulated
+    bool ZoneMassBalanceHVACReSim;         // True when zone air mass flow balance and air loop needs (re)simulated
+    int MinAirLoopIterationsAfterFirst = 1; // minimum number of HVAC iterations after FirstHVACIteration
 
     void clear_state() override
     {
+        this->ZoneComp.deallocate();
+        this->CompSetPtEquip.deallocate();
+        this->OptStartData = DataHVACGlobals::OptStartDataType();
+        // unit test ZoneTempPredictorCorrector_ReportingTest fails without this next line. Next 2 lines are just to be thorough.
+        this->OptStartData.OptStartFlag.deallocate();
+        this->OptStartData.ActualZoneNum.deallocate();
+        this->OptStartData.OccStartTime.deallocate();
 
+        this->NumHybridVentSysAvailMgrs = 0;
+        this->HybridVentSysAvailAirLoopNum.deallocate();
+        this->HybridVentSysAvailVentCtrl.deallocate();
+        this->HybridVentSysAvailActualZoneNum.deallocate();
+        this->HybridVentSysAvailANCtrlStatus.deallocate();
+        this->HybridVentSysAvailMaster.deallocate();
+        this->HybridVentSysAvailWindModifier.deallocate();
+        this->MSHPMassFlowRateLow = 0.0;
+        this->MSHPMassFlowRateHigh = 0.0;
+        this->MSHPWasteHeat = 0.0;
+        this->PreviousTimeStep = 0.0;
+        this->ShortenTimeStepSysRoomAir = false;
+        this->deviationFromSetPtThresholdHtg = -0.2;
+        this->deviationFromSetPtThresholdClg = 0.2;
+        this->SimAirLoopsFlag = true;
+        this->SimElecCircuitsFlag = true;
+        this->SimPlantLoopsFlag = true;
+        this->SimZoneEquipmentFlag = true;
+        this->SimNonZoneEquipmentFlag = true;
+        this->ZoneMassBalanceHVACReSim = true;
+        this->MinAirLoopIterationsAfterFirst = 1;
     }
 };
 

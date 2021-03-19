@@ -605,7 +605,7 @@ namespace HeatBalanceManager {
         // ZoneAirContaminantBalance, Added by L. Gu, 06/10
 
         // Using/Aliasing
-        using DataHVACGlobals::HVACSystemRootFinding;
+        auto &HVACSystemRootFinding = state.dataHVACGlobal->HVACSystemRootFinding;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

@@ -1732,24 +1732,24 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
-                        if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
+                        if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                             state.dataContaminantBalance->ZoneCO21(ZoneNum) = state.dataContaminantBalance->ZoneCO2M2(ZoneNum);
                         } else {
                             state.dataContaminantBalance->ZoneCO21(ZoneNum) = state.dataContaminantBalance->ZoneCO2MX(ZoneNum);
                         }
-                        ShortenTimeStepSysRoomAir = true;
+                        state.dataHVACGlobal->ShortenTimeStepSysRoomAir = true;
                     } else {
                         state.dataContaminantBalance->ZoneCO21(ZoneNum) = state.dataContaminantBalance->ZoneAirCO2(ZoneNum);
                     }
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
-                        if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
+                        if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                             state.dataContaminantBalance->ZoneGC1(ZoneNum) = state.dataContaminantBalance->ZoneGCM2(ZoneNum);
                         } else {
                             state.dataContaminantBalance->ZoneGC1(ZoneNum) = state.dataContaminantBalance->ZoneGCMX(ZoneNum);
                         }
-                        ShortenTimeStepSysRoomAir = true;
+                        state.dataHVACGlobal->ShortenTimeStepSysRoomAir = true;
                     } else {
                         state.dataContaminantBalance->ZoneGC1(ZoneNum) = state.dataContaminantBalance->ZoneAirGC(ZoneNum);
                     }

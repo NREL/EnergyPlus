@@ -752,7 +752,7 @@ namespace WindowAC {
         // Uses the status flags to trigger initializations.
 
         using DataHVACGlobals::SmallLoad;
-        using DataHVACGlobals::ZoneComp;
+        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         using DataHVACGlobals::ZoneCompTurnFansOff;
         using DataHVACGlobals::ZoneCompTurnFansOn;
         using DataZoneEquipment::CheckZoneEquipmentList;

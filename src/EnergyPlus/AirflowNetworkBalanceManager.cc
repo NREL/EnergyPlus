@@ -128,7 +128,6 @@ namespace AirflowNetworkBalanceManager {
     using DataHVACGlobals::FanType_SimpleOnOff;
     using DataHVACGlobals::FanType_SimpleVAV;
     using DataHVACGlobals::FanType_ZoneExhaust;
-    using DataHVACGlobals::NumHybridVentSysAvailMgrs;
     using DataHVACGlobals::OnOffFanPartLoadFraction;
     using DataHVACGlobals::SysTimeElapsed;
     using DataSurfaces::cExtBoundCondition;
@@ -245,8 +244,11 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
         }
-        if (allocated(state.dataZoneEquip->ZoneEquipConfig) && NumHybridVentSysAvailMgrs > 0 && allocated(state.dataAirSystemsData->PrimaryAirSystems)) HybridVentilationControl(state);
-        if (state.dataAirflowNetworkBalanceManager->VentilationCtrl == 1 && NumHybridVentSysAvailMgrs > 0) state.dataAirflowNetwork->AirflowNetworkFanActivated = false;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig) && state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0 &&
+            allocated(state.dataAirSystemsData->PrimaryAirSystems))
+            HybridVentilationControl(state);
+        if (state.dataAirflowNetworkBalanceManager->VentilationCtrl == 1 && state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0)
+            state.dataAirflowNetwork->AirflowNetworkFanActivated = false;
 
         if (present(Iter) && present(ResimulateAirZone) && state.dataAirflowNetwork->SimulateAirflowNetwork >= AirflowNetworkControlSimpleADS) {
             if (state.dataAirflowNetwork->AirflowNetworkFanActivated && Iter < 3 && AFNSupplyFanType == FanType_SimpleOnOff) {
@@ -10471,14 +10473,13 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs hybrid ventilation control
 
-        // Using/Aliasing
-        using DataHVACGlobals::HybridVentSysAvailActualZoneNum;
-        using DataHVACGlobals::HybridVentSysAvailAirLoopNum;
-        using DataHVACGlobals::HybridVentSysAvailANCtrlStatus;
-        using DataHVACGlobals::HybridVentSysAvailMaster;
-        using DataHVACGlobals::HybridVentSysAvailVentCtrl;
-        using DataHVACGlobals::HybridVentSysAvailWindModifier;
-        using DataHVACGlobals::NumHybridVentSysAvailMgrs;
+        auto &HybridVentSysAvailActualZoneNum = state.dataHVACGlobal->HybridVentSysAvailActualZoneNum;
+        auto &HybridVentSysAvailAirLoopNum = state.dataHVACGlobal->HybridVentSysAvailAirLoopNum;
+        auto &HybridVentSysAvailANCtrlStatus = state.dataHVACGlobal->HybridVentSysAvailANCtrlStatus;
+        auto &HybridVentSysAvailMaster = state.dataHVACGlobal->HybridVentSysAvailMaster;
+        auto &HybridVentSysAvailVentCtrl = state.dataHVACGlobal->HybridVentSysAvailVentCtrl;
+        auto &HybridVentSysAvailWindModifier = state.dataHVACGlobal->HybridVentSysAvailWindModifier;
+        auto &NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const HybridVentCtrl_Close(2);                                  // Open windows or doors

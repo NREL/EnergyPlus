@@ -11741,9 +11741,9 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::MSHPMassFlowRateHigh;
-        using DataHVACGlobals::MSHPMassFlowRateLow;
-        using DataHVACGlobals::MSHPWasteHeat;
+        auto & MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
+        auto & MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
+        auto & MSHPWasteHeat = state.dataHVACGlobal->MSHPWasteHeat;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -12590,9 +12590,9 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::MSHPMassFlowRateHigh;
-        using DataHVACGlobals::MSHPMassFlowRateLow;
-        using DataHVACGlobals::MSHPWasteHeat;
+        auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
+        auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
+        auto &MSHPWasteHeat = state.dataHVACGlobal->MSHPWasteHeat;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
@@ -16588,7 +16588,7 @@ namespace EnergyPlus::DXCoils {
                 Par(5) = BF;
 
                 FanSpdRatioMax = 1.0;
-                SolveRoot(1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
+                SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
                 if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
                 FanSpdRatio = Ratio1;
                 CoilOnOffRatio = 1.0;
@@ -16689,7 +16689,7 @@ namespace EnergyPlus::DXCoils {
                 Par(5) = BF;
 
                 FanSpdRatioMax = 1.0;
-                SolveRoot(1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
+                SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
                 // this will likely cause problems eventually, -1 and -2 mean different things
                 if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
                 FanSpdRatio = Ratio1;

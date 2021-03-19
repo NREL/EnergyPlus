@@ -3643,10 +3643,10 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             }
 
             // Exact solution or Euler method
-            ShortenTimeStepSysRoomAir = false;
+            state.dataHVACGlobal->ShortenTimeStepSysRoomAir = false;
             if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
                 if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
-                    if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
+                    if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                         state.dataHeatBalFanSys->ZoneT1(ZoneNum) = state.dataHeatBalFanSys->ZoneTM2(ZoneNum);
                         state.dataHeatBalFanSys->ZoneW1(ZoneNum) = state.dataHeatBalFanSys->ZoneWM2(ZoneNum);
                         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
@@ -3669,7 +3669,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             }
                         }
                     }
-                    ShortenTimeStepSysRoomAir = true;
+                    state.dataHVACGlobal->ShortenTimeStepSysRoomAir = true;
                 } else {
                     state.dataHeatBalFanSys->ZoneT1(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
                     state.dataHeatBalFanSys->ZoneW1(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
@@ -3828,17 +3828,17 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
                     // Change the room set point to occupied set point during optimum start period--------------
 
-                    if (allocated(OptStartData.OptStartFlag)) {
+                    if (allocated(state.dataHVACGlobal->OptStartData.OptStartFlag)) {
                         if (!allocated(DaySPValues)) {
                             DaySPValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
                         }
-                        if (OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
+                        if (state.dataHVACGlobal->OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
                             GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);
-                            OccStartTime = CEILING(OptStartData.OccStartTime(ActualZoneNum)) + 1;
+                            OccStartTime = CEILING(state.dataHVACGlobal->OptStartData.OccStartTime(ActualZoneNum)) + 1;
                             state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) = DaySPValues(1, OccStartTime);
                         }
 
-                        if (OptStartData.OptStartFlag(ActualZoneNum)) {
+                        if (state.dataHVACGlobal->OptStartData.OptStartFlag(ActualZoneNum)) {
                             state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
                             state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
                         }
@@ -3871,19 +3871,19 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
                     // Change the room set point to occupied set point during optimum start period--------------
 
-                    if (allocated(OptStartData.OptStartFlag)) {
+                    if (allocated(state.dataHVACGlobal->OptStartData.OptStartFlag)) {
                         if (!allocated(DaySPValues)) {
                             DaySPValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
                         }
-                        if (OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
+                        if (state.dataHVACGlobal->OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
                             GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);
-                            OccStartTime = CEILING(OptStartData.OccStartTime(ActualZoneNum)) + 1;
+                            OccStartTime = CEILING(state.dataHVACGlobal->OptStartData.OccStartTime(ActualZoneNum)) + 1;
                             state.dataZoneCtrls->OccRoomTSetPointCool(ActualZoneNum) = DaySPValues(1, OccStartTime);
                             GetScheduleValuesForDay(state, SetPointTempSchedIndexHot, DaySPValues);
                             state.dataZoneCtrls->OccRoomTSetPointHeat(ActualZoneNum) = DaySPValues(1, OccStartTime);
                         }
 
-                        if (OptStartData.OptStartFlag(ActualZoneNum)) {
+                        if (state.dataHVACGlobal->OptStartData.OptStartFlag(ActualZoneNum)) {
                             state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataZoneCtrls->OccRoomTSetPointCool(ActualZoneNum);
                             state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataZoneCtrls->OccRoomTSetPointHeat(ActualZoneNum);
                         }

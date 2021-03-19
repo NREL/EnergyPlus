@@ -5272,14 +5272,15 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             }
         }
 
-        if (allocated(DataHVACGlobals::ZoneComp)) {
+        if (allocated(state.dataHVACGlobal->ZoneComp)) {
             if (state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum)) { // initialize the name of each availability manager list and zone number
-                DataHVACGlobals::ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).AvailManagerListName =
+                state.dataHVACGlobal->ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).AvailManagerListName =
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailManagerListName;
-                DataHVACGlobals::ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).ZoneNum = ZoneNum;
+                state.dataHVACGlobal->ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).ZoneNum = ZoneNum;
                 state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum) = false;
             }
-            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailStatus = DataHVACGlobals::ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).AvailStatus;
+            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailStatus =
+                state.dataHVACGlobal->ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).AvailStatus;
         }
 
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {

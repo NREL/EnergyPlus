@@ -2025,7 +2025,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     // Using/Aliasing
     using DataHVACGlobals::ForceOff;
     using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::ZoneComp;
+    auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
     using DataZoneEquipment::PurchasedAir_Num;
 
     // SUBROUTINE PARAMETER DEFINITIONS:

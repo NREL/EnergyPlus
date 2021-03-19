@@ -1175,14 +1175,15 @@ namespace EnergyPlus::HVACStandAloneERV {
             state.dataHVACStandAloneERV->MyOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
+        if (allocated(state.dataHVACGlobal->ZoneComp)) {
             if (state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(ERVStandAlone_Num).ZoneCompAvailMgrs(StandAloneERVNum).AvailManagerListName =
+                state.dataHVACGlobal->ZoneComp(ERVStandAlone_Num).ZoneCompAvailMgrs(StandAloneERVNum).AvailManagerListName =
                     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailManagerListName;
-                ZoneComp(ERVStandAlone_Num).ZoneCompAvailMgrs(StandAloneERVNum).ZoneNum = ZoneNum;
+                state.dataHVACGlobal->ZoneComp(ERVStandAlone_Num).ZoneCompAvailMgrs(StandAloneERVNum).ZoneNum = ZoneNum;
                 state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum) = false;
             }
-            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailStatus = ZoneComp(ERVStandAlone_Num).ZoneCompAvailMgrs(StandAloneERVNum).AvailStatus;
+            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailStatus =
+                state.dataHVACGlobal->ZoneComp(ERVStandAlone_Num).ZoneCompAvailMgrs(StandAloneERVNum).AvailStatus;
         }
 
         // need to check all units to see if they are on Zone Equipment List or issue warning

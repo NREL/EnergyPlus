@@ -220,7 +220,7 @@ void ManageHVAC(EnergyPlusData &state)
         AirLoopsSimOnce = false;
         state.dataHVACMgr->MyEnvrnFlag = false;
         NumOfSysTimeStepsLastZoneTimeStep = 1;
-        PreviousTimeStep = state.dataGlobal->TimeStepZone;
+        state.dataHVACGlobal->PreviousTimeStep = state.dataGlobal->TimeStepZone;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
         state.dataHVACMgr->MyEnvrnFlag = true;
@@ -304,7 +304,7 @@ void ManageHVAC(EnergyPlusData &state)
         UseZoneTimeStepHistory = true;
     }
 
-    if (UseZoneTimeStepHistory) PreviousTimeStep = state.dataGlobal->TimeStepZone;
+    if (UseZoneTimeStepHistory) state.dataHVACGlobal->PreviousTimeStep = state.dataGlobal->TimeStepZone;
     for (SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
         if (state.dataGlobal->stopSimulation) break;
 
@@ -344,7 +344,7 @@ void ManageHVAC(EnergyPlusData &state)
             ManageZoneAirUpdates(state, iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
             if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
                 ManageZoneContaminanUpdates(state, iPushSystemTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-            PreviousTimeStep = TimeStepSys;
+            state.dataHVACGlobal->PreviousTimeStep = TimeStepSys;
         }
 
         FracTimeStepZone = TimeStepSys / state.dataGlobal->TimeStepZone;
@@ -629,6 +629,12 @@ void SimHVAC(EnergyPlusData &state)
     Real64 const square_sum_ConvergLogStackARR(pow_2(sum_ConvergLogStackARR));
     Real64 const sum_square_ConvergLogStackARR(sum(pow(ConvergLogStackARR, 2)));
 
+    auto &SimZoneEquipmentFlag = state.dataHVACGlobal->SimZoneEquipmentFlag;
+    auto &SimNonZoneEquipmentFlag = state.dataHVACGlobal->SimNonZoneEquipmentFlag;
+    auto &SimAirLoopsFlag = state.dataHVACGlobal->SimAirLoopsFlag;
+    auto &SimPlantLoopsFlag = state.dataHVACGlobal->SimPlantLoopsFlag;
+    auto &SimElecCircuitsFlag = state.dataHVACGlobal->SimElecCircuitsFlag;
+
     // Initialize all of the simulation flags to true for the first iteration
     SimZoneEquipmentFlag = true;
     SimNonZoneEquipmentFlag = true;
@@ -807,7 +813,7 @@ void SimHVAC(EnergyPlusData &state)
             // the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice
             SimAirLoopsFlag = true;
         }
-        if (state.dataHVACMgr->HVACManageIteration < MinAirLoopIterationsAfterFirst) {
+        if (state.dataHVACMgr->HVACManageIteration < state.dataHVACGlobal->MinAirLoopIterationsAfterFirst) {
             // sequenced zone loads for airloops may require extra iterations depending upon zone equipment order and load distribution type
             SimAirLoopsFlag = true;
             SimZoneEquipmentFlag = true;
@@ -1860,12 +1866,14 @@ void SimSelectedEquipment(EnergyPlusData &state,
             ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
             SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
             ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
-            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
+                state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
 
         ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
 
             state.dataErrTracking->AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
-            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
+            state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
         } else {
             state.dataHVACMgr->FlowResolutionNeeded = false;
             while ((SimAirLoops || SimZoneEquipment) && (IterAir <= MaxAir)) {
@@ -1921,7 +1929,8 @@ void SimSelectedEquipment(EnergyPlusData &state,
         }
 
             if (SimElecCircuits) {
-                state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
+                state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
             }
 
         if (!SimPlantLoops) {
@@ -1936,7 +1945,8 @@ void SimSelectedEquipment(EnergyPlusData &state,
         }
 
             if (SimElecCircuits) {
-                state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
+                state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
             }
         }
     }

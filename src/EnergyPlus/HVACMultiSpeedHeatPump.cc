@@ -4133,7 +4133,7 @@ namespace HVACMultiSpeedHeatPump {
         //  Calculate the heat recovered from MSHP
 
         // Using/Aliasing
-        using DataHVACGlobals::MSHPWasteHeat;
+        auto &MSHPWasteHeat = state.dataHVACGlobal->MSHPWasteHeat;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
 
@@ -4210,8 +4210,8 @@ namespace HVACMultiSpeedHeatPump {
         // Set OnOffAirFlowRatio to be used by DX coils
 
         // Using/Aliasing
-        using DataHVACGlobals::MSHPMassFlowRateHigh;
-        using DataHVACGlobals::MSHPMassFlowRateLow;
+        auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
+        auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;              // inlet node number for PTHPNum

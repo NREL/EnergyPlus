@@ -6448,8 +6448,6 @@ namespace EnergyPlus::WaterCoils {
         // update sim routine called from plant
 
         // Using/Aliasing
-        using DataHVACGlobals::SimAirLoopsFlag;
-        using DataHVACGlobals::SimZoneEquipmentFlag;
         using DataPlant::ccSimPlantEquipTypes;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -6520,8 +6518,8 @@ namespace EnergyPlus::WaterCoils {
             state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
             // set sim flags for air side users of coils
 
-            SimAirLoopsFlag = true;
-            SimZoneEquipmentFlag = true;
+            state.dataHVACGlobal->SimAirLoopsFlag = true;
+            state.dataHVACGlobal->SimZoneEquipmentFlag = true;
         } else { // nothing changed so turn off sim flag
             state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = false;
         }

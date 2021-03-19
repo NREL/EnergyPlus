@@ -227,7 +227,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // Using/Aliasing
         using DataHVACGlobals::NoAction;
         using DataHVACGlobals::NumOfSizingTypes;
-        using DataHVACGlobals::ZoneComp;
+        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNodeNum;
@@ -2736,6 +2736,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                 if (ZoneEquipTypeNum <= NumValidSysAvailZoneComponents) ValidSAMComp = true;
 
+                auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
+
                 if (ZoneCompNum > 0 && ValidSAMComp) {
 
                     GetZoneEqAvailabilityManager(state, ZoneEquipTypeNum, ZoneCompNum, ErrorFlag);
@@ -3834,7 +3836,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using namespace DataRoomAirModel; // UCSD
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::SmallMassFlow;
-        using DataHVACGlobals::ZoneMassBalanceHVACReSim;
+        auto &ZoneMassBalanceHVACReSim = state.dataHVACGlobal->ZoneMassBalanceHVACReSim;
         using ScheduleManager::GetCurrentScheduleValue;
 
         int const IterMax(25);

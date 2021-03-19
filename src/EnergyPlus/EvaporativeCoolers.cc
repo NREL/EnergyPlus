@@ -3866,7 +3866,7 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::ZoneComp;
+        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
