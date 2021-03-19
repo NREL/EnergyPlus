@@ -195,12 +195,12 @@ namespace EnergyPlus::SetPointManager {
     {
         // wrapper for GetInput to allow unit testing when fatal inputs are detected
         bool ErrorsFound(false);
-        static std::string const RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
+        const char *  RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
 
         GetSetPointManagerInputData(state, ErrorsFound);
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, format("{}Errors found in input.  Program terminates.",RoutineName));
         }
     }
 
@@ -251,7 +251,7 @@ namespace EnergyPlus::SetPointManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
+        const char *  RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphaFieldNames;
@@ -5213,14 +5213,12 @@ namespace EnergyPlus::SetPointManager {
         int RetNode;
         int OAMixOAInNode;
         Real64 FanDeltaT;
-        static Real64 TSupNoHC(0.0); // supply temperature with no heating or cooling
         Real64 TMixAtMinOA;
         Real64 EnthMixAtMinOA;
         Real64 HumRatMixAtMinOA;
         int AirLoopNum;
         Real64 OAFrac;
         int LoopInNode;
-        static Real64 ExtrRateNoHC(0.0); // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
 
         ZoneInletNode = this->ZoneInletNodeNum;
         ZoneNum = this->ControlZoneNum;
@@ -5250,41 +5248,41 @@ namespace EnergyPlus::SetPointManager {
         } else {
             FanDeltaT = 0.0;
         }
-        TSupNoHC = TMixAtMinOA + FanDeltaT;
+        state.dataSetPointManager->TSupNoHC = TMixAtMinOA + FanDeltaT;
         CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneInletNode).HumRat);
-        ExtrRateNoHC = CpAir * ZoneMassFlow * (TSupNoHC - ZoneTemp);
+        state.dataSetPointManager->ExtrRateNoHC = CpAir * ZoneMassFlow * (state.dataSetPointManager->TSupNoHC - ZoneTemp);
         if (ZoneMassFlow <= SmallMassFlow) {
-            TSetPt = TSupNoHC;
+            TSetPt = state.dataSetPointManager->TSupNoHC;
         } else if (DeadBand || std::abs(ZoneLoad) < SmallLoad) {
             // if air with no active heating or cooling provides cooling
-            if (ExtrRateNoHC < 0.0) {
+            if (state.dataSetPointManager->ExtrRateNoHC < 0.0) {
                 // if still in deadband, do no active heating or cooling;
                 // if below heating setpoint, set a supply temp that will cool to the heating setpoint
-                if (ExtrRateNoHC >= ZoneLoadToHeatSetPt) {
-                    TSetPt = TSupNoHC;
+                if (state.dataSetPointManager->ExtrRateNoHC >= ZoneLoadToHeatSetPt) {
+                    TSetPt = state.dataSetPointManager->TSupNoHC;
                 } else {
                     TSetPt = ZoneTemp + ZoneLoadToHeatSetPt / (CpAir * ZoneMassFlow);
                 }
                 // if air with no active heating or cooling provides heating
-            } else if (ExtrRateNoHC > 0.0) {
+            } else if (state.dataSetPointManager->ExtrRateNoHC > 0.0) {
                 // if still in deadband, do no active heating or cooling;
                 // if above cooling setpoint, set a supply temp that will heat to the cooling setpoint
-                if (ExtrRateNoHC <= ZoneLoadToCoolSetPt) {
-                    TSetPt = TSupNoHC;
+                if (state.dataSetPointManager->ExtrRateNoHC <= ZoneLoadToCoolSetPt) {
+                    TSetPt = state.dataSetPointManager->TSupNoHC;
                 } else {
                     TSetPt = ZoneTemp + ZoneLoadToCoolSetPt / (CpAir * ZoneMassFlow);
                 }
             } else {
-                TSetPt = TSupNoHC;
+                TSetPt = state.dataSetPointManager->TSupNoHC;
             }
         } else if (ZoneLoad < (-1.0 * SmallLoad)) {
             TSetPt1 = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlow);
             TSetPt2 = ZoneTemp + ZoneLoadToHeatSetPt / (CpAir * ZoneMassFlow);
-            if (TSetPt1 > TSupNoHC) {
-                if (TSetPt2 > TSupNoHC) {
+            if (TSetPt1 > state.dataSetPointManager->TSupNoHC) {
+                if (TSetPt2 > state.dataSetPointManager->TSupNoHC) {
                     TSetPt = TSetPt2;
                 } else {
-                    TSetPt = TSupNoHC;
+                    TSetPt = state.dataSetPointManager->TSupNoHC;
                 }
             } else {
                 TSetPt = TSetPt1;
@@ -5292,17 +5290,17 @@ namespace EnergyPlus::SetPointManager {
         } else if (ZoneLoad > SmallLoad) {
             TSetPt1 = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlow);
             TSetPt2 = ZoneTemp + ZoneLoadToCoolSetPt / (CpAir * ZoneMassFlow);
-            if (TSetPt1 < TSupNoHC) {
-                if (TSetPt2 < TSupNoHC) {
+            if (TSetPt1 < state.dataSetPointManager->TSupNoHC) {
+                if (TSetPt2 < state.dataSetPointManager->TSupNoHC) {
                     TSetPt = TSetPt2;
                 } else {
-                    TSetPt = TSupNoHC;
+                    TSetPt = state.dataSetPointManager->TSupNoHC;
                 }
             } else {
                 TSetPt = TSetPt1;
             }
         } else {
-            TSetPt = TSupNoHC;
+            TSetPt = state.dataSetPointManager->TSupNoHC;
         }
 
         TSetPt = max(min(TSetPt, this->MaxSetTemp), this->MinSetTemp);
@@ -8156,7 +8154,7 @@ namespace EnergyPlus::SetPointManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ResetHumidityRatioCtrlVarType: ");
+        const char *  RoutineName("ResetHumidityRatioCtrlVarType: ");
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -8195,7 +8193,7 @@ namespace EnergyPlus::SetPointManager {
     SPMLoop_exit:;
 
         if (ResetCntrlVarType) {
-            ShowWarningError(state, RoutineName + managerTypeName(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).SPMType) + "=\"" + state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).Name + "\". ");
+            ShowWarningError(state, format("{}{}=\"{}\". ",RoutineName,managerTypeName(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).SPMType), state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).Name));
             ShowContinueError(state, format(" ..Humidity ratio control variable type specified is = {}", controlTypeName(iCtrlVarType::HumRat)));
             ShowContinueError(state, format(" ..Humidity ratio control variable type allowed with water coils is = {}", controlTypeName(iCtrlVarType::MaxHumRat)));
             ShowContinueError(state, format(" ..Setpointmanager control variable type is reset to = {}", controlTypeName(iCtrlVarType::MaxHumRat)));
