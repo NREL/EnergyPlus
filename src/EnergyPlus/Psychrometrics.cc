@@ -510,9 +510,9 @@ namespace Psychrometrics {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        int const itmax(100); // Maximum No of Iterations
-        static Real64 convTol(0.0001);
-        static std::string const RoutineName("PsyTwbFnTdbWPb");
+        int constexpr itmax(100); // Maximum No of Iterations
+        Real64 const convTol(0.0001);
+        const char *  RoutineName("PsyTwbFnTdbWPb");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -522,8 +522,6 @@ namespace Psychrometrics {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 tBoil;                       // Boiling temperature of water at given pressure
-        static Real64 last_Patm(-99999.0);  // barometric pressure {Pascals}  (last)
-        static Real64 last_tBoil(-99999.0); // Boiling temperature of water at given pressure (last)
         Real64 newW;                        // Humidity ratio calculated with wet bulb guess
         Real64 W;                           // Humidity ratio entered and corrected as necessary
         Real64 ResultX;                     // ResultX is the final Iteration result passed back to the calling routine
@@ -588,12 +586,12 @@ namespace Psychrometrics {
         }
 
         // Initial temperature guess at atmospheric pressure
-        if (Patm != last_Patm) {
+        if (Patm != state.dataPsychrometrics->last_Patm) {
             tBoil = PsyTsatFnPb(state, Patm, (CalledFrom.empty() ? RoutineName : CalledFrom));
-            last_Patm = Patm;
-            last_tBoil = tBoil;
+            state.dataPsychrometrics->last_Patm = Patm;
+            state.dataPsychrometrics->last_tBoil = tBoil;
         } else {
-            tBoil = last_tBoil;
+            tBoil = state.dataPsychrometrics->last_tBoil;
         }
 
         // Set initial guess of WetBulbTemp=Entering Dry Bulb Temperature
@@ -1334,9 +1332,9 @@ namespace Psychrometrics {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        int const itmax(50); // Maximum number of iterations
+        int constexpr itmax(50); // Maximum number of iterations
         Real64 const convTol(0.0001);
-        static std::string const RoutineName("PsyTsatFnPb");
+        const char *  RoutineName("PsyTsatFnPb");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1346,8 +1344,6 @@ namespace Psychrometrics {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         bool FlagError; // set when errors should be flagged
-        static Real64 Press_Save(-99999.0);
-        static Real64 tSat_Save(-99999.0);
         Real64 tSat; // Water temperature guess
         int iter;    // Iteration counter
 
@@ -1374,10 +1370,10 @@ namespace Psychrometrics {
             }
         }
 #endif
-        if (Press == Press_Save) {
-            return tSat_Save;
+        if (Press == state.dataPsychrometrics->Press_Save) {
+            return state.dataPsychrometrics->tSat_Save;
         }
-        Press_Save = Press;
+        state.dataPsychrometrics->Press_Save = Press;
 
         // Uses an iterative process to determine the saturation temperature at a given
         // pressure by correlating saturated water vapor as a function of temperature.
@@ -1455,7 +1451,7 @@ namespace Psychrometrics {
 #endif
 
         // Result is SatTemperature
-        Real64 const Temp = tSat_Save = tSat; // result=> saturation temperature {C}
+        Real64 const Temp = state.dataPsychrometrics->tSat_Save = tSat; // result=> saturation temperature {C}
 
 #ifdef EP_psych_errors
         if (FlagError) {

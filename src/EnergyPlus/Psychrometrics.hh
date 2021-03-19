@@ -1399,8 +1399,18 @@ struct PsychrometricsData : BaseGlobalStruct
     std::string String;
     bool ReportErrors = true;
 
+    Real64 last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
+    Real64 last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
+    Real64 Press_Save = -99999.0;
+    Real64 tSat_Save = -99999.0;
+
     void clear_state() override
     {
+        last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
+        last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
+        Press_Save = -99999.0;
+        tSat_Save = -99999.0;
+
         String = "";
         ReportErrors = true;
     }
