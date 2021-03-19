@@ -85,12 +85,9 @@ namespace EnergyPlus::EarthTube {
     // Using/Aliasing
     using namespace DataEnvironment;
     using namespace DataHeatBalFanSys;
-    using namespace DataHeatBalance; // This is the heat balance super block data module
+    using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace Psychrometrics;
-
-    // MODULE VARIABLES DECLARATIONS:
-    static std::string const BlankString;
 
     void ManageEarthTube(EnergyPlusData &state)
     {
@@ -231,7 +228,7 @@ namespace EnergyPlus::EarthTube {
                     state.dataEarthTube->EarthTubeSys(Loop).FanType = EarthTubeVentilation::Exhaust;
                 } else if (SELECT_CASE_var == "INTAKE") {
                     state.dataEarthTube->EarthTubeSys(Loop).FanType = EarthTubeVentilation::Intake;
-                } else if ((SELECT_CASE_var == "NATURAL") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var == BlankString)) {
+                } else if ((SELECT_CASE_var == "NATURAL") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var.empty())) {
                     state.dataEarthTube->EarthTubeSys(Loop).FanType = EarthTubeVentilation::Natural;
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + ": " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1) + ", " + cAlphaFieldNames(3) +

@@ -139,7 +139,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
     EXPECT_DOUBLE_EQ(175.0, pvw3.getAzimuth());
     EXPECT_DOUBLE_EQ(21.0, pvw3.getTilt());
     EXPECT_DOUBLE_EQ(0.5, pvw3.getGroundCoverageRatio());
-    EXPECT_EQ(static_cast<int>(PVWattsGenerators.size()), 3);
+    EXPECT_EQ(static_cast<int>(state->dataPVWatts->PVWattsGenerators.size()), 3);
 }
 
 TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)

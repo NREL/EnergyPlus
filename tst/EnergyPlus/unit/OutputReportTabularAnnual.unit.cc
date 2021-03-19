@@ -86,9 +86,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GetInput)
 
     GetInputTabularAnnual(*state);
 
-    EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
+    EXPECT_EQ(state->dataOutputReportTabularAnnual->annualTables.size(), 1u);
 
-    std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
+    std::vector<AnnualTable>::iterator firstTable = state->dataOutputReportTabularAnnual->annualTables.begin();
 
     std::vector<std::string> tableParams = firstTable->inspectTable();
 
@@ -167,9 +167,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
     state->dataGlobal->DoWeathSim = true;
 
     GetInputTabularAnnual(*state); // this also calls setupGathering
-    EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
+    EXPECT_EQ(state->dataOutputReportTabularAnnual->annualTables.size(), 1u);
 
-    std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
+    std::vector<AnnualTable>::iterator firstTable = state->dataOutputReportTabularAnnual->annualTables.begin();
     std::vector<std::string> fieldSetParams = firstTable->inspectTableFieldSets(0);
 
     EXPECT_EQ(fieldSetParams[0], "EXTERIOR LIGHTS ELECTRIC ENERGY");
@@ -239,7 +239,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
     state->dataGlobal->TimeStepZone = 0.25;
 
     GetInputTabularAnnual(*state);
-    EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
+    EXPECT_EQ(state->dataOutputReportTabularAnnual->annualTables.size(), 1u);
 
     extLitPow = 2.01;
     extLitUse = 1.01;
@@ -249,7 +249,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
 
     // STOPPPED HERE. NOT SEEING THE POWER VARIABLE SHOWING UP
 
-    std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
+    std::vector<AnnualTable>::iterator firstTable = state->dataOutputReportTabularAnnual->annualTables.begin();
     std::vector<std::string> fieldSetParams = firstTable->inspectTableFieldSets(0);
 }
 
@@ -349,9 +349,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 
     OutputReportTabularAnnual::GetInputTabularAnnual(*state);
 
-    EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
+    EXPECT_EQ(state->dataOutputReportTabularAnnual->annualTables.size(), 1u);
 
-    std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
+    std::vector<AnnualTable>::iterator firstTable = state->dataOutputReportTabularAnnual->annualTables.begin();
 
     firstTable->columnHeadersToTitleCase(*state);
 
@@ -406,9 +406,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
 
     OutputReportTabularAnnual::GetInputTabularAnnual(*state);
 
-    EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
+    EXPECT_EQ(state->dataOutputReportTabularAnnual->annualTables.size(), 1u);
 
-    std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
+    std::vector<AnnualTable>::iterator firstTable = state->dataOutputReportTabularAnnual->annualTables.begin();
 
     EXPECT_TRUE(firstTable->invalidAggregationOrder(*state));
 }

@@ -140,9 +140,11 @@ namespace DXFEarClipping {
 
 struct DXFEarClippingData : BaseGlobalStruct {
 
+    bool trackit = false;
+
     void clear_state() override
     {
-
+        this->trackit = false;
     }
 };
 
