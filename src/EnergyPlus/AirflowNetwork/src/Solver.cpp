@@ -135,10 +135,10 @@ namespace AirflowNetwork {
 
     // Functions
 
-    AirProperties::AirProperties(double const airDensity)
+    AirProperties::AirProperties(Real64 const airDensity)
     {
         this->density = airDensity;
-        this->sqrtDensity = sqrt(airDensity);
+        this->sqrt_density = sqrt(airDensity);
     }
 
     void Solver::allocate(EnergyPlusData &state)
@@ -177,7 +177,6 @@ namespace AirflowNetwork {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
-        iComponentTypeNum j;
         int n;
 
         // Formats
@@ -216,8 +215,8 @@ namespace AirflowNetwork {
 
         n = 0;
         for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfLinks; ++i) {
-            j = state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum;
-            if (j == iComponentTypeNum::DOP) {
+            ComponentType j = state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum;
+            if (j == ComponentType::DOP) {
                 ++n;
             }
         }
@@ -245,7 +244,7 @@ namespace AirflowNetwork {
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
             PZ(i) = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ;
             properties[i].temperature = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidityRatio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
+            properties[i].humidity_ratio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
 
@@ -366,7 +365,7 @@ namespace AirflowNetwork {
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
             PZ(i) = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ;
             properties[i].temperature = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidityRatio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
+            properties[i].humidity_ratio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
     }
@@ -499,12 +498,12 @@ namespace AirflowNetwork {
         }
         // Compute zone air properties.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
-            properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
+            properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidity_ratio);
             // RHOZ(n) = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), TZ(n), WZ(n));
             if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).ExtNodeNum > 0) {
                 properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
                 properties[n].temperature = state.dataEnvrn->OutDryBulbTemp;
-                properties[n].humidityRatio = state.dataEnvrn->OutHumRat;
+                properties[n].humidity_ratio = state.dataEnvrn->OutHumRat;
             }
             properties[n].sqrt_density = std::sqrt(properties[n].density);
             properties[n].viscosity = 1.71432e-5 + 4.828e-8 * properties[n].temperature;
@@ -543,7 +542,7 @@ namespace AirflowNetwork {
             //if (LIST >= 1) {
             //    gio::write(outputFile, Format_901) << "Flow: " << i << n << m << AirflowNetworkLinkSimu(i).DP << AFLOW(i) << AFLOW2(i);
             //}
-            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::HOP) {
+            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum == ComponentType::HOP) {
                 SUMAF(n) = SUMAF(n) - AFLOW(i);
                 SUMAF(m) += AFLOW(i);
             } else {
@@ -565,7 +564,7 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = 0.0;
                 state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
             }
-            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::HOP) {
+            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum == ComponentType::HOP) {
                 if (AFLOW(i) > 0.0) {
                     state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
                     state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
@@ -580,7 +579,7 @@ namespace AirflowNetwork {
                     state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
                 }
             }
-            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SOP && AFLOW2(i) != 0.0) {
+            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum == ComponentType::SOP && AFLOW2(i) != 0.0) {
                 if (AFLOW(i) >= 0.0) {
                     state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
                     state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).FLOW2 = std::abs(AFLOW2(i));
@@ -908,7 +907,7 @@ namespace AirflowNetwork {
             state.dataAirflowNetwork->AirflowNetworkLinkSimu(i).DP = DP;
             AFLOW(i) = F[0];
             AFLOW2(i) = 0.0;
-            if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::DOP) {
+            if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == ComponentType::DOP) {
                 AFLOW2(i) = F[1];
             }
             //if (LIST >= 3) ObjexxFCL::gio::write(outputFile, Format_901) << " NRi:" << i << n << M << AirflowNetworkLinkSimu(i).DP << F[0] << DF[0];
@@ -1019,18 +1018,19 @@ namespace AirflowNetwork {
 #endif
     }
 
-    void generic_crack(EnergyPlusData &state,
-                       Real64 const coefficient,    // Flow coefficient
-                       Real64 const exponent,       // Flow exponent
-                       bool const linear,           // Initialization flag.If true, use linear relationship
-                       Real64 const pdrop,          // Total pressure drop across a component (P1 - P2) [Pa]
-                       const AirProperties &propN,  // Node 1 properties
-                       const AirProperties &propM,  // Node 2 properties
-                       std::array<Real64, 2> &F,    // Airflow through the component [kg/s]
-                       std::array<Real64, 2> &DF,   // Partial derivative:  DF/DP
-                       Real64 const referenceP,     // Reference pressure
-                       Real64 const referenceT,     // Reference temperature
-                       Real64 const referenceW      // Reference humidity ratio
+    void generic_crack(Real64 const coefficient,         // Flow coefficient
+                       Real64 const exponent,            // Flow exponent
+                       bool const linear,                // Initialization flag.If true, use linear relationship
+                       Real64 const pdrop,               // Total pressure drop across a component (P1 - P2) [Pa]
+                       const AirProperties &propN,       // Node 1 properties
+                       const AirProperties &propM,       // Node 2 properties
+                       std::array<Real64, 2> &F,         // Airflow through the component [kg/s]
+                       std::array<Real64, 2> &DF,        // Partial derivative:  DF/DP
+                       const Real64 reference_density,   // reference state density
+                       const Real64 reference_viscosity  // reference state viscosity
+                       //Real64 const referenceP,     // Reference pressure
+                       //Real64 const referenceT,     // Reference temperature
+                       //Real64 const referenceW      // Reference humidity ratio
     )
     {
 
@@ -1054,8 +1054,8 @@ namespace AirflowNetwork {
 
         // FLOW:
         // Calculate normal density and viscocity at reference conditions
-        Real64 RhozNorm = AIRDENSITY(referenceP, referenceT, referenceW);
-        Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * referenceT;
+        //Real64 RhozNorm = AIRDENSITY(referenceP, referenceT, referenceW);
+        //Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * referenceT;
 
         Real64 VisAve{0.5 * (propN.viscosity + propM.viscosity)};
         Real64 Tave{0.5 * (propN.temperature + propM.temperature)};
@@ -1080,7 +1080,7 @@ namespace AirflowNetwork {
 
         // Laminar calculation
         Real64 RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
-        Real64 Ctl{std::pow(RhozNorm / upwind_density / RhoCor, exponent - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * exponent - 1.0)};
+        Real64 Ctl{std::pow(reference_density / upwind_density / RhoCor, exponent - 1.0) * std::pow(reference_viscosity / VisAve, 2.0 * exponent - 1.0)};
         Real64 CDM{coef * upwind_density / upwind_viscosity * Ctl};
         Real64 FL{CDM * pdrop};
 
@@ -1964,7 +1964,7 @@ namespace AirflowNetwork {
         int To;
         int Fromz;
         int Toz;
-        iComponentTypeNum Ltyp;
+        ComponentType Ltyp;
         int i;
         int ll;
         int j;
@@ -2009,7 +2009,7 @@ namespace AirflowNetwork {
             }
 
             Ltyp = state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum;
-            if (Ltyp == iComponentTypeNum::DOP) {
+            if (Ltyp == ComponentType::DOP) {
                 ActLh = state.dataAirflowNetwork->MultizoneSurfaceData(i).Height;
                 ActLOwnh = ActLh * 1.0;
             } else {
@@ -2018,9 +2018,9 @@ namespace AirflowNetwork {
             }
 
             TempL1 = solver.properties[From].temperature;
-            Xhl1 = solver.properties[From].humidityRatio;
+            Xhl1 = solver.properties[From].humidity_ratio;
             TzFrom = solver.properties[From].temperature;
-            XhzFrom = solver.properties[From].humidityRatio;
+            XhzFrom = solver.properties[From].humidity_ratio;
             RhoL1 = solver.properties[From].density;
             if (ll == 0 || ll == 3) {
                 PzFrom = solver.PZ(From);
@@ -2038,9 +2038,9 @@ namespace AirflowNetwork {
             }
 
             TempL2 = solver.properties[To].temperature;
-            Xhl2 = solver.properties[To].humidityRatio;
+            Xhl2 = solver.properties[To].humidity_ratio;
             TzTo = solver.properties[To].temperature;
-            XhzTo = solver.properties[To].humidityRatio;
+            XhzTo = solver.properties[To].humidity_ratio;
             RhoL2 = solver.properties[To].density;
 
             if (ll < 3) {
@@ -2190,7 +2190,7 @@ namespace AirflowNetwork {
             DpP = -psz(Pref, RhoLd(2), 0.0, 0.0, -H, G);
             DpL(i, 2) = (DpF(1) - DpT(1) + DpP);
 
-            if (Ltyp == iComponentTypeNum::DOP) {
+            if (Ltyp == ComponentType::DOP) {
                 Pprof = OpenNum * (NrInt + 2);
                 PresProfile(state, i, Pprof, G, DpF, DpT, BetaStF, BetaStT, RhoStF, RhoStT, From, To, ActLh, Hfl(i));
                 ++OpenNum;

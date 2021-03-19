@@ -100,34 +100,9 @@ namespace AirflowNetwork {
     // all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    enum class iComponentTypeNum : int
-    {
-        Unassigned = 0,
-        DOP = 1,  // Detailed large opening component
-        SOP = 2,  // Simple opening component
-        SCR = 3,  // Surface crack component
-        SEL = 4,  // Surface effective leakage ratio component
-        PLR = 5,  // Distribution system crack component
-        DWC = 6,  // Distribution system duct component
-        CVF = 7,  // Distribution system constant volume fan component
-        FAN = 8,  // Distribution system detailed fan component
-        MRR = 9,  // Distribution system multiple curve fit power law resistant flow component
-        DMP = 10, // Distribution system damper component
-        ELR = 11, // Distribution system effective leakage ratio component
-        CPD = 12, // Distribution system constant pressure drop component
-        COI = 13, // Distribution system coil component
-        TMU = 14, // Distribution system terminal unit component
-        EXF = 15, // Zone exhaust fan
-        HEX = 16, // Distribution system heat exchanger
-        HOP = 17, // Horizontal opening component
-        RVD = 18, // Reheat VAV terminal damper
-        OAF = 19, // Distribution system OA
-        REL = 20  // Distribution system relief air
-    };
-
-
     enum class ComponentType
     {
+        Unassigned = 0, // So dumb. Delete this once it can be. Again.
         DOP = 1, // Detailed large opening component
         SOP,     // Simple opening component
         SCR,     // Surface crack component
@@ -151,7 +126,7 @@ namespace AirflowNetwork {
     };
 
     // EPlus component Type
-    enum class iEPlusComponentType : int
+    enum class EPlusComponentType : int
     {
         Unassigned = 0,
         SCN = 1, // Supply connection
@@ -164,7 +139,7 @@ namespace AirflowNetwork {
     };
 
     // EPlus node type
-    enum class iEPlusNodeType : int
+    enum class EPlusNodeType : int
     {
         Unassigned = 0,
         ZIN = 1,  // Zone inlet node
@@ -183,8 +158,7 @@ namespace AirflowNetwork {
         SPO = 14  // Splitter Outlet Node
     };
 
-    enum class iWPCCntr : int{
-        Unassigned = 0,
+    enum class WindPressureCoefficientType : int{
         Input = 1,
         SurfAvg = 2
     };
@@ -230,7 +204,7 @@ namespace AirflowNetwork {
         // MULTIZONE WITH DISTRIBUTION ONLY DURING FAN OPERATION,
         // and NO MULTIZONE OR DISTRIBUTION
         std::string WPCCntr;      // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-        iWPCCntr iWPCCnt = iWPCCntr::Unassigned;        // Integer equivalent for WPCCntr field
+        WindPressureCoefficientType iWPCCnt = WindPressureCoefficientType::SurfAvg; // Integer equivalent for WPCCntr field
         std::string BldgType;     // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
         std::string HeightOption; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
         int MaxIteration;         // Maximum number of iteration, default 500
@@ -426,7 +400,7 @@ namespace AirflowNetwork {
                               std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
                               ) = 0;
 
-        // Make this abstract once all the classes implement it
+        // Make this abstract once all the classes implement it. And delete all the [[maybe_unused]]
         virtual int calculate([[maybe_unused]] EnergyPlusData &state,
                               [[maybe_unused]] const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                               [[maybe_unused]] const Real64 multiplier,    // Element multiplier
@@ -592,14 +566,16 @@ namespace AirflowNetwork {
     {
         // Members
         // std::string ExternalNodeNames; // Name of external node.Not required for internal surface
-        Real64 coefficient; // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
-        Real64 exponent;    // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
-        Real64 StandardT;   // Standard temperature for crack data
-        Real64 StandardP;   // Standard barometric pressure for crack data
-        Real64 StandardW;   // Standard humidity ratio for crack data
+        Real64 coefficient;         // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+        Real64 exponent;            // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
+        Real64 reference_density;   // Reference density for crack data
+        Real64 reference_viscosity; // Reference viscosity for crack data
+        //Real64 StandardT;   // Standard temperature for crack data
+        //Real64 StandardP;   // Standard barometric pressure for crack data
+        //Real64 StandardW;   // Standard humidity ratio for crack data
 
         // Default Constructor
-        SurfaceCrack() : coefficient(0.0), exponent(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0)
+        SurfaceCrack() : coefficient(0.0), exponent(0.0), reference_density(AIRDENSITY_CONST(101325.0, 20.0, 0.0)), reference_viscosity(AIRDYNAMICVISCOSITY(20.0))
         {
         }
 
@@ -1259,14 +1235,14 @@ namespace AirflowNetwork {
         int EPlusNodeNum;
         int ExtNodeNum;
         int OutAirNodeNum;
-        iEPlusNodeType EPlusTypeNum;
+        EPlusNodeType EPlusTypeNum;
         int RAFNNodeNum; // RoomAir model node number
         int NumOfLinks;  // Number of links for RoomAir model
         int AirLoopNum;  // AirLoop number
 
         // Default Constructor
         AirflowNetworkNodeProp()
-            : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0), EPlusTypeNum(iEPlusNodeType::Unassigned),
+            : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0), EPlusTypeNum(EPlusNodeType::Unassigned),
               RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
         {
         }
@@ -1276,16 +1252,16 @@ namespace AirflowNetwork {
     {
         // Members
         std::string Name;          // Provide a unique element name
-        iComponentTypeNum CompTypeNum;           // Provide numeric equivalent for AirflowNetworkCompType
+        ComponentType CompTypeNum;           // Provide numeric equivalent for AirflowNetworkCompType
         int TypeNum;               // Component number under same component type
         int CompNum;               // General component number
         std::string EPlusName;     // Provide a unique element name
         std::string EPlusCompName; // Provide EPlus component name or Other
         std::string EPlusType;     // Provide EPlus type, such as terminal reheat, coil, etc. 9/30/03 or Other
-        iEPlusComponentType EPlusTypeNum;          // Provide EPlus component type
+        EPlusComponentType EPlusTypeNum;          // Provide EPlus component type
 
         // Default Constructor
-        AirflowNetworkCompProp() : CompTypeNum(iComponentTypeNum::Unassigned), TypeNum(0), CompNum(0), EPlusTypeNum(iEPlusComponentType::Unassigned)
+        AirflowNetworkCompProp() : CompTypeNum(ComponentType::Unassigned), TypeNum(0), CompNum(0), EPlusTypeNum(EPlusComponentType::Unassigned)
         {
         }
     };
@@ -1296,14 +1272,14 @@ namespace AirflowNetwork {
         std::string ZoneName; // Name of zone
         int ZoneNum;          // Zone Number
         int DetOpenNum;       // Large Opening number
-        iEPlusComponentType ConnectionFlag;   // Return and supply connection flag
+        EPlusComponentType ConnectionFlag;   // Return and supply connection flag
         bool VAVTermDamper;   // True if this component is a damper for a VAV terminal
         int LinkageViewFactorObjectNum;
         int AirLoopNum; // Airloop number
 
         // Default Constructor
         AirflowNetworkLinkageProp()
-            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Unassigned), VAVTermDamper(false), LinkageViewFactorObjectNum(0),
+            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(EPlusComponentType::Unassigned), VAVTermDamper(false), LinkageViewFactorObjectNum(0),
               AirLoopNum(0)
         {
         }

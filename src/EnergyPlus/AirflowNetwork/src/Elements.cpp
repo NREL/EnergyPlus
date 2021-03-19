@@ -420,8 +420,8 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        Real64 rhoz_norm = AIRDENSITY(StandardP, StandardT, StandardW);
-        Real64 viscz_norm = 1.71432e-5 + 4.828e-8 * StandardT;
+        //Real64 rhoz_norm = AIRDENSITY(StandardP, StandardT, StandardW);
+        //Real64 viscz_norm = 1.71432e-5 + 4.828e-8 * StandardT;
 
         Real64 VisAve{0.5 * (propN.viscosity + propM.viscosity)};
         Real64 Tave{0.5 * (propN.temperature + propM.temperature)};
@@ -446,7 +446,7 @@ namespace AirflowNetwork {
 
         // Laminar calculation
         Real64 RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
-        Real64 Ctl{std::pow(rhoz_norm / upwind_density / RhoCor, exponent - 1.0) * std::pow(viscz_norm / VisAve, 2.0 * exponent - 1.0)};
+        Real64 Ctl{std::pow(reference_density / upwind_density / RhoCor, exponent - 1.0) * std::pow(reference_viscosity / VisAve, 2.0 * exponent - 1.0)};
         Real64 CDM{coef * upwind_density / upwind_viscosity * Ctl};
         Real64 FL{CDM * pdrop};
         Real64 abs_FT;
@@ -500,8 +500,8 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        Real64 rhoz_norm = AIRDENSITY(StandardP, StandardT, StandardW);
-        Real64 viscz_norm = 1.71432e-5 + 4.828e-8 * StandardT;
+        //Real64 rhoz_norm = AIRDENSITY(StandardP, StandardT, StandardW);
+        //Real64 viscz_norm = 1.71432e-5 + 4.828e-8 * StandardT;
 
         Real64 VisAve{0.5 * (propN.viscosity + propM.viscosity)};
         Real64 Tave{0.5 * (propN.temperature + propM.temperature)};
@@ -526,7 +526,7 @@ namespace AirflowNetwork {
 
         // Laminar calculation
         Real64 RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
-        Real64 Ctl{std::pow(rhoz_norm / upwind_density / RhoCor, exponent - 1.0) * std::pow(viscz_norm / VisAve, 2.0 * exponent - 1.0)};
+        Real64 Ctl{std::pow(reference_density / upwind_density / RhoCor, exponent - 1.0) * std::pow(reference_viscosity / VisAve, 2.0 * exponent - 1.0)};
         Real64 CDM{coef * upwind_density / upwind_viscosity * Ctl};
         Real64 FL{CDM * pdrop};
         Real64 abs_FT;
@@ -818,7 +818,7 @@ namespace AirflowNetwork {
                         SumTermFlow += state.dataLoopNodes->Node(k1).MassFlowRate;
                     }
                 }
-                if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).CompNum).CompTypeNum == iComponentTypeNum::ELR) {
+                if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(k).CompNum).CompTypeNum == ComponentType::ELR) {
                     // Calculate supply leak sensible losses
                     Node1 = state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[0];
                     Node2 = state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[1];
@@ -894,7 +894,7 @@ namespace AirflowNetwork {
 
         if (solver.AFECTL(i) <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            generic_crack(state, FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            generic_crack(FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
             return 1;
         }
         // Pressure rise at reference fan speed.
@@ -1024,7 +1024,7 @@ namespace AirflowNetwork {
 
         if (control <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            generic_crack(state, FlowCoef, FlowExpo, false, PDROP, propN, propM, F, DF);
+            generic_crack(FlowCoef, FlowExpo, false, PDROP, propN, propM, F, DF);
         }
         // Pressure rise at reference fan speed.
         if (control >= TranRat) {
@@ -1941,14 +1941,14 @@ namespace AirflowNetwork {
         GDRHO = 9.8 * DRHO;
         // if (LIST >= 4) gio::write(Unit21, Format_903) << " DOR:" << i << n << m << PDROP << std::abs(DRHO) << MinRhoDiff;
         if (OpenFactor == 0.0) {
-            generic_crack(state, coeff, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            generic_crack(coeff, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
             return 1;
         }
         if (std::abs(DRHO) < MinRhoDiff || LFLAG) {
             DPMID = PDROP - 0.5 * Height * GDRHO;
             // Initialization or identical temps: treat as one-way flow.
             NF = 1;
-            generic_crack(state, coeff, FlowExpo, LFLAG, DPMID, propN, propM, F, DF);
+            generic_crack(coeff, FlowExpo, LFLAG, DPMID, propN, propM, F, DF);
             // if (LIST >= 4) gio::write(Unit21, Format_900) << " Drs:" << DPMID << F[0] << DF[0];
         } else {
             // Possible two-way flow:
@@ -3305,7 +3305,7 @@ namespace AirflowNetwork {
 
         // Check which zone is higher
         if (Fact == 0.0) {
-            generic_crack(state, coef, expn, LFLAG, PDROP, propN, propM, F, DF);
+            generic_crack(coef, expn, LFLAG, PDROP, propN, propM, F, DF);
             return 1;
         }
 

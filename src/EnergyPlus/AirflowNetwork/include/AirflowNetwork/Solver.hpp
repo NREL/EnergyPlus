@@ -68,14 +68,14 @@ namespace AirflowNetwork {
 
     struct AirProperties
     {
-        Real64 temperature{20.0};
+        Real64 temperature; // 20
         // Real64 pressure;      //{0.0}; // gage pressure
-        Real64 humidityRatio{0.0};
-        Real64 density{AIRDENSITY(101325.0, 20.0, 0.0)};
-        Real64 sqrt_density{sqrt(AIRDENSITY(101325.0, 20.0, 0.0))};
-        Real64 viscosity{AIRDYNAMICVISCOSITY(20.0)};
+        Real64 humidity_ratio;
+        Real64 density; //{AIRDENSITY(101325.0, 20.0, 0.0)};
+        Real64 sqrt_density; //{sqrt(AIRDENSITY(101325.0, 20.0, 0.0))};
+        Real64 viscosity; //{AIRDYNAMICVISCOSITY(20.0)};
 
-        explicit AirProperties(double const airDensity);
+        AirProperties(Real64 const airDensity = AIRDENSITY_CONST(101325.0, 20.0, 0.0));
     };
 
     // Forward declaration
@@ -180,18 +180,19 @@ namespace AirflowNetwork {
     extern Array2D<Real64> DpL;      // Array of stack pressures in link
 
     // Functions
-    void generic_crack(EnergyPlusData &state,
-                       Real64 const coefficient,            // Flow coefficient
-                       Real64 const exponent,               // Flow exponent
-                       bool const linear,                   // Initialization flag.If true, use linear relationship
-                       Real64 const pdrop,                  // Total pressure drop across a component (P1 - P2) [Pa]
-                       const AirProperties &propN,          // Node 1 properties
-                       const AirProperties &propM,          // Node 2 properties
-                       std::array<Real64, 2> &F,            // Airflow through the component [kg/s]
-                       std::array<Real64, 2> &DF,           // Partial derivative:  DF/DP
-                       Real64 const referenceP = 101325.0,  // Reference pressure
-                       Real64 const referenceT = 20.0,      // Reference temperature
-                       Real64 const referenceW = 0.0        // Reference humidity ratio
+    void generic_crack(Real64 const coefficient,         // Flow coefficient
+                       Real64 const exponent,            // Flow exponent
+                       bool const linear,                // Initialization flag.If true, use linear relationship
+                       Real64 const pdrop,               // Total pressure drop across a component (P1 - P2) [Pa]
+                       const AirProperties &propN,       // Node 1 properties
+                       const AirProperties &propM,       // Node 2 properties
+                       std::array<Real64, 2> &F,         // Airflow through the component [kg/s]
+                       std::array<Real64, 2> &DF,        // Partial derivative:  DF/DP
+                       const Real64 reference_density = AIRDENSITY_CONST(101325.0, 20.0, 0.0), // reference state density
+                       const Real64 reference_viscosity = AIRDYNAMICVISCOSITY(20.0)                                       // reference state viscosity
+                       //Real64 const referenceP = 101325.0,  // Reference pressure
+                       //Real64 const referenceT = 20.0,      // Reference temperature
+                       //Real64 const referenceW = 0.0        // Reference humidity ratio
     );
 
     int GenericDuct(Real64 const Length,        // Duct length

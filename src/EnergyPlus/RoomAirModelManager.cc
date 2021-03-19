@@ -1081,16 +1081,15 @@ namespace RoomAirModelManager {
                      state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum1).EPlusZoneNum == ThisZone)) {
                     state.dataRoomAirModelMgr->CompNum = state.dataAirflowNetwork->AirflowNetworkLinkageData(Loop2).CompNum;
                     state.dataRoomAirModelMgr->TypeNum = state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNum).TypeNum;
-                    if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNum).CompTypeNum ==
-                        AirflowNetwork::iComponentTypeNum::SCR) {
-                        if (state.dataAirflowNetwork->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNum).FlowExpo != 0.50) {
+                    if (state.dataAirflowNetwork->AirflowNetworkLinkageData(Loop2).element->type() == AirflowNetwork::ComponentType::SCR) {
+                        if (state.dataAirflowNetwork->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNum).exponent != 0.50) {
                             state.dataRoomAirMod->AirModel(ThisZone).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                             ShowWarningError(state, "Problem with " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                             ShowWarningError(state, "Roomair model will not be applied for Zone=" + cAlphaArgs(1) + '.');
                             ShowContinueError(
                                 state,
                                 format("AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was={:.2R}",
-                                       state.dataAirflowNetwork->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNum).FlowExpo));
+                                       state.dataAirflowNetwork->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNum).exponent));
                         }
                     }
                 }
@@ -2013,12 +2012,9 @@ namespace RoomAirModelManager {
                             state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(SurfNum, state.dataRoomAirModelMgr->Loop) =
                                 state.dataRoomAirModelMgr->Loop2;
                             // calculate the surface width and height
-                            state.dataRoomAirModelMgr->CompNumber =
-                                state.dataAirflowNetwork->AirflowNetworkLinkageData(state.dataRoomAirModelMgr->Loop2).CompNum;
-                            state.dataRoomAirModelMgr->TypeNumber =
-                                state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).TypeNum;
-                            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).CompTypeNum ==
-                                AirflowNetwork::iComponentTypeNum::DOP) {
+                            state.dataRoomAirModelMgr->CompNumber = state.dataAirflowNetwork->AirflowNetworkLinkageData(state.dataRoomAirModelMgr->Loop2).CompNum;
+                            state.dataRoomAirModelMgr->TypeNumber = state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).TypeNum;
+                            if (state.dataAirflowNetwork->AirflowNetworkLinkageData(state.dataRoomAirModelMgr->Loop2).element->type() == AirflowNetwork::ComponentType::DOP) {
                                 WidthFactMax = 0.0;
                                 HeightFactMax = 0.0;
                                 for (state.dataRoomAirModelMgr->Loop3 = 1;
@@ -2052,14 +2048,14 @@ namespace RoomAirModelManager {
                                 state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Height =
                                     HeightFactMax * state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Height;
                             } else if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).CompTypeNum ==
-                                       AirflowNetwork::iComponentTypeNum::SCR) { // surface type = CRACK
+                                       AirflowNetwork::ComponentType::SCR) { // surface type = CRACK
                                 state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Width = state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Width / 2;
-                                AinCV = state.dataAirflowNetwork->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNumber).FlowCoef /
+                                AinCV = state.dataAirflowNetwork->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNumber).coefficient /
                                         (BaseDischargeCoef * std::sqrt(2.0 / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(state.dataRoomAirModelMgr->Loop), state.dataHeatBalFanSys->ZoneAirHumRat(state.dataRoomAirModelMgr->Loop))));
                                 state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Height = AinCV / state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Width;
                             }
                             // calculate the surface Zmin and Zmax
-                            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).CompTypeNum == AirflowNetwork::iComponentTypeNum::DOP) {
+                            if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).CompTypeNum == AirflowNetwork::ComponentType::DOP) {
                                 AirflowNetworkSurfPtr = state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum;
                                 NSides = state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Sides;
                                 Real64 z_min(std::numeric_limits<Real64>::max()), z_max(std::numeric_limits<Real64>::lowest());
@@ -2071,7 +2067,7 @@ namespace RoomAirModelManager {
                                 state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Zmin = z_min - ceilingHeight;
                                 state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Zmax = z_max - ceilingHeight;
                             } else if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).CompTypeNum ==
-                                       AirflowNetwork::iComponentTypeNum::SCR) { // surface type = CRACK
+                                       AirflowNetwork::ComponentType::SCR) { // surface type = CRACK
                                 AirflowNetworkSurfPtr = state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum;
                                 NSides = state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Sides;
                                 Real64 z_min(std::numeric_limits<Real64>::max()), z_max(std::numeric_limits<Real64>::lowest());
@@ -2630,7 +2626,7 @@ namespace RoomAirModelManager {
                          ++state.dataRoomAirModelMgr->i) {
                         state.dataRoomAirModelMgr->N = state.dataAirflowNetwork->AirflowNetworkLinkageData(state.dataRoomAirModelMgr->i).CompNum;
                         if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->N).CompTypeNum ==
-                            AirflowNetwork::iComponentTypeNum::DOP) {
+                            AirflowNetwork::ComponentType::DOP) {
                             SurfNum = state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirModelMgr->i).SurfNum;
                             SetupOutputVariable(state, "Room Air Window Jet Region Average Air Velocity",
                                                 OutputProcessor::Unit::m_s,
