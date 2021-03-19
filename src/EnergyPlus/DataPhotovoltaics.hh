@@ -67,45 +67,43 @@ namespace DataPhotovoltaics {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    extern std::string const cPVGeneratorObjectName;
-    extern std::string const cPVSimplePerfObjectName;
-    extern std::string const cPVEquiv1DiodePerfObjectName;
-    extern std::string const cPVSandiaPerfObjectName;
+    
+    
+    
+    
 
-    extern int const iNotYetSetPVModel;
-    extern int const iSimplePVModel;
-    extern int const iTRNSYSPVModel;
-    extern int const iSandiaPVModel;
+    enum class PVModel
+    {
+        Unassigned,
+        Simple,
+        TRNSYS,
+        Sandia
+    };
 
-    extern int const iNotYetSetCellIntegration;                // cell temp method not set
-    extern int const iDecoupledCellIntegration;                // cell temp method based on energy balance
-    extern int const iDecoupledUllebergDynamicCellIntegration; // cell temp method based on energy bal with capacity
-    extern int const iSurfaceOutsideFaceCellIntegration;       // cell temp method based on coupling to E+'s heat balance
-    extern int const iTranspiredCollectorCellIntegration;      // cell temp method based on coupling to unglazed transpired co
-    extern int const iExteriorVentedCavityCellIntegration;     // cell temp method based on coupling to nat vent exterior cavi
-    extern int const iPVTSolarCollectorCellIntegration;        // cell temp method based on coupling to PVT model
+    enum class CellIntegration
+    {
+        Unassigned,                         // cell temp method not set
+        Decoupled,                          // cell temp method based on energy balance
+        DecoupledUllebergDynamic,           // cell temp method based on energy bal with capacity
+        SurfaceOutsideFace,                 // cell temp method based on coupling to E+'s heat balance
+        TranspiredCollector,                // cell temp method based on coupling to unglazed transpired co
+        ExteriorVentedCavity,               // cell temp method based on coupling to nat vent exterior cavi
+        PVTSolarCollector                   // cell temp method based on coupling to PVT model
+    };
+  
+    enum class Efficiency
+    {
+        Unassigned,
+        Fixed,                              // simple PV, constant efficiency
+        Scheduled                           // simpel PV, scheduled efficiency
+    };
 
-    extern int const FixedEfficiency;     // simple PV, constant efficiency
-    extern int const ScheduledEfficiency; // simpel PV, scheduled efficiency
-
-    extern int const CrystallineSiPVCells;
-    extern int const AmorphousSiPVCells;
-
-    extern Real64 const MinIrradiance; // [W/m2] Assume no operation if Ic is below this number (W/m2)
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumPVs;                 // count of number of PV generators
-    extern int Num1DiodePVModuleTypes; // count for Equivalent one-diode model
-    extern int NumSimplePVModuleTypes; // count of number of input objs for simple model
-    extern int NumSNLPVModuleTypes;    // count of number of input objs for Sandia model
-
-    extern Real64 ShuntResistance; // old "RSH" in common block of trnsys code
-
-    // Types
+    enum class SiPVCells
+    {
+        Unassigned,
+        Crystalline,
+        Amorphous
+    };
 
     struct SimplePVParamsStruct
     {
@@ -341,19 +339,30 @@ namespace DataPhotovoltaics {
         {
         }
     };
-
-    // Object Data
-    extern Array1D<PVArrayStruct> PVarray;
-
-    void clear_state();
-
 } // namespace DataPhotovoltaics
 
 struct PhotovoltaicsData : BaseGlobalStruct {
 
+    std::string const cPVGeneratorObjectName = "Generator:Photovoltaic";
+    std::string const cPVSimplePerfObjectName = "PhotovoltaicPerformance:Simple";
+    std::string const cPVEquiv1DiodePerfObjectName = "PhotovoltaicPerformance:EquivalentOne-Diode";
+    std::string const cPVSandiaPerfObjectName = "PhotovoltaicPerformance:Sandia";
+    Real64 const MinIrradiance = 0.3; // [W/m2] Assume no operation if Ic is below this number (W/m2)
+    int NumPVs = 0;                 // count of number of PV generators
+    int Num1DiodePVModuleTypes = 0; // count for Equivalent one-diode model
+    int NumSimplePVModuleTypes = 0; // count of number of input objs for simple model
+    int NumSNLPVModuleTypes = 0;    // count of number of input objs for Sandia model
+    Real64 ShuntResistance = 0.0; // old "RSH" in common block of trnsys code
+    Array1D<DataPhotovoltaics::PVArrayStruct> PVarray;
+
     void clear_state() override
     {
-
+        NumPVs = 0;
+        Num1DiodePVModuleTypes = 0;
+        NumSimplePVModuleTypes = 0;
+        NumSNLPVModuleTypes = 0;
+        ShuntResistance = 0.0;
+        PVarray.deallocate();
     }
 };
 

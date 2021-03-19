@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
@@ -117,7 +116,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataHVACGlobals::clear_state();
     DataIPShortCuts::clear_state();
     DataOutputs::clear_state();
-    DataPhotovoltaics::clear_state();
     DataStringGlobals::clear_state();
     DataSystemVariables::clear_state();
     DataViewFactorInformation::clear_state();
