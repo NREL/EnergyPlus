@@ -56,10 +56,9 @@
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
-namespace EnergyPlus {
-
-namespace PollutionModule {
+namespace EnergyPlus::PollutionModule {
     // Module containing the pollution calculation routines
 
     // MODULE INFORMATION:
@@ -84,19 +83,6 @@ namespace PollutionModule {
     //         STEP 3:  All energy numbers have been converted to units of MJ's or 1x10^6 Joules.
     //         STEP 4:  Environmental Impact Factors are calculated from Coefficients
 
-    // MODULE PARAMETER DEFINITIONS:
-    int const ElecPollFactor(1);
-    int const NatGasPollFactor(2);
-    int const FuelOil1PollFactor(3);
-    int const FuelOil2PollFactor(4);
-    int const CoalPollFactor(5);
-    int const GasolinePollFactor(6);
-    int const PropanePollFactor(7);
-    int const DieselPollFactor(8);
-    int const OtherFuel1PollFactor(9);
-    int const OtherFuel2PollFactor(10);
-    int const PollFactorNumTypes(10);
-
     // MODULE VARIABLE DECLARATIONS:
     // Total for all of the Pollutants
     // Total Carbon Equivalent Components
@@ -107,415 +93,6 @@ namespace PollutionModule {
     // Fuel Types used with the Pollution Factors
     // Facility Meter Indexes
     // Facility Meter Values used in Pollution Calcs
-
-    bool PollutionReportSetup(false);
-    bool GetInputFlagPollution(true);
-    int NumEnvImpactFactors(0);
-    int NumFuelFactors(0);
-
-    //         Subroutine Specifications for the Module
-
-    // Object Data
-    PollutionProps
-        Pollution(ComponentProps(ElecPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(ElecPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(ElecPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(NatGasPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(FuelOil1PollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(FuelOil2PollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(CoalPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(GasolinePollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(PropanePollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(DieselPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(OtherFuel1PollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(OtherFuel2PollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0,
-                  CoefficientProps(ElecPollFactor,
-                                   false,
-                                   3.167,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(NatGasPollFactor,
-                                   false,
-                                   1.084,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(FuelOil1PollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(FuelOil2PollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(CoalPollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(GasolinePollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(PropanePollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(DieselPollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(OtherFuel1PollFactor,
-                                   false,
-                                   1.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(OtherFuel2PollFactor,
-                                   false,
-                                   1.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0);
-    FuelTypeProps FuelType;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
-    // Clears the global data in Pollution module.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        PollutionReportSetup = false;
-        GetInputFlagPollution = true;
-        NumEnvImpactFactors = 0;
-        NumFuelFactors = 0;
-    }
 
     void CalculatePollution(EnergyPlusData &state)
     {
@@ -532,28 +109,7 @@ namespace PollutionModule {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (!PollutionReportSetup) return;
+        if (!state.dataPollutionModule->PollutionReportSetup) return;
 
         //   Call the Routine to Read the Energy Values from the EnergyPlus Meters
         ReadEnergyMeters(state);
@@ -595,7 +151,7 @@ namespace PollutionModule {
         // First determine if the Pollution reporting has been triggered, and is not exit.
         cCurrentModuleObject = "Output:EnvironmentalImpactFactors";
         NumPolluteRpt = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        PollutionReportSetup = true;
+        state.dataPollutionModule->PollutionReportSetup = true;
 
         for (Loop = 1; Loop <= NumPolluteRpt; ++Loop) {
 
@@ -645,14 +201,15 @@ namespace PollutionModule {
         int Loop;
         int IOStat;
         bool ErrorsFound(false);
+        auto & Pollution = state.dataPollutionModule->Pollution;
+        auto & FuelType = state.dataPollutionModule->FuelType;
+        if (!state.dataPollutionModule->GetInputFlagPollution) return; // Input already gotten
 
-        if (!GetInputFlagPollution) return; // Input already gotten
-
-        GetInputFlagPollution = false;
+        state.dataPollutionModule->GetInputFlagPollution = false;
 
         cCurrentModuleObject = "EnvironmentalImpactFactors";
-        NumEnvImpactFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (NumEnvImpactFactors > 0) {
+        state.dataPollutionModule->NumEnvImpactFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        if (state.dataPollutionModule->NumEnvImpactFactors > 0) {
             // Now find and load all of the user inputs and factors.
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -667,7 +224,7 @@ namespace PollutionModule {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
         } else {
-            if (PollutionReportSetup) ShowWarningError(state, cCurrentModuleObject + ": not entered.  Values will be defaulted.");
+            if (state.dataPollutionModule->PollutionReportSetup) ShowWarningError(state, cCurrentModuleObject + ": not entered.  Values will be defaulted.");
         }
 
         Pollution.PurchHeatEffic = 0.3;
@@ -677,7 +234,7 @@ namespace PollutionModule {
         Pollution.CarbonEquivCH4 = 0.0;
         Pollution.CarbonEquivCO2 = 0.0;
 
-        if (NumEnvImpactFactors > 0) {
+        if (state.dataPollutionModule->NumEnvImpactFactors > 0) {
             // If Heating Efficiency defined by the User is negative or zero then a default of 30% will be assigned.
             if (rNumericArgs(1) > 0.0) {
                 Pollution.PurchHeatEffic = rNumericArgs(1);
@@ -701,9 +258,9 @@ namespace PollutionModule {
 
         // Compare all of the Fuel Factors and compare to PollutionCalculationFactors List
         cCurrentModuleObject = "FuelFactors";
-        NumFuelFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataPollutionModule->NumFuelFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        for (Loop = 1; Loop <= NumFuelFactors; ++Loop) {
+        for (Loop = 1; Loop <= state.dataPollutionModule->NumFuelFactors; ++Loop) {
             // Now find and load all of the user inputs and factors.
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -1733,7 +1290,7 @@ namespace PollutionModule {
         FuelType.ElecPurchasedFacilityIndex = GetMeterIndex(state, "ElectricityPurchased:Facility");
         FuelType.ElecSurplusSoldFacilityIndex = GetMeterIndex(state, "ElectricitySurplusSold:Facility");
 
-        if (PollutionReportSetup) { // only do this if reporting on the pollution
+        if (state.dataPollutionModule->PollutionReportSetup) { // only do this if reporting on the pollution
             // Need to go through all of the Fuel Types and make sure a Fuel Factor was found for each type of energy being simulated
             // Check for Electricity
             if (!Pollution.ElecCoef.FuelFactorUsed &&
@@ -1812,11 +1369,12 @@ namespace PollutionModule {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
 
-        if (GetInputFlagPollution) {
+        if (state.dataPollutionModule->GetInputFlagPollution) {
             GetPollutionFactorInput(state);
-            GetInputFlagPollution = false;
+            state.dataPollutionModule->GetInputFlagPollution = false;
         }
-
+        auto & Pollution = state.dataPollutionModule->Pollution;
+        auto & FuelType = state.dataPollutionModule->FuelType;
         for (Loop = 1; Loop <= PollFactorNumTypes; ++Loop) {
 
             if (FuelType.FuelTypeNames(Loop).empty()) continue;
@@ -3797,7 +3355,7 @@ namespace PollutionModule {
         // <description>
 
         // in progress
-        if (NumFuelFactors == 0 || NumEnvImpactFactors == 0) {
+        if (state.dataPollutionModule->NumFuelFactors == 0 || state.dataPollutionModule->NumEnvImpactFactors == 0) {
             if (ReportingThisVariable(state, "Environmental Impact Total N2O Emissions Carbon Equivalent Mass") ||
                 ReportingThisVariable(state, "Environmental Impact Total CH4 Emissions Carbon Equivalent Mass") ||
                 ReportingThisVariable(state, "Environmental Impact Total CO2 Emissions Carbon Equivalent Mass") ||
@@ -3805,7 +3363,7 @@ namespace PollutionModule {
                 ShowWarningError(state,
                     "GetPollutionFactorInput: Requested reporting for Carbon Equivalent Pollution, but insufficient information is entered.");
                 ShowContinueError(state,
-                    "Both \"FuelFactors\" and \"EnvironmentalImpactFactors\" must be entered or the displayed carbon pollution will all be zero.");
+                    R"(Both "FuelFactors" and "EnvironmentalImpactFactors" must be entered or the displayed carbon pollution will all be zero.)");
             }
         }
     }
@@ -3830,30 +3388,9 @@ namespace PollutionModule {
         // This support routine performs the "obtain schedule pointer" and checks Fuel Factor
         // schedules for validity (values must be >= 0).
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         SchedulePtr = GetScheduleIndex(state, ScheduleName);
         if (SchedulePtr == 0) {
@@ -3932,6 +3469,8 @@ namespace PollutionModule {
         DieselValue = 0.0;
         OtherFuel1Value = 0.0;
         OtherFuel2Value = 0.0;
+        auto & Pollution = state.dataPollutionModule->Pollution;
+        auto & FuelType = state.dataPollutionModule->FuelType;
 
         if (Pollution.ElecCoef.FuelFactorUsed) {
             Pollution.ElecComp.CO2Pollution = 0.0;
@@ -5686,6 +5225,8 @@ namespace PollutionModule {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        auto & Pollution = state.dataPollutionModule->Pollution;
+        auto & FuelType = state.dataPollutionModule->FuelType;
 
         FuelType.ElecFacility =
             GetInstantMeterValue(state, FuelType.ElecFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
@@ -5822,10 +5363,11 @@ namespace PollutionModule {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (GetInputFlagPollution) {
+        if (state.dataPollutionModule->GetInputFlagPollution) {
             GetPollutionFactorInput(state);
-            GetInputFlagPollution = false;
+            state.dataPollutionModule->GetInputFlagPollution = false;
         }
+        auto & Pollution = state.dataPollutionModule->Pollution;
 
         fuelFactorUsed = false;
         fuelSourceFactor = 0.0;
@@ -5833,7 +5375,7 @@ namespace PollutionModule {
         ffScheduleIndex = 0;
 
         {
-            auto const SELECT_CASE_var(fuelName);
+            auto const& SELECT_CASE_var(fuelName);
 
             if ((SELECT_CASE_var == "NaturalGas") || (SELECT_CASE_var == "Gas")) {
                 if (Pollution.NatGasCoef.FuelFactorUsed) {
@@ -6041,18 +5583,16 @@ namespace PollutionModule {
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // Each of the arguments must be entered in the EnvironmentalImpactFactors object
 
-        if (GetInputFlagPollution) {
+        if (state.dataPollutionModule->GetInputFlagPollution) {
             GetPollutionFactorInput(state);
-            GetInputFlagPollution = false;
+            state.dataPollutionModule->GetInputFlagPollution = false;
         }
 
-        if (NumEnvImpactFactors > 0) {
-            efficiencyDistrictHeating = Pollution.PurchHeatEffic;
-            efficiencyDistrictCooling = Pollution.PurchCoolCOP;
-            sourceFactorSteam = Pollution.SteamConvEffic;
+        if (state.dataPollutionModule->NumEnvImpactFactors > 0) {
+            efficiencyDistrictHeating = state.dataPollutionModule->Pollution.PurchHeatEffic;
+            efficiencyDistrictCooling = state.dataPollutionModule->Pollution.PurchCoolCOP;
+            sourceFactorSteam = state.dataPollutionModule->Pollution.SteamConvEffic;
         }
     }
-
-} // namespace PollutionModule
 
 } // namespace EnergyPlus
