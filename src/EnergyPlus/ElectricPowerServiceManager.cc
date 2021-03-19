@@ -3861,7 +3861,9 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     ssc_battery_->changeSOCLimits(controlSOCMinFracLimit * 100.0, controlSOCMaxFracLimit * 100.0);
 
     // Set the current timestep length
-    ssc_battery_->ChangeTimestep(DataHVACGlobals::TimeStepSys);
+    if (std::lround(ssc_battery_->get_params().dt_hr * 60.0) != std::lround(DataHVACGlobals::TimeStepSys * 60.0)) {
+        ssc_battery_->ChangeTimestep(DataHVACGlobals::TimeStepSys);
+    }
 
     // Run the battery
     // SAM uses negative values for charging, positive for discharging
