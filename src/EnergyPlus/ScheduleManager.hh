@@ -174,7 +174,6 @@ namespace ScheduleManager {
 
     // Clears the global data in ScheduleManager.
     // Needed for unit tests, should not be normally called.
-    void clear_state();
 
     void ProcessScheduleInput(EnergyPlusData &state);
 
@@ -335,6 +334,13 @@ namespace ScheduleManager {
 
 struct ScheduleManagerData : BaseGlobalStruct
 {
+    bool CheckScheduleValueMinMaxRunOnceOnly = true;
+    bool DoScheduleReportingSetup = true;
+    std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
+    std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
+    std::unordered_map<std::string, std::string> UniqueScheduleNames;
+
+
     // Integer Variables for the Module
     int NumScheduleTypes = 0;
     int NumDaySchedules = 0;
@@ -354,6 +360,12 @@ struct ScheduleManagerData : BaseGlobalStruct
 
     void clear_state() override
     {
+        CheckScheduleValueMinMaxRunOnceOnly = true;
+        UniqueDayScheduleNames.clear();
+        UniqueWeekScheduleNames.clear();
+        UniqueScheduleNames.clear();
+        DoScheduleReportingSetup = true;
+
         NumScheduleTypes = 0;
         NumDaySchedules = 0;
         NumWeekSchedules = 0;
