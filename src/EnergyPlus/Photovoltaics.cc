@@ -931,7 +931,7 @@ namespace Photovoltaics {
             {
                 auto const SELECT_CASE_var(state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode);
 
-                if (SELECT_CASE_var == iDecoupledCellIntegration) { // Sandia module temperature model for rack mounted PVs
+                if (SELECT_CASE_var == CellIntegration::Decoupled) { // Sandia module temperature model for rack mounted PVs
                     // Calculate back-of-module temperature:
                     state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback = SandiaModuleTemperature(state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
                                                                              state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
@@ -948,7 +948,7 @@ namespace Photovoltaics {
                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
 
-                } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
+                } else if (SELECT_CASE_var == CellIntegration::SurfaceOutsideFace) {
                     // get back-of-module temperature from elsewhere in EnergyPlus
                     state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback = state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr);
 
@@ -958,7 +958,7 @@ namespace Photovoltaics {
                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
 
-                } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
+                } else if (SELECT_CASE_var == CellIntegration::TranspiredCollector) {
                     GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback);
 
                     state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
@@ -967,7 +967,7 @@ namespace Photovoltaics {
                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
 
-                } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
+                } else if (SELECT_CASE_var == CellIntegration::ExteriorVentedCavity) {
                     GetExtVentedCavityTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback);
 
                     state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
@@ -976,7 +976,7 @@ namespace Photovoltaics {
                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
 
-                } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
+                } else if (SELECT_CASE_var == CellIntegration::PVTSolarCollector) {
                     // add calls to PVT models here
 
                 } else {
@@ -1143,7 +1143,7 @@ namespace Photovoltaics {
         // perform the one time initializations
         if (MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            MyEnvrnFlag.dimension(NumPVs, true);
+            MyEnvrnFlag.dimension(state.dataPhotovoltaic->NumPVs, true);
             MyOneTimeFlag = false;
         }
 
@@ -1235,13 +1235,13 @@ namespace Photovoltaics {
         // unused1208  INTEGER :: thisZone
 
         // if the cell temperature mode is 2, convert the timestep to seconds
-        if (firstTime && state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode == iDecoupledUllebergDynamicCellIntegration) {
+        if (firstTime && state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode == CellIntegration::DecoupledUllebergDynamic) {
             PVTimeStep = double(state.dataGlobal->MinutesPerTimeStep) * 60.0; // Seconds per time step
         }
         firstTime = false;
 
         // place the shunt resistance into its common block
-        ShuntResistance = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.ShuntResistance;
+        state.dataPhotovoltaic->ShuntResistance = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.ShuntResistance;
 
         // convert ambient temperature from C to K
         Tambient = state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
@@ -1259,7 +1259,7 @@ namespace Photovoltaics {
 
                 {
                     auto const SELECT_CASE_var(state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode);
-                    if (SELECT_CASE_var == iDecoupledCellIntegration) {
+                    if (SELECT_CASE_var == CellIntegration::Decoupled) {
                         //  cell temperature based on energy balance
                         state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef =
                             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha * state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.NOCTInsolation /
@@ -1267,7 +1267,7 @@ namespace Photovoltaics {
                         CellTemp = Tambient + (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation * state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha /
                                                state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef) *
                                                   (1.0 - ETA / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha);
-                    } else if (SELECT_CASE_var == iDecoupledUllebergDynamicCellIntegration) {
+                    } else if (SELECT_CASE_var == CellIntegration::DecoupledUllebergDynamic) {
                         //  cell temperature based on energy balance with thermal capacity effects
                         CellTemp =
                             Tambient +
@@ -1277,15 +1277,15 @@ namespace Photovoltaics {
                                 state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef *
                                 (1.0 -
                                  std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep));
-                    } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
+                    } else if (SELECT_CASE_var == CellIntegration::SurfaceOutsideFace) {
                         CellTemp = state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
-                    } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
+                    } else if (SELECT_CASE_var == CellIntegration::TranspiredCollector) {
                         GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, CellTemp);
                         CellTemp += DataGlobalConstants::KelvinConv;
-                    } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
+                    } else if (SELECT_CASE_var == CellIntegration::ExteriorVentedCavity) {
                         GetExtVentedCavityTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, CellTemp);
                         CellTemp += DataGlobalConstants::KelvinConv;
-                    } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
+                    } else if (SELECT_CASE_var == CellIntegration::PVTSolarCollector) {
                         // get PVT model result for cell temp..
                     }
                 }
@@ -1344,21 +1344,21 @@ namespace Photovoltaics {
             // if there is no incident radiation or if the control switch is 'Off'
             {
                 auto const SELECT_CASE_var(state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode);
-                if (SELECT_CASE_var == iDecoupledCellIntegration) {
+                if (SELECT_CASE_var == CellIntegration::Decoupled) {
                     CellTemp = Tambient;
-                } else if (SELECT_CASE_var == iDecoupledUllebergDynamicCellIntegration) {
+                } else if (SELECT_CASE_var == CellIntegration::DecoupledUllebergDynamic) {
                     CellTemp = Tambient +
                                (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
                                    std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep);
-                } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
+                } else if (SELECT_CASE_var == CellIntegration::SurfaceOutsideFace) {
                     CellTemp = state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
-                } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
+                } else if (SELECT_CASE_var == CellIntegration::TranspiredCollector) {
                     GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, CellTemp);
                     CellTemp += DataGlobalConstants::KelvinConv;
-                } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
+                } else if (SELECT_CASE_var == CellIntegration::ExteriorVentedCavity) {
                     GetExtVentedCavityTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, CellTemp);
                     CellTemp += DataGlobalConstants::KelvinConv;
-                } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
+                } else if (SELECT_CASE_var == CellIntegration::PVTSolarCollector) {
                     // get PVT model result for cell temp.. //Bug CellTemp not set but used below
                 } else {
                     assert(false);
@@ -1573,11 +1573,11 @@ namespace Photovoltaics {
         Real64 FUN(0.0);
 
         if (((VV + II * RSER) / AA) < 700.0) {
-            FUN = II - IL + IO * (std::exp((VV + II * RSER) / AA) - 1.0) - ((VV + II * RSER) / ShuntResistance);
+            FUN = II - IL + IO * (std::exp((VV + II * RSER) / AA) - 1.0) - ((VV + II * RSER) / state.dataPhotovoltaic->ShuntResistance);
         } else {
             ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
             ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
-            ShowContinueError(state, "Check input data in " + cPVEquiv1DiodePerfObjectName);
+            ShowContinueError(state, "Check input data in " + state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName);
             ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
             ShowContinueError(state, format("II (current) = {:.5R}", II));
             ShowFatalError(state, "FUN: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
@@ -1606,11 +1606,11 @@ namespace Photovoltaics {
         Real64 FI(0.0);
 
         if (((VV + II * RSER) / AA) < 700.0) {
-            FI = 1.0 + IO * std::exp((VV + II * RSER) / AA) * RSER / AA + (RSER / ShuntResistance);
+            FI = 1.0 + IO * std::exp((VV + II * RSER) / AA) * RSER / AA + (RSER / state.dataPhotovoltaic->ShuntResistance);
         } else {
             ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
             ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
-            ShowContinueError(state, "Check input data in " + cPVEquiv1DiodePerfObjectName);
+            ShowContinueError(state, "Check input data in " + state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName);
             ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
             ShowContinueError(state, format("II (current) = {:.5R}", II));
             ShowFatalError(state, "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
@@ -1639,11 +1639,11 @@ namespace Photovoltaics {
         Real64 FV(0.0);
 
         if (((VV + II * RSER) / AA) < 700.0) {
-            FV = IO * std::exp((VV + II * RSER) / AA) / AA + (1.0 / ShuntResistance);
+            FV = IO * std::exp((VV + II * RSER) / AA) / AA + (1.0 / state.dataPhotovoltaic->ShuntResistance);
         } else {
             ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
             ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
-            ShowContinueError(state, "Check input data in " + cPVEquiv1DiodePerfObjectName);
+            ShowContinueError(state, "Check input data in " + state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName);
             ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
             ShowContinueError(state, format("II (current) = {:.5R}", II));
             ShowFatalError(state, "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");

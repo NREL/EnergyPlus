@@ -298,8 +298,8 @@ namespace PhotovoltaicThermalCollectors {
                     ErrorsFound = true;
                 }
             }
-            if (allocated(DataPhotovoltaics::PVarray)) { // then PV input gotten... but don't expect this to be true.
-                PVT(Item).PVnum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), DataPhotovoltaics::PVarray);
+            if (allocated(state.dataPhotovoltaic->PVarray)) { // then PV input gotten... but don't expect this to be true.
+                PVT(Item).PVnum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), state.dataPhotovoltaic->PVarray);
                 // check PV
                 if (PVT(Item).PVnum == 0) {
                     ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + DataIPShortCuts::cAlphaArgs(4));
@@ -494,8 +494,8 @@ namespace PhotovoltaicThermalCollectors {
 
         // finish set up of PV, because PV get-input follows PVT's get input.
         if (!this->PVfound) {
-            if (allocated(DataPhotovoltaics::PVarray)) {
-                this->PVnum = UtilityRoutines::FindItemInList(this->PVname, DataPhotovoltaics::PVarray);
+            if (allocated(state.dataPhotovoltaic->PVarray)) {
+                this->PVnum = UtilityRoutines::FindItemInList(this->PVname, state.dataPhotovoltaic->PVarray);
                 if (this->PVnum == 0) {
                     ShowSevereError(state, "Invalid name for photovoltaic generator = " + this->PVname);
                     ShowContinueError(state, "Entered in flat plate photovoltaic-thermal collector = " + this->Name);
@@ -611,7 +611,7 @@ namespace PhotovoltaicThermalCollectors {
 
             if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
                 // heating only right now, so control flow requests based on incident solar;
-                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
                     this->MassFlowRate = this->MaxMassFlowRate;
                 } else {
                     this->MassFlowRate = 0.0;
@@ -817,7 +817,7 @@ namespace PhotovoltaicThermalCollectors {
         if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
 
             if (this->PVTModelType == SimplePVTmodel) {
-                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
                     // is heating wanted?
                     //  Outlet node is required to have a setpoint.
                     if (state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint > state.dataLoopNodes->Node(this->HVACInletNodeNum).Temp) {
@@ -845,7 +845,7 @@ namespace PhotovoltaicThermalCollectors {
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
             if (this->PVTModelType == SimplePVTmodel) {
-                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
                     // is heating wanted?
                     this->HeatingUseful = true;
                     this->BypassDamperOff = true;
