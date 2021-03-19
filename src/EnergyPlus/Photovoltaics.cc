@@ -112,16 +112,10 @@ namespace Photovoltaics {
     using namespace DataPhotovoltaics;
     using DataHVACGlobals::TimeStepSys;
 
-    Array1D_bool CheckEquipName;
-    bool GetInputFlag(true); // one time get input flag
-    bool MyOneTimeFlag(true);
-    bool firstTime(true);
+
 
     void clear_state() {
-        CheckEquipName.clear();
-        GetInputFlag = true;
-        MyOneTimeFlag = true;
-        firstTime = true;
+
     }
 
     void SimPVGenerator(EnergyPlusData &state,
@@ -148,9 +142,9 @@ namespace Photovoltaics {
         int PVnum;                      // index of unit in PV array for Equivalent one-diode model
 
         // Get PV data from input file
-        if (GetInputFlag) {
+        if (state.dataPhotovoltaicState->GetInputFlag) {
             GetPVInput(state); // for all three types of models
-            GetInputFlag = false;
+            state.dataPhotovoltaicState->GetInputFlag = false;
         }
 
         if (GeneratorIndex == 0) {
@@ -168,7 +162,7 @@ namespace Photovoltaics {
                                       NumPVs,
                                       GeneratorName));
             }
-            if (CheckEquipName(PVnum)) {
+            if (state.dataPhotovoltaicState->CheckEquipName(PVnum)) {
                 if (GeneratorName != PVarray(PVnum).Name) {
                     ShowFatalError(
                         state,
@@ -177,7 +171,7 @@ namespace Photovoltaics {
                                GeneratorName,
                                PVarray(PVnum).Name));
                 }
-                CheckEquipName(PVnum) = false;
+                state.dataPhotovoltaicState->CheckEquipName(PVnum) = false;
             }
         }
 
@@ -296,7 +290,7 @@ namespace Photovoltaics {
         }
 
         if (!allocated(PVarray)) PVarray.allocate(NumPVs);
-        CheckEquipName.dimension(NumPVs, true);
+        state.dataPhotovoltaicState->CheckEquipName.dimension(NumPVs, true);
 
         cCurrentModuleObject = cPVGeneratorObjectName;
         for (PVnum = 1; PVnum <= NumPVs; ++PVnum) {
@@ -1127,10 +1121,10 @@ namespace Photovoltaics {
         Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 
         // perform the one time initializations
-        if (MyOneTimeFlag) {
+        if (state.dataPhotovoltaicState->MyOneTimeFlag) {
             // initialize the environment and sizing flags
             MyEnvrnFlag.dimension(NumPVs, true);
-            MyOneTimeFlag = false;
+            state.dataPhotovoltaicState->MyOneTimeFlag = false;
         }
 
         // Do the Begin Environment initializations
@@ -1221,10 +1215,10 @@ namespace Photovoltaics {
         // unused1208  INTEGER :: thisZone
 
         // if the cell temperature mode is 2, convert the timestep to seconds
-        if (firstTime && PVarray(PVnum).CellIntegrationMode == iDecoupledUllebergDynamicCellIntegration) {
+        if (state.dataPhotovoltaicState->firstTime && PVarray(PVnum).CellIntegrationMode == iDecoupledUllebergDynamicCellIntegration) {
             PVTimeStep = double(state.dataGlobal->MinutesPerTimeStep) * 60.0; // Seconds per time step
         }
-        firstTime = false;
+        state.dataPhotovoltaicState->firstTime = false;
 
         // place the shunt resistance into its common block
         ShuntResistance = PVarray(PVnum).TRNSYSPVModule.ShuntResistance;

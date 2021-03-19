@@ -73,8 +73,6 @@ namespace Photovoltaics {
     // DERIVED TYPE DEFINITIONS:
     //   see DataPhotovoltaics.cc
 
-    extern Array1D_bool CheckEquipName;
-
     void clear_state();
 
     void SimPVGenerator(EnergyPlusData &state,
@@ -318,9 +316,17 @@ namespace Photovoltaics {
 
 struct PhotovoltaicStateData : BaseGlobalStruct {
 
+    Array1D_bool CheckEquipName;
+    bool GetInputFlag = true; // one time get input flag
+    bool MyOneTimeFlag = true;
+    bool firstTime = true;
+
     void clear_state() override
     {
-
+        CheckEquipName.clear();
+        GetInputFlag = true;
+        MyOneTimeFlag = true;
+        firstTime = true;
     }
 };
 
