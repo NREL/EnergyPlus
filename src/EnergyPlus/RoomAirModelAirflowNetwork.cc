@@ -110,25 +110,9 @@ namespace RoomAirModelAirflowNetwork {
     using namespace DataHeatBalance;
 
     // Object Data
-    Array1D<RAFNData> RAFN;
-
-    namespace {
-        bool InitRoomAirModelAirflowNetworkOneTimeFlag(true);
-        bool InitRoomAirModelAirflowNetworkOneTimeFlagConf(true);
-        bool InitRoomAirModelAirflowNetworkEnvrnFlag(true);
-        bool LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag(true);
-    } // namespace
 
     // Functions
 
-    void clear_state()
-    {
-        InitRoomAirModelAirflowNetworkOneTimeFlag = true;
-        InitRoomAirModelAirflowNetworkOneTimeFlagConf = true;
-        InitRoomAirModelAirflowNetworkEnvrnFlag = true;
-        LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = true;
-        RAFN.deallocate();
-    }
 
     void SimRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
@@ -162,7 +146,7 @@ namespace RoomAirModelAirflowNetwork {
             ShowFatalError(state, "SimRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" + state.dataHeatBal->Zone(ZoneNum).Name);
         }
 
-        auto &thisRAFN(RAFN(RAFNNum));
+        auto &thisRAFN(state.dataRoomAirflowNetModel->RAFN(RAFNNum));
         thisRAFN.ZoneNum = ZoneNum;
 
         // model control volume for each roomAir:node in the zone.
@@ -204,14 +188,14 @@ namespace RoomAirModelAirflowNetwork {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool OneTimeFlag_FindFirstLastPtr( true );  // one time setup flag // LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag
+        // static bool OneTimeFlag_FindFirstLastPtr( true );  // one time setup flag // state.dataRoomAirflowNetModel->LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag
         ////////////////////////////////////////////////////////////////////////////////////
         int RAFNNum;
 
 
-        if (LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag) {
-            RAFN.allocate(state.dataRoomAirMod->NumOfRoomAirflowNetControl);
-            LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = false;
+        if (state.dataRoomAirflowNetModel->LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag) {
+            state.dataRoomAirflowNetModel->RAFN.allocate(state.dataRoomAirMod->NumOfRoomAirflowNetControl);
+            state.dataRoomAirflowNetModel->LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = false;
         }
 
         RAFNNum = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).RAFNNum;
@@ -220,7 +204,7 @@ namespace RoomAirModelAirflowNetwork {
             ShowFatalError(state, "LoadPredictionRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" +
                            state.dataHeatBal->Zone(ZoneNum).Name);
         }
-        auto &thisRAFN(RAFN(RAFNNum));
+        auto &thisRAFN(state.dataRoomAirflowNetModel->RAFN(RAFNNum));
         thisRAFN.ZoneNum = ZoneNum;
 
         thisRAFN.InitRoomAirModelAirflowNetwork(state, RoomAirNode);
@@ -247,9 +231,9 @@ namespace RoomAirModelAirflowNetwork {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool MyOneTimeFlag( true );  // one time setup flag // InitRoomAirModelAirflowNetworkOneTimeFlag
-        // static bool MyOneTimeFlagConf( true ); // one time setup flag for zone configuration // InitRoomAirModelAirflowNetworkOneTimeFlagConf
-        // static bool MyEnvrnFlag( true ); // one time setup flag for zone configuration // InitRoomAirModelAirflowNetworkEnvrnFlag
+        // static bool MyOneTimeFlag( true );  // one time setup flag // state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlag
+        // static bool MyOneTimeFlagConf( true ); // one time setup flag for zone configuration // state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf
+        // static bool MyEnvrnFlag( true ); // one time setup flag for zone configuration // state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkEnvrnFlag
         ////////////////////////////////////////////////////////////////////////////////////
         Real64 SumLinkMCp;
         Real64 SumLinkMCpT;
@@ -279,7 +263,7 @@ namespace RoomAirModelAirflowNetwork {
         Array1D<Real64> SupplyFrac;
         Array1D<Real64> ReturnFrac;
 
-        if (InitRoomAirModelAirflowNetworkOneTimeFlag) { // then do one - time setup inits
+        if (state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlag) { // then do one - time setup inits
 
             // loop over all zones with RoomAirflowNetwork model
             for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
@@ -317,10 +301,10 @@ namespace RoomAirModelAirflowNetwork {
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
                 }
             }
-            InitRoomAirModelAirflowNetworkOneTimeFlag = false;
+            state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlag = false;
         }
 
-        if (InitRoomAirModelAirflowNetworkOneTimeFlagConf) { // then do one - time setup inits
+        if (state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf) { // then do one - time setup inits
             if (allocated(state.dataZoneEquip->ZoneEquipConfig) && allocated(state.dataZoneEquip->ZoneEquipList)) {
                 MaxNodeNum = 0;
                 MaxEquipNum = 0;
@@ -490,15 +474,15 @@ namespace RoomAirModelAirflowNetwork {
                         }
                     }
                 }
-                InitRoomAirModelAirflowNetworkOneTimeFlagConf = false;
+                state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf = false;
                 if (allocated(NodeFound)) NodeFound.deallocate();
                 if (ErrorsFound) {
                     ShowFatalError(state, "GetRoomAirflowNetworkData: Errors found getting air model input.  Program terminates.");
                 }
             }
-        } // End of InitRoomAirModelAirflowNetworkOneTimeFlagConf
+        } // End of state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf
 
-        if (state.dataGlobal->BeginEnvrnFlag && InitRoomAirModelAirflowNetworkEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkEnvrnFlag) {
             for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
                 if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
                 for (LoopAirNode = 1; LoopAirNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
@@ -533,10 +517,10 @@ namespace RoomAirModelAirflowNetwork {
                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SysDepZoneLoadsLaggedOld = 0.0;
                 }
             }
-            InitRoomAirModelAirflowNetworkEnvrnFlag = false;
+            state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkEnvrnFlag = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            InitRoomAirModelAirflowNetworkEnvrnFlag = true;
+            state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkEnvrnFlag = true;
         }
 
         // reuse code in ZoneTempPredictorCorrector for sensible components.
@@ -846,7 +830,7 @@ namespace RoomAirModelAirflowNetwork {
         Real64 SumSysM;    //                !Zone sum of air system MassFlowRate
         Real64 SumSysMW;   //               !Zone sum of air system MassFlowRate*W
         int EquipLoop;     //              !Index of equipment loop
-        int Loop;          //                   !Index of RAFN node
+        int Loop;          //                   !Index of state.dataRoomAirflowNetModel->RAFN node
         bool Found;        //
         Real64 SumLinkM;   //               !Zone sum of MassFlowRate from the AirflowNetwork model
         Real64 SumLinkMW;  //             !Zone sum of MassFlowRate*W from the AirflowNetwork model

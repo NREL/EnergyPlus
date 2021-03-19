@@ -100,7 +100,6 @@
 #include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
@@ -151,6 +150,5 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PhotovoltaicThermalCollectors::clear_state();
     Psychrometrics::clear_state();
     PVWatts::clear_state();
-    RoomAirModelAirflowNetwork::clear_state();
     ScheduleManager::clear_state();
 }
