@@ -147,7 +147,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     HeatingCoils::HeatingCoil(CoilNum).SchedPtr = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
-    DataHVACGlobals::MSHPMassFlowRateLow = OnMassFlowrate;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = OnMassFlowrate;
     HeatingCoils::HeatingCoil(CoilNum).MSNominalCapacity.allocate(1);
     HeatingCoils::HeatingCoil(CoilNum).MSNominalCapacity(1) = 10000;
     HeatingCoils::HeatingCoil(CoilNum).MSEfficiency.allocate(1);

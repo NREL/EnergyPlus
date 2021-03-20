@@ -754,7 +754,7 @@ namespace SolarCollectors {
 
         this->update(state);
 
-        this->report();
+        this->report(state);
     }
 
     void CollectorData::initialize(EnergyPlusData &state)
@@ -899,7 +899,7 @@ namespace SolarCollectors {
 
         if (this->InitICS) {
 
-            Real64 timeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+            Real64 timeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
 
             if (this->TimeElapsed != timeElapsed) {
                 // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous
@@ -1238,7 +1238,7 @@ namespace SolarCollectors {
 
         int SurfNum = this->Surface;
         int ParamNum = this->Parameters;
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         Real64 TempWater = this->SavedTempOfWater;
         Real64 TempAbsPlate = this->SavedTempOfAbsPlate;
         Real64 TempOutdoorAir = state.dataSurface->Surface(SurfNum).OutDryBulbTemp;
@@ -1976,7 +1976,7 @@ namespace SolarCollectors {
         state.dataLoopNodes->Node(this->OutletNode).Enthalpy = Cp * state.dataLoopNodes->Node(this->OutletNode).Temp;
     }
 
-    void CollectorData::report()
+    void CollectorData::report(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1986,7 +1986,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
 
-        Real64 TimeStepInSecond = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepInSecond = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         this->Energy = this->Power * TimeStepInSecond;
         this->HeatEnergy = this->HeatRate * TimeStepInSecond;

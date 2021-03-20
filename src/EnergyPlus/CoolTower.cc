@@ -705,14 +705,11 @@ namespace CoolTower {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolTowerNum;
         Real64 TSMult;
 
-        TSMult = TimeStepSys * DataGlobalConstants::SecInHour;
+        TSMult = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
 

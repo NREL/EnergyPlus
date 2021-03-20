@@ -836,8 +836,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate;  // OA mass flow rate during comp on
     state->dataPTHP->OACompOffMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate during comp off
     state->dataPTHP->CompOnFlowRatio = 1.0;
-    DataHVACGlobals::ZoneCompTurnFansOff = false;
-    DataHVACGlobals::ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
+    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
 
     PTUnitNum = 1;
     state->dataPTHP->PTUnit(1).OpMode = ContFanCycCoil;
@@ -1182,8 +1182,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     //		PackagedTerminalHeatPump::OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate during comp on
     //		PackagedTerminalHeatPump::OACompOffMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate during comp off
     //		PackagedTerminalHeatPump::CompOnFlowRatio = 1.0;
-    DataHVACGlobals::ZoneCompTurnFansOff = false;
-    DataHVACGlobals::ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
+    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
 
     PTUnitNum = 1;
     state->dataPTHP->PTUnit(1).OpMode = ContFanCycCoil;

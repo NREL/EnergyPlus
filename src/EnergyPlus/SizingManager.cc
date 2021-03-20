@@ -97,7 +97,6 @@ namespace EnergyPlus::SizingManager {
     using namespace HeatBalanceManager;
     using namespace WeatherManager;
     using namespace DataSizing;
-    using DataHVACGlobals::NumPrimaryAirSys;
     using DataStringGlobals::CharComma;
     using DataStringGlobals::CharSpace;
     using DataStringGlobals::CharTab;
@@ -705,7 +704,7 @@ namespace EnergyPlus::SizingManager {
             // CalcZoneSizing.deallocate();
         }
         if (state.dataSize->SysSizingRunDone) {
-            for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+            for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
                 curName = FinalSysSizing(AirLoopNum).AirPriLoopName;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcClAir, curName, CalcSysSizing(AirLoopNum).DesCoolVolFlow);
                 if (std::abs(CalcSysSizing(AirLoopNum).DesCoolVolFlow) <= 1.e-8) {
@@ -852,7 +851,7 @@ namespace EnergyPlus::SizingManager {
             ZoneEquipmentManager::ManageZoneEquipment(state, true, t_SimZoneEquip, t_SimAir);
             state.dataGlobal->BeginEnvrnFlag = false;
 
-            for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+            for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
                 // Mine data from ATUs to find new design heating flow rates and new maximum flow rates
                 Real64 airLoopMaxFlowRateSum(0.0);
                 Real64 airLoopHeatingMinimumFlowRateSum(0.0);
@@ -1287,7 +1286,7 @@ namespace EnergyPlus::SizingManager {
         // redo std 62.1 calculations using latest information on zone flows and report to tables
 
         // redo 62.1 zone calculations with final (or user) zone terminal flow sizes, only redo calculations that might change with final flows
-        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             int SysSizNum =
                 UtilityRoutines::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
             if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
@@ -1512,7 +1511,7 @@ namespace EnergyPlus::SizingManager {
         } // airloop loop
 
         // write out predefined standard 62.1 report data, total of 8 tables
-        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
 
             // System Ventilation Requirements for Cooling (table 1)
             OutputReportPredefined::PreDefTableEntry(state,
@@ -1913,14 +1912,14 @@ namespace EnergyPlus::SizingManager {
 
         // first determine if any airloops use VRP, if not then don't need to march thru year of schedules for performance
         bool anyVRPinModel(false);
-        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_VRP) {
                 anyVRPinModel = true;
                 break;
             }
         }
         // First get the design (max) level of people in all zones connected to air loop
-        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             int SysSizNum =
                 UtilityRoutines::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
             if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
@@ -1941,7 +1940,7 @@ namespace EnergyPlus::SizingManager {
         }
 
         if (!anyVRPinModel) {
-            for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+            for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
                 state.dataSize->DBySys(AirLoopNum) = 1.0;
             }
             return; // early return to not march through schedules
@@ -1964,7 +1963,7 @@ namespace EnergyPlus::SizingManager {
                     state.dataGlobal->TimeStep = TS;                     // avoid crash in schedule manager
                     Real64 TSfraction(0.0);
                     if (state.dataGlobal->NumOfTimeStepInHour > 0.0) TSfraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
-                    for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // loop over all the air systems
+                    for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) { // loop over all the air systems
                         int SysSizNum = UtilityRoutines::FindItemInList(
                             FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
                         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
@@ -2011,7 +2010,7 @@ namespace EnergyPlus::SizingManager {
         }
 
         // compute D for standard 62.1 by system
-        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             if (state.dataSize->PzSumBySys(AirLoopNum) > 0.0) {
                 state.dataSize->DBySys(AirLoopNum) = state.dataSize->PsBySys(AirLoopNum) / state.dataSize->PzSumBySys(AirLoopNum);
             } else {

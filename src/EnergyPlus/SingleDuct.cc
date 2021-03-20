@@ -119,7 +119,6 @@ namespace EnergyPlus::SingleDuct {
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
-    using DataHVACGlobals::TurnFansOn;
     using namespace DataSizing;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -4758,7 +4757,6 @@ namespace EnergyPlus::SingleDuct {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::TurnFansOff;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -4786,7 +4784,7 @@ namespace EnergyPlus::SingleDuct {
         bool TurnFansOffSav; // save the fan off flag
         Real64 mdot;
 
-        TurnFansOffSav = TurnFansOff;
+        TurnFansOffSav = state.dataHVACGlobal->TurnFansOff;
         FanInNode = this->InletNodeNum;
         FanOutNode = this->OutletNodeNum;
         HCOutNode = this->ReheatAirOutletNode;
@@ -4800,13 +4798,13 @@ namespace EnergyPlus::SingleDuct {
             HVACFan::fanObjs[this->Fan_Index]->simulate(state, _, _, _, _);
 
         } else { // pass through conditions
-            TurnFansOff = true;
+            state.dataHVACGlobal->TurnFansOff = true;
             if (FanType == DataHVACGlobals::FanType_SimpleVAV) {
                 Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
             } else if (FanType == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[this->Fan_Index]->simulate(state, _, _, TurnFansOff, _);
+                HVACFan::fanObjs[this->Fan_Index]->simulate(state, _, _, state.dataHVACGlobal->TurnFansOff, _);
             }
-            TurnFansOff = TurnFansOffSav;
+            state.dataHVACGlobal->TurnFansOff = TurnFansOffSav;
             state.dataLoopNodes->Node(FanOutNode).MassFlowRate = state.dataLoopNodes->Node(FanInNode).MassFlowRate;
             state.dataLoopNodes->Node(FanOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(FanInNode).MassFlowRateMaxAvail;
             state.dataLoopNodes->Node(FanOutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(FanInNode).MassFlowRateMinAvail;
