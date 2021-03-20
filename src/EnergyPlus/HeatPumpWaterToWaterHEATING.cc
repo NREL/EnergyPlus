@@ -538,7 +538,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterHEATING {
         //       RE-ENGINEERED  Mar2000
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         using namespace FluidProperties;
 
         using PlantUtilities::SetComponentFlowRate;
@@ -877,7 +877,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterHEATING {
             // set node flow rates;  for these load based models
             // assume that the sufficient Source Side flow rate available
 
-            Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
             this->Energy = this->Power * ReportingConstant;
             this->QSourceEnergy = QSource * ReportingConstant;

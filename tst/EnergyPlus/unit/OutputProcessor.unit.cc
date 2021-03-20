@@ -5249,8 +5249,8 @@ namespace OutputProcessor {
         bool errors_found = false;
         Real64 transferredenergy = 0;
         state->dataGlobal->NumOfZones = 1;
-        DataHVACGlobals::NumPrimaryAirSys = 1;
-        state->dataAirSystemsData->PrimaryAirSystems.allocate(DataHVACGlobals::NumPrimaryAirSys);
+        state->dataHVACGlobal->NumPrimaryAirSys = 1;
+        state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
         state->dataAirSystemsData->PrimaryAirSystems(1).Name = "Air Loop 1";
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipConfig(state->dataGlobal->NumOfZones).IsControlled = true;

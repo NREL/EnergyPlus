@@ -1052,7 +1052,7 @@ namespace ZoneDehumidifier {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using Psychrometrics::RhoH2O;
 
         // Locals

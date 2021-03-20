@@ -1411,7 +1411,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     state->dataHVACMultiSpdHP->MSHeatPump(1).MaxHeatRecOutletTemp = 80;
     state->dataHVACMultiSpdHP->MSHeatPump(1).HRLoopNum = 1; // index to plant
     state->dataLoopNodes->Node(HeatRecInNode).Temp = 50.0;
-    DataHVACGlobals::MSHPWasteHeat = 1000.0;
+    state->dataHVACGlobal->MSHPWasteHeat = 1000.0;
 
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
@@ -1422,7 +1422,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
 
     // outlet temp should equal inlet temp since mass flow rate = 0
     Real64 calculatedOutletTemp =
-        state->dataLoopNodes->Node(HeatRecInNode).Temp + DataHVACGlobals::MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
+        state->dataLoopNodes->Node(HeatRecInNode).Temp + state->dataHVACGlobal->MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
     EXPECT_DOUBLE_EQ(0.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryRate);
     EXPECT_DOUBLE_EQ(50.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryInletTemp);
     EXPECT_DOUBLE_EQ(50.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryOutletTemp);
@@ -1433,14 +1433,14 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
 
     // outlet temp should equal temperature rise due to 1 kW of heat input at 0.1 kg/s
     calculatedOutletTemp =
-        state->dataLoopNodes->Node(HeatRecInNode).Temp + DataHVACGlobals::MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
+        state->dataLoopNodes->Node(HeatRecInNode).Temp + state->dataHVACGlobal->MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
     EXPECT_DOUBLE_EQ(1000.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryRate);
     EXPECT_DOUBLE_EQ(50.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryInletTemp);
     EXPECT_DOUBLE_EQ(calculatedOutletTemp, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryOutletTemp);
     EXPECT_DOUBLE_EQ(52.391772303276724, calculatedOutletTemp);
     EXPECT_DOUBLE_EQ(0.1, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryMassFlowRate);
 
-    DataHVACGlobals::MSHPWasteHeat = 100000.0; // test very high heat transfer that would limit outlet water temperature
+    state->dataHVACGlobal->MSHPWasteHeat = 100000.0; // test very high heat transfer that would limit outlet water temperature
     state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate = 0.1;
     HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);
 

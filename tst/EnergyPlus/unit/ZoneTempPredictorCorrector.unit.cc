@@ -101,7 +101,7 @@ using namespace SimulationManager;
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
 {
 
-    TimeStepSys = 15.0 / 60.0; // System timestep in hours
+    state->dataHVACGlobal->TimeStepSys = 15.0 / 60.0; // System timestep in hours
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";

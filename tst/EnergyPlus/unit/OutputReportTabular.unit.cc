@@ -3716,7 +3716,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 
     state->dataOutRptTab->displayHeatEmissionsSummary = true;
     state->dataGlobal->DoWeathSim = true;
-    DataHVACGlobals::TimeStepSys = 10.0;
+    state->dataHVACGlobal->TimeStepSys = 10.0;
     state->dataEnvrn->OutHumRat = 0.005;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
 
@@ -3729,7 +3729,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataCondenserLoopTowers->towers(1).Qactual = 1.0;
     state->dataCondenserLoopTowers->towers(1).FanEnergy = 50.0;
 
-    Real64 TimeStepSysSec = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     Real64 reliefEnergy = 2.0 * TimeStepSysSec;
     Real64 condenserReject = 1.0 * TimeStepSysSec + 50.0;
 
@@ -6885,19 +6885,19 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     sqlite->sqliteBegin();
     sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
-    state->dataSize->SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataSize->FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataSize->CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataSize->SysSizPeakDDNum.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataSize->FinalSysSizing.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     int numDesDays = 2;
-    state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataAirLoop->AirToZoneNodeInfo.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     state->dataGlobal->NumOfZones = 0;
     state->dataOutRptTab->displayAirLoopComponentLoadSummary = true;
     state->dataGlobal->CompLoadReportIsReq = true;
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
 
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
 
     WriteLoadComponentSummaryTables(*state);
 
@@ -6995,10 +6995,10 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
     // One airloop, that serves this zone.
-    DataHVACGlobals::NumPrimaryAirSys = 1;
-    state->dataSize->SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataSize->FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataSize->CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataSize->SysSizPeakDDNum.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataSize->FinalSysSizing.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
@@ -7019,7 +7019,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataSize->CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
     state->dataSize->CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
 
-    state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataAirLoop->AirToZoneNodeInfo.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;
     state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(1);
     state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
@@ -7031,12 +7031,12 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test
     state->dataSize->FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
 
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = heatDDNum;
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = coolTimeOfMax;
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk(2) = heatTimeOfMax;
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).HeatPeakDD = heatDDNum;
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = coolTimeOfMax;
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtHeatPk(2) = heatTimeOfMax;
 
 
     // Set up Facility to peak like the zone too
@@ -8300,7 +8300,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     state->dataOutRptPredefined->reportName.allocate(1);
     state->dataOutRptPredefined->reportName(state->dataOutRptPredefined->pdrSensibleGain).show = true;
 
-    DataHVACGlobals::TimeStepSys = 10.0;
+    state->dataHVACGlobal->TimeStepSys = 10.0;
     state->dataGlobal->TimeStepZone = 20.0;
     state->dataDefineEquipment->NumAirDistUnits = 1;
 
@@ -8325,8 +8325,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 
     GatherHeatGainReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
 
-    EXPECT_EQ(1.0*(DataHVACGlobals::TimeStepSys)*DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqHt);
-    EXPECT_EQ(0.0*(DataHVACGlobals::TimeStepSys)*DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqCl);
+    EXPECT_EQ(1.0*(state->dataHVACGlobal->TimeStepSys)*DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqHt);
+    EXPECT_EQ(0.0*(state->dataHVACGlobal->TimeStepSys)*DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqCl);
     EXPECT_EQ(1000.0, state->dataHeatBal->ZonePreDefRep(1).SHGSAnHvacATUHt);
     EXPECT_EQ(-2000.0, state->dataHeatBal->ZonePreDefRep(1).SHGSAnHvacATUCl);
 }

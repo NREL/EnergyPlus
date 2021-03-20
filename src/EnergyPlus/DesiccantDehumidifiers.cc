@@ -135,7 +135,6 @@ namespace DesiccantDehumidifiers {
     using DataHVACGlobals::Coil_HeatingWater;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::DrawThru;
-    using DataHVACGlobals::OnOffFanPartLoadFraction;
     using DataHVACGlobals::SmallMassFlow;
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
@@ -265,7 +264,7 @@ namespace DesiccantDehumidifiers {
 
         UpdateDesiccantDehumidifier(state, DesicDehumNum);
 
-        ReportDesiccantDehumidifier(DesicDehumNum);
+        ReportDesiccantDehumidifier(state, DesicDehumNum);
     }
 
     void GetDesiccantDehumidifierInput(EnergyPlusData &state)
@@ -1728,8 +1727,8 @@ namespace DesiccantDehumidifiers {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::DoSetPointTest;
-        using DataHVACGlobals::SetPointErrorFlag;
+        auto & DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
+        auto & SetPointErrorFlag = state.dataHVACGlobal->SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -2643,8 +2642,8 @@ namespace DesiccantDehumidifiers {
         ExhaustFanMassFlowRate = 0.0;
 
         // Save OnOffFanPartLoadFraction while performing exhaust fan calculations
-        OnOffFanPLF = OnOffFanPartLoadFraction;
-        OnOffFanPartLoadFraction = 1.0;
+        OnOffFanPLF = state.dataHVACGlobal->OnOffFanPartLoadFraction;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
 
         if (DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide == Yes) {
             // Cooling coil directly upstream of desiccant dehumidifier, dehumidifier runs in tandem with DX coil
@@ -3077,7 +3076,7 @@ namespace DesiccantDehumidifiers {
         }
 
         // Reset OnOffFanPartLoadFraction for process side fan calculations
-        OnOffFanPartLoadFraction = OnOffFanPLF;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = OnOffFanPLF;
     }
 
     void UpdateDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum) // number of the current dehumidifier being simulated
@@ -3161,7 +3160,7 @@ namespace DesiccantDehumidifiers {
         }
     }
 
-    void ReportDesiccantDehumidifier(int const DesicDehumNum) // number of the current dehumidifier being simulated
+    void ReportDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum) // number of the current dehumidifier being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -3181,7 +3180,7 @@ namespace DesiccantDehumidifiers {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

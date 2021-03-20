@@ -55,7 +55,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -80,7 +79,6 @@
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
-#include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
@@ -98,7 +96,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
-    DataHVACGlobals::clear_state();
     DataIPShortCuts::clear_state();
     DataOutputs::clear_state();
     DataStringGlobals::clear_state();
@@ -120,7 +117,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACSingleDuctInduc::clear_state();
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
-    PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
     Psychrometrics::clear_state();

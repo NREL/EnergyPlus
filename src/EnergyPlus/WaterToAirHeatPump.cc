@@ -98,7 +98,6 @@ namespace WaterToAirHeatPump {
     using namespace DataLoopNode;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
-    using DataHVACGlobals::TimeStepSys;
     using DataPlant::TypeOf_CoilWAHPCoolingParamEst;
     using DataPlant::TypeOf_CoilWAHPHeatingParamEst;
 
@@ -1625,7 +1624,7 @@ namespace WaterToAirHeatPump {
         QSource *= PartLoadRatio;
 
         // Update heat pump data structure
-        DataHVACGlobals::DXElecCoolingPower = Power;
+        state.dataHVACGlobal->DXElecCoolingPower = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QLoadTotal = QLoadTotal;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSensible = QSensible;
@@ -2145,7 +2144,7 @@ namespace WaterToAirHeatPump {
         QSource *= PartLoadRatio;
 
         // Update heat pump data structure
-        DataHVACGlobals::DXElecHeatingPower = Power;
+        state.dataHVACGlobal->DXElecHeatingPower = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QLoadTotal = QLoadTotal;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSensible = QLoadTotal;
@@ -2189,7 +2188,7 @@ namespace WaterToAirHeatPump {
         // Data is moved from the HP data structure to the HP outlet nodes.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

@@ -110,7 +110,7 @@ protected:
         state->dataWeatherManager->Environment(4).SeedEnvrnNum = 2;
 
         OutputProcessor::SetupTimePointers(*state, "ZONE", state->dataGlobal->TimeStepZone);
-        OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
+        OutputProcessor::SetupTimePointers(*state, "HVAC", state->dataHVACGlobal->TimeStepSys);
 
         state->dataSize->PlantSizData.allocate(1);
 
@@ -397,7 +397,7 @@ TEST_F(SizingAnalysisObjectsTest, DISABLED_LoggingSubStep4stepPerHour)
     int Envrn(3);
     state->dataGlobal->DayOfSim = 1;
     int HourofDay(0);
-    DataHVACGlobals::TimeStepSys = 1.0 / (4.0 * 5.0); // fractional hours, duration
+    state->dataHVACGlobal->TimeStepSys = 1.0 / (4.0 * 5.0); // fractional hours, duration
     Real64 zoneTimeStepDuration(0.25);
     int numTimeStepsInHour(4);
 

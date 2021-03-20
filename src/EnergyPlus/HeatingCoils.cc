@@ -1257,7 +1257,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).HCoilType_Num != Coil_HeatingGas_MultiStage) {
 
             //   If the coil is temperature controlled (QCoilReq == -999.0), both a control node and setpoint are required.
-            if (!state.dataGlobal->SysSizingCalc && DoSetPointTest) {
+            if (!state.dataGlobal->SysSizingCalc && state.dataHVACGlobal->DoSetPointTest) {
                 //     3 possibilities here:
                 //     1) TempSetPointNodeNum .GT. 0 and TempSetPoint /= SensedNodeFlagValue, this is correct
                 //     2) TempSetPointNodeNum .EQ. 0, this is not correct, control node is required
@@ -1652,7 +1652,7 @@ namespace HeatingCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataHVACGlobals::ElecHeatingCoilPower;
+        auto & ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         using DataHVACGlobals::TempControlTol;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1823,9 +1823,9 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::ElecHeatingCoilPower;
-        using DataHVACGlobals::MSHPMassFlowRateHigh;
-        using DataHVACGlobals::MSHPMassFlowRateLow;
+        auto & ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
+        auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
+        auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
 
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
@@ -2199,7 +2199,7 @@ namespace HeatingCoils {
                 // Fan power will also be modified by the heating coil's part load fraction
                 // OnOffFanPartLoadFraction passed to fan via DataHVACGlobals (cycling fan only)
                 if (FanOpMode == CycFanCycCoil) {
-                    OnOffFanPartLoadFraction = PLF;
+                    state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
                 }
             }
         }
@@ -2219,7 +2219,7 @@ namespace HeatingCoils {
             state.dataAirLoop->AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF =
                 max(state.dataAirLoop->AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, HeatingCoil(CoilNum).RTF);
         }
-        ElecHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
+        state.dataHVACGlobal->ElecHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
 
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
         state.dataLoopNodes->Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
@@ -2251,9 +2251,9 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::ElecHeatingCoilPower;
-        using DataHVACGlobals::MSHPMassFlowRateHigh;
-        using DataHVACGlobals::MSHPMassFlowRateLow;
+        auto & ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
+        auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
+        auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
 
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
@@ -2493,7 +2493,7 @@ namespace HeatingCoils {
                 // Fan power will also be modified by the heating coil's part load fraction
                 // OnOffFanPartLoadFraction passed to fan via DataHVACGlobals (cycling fan only)
                 if (FanOpMode == CycFanCycCoil) {
-                    OnOffFanPartLoadFraction = PLF;
+                    state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
                 }
             }
         }
@@ -2797,7 +2797,7 @@ namespace HeatingCoils {
         // This subroutine updates the report variable for the coils.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
@@ -2810,9 +2810,9 @@ namespace HeatingCoils {
         state.dataHeatingCoils->HeatingCoil(CoilNum).FuelUseRate = state.dataHeatingCoils->HeatingCoil(CoilNum).FuelUseLoad;
         state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseRate = state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad;
         if (coilIsSuppHeater) {
-            DataHVACGlobals::SuppHeatingCoilPower = state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad;
+            state->dataHVACGlobal->SuppHeatingCoilPower = state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad;
         } else {
-            DataHVACGlobals::ElecHeatingCoilPower = state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad;
+            state->dataHVACGlobal->ElecHeatingCoilPower = state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad;
         }
         state.dataHeatingCoils->HeatingCoil(CoilNum).FuelUseLoad *= ReportingConstant;
         state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad *= ReportingConstant;

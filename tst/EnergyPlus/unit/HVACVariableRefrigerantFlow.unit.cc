@@ -202,7 +202,7 @@ protected:
         state->dataCurveManager->PerfCurve(2).Coeff1 = 1.0;
         state->dataCurveManager->PerfCurve(2).CurveMax = 1.0;
 
-        int NumAirLoops = DataHVACGlobals::NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
+        int NumAirLoops = state->dataHVACGlobal->NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
         state->dataAirSystemsData->PrimaryAirSystems.allocate(NumAirLoops);
         int thisAirLoop = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch.allocate(1);
@@ -6468,23 +6468,23 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 0.0; // turn off fan
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(0.0, state->dataLoopNodes->Node(OutsideAirNode).MassFlowRate);
-    EXPECT_FALSE(DataHVACGlobals::ZoneCompTurnFansOn);
-    EXPECT_FALSE(DataHVACGlobals::ZoneCompTurnFansOff);
+    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOn);
+    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOff);
     EXPECT_EQ(0.0, state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue);
 
     // turn on "Turn Fan On" flag for availability manager, result should be the same as previous non-zero result
-    DataHVACGlobals::ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(AverageOAMassFlow, state->dataLoopNodes->Node(OutsideAirNode).MassFlowRate);
-    EXPECT_TRUE(DataHVACGlobals::ZoneCompTurnFansOn);
-    EXPECT_FALSE(DataHVACGlobals::ZoneCompTurnFansOff);
+    EXPECT_TRUE(state->dataHVACGlobal->ZoneCompTurnFansOn);
+    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOff);
 
     // turn on "Turn Fan Off" flag for availability manager, result should be 0
-    DataHVACGlobals::ZoneCompTurnFansOff = true;
+    state->dataHVACGlobal->ZoneCompTurnFansOff = true;
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(0.0, state->dataLoopNodes->Node(OutsideAirNode).MassFlowRate);
-    EXPECT_TRUE(DataHVACGlobals::ZoneCompTurnFansOn);
-    EXPECT_TRUE(DataHVACGlobals::ZoneCompTurnFansOff);
+    EXPECT_TRUE(state->dataHVACGlobal->ZoneCompTurnFansOn);
+    EXPECT_TRUE(state->dataHVACGlobal->ZoneCompTurnFansOff);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
@@ -6594,7 +6594,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     state->dataGlobal->DayOfSim = 1;
     state->dataGlobal->CurrentTime = 0.25;
     state->dataGlobal->TimeStepZone = 0.25;
-    DataHVACGlobals::SysTimeElapsed = 0.0;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.01;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -13139,8 +13139,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     state->dataGlobal->DayOfSim = 2; // user a higher day than previous unit test to get around static timer variables problem
     state->dataGlobal->CurrentTime = 0.25;
     state->dataGlobal->TimeStepZone = 0.25;
-    DataHVACGlobals::TimeStepSys = 0.25;
-    DataHVACGlobals::SysTimeElapsed = 0.0;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.01;
     state->dataEnvrn->OutBaroPress = 101325.0;
