@@ -344,7 +344,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -591,7 +591,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -922,7 +922,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -1336,7 +1336,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -1749,7 +1749,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -2421,7 +2421,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -3100,7 +3100,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -4850,7 +4850,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -6604,7 +6604,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -6851,7 +6851,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -7088,7 +7088,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -7334,7 +7334,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -7512,7 +7512,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     bool FirstHVACIteration(false);
@@ -7941,7 +7941,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     bool FirstHVACIteration(false);

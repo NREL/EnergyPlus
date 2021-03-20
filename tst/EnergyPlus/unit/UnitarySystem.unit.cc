@@ -765,7 +765,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the UnitarySystem factory
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -977,7 +977,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     // call the UnitarySystem factory
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -1260,7 +1260,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     // call the UnitarySystem factory
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -1483,7 +1483,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -1721,7 +1721,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -1955,7 +1955,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoil_Only)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -2171,7 +2171,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -2665,7 +2665,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -3050,7 +3050,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -3414,7 +3414,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -3661,7 +3661,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
         "  Until: 24:00, 1.0;      !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     UnitarySys thisSys;
     state->dataUnitarySystems->numUnitarySystems = 1;
@@ -4631,7 +4631,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
         "  Dimensionless;          !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                            // expect no errors
@@ -5177,7 +5177,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VSDXCoilSizing)
         "  Dimensionless;          !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                            // expect no errors
@@ -5512,7 +5512,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
         "  Dimensionless;          !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                            // expect no errors
@@ -5974,7 +5974,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
         "  Dimensionless;          !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                            // expect no errors
@@ -6299,7 +6299,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInput)
         "  Dimensionless;          !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                            // expect no errors
@@ -6484,7 +6484,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInputSZVAV)
         "  Dimensionless;          !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                            // expect no errors
@@ -6929,7 +6929,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ReportingTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -7662,7 +7662,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
         "    Until: 24:00,15.6;       !- Field 23",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     SimulationManager::GetProjectData(*state);
     createFacilityElectricPowerServiceObject(*state);
@@ -8057,7 +8057,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
         "  38.;                  ! Maximum Curve Output",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                            // expect no errors
@@ -8390,7 +8390,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                            // expect no errors
@@ -9406,7 +9406,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
         "    Until: 24:00,15.6;       !- Field 23",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     SimulationManager::GetProjectData(*state);
     createFacilityElectricPowerServiceObject(*state);
@@ -10183,7 +10183,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
         "  ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
     state->dataLoopNodes->Node.allocate(10);
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -11385,7 +11385,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
         "    Until: 24:00,15.6;       !- Field 23",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     SimulationManager::GetProjectData(*state);
     createFacilityElectricPowerServiceObject(*state);
@@ -11486,7 +11486,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
         "    TestFan4OutletNode;           !- Air Outlet Node Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string fanName = "TEST FAN 1";
     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
@@ -11728,7 +11728,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerInlet)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
@@ -11877,7 +11877,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerSupply)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
@@ -12003,7 +12003,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
@@ -12134,7 +12134,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipmentBlankCtrlZone)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
@@ -12250,7 +12250,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
         "    CrossFlow;                              !- Heat Exchanger Configuration",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     // call the UnitarySystem factory
     bool ErrorsFound = false;
@@ -12392,7 +12392,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
         "    CrossFlow;                              !- Heat Exchanger Configuration",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     // call the UnitarySystem factory
     bool ErrorsFound = false;
@@ -12563,7 +12563,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     // call the UnitarySystem factory
     bool ErrorsFound = false;
@@ -12825,7 +12825,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
         "  Dimensionless;          !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                            // expect no errors
@@ -13059,7 +13059,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
         "  Dimensionless;          !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
@@ -14401,7 +14401,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
     // Read objects
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
@@ -14780,7 +14780,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
         "  Dimensionless;            !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     bool ErrorsFound(false);
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
@@ -15034,7 +15034,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_VariableSpeedDXCoilsNoLoadFlowRate
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -15342,7 +15342,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -15649,7 +15649,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     bool ErrorsFound = false;
 
@@ -16114,7 +16114,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_CheckBadInputOutputNodes)
     ;                        !- Design Specification Multispeed Object Name
     )IDF";
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -16268,7 +16268,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SetpointControlCyclingFan)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     // call the UnitarySystem factory
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -16401,7 +16401,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -16597,7 +16597,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoilStptNodeTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -16899,7 +16899,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
         "  Until: 24:00,0.0;        !- Field 21",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;

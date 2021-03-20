@@ -193,7 +193,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
         "    ;                            !- Control Type",
 
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
@@ -317,7 +317,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
         "    ZoneEvapCool Inlet Node,     !- Air Outlet Node Name",
         "    ZoneEvapCool Inlet Node;     !- Sensor Node Name",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
@@ -446,7 +446,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
         "    Secondary OA inlet node;     !- Name",
 
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;

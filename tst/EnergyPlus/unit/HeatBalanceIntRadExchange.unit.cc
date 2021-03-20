@@ -372,7 +372,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
         "SB51,SB53,8.311358E-002,",
         "SB51,SB54,2.672021E-002;",
         });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -452,7 +452,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
         "SB51,SB53,8.311358E-002,",
         "SB51,SB54,2.672021E-002;",
         });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -531,7 +531,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
         "SB51,SB53,8.311358E-002,",
         "SB51,SB54,2.672021E-002;",
         });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -611,7 +611,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
         "SB51,SB53,8.311358E-002,",
         "SB51,SB54,2.672021E-002;",
         });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

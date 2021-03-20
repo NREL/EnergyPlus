@@ -110,7 +110,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
@@ -159,7 +159,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
@@ -207,7 +207,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
 
     });
 
-    ASSERT_FALSE(process_idf(idf_objects, false)); // add false to supress error assertions
+    ASSERT_FALSE(process_idf(*state, idf_objects, false)); // add false to supress error assertions
     EXPECT_TRUE(has_err_output(false));
 
     std::string error_string = delimited_string(
@@ -282,7 +282,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound1(false);
 
@@ -463,7 +463,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
         "  Dimensionless;           !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
@@ -648,7 +648,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
          "  Dimensionless;           !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
@@ -875,7 +875,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
@@ -1033,7 +1033,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
         "  Dimensionless;           !- Output Unit Type"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
@@ -1292,7 +1292,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
         "    Schedule1;               !- Schedule Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
@@ -1554,7 +1554,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
         "    Until: 24:00,1.00;       !- Field 47",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -1777,7 +1777,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
          "    Until: 24:00,1.00;       !- Field 47",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -2003,7 +2003,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesG
          "    Until: 24:00,1.00;       !- Field 47",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -2230,7 +2230,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
          "    Until: 24:00,1.00;       !- Field 47",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -2456,7 +2456,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
         "    Until: 24:00,1.00;       !- Field 47",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     state->dataGlobal->NumOfTimeStepInHour = 1;

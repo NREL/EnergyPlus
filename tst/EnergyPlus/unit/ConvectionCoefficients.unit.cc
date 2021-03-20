@@ -431,7 +431,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     std::string const idf_objects = this->getIDFString();
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
@@ -976,7 +976,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 {
     std::string const idf_objects = this->getIDFString();
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -1033,7 +1033,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
 
     std::string const idf_objects = this->getIDFString();
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -1090,7 +1090,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
 
     std::string const idf_objects = this->getIDFString();
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -1147,7 +1147,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
 
     std::string const idf_objects = this->getIDFString();
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -1204,7 +1204,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
 
     std::string const idf_objects = this->getIDFString();
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -1261,7 +1261,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
 
     std::string const idf_objects = this->getIDFString();
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -1465,7 +1465,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ProperConstruction)
         "Default algorithms;      !- Name"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     int algorithm_identifier;
 
@@ -1593,7 +1593,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
 
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
     state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
@@ -1833,7 +1833,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
                                                          ";                        !- Natural Convection Unstable Horizontal Equation User Curve Name",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
     state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;

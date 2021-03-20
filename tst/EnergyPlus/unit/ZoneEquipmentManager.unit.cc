@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
@@ -376,7 +376,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     ScheduleManager::ProcessScheduleInput(*state);
@@ -508,7 +508,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
@@ -642,7 +642,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
         "  Basis Node 3;          !- Node 3 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
@@ -742,7 +742,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
@@ -935,7 +935,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
@@ -1110,7 +1110,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
@@ -1296,7 +1296,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
@@ -1514,7 +1514,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
@@ -1840,7 +1840,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
@@ -2066,7 +2066,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
@@ -3048,7 +3048,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
 
     int ZoneNum;
@@ -3293,7 +3293,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     int ZoneNum;
     int NodeNum;
@@ -3558,7 +3558,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     int ZoneNum;
     int NodeNum;
@@ -3825,7 +3825,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     int ZoneNum;
     int NodeNum;
@@ -4141,7 +4141,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wSourceAndReceivingZone)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     int ZoneNum;
     int NodeNum;
@@ -4383,7 +4383,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_ZoneMixingInfiltrationFlowsFlag
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     ScheduleManager::ProcessScheduleInput(*state);

@@ -70,7 +70,7 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
                                                       " Constant,                !- Temperature Specification Type",
                                                       " 8,                       !- Source Temperature {C}",
                                                       " ;                        !- Source Temperature Schedule Name"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Setup the plant itself manually
     state->dataPlnt->TotNumLoops = 1;

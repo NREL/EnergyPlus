@@ -69,7 +69,7 @@ TEST_F(EnergyPlusFixture, FluidProperties_GetDensityGlycol)
                                                       "  PropyleneGlycol, !- Glycol Type", "  ,                !- User Defined Glycol Name",
                                                       "  0.3;             !- Glycol Concentration", " "});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
 
     int FluidIndex = 0;

@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, CTElectricGenerator_Fueltype)
         "  1;                       !- Maximum Value of x",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetCTGeneratorInput(*state);
 

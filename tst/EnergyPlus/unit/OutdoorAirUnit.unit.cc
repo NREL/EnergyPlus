@@ -287,7 +287,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
         " ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurZoneEqNum = 1;
@@ -545,7 +545,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
         "    CrossFlow;               !- Heat Exchanger Configuration",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataGlobal->TimeStep = 1;
@@ -850,7 +850,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataEnvrn->OutBaroPress = 101325.0;

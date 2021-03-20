@@ -83,7 +83,7 @@ TEST_F(EnergyPlusFixture, ConstructionInternalSource)
         "	FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 5",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errorsFound(false);
 

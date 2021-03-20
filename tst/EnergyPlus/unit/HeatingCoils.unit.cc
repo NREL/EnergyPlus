@@ -71,7 +71,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInput)
          "  0.8,                     !- Gas Burner Efficiency", "  20000,                   !- Nominal Capacity {W}",
          "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name", "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 
@@ -89,7 +89,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
                                                       "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
                                                       "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
 
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
     ASSERT_THROW(HeatingCoils::GetHeatingCoilInput(*state), std::runtime_error);
 
     std::string const error_string = delimited_string({
@@ -111,7 +111,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeCoal)
          "  0.8,                     !- Gas Burner Efficiency", "  20000,                   !- Nominal Capacity {W}",
          "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name", "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 
@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
          "  0.8,                     !- Gas Burner Efficiency", "  20000,                   !- Nominal Capacity {W}",
          "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name", "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 

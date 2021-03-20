@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
                           "0,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors_found(false);
     HeatBalanceManager::GetMaterialData(*state, errors_found);
@@ -182,7 +182,7 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
                           "0,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors_found(false);
     HeatBalanceManager::GetMaterialData(*state, errors_found);
@@ -219,7 +219,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
                           "0.002,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors_found(false);
     HeatBalanceManager::GetMaterialData(*state, errors_found);
@@ -307,7 +307,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
                           "0,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "0;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors_found(false);
     HeatBalanceManager::GetMaterialData(*state, errors_found);

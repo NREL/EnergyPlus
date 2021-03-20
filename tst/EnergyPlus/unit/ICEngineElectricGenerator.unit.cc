@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, ICEngineElectricGenerator_Fueltype)
         "  1;                       !- Maximum Value of x",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetICEngineGeneratorInput(*state);
 

@@ -187,7 +187,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
                           "  autocalculate,           !- Ceiling Height {m}",
                           "  autocalculate;           !- Volume {m3}"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
@@ -460,7 +460,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
                           "  autocalculate,           !- Ceiling Height {m}",
                           "  autocalculate;           !- Volume {m3}"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
@@ -2483,7 +2483,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    0.9;                     !- Divider Thermal Hemispherical Emissivity",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::GetProjectData(*state);
     bool FoundError = false;
@@ -2684,7 +2684,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
                           "  autocalculate,           !- Ceiling Height {m}",
                           "  autocalculate;           !- Volume {m3}"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
@@ -2857,7 +2857,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     "159.2276,                !- Slat Conductivity {W / m - K}",
     "0.0000;                  !- Slat Curve {m}" });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool errors_found = false;
     HeatBalanceManager::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);

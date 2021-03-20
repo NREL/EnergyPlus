@@ -685,7 +685,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
 
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
@@ -1212,7 +1212,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
                           "    For: AllDays,                 !- Field 2",
                           "    Until: 24:00, 90;             !- Field 3"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
 
     ScheduleManager::ProcessScheduleInput(*state);
@@ -1787,7 +1787,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
 
     ScheduleManager::ProcessScheduleInput(*state);
@@ -1936,7 +1936,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
         " Output:Diagnostics, DisplayAdvancedReportVariables;",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->DisplayAdvancedReportVariables = true;
 
@@ -2346,7 +2346,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
                           "	 Sche_Q_Add_Heat,            !- Inside Face Heat Source Term Schedule Name",
                           "    ;                           !- Outside Face Heat Source Term Schedule Name"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
 
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
@@ -3043,7 +3043,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
                                                       "    1,0,1,  !- X,Y,Z ==> Vertex 3 {m}",
                                                       "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
 
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);

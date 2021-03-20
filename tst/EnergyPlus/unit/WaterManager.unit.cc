@@ -75,7 +75,7 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
         ",",
         "1;",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     WaterManager::GetWaterManagerInput(*state);
 
@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
         ",",
         "1;",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     WaterManager::GetWaterManagerInput(*state);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
@@ -171,7 +171,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
         "    18.0;                    !- Hourly Value",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     WaterManager::GetWaterManagerInput(*state);
     state->dataWaterManager->GetInputFlag = false;

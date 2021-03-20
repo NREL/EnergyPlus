@@ -1571,7 +1571,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
 
      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);

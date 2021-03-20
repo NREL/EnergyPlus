@@ -132,7 +132,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
                           "   0.8,         !- Source Side Heat Transfer Resistance1{ dimensionless }",
                           "   20.0;        !- Source Side Heat Transfer Resistance2{ W / K }"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     FluidProperties::RefrigData.allocate(1);
     FluidProperties::RefrigData(1).Name = "R22";

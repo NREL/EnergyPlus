@@ -2304,7 +2304,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    HW Loop Temp Schedule,   !- Schedule Name",
         "    Hot Water Loop Setpoint Node List;  !- Setpoint Node or NodeList Name",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->ZoneEqSizing.allocate(1);

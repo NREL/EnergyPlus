@@ -129,7 +129,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
         "	CW Coil Controller; !- Controller 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetSetPointManagerInputs(*state);
     // check specified control variable type is "HumidityRatio"
@@ -201,7 +201,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
         "	CW Coil Controller; !- Controller 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetSetPointManagerInputs(*state);
     // check specified control variable type is "HumidityRatio"
@@ -345,7 +345,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
         "	Cooling Coil Contoller;   !- Controller 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetSetPointManagerInputs(*state);
     // There are two setpoint managers and are schedule type
@@ -403,7 +403,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetControllerInput(*state);
 
@@ -496,7 +496,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetControllerInput(*state);
 
@@ -628,7 +628,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetControllerInput(*state);
 
@@ -837,7 +837,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_BlankAutosized)
         "   CW Coil Controller; !- Controller 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetSetPointManagerInputs(*state);
 
@@ -912,7 +912,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
         "   CW Coil Controller; !- Controller 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetSetPointManagerInputs(*state);
 

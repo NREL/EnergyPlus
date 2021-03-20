@@ -1773,7 +1773,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::ManageSimulation(*state); // run the design day
 

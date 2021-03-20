@@ -3931,7 +3931,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     using namespace EnergyPlus::DataIPShortCuts;
 
@@ -4246,7 +4246,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
         "    PSZ-AC:5 Supply Equipment Inlet Node;  !- Return Air Stream Node Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     MixedAir::GetOutsideAirSysInputs(*state);
     state->dataMixedAir->GetOASysInputFlag = false;

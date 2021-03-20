@@ -192,7 +192,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest)
         "    Until: 24:00,1;          !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     createFacilityElectricPowerServiceObject(*state);
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
@@ -260,7 +260,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1)
         "    Until: 24:00,1;          !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     createFacilityElectricPowerServiceObject(*state);
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
@@ -335,7 +335,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2)
         "    Until: 24:00,1;          !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     createFacilityElectricPowerServiceObject(*state);
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
@@ -421,7 +421,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
         "    1;          !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // get availability schedule to work
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
@@ -528,7 +528,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
         "    Until: 24:00,1;          !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -626,7 +626,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
         "    Until: 24:00,1;          !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // get availability schedule to work
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
@@ -685,7 +685,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting)
         "    Campus output Flow Frac;         !- Flow Rate Fraction Schedule Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     createFacilityElectricPowerServiceObject(*state);
     bool SimElecCircuitsFlag = false;
@@ -772,7 +772,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
         "    Until: 24:00,1;          !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // get availability schedule to work
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -924,7 +924,7 @@ TEST_F(EnergyPlusFixture, ElectricLoadCenter_WarnAvailabilitySchedule_Photovolta
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     createFacilityElectricPowerServiceObject(*state);
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
@@ -1011,7 +1011,7 @@ TEST_F(EnergyPlusFixture, ElectricLoadCenter_WarnAvailabilitySchedule_PVWatts)
       "  20,                      !- Tilt Angle {deg}",
       "  180;                     !- Azimuth Angle {deg}",   });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     createFacilityElectricPowerServiceObject(*state);
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
@@ -1065,7 +1065,7 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Constructor)
         "  0.8;            !- Fraction of Cell Capacity Removed at the End of Nominal Zone",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     ElectricStorage battery1{*state, "Battery1"};
     ASSERT_TRUE(UtilityRoutines::SameString(battery1.name(), "Battery1"));
 
@@ -1107,7 +1107,7 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
         "  ,               !- Battery Specific Heat Capacity",
         "  ;               !- Heat Transfer Coefficient Between Battery and Ambient",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ElectricStorage battery{*state, "Battery1"};
 

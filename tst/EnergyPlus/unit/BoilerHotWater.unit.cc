@@ -182,7 +182,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
         "  1;                       !- Sizing Factor",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GetBoilerInput(*state);
 
     EXPECT_EQ(1, state->dataBoilers->numBoilers);
@@ -235,7 +235,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
         "  1;                       !- Maximum Value of x",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects, false));
+    EXPECT_TRUE(process_idf(*state, idf_objects, false));
 
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {

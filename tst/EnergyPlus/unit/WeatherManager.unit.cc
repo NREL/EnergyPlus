@@ -123,7 +123,7 @@ TEST_F(EnergyPlusFixture, SkyTempTest)
         "    190;                     !- Elevation {m}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     Array2D<Real64> TomorrowSkyTemp; // Sky temperature
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
@@ -312,7 +312,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
                           "Schedule:Constant, WaterTempSchedule, , 30;",
                           "Schedule:Constant, WaterVelocitySchedule, , 3.0;"
                           "SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
@@ -336,7 +336,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
     std::string const idf_objects = delimited_string({"SurfaceProperty:Underwater, UnderwaterSurfaceName, 31.4159, WaterTempSchedule, ;",
                                                       "Schedule:Constant, WaterTempSchedule, , 30;",
                                                       "SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
@@ -374,7 +374,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
         "  28.78;                        !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
@@ -417,7 +417,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
         "  28.78;                        !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
@@ -469,7 +469,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
         "  28.78;                        !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
@@ -556,7 +556,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
         "    1.779;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     state->dataEnvrn->TotDesDays = 2;
@@ -658,7 +658,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
 });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->BeginSimFlag = false;
     state->dataGlobal->NumOfTimeStepInHour = 4;
@@ -730,7 +730,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
         "  1.428;                                  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::OpenOutputFiles(*state);
     // reset eio stream
@@ -988,7 +988,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
                                                          "    1.779;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     state->dataEnvrn->TotDesDays = 2;
@@ -1060,7 +1060,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
         "Output:Variable,*,Site Opaque Sky Cover,Timestep;",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::PostIPProcessing(*state);
     bool ErrorsFound(false);

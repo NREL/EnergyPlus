@@ -1566,7 +1566,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetIHPInput)
         "    1.0;                     !- Maximum Value of x",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_NO_THROW(GetIHPInput(*state));
     compare_err_stream("");

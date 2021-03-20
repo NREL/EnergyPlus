@@ -247,7 +247,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
@@ -559,7 +559,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
@@ -869,7 +869,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
@@ -1248,7 +1248,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
@@ -1567,7 +1567,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
@@ -1924,7 +1924,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
@@ -2259,7 +2259,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         // OutputProcessor::TimeValue.allocate(2);
 
@@ -2633,7 +2633,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
@@ -3051,7 +3051,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
@@ -3454,7 +3454,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
@@ -3821,7 +3821,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
@@ -4188,7 +4188,7 @@ namespace EnergyPlus {
 
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
@@ -4500,7 +4500,7 @@ namespace EnergyPlus {
             "  CONTINUOUS;                !- Numeric Type",
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;

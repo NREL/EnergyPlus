@@ -501,7 +501,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
         "   AHU OA Controller;         !- Controller 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetReturnAirPathInput(*state);
     GetAirPathData(*state);
@@ -3832,7 +3832,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2); //
     ManageSimulation(*state);                     // run the design day
@@ -3940,7 +3940,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // get heat recovery heat exchanger generic
     GetHeatRecoveryInput(*state);
@@ -4063,7 +4063,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ScheduleManager::ProcessScheduleInput(*state);
     // get OA Controller
@@ -4183,7 +4183,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // get HR HX generic
     GetHeatRecoveryInput(*state);

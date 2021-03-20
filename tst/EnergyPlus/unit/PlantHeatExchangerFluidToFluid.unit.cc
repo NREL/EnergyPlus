@@ -1059,7 +1059,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
         "    UNTIL: 24:00,1.0;        !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
 
     state->dataGlobal->BeginSimFlag = true;
@@ -2150,7 +2150,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
         "    UNTIL: 24:00,0.0;        !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
 
     state->dataGlobal->BeginSimFlag = true;

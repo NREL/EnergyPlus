@@ -91,7 +91,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
         "    Steam Boiler Plant Boiler Outlet Node;  !- Steam Outlet Node Name                                      ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects, false));
+    ASSERT_TRUE(process_idf(*state, idf_objects, false));
     GetBoilerInput(*state);
     auto &thisBoiler = state->dataBoilerSteam->Boiler(state->dataBoilerSteam->numBoilers);
     EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
         "    Steam Boiler Plant Boiler Outlet Node;  !- Steam Outlet Node Name                                      ",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects, false));
+    EXPECT_TRUE(process_idf(*state, idf_objects, false));
 
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {

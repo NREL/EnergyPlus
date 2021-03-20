@@ -93,7 +93,7 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
         "    2;                       !- Basin Heater Setpoint Temperature {C}",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects, false));
+    EXPECT_TRUE(process_idf(*state, idf_objects, false));
 
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);

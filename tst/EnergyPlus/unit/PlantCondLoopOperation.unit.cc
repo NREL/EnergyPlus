@@ -832,7 +832,7 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
 
     });
 
-    EXPECT_TRUE(process_idf(idf_objects, false));
+    EXPECT_TRUE(process_idf(*state, idf_objects, false));
 
     // Setup the plant itself manually
     state->dataPlnt->TotNumLoops = 1;

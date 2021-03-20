@@ -77,7 +77,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject1)
         "TimeSeriesAndTabular;",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataResultsFramework->resultsFramework->setupOutputOptions(*state);
 
@@ -91,7 +91,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject2)
         "TimeSeries;",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataResultsFramework->resultsFramework->setupOutputOptions(*state);
 

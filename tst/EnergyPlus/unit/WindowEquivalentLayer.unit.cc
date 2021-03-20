@@ -176,7 +176,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
         "  Sealed;                    !- Gap Vent Type ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
@@ -520,7 +520,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "  Sealed;                    !- Gap Vent Type ",
 
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2); //
     SimulationManager::ManageSimulation(*state);
@@ -875,7 +875,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "  Sealed;                    !- Gap Vent Type ",
 
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(*state);
@@ -929,7 +929,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
         "     Simple Glazing System Layer;   !- Outside Layer",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1226,7 +1226,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "   VentedOutdoor;           !- Gap Vent Type",
 
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::ManageSimulation(*state);
 
@@ -1548,7 +1548,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "   VentedIndoor;            !- Gap Vent Type",
 
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::ManageSimulation(*state);
 
@@ -1934,7 +1934,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "      FixedSlatAngle;          !- Slat Angle Control",
 
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::ManageSimulation(*state);
 

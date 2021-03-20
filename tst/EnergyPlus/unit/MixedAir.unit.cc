@@ -133,7 +133,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
         "    ProportionalMinimum;     !- Minimum Limit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
     int ControllerNum(0);    // Controller number
@@ -487,7 +487,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GetOAControllerInputs(*state);
     EXPECT_EQ(2, state->dataMixedAir->OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(*state, state->dataMixedAir->OAController(1).OANode));
@@ -731,7 +731,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
         "    CM DSZAD West Zone; !- Design Specification Zone Air Distribution Object Name 1",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
@@ -942,7 +942,7 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
         "  1; !- Zone Air Distribution Effectiveness in Heating Mode{ dimensionless }",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
@@ -1062,7 +1062,7 @@ TEST_F(EnergyPlusFixture, MixedAir_TestHXinOASystem)
         "    OA Sys 1 Equipment list; !- Outdoor Air Equipment List Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataMixedAir->GetOASysInputFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1206,7 +1206,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
         "    DOAS OA Controller;      !- Controller 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
@@ -1303,7 +1303,7 @@ TEST_F(EnergyPlusFixture, FreezingCheckTest)
         "    OAFractionSched;                        !- Minimum Outdoor Air Schedule Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetOAControllerInputs(*state);
 
@@ -1436,7 +1436,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
         "    1;                        !- High Humidity Outdoor Air Flow Ratio",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     compare_err_stream(""); // just for debugging
 
@@ -1568,7 +1568,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
         "    Yes;                      !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     compare_err_stream(""); // just for debugging
 
@@ -1734,7 +1734,7 @@ TEST_F(EnergyPlusFixture, OAControllerMixedAirSPTest)
         "    ;                        !- Mechanical Ventilation Controller Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
@@ -1883,7 +1883,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart1)
         "    OA Sys 1 Equipment list; !- Outdoor Air Equipment List Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GetOAControllerInputs(*state);
 
     EXPECT_EQ(1, GetNumOAMixers(*state));
@@ -5211,7 +5211,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GetOAControllerInputs(*state);
 
     EXPECT_EQ(6, GetNumOAMixers(*state));
@@ -5247,7 +5247,7 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
                                                       "    Zone, Zone 1;",
                                                       "    Zone, Zone 2;"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     GetZoneData(*state, ErrorsFound);
@@ -5436,7 +5436,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
                                                       "    3600,                    !- Volume {m3}",
                                                       "    600;                     !- Floor Area {m2}"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     GetZoneData(*state, ErrorsFound);
@@ -5588,7 +5588,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
         "    CM DSZAD West Zone; !- Design Specification Zone Air Distribution Object Name 1",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataContaminantBalance->ContaminantControlledZone.allocate(1);
     state->dataContaminantBalance->ContaminantControlledZone(1).AvaiSchedPtr = 4;
@@ -5921,7 +5921,7 @@ TEST_F(EnergyPlusFixture, MixedAir_OAControllerOrderInControllersListTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetOAControllerInputs(*state);
 
@@ -6004,7 +6004,7 @@ TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GetOAControllerInputs(*state);
     EXPECT_EQ(2, state->dataMixedAir->OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(*state, state->dataMixedAir->OAController(1).OANode));
@@ -6190,7 +6190,7 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GetOutsideAirSysInputs(*state);
     EXPECT_EQ(1, state->dataAirLoop->NumOASystems);
     EXPECT_EQ("OA SYS", state->dataAirLoop->OutsideAirSys(1).Name);
@@ -6397,7 +6397,7 @@ TEST_F(EnergyPlusFixture, OAController_HighExhaustMassFlowTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GetOutsideAirSysInputs(*state);
     EXPECT_EQ(1, state->dataAirLoop->NumOASystems);
     EXPECT_EQ("OA SYS", state->dataAirLoop->OutsideAirSys(1).Name);
@@ -6648,7 +6648,7 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GetOutsideAirSysInputs(*state);
     EXPECT_EQ(1, state->dataAirLoop->NumOASystems);
     EXPECT_EQ("OA SYS", state->dataAirLoop->OutsideAirSys(1).Name);

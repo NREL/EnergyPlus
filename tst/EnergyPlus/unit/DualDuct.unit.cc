@@ -345,7 +345,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_GetInputs)
         "     Until: 24:00,0.25;       !- Field 9",
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     DualDuct::GetDualDuctInput(*state);
@@ -418,7 +418,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
         "     CONTINUOUS;                 !- Numeric Type",
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
 
     // setup variables for dual duct VAV air terminal

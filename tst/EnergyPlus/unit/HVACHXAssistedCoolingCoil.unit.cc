@@ -379,7 +379,7 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
         "  Dimensionless;          !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors

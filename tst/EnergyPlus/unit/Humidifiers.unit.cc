@@ -226,7 +226,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_GetHumidifierInput)
         "    Dimensionless;           !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetHumidifierInput(*state);
     ASSERT_EQ(1, NumHumidifiers);
@@ -283,7 +283,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
         "    1.2;                     !- Maximum Value of x",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     thisHum.EfficiencyCurvePtr = CurveManager::GetCurveIndex(*state, "THERMALEFFICIENCYFPLR");
 

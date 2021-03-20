@@ -2489,7 +2489,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
 
@@ -2658,7 +2658,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
 
@@ -2755,7 +2755,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
 
@@ -2900,7 +2900,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     // get coil inputs
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     // Setting predefined tables is needed though

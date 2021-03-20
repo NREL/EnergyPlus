@@ -62,8 +62,9 @@ void initializeFunctionalAPI(EnergyPlusState) {
     EnergyPlus::FluidProperties::InitializeGlycRoutines();
 }
 
-const char * apiVersionFromEPlus(EnergyPlusState) {
-    return state->dataStrGlobals->PythonAPIVersion.c_str();
+const char * apiVersionFromEPlus(EnergyPlusState state) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataStrGlobals->PythonAPIVersion.c_str();
 }
 
 void registerErrorCallback(EnergyPlusState state, std::function<void(EnergyPlus::Error, const std::string &)> f) {

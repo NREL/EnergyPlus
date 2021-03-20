@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, WCEClear)
         "Glass_102_LayerAvg;      !- Outside Layer"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
@@ -186,7 +186,7 @@ TEST_F(EnergyPlusFixture, WCEVenetian)
         "0;                       !- Maximum Slat Angle {deg}"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
@@ -264,7 +264,7 @@ TEST_F(EnergyPlusFixture, WCEShade)
         "0;                       !- Airflow Permeability{ dimensionless }"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);

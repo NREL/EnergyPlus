@@ -157,7 +157,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex)
         "System Node Humidity Ratio,",
         "timestep;",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 10);
     // FindItemInVariableList is case-insentive, so we also test that
@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Plus)
         "System Node Temperature,",
         "timestep;",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 6);
     EXPECT_TRUE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));
     EXPECT_TRUE(FindItemInVariableList("SalesFloor INLET Node", "System Node Mass Flow Rate"));
@@ -253,7 +253,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Star)
         "Refrigeration Compressor Rack Electric Power,",
         "timestep;",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 7);
     EXPECT_TRUE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));
@@ -298,7 +298,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Pipe)
         "System Node Humidity Ratio,",
         "timestep;",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 4);
     EXPECT_TRUE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));
@@ -325,7 +325,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Brackets)
         "timestep;",    " Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,",
         "timestep;",
     });
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
 
     EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 6);
     EXPECT_TRUE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));
@@ -355,7 +355,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_SpecChars)
         "timestep;",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 1);
 
@@ -377,7 +377,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Carrot)
         "System Node Humidity Ratio,",
         "timestep;",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 2);
     EXPECT_FALSE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));
@@ -395,7 +395,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Dollar)
         "System Node Mass Flow Rate,",
         "timestep;",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 1);
     EXPECT_TRUE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));

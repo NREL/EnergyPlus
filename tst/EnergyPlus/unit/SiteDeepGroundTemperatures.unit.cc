@@ -77,7 +77,7 @@ TEST_F(EnergyPlusFixture, SiteDeepGroundTempTest)
         "	32.00;	!- December",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = CurrentModuleObjects(objectType_SiteDeepGroundTemp);
 

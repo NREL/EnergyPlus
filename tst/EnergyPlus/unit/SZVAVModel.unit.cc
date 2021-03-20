@@ -163,7 +163,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
 
     state->dataSize->CurZoneEqNum = 0;
@@ -548,7 +548,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
 
     state->dataEnvrn->OutBaroPress = 101325.0;

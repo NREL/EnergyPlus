@@ -464,7 +464,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
         "  Until: 24:00,24.0;       !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
     GetZoneData(*state, ErrorsFound);
@@ -809,7 +809,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
         "  Until: 24:00,24.0;                     !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // Tstat should show if the idf is legel
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // Tstat should show if the idf is legel
 
     int ZoneNum(4);
     int CoolZoneASHNum(1);
@@ -1142,7 +1142,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;

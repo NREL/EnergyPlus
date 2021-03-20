@@ -174,7 +174,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
         " ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);

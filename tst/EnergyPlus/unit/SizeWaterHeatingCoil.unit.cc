@@ -218,7 +218,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
@@ -456,7 +456,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
@@ -693,7 +693,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
@@ -930,7 +930,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
@@ -1132,7 +1132,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->FinalSysSizing.allocate(1);
     state->dataSize->UnitarySysEqSizing.allocate(1);
@@ -1347,7 +1347,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->TermUnitSizing.allocate(1);
     state->dataPlnt->TotNumLoops = 1;

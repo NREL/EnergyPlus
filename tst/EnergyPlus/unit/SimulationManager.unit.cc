@@ -68,7 +68,7 @@ TEST_F(EnergyPlusFixture, CheckThreading)
 
     });
 
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** Line: 1 Index: 14 - \"ProgramControl\" is not a valid Object Type.",
@@ -91,7 +91,7 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
         "    No;       ! - Use Coil Direct Solutions",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::GetProjectData(*state);
 
@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Mess
 
     });
 
-    EXPECT_TRUE(process_idf(idf_objects, false));
+    EXPECT_TRUE(process_idf(*state, idf_objects, false));
 
     SimulationManager::GetProjectData(*state);
 
@@ -171,7 +171,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
             "    No;                      !- Report Debugging Data",
         });
 
-        EXPECT_TRUE(process_idf(idf_objects));
+        EXPECT_TRUE(process_idf(*state, idf_objects));
 
         SimulationManager::GetProjectData(*state);
         EXPECT_FALSE(state->dataReportFlag->DebugOutput);
@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
             "    ;                        !- Report During Warmup",
         });
 
-        EXPECT_TRUE(process_idf(idf_objects));
+        EXPECT_TRUE(process_idf(*state, idf_objects));
 
         SimulationManager::GetProjectData(*state);
         EXPECT_TRUE(state->dataReportFlag->DebugOutput);
@@ -205,7 +205,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
             "    Yes;                     !- Report During Warmup",
         });
 
-        EXPECT_TRUE(process_idf(idf_objects));
+        EXPECT_TRUE(process_idf(*state, idf_objects));
 
         SimulationManager::GetProjectData(*state);
         EXPECT_FALSE(state->dataReportFlag->DebugOutput);
@@ -228,7 +228,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
         });
 
         // Input processor with throw a severe, so do not use assertions
-        EXPECT_FALSE(process_idf(idf_objects, false));
+        EXPECT_FALSE(process_idf(*state, idf_objects, false));
         // Instead do it here, making sure to reset the stream
         {
             std::string const expectedError = delimited_string({
@@ -257,7 +257,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
         "  Output:Diagnostics;",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::GetProjectData(*state);
 
@@ -293,7 +293,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_SimpleCase)
         "    DisplayAdvancedReportVariables;    !- Key 2",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::GetProjectData(*state);
 
@@ -333,7 +333,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_AllKeys)
         "    ReportDuringHVACSizingSimulation;",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::GetProjectData(*state);
 
@@ -365,7 +365,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
     });
 
     // Input processor will throw a severe, so do not use assertions
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
     // Instead do it here, making sure to reset the stream
     {
         std::string const expectedError = delimited_string({
@@ -408,7 +408,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
     });
 
     // This will throw a warning in InputProcessor since these aren't supported keys, so do not use assertions
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
     const std::string expected_warning = delimited_string({
         "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][0][key] - \"IgnoreSolarRadiation\" - Failed to match against any enum values.",
         "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][1][key] - \"IgnoreBeamRadiation\" - Failed to match against any enum values.",
@@ -453,7 +453,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
         "    DisplayAdvancedReportVariables;    !- Key 2",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     ASSERT_NO_THROW(SimulationManager::GetProjectData(*state));
 
@@ -491,7 +491,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_HVACSizingSimulationChoiceTest)
         "    Yes;                     !- Do HVAC Sizing Simulation for Sizing Periods",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::GetProjectData(*state);
 

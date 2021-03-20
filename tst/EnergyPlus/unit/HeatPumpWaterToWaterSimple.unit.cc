@@ -733,7 +733,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
     bool ErrorsFound = false;
 
@@ -1511,7 +1511,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
     bool ErrorsFound = false;
 

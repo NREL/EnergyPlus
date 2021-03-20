@@ -231,7 +231,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->NumAirTerminalSizingSpec = 1;
@@ -411,7 +411,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
@@ -591,7 +591,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
@@ -772,7 +772,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
@@ -921,7 +921,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->NumAirTerminalSizingSpec = 1;

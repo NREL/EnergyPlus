@@ -606,7 +606,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
         "    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shading",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::GetProjectData(*state);
     bool FoundError = false;
@@ -1004,7 +1004,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
         "    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shading",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::GetProjectData(*state);
     bool FoundError = false;
@@ -1412,7 +1412,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
         "    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shading",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::GetProjectData(*state);
     bool FoundError = false;
@@ -1782,7 +1782,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
         "    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shading",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::GetProjectData(*state);
     bool FoundError = false;
@@ -2190,7 +2190,7 @@ WindowMaterial:SimpleGlazingSystem,
   0.4;  !- Visible Transmittance
 )IDF";
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::GetProjectData(*state);
     bool FoundError = false;
@@ -2502,7 +2502,7 @@ WindowMaterial:SimpleGlazingSystem,
   0.4;  !- Visible Transmittance
 )IDF";
 
-ASSERT_TRUE(process_idf(idf_objects));
+ASSERT_TRUE(process_idf(*state, idf_objects));
 
 SimulationManager::GetProjectData(*state);
 bool FoundError = false;

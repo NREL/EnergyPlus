@@ -196,7 +196,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool errors_in_input(false);
     int totalrps(7);
     WeatherManager::GetRunPeriodData(*state, totalrps, errors_in_input);
@@ -265,7 +265,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
         "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool errors_in_input(false);
     int totalrps(1);
     WeatherManager::GetRunPeriodData(*state, totalrps, errors_in_input);
@@ -295,7 +295,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NoName) {
 
     });
 
-    ASSERT_FALSE(process_idf(idf_objects, false));
+    ASSERT_FALSE(process_idf(*state, idf_objects, false));
 
     std::string const error_string =
         delimited_string({
@@ -331,7 +331,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
 
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
         bool ErrorsFound = false;
         int totalrps(1);
         WeatherManager::GetRunPeriodData(*state, totalrps, ErrorsFound);
@@ -366,7 +366,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
 
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
         bool ErrorsFound = false;
         int totalrps(1);
         WeatherManager::GetRunPeriodData(*state, totalrps, ErrorsFound);
@@ -404,7 +404,7 @@ TEST_F(EnergyPlusFixture, SizingPeriod_WeatherFile)
             "  No;                      !- Use Weather File Rain and Snow Indicators",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
         bool ErrorsFound = false;
         WeatherManager::GetRunPeriodDesignData(*state, ErrorsFound);
         // This should just issue a severe
@@ -440,7 +440,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_BadLeapDayFlagLogic)
         "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool errors_in_input(false);
     int totalrps(1);
     WeatherManager::GetRunPeriodData(*state, totalrps, errors_in_input);

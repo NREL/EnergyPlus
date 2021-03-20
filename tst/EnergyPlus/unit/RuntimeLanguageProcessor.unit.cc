@@ -136,7 +136,7 @@ TEST_F(EnergyPlusFixture, TestOutOfRangeAlphaFields)
         "  Transformer,",
         "  J;"
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     RuntimeLanguageProcessor::GetRuntimeLanguageUserInput(*state);
 
 

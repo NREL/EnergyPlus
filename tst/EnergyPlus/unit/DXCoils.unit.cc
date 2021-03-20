@@ -1056,7 +1056,7 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
         "	10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ProcessScheduleInput(*state);
     GetCurveInput(*state);
@@ -1102,7 +1102,7 @@ TEST_F(EnergyPlusFixture, TestDXCoilIndoorOrOutdoor)
         "   Outside Air Inlet Node 2;!- Node 1 Name            ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Run
     DXCoilNum = 1;
@@ -1293,7 +1293,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
         "  1.0;                     !- Maximum Value of x",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Case 1 test
     GetDXCoils(*state);
@@ -1440,7 +1440,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
         "	10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ProcessScheduleInput(*state);
     GetCurveInput(*state);
@@ -1684,7 +1684,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
         "  1.0;                     !- Maximum Value of x",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Case 1 test
     GetDXCoils(*state);
@@ -1770,7 +1770,7 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
         "	4;                       !- Region number for calculating HSPF",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ProcessScheduleInput(*state);
     GetCurveInput(*state);
@@ -1837,7 +1837,7 @@ TEST_F(EnergyPlusFixture, CurveOutputLimitWarning)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ProcessScheduleInput(*state);
     GetCurveInput(*state);
@@ -1942,7 +1942,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ProcessScheduleInput(*state);
     GetDXCoils(*state);
@@ -2051,7 +2051,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ProcessScheduleInput(*state);
     GetDXCoils(*state);
@@ -2172,7 +2172,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
         "  BasinHeaterSched;        !- Basin Heater Operating Schedule Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ScheduleManager::ProcessScheduleInput(*state);
     DXCoils::GetDXCoils(*state);
@@ -2397,7 +2397,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
         "  10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ScheduleManager::ProcessScheduleInput(*state);
     DXCoils::GetDXCoils(*state);
@@ -2881,7 +2881,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedHeatingCoilSizingOutput)
         "   1;                                      !- Maximum Curve Output {BasedOnField A3}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // get input
     GetDXCoils(*state);
@@ -3096,7 +3096,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilTabularReporting)
         "   1;                                      !- Maximum Curve Output {BasedOnField A3}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // get input
     GetDXCoils(*state);
@@ -3500,7 +3500,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
         "   1;                                      !- Maximum Curve Output {BasedOnField A3}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // get input
     GetDXCoils(*state);
@@ -3752,7 +3752,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // get input
     GetDXCoils(*state);

@@ -2038,7 +2038,7 @@ TEST_F(InputProcessorFixture, getObjectItem_json1)
         "Output:SQLite,SimpleAndTabular;",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     std::string const CurrentModuleObject = "Output:SQLite";
 
     int NumSQLite = inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
@@ -2089,7 +2089,7 @@ TEST_F(InputProcessorFixture, getObjectItem_json2)
         "  Main Humidifier Outlet Node,  !- Air Outlet Node Name",
         "  ;                        !- Water Storage Tank Name",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
     int NumGasSteamHums = inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
@@ -2163,7 +2163,7 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
         "    15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     std::string const CurrentModuleObject = "BuildingSurface:Detailed";
 
     int numBuildingSurfaceDetailed = inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
@@ -2222,7 +2222,7 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields)
         "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
         "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
 
@@ -2286,7 +2286,7 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2)
         "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
         "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
 
@@ -2358,7 +2358,7 @@ TEST_F(InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults)
     // fields and have no default expect Dimensionless to be inserted for Input Unit Type for X, blank field with a default. Expect true for it's
     // alphaBlank value
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "Curve:Biquadratic";
 
@@ -2464,7 +2464,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon)
     // fields and have no default expect "" to be inserted for the missing alpha fields due to the truncation, blank field with a default. Expect true
     // for it's alphaBlank value
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "Curve:Biquadratic";
 
@@ -2566,7 +2566,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
         "  ;                        !- System Outdoor Air Method",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects, false));
+    ASSERT_TRUE(process_idf(*state, idf_objects, false));
 
     std::string const CurrentModuleObject = "Sizing:System";
 
@@ -2651,7 +2651,7 @@ TEST_F(InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_a
     // Expect Rated Capacity to be filled in with ZERO, not with the autosize value of -99999. Expect
     // Auxiliary Electric Power to be filled in with .80 (it's default value)
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
@@ -2725,7 +2725,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
 
     // Expect Rated Capacity to be filled in with the autosize value of -99999. Expect everything else to be empty string and 0
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
@@ -2824,7 +2824,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
         "  80;                     !- Maximum Supply Air Temperature{ C }",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "AirLoopHVAC:UnitarySystem";
 
@@ -2912,7 +2912,7 @@ TEST_F(InputProcessorFixture, getObjectItem_test_numbers_as_strings)
         "    Z401 outlet node;        !- Zone Return Air Node Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
@@ -2971,7 +2971,7 @@ TEST_F(InputProcessorFixture, getObjectItem_test_zone_input)
         "  autocalculate;          !- Volume{ m3 }",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "Zone";
 
@@ -3028,7 +3028,7 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
@@ -3143,7 +3143,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
         "  0.444; ! field Parasitic Fuel Load",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "Coil:Heating:Fuel";
 
@@ -3229,7 +3229,7 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
         "  Until: 24:00, 1.0;      !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string CurrentModuleObject = "ScheduleTypeLimits";
 
@@ -3320,7 +3320,7 @@ TEST_F(InputProcessorFixture, getObjectItem_fan_on_off)
         "  ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "Fan:OnOff";
 
@@ -3384,7 +3384,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
         "  1.0;                    !- Maximum Value of x",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "Curve:Quadratic";
 
@@ -3593,7 +3593,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
         "  COOLEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "Coil:Cooling:DX:VariableSpeed";
 
@@ -3759,7 +3759,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
         "  Dimensionless;          !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "Curve:Biquadratic";
 
@@ -3848,7 +3848,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
         "  Dimensionless;           !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     std::string const CurrentModuleObject = "Curve:Biquadratic";
 
@@ -4129,7 +4129,7 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     inputProcessor->reportIDFRecordsStats(*state);
 
@@ -4204,7 +4204,7 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
     // Not really happy about the processing of the SurfaceProperty object (needs a SurfaceProperty:LocalEnvironment, a surface itself, etc)
     // but that's not what I'm trying to test so power through.
     bool use_assertions = false;
-    process_idf(idf_objects, use_assertions);
+    process_idf(*state, idf_objects, use_assertions);
 
     inputProcessor->reportIDFRecordsStats(*state);
 

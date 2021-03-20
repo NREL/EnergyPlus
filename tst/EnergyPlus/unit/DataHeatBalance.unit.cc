@@ -797,7 +797,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
 

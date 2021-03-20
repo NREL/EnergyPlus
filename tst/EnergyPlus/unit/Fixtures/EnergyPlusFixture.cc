@@ -304,14 +304,14 @@ bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool
     return match_found;
 }
 
-bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
+bool EnergyPlusFixture::process_idf(EnergyPlusData &state, std::string const &idf_snippet, bool use_assertions)
 {
     bool success = true;
     inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
     // Add common objects that will trigger a warning if not present
     if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {
-        inputProcessor->epJSON["Version"] = {{"", {{"idf_order", 0}, {"version_identifier", state->dataStrGlobals->MatchVersion}}}};
+        inputProcessor->epJSON["Version"] = {{"", {{"idf_order", 0}, {"version_identifier", state.dataStrGlobals->MatchVersion}}}};
     }
     if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
         inputProcessor->epJSON["Building"] = {{"Bldg",
@@ -347,10 +347,10 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
 
     bool is_valid = inputProcessor->validation->validate(inputProcessor->epJSON);
-    bool hasErrors = inputProcessor->processErrors(*state);
+    bool hasErrors = inputProcessor->processErrors(state);
 
     inputProcessor->initializeMaps();
-    SimulationManager::PostIPProcessing(*state);
+    SimulationManager::PostIPProcessing(state);
     // inputProcessor->state->printErrors();
 
     bool successful_processing = success && is_valid && !hasErrors;

@@ -118,7 +118,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_CorrectInputs) {
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -187,7 +187,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadOSCMName) {
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -256,7 +256,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabLocation) {
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -325,7 +325,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabMaterialName) 
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -394,7 +394,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsSelection)
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -463,7 +463,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsMaterialNa
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -532,7 +532,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsExtentsSel
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -601,7 +601,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_PerimeterInsulationWi
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -670,7 +670,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsSelection) 
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -739,7 +739,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsMaterialNam
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -808,7 +808,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsDepth) {
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -877,7 +877,7 @@ TEST_F(EnergyPlusFixture, DISABLED_SiteGroundDomainSlab_CheckInputs_BadTimeStepS
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -946,7 +946,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_CorrectInputs) {
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -1015,7 +1015,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadOSCMName) {
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -1084,7 +1084,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsSelect
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -1153,7 +1153,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsMateri
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -1222,7 +1222,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsExtent
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -1291,7 +1291,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadBasementDepth)
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -1360,7 +1360,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadFloorOSCMName)
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -1429,7 +1429,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsSelecti
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -1498,7 +1498,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsName) {
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -1567,7 +1567,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelect
                                                              "0.65;			!- Visible Absorptance",
                                                      });
 
-    EXPECT_FALSE(process_idf(idf_objects, false));
+    EXPECT_FALSE(process_idf(*state, idf_objects, false));
 
     // Dummy surface
     state->dataSurface->Surface.allocate(1);
@@ -1698,7 +1698,7 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
                               "    1.25,                    !- Y Position {m}",
                               "    DecreasingZ;             !- Flow Direction"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Setup the plant itself manually
     state->dataPlnt->TotNumLoops = 1;
@@ -1871,7 +1871,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_Check_Correct_Pipe_Diameters) {
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     PlantPipingSystemsManager::ReadPipeCircuitInputs(*state, ErrorsFound);

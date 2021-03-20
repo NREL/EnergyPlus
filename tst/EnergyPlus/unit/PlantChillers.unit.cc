@@ -222,7 +222,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
         "  1;                       !- Maximum Value of x",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EngineDrivenChillerSpecs::getInput(*state);
 
     EXPECT_EQ(1, state->dataPlantChillers->NumEngineDrivenChillers);
@@ -291,7 +291,7 @@ TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
         "  80.0;                    !- Heat Recovery Maximum Temperature {C}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GTChillerSpecs::getInput(*state);
 
     EXPECT_EQ(1, state->dataPlantChillers->NumGTChillers);

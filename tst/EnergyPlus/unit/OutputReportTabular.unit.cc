@@ -1424,7 +1424,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         "  Temperature;             !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -2459,7 +2459,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "  Temperature;             !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -3462,7 +3462,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
         "Minimum; !- Aggregation Type for Variable or Meter 2",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     Real64 extLitUse;
 
@@ -3774,7 +3774,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
                                                       "0.20, !- Interval Size",
                                                       "5,                       !- Interval Count",
                                                       "Always1; !- Schedule Name"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -6398,7 +6398,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     Real64 extLitUse;
 
@@ -7127,7 +7127,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
         "  0.0;                     !- Sky Clearness",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_TRUE(hasSizingPeriodsDays(*state));
 }
@@ -7146,7 +7146,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
         "  No;                      !- Use Weather File Rain and Snow Indicators",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_TRUE(hasSizingPeriodsDays(*state));
 }
@@ -7162,7 +7162,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
         "  Yes;                     !- Use Weather File Rain and Snow Indicators",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // this test should show a false since this type of sizing period is not compatible with the component loads calculations
     EXPECT_FALSE(hasSizingPeriodsDays(*state));
@@ -7179,7 +7179,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
         " SetpointsNotMetWithTemperaturesMonthly; !- Report 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_EQ(1, inputProcessor->getNumObjectsFound(*state, "Output:Table:SummaryReports"));
     EXPECT_EQ(0, inputProcessor->getNumObjectsFound(*state, "Output:Variable"));
@@ -8367,7 +8367,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
         "  SumOrAverage;                     !- Aggregation Type for Variable or Meter 6",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     Real64 extLitUse;
 
@@ -8434,7 +8434,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
             "SimpleAndTabular, !-Option Type",
             "UseOutputControlTableStyle; !-Tabular Unit Conversion"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->files.outputControl.sqlite = true;
     state->dataStrGlobals->outputSqlFileName = "eplussqlite1.err";
@@ -8458,7 +8458,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
         "SimpleAndTabular, !-Option Type",
         "InchPound; !-Tabular Unit Conversion"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->files.outputControl.sqlite = true;
 
@@ -8482,7 +8482,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
         "SimpleAndTabular, !-Option Type",
         "None; !-Tabular Unit Conversion"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->files.outputControl.sqlite = true;
 
@@ -8507,7 +8507,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
         "; !-Tabular Unit Conversion"
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->files.outputControl.sqlite = true;
 
@@ -8534,7 +8534,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
         "SimpleAndTabular; !-Option Type"
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->files.outputControl.sqlite = true;
 

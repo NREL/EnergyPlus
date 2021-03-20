@@ -173,7 +173,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVReheat_GetInputTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
@@ -303,7 +303,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
 
     });
 
-    process_idf(idf_objects);
+    process_idf(*state, idf_objects);
 
     state->dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
@@ -392,7 +392,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVHeatCool_GetInputTest)
 
     });
 
-    process_idf(idf_objects);
+    process_idf(*state, idf_objects);
 
     state->dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
@@ -515,7 +515,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
@@ -612,7 +612,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
         "    1;                                     !- Zone Equipment Heating or No-Load Sequence 1",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
@@ -882,7 +882,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVAirTerminals_GetInputs)
         "     Until: 24:00,0.25;       !- Field 9",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
@@ -1005,7 +1005,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     // setup variables for VAV Reheat
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1210,7 +1210,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1382,7 +1382,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1565,7 +1565,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
         "     Dimensionless;           !- Output Unit Type",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
@@ -1712,7 +1712,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     // setup variables for VAV HeatCoolReheat
     int SysNum = 1;
     int ZoneNum = 1;

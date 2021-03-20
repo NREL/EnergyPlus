@@ -158,7 +158,7 @@ TEST_F(EnergyPlusFixture, Dual_NodeTempSetpoints)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     OutAirNodeManager::SetOutAirNodes(*state);
 
@@ -200,7 +200,7 @@ TEST_F(EnergyPlusFixture, CheckActuatorInit)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     OutAirNodeManager::SetOutAirNodes(*state);
     EMSManager::GetEMSInput(*state);
 
@@ -232,7 +232,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // sets number of EMS objects
     EMSManager::CheckIfAnyEMS(*state);
@@ -396,7 +396,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // sets number of EMS objects
     EMSManager::CheckIfAnyEMS(*state);
@@ -702,7 +702,7 @@ TEST_F(EnergyPlusFixture, Test_EMSLogic)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     OutAirNodeManager::SetOutAirNodes(*state);
 
@@ -770,7 +770,7 @@ TEST_F(EnergyPlusFixture, Debug_EMSLogic)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     OutAirNodeManager::SetOutAirNodes(*state);
 
@@ -808,7 +808,7 @@ TEST_F(EnergyPlusFixture, TestAnyRanArgument)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     OutAirNodeManager::SetOutAirNodes(*state);
     NodeInputManager::SetupNodeVarsForReporting(*state);
@@ -847,7 +847,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable1)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EMSManager::CheckIfAnyEMS(*state);
     state->dataEMSMgr->FinishProcessingUserInput = true;
@@ -903,7 +903,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     OutAirNodeManager::SetOutAirNodes(*state);
 
@@ -947,7 +947,7 @@ TEST_F(EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS)
         "    Verbose;                 !- EMS Runtime Language Debug Output Level                         ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     CheckIfAnyEMS(*state);
     EXPECT_TRUE(state->dataGlobal->AnyEnergyManagementSystemInModel);
@@ -1087,7 +1087,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->TimeStepZone = 0.25;
 
@@ -1744,7 +1744,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->NumOfTimeStepInHour = 4;
@@ -1872,7 +1872,7 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->NumOfTimeStepInHour = 4;
@@ -2192,7 +2192,7 @@ TEST_F(EnergyPlusFixture, EMS_ViewFactorToGround)
         "    ENDIF;                   !- A8",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::ManageSimulation(*state);
 

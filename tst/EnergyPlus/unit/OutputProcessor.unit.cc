@@ -3141,7 +3141,7 @@ namespace OutputProcessor {
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetReportVariableInput(*state);
 
@@ -3196,7 +3196,7 @@ namespace OutputProcessor {
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetReportVariableInput(*state);
 
@@ -3259,7 +3259,7 @@ namespace OutputProcessor {
             "Output:Variable,Living,Zone Total Internal Sensible Gain Rate,Hourly;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         inputProcessor->preScanReportingVariables(*state);
         InitializeOutput(*state);
@@ -3316,7 +3316,7 @@ namespace OutputProcessor {
             "Output:Variable,Living,Zone Total Internal Sensible Gain Rate,Hourly;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         inputProcessor->preScanReportingVariables(*state);
         InitializeOutput(*state);
@@ -3365,7 +3365,7 @@ namespace OutputProcessor {
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         InitializeOutput(*state);
 
@@ -3453,7 +3453,7 @@ namespace OutputProcessor {
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         AddToOutputVariableList(*state,
                                 "Site Outdoor Air Drybulb Temperature",
@@ -3519,7 +3519,7 @@ namespace OutputProcessor {
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetReportVariableInput(*state);
         SetupOutputVariable(*state,
@@ -3558,7 +3558,7 @@ namespace OutputProcessor {
             "Output:Variable,*,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,runperiod;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetReportVariableInput(*state);
 
@@ -3659,7 +3659,7 @@ namespace OutputProcessor {
     {
         std::string const idf_objects = delimited_string({"Output:Variable,*,Boiler NaturalGas Rate,runperiod;"});
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetReportVariableInput(*state);
         Real64 fuel_used = 999;
@@ -3690,7 +3690,7 @@ namespace OutputProcessor {
     {
         std::string const idf_objects = delimited_string({"Output:Variable,Boiler[13],Boiler NaturalGas Rate,runperiod;"});
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetReportVariableInput(*state);
         Real64 fuel_used = 999;
@@ -3719,7 +3719,7 @@ namespace OutputProcessor {
     {
         std::string const idf_objects = delimited_string({"Output:Variable,Boiler.*,Boiler NaturalGas Rate,runperiod;"});
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetReportVariableInput(*state);
         Real64 fuel_used = 999;
@@ -3750,7 +3750,7 @@ namespace OutputProcessor {
     {
         std::string const idf_objects = delimited_string({"Output:Variable,Zn003:Wall.*,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;"});
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetReportVariableInput(*state);
         Real64 vol_flow = 999;
@@ -3800,7 +3800,7 @@ namespace OutputProcessor {
         std::string const idf_objects =
             delimited_string({"Output:Variable,(?i)Zn003:Wall.*,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;"});
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         GetReportVariableInput(*state);
         Real64 vol_flow = 999;
@@ -3854,7 +3854,7 @@ namespace OutputProcessor {
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         auto const keyed_value = "Environment";
         auto const var_name = "Site Outdoor Air Drybulb Temperature";
@@ -3937,7 +3937,7 @@ namespace OutputProcessor {
             "    MyGeneralLights;         !- Output Variable or Meter Name 1",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
         Real64 light_consumption = 0;
         SetupOutputVariable(*state, "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -4065,7 +4065,7 @@ namespace OutputProcessor {
             "Output:Meter,Electricity:Facility,runperiod;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         InitializeOutput(*state);
 
@@ -4120,7 +4120,7 @@ namespace OutputProcessor {
             "Output:Meter,Electricity:Facility,runperiod;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
@@ -4364,7 +4364,7 @@ namespace OutputProcessor {
             "Output:Meter,Electricity:Facility,runperiod;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
@@ -4621,7 +4621,7 @@ namespace OutputProcessor {
             "Output:Meter,Electricity:Facility,runperiod;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
@@ -4825,7 +4825,7 @@ namespace OutputProcessor {
             "Output:Meter:MeterFileOnly,DistrictHeating:HVAC,hourly;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         // Setup so that UpdateDataandReport can be called.
         state->dataGlobal->DayOfSim = 365;
@@ -4966,7 +4966,7 @@ namespace OutputProcessor {
             "Output:Meter,Electricity:Facility,timestep;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
@@ -5044,7 +5044,7 @@ namespace OutputProcessor {
             "Output:Variable,Air Loop 1|AirSupply InletNode,System Node Temperature,Hourly;",
         });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
@@ -5245,7 +5245,7 @@ namespace OutputProcessor {
 
                               "Output:Meter, Meter Air System Hot Water Energy, Timestep;"});
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
         bool errors_found = false;
         Real64 transferredenergy = 0;
         state->dataGlobal->NumOfZones = 1;
@@ -5290,7 +5290,7 @@ namespace OutputProcessor {
                                                           "Output:Meter,CustomMeter1,Hourly;",
                                                           "Output:Meter,CustomMeter2,Hourly;"});
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         bool errors_found = false;
 
@@ -5412,7 +5412,7 @@ namespace OutputProcessor {
             "NaturalGas:Facility;        !- Variable or Meter 1 Name",
             });
 
-        ASSERT_TRUE(process_idf(idf_objects));
+        ASSERT_TRUE(process_idf(*state, idf_objects));
 
         bool errors_found = false;
 

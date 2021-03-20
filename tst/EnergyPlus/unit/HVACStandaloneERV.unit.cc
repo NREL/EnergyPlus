@@ -107,7 +107,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
         "    Until: 24:00,1.0;        !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
         "    Until: 24:00,1.0;        !- Field 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized

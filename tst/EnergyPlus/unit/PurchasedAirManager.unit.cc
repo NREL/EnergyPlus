@@ -284,7 +284,7 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
         "; !- Latent Heat Recovery Effectiveness{ dimensionless }",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -385,7 +385,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -497,7 +497,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -620,7 +620,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
 
      });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -796,7 +796,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
         "set Mdot = 0.1;",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -906,7 +906,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
         "  1;                              !- Zone Equipment 1 Heating or No - Load Sequence",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -1055,7 +1055,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
         "set HRsupply = 0.010;",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -1228,7 +1228,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
         "set HRsupply = 0.010;",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     state->dataGlobal->DoWeathSim = true;
 

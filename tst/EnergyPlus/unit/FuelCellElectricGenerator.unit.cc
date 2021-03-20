@@ -788,7 +788,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_FALSE(has_err_output());
 
     SimulationManager::ManageSimulation(*state);

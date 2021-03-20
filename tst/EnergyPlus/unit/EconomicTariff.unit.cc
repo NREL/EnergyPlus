@@ -190,7 +190,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GetInput_Test)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     UpdateUtilityBills(*state);
 
@@ -256,7 +256,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
         "    3.3076;                  !- Cost per Unit Value or Variable Name        ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Create a water meter
     state->dataOutputProcessor->NumEnergyMeters = 1;
@@ -299,7 +299,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
         "    10;                      !- Monthly Charge or Variable Name             ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Create a water meter
     state->dataOutputProcessor->NumEnergyMeters = 1;
@@ -339,7 +339,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
         "    10;                      !- Monthly Charge or Variable Name             ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Create a water meter
     state->dataOutputProcessor->NumEnergyMeters = 1;
@@ -380,7 +380,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
         "    10;                      !- Monthly Charge or Variable Name             ",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Create a water meter
     state->dataOutputProcessor->NumEnergyMeters = 1;
@@ -582,7 +582,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
@@ -740,7 +740,7 @@ TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test0)
 
     bool ErrorsFound = false;
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetInputEconomicsVariable(*state, ErrorsFound);
 
@@ -821,7 +821,7 @@ TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test1)
 
     bool ErrorsFound = false;
 
-    ASSERT_TRUE(process_idf(idf_objects1));
+    ASSERT_TRUE(process_idf(*state, idf_objects1));
     GetInputEconomicsVariable(*state, ErrorsFound);
 
     // Make sure variable input type "Energy" is processed as expected
@@ -899,7 +899,7 @@ TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test2)
         "12.00; !-December Value"});
 
     bool ErrorsFound = false;
-    ASSERT_TRUE(process_idf(idf_objects2));
+    ASSERT_TRUE(process_idf(*state, idf_objects2));
     GetInputEconomicsVariable(*state, ErrorsFound);
 
     // Make sure variable input type "Dimensionless" is processed as expected
@@ -977,7 +977,7 @@ TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test3)
         "12.00; !-December Value"});
 
     bool ErrorsFound = false;
-    ASSERT_TRUE(process_idf(idf_objects3));
+    ASSERT_TRUE(process_idf(*state, idf_objects3));
     GetInputEconomicsVariable(*state, ErrorsFound);
 
     // Make sure variable input type "Currency" is processed as expected
@@ -1122,7 +1122,7 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;

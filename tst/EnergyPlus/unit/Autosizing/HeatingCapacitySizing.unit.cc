@@ -79,7 +79,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
         "    0.50;                        !- Fan Total Efficiency",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     state->dataEnvrn->StdRhoAir = 1.2;
     // call simulate to trigger sizing call
     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));

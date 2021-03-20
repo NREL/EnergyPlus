@@ -1038,7 +1038,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
         "    For: AllDays,            !- Field 2",
         "    Until: 24:00,0.0;        !- Field 3",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(*state);
@@ -2016,7 +2016,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
         "    32.2,                    !- Rated Outlet Air Temperature {C}",
         "    ;                        !- Rated Ratio for Air and Water Convection",
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(*state);

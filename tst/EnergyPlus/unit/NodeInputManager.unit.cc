@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
         "System Node Specific Heat;",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     OutAirNodeManager::SetOutAirNodes(*state);
 

@@ -83,7 +83,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     static std::string const RoutineName("GetBranchInput: ");
     std::string CurrentModuleObject = "Branch";
@@ -239,7 +239,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     static std::string const RoutineName("GetBranchInput: ");
     std::string CurrentModuleObject = "Branch";
@@ -358,7 +358,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     std::string BranchListName;
     std::string FoundLoopName;
     int FoundLoopNum;
@@ -451,7 +451,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     std::string CompType;
     std::string CompName;
     int BranchIndex;

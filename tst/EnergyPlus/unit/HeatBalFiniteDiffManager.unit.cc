@@ -207,7 +207,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
          "    1,                       !- High Temperature Difference of Freezing Curve {deltaC}",
          "    23,                      !- Peak Freezing Temperature {C}",
          "    1;                       !- Low Temperature Difference of Freezing Curve {deltaC}"});
-    ASSERT_TRUE(process_idf(idf_objects, false));
+    ASSERT_TRUE(process_idf(*state, idf_objects, false));
 
     // allocate a finite difference surface object and needed member variables
     int const surfaceIndex = 1;
@@ -304,7 +304,7 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalFiniteDiffManager_skipNotUsedConstruct
      "Output:Constructions,",
      "Materials;", });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
           
     ErrorsFound = false;
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data

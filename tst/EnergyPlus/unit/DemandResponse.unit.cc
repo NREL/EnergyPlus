@@ -72,7 +72,7 @@ TEST_F(EnergyPlusFixture, DemandManagerGetInput)
                                                       " ,", // N4 left blank because Numbers was only assigned up to 2
                                                       " ALL,", " ,", " OA CONTROLLER 1;"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataMixedAir->NumOAControllers = 1;
     state->dataMixedAir->OAController.allocate(state->dataMixedAir->NumOAControllers);

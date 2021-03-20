@@ -1155,7 +1155,7 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
         "    DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     int CompIndex(0);
     int AirLoopNum(1);

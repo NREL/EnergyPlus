@@ -74,7 +74,7 @@ TEST_F(EnergyPlusFixture, CurveExponentialSkewNormal_MaximumCurveOutputTest)
         "  1.;                      !- Maximum Curve Output",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
     CurveManager::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, QuadraticCurve)
         "  38.;               ! Maximum Curve Output",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
     CurveManager::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
@@ -151,7 +151,7 @@ TEST_F(EnergyPlusFixture, QuintLinearCurve)
         "  38.;               ! Maximum Curve Output",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
     CurveManager::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
@@ -259,7 +259,7 @@ TEST_F(EnergyPlusFixture, TableLookup)
         "  1.04;"
      });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     CurveManager::GetCurveInput(*state);
@@ -358,7 +358,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
         "3.0;                                   !- Value 3",
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     CurveManager::GetCurveInput(*state);
@@ -459,7 +459,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
         "3.0;                                   !- Value 3",
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     CurveManager::GetCurveInput(*state);
@@ -561,7 +561,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
         "3.0;                                   !- Value 3",
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     CurveManager::GetCurveInput(*state);
@@ -664,7 +664,7 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
         "3.0;                                   !- Value 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     CurveManager::GetCurveInput(*state);

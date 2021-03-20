@@ -458,7 +458,7 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout1)
         "   AHU OA Controller;         !- Controller 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimAirServingZones::GetAirPathData(*state);
 
@@ -618,7 +618,7 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout2)
         "	AHU cooling coil controller; !- Controller 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimAirServingZones::GetAirPathData(*state);
 
@@ -770,7 +770,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1002,7 +1002,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1267,7 +1267,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1533,7 +1533,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -2073,7 +2073,7 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::ManageSimulation(*state); // run the design days
 

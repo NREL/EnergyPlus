@@ -211,7 +211,7 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     state->dataGlobal->NumOfZones = 1;
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
@@ -1714,7 +1714,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
         "  1.04;"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
 
     bool ErrorsFound = false;
@@ -3288,7 +3288,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
         "  1.04;"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
 
     bool ErrorsFound = false;

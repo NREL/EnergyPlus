@@ -1032,7 +1032,7 @@ TEST_F(SQLiteFixture, HVACSizing_Passes_SQL_Output)
       "  Timestep;                               !- Reporting Frequency",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 

@@ -221,7 +221,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
         "  0.78;                    !- Discharge Coefficient{ dimensionless }",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GetAirflowNetworkInput(*state);
 
     // MultizoneZoneData has only 1 element so may be hardcoded
@@ -344,7 +344,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
         "  ReferenceCrackConditions; !- Reference Crack Conditions",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GetAirflowNetworkInput(*state);
     std::string const error_string = delimited_string({
         "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
@@ -2218,7 +2218,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     using namespace EnergyPlus::DataIPShortCuts;
 
@@ -2485,7 +2485,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
         "  0.78;                    !- Discharge Coefficient{ dimensionless }",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetAirflowNetworkInput(*state);
 
@@ -3027,7 +3027,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     GetAirflowNetworkInput(*state);
 
@@ -4414,7 +4414,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     // Read objects
@@ -4622,7 +4622,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
                                                       "  -0.56;"});
 
     // Load and verify the table
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
     CurveManager::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
@@ -4704,7 +4704,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
                                                       "  0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}"});
 
     // Load and verify the table
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
     CurveManager::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
@@ -5690,7 +5690,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
          "ZoneAirHeatBalanceAlgorithm,",
          "  AnalyticalSolution;      !- Algorithm"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors = false;
 
@@ -6394,7 +6394,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
          "ZoneAirHeatBalanceAlgorithm,",
          "  AnalyticalSolution;      !- Algorithm"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors = false;
 
@@ -7017,7 +7017,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
          "ZoneAirHeatBalanceAlgorithm,",
          "  AnalyticalSolution;      !- Algorithm"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors = false;
 
@@ -7706,7 +7706,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
          "ZoneAirHeatBalanceAlgorithm,",
          "  AnalyticalSolution;      !- Algorithm"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors = false;
 
@@ -8340,7 +8340,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
          "ZoneAirHeatBalanceAlgorithm,",
          "  AnalyticalSolution;      !- Algorithm"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors = false;
 
@@ -9055,7 +9055,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
          "ZoneAirHeatBalanceAlgorithm,",
          "  AnalyticalSolution;      !- Algorithm"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors = false;
 
@@ -9548,7 +9548,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
         1.4391966568855996,    1.1829453813575432,    0.81696925904461237,   0.37465991281286887,  -0.041152159946210520, -0.28653692388308377,
         -0.56146269488642231};
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors = false;
 
@@ -13092,7 +13092,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "Output:Diagnostics,DisplayExtraWarnings,DisplayUnusedSchedules;"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     // Read objects
@@ -13637,7 +13637,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
         1.4391966568855996,    1.1829453813575432,    0.81696925904461237,   0.37465991281286887,  -0.041152159946210520, -0.28653692388308377,
         -0.56146269488642231};
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool errors = false;
 
@@ -15550,7 +15550,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    Fan Energy;              !- End-Use Subcategory",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     using namespace EnergyPlus::DataIPShortCuts;
 
@@ -17143,7 +17143,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     // Read objects
@@ -19922,7 +19922,7 @@ std::string const idf_objects = delimited_string({
     "Output:Diagnostics,DisplayUnusedSchedules;"});
 
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     // Read objects
@@ -20117,7 +20117,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
         "  0.78;                    !- Discharge Coefficient{ dimensionless }",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     GetAirflowNetworkInput(*state);
     // Expect warnings about the air boundary surface
     EXPECT_TRUE(has_err_output(false));

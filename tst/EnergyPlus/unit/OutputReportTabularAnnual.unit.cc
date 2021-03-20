@@ -80,7 +80,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GetInput)
         "Zone Electric Equipment Total Heating Energy; !- Variable or Meter 3 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
         "Zone Electric Equipment Total Heating Energy; !- Variable or Meter 3 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     Real64 extLitPow;
     Real64 extLitUse;
@@ -196,7 +196,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
         "Zone Electric Equipment Total Heating Energy; !- Variable or Meter 3 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     Real64 extLitPow;
     Real64 extLitUse;
@@ -326,7 +326,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
         "    Until: 24:00, 0.0;       !- Field 11",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     Real64 facilUse;
     SetupOutputVariable(*state, "Misc Facility Electric Energy",
@@ -383,7 +383,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
         "0; !- field Digits After Decimal 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     Real64 facilUse;
     SetupOutputVariable(*state, "Misc Facility Electric Energy",

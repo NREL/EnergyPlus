@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
         "autocalculate;           !- Volume {m3}",
 
     });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
     auto numZones = inputProcessor->getNumObjectsFound(*state, "Zone");
     state->dataHeatBalFanSys->ZoneReOrder.allocate(numZones);
@@ -154,7 +154,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
         "    101325.0000;             !- Pressure {Pa}",
     });
 
-    ASSERT_FALSE(process_idf(idf_objects, false)); // expect errors
+    ASSERT_FALSE(process_idf(*state, idf_objects, false)); // expect errors
     std::string const error_string = delimited_string({
         "   ** Severe  ** Duplicate name found for object of type \"WindowMaterial:Gap\" named \"Gap_1_Layer\". Overwriting existing object.",
     });
@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_
         "    101325.0000;             !- Pressure {Pa}",
     });
 
-    ASSERT_FALSE(process_idf(idf_objects, false)); // expect errors
+    ASSERT_FALSE(process_idf(*state, idf_objects, false)); // expect errors
     std::string const error_string = delimited_string({
         "   ** Severe  ** Duplicate name found for object of type \"WindowMaterial:Gap\" named \"Gap_1_Layer\". Overwriting existing object.",
     });
@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
         " GLASS;        !- Layer 3",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
 
@@ -385,7 +385,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
         "MixingSourceZonesOnly; !- Infiltration Balancing Zones",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
 
@@ -447,7 +447,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
 
@@ -595,7 +595,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
         ";                !- Infiltration Balancing Zones"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
 
@@ -655,7 +655,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
         "   hourly;                  !- Reporting Frequency",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
 
@@ -704,7 +704,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
         "    Advanced;                !- Moisture Diffusion Calculation Method",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     GetMaterialData(*state, ErrorsFound);
@@ -1200,7 +1200,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
         "    Until: 24:00, 90;             !- Field 3"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool ErrorsFound = false;
 
     ScheduleManager::ProcessScheduleInput(*state);
@@ -1321,7 +1321,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
@@ -1351,7 +1351,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
@@ -1559,7 +1559,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(*state);
@@ -1611,7 +1611,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
         "  Building, My Building;",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
@@ -1638,7 +1638,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
         "  200.6;                      !- Maximum Surface Convection Heat Transfer Coefficient Value",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
@@ -1664,7 +1664,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
         "  MoisturePenetrationDepthConductionTransferFunction; !- Algorithm",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
@@ -1687,7 +1687,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
         "  ConductionFiniteDifference; !- Algorithm",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
@@ -1710,7 +1710,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
         "  CombinedHeatAndMoistureFiniteElement; !- Algorithm",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
@@ -1759,7 +1759,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
         "0.84;                    !- Back Side Infrared Emissivity {dimensionless}",
     });
 
-    EXPECT_TRUE(process_idf(idf_objects));
+    EXPECT_TRUE(process_idf(*state, idf_objects));
 
     HeatBalanceManager::GetMaterialData(*state, errorsfound);
 
@@ -1787,7 +1787,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     ProcessScheduleInput(*state);
@@ -1836,7 +1836,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false);
     ProcessScheduleInput(*state);
@@ -1945,7 +1945,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisec
         " Bisection;!- Algorithm",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
@@ -2150,7 +2150,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     SimulationManager::ManageSimulation(*state);
 

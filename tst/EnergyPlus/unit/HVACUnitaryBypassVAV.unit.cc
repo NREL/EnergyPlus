@@ -638,7 +638,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
         "  Zone 1 Zone Return Air Node;            !- Inlet Node Name 1",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+    ASSERT_TRUE(process_idf(*state, idf_objects)); // read idf objects
 
     bool ErrorsFound = false;
     bool firstHVACIteration = true;

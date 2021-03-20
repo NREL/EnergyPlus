@@ -108,7 +108,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
@@ -215,7 +215,7 @@ TEST_F(EnergyPlusFixture, HeatingConstructionFullObjectsNoCompanion)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
@@ -263,7 +263,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectsNoCompanion)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -311,7 +311,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectWithDefaults)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -352,7 +352,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_WaterSource)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -394,7 +394,7 @@ TEST_F(EnergyPlusFixture, CatchErrorsOnBadCurves)
                                                       "  dummyCurveA,",
                                                       "  dummyCurveB,",
                                                       "  dummyCurveC;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     // call the factory with a valid name to trigger reading inputs, it should throw for the bad curves
     EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE"), std::runtime_error);
 }
@@ -423,7 +423,7 @@ TEST_F(EnergyPlusFixture, Initialization)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up the plant loops
     // first the load side
@@ -539,7 +539,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -726,7 +726,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -863,7 +863,7 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -976,7 +976,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
@@ -1065,7 +1065,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
@@ -1158,7 +1158,7 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up the plant loops
     // first the load side
@@ -1237,7 +1237,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up the plant loops
     // first the load side
@@ -1370,7 +1370,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up a couple simple plant loops with one branch per loop-side and one component per branch
     state->dataPlnt->TotNumLoops = 2;
@@ -1487,7 +1487,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up the plant loops
     // first the load side
@@ -1621,7 +1621,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up the plant loops
     // first the load side
@@ -1791,7 +1791,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
@@ -1850,7 +1850,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up the plant loops
     // first the load side
@@ -1967,7 +1967,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up the plant loops
     // first the load side
@@ -2100,7 +2100,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_AirSource)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -2148,7 +2148,7 @@ TEST_F(EnergyPlusFixture, ClearState)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -2183,7 +2183,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up the plant loops
     // first the load side
@@ -2312,7 +2312,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -2476,7 +2476,7 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -2641,7 +2641,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
                                                       "  0.0,",
                                                       "  1.0;"});
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up the plant loops
     // first the load side
@@ -2738,7 +2738,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up the plant loops
     // first the load side
@@ -2838,7 +2838,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"});
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // set up the plant loops
     // first the load side

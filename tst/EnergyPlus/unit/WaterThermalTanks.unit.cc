@@ -353,7 +353,7 @@ TEST_F(EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning)
         "    IdealLoadOutNode;      !- Node 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
@@ -528,7 +528,7 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
     }
     std::string const idf_objects = delimited_string(idf_lines);
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     WaterThermalTanks::GetWaterThermalTankInput(*state);
 
@@ -720,7 +720,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
         "    Water Heating_1;         !- End-Use Subcategory",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
 
     ASSERT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
@@ -1026,7 +1026,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
         "    IdealLoadOutNode;      !- Node 1 Name",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
 
     bool ErrorsFound = false;
@@ -1224,7 +1224,7 @@ TEST_F(EnergyPlusFixture, HPWHOutdoorAirMissingNodeNameWarning)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = WaterThermalTanks::GetWaterThermalTankInput(*state);
     EXPECT_TRUE(ErrorsFound);
@@ -1390,7 +1390,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
 
     state->dataHVACGlobal->TimeStepSys = 1;
@@ -1593,7 +1593,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
@@ -1691,7 +1691,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
@@ -1808,7 +1808,7 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
         "    1.5;                     !- Indirect Water Heating Recovery Time {hr}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
@@ -1921,7 +1921,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
         "  ;                        !- Node 10 Additional Loss Coefficient {W/K}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
@@ -2117,7 +2117,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
         "  ;                        !- Node 10 Additional Loss Coefficient {W/K}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
@@ -2353,7 +2353,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
@@ -2626,7 +2626,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "  38.;                  ! Maximum Curve Output",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
@@ -3019,7 +3019,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
         "  1;                                      !- Maximum Curve Output {BasedOnField A3}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
@@ -3179,7 +3179,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // Schedules setup
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
@@ -3286,7 +3286,7 @@ TEST_F(EnergyPlusFixture, MixedTank_WarnPotentialFreeze)
         "    1.5;                     !- Indirect Water Heating Recovery Time {hr}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
@@ -3386,7 +3386,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
         "  0.1;                     !- Additional Destratification Conductivity {W/m-K}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
@@ -3672,7 +3672,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -4197,7 +4197,7 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     EXPECT_TRUE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
@@ -4423,7 +4423,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         "    0.95;                    !- Source Side Effectiveness",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
 
     state->dataHVACGlobal->TimeStepSys = 1;
@@ -4716,7 +4716,7 @@ TEST_F(EnergyPlusFixture, HPWH_Wrapped_Stratified_Simultaneous)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // This returns true if ErrorsFound
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
@@ -4990,7 +4990,7 @@ TEST_F(EnergyPlusFixture, HPWH_Pumped_Stratified_Simultaneous)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     // This returns true if ErrorsFound
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
@@ -5079,7 +5079,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_FalsePositiveBlank
         "  ;                        !- Node 10 Additional Loss Coefficient {W/K}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
@@ -5180,7 +5180,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_FalsePositiveZeroe
         "  IndirectHeatPrimarySetpoint;   !- Source Side Flow Control Mode"
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
@@ -5279,7 +5279,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_ExpectedWarning)
         "  ;                        !- Node 10 Additional Loss Coefficient {W/K}",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data

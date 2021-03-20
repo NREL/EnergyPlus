@@ -486,7 +486,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
          "    TowerWaterSys Supply Outlet Node;  !- Outlet Node Name"
 
         });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
 
     bool ErrorsFound = false;
@@ -878,7 +878,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
                           "    TowerWaterSys Supply Outlet Node;  !- Outlet Node Name"
 
         });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
 
     bool ErrorsFound = false;
@@ -1309,7 +1309,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
                           "    TowerWaterSys Supply Outlet Node;  !- Outlet Node Name"
 
         });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
 
     bool ErrorsFound = false;
@@ -1724,7 +1724,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
                           "    TowerWaterSys Supply Outlet Node;  !- Outlet Node Name"
 
         });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
 
     bool ErrorsFound = false;
@@ -2208,7 +2208,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
          "    TowerWaterSys Supply Outlet Node;  !- Outlet Node Name"
 
         });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
 
     bool ErrorsFound = false;
@@ -2635,7 +2635,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
                           "    TowerWaterSys Supply Outlet Node;  !- Outlet Node Name"
 
         });
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
 
     bool ErrorsFound = false;
@@ -3024,7 +3024,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
 
     state->dataGlobal->BeginSimFlag = true;
@@ -3416,7 +3416,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
 
     state->dataGlobal->BeginSimFlag = true;
@@ -3890,7 +3890,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     SimulationManager::PostIPProcessing(*state);
 
     state->dataGlobal->BeginSimFlag = true;
