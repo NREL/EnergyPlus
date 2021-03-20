@@ -2810,9 +2810,9 @@ namespace HeatingCoils {
         state.dataHeatingCoils->HeatingCoil(CoilNum).FuelUseRate = state.dataHeatingCoils->HeatingCoil(CoilNum).FuelUseLoad;
         state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseRate = state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad;
         if (coilIsSuppHeater) {
-            state->dataHVACGlobal->SuppHeatingCoilPower = state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad;
+            state.dataHVACGlobal->SuppHeatingCoilPower = state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad;
         } else {
-            state->dataHVACGlobal->ElecHeatingCoilPower = state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad;
+            state.dataHVACGlobal->ElecHeatingCoilPower = state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad;
         }
         state.dataHeatingCoils->HeatingCoil(CoilNum).FuelUseLoad *= ReportingConstant;
         state.dataHeatingCoils->HeatingCoil(CoilNum).ElecUseLoad *= ReportingConstant;
