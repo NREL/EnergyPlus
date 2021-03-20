@@ -2017,8 +2017,8 @@ namespace EnergyPlus::Construction {
         this->BlAbsDiffSky.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
         this->AbsDiffBack.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
         this->BlAbsDiffBack.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-        this->AbsBeamCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-        this->AbsBeamBackCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->AbsBeamCoef.dimension(state.dataHeatBal->MaxSolidWinLayers, 6, 0.0);
+        this->AbsBeamBackCoef.dimension(state.dataHeatBal->MaxSolidWinLayers, 6, 0.0);
     }
 
 }   // namespace EnergyPlus

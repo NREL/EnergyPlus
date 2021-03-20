@@ -5923,7 +5923,7 @@ namespace EnergyPlus::SolarShading {
         // For a time step, calculates solar radiation absorbed by exterior
         // surfaces and interior solar radiation distribution
 
-        using General::InterpSw;
+//        using General::InterpSw;
         using General::POLYF;
         using ScheduleManager::GetCurrentScheduleValue;
         using DaylightingDevices::TransTDD;
@@ -6203,7 +6203,7 @@ namespace EnergyPlus::SolarShading {
                         int NGlass = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                         Array1D<Real64> AbWin(NGlass); // Factor for front beam radiation absorbed in window glass layer
                         for (int Lay = 1; Lay <= NGlass; ++Lay) {
-                            AbWin(Lay) = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef({1, 6}, Lay)) *
+                            AbWin(Lay) = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(Lay, _)) *
                                          CosInc * SunLitFract * state.dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(state.dataGlobal->HourOfDay);
                         }
                         if (!IS_SHADED_NO_GLARE_CTRL(ShadeFlag)) {
@@ -6224,7 +6224,7 @@ namespace EnergyPlus::SolarShading {
                             if (ANY_SHADE(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
                                 // Shade or switchable glazing on
                                 for (int Lay = 1; Lay <= NGlass; ++Lay) {
-                                    AbWinSh(Lay) = POLYF(CosInc, state.dataConstruction->Construct(ConstrNumSh).AbsBeamCoef({1, 6}, Lay)) * CosInc * FracSunLit;
+                                    AbWinSh(Lay) = POLYF(CosInc, state.dataConstruction->Construct(ConstrNumSh).AbsBeamCoef(Lay, _)) * CosInc * FracSunLit;
                                     ADiffWinSh(Lay) = state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay);
                                 }
                                 if (ShadeFlag == WinShadingType::IntShade) { // Exterior beam absorbed by INTERIOR SHADE
@@ -6244,18 +6244,18 @@ namespace EnergyPlus::SolarShading {
                                 ProfAng = state.dataSurface->SurfWinProfileAng(SurfNum);
                                 if (ShadeFlag == WinShadingType::IntBlind) {
                                     // Interior blind on
-                                    Real64 TGlBm = POLYF(CosInc,state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef); // Glazing system front solar beam transmittance
+                                    Real64 TBmBm = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef);
                                     Real64 RGlDiffBack = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack; // Glazing system back diffuse solar reflectance
                                     Real64 RhoBlFront = FrontBeamDiffRefl; // Blind solar front beam reflectance
                                     Real64 RhoBlDiffFront = FrontDiffDiffRefl; // Blind solar front diffuse reflectance
                                     for (int Lay = 1; Lay <= NGlass; ++Lay) {
                                         Real64 ADiffWin = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay); // Diffuse solar absorptance of glass layer, bare window
                                         Real64 AGlDiffBack = state.dataConstruction->Construct(ConstrNum).AbsDiffBack(Lay); // Glass layer back diffuse solar absorptance
-                                        AbWinSh(Lay) = AbWin(Lay) + (TGlBm * AGlDiffBack * RhoBlFront / (1.0 - RhoBlFront * RGlDiffBack)) * CosInc * FracSunLit;
+                                        AbWinSh(Lay) = AbWin(Lay) + (TBmBm * AGlDiffBack * RhoBlFront / (1.0 - RhoBlFront * RGlDiffBack)) * CosInc * FracSunLit;
                                         ADiffWinSh(Lay) = ADiffWin + state.dataConstruction->Construct(ConstrNum).TransDiff * AGlDiffBack * RhoBlDiffFront / (1.0 - RhoBlDiffFront * RGlDiffBack);
                                     }
                                     // Exterior beam absorbed by INTERIOR BLIND
-                                    Real64 TBmBm = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef);
+
                                     Real64 AbsBlFront = FrontBeamAbs; // Blind solar front beam absorptance
                                     Real64 AbsBlDiffFront = FrontDiffAbs; // Blind solar front diffuse absorptance
                                     Real64 AbsShade = TBmBm * (AbsBlFront + RhoBlFront * RGlDiffBack * AbsBlDiffFront / (1.0 - RhoBlDiffFront * RGlDiffBack));
@@ -6393,10 +6393,10 @@ namespace EnergyPlus::SolarShading {
                                 for (int Lay = 1; Lay <= NGlass; ++Lay) {
                                     Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum);
                                     Real64 ADiffWin = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay);
-                                    state.dataSurface->SurfWinA(Lay, SurfNum) = InterpSw(SwitchFac, AbWin(Lay), AbWinSh(Lay));
+                                    state.dataSurface->SurfWinA(Lay, SurfNum) = General::InterpSw(SwitchFac, AbWin(Lay), AbWinSh(Lay));
                                     // Add contribution of diffuse from beam on outside and inside reveal
-                                    state.dataSurface->SurfWinA(Lay, SurfNum) += InterpSw(SwitchFac, ADiffWin, ADiffWinSh(Lay)) * state.dataSurface->SurfWinOutsRevealDiffOntoGlazing(SurfNum) +
-                                                              InterpSw(SwitchFac, state.dataConstruction->Construct(ConstrNum).AbsDiffBack(Lay), state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(Lay)) * state.dataSurface->SurfWinInsRevealDiffOntoGlazing(SurfNum);
+                                    state.dataSurface->SurfWinA(Lay, SurfNum) += General::InterpSw(SwitchFac, ADiffWin, ADiffWinSh(Lay)) * state.dataSurface->SurfWinOutsRevealDiffOntoGlazing(SurfNum) +
+                                            General::InterpSw(SwitchFac, state.dataConstruction->Construct(ConstrNum).AbsDiffBack(Lay), state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(Lay)) * state.dataSurface->SurfWinInsRevealDiffOntoGlazing(SurfNum);
                                 }
                             }
                         }
@@ -6537,7 +6537,7 @@ namespace EnergyPlus::SolarShading {
                         } else {
                             // Switchable glazing
                             Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum); // Switching factor for a window
-                            DiffTrans = InterpSw(SwitchFac, state.dataConstruction->Construct(ConstrNum).TransDiff, state.dataConstruction->Construct(ConstrNumSh).TransDiff);
+                            DiffTrans = General::InterpSw(SwitchFac, state.dataConstruction->Construct(ConstrNum).TransDiff, state.dataConstruction->Construct(ConstrNumSh).TransDiff);
                         }
                     }
                 }
@@ -6716,9 +6716,9 @@ namespace EnergyPlus::SolarShading {
                     // Switchable glazing
                     Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum);
                     if (!state.dataSurface->SurfWinSolarDiffusing(SurfNum)) {
-                        TBmBm = InterpSw(SwitchFac, TBmBm, TBmAllShBlSc);
+                        TBmBm = General::InterpSw(SwitchFac, TBmBm, TBmAllShBlSc);
                     } else {
-                        TBmDif = InterpSw(SwitchFac, TBmDif, TBmAllShBlSc);
+                        TBmDif = General::InterpSw(SwitchFac, TBmDif, TBmAllShBlSc);
                     }
                 }
                 // Report variables
@@ -6955,7 +6955,7 @@ namespace EnergyPlus::SolarShading {
                                     // or interior window WITHOUT SHADING this timestep
                                     if (NOT_SHADED(ShadeFlagBack)) {
                                         for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
-                                            AbsBeamWin(Lay) = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef({1, 6}, Lay));
+                                            AbsBeamWin(Lay) = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef(Lay, _));
                                         }
                                         TransBeamWin = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef);
                                     }
@@ -6964,7 +6964,7 @@ namespace EnergyPlus::SolarShading {
                                     // of back exterior window with SHADE
                                     if (ANY_SHADE(ShadeFlagBack)) {
                                         for (int Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNumBackSh).TotGlassLayers; ++Lay) {
-                                            AbsBeamWin(Lay) = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBackSh).AbsBeamBackCoef({1, 6}, Lay));
+                                            AbsBeamWin(Lay) = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBackSh).AbsBeamBackCoef(Lay, _));
                                         }
                                         TransBeamWin = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBackSh).TransSolBeamCoef);
                                     }
@@ -7148,7 +7148,7 @@ namespace EnergyPlus::SolarShading {
                                             }
 
                                             for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
-                                                Real64 AbWinBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef({1, 6}, Lay));
+                                                Real64 AbWinBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef(Lay, _));
                                                 Real64 AGlDiffFront = state.dataConstruction->Construct(ConstrNumBack).AbsDiff(Lay);
                                                 AbsBeamWin(Lay) = AbWinBack + (TGlBmBack * AGlDiffFront * RhoBlBack / (1.0 - RhoBlBack * RGlDiffFront));
                                             }
@@ -7305,7 +7305,7 @@ namespace EnergyPlus::SolarShading {
                                         Real64 RScBack = state.dataHeatBal->SurfaceScreens(ScNumBack).ReflectSolBeamFront;
                                         Real64 RScDifBack = state.dataHeatBal->SurfaceScreens(ScNumBack).DifReflect;
                                         for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
-                                            Real64 AbWinBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef({1, 6}, Lay));
+                                            Real64 AbWinBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef(Lay, _));
                                             Real64 AGlDiffFront = state.dataConstruction->Construct(ConstrNumBack).AbsDiff(Lay);
                                             AbsBeamWin(Lay) = AbWinBack + (TGlBmBack * AGlDiffFront * RScBack / (1.0 - RScDifBack * RGlDiffFront));
                                         }
@@ -7332,12 +7332,12 @@ namespace EnergyPlus::SolarShading {
                                         Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum); // Switching factor for a window
                                         Real64 AbsBeamWinSh;  // Glass layer beam solar absorptance of a shaded window
                                         for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
-                                            AbsBeamWinSh = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBackSh).AbsBeamBackCoef({1, 6}, Lay));
-                                            AbsBeamWin(Lay) = InterpSw(SwitchFac, AbsBeamWin(Lay), AbsBeamWinSh);
+                                            AbsBeamWinSh = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBackSh).AbsBeamBackCoef(Lay, _));
+                                            AbsBeamWin(Lay) = General::InterpSw(SwitchFac, AbsBeamWin(Lay), AbsBeamWinSh);
                                         }
                                         // Beam solar transmittance of a shaded window
                                         Real64 TransBeamWinSh = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBackSh).TransSolBeamCoef);
-                                        TransBeamWin = InterpSw(SwitchFac, TransBeamWin, TransBeamWinSh);
+                                        TransBeamWin = General::InterpSw(SwitchFac, TransBeamWin, TransBeamWinSh);
                                     }
 
                                     // Sum of interior beam absorbed by all glass layers of back window
@@ -9322,18 +9322,19 @@ namespace EnergyPlus::SolarShading {
                                                                                                       state.dataHeatBal->Blind(BlNum).SlatSeparation,
                                                                                                       state.dataHeatBal->Blind(BlNum).SlatThickness);
                         // Calculate blind interpolation factors and indices.
-                        if (!state.dataSurface->SurfWinMovableSlats(ISurf)) continue;
-                        if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {
-                            SlatAng = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
-                        }
-                        Real64 SlatsAngIndex = 1 + int(SlatAng * DeltaAng_inv);
-                        state.dataSurface->SurfWinSlatsAngIndex(ISurf) = SlatsAngIndex;
-                        state.dataSurface->SurfWinSlatsAngInterpFac(ISurf) = (SlatAng - DeltaAng * (SlatsAngIndex - 1)) * DeltaAng_inv;
+                        if (state.dataSurface->SurfWinMovableSlats(ISurf)) {
+                            if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {
+                                SlatAng = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
+                            }
+                            Real64 SlatsAngIndex = 1 + int(SlatAng * DeltaAng_inv);
+                            state.dataSurface->SurfWinSlatsAngIndex(ISurf) = SlatsAngIndex;
+                            state.dataSurface->SurfWinSlatsAngInterpFac(ISurf) = (SlatAng - DeltaAng * (SlatsAngIndex - 1)) * DeltaAng_inv;
 
-                        // TODO: floating point error is causing the result diff
-                        // double test1 = state.dataSurface->SurfWinSlatsAngInterpFac(ISurf);
-                        // double test2 = (SlatAng - DeltaAng * (SlatsAngIndex - 1)) / DeltaAng;
-                        // std::cout << state.dataEnvrn->Month << "," << state.dataEnvrn->DayOfMonth << "," << state.dataGlobal->HourOfDay << "," << state.dataGlobal->TimeStep << "," << std::abs(test1 - test2) << "\n";
+                            // TODO: floating point error is causing the result diff
+                            // double test1 = state.dataSurface->SurfWinSlatsAngInterpFac(ISurf);
+                            // double test2 = (SlatAng - DeltaAng * (SlatsAngIndex - 1)) / DeltaAng;
+                            // std::cout << state.dataEnvrn->Month << "," << state.dataEnvrn->DayOfMonth << "," << state.dataGlobal->HourOfDay << "," << state.dataGlobal->TimeStep << "," << std::abs(test1 - test2) << "\n";
+                        }
                     }
                 } // End of check if interior or exterior or between glass blind in place
 
