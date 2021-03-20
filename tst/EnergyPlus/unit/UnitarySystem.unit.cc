@@ -287,7 +287,6 @@ public:
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
 
-        state->dataHVACGlobal->NumPrimaryAirSys = 0;
         Psychrometrics::cached_Twb.clear();
         Psychrometrics::cached_Psat.clear();
     }
