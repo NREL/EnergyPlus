@@ -2470,7 +2470,7 @@ namespace EnergyPlus {
         EXPECT_NEAR(minFlow, 0.0, 0.0000001);
         EXPECT_NEAR(maxFlow, 0.09375, 0.0000001);
         MaxIte = 20;
-        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+        state->dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
         TempSolveRoot::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, minFlow, maxFlow, Par);
         EXPECT_EQ(3, SolFla);
     }

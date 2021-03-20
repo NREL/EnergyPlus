@@ -1774,9 +1774,9 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                 state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
         }
 
-        this->EnergyGen = this->ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->ExhaustEnergyRec = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EnergyGen = this->ElecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ExhaustEnergyRec = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         if (this->FuelEnergyUseRateLHV > 0.0) {
             this->ElectricEfficiencyLHV = this->ElecPowerGenerated / this->FuelEnergyUseRateLHV;
             this->ThermalEfficiencyLHV = this->QHeatRecovered / this->FuelEnergyUseRateLHV;
@@ -1784,8 +1784,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             this->ElectricEfficiencyLHV = 0.0;
             this->ThermalEfficiencyLHV = 0.0;
         }
-        this->AncillaryEnergy = this->AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->StandbyEnergy = this->StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
 } // namespace EnergyPlus

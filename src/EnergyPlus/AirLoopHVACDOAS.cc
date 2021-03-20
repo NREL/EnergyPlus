@@ -944,7 +944,7 @@ namespace AirLoopHVACDOAS {
         if (errorsFound) {
             ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
-        state.dataSize->CurSysNum = DataHVACGlobals::NumPrimaryAirSys + this->m_AirLoopDOASNum + 1;
+        state.dataSize->CurSysNum = state.dataHVACGlobal->NumPrimaryAirSys + this->m_AirLoopDOASNum + 1;
         state.dataSize->CurOASysNum = this->m_OASystemNum;
     }
 

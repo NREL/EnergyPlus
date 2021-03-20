@@ -193,7 +193,7 @@ namespace EnergyPlus::DemandManager {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

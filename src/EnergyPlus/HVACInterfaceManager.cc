@@ -546,8 +546,8 @@ namespace EnergyPlus::HVACInterfaceManager {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -687,8 +687,8 @@ namespace EnergyPlus::HVACInterfaceManager {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using DataPlant::DemandSide;
         using FluidProperties::GetSpecificHeatGlycol;
 

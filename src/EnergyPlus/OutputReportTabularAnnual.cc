@@ -605,7 +605,7 @@ namespace EnergyPlus::OutputReportTabularAnnual {
     {
         Real64 elapsedTime;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
-            elapsedTime = DataHVACGlobals::TimeStepSys;
+            elapsedTime = state.dataHVACGlobal->TimeStepSys;
         } else {
             elapsedTime = state.dataGlobal->TimeStepZone;
         }
@@ -616,7 +616,7 @@ namespace EnergyPlus::OutputReportTabularAnnual {
     {
         Real64 secondsInTimeStep;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
-            secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            secondsInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         } else {
             secondsInTimeStep = state.dataGlobal->TimeStepZoneSec;
         }

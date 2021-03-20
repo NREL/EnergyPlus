@@ -781,7 +781,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
     state->dataGlobal->TimeStep = 1;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
@@ -1111,7 +1111,7 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
 
     ElectricStorage battery{*state, "Battery1"};
 
-    DataHVACGlobals::TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
     state->dataEnvrn->OutDryBulbTemp = 23.0;
     Real64 socMin = 0.1;
     Real64 socMax = 0.95;
@@ -1130,7 +1130,7 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
     ASSERT_NEAR(battery.stateOfChargeFraction(), 0.929, 0.01);
     ASSERT_NEAR(battery.batteryTemperature(), 20.1, 0.1);
 
-    DataHVACGlobals::SysTimeElapsed += DataHVACGlobals::TimeStepSys;
+    state->dataHVACGlobal->SysTimeElapsed += state->dataHVACGlobal->TimeStepSys;
     powerDischarge = 0.0;
     powerCharge = 5000.0;
     charging = true;
@@ -1156,7 +1156,7 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
     ASSERT_NEAR(battery.stateOfChargeFraction(), 0.837, 0.01);
 
     // See that the battery state is reset at the beginning of a new environment (and also at the end of warmup)
-    DataHVACGlobals::SysTimeElapsed = 0.0;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
     battery.reinitAtBeginEnvironment();
     battery.timeCheckAndUpdate(*state);
     powerDischarge = 0.0;

@@ -438,7 +438,7 @@ namespace EnergyPlus::PondGroundHeatExchanger {
             this->MyFlag = false;
         }
 
-        if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && this->firstTimeThrough) {
+        if (FirstHVACIteration && !state.dataHVACGlobal->ShortenTimeStepSys && this->firstTimeThrough) {
             // update past temperature
             this->PastBulkTemperature = this->BulkTemperature;
             this->firstTimeThrough = false;
@@ -501,17 +501,17 @@ namespace EnergyPlus::PondGroundHeatExchanger {
 
         Real64 Flux = this->CalcTotalFLux(state, this->PondTemp);
         Real64 PondTempStar =
-            this->PastBulkTemperature + 0.5 * DataGlobalConstants::SecInHour * DataHVACGlobals::TimeStepSys * Flux / (SpecificHeat * PondMass);
+            this->PastBulkTemperature + 0.5 * DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys * Flux / (SpecificHeat * PondMass);
 
         Real64 FluxStar = this->CalcTotalFLux(state, PondTempStar);
         Real64 PondTempStarStar =
-            this->PastBulkTemperature + 0.5 * DataGlobalConstants::SecInHour * DataHVACGlobals::TimeStepSys * FluxStar / (SpecificHeat * PondMass);
+            this->PastBulkTemperature + 0.5 * DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys * FluxStar / (SpecificHeat * PondMass);
 
         Real64 FluxStarStar = this->CalcTotalFLux(state, PondTempStarStar);
         Real64 PondTempStarStarStar =
-            this->PastBulkTemperature + DataGlobalConstants::SecInHour * DataHVACGlobals::TimeStepSys * FluxStarStar / (SpecificHeat * PondMass);
+            this->PastBulkTemperature + DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys * FluxStarStar / (SpecificHeat * PondMass);
 
-        this->PondTemp = this->PastBulkTemperature + DataGlobalConstants::SecInHour * DataHVACGlobals::TimeStepSys *
+        this->PondTemp = this->PastBulkTemperature + DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys *
                                                          (Flux + 2.0 * FluxStar + 2.0 * FluxStarStar + this->CalcTotalFLux(state, PondTempStarStarStar)) /
                                                          (6.0 * SpecificHeat * PondMass);
     }
@@ -873,7 +873,7 @@ namespace EnergyPlus::PondGroundHeatExchanger {
         // compute pond heat transfer
         Real64 effectiveness = this->CalcEffectiveness(state, this->InletTemp, this->PondTemp, this->MassFlowRate);
         this->HeatTransferRate = this->MassFlowRate * CpFluid * effectiveness * (this->InletTemp - this->PondTemp);
-        this->Energy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->Energy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // keep track of the bulk temperature
         this->BulkTemperature = this->PondTemp;

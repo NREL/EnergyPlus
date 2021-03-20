@@ -828,7 +828,7 @@ namespace AirflowNetwork {
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

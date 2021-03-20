@@ -127,7 +127,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // start with an auto-sized value as the user input
     state->dataSize->ZoneSizingRunDone = true;
     inputValue = DataSizing::AutoSize;
-    DataHVACGlobals::DXCT = DataHVACGlobals::RegularDXCoil;
+    state->dataHVACGlobal->DXCT = DataHVACGlobals::RegularDXCoil;
     // do sizing
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
@@ -161,7 +161,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // missing Data* globals and Plant data
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.800655, sizedValue, 0.000001); // includes impact of ValidateADP
-    initialSHR = 0.431 + 6086.0 * DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT); // does not include impact of ValidateADP, which increases SHR
+    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
     EXPECT_LT(initialSHR, sizedValue); // includes impact of ValidateADP
     sizer.autoSizedValue = 0.0; // reset for next test
 
@@ -175,7 +175,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    initialSHR = 0.431 + 6086.0 * DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT); // does not include impact of ValidateADP, which increases SHR
+    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
     EXPECT_GT(initialSHR, sizedValue); // compares impact of ValidateADP
     EXPECT_NEAR(0.676083, initialSHR, 0.000001); // does not include impact of ValidateADP
     EXPECT_NEAR(0.675083, sizedValue, 0.000001); // includes impact of ValidateADP
@@ -188,7 +188,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     state->dataSize->DataFlowUsedForSizing = 0.3;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
-    DataHVACGlobals::DXCT = DataHVACGlobals::DOASDXCoil;
+    state->dataHVACGlobal->DXCT = DataHVACGlobals::DOASDXCoil;
     // do sizing
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
@@ -212,7 +212,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // missing Data* globals and Plant data
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.800798, sizedValue, 0.000001); // includes impact of ValidateADP
-    initialSHR = 0.431 + 6086.0 * DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT); // does not include impact of ValidateADP, which increases SHR
+    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
     EXPECT_LT(initialSHR, sizedValue); // includes impact of ValidateADP
     sizer.autoSizedValue = 0.0; // reset for next test
 
@@ -226,7 +226,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    initialSHR = 0.431 + 6086.0 * DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT); // does not include impact of ValidateADP, which increases SHR
+    initialSHR = 0.431 + 6086.0 * state->dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state->dataHVACGlobal->DXCT); // does not include impact of ValidateADP, which increases SHR
     EXPECT_LT(initialSHR, sizedValue); // compares impact of ValidateADP
     EXPECT_NEAR(0.533062, initialSHR, 0.000001); // does not include impact of ValidateADP
     EXPECT_NEAR(0.675861, sizedValue, 0.000001); // includes impact of ValidateADP
@@ -243,7 +243,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     state->dataSize->ZoneEqSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -266,7 +266,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     state->dataSize->SysSizInput(1).AirLoopNum = 1;
 
     state->dataSize->DataFlowUsedForSizing = 0.5; // flow to capacity ratio within limits
-    DataHVACGlobals::DXCT = DataHVACGlobals::RegularDXCoil;
+    state->dataHVACGlobal->DXCT = DataHVACGlobals::RegularDXCoil;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 

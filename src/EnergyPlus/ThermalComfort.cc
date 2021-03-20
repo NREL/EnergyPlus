@@ -2240,8 +2240,8 @@ namespace ThermalComfort {
 
         // Using/Aliasing
         using namespace OutputReportPredefined;
-        using DataHVACGlobals::deviationFromSetPtThresholdClg;
-        using DataHVACGlobals::deviationFromSetPtThresholdHtg;
+        auto &deviationFromSetPtThresholdClg = state.dataHVACGlobal->deviationFromSetPtThresholdClg;
+        auto &deviationFromSetPtThresholdHtg = state.dataHVACGlobal->deviationFromSetPtThresholdHtg;
         using DataHVACGlobals::DualSetPointWithDeadBand;
         using DataHVACGlobals::SingleCoolingSetPoint;
         using DataHVACGlobals::SingleHeatCoolSetPoint;
@@ -2426,7 +2426,7 @@ namespace ThermalComfort {
         // the relevant file once to initialize, and then operates within the loop.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
 
@@ -2663,7 +2663,7 @@ namespace ThermalComfort {
         // moving average of the outdoor air temperature.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
 

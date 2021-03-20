@@ -112,8 +112,6 @@ namespace EnergyPlus::GroundHeatExchangers {
     //   Ground Heat Exchanger.' Applied Energy. Vol 114, 57-69.
 
     // Using/Aliasing
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
     using namespace DataLoopNode;
 
     using namespace GroundTemperatureManager;
@@ -2117,7 +2115,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         state.dataGroundHeatExchanger->currentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 +
                                                         (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
-                                                        SysTimeElapsed; //+ TimeStepsys
+                                                        state.dataHVACGlobal->SysTimeElapsed; //+ TimeStepsys
         state.dataGroundHeatExchanger->locHourOfDay =
             static_cast<int>(mod(state.dataGroundHeatExchanger->currentSimTime, DataGlobalConstants::HoursInDay) + 1);
         state.dataGroundHeatExchanger->locDayOfSim = static_cast<int>(state.dataGroundHeatExchanger->currentSimTime / 24 + 1);
@@ -3121,7 +3119,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
-                           (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) *
+                           (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
                           DataGlobalConstants::SecInHour;
 
         // Init more variables
@@ -3226,7 +3224,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         using namespace GroundTemperatureManager;
 
         Real64 CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
-                          (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) *
+                          (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
                          DataGlobalConstants::SecInHour;
 
         // Init more variables

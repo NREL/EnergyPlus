@@ -81,19 +81,19 @@ Real64 CoolingSHRSizer::size(EnergyPlusData &state, Real64 _originalValue, bool 
                     // rated SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a
                     // regression of flow/capacity ratio vs SHR for several actual coils.
                     Real64 RatedVolFlowPerRatedTotCap = this->dataFlowUsedForSizing / this->dataCapacityUsedForSizing;
-                    if (DataHVACGlobals::DXCT == DataHVACGlobals::RegularDXCoil) {
-                        if (RatedVolFlowPerRatedTotCap > DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                            this->autoSizedValue = 0.431 + 6086.0 * DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
-                        } else if (RatedVolFlowPerRatedTotCap < DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                            this->autoSizedValue = 0.431 + 6086.0 * DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
+                    if (state.dataHVACGlobal->DXCT == DataHVACGlobals::RegularDXCoil) {
+                        if (RatedVolFlowPerRatedTotCap > state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT)) {
+                            this->autoSizedValue = 0.431 + 6086.0 * state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT);
+                        } else if (RatedVolFlowPerRatedTotCap < state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT)) {
+                            this->autoSizedValue = 0.431 + 6086.0 * state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT);
                         } else {
                             this->autoSizedValue = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
                         }
                     } else { // DOASDXCoil, or DXCT = 2
-                        if (RatedVolFlowPerRatedTotCap > DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                            this->autoSizedValue = 0.389 + 7684.0 * DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
-                        } else if (RatedVolFlowPerRatedTotCap < DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                            this->autoSizedValue = 0.389 + 7684.0 * DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
+                        if (RatedVolFlowPerRatedTotCap > state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT)) {
+                            this->autoSizedValue = 0.389 + 7684.0 * state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT);
+                        } else if (RatedVolFlowPerRatedTotCap < state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT)) {
+                            this->autoSizedValue = 0.389 + 7684.0 * state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT);
                         } else {
                             this->autoSizedValue = 0.389 + 7684.0 * RatedVolFlowPerRatedTotCap;
                         }

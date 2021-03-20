@@ -744,7 +744,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
+    OutputProcessor::SetupTimePointers(*state, "HVAC", state->dataHVACGlobal->TimeStepSys);
     createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
@@ -1522,7 +1522,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
+    OutputProcessor::SetupTimePointers(*state, "HVAC", state->dataHVACGlobal->TimeStepSys);
     createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
