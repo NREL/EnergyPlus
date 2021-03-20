@@ -10179,12 +10179,7 @@ namespace UnitarySystems {
         }             // No Heating/Cooling Load
 
         if (this->m_MultiSpeedHeatingCoil && (state.dataUnitarySystems->HeatingLoad && HeatSpeedNum == 1)) {
-            if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
-                state.dataHVACGlobal->MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow; // #5737
-            } else {
-                state.dataHVACGlobal->MSHPMassFlowRateLow =
-                    state.dataUnitarySystems->CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
-            }
+            state.dataHVACGlobal->MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow;
         } else if (this->m_DiscreteSpeedCoolingCoil && (state.dataUnitarySystems->CoolingLoad && CoolSpeedNum == 1)) {
             state.dataHVACGlobal->MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow;
         } else {
@@ -16001,11 +15996,7 @@ namespace UnitarySystems {
                 if (this->m_HeatingSpeedNum <= 1) {
                     this->m_HeatingSpeedRatio = 0.0;
                     this->m_HeatingCycRatio = PartLoadRatio;
-                    if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
-                        state.dataHVACGlobal->MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow; // #5737
-                    } else {
-                        state.dataHVACGlobal->MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow * PartLoadRatio; // #5518
-                    }
+                    state.dataHVACGlobal->MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow;
                 } else {
                     if (this->m_SingleMode == 0) {
                         this->m_HeatingSpeedRatio = PartLoadRatio;
