@@ -196,7 +196,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
     int EQLNum = 0;
     InitEquivalentLayerWindowCalculations(*state);
     EQLNum = state->dataConstruction->Construct(ConstrNum).EQLConsPtr;
-    EXPECT_EQ(CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL, state->dataWindowEquivalentLayer->lscVBNOBM);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(state->dataWindowEquivLayer->CFS(EQLNum).VBLayerPtr).CNTRL, state->dataWindowEquivalentLayer->lscVBNOBM);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
@@ -938,7 +938,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
     // get construction returns error forund true due to invalid layer
     GetConstructData(*state, ErrorsFound);
     EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
-    EXPECT_EQ(1, DataWindowEquivalentLayer::TotWinEquivLayerConstructs);
+    EXPECT_EQ(1, state->dataWindowEquivLayer->TotWinEquivLayerConstructs);
     EXPECT_TRUE(state->dataConstruction->Construct(1).TypeIsWindow);
     EXPECT_TRUE(state->dataConstruction->Construct(1).WindowTypeEQL);
     EXPECT_TRUE(ErrorsFound); // error found due to invalid layer
@@ -1252,17 +1252,17 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
     H(2) = HcIn;
 
     // check the window air gap vent type: vented to outdoor
-    EXPECT_EQ(CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENout);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENout);
     // zero solar absorbed on glazing layers or no solar input
     Source = 0.0;
-    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(*state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 308.610, 0.001);
     EXPECT_NEAR(T(2), 306.231, 0.001);
 
     // with solar absrobed on glazing layers
     Source(1) = 100.0; // outside glass layer
     Source(2) = 50.0;  // inside glass layer
-    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(*state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 313.886, 0.001);
     EXPECT_NEAR(T(2), 310.559, 0.001);
 }
@@ -1574,17 +1574,17 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
     H(2) = HcIn;
 
     // check the window air gap vent type: vented to outdoor
-    EXPECT_EQ(CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENin);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENin);
     // zero solar absorbed on glazing layers or no solar input
     Source = 0.0;
-    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(*state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 307.054, 0.001);
     EXPECT_NEAR(T(2), 304.197, 0.001);
 
     // with solar absrobed on glazing layers
     Source(1) = 100.0; // outside glass layer
     Source(2) = 50.0;  // inside glass layer
-    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(*state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 314.666, 0.001);
     EXPECT_NEAR(T(2), 311.282, 0.001);
 }
@@ -1967,12 +1967,12 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
 
     EQLNum = state->dataConstruction->Construct(ConstrNum).EQLConsPtr;
     // check number of solid layers
-    EXPECT_EQ(CFS(EQLNum).NL, 3);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).NL, 3);
     // check optical and thermal property of the VB layer (Inside Layer)
-    EXPECT_EQ(CFS(EQLNum).L(3).Name, "WMTEUQL_BLND_KINDV_RF80_T02_A18_RB45");
-    EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.TAUL, 0.0);
-    EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLF, 0.90);
-    EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLB, 0.90);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(3).Name, "WMTEUQL_BLND_KINDV_RF80_T02_A18_RB45");
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(3).LWP_MAT.TAUL, 0.0);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(3).LWP_MAT.EPSLF, 0.90);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(3).LWP_MAT.EPSLB, 0.90);
     // check inside face effective emissivity
     EXPECT_NEAR(state->dataConstruction->Construct(ConstrNum).InsideAbsorpThermal, 0.91024, 0.00001);
     // for fixed slate angle the emissivity remains the same

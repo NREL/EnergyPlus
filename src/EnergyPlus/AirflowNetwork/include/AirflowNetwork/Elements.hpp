@@ -55,6 +55,7 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+struct AirflowNetworkData;
 
 namespace AirflowNetwork {
 
@@ -99,26 +100,30 @@ namespace AirflowNetwork {
     // all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const CompTypeNum_DOP; // Detailed large opening component
-    extern int const CompTypeNum_SOP; // Simple opening component
-    extern int const CompTypeNum_SCR; // Surface crack component
-    extern int const CompTypeNum_SEL; // Surface effective leakage ratio component
-    extern int const CompTypeNum_PLR; // Distribution system crack component
-    extern int const CompTypeNum_DWC; // Distribution system duct component
-    extern int const CompTypeNum_CVF; // Distribution system constant volume fan component
-    extern int const CompTypeNum_FAN; // Distribution system detailed fan component
-    extern int const CompTypeNum_MRR; // Distribution system multiple curve fit power law resistant flow component
-    extern int const CompTypeNum_DMP; // Distribution system damper component
-    extern int const CompTypeNum_ELR; // Distribution system effective leakage ratio component
-    extern int const CompTypeNum_CPD; // Distribution system constant pressure drop component
-    extern int const CompTypeNum_COI; // Distribution system coil component
-    extern int const CompTypeNum_TMU; // Distribution system terminal unit component
-    extern int const CompTypeNum_EXF; // Zone exhaust fan
-    extern int const CompTypeNum_HEX; // Distribution system heat exchanger
-    extern int const CompTypeNum_HOP; // Horizontal opening component
-    extern int const CompTypeNum_RVD; // Reheat VAV terminal damper
-    extern int const CompTypeNum_OAF; // Distribution system OA
-    extern int const CompTypeNum_REL; // Distribution system relief air
+    enum class iComponentTypeNum : int
+    {
+        Unassigned = 0,
+        DOP = 1,  // Detailed large opening component
+        SOP = 2,  // Simple opening component
+        SCR = 3,  // Surface crack component
+        SEL = 4,  // Surface effective leakage ratio component
+        PLR = 5,  // Distribution system crack component
+        DWC = 6,  // Distribution system duct component
+        CVF = 7,  // Distribution system constant volume fan component
+        FAN = 8,  // Distribution system detailed fan component
+        MRR = 9,  // Distribution system multiple curve fit power law resistant flow component
+        DMP = 10, // Distribution system damper component
+        ELR = 11, // Distribution system effective leakage ratio component
+        CPD = 12, // Distribution system constant pressure drop component
+        COI = 13, // Distribution system coil component
+        TMU = 14, // Distribution system terminal unit component
+        EXF = 15, // Zone exhaust fan
+        HEX = 16, // Distribution system heat exchanger
+        HOP = 17, // Horizontal opening component
+        RVD = 18, // Reheat VAV terminal damper
+        OAF = 19, // Distribution system OA
+        REL = 20  // Distribution system relief air
+    };
 
 
     enum class ComponentType
@@ -145,37 +150,47 @@ namespace AirflowNetwork {
         REL      // Distribution system relief air
     };
 
-
     // EPlus component Type
-    extern int const EPlusTypeNum_SCN; // Supply connection
-    extern int const EPlusTypeNum_RCN; // Return connection
-    extern int const EPlusTypeNum_RHT; // Reheat terminal
-    extern int const EPlusTypeNum_FAN; // Fan
-    extern int const EPlusTypeNum_COI; // Heating or cooling coil
-    extern int const EPlusTypeNum_HEX; // Heat exchanger
-    extern int const EPlusTypeNum_RVD; // Reheat VAV terminal damper
+    enum class iEPlusComponentType : int
+    {
+        Unassigned = 0,
+        SCN = 1, // Supply connection
+        RCN = 2, // Return connection
+        RHT = 3, // Reheat terminal
+        FAN = 4, // Fan
+        COI = 5, // Heating or cooling coil
+        HEX = 6, // Heat exchanger
+        RVD = 7  // Reheat VAV terminal damper
+    };
 
     // EPlus node type
-    extern int const EPlusTypeNum_ZIN; // Zone inlet node
-    extern int const EPlusTypeNum_ZOU; // Zone outlet node
-    extern int const EPlusTypeNum_SPL; // Splitter node
-    extern int const EPlusTypeNum_MIX; // Mixer node
-    extern int const EPlusTypeNum_OAN; // Outside air system node
-    extern int const EPlusTypeNum_EXT; // OA system inlet node
-    extern int const EPlusTypeNum_FIN; // Fan Inlet node
-    extern int const EPlusTypeNum_FOU; // Fan Outlet Node
-    extern int const EPlusTypeNum_COU; // Coil Outlet Node
-    extern int const EPlusTypeNum_HXO; // Heat exchanger Outlet Node
-    extern int const EPlusTypeNum_DIN; // Damper Inlet node
-    extern int const EPlusTypeNum_DOU; // Damper Outlet Node
-    extern int const EPlusTypeNum_SPI; // Splitter inlet Node
-    extern int const EPlusTypeNum_SPO; // Splitter Outlet Node
+    enum class iEPlusNodeType : int
+    {
+        Unassigned = 0,
+        ZIN = 1,  // Zone inlet node
+        ZOU = 2,  // Zone outlet node
+        SPL = 3,  // Splitter node
+        MIX = 4,  // Mixer node
+        OAN = 5,  // Outside air system node
+        EXT = 6,  // OA system inlet node
+        FIN = 7,  // Fan Inlet node
+        FOU = 8,  // Fan Outlet Node
+        COU = 9,  // Coil Outlet Node
+        HXO = 10, // Heat exchanger Outlet Node
+        DIN = 11, // Damper Inlet node
+        DOU = 12, // Damper Outlet Node
+        SPI = 13, // Splitter inlet Node
+        SPO = 14  // Splitter Outlet Node
+    };
 
-    extern int const iWPCCntr_Input;
-    extern int const iWPCCntr_SurfAvg;
+    enum class iWPCCntr : int{
+        Unassigned = 0,
+        Input = 1,
+        SurfAvg = 2
+    };
 
-    extern int const PressureCtrlExhaust;
-    extern int const PressureCtrlRelief;
+    int constexpr PressureCtrlExhaust = 1;
+    int constexpr PressureCtrlRelief = 2;
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -184,7 +199,6 @@ namespace AirflowNetwork {
     // Link simulation variable in air distribution system
     // Sensible and latent exchange variable in air distribution system
 
-    extern int SimulateAirflowNetwork;
     // Vent Control  DistSys Control  Flag    Description
     //  NONE           NONE           0      No AirflowNetwork and SIMPLE
     //  SIMPLE         NONE           1      Simple calculations only
@@ -193,48 +207,12 @@ namespace AirflowNetwork {
     //  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
     //  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
 
-    extern int const AirflowNetworkControlSimple;    // Simple calculations only
-    extern int const AirflowNetworkControlMultizone; // Perform multizone calculations only
-    extern int const AirflowNetworkControlSimpleADS; // Perform distribution system during system
+    int constexpr AirflowNetworkControlSimple(1);    // Simple calculations only
+    int constexpr AirflowNetworkControlMultizone(2); // Perform multizone calculations only
+    int constexpr AirflowNetworkControlSimpleADS(4); // Perform distribution system during system
     // on time and simple calculations during off time
-    extern int const AirflowNetworkControlMultiADS; // Perform distribution system during system on time
-    // and multizone calculations during off time
-
-    extern Array1D_bool AirflowNetworkZoneFlag;
-
-    extern int NumOfNodesMultiZone;    // Number of nodes for multizone calculation
-    extern int NumOfNodesDistribution; // Number of nodes for distribution system calculation
-    extern int NumOfLinksMultiZone;    // Number of links for multizone calculation
-    extern int NumOfLinksDistribution; // Number of links for distribution system calculation
-    extern int NumOfNodesIntraZone;    // Number of nodes for intrazone calculation
-    extern int NumOfLinksIntraZone;    // Number of links for intrazone calculation
-
-    extern int AirflowNetworkNumOfNodes; // Number of nodes for AirflowNetwork calculation
-    // = NumOfNodesMultiZone+NumOfNodesDistribution
-    extern int AirflowNetworkNumOfComps; // Number of components for AirflowNetwork calculation
-    extern int AirflowNetworkNumOfLinks; // Number of links for AirflowNetwork calculation
-    // = NumOfLinksMultiZone+NumOfLinksDistribution
-    // RoomAirManager use
-    extern int AirflowNetworkNumOfSurfaces; // The number of surfaces for multizone calculation
-    extern int AirflowNetworkNumOfZones;    // The number of zones for multizone calculation
-
-    extern bool RollBackFlag;                         // Roll back flag when system time step down shifting
-    extern Array1D<Real64> ANZT;                      // Local zone air temperature for roll back use
-    extern Array1D<Real64> ANZW;                      // Local zone air humidity ratio for roll back use
-    extern Array1D<Real64> ANCO;                      // Local zone air CO2 for roll back use
-    extern Array1D<Real64> ANGC;                      // Local zone air generic contaminant for roll back use
-    extern int AirflowNetworkNumOfExhFan;             // Number of zone exhaust fans
-    extern Array1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
-    extern bool AirflowNetworkFanActivated;           // Supply fan activation flag
-    extern bool AirflowNetworkUnitarySystem;          // set to TRUE for unitary systems (to make answers equal, will remove eventually)
-    // Multispeed HP only
-    extern int MultiSpeedHPIndicator; // Indicator for multispeed heat pump use
-    // Addiitonal airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
-    extern Real64 VAVTerminalRatio;       // The terminal flow ratio when a supply VAV fan reach its max flow rate
-    extern bool VAVSystem;                // This flag is used to represent a VAV system
-    extern Real64 ExhaustFanMassFlowRate; // Exhaust fan flow rate used in PressureStat
-    extern int PressureSetFlag;           // PressureSet flag
-    extern Real64 ReliefMassFlowRate;     // OA Mixer relief node flow rate used in PressureStat
+    int constexpr AirflowNetworkControlMultiADS(5); // Perform distribution system during system on time
+                                                // and multizone calculations during off time
 
     // Types
 
@@ -252,7 +230,7 @@ namespace AirflowNetwork {
         // MULTIZONE WITH DISTRIBUTION ONLY DURING FAN OPERATION,
         // and NO MULTIZONE OR DISTRIBUTION
         std::string WPCCntr;      // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-        int iWPCCntr;             // Integer equivalent for WPCCntr field
+        iWPCCntr iWPCCnt = iWPCCntr::Unassigned;        // Integer equivalent for WPCCntr field
         std::string BldgType;     // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
         std::string HeightOption; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
         int MaxIteration;         // Maximum number of iteration, default 500
@@ -286,7 +264,6 @@ namespace AirflowNetwork {
         AirflowNetworkSimuProp(std::string const &AirflowNetworkSimuName, // Provide a unique object name
                                std::string const &Control,                // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
                                std::string const &WPCCntr,      // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-                               int const iWPCCntr,              // Integer equivalent for WPCCntr field
                                std::string const &BldgType,     // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATION"
                                std::string const &HeightOption, // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
                                int const MaxIteration,          // Maximum number of iteration, default 500
@@ -306,7 +283,7 @@ namespace AirflowNetwork {
                                Solver solver,                     // Solver type
                                bool const TExtHeightDep           // Choice of height dependence of external node temperature
                                )
-            : AirflowNetworkSimuName(AirflowNetworkSimuName), Control(Control), WPCCntr(WPCCntr), iWPCCntr(iWPCCntr), BldgType(BldgType),
+            : AirflowNetworkSimuName(AirflowNetworkSimuName), Control(Control), WPCCntr(WPCCntr), BldgType(BldgType),
               HeightOption(HeightOption), MaxIteration(MaxIteration), InitFlag(InitFlag), solver(solver), RelTol(RelTol), AbsTol(AbsTol),
               ConvLimit(ConvLimit), MaxPressure(MaxPressure), Azimuth(Azimuth), AspectRatio(AspectRatio), DiffP(DiffP),
               ExtLargeOpeningErrCount(ExtLargeOpeningErrCount), ExtLargeOpeningErrIndex(ExtLargeOpeningErrIndex),
@@ -1281,14 +1258,14 @@ namespace AirflowNetwork {
         int EPlusNodeNum;
         int ExtNodeNum;
         int OutAirNodeNum;
-        int EPlusTypeNum;
+        iEPlusNodeType EPlusTypeNum;
         int RAFNNodeNum; // RoomAir model node number
         int NumOfLinks;  // Number of links for RoomAir model
         int AirLoopNum;  // AirLoop number
 
         // Default Constructor
         AirflowNetworkNodeProp()
-            : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0), EPlusTypeNum(0),
+            : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0), EPlusTypeNum(iEPlusNodeType::Unassigned),
               RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
         {
         }
@@ -1298,16 +1275,16 @@ namespace AirflowNetwork {
     {
         // Members
         std::string Name;          // Provide a unique element name
-        int CompTypeNum;           // Provide numeric equivalent for AirflowNetworkCompType
+        iComponentTypeNum CompTypeNum;           // Provide numeric equivalent for AirflowNetworkCompType
         int TypeNum;               // Component number under same component type
         int CompNum;               // General component number
         std::string EPlusName;     // Provide a unique element name
         std::string EPlusCompName; // Provide EPlus component name or Other
         std::string EPlusType;     // Provide EPlus type, such as terminal reheat, coil, etc. 9/30/03 or Other
-        int EPlusTypeNum;          // Provide EPlus component type
+        iEPlusComponentType EPlusTypeNum;          // Provide EPlus component type
 
         // Default Constructor
-        AirflowNetworkCompProp() : CompTypeNum(0), TypeNum(0), CompNum(0), EPlusTypeNum(0)
+        AirflowNetworkCompProp() : CompTypeNum(iComponentTypeNum::Unassigned), TypeNum(0), CompNum(0), EPlusTypeNum(iEPlusComponentType::Unassigned)
         {
         }
     };
@@ -1318,14 +1295,14 @@ namespace AirflowNetwork {
         std::string ZoneName; // Name of zone
         int ZoneNum;          // Zone Number
         int DetOpenNum;       // Large Opening number
-        int ConnectionFlag;   // Return and supply connection flag
+        iEPlusComponentType ConnectionFlag;   // Return and supply connection flag
         bool VAVTermDamper;   // True if this component is a damper for a VAV terminal
         int LinkageViewFactorObjectNum;
         int AirLoopNum; // Airloop number
 
         // Default Constructor
         AirflowNetworkLinkageProp()
-            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(0), VAVTermDamper(false), LinkageViewFactorObjectNum(0),
+            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Unassigned), VAVTermDamper(false), LinkageViewFactorObjectNum(0),
               AirLoopNum(0)
         {
         }
@@ -1637,54 +1614,158 @@ namespace AirflowNetwork {
     };
 
     // Object Data
-    extern Array1D<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
-    extern Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
-
-    extern AirflowNetworkSimuProp AirflowNetworkSimu;
-    // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
-                            // field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration |
-                            // Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit |
-                            // Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along
-                            // Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening
-                            // error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large
-                            // opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag
-                            // type
-    extern Array1D<AirflowNetworkNodeProp> AirflowNetworkNodeData;
-    extern Array1D<AirflowNetworkCompProp> AirflowNetworkCompData;
-    extern Array1D<AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
-    extern Array1D<MultizoneZoneProp> MultizoneZoneData;
-    extern Array1D<MultizoneSurfaceProp> MultizoneSurfaceData;
-    extern Array1D<DetailedOpening> MultizoneCompDetOpeningData;
-    extern Array1D<SimpleOpening> MultizoneCompSimpleOpeningData;
-    extern Array1D<HorizontalOpening> MultizoneCompHorOpeningData;
-    extern Array1D<SurfaceCrack> MultizoneSurfaceCrackData;
-    extern Array1D<EffectiveLeakageArea> MultizoneSurfaceELAData;
-    extern Array1D<MultizoneExternalNodeProp> MultizoneExternalNodeData;
-    extern Array1D<DeltaCpProp> DeltaCp;
-    extern Array1D<DeltaCpProp> EPDeltaCP;
-    extern Array1D<ZoneExhaustFan> MultizoneCompExhaustFanData;
-    extern Array1D<IntraZoneNodeProp> IntraZoneNodeData;       // Intra zone data set
-    extern Array1D<IntraZoneLinkageProp> IntraZoneLinkageData; // Intra zone linkage adat set
-    extern Array1D<DisSysNodeProp> DisSysNodeData;
-    extern Array1D<DuctLeak> DisSysCompLeakData;
-    extern Array1D<EffectiveLeakageRatio> DisSysCompELRData;
-    extern Array1D<Duct> DisSysCompDuctData;
-    extern Array1D<Damper> DisSysCompDamperData;
-    extern Array1D<ConstantVolumeFan> DisSysCompCVFData;
-    extern Array1D<DetailedFan> DisSysCompDetFanData;
-    extern Array1D<DisSysCompCoilProp> DisSysCompCoilData;
-    extern Array1D<DisSysCompHXProp> DisSysCompHXData;
-    extern Array1D<DisSysCompTermUnitProp> DisSysCompTermUnitData;
-    extern Array1D<ConstantPressureDrop> DisSysCompCPDData;
-    extern Array1D<AiflowNetworkReportProp> AirflowNetworkReportData;
-    extern Array1D<PressureControllerProp> PressureControllerData;
-    extern Array1D<OutdoorAirFan> DisSysCompOutdoorAirData;
-    extern Array1D<ReliefFlow> DisSysCompReliefAirData;
-    extern Array1D<AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
 
     void clear_state();
 
 } // namespace AirflowNetwork
+
+struct AirflowNetworkData : BaseGlobalStruct {
+
+    int SimulateAirflowNetwork = 1;
+    Array1D_bool AirflowNetworkZoneFlag;
+    int NumOfNodesMultiZone = 0;    // Number of nodes for multizone calculation
+    int NumOfNodesDistribution = 0; // Number of nodes for distribution system calculation
+    int NumOfLinksMultiZone = 0;    // Number of links for multizone calculation
+    int NumOfLinksDistribution = 0; // Number of links for distribution system calculation
+    int NumOfNodesIntraZone = 0;    // Number of nodes for intrazone calculation
+    int NumOfLinksIntraZone = 0;    // Number of links for intrazone calculation
+
+    int AirflowNetworkNumOfNodes = 0; // Number of nodes for AirflowNetwork calculation
+    // = NumOfNodesMultiZone+NumOfNodesDistribution
+    int AirflowNetworkNumOfComps = 0; // Number of components for AirflowNetwork calculation
+    int AirflowNetworkNumOfLinks = 0; // Number of links for AirflowNetwork calculation
+    // = NumOfLinksMultiZone+NumOfLinksDistribution
+    // RoomAirManager use
+    int AirflowNetworkNumOfSurfaces = 0; // The number of surfaces for multizone calculation
+    int AirflowNetworkNumOfZones = 0;    // The number of zones for multizone calculation
+
+    bool RollBackFlag = false;                 // Roll back flag when system time step down shifting
+    Array1D<Real64> ANZT;                      // Local zone air temperature for roll back use
+    Array1D<Real64> ANZW;                      // Local zone air humidity ratio for roll back use
+    Array1D<Real64> ANCO;                      // Local zone air CO2 for roll back use
+    Array1D<Real64> ANGC;                      // Local zone air generic contaminant for roll back use
+    int AirflowNetworkNumOfExhFan = 0;         // Number of zone exhaust fans
+    Array1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
+    bool AirflowNetworkFanActivated = false;   // Supply fan activation flag
+    bool AirflowNetworkUnitarySystem = false;  // set to TRUE for unitary systems (to make answers equal, will remove eventually)
+    // Multispeed HP only
+    int MultiSpeedHPIndicator = 0; // Indicator for multispeed heat pump use
+    // Additional airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
+    Real64 VAVTerminalRatio = 0.0;       // The terminal flow ratio when a supply VAV fan reach its max flow rate
+    bool VAVSystem = false;              // This flag is used to represent a VAV system
+    Real64 ExhaustFanMassFlowRate = 0.0; // Exhaust fan flow rate used in PressureStat
+    int PressureSetFlag = 0;             // PressureSet flag
+    Real64 ReliefMassFlowRate = 0.0;     // OA Mixer relief node flow rate used in PressureStat
+
+    Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
+    Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
+
+    AirflowNetwork::AirflowNetworkSimuProp AirflowNetworkSimu;
+    // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
+    // field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration |
+    // Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit |
+    // Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along
+    // Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening
+    // error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large
+    // opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag
+    // type
+    Array1D<AirflowNetwork::AirflowNetworkNodeProp> AirflowNetworkNodeData;
+    Array1D<AirflowNetwork::AirflowNetworkCompProp> AirflowNetworkCompData;
+    Array1D<AirflowNetwork::AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
+    Array1D<AirflowNetwork::MultizoneZoneProp> MultizoneZoneData;
+    Array1D<AirflowNetwork::MultizoneSurfaceProp> MultizoneSurfaceData;
+    Array1D<AirflowNetwork::DetailedOpening> MultizoneCompDetOpeningData;
+    Array1D<AirflowNetwork::SimpleOpening> MultizoneCompSimpleOpeningData;
+    Array1D<AirflowNetwork::HorizontalOpening> MultizoneCompHorOpeningData;
+    Array1D<AirflowNetwork::SurfaceCrack> MultizoneSurfaceCrackData;
+    Array1D<AirflowNetwork::EffectiveLeakageArea> MultizoneSurfaceELAData;
+    Array1D<AirflowNetwork::MultizoneExternalNodeProp> MultizoneExternalNodeData;
+    Array1D<AirflowNetwork::DeltaCpProp> DeltaCp;
+    Array1D<AirflowNetwork::DeltaCpProp> EPDeltaCP;
+    Array1D<AirflowNetwork::ZoneExhaustFan> MultizoneCompExhaustFanData;
+    Array1D<AirflowNetwork::IntraZoneNodeProp> IntraZoneNodeData;       // Intra zone data set
+    Array1D<AirflowNetwork::IntraZoneLinkageProp> IntraZoneLinkageData; // Intra zone linkage adat set
+    Array1D<AirflowNetwork::DisSysNodeProp> DisSysNodeData;
+    Array1D<AirflowNetwork::DuctLeak> DisSysCompLeakData;
+    Array1D<AirflowNetwork::EffectiveLeakageRatio> DisSysCompELRData;
+    Array1D<AirflowNetwork::Duct> DisSysCompDuctData;
+    Array1D<AirflowNetwork::Damper> DisSysCompDamperData;
+    Array1D<AirflowNetwork::ConstantVolumeFan> DisSysCompCVFData;
+    Array1D<AirflowNetwork::DetailedFan> DisSysCompDetFanData;
+    Array1D<AirflowNetwork::DisSysCompCoilProp> DisSysCompCoilData;
+    Array1D<AirflowNetwork::DisSysCompHXProp> DisSysCompHXData;
+    Array1D<AirflowNetwork::DisSysCompTermUnitProp> DisSysCompTermUnitData;
+    Array1D<AirflowNetwork::ConstantPressureDrop> DisSysCompCPDData;
+    Array1D<AirflowNetwork::AiflowNetworkReportProp> AirflowNetworkReportData;
+    Array1D<AirflowNetwork::PressureControllerProp> PressureControllerData;
+    Array1D<AirflowNetwork::OutdoorAirFan> DisSysCompOutdoorAirData;
+    Array1D<AirflowNetwork::ReliefFlow> DisSysCompReliefAirData;
+    Array1D<AirflowNetwork::AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
+
+    void clear_state() override
+    {
+        this->SimulateAirflowNetwork = 1;
+        this->AirflowNetworkNodeSimu.clear();
+        this->AirflowNetworkLinkSimu.clear();
+        this->AirflowNetworkZoneFlag.clear();
+        this->NumOfNodesMultiZone = 0;
+        this->NumOfNodesDistribution = 0;
+        this->NumOfLinksMultiZone = 0;
+        this->NumOfLinksDistribution = 0;
+        this->NumOfNodesIntraZone = 0;
+        this->NumOfLinksIntraZone = 0;
+        this->AirflowNetworkNumOfNodes = 0;
+        this->AirflowNetworkNumOfComps = 0;
+        this->AirflowNetworkNumOfLinks = 0;
+        this->AirflowNetworkNumOfSurfaces = 0;
+        this->AirflowNetworkNumOfZones = 0;
+        this->RollBackFlag = false;
+        this->ANZT.clear();
+        this->ANZW.clear();
+        this->ANCO.clear();
+        this->ANGC.clear();
+        this->AirflowNetworkNumOfExhFan = 0;
+        this->AirflowNetworkZoneExhaustFan.clear();
+        this->AirflowNetworkFanActivated = false;
+        this->AirflowNetworkUnitarySystem = false;
+        this->MultiSpeedHPIndicator = 0;
+        this->VAVTerminalRatio = 0.0;
+        this->VAVSystem = false;
+        this->AirflowNetworkSimu = AirflowNetwork::AirflowNetworkSimuProp();
+        this->AirflowNetworkNodeData.clear();
+        this->AirflowNetworkCompData.clear();
+        this->AirflowNetworkLinkageData.clear();
+        this->MultizoneZoneData.clear();
+        this->MultizoneSurfaceData.clear();
+        this->MultizoneCompDetOpeningData.clear();
+        this->MultizoneCompSimpleOpeningData.clear();
+        this->MultizoneCompHorOpeningData.clear();
+        this->MultizoneSurfaceCrackData.clear();
+        this->MultizoneSurfaceELAData.clear();
+        this->MultizoneExternalNodeData.clear();
+        this->DeltaCp.clear();
+        this->EPDeltaCP.clear();
+        this->MultizoneCompExhaustFanData.clear();
+        this->IntraZoneNodeData.clear();    // Intra zone data set
+        this->IntraZoneLinkageData.clear(); // Intra zone linkage adat set
+        this->DisSysNodeData.clear();
+        this->DisSysCompLeakData.clear();
+        this->DisSysCompELRData.clear();
+        this->DisSysCompDuctData.clear();
+        this->DisSysCompDamperData.clear();
+        this->DisSysCompCVFData.clear();
+        this->DisSysCompDetFanData.clear();
+        this->DisSysCompCoilData.clear();
+        this->DisSysCompHXData.clear();
+        this->DisSysCompTermUnitData.clear();
+        this->DisSysCompCPDData.clear();
+        this->AirflowNetworkReportData.clear();
+        this->PressureControllerData.clear();
+        this->DisSysCompOutdoorAirData.clear();
+        this->DisSysCompReliefAirData.clear();
+        this->AirflowNetworkLinkageViewFactorData.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

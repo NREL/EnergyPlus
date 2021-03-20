@@ -172,7 +172,7 @@ namespace EnergyPlus {
             thisDomain.PerformIterationLoop(state, this);
 
             // Update outlet nodes, etc.
-            thisDomain.UpdatePipingSystems(this);
+            thisDomain.UpdatePipingSystems(state, this);
         }
 
         void SimulateGroundDomains(EnergyPlusData &state, bool initOnly)
@@ -210,7 +210,7 @@ namespace EnergyPlus {
                 thisDomain.Cur.CurSimTimeStepSize = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                 thisDomain.Cur.CurSimTimeSeconds = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                                                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
-                                                    DataHVACGlobals::SysTimeElapsed) * DataGlobalConstants::SecInHour;
+                                                    state.dataHVACGlobal->SysTimeElapsed) * DataGlobalConstants::SecInHour;
 
                 // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
                 if ((state.dataGlobal->BeginSimFlag && thisDomain.BeginSimInit) ||
@@ -246,15 +246,15 @@ namespace EnergyPlus {
                     // Aggregate the heat flux
                     // Zone-coupled slab
                     if (thisDomain.HasZoneCoupledSlab) {
-                        thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux();
+                        thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux(state);
                         thisDomain.NumHeatFlux += 1;
                         thisDomain.HeatFlux = thisDomain.AggregateHeatFlux / thisDomain.NumHeatFlux;
                     } else { // Coupled basement
 
                         // basement walls
-                        thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux();
+                        thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux(state);
                         // basement floor
-                        thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux();
+                        thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux(state);
 
                         thisDomain.NumHeatFlux += 1;
                         thisDomain.WallHeatFlux = thisDomain.AggregateWallHeatFlux / thisDomain.NumHeatFlux;
@@ -264,14 +264,14 @@ namespace EnergyPlus {
                     // Aggregate the heat flux
                     // Zone-coupled slab
                     if (thisDomain.HasZoneCoupledSlab) {
-                        thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux();
+                        thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux(state);
                         thisDomain.NumHeatFlux += 1;
                         thisDomain.HeatFlux = thisDomain.AggregateHeatFlux / thisDomain.NumHeatFlux;
                     } else if (thisDomain.HasZoneCoupledBasement) { // Coupled basement
                         // basement walls
-                        thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux();
+                        thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux(state);
                         // basement floor
-                        thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux();
+                        thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux(state);
 
                         thisDomain.NumHeatFlux += 1;
                         thisDomain.WallHeatFlux = thisDomain.AggregateWallHeatFlux / thisDomain.NumHeatFlux;
@@ -1552,7 +1552,7 @@ namespace EnergyPlus {
                 thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
                 thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                         DataIPShortCuts::cAlphaArgs(2), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
-                        DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1,
+                        DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1,
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
                     CurIndex = 2;
@@ -1564,7 +1564,7 @@ namespace EnergyPlus {
                 thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
                 thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                         DataIPShortCuts::cAlphaArgs(3), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
-                        DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1,
+                        DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1,
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {
                     CurIndex = 3;
@@ -1669,8 +1669,8 @@ namespace EnergyPlus {
                                                                                ErrorsFound,
                                                                                ObjName_HorizTrench,
                                                                                thisTrenchName,
-                                                                               DataLoopNode::NodeType_Water,
-                                                                               DataLoopNode::NodeConnectionType_Inlet,
+                                                                               DataLoopNode::NodeFluidType::Water,
+                                                                               DataLoopNode::NodeConnectionType::Inlet,
                                                                                1,
                                                                                DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
@@ -1681,8 +1681,8 @@ namespace EnergyPlus {
                                                                                 ErrorsFound,
                                                                                 ObjName_HorizTrench,
                                                                                 thisTrenchName,
-                                                                                DataLoopNode::NodeType_Water,
-                                                                                DataLoopNode::NodeConnectionType_Outlet,
+                                                                                DataLoopNode::NodeFluidType::Water,
+                                                                                DataLoopNode::NodeConnectionType::Outlet,
                                                                                 1,
                                                                                 DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {
@@ -2165,10 +2165,10 @@ namespace EnergyPlus {
             // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
             // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
             // which would be carried over from the previous environment
-            this->Cur.CurSimTimeStepSize = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            this->Cur.CurSimTimeStepSize = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             this->Cur.CurSimTimeSeconds = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                                           (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
-                                          DataHVACGlobals::SysTimeElapsed;
+                                          state.dataHVACGlobal->SysTimeElapsed;
 
             // There are also some inits that are "close to one time" inits...(one-time in standalone, each envrn in E+)
             if ((state.dataGlobal->BeginSimFlag && this->BeginSimInit) ||
@@ -2176,7 +2176,7 @@ namespace EnergyPlus {
 
                 // this seemed to clean up a lot of reverse DD stuff because fluid thermal properties were
                 // being based on the inlet temperature, which wasn't updated until later
-                thisCircuit->CurCircuitInletTemp = DataLoopNode::Node(thisCircuit->InletNodeNum).Temp;
+                thisCircuit->CurCircuitInletTemp = state.dataLoopNodes->Node(thisCircuit->InletNodeNum).Temp;
                 thisCircuit->InletTemperature = thisCircuit->CurCircuitInletTemp;
 
                 this->DoOneTimeInitializations(state, thisCircuit);
@@ -2197,7 +2197,7 @@ namespace EnergyPlus {
             // Get the mass flow and inlet temperature to use for this time step
             int InletNodeNum = thisCircuit->InletNodeNum;
             int OutletNodeNum = thisCircuit->OutletNodeNum;
-            thisCircuit->CurCircuitInletTemp = DataLoopNode::Node(InletNodeNum).Temp;
+            thisCircuit->CurCircuitInletTemp = state.dataLoopNodes->Node(InletNodeNum).Temp;
 
             // request design, set component flow will decide what to give us based on restrictions and flow lock status
             thisCircuit->CurCircuitFlowRate = thisCircuit->DesignMassFlowRate;
@@ -2210,7 +2210,7 @@ namespace EnergyPlus {
                                                  thisCircuit->CompNum);
         }
 
-        void Domain::UpdatePipingSystems(Circuit * thisCircuit) {
+        void Domain::UpdatePipingSystems(EnergyPlusData &state, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2220,7 +2220,7 @@ namespace EnergyPlus {
 
             int OutletNodeNum = thisCircuit->OutletNodeNum;
             auto const &out_cell(thisCircuit->CircuitOutletCell);
-            DataLoopNode::Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y,
+            state.dataLoopNodes->Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y,
                                                                  out_cell.Z).PipeCellData.Fluid.Temperature;
         }
 
@@ -4219,7 +4219,7 @@ namespace EnergyPlus {
                                 if (this->HasZoneCoupledBasement) {
                                     cell.Temperature = this->EvaluateZoneInterfaceTemperature(cell);
                                 } else { // FHX model
-                                    cell.Temperature = this->EvaluateBasementCellTemperature(cell);
+                                    cell.Temperature = this->EvaluateBasementCellTemperature(state, cell);
                                 }
                                 break;
                             case CellType::ZoneGroundInterface:
@@ -4574,7 +4574,7 @@ namespace EnergyPlus {
             return Numerator / Denominator;
         }
 
-        Real64 Domain::EvaluateBasementCellTemperature(CartesianCell &cell) {
+        Real64 Domain::EvaluateBasementCellTemperature(EnergyPlusData &state, CartesianCell &cell) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4604,7 +4604,7 @@ namespace EnergyPlus {
                     Beta = cell.Beta / 2.0;
 
                     // get the average basement wall heat flux and add it to the tally
-                    HeatFlux = this->GetBasementWallHeatFlux();
+                    HeatFlux = this->GetBasementWallHeatFlux(state);
                     Numerator += Beta * HeatFlux * cell.height();
 
                     // then get the +x conduction to continue the heat balance
@@ -4623,7 +4623,7 @@ namespace EnergyPlus {
                     Beta = cell.Beta / 2.0;
 
                     // get the average basement floor heat flux and add it to the tally
-                    HeatFlux = this->GetBasementFloorHeatFlux();
+                    HeatFlux = this->GetBasementFloorHeatFlux(state);
                     Numerator += Beta * HeatFlux * cell.width();
 
                     // then get the -y conduction to continue the heat balance
@@ -4800,7 +4800,7 @@ namespace EnergyPlus {
             return Numerator / Denominator;
         }
 
-        Real64 Domain::GetBasementWallHeatFlux() {
+        Real64 Domain::GetBasementWallHeatFlux(EnergyPlusData &state) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4811,12 +4811,12 @@ namespace EnergyPlus {
             Real64 RunningSummation = 0.0;
             auto const &numSurfaces = static_cast<unsigned int>(this->BasementZone.WallSurfacePointers.size());
             for (auto &surfaceIndex : this->BasementZone.WallSurfacePointers) {
-                RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(surfaceIndex);
+                RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(surfaceIndex);
             }
             return -RunningSummation / numSurfaces; // heat flux is negative here
         }
 
-        Real64 Domain::GetBasementFloorHeatFlux() {
+        Real64 Domain::GetBasementFloorHeatFlux(EnergyPlusData &state) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4827,7 +4827,7 @@ namespace EnergyPlus {
             Real64 RunningSummation = 0.0;
             auto const &numSurfaces = static_cast<unsigned int>(this->BasementZone.FloorSurfacePointers.size());
             for (auto &surfaceIndex : this->BasementZone.FloorSurfacePointers) {
-                RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(surfaceIndex);
+                RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(surfaceIndex);
             }
             return -RunningSummation / numSurfaces; // heat flux is negative here
         }
@@ -4860,7 +4860,7 @@ namespace EnergyPlus {
             state.dataSurface->OSCM(OSCMIndex).HRad = 0.0;
         }
 
-        Real64 Domain::GetZoneInterfaceHeatFlux() {
+        Real64 Domain::GetZoneInterfaceHeatFlux(EnergyPlusData &state) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4871,7 +4871,7 @@ namespace EnergyPlus {
             Real64 RunningSummation = 0.0;
             auto const &NumSurfaces = this->ZoneCoupledSurfaces.size();
             for (auto &z : this->ZoneCoupledSurfaces) {
-                RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(z.IndexInSurfaceArray);
+                RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(z.IndexInSurfaceArray);
             }
             return -RunningSummation / NumSurfaces; // heat flux is negative here
         }

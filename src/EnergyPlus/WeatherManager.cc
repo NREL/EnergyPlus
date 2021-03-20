@@ -368,7 +368,7 @@ namespace WeatherManager {
 
         if (state.dataGlobal->BeginSimFlag && state.dataWeatherManager->GetEnvironmentFirstCall) {
 
-            DataReportingFlags::PrintEndDataDictionary = true;
+            state.dataReportFlag->PrintEndDataDictionary = true;
 
             ReportOutputFileHeaders(state); // Write the output file header information
 
@@ -555,12 +555,12 @@ namespace WeatherManager {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName + "No Design Days or Run Period(s) specified, program will terminate.");
             }
-            if (DataSystemVariables::DDOnly && state.dataEnvrn->TotDesDays == 0) {
+            if (state.dataSysVars->DDOnly && state.dataEnvrn->TotDesDays == 0) {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName +
                                 "Requested Design Days only (DataSystemVariables::DDOnly) but no Design Days specified, program will terminate.");
             }
-            if (DataSystemVariables::ReverseDD && state.dataEnvrn->TotDesDays == 1) {
+            if (state.dataSysVars->ReverseDD && state.dataEnvrn->TotDesDays == 1) {
                 ErrorsFound = true;
                 ShowSevereError(state,
                     RoutineName +
@@ -647,7 +647,7 @@ namespace WeatherManager {
                 state.dataEnvrn->RunPeriodStartDayOfWeek = 0;
                 if ((state.dataGlobal->DoDesDaySim && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) ||
                     ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && state.dataGlobal->DoWeathSim)) {
-                    if (state.dataWeatherManager->PrntEnvHeaders && DataReportingFlags::DoWeatherInitReporting) {
+                    if (state.dataWeatherManager->PrntEnvHeaders && state.dataReportFlag->DoWeatherInitReporting) {
                         static constexpr auto EnvironFormat(
                             "! <Environment>,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {#days}, "
                             "Source:Start DayOfWeek,  Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule,  Use Rain Values, Use Snow "
@@ -780,7 +780,7 @@ namespace WeatherManager {
                         int TWeekDay = (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DayOfWeek == 0) ? 1 : state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DayOfWeek;
                         auto const &MonWeekDay = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay;
 
-                        if (DataReportingFlags::DoWeatherInitReporting) {
+                        if (state.dataReportFlag->DoWeatherInitReporting) {
                             std::string const AlpUseDST = (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).UseDST) ? "Yes" : "No";
                             std::string const AlpUseSpec = (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).UseHolidays) ? "Yes" : "No";
                             std::string const ApWkRule = (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).ApplyWeekendRule) ? "Yes" : "No";
@@ -905,7 +905,7 @@ namespace WeatherManager {
                             if (state.dataWeatherManager->IDFDaylightSaving) {
                                 Source = "InputFile";
                             }
-                            if (state.dataWeatherManager->DaylightSavingIsActive && DataReportingFlags::DoWeatherInitReporting) {
+                            if (state.dataWeatherManager->DaylightSavingIsActive && state.dataReportFlag->DoWeatherInitReporting) {
                                 StDate = format(DateFormat, DSTActStMon, DSTActStDay);
                                 EnDate = format(DateFormat, DSTActEnMon, DSTActEnDay);
                                 print(state.files.eio, EnvDSTYFormat, Source, StDate, EnDate);
@@ -914,7 +914,7 @@ namespace WeatherManager {
                             }
                             for (int i = 1; i <= state.dataWeatherManager->NumSpecialDays; ++i) {
                                 static constexpr auto EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}");
-                                if (state.dataWeatherManager->SpecialDays(i).WthrFile && state.dataWeatherManager->UseSpecialDays && DataReportingFlags::DoWeatherInitReporting) {
+                                if (state.dataWeatherManager->SpecialDays(i).WthrFile && state.dataWeatherManager->UseSpecialDays && state.dataReportFlag->DoWeatherInitReporting) {
                                     StDate = format(DateFormat, state.dataWeatherManager->SpecialDays(i).ActStMon, state.dataWeatherManager->SpecialDays(i).ActStDay);
                                     print(state.files.eio,
                                           EnvSpDyFormat,
@@ -924,7 +924,7 @@ namespace WeatherManager {
                                           StDate,
                                           state.dataWeatherManager->SpecialDays(i).Duration);
                                 }
-                                if (!state.dataWeatherManager->SpecialDays(i).WthrFile && DataReportingFlags::DoWeatherInitReporting) {
+                                if (!state.dataWeatherManager->SpecialDays(i).WthrFile && state.dataReportFlag->DoWeatherInitReporting) {
                                     StDate = format(DateFormat, state.dataWeatherManager->SpecialDays(i).ActStMon, state.dataWeatherManager->SpecialDays(i).ActStDay);
                                     print(state.files.eio,
                                           EnvSpDyFormat,
@@ -943,7 +943,7 @@ namespace WeatherManager {
                         StDate = format(
                             DateFormat, state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).Month, state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).DayOfMonth);
                         EnDate = StDate;
-                        if (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).DayType <= 7 && DataReportingFlags::DoWeatherInitReporting) {
+                        if (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).DayType <= 7 && state.dataReportFlag->DoWeatherInitReporting) {
 
                             print(state.files.eio,
                                   EnvNameFormat,
@@ -960,7 +960,7 @@ namespace WeatherManager {
                                   "N/A",
                                   "N/A",
                                   SkyTempModelNames.at(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel));
-                        } else if (DataReportingFlags::DoWeatherInitReporting) {
+                        } else if (state.dataReportFlag->DoWeatherInitReporting) {
                             print(state.files.eio,
                                   EnvNameFormat,
                                   state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title,
@@ -977,9 +977,9 @@ namespace WeatherManager {
                                   "N/A",
                                   SkyTempModelNames.at(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel));
                         }
-                        if (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).DSTIndicator == 0 && DataReportingFlags::DoWeatherInitReporting) {
+                        if (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).DSTIndicator == 0 && state.dataReportFlag->DoWeatherInitReporting) {
                             print(state.files.eio, EnvDSTNFormat, "SizingPeriod:DesignDay");
-                        } else if (DataReportingFlags::DoWeatherInitReporting) {
+                        } else if (state.dataReportFlag->DoWeatherInitReporting) {
                             print(state.files.eio, EnvDSTYFormat, "SizingPeriod:DesignDay", StDate, EnDate);
                         }
                     }
@@ -3472,7 +3472,7 @@ namespace WeatherManager {
                                   state.dataWeatherManager->DesignDay(EnvrnNum).SinSolarDeclinAngle,
                                   state.dataWeatherManager->DesignDay(EnvrnNum).CosSolarDeclinAngle);
 
-        if (state.dataWeatherManager->PrintDDHeader && DataReportingFlags::DoWeatherInitReporting) {
+        if (state.dataWeatherManager->PrintDDHeader && state.dataReportFlag->DoWeatherInitReporting) {
             static constexpr auto EnvDDHdFormat(
                 "! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, "
                 "Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, Wind Direction {deg CW from N}, Wind "
@@ -3483,7 +3483,7 @@ namespace WeatherManager {
             print(state.files.eio, "{}\n", DDayMiscHdFormat);
             state.dataWeatherManager->PrintDDHeader = false;
         }
-        if (DataReportingFlags::DoWeatherInitReporting) {
+        if (state.dataReportFlag->DoWeatherInitReporting) {
             std::string const AlpUseRain = (state.dataWeatherManager->DesDayInput(EnvrnNum).RainInd == 1) ? "Yes" : "No";
             std::string const AlpUseSnow = (state.dataWeatherManager->DesDayInput(EnvrnNum).SnowInd == 1) ? "Yes" : "No";
             print(state.files.eio, "Environment:Design Day Data,");
@@ -4319,7 +4319,7 @@ namespace WeatherManager {
 
                 int endcol = len(Line.data);
                 if (endcol > 0) {
-                    if (int(Line.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
+                    if (int(Line.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
                         ShowSevereError(state, "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.",
                                         OptionalOutputFileRef(state.files.eso));
                         ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
@@ -4635,11 +4635,11 @@ namespace WeatherManager {
 
             if (printEnvrnStamp) {
 
-                if (DataReportingFlags::PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
+                if (state.dataReportFlag->PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
                     static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
                     print(state.files.mtr, "{}\n", EndOfHeaderString);
-                    DataReportingFlags::PrintEndDataDictionary = false;
+                    state.dataReportFlag->PrintEndDataDictionary = false;
                 }
                 if (state.dataGlobal->DoOutputReporting) {
                     std::string const &Title(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title);
@@ -4710,7 +4710,7 @@ namespace WeatherManager {
             state.dataWeatherManager->Environment(Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
         }
         for (int Env = 1; Env <= RPD1 + RPD2; ++Env) {
-            if (!DataSystemVariables::DDOnly) {
+            if (!state.dataSysVars->DDOnly) {
                 state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodDesign;
             } else {
                 state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
@@ -4731,16 +4731,16 @@ namespace WeatherManager {
         // the last environment(s) is designated the weather environment if an annual run
         // is selected.  All of the design systems is done from the design day info
         // which will have to be completed to run the annual run.
-        if (state.dataWeatherManager->TotRunPers >= 1 || DataSystemVariables::FullAnnualRun) {
+        if (state.dataWeatherManager->TotRunPers >= 1 || state.dataSysVars->FullAnnualRun) {
             GetRunPeriodData(state, state.dataWeatherManager->TotRunPers, ErrorsFound);
         }
 
-        if (DataSystemVariables::FullAnnualRun) {
+        if (state.dataSysVars->FullAnnualRun) {
             // GetRunPeriodData may have reset the value of TotRunPers
              state.dataWeatherManager->NumOfEnvrn = state.dataEnvrn->TotDesDays + state.dataWeatherManager->TotRunPers + RPD1 + RPD2;
         }
 
-        if (RPD1 >= 1 || RPD2 >= 1 || state.dataWeatherManager->TotRunPers >= 1 || DataSystemVariables::FullAnnualRun) {
+        if (RPD1 >= 1 || RPD2 >= 1 || state.dataWeatherManager->TotRunPers >= 1 || state.dataSysVars->FullAnnualRun) {
             GetSpecialDayPeriodData(state, ErrorsFound);
             GetDSTData(state, ErrorsFound);
             if (state.dataWeatherManager->IDFDaylightSaving) {
@@ -4865,7 +4865,7 @@ namespace WeatherManager {
             state.dataWeatherManager->RunPeriodInput(i).endYear = int(DataIPShortCuts::rNumericArgs(6));
             state.dataWeatherManager->RunPeriodInput(i).TreatYearsAsConsecutive = true;
 
-            if (DataSystemVariables::FullAnnualRun && i == 1) {
+            if (state.dataSysVars->FullAnnualRun && i == 1) {
                 state.dataWeatherManager->RunPeriodInput(i).startMonth = 1;
                 state.dataWeatherManager->RunPeriodInput(i).startDay = 1;
                 state.dataWeatherManager->RunPeriodInput(i).endMonth = 12;
@@ -5156,7 +5156,7 @@ namespace WeatherManager {
             }
         }
 
-        if (nRunPeriods == 0 && DataSystemVariables::FullAnnualRun) {
+        if (nRunPeriods == 0 && state.dataSysVars->FullAnnualRun) {
             ShowWarningError(state, "No Run Periods input but Full Annual Simulation selected.  Adding Run Period to 1/1 through 12/31.");
             state.dataWeatherManager->Environment.redimension(++ state.dataWeatherManager->NumOfEnvrn);
             state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
@@ -5170,7 +5170,7 @@ namespace WeatherManager {
                 SetupWeekDaysByMonth(state,
                     state.dataWeatherManager->RunPeriodInput(1).startMonth, state.dataWeatherManager->RunPeriodInput(1).startDay, state.dataWeatherManager->RunPeriodInput(1).dayOfWeek, state.dataWeatherManager->RunPeriodInput(1).monWeekDay);
             }
-        } else if (nRunPeriods > 1 && DataSystemVariables::FullAnnualRun) {
+        } else if (nRunPeriods > 1 && state.dataSysVars->FullAnnualRun) {
             nRunPeriods = 1;
         }
     }
@@ -5803,7 +5803,7 @@ namespace WeatherManager {
         state.dataWeatherManager->SPSiteDiffuseSolarScheduleValue.dimension(TotDesDays, 0.0);
         state.dataWeatherManager->SPSiteSkyTemperatureScheduleValue.dimension(TotDesDays, 0.0);
 
-        if (DataSystemVariables::ReverseDD && TotDesDays <= 1) {
+        if (state.dataSysVars->ReverseDD && TotDesDays <= 1) {
             ShowSevereError(state, "GetDesignDayData: Reverse Design Day requested but # Design Days <=1");
         }
 
@@ -5811,7 +5811,7 @@ namespace WeatherManager {
         for (int i = 1; i <= TotDesDays; ++i) {
 
             int EnvrnNum;
-            if (DataSystemVariables::ReverseDD) {
+            if (state.dataSysVars->ReverseDD) {
                 if (i == 1 && TotDesDays > 1) {
                     EnvrnNum = 2;
                 } else if (i == 2) {

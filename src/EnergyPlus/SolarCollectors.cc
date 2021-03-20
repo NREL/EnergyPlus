@@ -352,16 +352,16 @@ namespace SolarCollectors {
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeType_Water,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        DataLoopNode::NodeFluidType::Water,
+                                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                          ErrorsFound,
                                                                                          CurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeType_Water,
-                                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                                         DataLoopNode::NodeFluidType::Water,
+                                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
 
@@ -607,16 +607,16 @@ namespace SolarCollectors {
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeType_Water,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        DataLoopNode::NodeFluidType::Water,
+                                                                                        DataLoopNode::NodeConnectionType::Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
                                                                                          ErrorsFound,
                                                                                          CurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeType_Water,
-                                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                                         DataLoopNode::NodeFluidType::Water,
+                                                                                         DataLoopNode::NodeConnectionType::Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
 
@@ -754,7 +754,7 @@ namespace SolarCollectors {
 
         this->update(state);
 
-        this->report();
+        this->report(state);
     }
 
     void CollectorData::initialize(EnergyPlusData &state)
@@ -812,7 +812,8 @@ namespace SolarCollectors {
                 this->MassFlowRateMax = BigNumber;
             }
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->MassFlowRateMax,
                                                this->InletNode,
                                                this->OutletNode,
@@ -888,7 +889,7 @@ namespace SolarCollectors {
             this->SetDiffRadFlag = false;
         }
 
-        this->InletTemp = DataLoopNode::Node(this->InletNode).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
 
         this->MassFlowRate = this->MassFlowRateMax;
 
@@ -898,7 +899,7 @@ namespace SolarCollectors {
 
         if (this->InitICS) {
 
-            Real64 timeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+            Real64 timeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
 
             if (this->TimeElapsed != timeElapsed) {
                 // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous
@@ -1237,7 +1238,7 @@ namespace SolarCollectors {
 
         int SurfNum = this->Surface;
         int ParamNum = this->Parameters;
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         Real64 TempWater = this->SavedTempOfWater;
         Real64 TempAbsPlate = this->SavedTempOfAbsPlate;
         Real64 TempOutdoorAir = state.dataSurface->Surface(SurfNum).OutDryBulbTemp;
@@ -1969,13 +1970,13 @@ namespace SolarCollectors {
 
         PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
         // Set outlet node variables that are possibly changed
-        DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
             state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, this->OutletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
-        DataLoopNode::Node(this->OutletNode).Enthalpy = Cp * DataLoopNode::Node(this->OutletNode).Temp;
+        state.dataLoopNodes->Node(this->OutletNode).Enthalpy = Cp * state.dataLoopNodes->Node(this->OutletNode).Temp;
     }
 
-    void CollectorData::report()
+    void CollectorData::report(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1985,7 +1986,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
 
-        Real64 TimeStepInSecond = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepInSecond = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         this->Energy = this->Power * TimeStepInSecond;
         this->HeatEnergy = this->HeatRate * TimeStepInSecond;

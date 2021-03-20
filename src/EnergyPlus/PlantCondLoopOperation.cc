@@ -101,8 +101,6 @@ namespace EnergyPlus::PlantCondLoopOperation {
 
     // Using/Aliasing
     using namespace DataPlant;
-    using DataHVACGlobals::NumCondLoops;
-    using DataHVACGlobals::NumPlantLoops;
     using DataHVACGlobals::SmallLoad;
     using FluidProperties::GetSpecificHeatGlycol;
 
@@ -130,22 +128,6 @@ namespace EnergyPlus::PlantCondLoopOperation {
         // Input" routines, initializes the loop pointers, then calls the
         // appropriate type of control algorithm (setpoint, load range based,
         // or uncontrolled) for the component
-
-        // METHODOLOGY EMPLOYED:
-        // na
-        // REFERENCES:
-        // na
-        // Using/Aliasing
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-        // DERIVED TYPE DEFINITIONS
-        // na
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ListNum;    // DO loop index in PlantLoop()%LoopSide()%Branch()%Comp()%OpScheme()%EquipList(ListNum)
         int CurListNum; // Current list...= ListNum,  used for error checking only
@@ -379,7 +361,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
         // Load the Plant data structure
         for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             PlantOpSchemeName = state.dataPlnt->PlantLoop(LoopNum).OperationScheme;
-            if (LoopNum <= NumPlantLoops) {
+            if (LoopNum <= state.dataHVACGlobal->NumPlantLoops) {
                 CurrentModuleObject = "PlantEquipmentOperationSchemes";
                 PlantLoopObject = "PlantLoop";
             } else {
@@ -753,7 +735,7 @@ CurrentModuleObject, PlantOpSchemeName);
         Array1D<Real64> NumArray;      // Numeric input items for object
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
+        int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
         //   certain object in the input file
         int Num;
         int NumEquipLists;
@@ -950,7 +932,7 @@ CurrentModuleObject, PlantOpSchemeName);
         Array1D<Real64> NumArray;      // Numeric input items for object
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
+        int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
         //   certain object in the input file
         int Num;
         int NumEquipLists;
@@ -1001,8 +983,8 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                                                    ErrorsFound,
                                                                                                    CurrentModuleObject,
                                                                                                    AlphArray(1),
-                                                                                                   NodeType_Water,
-                                                                                                   NodeConnectionType_Sensor,
+                                                                                                   DataLoopNode::NodeFluidType::Water,
+                                                                                                   DataLoopNode::NodeConnectionType::Sensor,
                                                                                                    1,
                                                                                                    ObjectIsNotParent);
                     // For DO Loop below -- Check for lower limit > upper limit.(invalid)
@@ -1071,10 +1053,6 @@ CurrentModuleObject, PlantOpSchemeName);
         int IOStat;
         bool IsNotOK;
         std::string CurrentModuleObject;
-        static int TotNumLists(0);
-        static Array1D_string EquipListsNameList;
-        static Array1D<LoopType> EquipListsTypeList;
-        static Array1D_int EquipListsIndexList;
         int iIndex;
         bool firstblank;
 
@@ -1082,11 +1060,11 @@ CurrentModuleObject, PlantOpSchemeName);
             // assemble mapping between list names and indices one time
             PELists = inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
             CELists = inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
-            TotNumLists = PELists + CELists;
-            if (TotNumLists > 0) {
-                EquipListsNameList.allocate(TotNumLists);
-                EquipListsTypeList.allocate(TotNumLists);
-                EquipListsIndexList.allocate(TotNumLists);
+            state.dataPlantCondLoopOp->TotNumLists = PELists + CELists;
+            if (state.dataPlantCondLoopOp->TotNumLists > 0) {
+                state.dataPlantCondLoopOp->EquipListsNameList.allocate(state.dataPlantCondLoopOp->TotNumLists);
+                state.dataPlantCondLoopOp->EquipListsTypeList.allocate(state.dataPlantCondLoopOp->TotNumLists);
+                state.dataPlantCondLoopOp->EquipListsIndexList.allocate(state.dataPlantCondLoopOp->TotNumLists);
 
                 // First load PlantEquipmentList info
                 if (PELists > 0) {
@@ -1105,9 +1083,9 @@ CurrentModuleObject, PlantOpSchemeName);
                                                       lAlphaFieldBlanks,
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
-                        EquipListsNameList(iIndex) = cAlphaArgs(1);
-                        EquipListsTypeList(iIndex) = LoopType::Plant;
-                        EquipListsIndexList(iIndex) = Num;
+                        state.dataPlantCondLoopOp->EquipListsNameList(iIndex) = cAlphaArgs(1);
+                        state.dataPlantCondLoopOp->EquipListsTypeList(iIndex) = LoopType::Plant;
+                        state.dataPlantCondLoopOp->EquipListsIndexList(iIndex) = Num;
                         MachineNum = 2;
                         while (MachineNum <= NumAlphas) {
                             firstblank = false;
@@ -1152,9 +1130,9 @@ CurrentModuleObject, PlantOpSchemeName);
                                                       lAlphaFieldBlanks,
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
-                        EquipListsNameList(iIndex) = cAlphaArgs(1);
-                        EquipListsTypeList(iIndex) = LoopType::Condenser;
-                        EquipListsIndexList(iIndex) = Num;
+                        state.dataPlantCondLoopOp->EquipListsNameList(iIndex) = cAlphaArgs(1);
+                        state.dataPlantCondLoopOp->EquipListsTypeList(iIndex) = LoopType::Condenser;
+                        state.dataPlantCondLoopOp->EquipListsIndexList(iIndex) = Num;
                         MachineNum = 2;
                         while (MachineNum <= NumAlphas) {
                             firstblank = false;
@@ -1192,12 +1170,12 @@ CurrentModuleObject, PlantOpSchemeName);
 
         FoundIntendedList = false;
         // find name in set of possible list
-        for (Num = 1; Num <= TotNumLists; ++Num) {
-            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name, EquipListsNameList(Num))) {
+        for (Num = 1; Num <= state.dataPlantCondLoopOp->TotNumLists; ++Num) {
+            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name, state.dataPlantCondLoopOp->EquipListsNameList(Num))) {
                 FoundIntendedList = true;
                 // get object item for real this time
                 {
-                    auto const SELECT_CASE_var(EquipListsTypeList(Num));
+                    auto const SELECT_CASE_var(state.dataPlantCondLoopOp->EquipListsTypeList(Num));
                     if (SELECT_CASE_var == LoopType::Plant) {
                         CurrentModuleObject = "PlantEquipmentList";
                     } else if (SELECT_CASE_var == LoopType::Condenser) {
@@ -1206,7 +1184,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 }
                 inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
-                                              EquipListsIndexList(Num),
+                                              state.dataPlantCondLoopOp->EquipListsIndexList(Num),
                                               cAlphaArgs,
                                               NumAlphas,
                                               rNumericArgs,
@@ -1351,8 +1329,8 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                                                                             ErrorsFound,
                                                                                                                             CurrentModuleObject,
                                                                                                                             cAlphaArgs(1),
-                                                                                                                            NodeType_Water,
-                                                                                                                            NodeConnectionType_Sensor,
+                                                                                                                            DataLoopNode::NodeFluidType::Water,
+                                                                                                                            DataLoopNode::NodeConnectionType::Sensor,
                                                                                                                             1,
                                                                                                                             ObjectIsNotParent);
                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName = cAlphaArgs(CompNumA);
@@ -1361,8 +1339,8 @@ CurrentModuleObject, PlantOpSchemeName);
                                               ErrorsFound,
                                               CurrentModuleObject,
                                               cAlphaArgs(1),
-                                              NodeType_Water,
-                                              NodeConnectionType_Sensor,
+                                              DataLoopNode::NodeFluidType::Water,
+                                              DataLoopNode::NodeConnectionType::Sensor,
                                               1,
                                               ObjectIsNotParent);
                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate = rNumericArgs(CompNumN);
@@ -1451,7 +1429,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         {
                             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme);
                             if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
-                                if (Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPoint ==
+                                if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPoint ==
                                     SensedNodeFlagValue) {
                                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                         ShowSevereError(state, "Missing temperature setpoint for " + CurrentModuleObject + " named " + cAlphaArgs(1));
@@ -1488,7 +1466,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                 }
                             } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                                 if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum == iCtrlType::CoolingOp) {
-                                    if (Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointHi ==
+                                    if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointHi ==
                                         SensedNodeFlagValue) {
                                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                             ShowSevereError(state, "Missing temperature high setpoint for " + CurrentModuleObject + " named " +
@@ -1526,7 +1504,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                         }
                                     }
                                 } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum == iCtrlType::HeatingOp) {
-                                    if (Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointLo ==
+                                    if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointLo ==
                                         SensedNodeFlagValue) {
                                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                             ShowSevereError(state, "Missing temperature low setpoint for " + CurrentModuleObject + " named " +
@@ -1568,9 +1546,9 @@ CurrentModuleObject, PlantOpSchemeName);
                                         }
                                     }
                                 } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum == iCtrlType::DualOp) {
-                                    if ((Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointHi ==
+                                    if ((state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointHi ==
                                          SensedNodeFlagValue) ||
-                                        (Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointLo ==
+                                        (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointLo ==
                                          SensedNodeFlagValue)) {
                                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                             ShowSevereError(state, "Missing temperature dual setpoints for " + CurrentModuleObject + " named " +
@@ -1654,7 +1632,6 @@ CurrentModuleObject, PlantOpSchemeName);
         bool SchemeNameFound;        // Set to FALSE if a match of OpScheme object and OpScheme name is not found
         std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
         int StackMngrNum;            // local temporary for Erl program calling manager index
-        static bool lDummy;          // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
 
         SchemeNameFound = true;
 
@@ -1704,7 +1681,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                              state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name,
                                          "Distributed Load Rate",
                                          "[W]",
-                                         lDummy,
+                                         state.dataPlantCondLoopOp->lDummy,
                                          state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).EMSActuatorDispatchedLoadValue);
                         // TODO: I think this should be a sensor really
                         SetupEMSInternalVariable(state, "Component Remaining Current Demand Rate",
@@ -2677,36 +2654,19 @@ CurrentModuleObject, PlantOpSchemeName);
         // Components are machines on plant equipment operation lists.  Need to make adjustments to the
         // load dispatch to account for limits and floating capacities.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        //  USE EconomizerHeatExchanger,  ONLY: GetEconHeatExchangerCurrentCapacity
-        // Using/Aliasing
-        using DataLoopNode::Node;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("PlantCondLoopOperation:DistributePlantLoad");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 CurMassFlowRate(0.0);
-        static Real64 ToutLowLimit(0.0);
-        static Real64 ToutHiLimit(0.0);
-        static Real64 TinLowLimit(0.0);
-        static Real64 Tinlet(0.0);
-        static Real64 Tsensor(0.0);
-        static Real64 CurSpecHeat(0.0);
-        static Real64 QdotTmp(0.0);
-        static int ControlNodeNum(0);
+        Real64 CurMassFlowRate(0.0);
+        Real64 ToutLowLimit(0.0);
+        Real64 ToutHiLimit(0.0);
+        Real64 TinLowLimit(0.0);
+        Real64 Tinlet(0.0);
+        Real64 Tsensor(0.0);
+        Real64 CurSpecHeat(0.0);
+        Real64 QdotTmp(0.0);
+        int ControlNodeNum(0);
 
         auto &this_component(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
 
@@ -2719,9 +2679,9 @@ CurrentModuleObject, PlantOpSchemeName);
             if (SELECT_CASE_var == HowMet_ByNominalCapLowOutLimit) { // chillers with lower limit on outlet temperature
 
                 //- Retrieve data from the plant loop data structure
-                CurMassFlowRate = Node(this_component.NodeNumIn).MassFlowRate;
+                CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
                 ToutLowLimit = this_component.MinOutletTemp;
-                Tinlet = Node(this_component.NodeNumIn).Temp;
+                Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
                 CurSpecHeat = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
                 QdotTmp = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
 
@@ -2743,7 +2703,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::Loop) {
                         ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
                         if (ControlNodeNum > 0) {
-                            Tsensor = Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
+                            Tsensor = state.dataLoopNodes->Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
                         } else {
                             Tsensor = 23.0;
                         }
@@ -2772,7 +2732,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::Loop) {
                         ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
                         if (ControlNodeNum > 0) {
-                            Tsensor = Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
+                            Tsensor = state.dataLoopNodes->Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
                         } else {
                             Tsensor = 23.0;
                         }
@@ -2787,9 +2747,9 @@ CurrentModuleObject, PlantOpSchemeName);
                     //- Retrieve data from the plant loop data structure
                     this_component.Available = true;
                     this_component.FreeCoolCntrlShutDown = false;
-                    CurMassFlowRate = Node(this_component.NodeNumIn).MassFlowRate;
+                    CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
                     ToutLowLimit = this_component.MinOutletTemp;
-                    Tinlet = Node(this_component.NodeNumIn).Temp;
+                    Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
                     CurSpecHeat = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
                     QdotTmp = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
 
@@ -2802,9 +2762,9 @@ CurrentModuleObject, PlantOpSchemeName);
 
             } else if (SELECT_CASE_var == HowMet_ByNominalCapHiOutLimit) { // boilers with upper limit on outlet temperature
                 //- Retrieve data from the plant loop data structure
-                CurMassFlowRate = Node(this_component.NodeNumIn).MassFlowRate;
+                CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
                 ToutHiLimit = this_component.MaxOutletTemp;
-                Tinlet = Node(this_component.NodeNumIn).Temp;
+                Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
                 CurSpecHeat = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
                 QdotTmp = CurMassFlowRate * CurSpecHeat * (ToutHiLimit - Tinlet);
 
@@ -2839,7 +2799,6 @@ CurrentModuleObject, PlantOpSchemeName);
         // Component SetPoint based scheme.
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataLoopNode::SensedNodeFlagValue;
         using FluidProperties::GetDensityGlycol;
 
@@ -2887,12 +2846,12 @@ CurrentModuleObject, PlantOpSchemeName);
         CompOptLoad = this_component.OptLoad;
         DemandNode = state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).DemandNodeNum;
         SetPtNode = state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointNodeNum;
-        TempIn = Node(DemandNode).Temp;
+        TempIn = state.dataLoopNodes->Node(DemandNode).Temp;
         rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, TempIn, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         DemandMdot = state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointFlowRate * rho;
         // DemandMDot is a constant design flow rate, next based on actual current flow rate for accurate current demand?
-        ActualMdot = Node(DemandNode).MassFlowRate;
+        ActualMdot = state.dataLoopNodes->Node(DemandNode).MassFlowRate;
         CurSpecHeat = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, TempIn, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
         if ((ActualMdot > 0.0) && (ActualMdot != DemandMdot)) {
             DemandMdot = ActualMdot;
@@ -2901,19 +2860,19 @@ CurrentModuleObject, PlantOpSchemeName);
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
-                TempSetPt = Node(SetPtNode).TempSetPoint;
+                TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPoint;
             } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                 if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::CoolingOp) {
-                    TempSetPt = Node(SetPtNode).TempSetPointHi;
+                    TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointHi;
                 } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::HeatingOp) {
-                    TempSetPt = Node(SetPtNode).TempSetPointLo;
+                    TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointLo;
                 } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::DualOp) {
-                    CurrentDemandForCoolingOp = DemandMdot * CurSpecHeat * (Node(SetPtNode).TempSetPointHi - TempIn);
-                    CurrentDemandForHeatingOp = DemandMdot * CurSpecHeat * (Node(SetPtNode).TempSetPointLo - TempIn);
+                    CurrentDemandForCoolingOp = DemandMdot * CurSpecHeat * (state.dataLoopNodes->Node(SetPtNode).TempSetPointHi - TempIn);
+                    CurrentDemandForHeatingOp = DemandMdot * CurSpecHeat * (state.dataLoopNodes->Node(SetPtNode).TempSetPointLo - TempIn);
                     if ((CurrentDemandForCoolingOp < 0.0) && (CurrentDemandForHeatingOp <= 0.0)) { // cooling
-                        TempSetPt = Node(SetPtNode).TempSetPointHi;
+                        TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointHi;
                     } else if ((CurrentDemandForCoolingOp >= 0.0) && (CurrentDemandForHeatingOp > 0.0)) { // heating
-                        TempSetPt = Node(SetPtNode).TempSetPointLo;
+                        TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointLo;
                     } else { // deadband
                         TempSetPt = TempIn;
                     }
@@ -3092,15 +3051,15 @@ CurrentModuleObject, PlantOpSchemeName);
 
         if (CurSchemeType == DryBulbTDBOpSchemeType) { // drybulb temp based controls
             ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
-            NodeTemperature = Node(ReferenceNodeNum).Temp;
+            NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
             FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDryBulbTemp;
         } else if (CurSchemeType == WetBulbTDBOpSchemeType) { // wetbulb temp based controls
             ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
-            NodeTemperature = Node(ReferenceNodeNum).Temp;
+            NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
             FindRangeVariable = NodeTemperature - state.dataEnvrn->OutWetBulbTemp;
         } else if (CurSchemeType == DewPointTDBOpSchemeType) { // dewpoint temp based controls
             ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
-            NodeTemperature = Node(ReferenceNodeNum).Temp;
+            NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
             FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDewPointTemp;
         } else {
             assert(false);
@@ -3269,7 +3228,7 @@ CurrentModuleObject, PlantOpSchemeName);
         std::string ActuatorType;
         std::string ActuatorName;
         std::string UniqueIDName;
-        static std::string Units("[on/off]");
+        static std::string const Units("[on/off]");
         // INTEGER                      :: NumAct
         int LoopNum;
         int LoopSideNum;
@@ -3437,9 +3396,9 @@ CurrentModuleObject, PlantOpSchemeName);
                         (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR)) {
 
                         //- Retrieve data from the plant loop data structure
-                        CurMassFlowRate = Node(this_comp.NodeNumIn).MassFlowRate;
+                        CurMassFlowRate = state.dataLoopNodes->Node(this_comp.NodeNumIn).MassFlowRate;
                         ToutLowLimit = this_comp.MinOutletTemp;
-                        Tinlet = Node(this_comp.NodeNumIn).Temp;
+                        Tinlet = state.dataLoopNodes->Node(this_comp.NodeNumIn).Temp;
                         CurSpecHeat = GetSpecificHeatGlycol(state, this_loop.FluidName, Tinlet, this_loop.FluidIndex, RoutineName);
                         QTemporary = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
 

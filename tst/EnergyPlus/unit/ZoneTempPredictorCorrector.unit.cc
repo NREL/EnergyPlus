@@ -101,7 +101,7 @@ using namespace SimulationManager;
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
 {
 
-    TimeStepSys = 15.0 / 60.0; // System timestep in hours
+    state->dataHVACGlobal->TimeStepSys = 15.0 / 60.0; // System timestep in hours
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
@@ -119,7 +119,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    Node.allocate(5);
+    state->dataLoopNodes->Node.allocate(5);
 
     state->dataHeatBal->Zone.allocate(1);
     HybridModelZone.allocate(1);
@@ -159,7 +159,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->SumHmARa.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
-    AirflowNetwork::SimulateAirflowNetwork = 0;
+    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
     state->dataHeatBalFanSys->MDotOA.allocate(1);
 
     state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
@@ -171,17 +171,17 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
 
     // Case 1 - All flows at the same humrat
     state->dataHeatBalFanSys->ZoneW1(1) = 0.008;
-    Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-    Node(1).HumRat = 0.008;
-    Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-    Node(2).HumRat = 0.008;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
+    state->dataLoopNodes->Node(1).HumRat = 0.008;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
+    state->dataLoopNodes->Node(2).HumRat = 0.008;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
-    Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
-    Node(3).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
-    Node(4).MassFlowRate = 0.03; // Zone return node
-    Node(4).HumRat = 0.000;
-    Node(5).HumRat = 0.000;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
+    state->dataLoopNodes->Node(3).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
+    state->dataLoopNodes->Node(4).HumRat = 0.000;
+    state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
     state->dataHeatBalFanSys->OAMFL(1) = 0.0;
     state->dataHeatBalFanSys->VAMFL(1) = 0.0;
@@ -197,21 +197,21 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     HybridModelZone(1).PeopleCountCalc_H = false;
 
     CorrectZoneHumRat(*state, 1);
-    EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
+    EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Case 2 - Unbalanced exhaust flow
     state->dataHeatBalFanSys->ZoneW1(1) = 0.008;
-    Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-    Node(1).HumRat = 0.008;
-    Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-    Node(2).HumRat = 0.008;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
+    state->dataLoopNodes->Node(1).HumRat = 0.008;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
+    state->dataLoopNodes->Node(2).HumRat = 0.008;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
-    Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
-    Node(3).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
-    Node(4).MassFlowRate = 0.01; // Zone return node
-    Node(4).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
-    Node(5).HumRat = 0.000;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
+    state->dataLoopNodes->Node(3).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.01; // Zone return node
+    state->dataLoopNodes->Node(4).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
+    state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
     state->dataHeatBalFanSys->OAMFL(1) = 0.0;
     state->dataHeatBalFanSys->VAMFL(1) = 0.0;
@@ -224,21 +224,21 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->MDotOA(1) = 0.0;
 
     CorrectZoneHumRat(*state, 1);
-    EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
+    EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Case 3 - Balanced exhaust flow with proper source flow from mixing
     state->dataHeatBalFanSys->ZoneW1(1) = 0.008;
-    Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-    Node(1).HumRat = 0.008;
-    Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-    Node(2).HumRat = 0.008;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
+    state->dataLoopNodes->Node(1).HumRat = 0.008;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
+    state->dataLoopNodes->Node(2).HumRat = 0.008;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.02;
-    Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
-    Node(3).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
-    Node(4).MassFlowRate = 0.03; // Zone return node
-    Node(4).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
-    Node(5).HumRat = 0.000;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
+    state->dataLoopNodes->Node(3).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
+    state->dataLoopNodes->Node(4).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
+    state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
     state->dataHeatBalFanSys->OAMFL(1) = 0.0;
     state->dataHeatBalFanSys->VAMFL(1) = 0.0;
@@ -251,21 +251,21 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->MDotOA(1) = 0.0;
 
     CorrectZoneHumRat(*state, 1);
-    EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
+    EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Case 4 - Balanced exhaust flow without source flow from mixing
     state->dataHeatBalFanSys->ZoneW1(1) = 0.008;
-    Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-    Node(1).HumRat = 0.008;
-    Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-    Node(2).HumRat = 0.008;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
+    state->dataLoopNodes->Node(1).HumRat = 0.008;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
+    state->dataLoopNodes->Node(2).HumRat = 0.008;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.02;
-    Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
-    Node(3).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
-    Node(4).MassFlowRate = 0.01; // Zone return node
-    Node(4).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
-    Node(5).HumRat = 0.000;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
+    state->dataLoopNodes->Node(3).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.01; // Zone return node
+    state->dataLoopNodes->Node(4).HumRat = state->dataHeatBalFanSys->ZoneW1(1);
+    state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
     state->dataHeatBalFanSys->OAMFL(1) = 0.0;
     state->dataHeatBalFanSys->VAMFL(1) = 0.0;
@@ -278,16 +278,16 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->MDotOA(1) = 0.0;
 
     CorrectZoneHumRat(*state, 1);
-    EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
+    EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Add a section to check #6119 by L. Gu on 5/16/17
     CorrectZoneHumRat(*state, 1);
-    EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
+    EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Issue 6233
     state->dataHeatBal->Zone(1).IsControlled = true;
     CorrectZoneHumRat(*state, 1);
-    EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
+    EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
@@ -1004,9 +1004,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBal->Zone(1).HTSurfaceLast = 3;
     state->dataSurface->Surface.allocate(3);
     state->dataHeatBal->HConvIn.allocate(3);
-    Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataHeatBal->TempEffBulkAir.allocate(3);
-    DataHeatBalSurface::TempSurfInTmp.allocate(3);
+    state->dataHeatBalSurf->TempSurfInTmp.allocate(3);
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(2).HeatTransSurf = true;
@@ -1017,21 +1017,21 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataSurface->Surface(1).TAirRef = ZoneMeanAirTemp;
     state->dataSurface->Surface(2).TAirRef = AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = ZoneSupplyAirTemp;
-    DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
-    DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
-    DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
+    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
+    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
     state->dataHeatBal->TempEffBulkAir(1) = 10.0;
     state->dataHeatBal->TempEffBulkAir(2) = 10.0;
     state->dataHeatBal->TempEffBulkAir(3) = 10.0;
 
-    Node(1).Temp = 20.0;
-    Node(2).Temp = 20.0;
-    Node(3).Temp = 20.0;
-    Node(4).Temp = 20.0;
-    Node(1).MassFlowRate = 0.1;
-    Node(2).MassFlowRate = 0.1;
-    Node(3).MassFlowRate = 0.1;
-    Node(4).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(1).Temp = 20.0;
+    state->dataLoopNodes->Node(2).Temp = 20.0;
+    state->dataLoopNodes->Node(3).Temp = 20.0;
+    state->dataLoopNodes->Node(4).Temp = 20.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
     state->dataHeatBal->HConvIn(1) = 0.5;
     state->dataHeatBal->HConvIn(2) = 0.5;
@@ -1045,15 +1045,15 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     EXPECT_EQ(300.0, SumHATsurf);
     EXPECT_EQ(150.0, SumHATref);
 
-    Node(1).MassFlowRate = 0.0;
-    Node(2).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
     CalcZoneSums(*state, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
     EXPECT_EQ(10.0, SumHA);
     EXPECT_EQ(300.0, SumHATsurf);
     EXPECT_EQ(50.0, SumHATref);
 
-    Node(1).MassFlowRate = 0.1;
-    Node(2).MassFlowRate = 0.2;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.2;
     CalcZoneSums(*state, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
     EXPECT_NEAR(302.00968500, SumSysMCp, 0.0001);
     EXPECT_NEAR(6040.1937, SumSysMCpT,0.0001);

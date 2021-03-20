@@ -143,8 +143,8 @@ namespace BaseboardElectric {
 
         PowerMet = baseboard->Baseboard(BaseboardNum).Power;
 
-        baseboard->Baseboard(BaseboardNum).Energy = baseboard->Baseboard(BaseboardNum).Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        baseboard->Baseboard(BaseboardNum).ElecUseLoad = baseboard->Baseboard(BaseboardNum).ElecUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        baseboard->Baseboard(BaseboardNum).Energy = baseboard->Baseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        baseboard->Baseboard(BaseboardNum).ElecUseLoad = baseboard->Baseboard(BaseboardNum).ElecUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void GetBaseboardInput(EnergyPlusData &state)
@@ -381,7 +381,6 @@ namespace BaseboardElectric {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the Baseboard units during simulation.
 
-        using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -424,8 +423,8 @@ namespace BaseboardElectric {
 
         // Do the every time step initializations
         ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-        baseboard->Baseboard(BaseboardNum).AirInletTemp = Node(ZoneNode).Temp;
-        baseboard->Baseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
+        baseboard->Baseboard(BaseboardNum).AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
+        baseboard->Baseboard(BaseboardNum).AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
     }
 
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum)
@@ -537,7 +536,6 @@ namespace BaseboardElectric {
 
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
-        using DataLoopNode::Node;
         using Psychrometrics::PsyCpAirFnW;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

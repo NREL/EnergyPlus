@@ -110,7 +110,6 @@ namespace Photovoltaics {
 
     // Using/Aliasing
     using namespace DataPhotovoltaics;
-    using DataHVACGlobals::TimeStepSys;
 
     Array1D_bool CheckEquipName;
     bool GetInputFlag(true); // one time get input flag
@@ -771,7 +770,7 @@ namespace Photovoltaics {
         // calculate the electricity production using a simple PV model
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -837,7 +836,7 @@ namespace Photovoltaics {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int thisZone; // working index for zones
 
-        PVarray(PVnum).Report.DCEnergy = PVarray(PVnum).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour);
+        PVarray(PVnum).Report.DCEnergy = PVarray(PVnum).Report.DCPower * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
 
         // add check for multiplier.  if surface is attached to a zone that is on a multiplier
         // then PV production should be multiplied out as well
@@ -895,7 +894,6 @@ namespace Photovoltaics {
         //    integrated photovoltaics. Solar 2002, Sunrise on the Reliable Energy Economy, June 15-19, 2002 Reno, NV
 
         // Using/Aliasing
-        using DataHeatBalSurface::SurfTempOut;
         using TranspiredCollector::GetUTSCTsColl;
 
         int ThisSurf; // working variable for indexing surfaces
@@ -937,7 +935,7 @@ namespace Photovoltaics {
 
                 } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
                     // get back-of-module temperature from elsewhere in EnergyPlus
-                    PVarray(PVnum).SNLPVCalc.Tback = SurfTempOut(PVarray(PVnum).SurfacePtr);
+                    PVarray(PVnum).SNLPVCalc.Tback = state.dataHeatBalSurf->SurfTempOut(PVarray(PVnum).SurfacePtr);
 
                     PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
                                                                             PVarray(PVnum).SNLPVinto.IcBeam,
@@ -1120,8 +1118,7 @@ namespace Photovoltaics {
         // subroutine was taken from InitBaseboard.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyEnvrnFlag;
@@ -1181,7 +1178,6 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the PV performance.
 
-        using DataHeatBalSurface::SurfTempOut;
         using TranspiredCollector::GetUTSCTsColl;
 
         Real64 const EPS(0.001);
@@ -1266,7 +1262,7 @@ namespace Photovoltaics {
                                 (1.0 -
                                  std::exp(-PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep));
                     } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                        CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
+                        CellTemp = state.dataHeatBalSurf->SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
                     } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
                         GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, CellTemp);
                         CellTemp += DataGlobalConstants::KelvinConv;
@@ -1339,7 +1335,7 @@ namespace Photovoltaics {
                                (PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
                                    std::exp(-PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep);
                 } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                    CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
+                    CellTemp = state.dataHeatBalSurf->SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
                 } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
                     GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, CellTemp);
                     CellTemp += DataGlobalConstants::KelvinConv;

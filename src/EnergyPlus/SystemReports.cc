@@ -738,7 +738,7 @@ namespace EnergyPlus::SystemReports {
                     // force the loop numbers to be the same.
 
                     // 3. Find Demand Side Component Corresponding to Supply Side Component
-                    for (PlantLoopNum = 1; PlantLoopNum <= NumPlantLoops; ++PlantLoopNum) {
+                    for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops; ++PlantLoopNum) {
                         for (BranchNum = 1; BranchNum <= state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum).TotalBranches; ++BranchNum) {
                             for (CompNum = 1; CompNum <= state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                                 {
@@ -755,7 +755,7 @@ namespace EnergyPlus::SystemReports {
                         }
                     }
 
-                    for (PlantLoopNum = 1; PlantLoopNum <= NumCondLoops; ++PlantLoopNum) {
+                    for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumCondLoops; ++PlantLoopNum) {
                         for (BranchNum = 1; BranchNum <= state.dataPlnt->VentRepCondSupplySide(PlantLoopNum).TotalBranches; ++BranchNum) {
                             for (CompNum = 1; CompNum <= state.dataPlnt->VentRepCondSupplySide(PlantLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                                 {
@@ -932,7 +932,7 @@ namespace EnergyPlus::SystemReports {
         }
 
         // On every iteration, load the air loop energy data
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             auto &pas = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
             for (BranchNum = 1; BranchNum <= pas.NumBranches; ++BranchNum) {
                 auto &pasBranch = pas.Branch(BranchNum);
@@ -1000,7 +1000,7 @@ namespace EnergyPlus::SystemReports {
         }
 
         // On every iteration, load the Plant Supply Side Data and load the Plant Demand Side Data
-        for (PlantLoopNum = 1; PlantLoopNum <= NumPlantLoops; ++PlantLoopNum) {
+        for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops; ++PlantLoopNum) {
             auto &vrpss = state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum);
             for (BranchNum = 1; BranchNum <= vrpss.TotalBranches; ++BranchNum) {
                 auto &vrpssBranch = vrpss.Branch(BranchNum);
@@ -1030,7 +1030,7 @@ namespace EnergyPlus::SystemReports {
         }
 
         // On every iteration, load the Condenser Supply Side Data and load the Condenser Demand Side Data
-        for (PlantLoopNum = 1; PlantLoopNum <= NumCondLoops; ++PlantLoopNum) {
+        for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumCondLoops; ++PlantLoopNum) {
             auto &vrcss = state.dataPlnt->VentRepCondSupplySide(PlantLoopNum);
             for (BranchNum = 1; BranchNum <= vrcss.TotalBranches; ++BranchNum) {
                 auto &vrcssBranch = vrcss.Branch(BranchNum);
@@ -1635,6 +1635,8 @@ namespace EnergyPlus::SystemReports {
         //       DATE WRITTEN   July 2005
         //       MODIFIED       na
         //       RE-ENGINEERED  na
+
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         // PURPOSE OF THIS SUBROUTINE:
         // Allocates Arrays and setup output variables related to Ventilation reports.
@@ -2346,7 +2348,7 @@ namespace EnergyPlus::SystemReports {
         int LoopSideNum;
 
         state.dataSysRpts->VentReportStructureCreated = true;
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     TypeOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
@@ -2461,7 +2463,7 @@ namespace EnergyPlus::SystemReports {
             }
         }
 
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     // Get complete list of components for complex branches
@@ -3016,13 +3018,13 @@ namespace EnergyPlus::SystemReports {
         // by operating on the pointer directly, we are actually operating on the item in the TARGET array item
         // in making this change, over 700 lines of code were dropped down to a single block
 
-        for (PlantLoopNum = 1; PlantLoopNum <= NumPlantLoops + NumCondLoops; ++PlantLoopNum) {
+        for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops + state.dataHVACGlobal->NumCondLoops; ++PlantLoopNum) {
             for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
 
                 // Report selection
                 ReportLoopData *select_ThisReportData(nullptr);
 
-                if (PlantLoopNum <= NumPlantLoops) {
+                if (PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops) {
                     {
                         auto const SELECT_CASE_var(LoopSideNum);
                         if (SELECT_CASE_var == DemandSide) {
@@ -3037,9 +3039,9 @@ namespace EnergyPlus::SystemReports {
                     {
                         auto const SELECT_CASE_var(LoopSideNum);
                         if (SELECT_CASE_var == DemandSide) {
-                            select_ThisReportData = &state.dataPlnt->VentRepCondDemandSide(PlantLoopNum - NumPlantLoops);
+                            select_ThisReportData = &state.dataPlnt->VentRepCondDemandSide(PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
                         } else if (SELECT_CASE_var == SupplySide) {
-                            select_ThisReportData = &state.dataPlnt->VentRepCondSupplySide(PlantLoopNum - NumPlantLoops);
+                            select_ThisReportData = &state.dataPlnt->VentRepCondSupplySide(PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
                         } else {
                             assert(false);
                         }
@@ -3156,14 +3158,14 @@ namespace EnergyPlus::SystemReports {
             }
         }
 
-        for (PlantLoopNum = 1; PlantLoopNum <= NumPlantLoops + NumCondLoops; ++PlantLoopNum) {
+        for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops + state.dataHVACGlobal->NumCondLoops; ++PlantLoopNum) {
 
             for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
 
                 // Report selection
                 ReportLoopData *select_ThisReportData(nullptr);
 
-                if (PlantLoopNum <= NumPlantLoops) {
+                if (PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops) {
                     {
                         auto const SELECT_CASE_var(LoopSideNum);
                         if (SELECT_CASE_var == DemandSide) {
@@ -3178,9 +3180,9 @@ namespace EnergyPlus::SystemReports {
                     {
                         auto const SELECT_CASE_var(LoopSideNum);
                         if (SELECT_CASE_var == DemandSide) {
-                            select_ThisReportData = &state.dataPlnt->VentRepCondDemandSide(PlantLoopNum - NumPlantLoops);
+                            select_ThisReportData = &state.dataPlnt->VentRepCondDemandSide(PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
                         } else if (SELECT_CASE_var == SupplySide) {
-                            select_ThisReportData = &state.dataPlnt->VentRepCondSupplySide(PlantLoopNum - NumPlantLoops);
+                            select_ThisReportData = &state.dataPlnt->VentRepCondSupplySide(PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
                         } else {
                             assert(false);
                         }
@@ -3440,7 +3442,9 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->DesDehumidElec = 0.0;
         state.dataSysRpts->SysEvapElec = 0.0;
 
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        auto &Node(state.dataLoopNodes->Node);
+
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             auto const &pas = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
             for (BranchNum = 1; BranchNum <= pas.NumBranches; ++BranchNum) {
                 auto const &pasBranch = pas.Branch(BranchNum);
@@ -3452,7 +3456,7 @@ namespace EnergyPlus::SystemReports {
                     if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                     CompLoad = Node(OutletNodeNum).MassFlowRate * (PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                    PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                    CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
+                    CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                     CompEnergyUse = 0.0;
                     EnergyType = DataGlobalConstants::ResourceType::None;
                     CompLoadFlag = true;
@@ -3473,7 +3477,7 @@ namespace EnergyPlus::SystemReports {
                         if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                         CompLoad = Node(OutletNodeNum).MassFlowRate * (PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                        PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                        CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
+                        CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                         CompEnergyUse = 0.0;
                         EnergyType = DataGlobalConstants::ResourceType::None;
                         CompLoadFlag = true;
@@ -3494,7 +3498,7 @@ namespace EnergyPlus::SystemReports {
                             if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                             CompLoad = Node(OutletNodeNum).MassFlowRate * (PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                            PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                            CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
+                            CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                             CompEnergyUse = 0.0;
                             EnergyType = DataGlobalConstants::ResourceType::None;
                             CompLoadFlag = true;
@@ -3581,7 +3585,7 @@ namespace EnergyPlus::SystemReports {
                             CompLoad -= (PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat) * Node(OutletNodeNum).MassFlowRate);
                         }
                     }
-                    CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
+                    CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                     CompEnergyUse = 0.0;
                     EnergyType = DataGlobalConstants::ResourceType::None;
                     CompLoadFlag = true;
@@ -3600,7 +3604,7 @@ namespace EnergyPlus::SystemReports {
                         if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                         CompLoad = Node(InletNodeNum).MassFlowRate * (PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                       PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                        CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
+                        CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                         CompEnergyUse = 0.0;
                         EnergyType = DataGlobalConstants::ResourceType::None;
                         CompLoadFlag = true;
@@ -3619,7 +3623,7 @@ namespace EnergyPlus::SystemReports {
                             if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                             CompLoad = Node(InletNodeNum).MassFlowRate * (PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                           PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                            CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
+                            CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                             CompEnergyUse = 0.0;
                             EnergyType = DataGlobalConstants::ResourceType::None;
                             CompLoadFlag = true;
@@ -3636,7 +3640,7 @@ namespace EnergyPlus::SystemReports {
             }             // ZoneInNum
         }                 // Controlled Zone Loop
 
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             state.dataSysRpts->SysTotHTNG(AirLoopNum) = state.dataSysRpts->SysFANCompHTNG(AirLoopNum) + state.dataSysRpts->SysHCCompHTNG(AirLoopNum) + state.dataSysRpts->SysHeatExHTNG(AirLoopNum) + state.dataSysRpts->SysHumidHTNG(AirLoopNum) +
                 state.dataSysRpts->SysSolarCollectHeating(AirLoopNum) + state.dataSysRpts->SysUserDefinedTerminalHeating(AirLoopNum);
             state.dataSysRpts->SysTotCLNG(AirLoopNum) = state.dataSysRpts->SysCCCompCLNG(AirLoopNum) + state.dataSysRpts->SysHeatExCLNG(AirLoopNum) + state.dataSysRpts->SysEvapCLNG(AirLoopNum) + state.dataSysRpts->DesDehumidCLNG(AirLoopNum) +
@@ -4260,6 +4264,9 @@ namespace EnergyPlus::SystemReports {
         int OutAirNode;       // Zone forced Air unit outdoor air node number
         int thisZoneEquipNum; // loop counter
 
+        auto &Node(state.dataLoopNodes->Node);
+        auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
+
         //  CALL GetComponentEnergyUse
         if (!state.dataSysRpts->VentReportStructureCreated) return;
         if (!state.dataSysRpts->VentLoadsReportEnabled) return;
@@ -4297,7 +4304,7 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->AllZonesTimeAtVozDynOcc = 0.0;
         state.dataSysRpts->AnyZoneTimeAboveVozDynOcc = 0.0;
 
-        for (int sysNum = 1; sysNum <= DataHVACGlobals::NumPrimaryAirSys; ++sysNum) {
+        for (int sysNum = 1; sysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++sysNum) {
             state.dataSysRpts->SysMechVentFlow(sysNum) = 0.0;
             state.dataSysRpts->SysNatVentFlow(sysNum) = 0.0;
             state.dataSysRpts->SysTargetVentilationFlowVoz(sysNum) = 0.0;
@@ -4777,7 +4784,7 @@ namespace EnergyPlus::SystemReports {
         } // loop over controlled zones
 
         // loop over air loops
-        for (int sysNum = 1; sysNum <= NumPrimaryAirSys; ++sysNum){
+        for (int sysNum = 1; sysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++sysNum){
             Real64 mechVentFlow = state.dataAirLoop->AirLoopFlow(sysNum).OAFlow * state.dataEnvrn->StdRhoAir;
             state.dataSysRpts->SysMechVentFlow(sysNum) = mechVentFlow;
             state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotal += mechVentFlow;
@@ -4989,7 +4996,7 @@ namespace EnergyPlus::SystemReports {
         // a match for the component type and name.  Once a match is found,
         // record the type of loop and the loop, branch, and component numbers.
         if (!MatchFound) { // Go through the plant demand side loops
-            for (PassLoopNum = 1; PassLoopNum <= NumPlantLoops; ++PassLoopNum) {
+            for (PassLoopNum = 1; PassLoopNum <= state.dataHVACGlobal->NumPlantLoops; ++PassLoopNum) {
                 for (PassBranchNum = 1; PassBranchNum <= state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).TotalBranches; ++PassBranchNum) {
                     for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents; ++PassCompNum) {
                         if (UtilityRoutines::SameString(CompType,
@@ -5011,7 +5018,7 @@ namespace EnergyPlus::SystemReports {
         }
 
         if (!MatchFound) { // Go through the condenser demand side loops
-            for (PassLoopNum = 1; PassLoopNum <= NumCondLoops; ++PassLoopNum) {
+            for (PassLoopNum = 1; PassLoopNum <= state.dataHVACGlobal->NumCondLoops; ++PassLoopNum) {
                 for (PassBranchNum = 1; PassBranchNum <= state.dataPlnt->VentRepCondDemandSide(PassLoopNum).TotalBranches; ++PassBranchNum) {
                     for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents; ++PassCompNum) {
                         if (UtilityRoutines::SameString(CompType,
@@ -5052,7 +5059,7 @@ namespace EnergyPlus::SystemReports {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5081,6 +5088,8 @@ namespace EnergyPlus::SystemReports {
                                          "Node Name>,<AirLoopHVAC Name>");
         static constexpr auto Format_714("! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed "
                                          "Air Outlet Node Name>,<AirLoopHVAC Name>");
+
+        auto &NodeID(state.dataLoopNodes->NodeID);
 
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", Format_706);

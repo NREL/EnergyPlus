@@ -319,16 +319,16 @@ namespace EnergyPlus::SwimmingPool {
                                                                             ErrorsFound,
                                                                             CurrentModuleObject,
                                                                             Alphas(1),
-                                                                            DataLoopNode::NodeType_Water,
-                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                            DataLoopNode::NodeFluidType::Water,
+                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsNotParent);
             state.dataSwimmingPools->Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state, Alphas(7),
                                                                              ErrorsFound,
                                                                              CurrentModuleObject,
                                                                              Alphas(1),
-                                                                             DataLoopNode::NodeType_Water,
-                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                             DataLoopNode::NodeFluidType::Water,
+                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsNotParent);
             if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
@@ -412,7 +412,7 @@ namespace EnergyPlus::SwimmingPool {
                 "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
             ErrorsFound = true;
             // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
-        } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel_CTF) {
+        } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) {
             ShowSevereError(state, state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and is attempting to use a non-CTF solution algorithm.  This is "
                             "not allowed.  Use the CTF solution algorithm for this surface.");
@@ -531,7 +531,7 @@ namespace EnergyPlus::SwimmingPool {
         Real64 mdot = 0.0;
         PlantUtilities::SetComponentFlowRate(state,
             mdot, this->WaterInletNode, this->WaterOutletNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchNum, this->HWCompNum);
-        this->WaterInletTemp = DataLoopNode::Node(this->WaterInletNode).Temp;
+        this->WaterInletTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
 
         // get the schedule values for different scheduled parameters
         if (this->ActivityFactorSchedPtr > 0) {
@@ -727,7 +727,8 @@ namespace EnergyPlus::SwimmingPool {
 
         if (!this->MyPlantScanFlagPool) {
             if (this->WaterInletNode > 0) {
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->WaterMassFlowRateMax,
                                                    this->WaterInletNode,
                                                    this->WaterOutletNode,
@@ -803,14 +804,15 @@ namespace EnergyPlus::SwimmingPool {
         this->EvapHeatLossRate = EvapEnergyLossPerArea * state.dataSurface->Surface(SurfNum).Area;
         // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
         // to the air directly and added to the zone air heat balance
-        Real64 LWsum =
-            (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + DataHeatBalSurface::SurfNetLWRadToSurf(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
+        Real64 LWsum = (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) +
+                        state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
              state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
              state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum)); // summation of all long-wavelenth radiation going to surface
         Real64 LWtotal = this->CurCoverLWRadFac * LWsum;      // total flux from long-wavelength radiation to surface
-        Real64 SWtotal = this->CurCoverSWRadFac * DataHeatBalSurface::SurfOpaqQRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
+        Real64 SWtotal =
+            this->CurCoverSWRadFac * state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
         this->RadConvertToConvect =
-            ((1.0 - this->CurCoverLWRadFac) * LWsum) + ((1.0 - this->CurCoverSWRadFac) * DataHeatBalSurface::SurfOpaqQRadSWInAbs(SurfNum));
+            ((1.0 - this->CurCoverLWRadFac) * LWsum) + ((1.0 - this->CurCoverSWRadFac) * state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum));
 
         // Heat gain from people (assumed to be all convective to pool water)
         Real64 PeopleGain =
@@ -821,17 +823,17 @@ namespace EnergyPlus::SwimmingPool {
             FluidProperties::GetSpecificHeatGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName); // specific heat of pool water
 
         Real64 TH22 =
-            DataHeatBalSurface::TH(2, 2, SurfNum); // inside surface temperature at the previous time step equals the old pool water temperature
+            state.dataHeatBalSurf->TH(2, 2, SurfNum); // inside surface temperature at the previous time step equals the old pool water temperature
         Real64 TInSurf =
             this->CurSetPtTemp; // Setpoint temperature for pool which is also the goal temperature and also the inside surface face temperature
         Real64 Tmuw = this->CurMakeupWaterTemp;                                // Inlet makeup water temperature
-        Real64 TLoopInletTemp = DataLoopNode::Node(this->WaterInletNode).Temp; // Inlet water temperature from the plant loop
+        Real64 TLoopInletTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp; // Inlet water temperature from the plant loop
         this->WaterInletTemp = TLoopInletTemp;
 
         // Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
         // old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain +
         // PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
-        Real64 MassFlowRate = (this->WaterMass / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour)) *
+        Real64 MassFlowRate = (this->WaterMass / (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour)) *
                               ((TInSurf - TH22) / (TLoopInletTemp - TInSurf)); // Target mass flow rate to achieve the proper setpoint temperature
         if (MassFlowRate > this->WaterMassFlowRateMax) {
             MassFlowRate = this->WaterMassFlowRateMax;
@@ -893,7 +895,7 @@ namespace EnergyPlus::SwimmingPool {
 
         int SurfNum = this->SurfacePtr; // surface number/pointer
 
-        if (this->LastSysTimeElapsed(SurfNum) == DataHVACGlobals::SysTimeElapsed) {
+        if (this->LastSysTimeElapsed(SurfNum) == state.dataHVACGlobal->SysTimeElapsed) {
             // Still iterating or reducing system time step, so subtract old values which were
             // not valid
             this->QPoolSrcAvg(SurfNum) -= this->LastQPoolSrc(SurfNum) * this->LastTimeStepSys(SurfNum) / state.dataGlobal->TimeStepZone;
@@ -901,18 +903,18 @@ namespace EnergyPlus::SwimmingPool {
         }
 
         // Update the running average and the "last" values with the current values of the appropriate variables
-        this->QPoolSrcAvg(SurfNum) += state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) * DataHVACGlobals::TimeStepSys / state.dataGlobal->TimeStepZone;
-        this->HeatTransCoefsAvg(SurfNum) += state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) * DataHVACGlobals::TimeStepSys / state.dataGlobal->TimeStepZone;
+        this->QPoolSrcAvg(SurfNum) += state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
+        this->HeatTransCoefsAvg(SurfNum) += state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
         this->LastQPoolSrc(SurfNum) = state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum);
         this->LastHeatTransCoefs(SurfNum) = state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum);
-        this->LastSysTimeElapsed(SurfNum) = DataHVACGlobals::SysTimeElapsed;
-        this->LastTimeStepSys(SurfNum) = DataHVACGlobals::TimeStepSys;
+        this->LastSysTimeElapsed(SurfNum) = state.dataHVACGlobal->SysTimeElapsed;
+        this->LastTimeStepSys(SurfNum) = state.dataHVACGlobal->TimeStepSys;
 
         PlantUtilities::SafeCopyPlantNode(state, this->WaterInletNode, this->WaterOutletNode);
 
-        Real64 WaterMassFlow = DataLoopNode::Node(this->WaterInletNode).MassFlowRate; // water mass flow rate
-        if (WaterMassFlow > 0.0) DataLoopNode::Node(this->WaterOutletNode).Temp = this->PoolWaterTemp;
+        Real64 WaterMassFlow = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate; // water mass flow rate
+        if (WaterMassFlow > 0.0) state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->PoolWaterTemp;
     }
 
     void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRUE. if the swimming pool "runs" this zone time step
@@ -1027,7 +1029,7 @@ namespace EnergyPlus::SwimmingPool {
                 }
             }
 
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * DataHeatBalSurface::TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;
@@ -1051,7 +1053,7 @@ namespace EnergyPlus::SwimmingPool {
             int SurfNum = state.dataSwimmingPools->Pool(PoolNum).SurfacePtr; // surface number index
 
             // First transfer the surface inside temperature data to the current pool water temperature
-            state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp = DataHeatBalSurface::TH(2, 1, SurfNum);
+            state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp = state.dataHeatBalSurf->TH(2, 1, SurfNum);
 
             // Next calculate the amount of heating done by the plant loop
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
@@ -1071,10 +1073,10 @@ namespace EnergyPlus::SwimmingPool {
             state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvectRep = state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvect * state.dataSurface->Surface(SurfNum).Area;
 
             // Finally calculate the summed up report variables
-            state.dataSwimmingPools->Pool(PoolNum).MiscEquipEnergy = state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            state.dataSwimmingPools->Pool(PoolNum).HeatEnergy = state.dataSwimmingPools->Pool(PoolNum).HeatPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass = state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            state.dataSwimmingPools->Pool(PoolNum).EvapEnergyLoss = state.dataSwimmingPools->Pool(PoolNum).EvapHeatLossRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSwimmingPools->Pool(PoolNum).MiscEquipEnergy = state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSwimmingPools->Pool(PoolNum).HeatEnergy = state.dataSwimmingPools->Pool(PoolNum).HeatPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass = state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSwimmingPools->Pool(PoolNum).EvapEnergyLoss = state.dataSwimmingPools->Pool(PoolNum).EvapHeatLossRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
             state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterVolFlowRate = MakeUpWaterVolFlowFunct(state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate, Density);
             state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterVol = MakeUpWaterVolFunct(state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass, Density);

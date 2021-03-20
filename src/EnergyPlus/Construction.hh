@@ -329,10 +329,13 @@ namespace Construction {
 
     struct ConstructionData : BaseGlobalStruct {
         Array1D<Construction::ConstructionProps> Construct;
+        Array1D_int LayerPoint = Array1D<int>(Construction::MaxLayersInConstruct, 0);
 
         void clear_state() override
         {
             this->Construct.deallocate();
+            this->LayerPoint.deallocate();
+            this->LayerPoint.dimension(Construction::MaxLayersInConstruct, 0);
         }
     };
 

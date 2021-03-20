@@ -54,12 +54,17 @@ If there is only one return node and no Zone Return Air Node 1 Flow Rate Basis N
 {\dot m_{R,1}} = ReturnFlowSchedule*{\dot m_{R}}
 \end{equation}
 
-The zone air mass flow conservation calculation limits the zone the return node air flow rate with air loop design supply to protect from large number the solution may throw as follows:
+In the zone air mass flow conservation calculation, the calculated zone total return flow rate is modified using return node flow schedule value when the zone air flow balancing is enforced and assigned to return node 1.  
+
+\begin{equation}
+{\dot m_{R,1}} = ReturnFlowSchedule*{\dot m_{R}}
+\end{equation}
+
+The zone air mass flow conservation calculation also limits the zone return node air flow rate with air loop design supply to protect from large number the solution may throw as follows:
 
 \begin{equation}
 {\dot m_{R,1}} = MIN\left( {{\dot m_{R,1}},\,{{\dot m}_{DesSupply,i}}} \right) 
-\end{equation}
-  
+\end{equation} 
 
 \subsubsection{Allocation to Multiple Return Nodes}\label{allocation-to-multiple-return-nodes}
 
@@ -75,11 +80,18 @@ For any air loop without an outdoor air inlet:
 {\dot m_{R,i}} = {\dot m_{R,i}}
 \end{equation}
 
-The zone air mass flow conservation calculation limits the zone the return node air flow rate with air loop design supply to protect from large number the solution may throw as follows:
+In the zone air mass flow conservation calculation, the calculated zone total return flow rate is distributed to the zone return nodes proportional to the return nodes current mass flow rates as follows:
+
+\begin{equation}
+{\dot m_{R,i,}} = {\dot m_{R,i}} * \left(\frac{ReturnFlowSchedule*{\dot m_{R}}} {\sum\nolimits_{i} {{{\dot m}_{R,i}}}} \right) 
+\end{equation}
+
+The zone air mass flow conservation calculation also limits the zone return node air flow rate with air loop design supply to protect from large number the solution may throw as follows:
 
 \begin{equation}
 {\dot m_{R,1}} = MIN\left( {{\dot m_{R,1}},\,{{\dot m}_{DesSupply, AirLoop}}} \right) 
 \end{equation}
+ 
 
 \subsubsection{Overall Return Air Balance}\label{overall-return-air-balance}
 
@@ -178,7 +190,7 @@ Similarly, the receiving zone mixing mass flow rate is calculated by tracking th
 \end{equation}
 
 Zone air mass flow balance can be enforced using four options: \textit{AdjustMixingOnly}, \textit{AdjustReturnOnly}, \textit{AdjustMixingThenReturn}, or \textit{AdjustReturnThenMixing}.  These options involve either adjusting zone mixing objects flows, adjusting the zone total return air flows, or a 
-combination of both. The zone air mass flow balance equation formulation is described next for each of the four options.
+combination of both. The zone air mass flow balance equation formulation for each of the four options is described next.
 
 \textbf{AdjustMixingOnly:} adjusts the zone mixing object flows only to enforce zone air mass flow balance and the adjusted zone mixing mass flow rates are used to determine the zone total return air mass flow rate. Infiltration air flow can also adjusted if required depending on user preference as specified in Section \textit{Infiltration Flow rates Adjustments}.
 
@@ -206,7 +218,7 @@ First, determine the user specified mixing object received and source air flow r
 {\dot m_{XR}} = \sum\nolimits_j {{{\dot m}_{XR,j}}}
 \end{equation}
 
-If ZoneAirMassFlowConservation is active, then determine the total zone return air flow rate:
+If ZoneAirMassFlowConservation is active, then determine the zone total return air flow rate:
 \begin{equation}
 {\dot m_{R}} = MAX\left( {0.0,\,{{\dot m}_S} - {{\dot m}_{EX,tot}} + [{{\dot m}_{XR}} - {{\dot m}_{XS}}]} \right)
 \end{equation}
@@ -218,7 +230,7 @@ Also checks that the zone total return air mass flow rate does not exceed the ai
 
 \textbf{AdjustMixingThenReturn:} first adjusts the zone mixing air mass flow rates, then adjusts the zone total return air mass flow rate to enforce zone air mass flow balance. Infiltration air flow can also adjusted if required depending on user preference as specified in section \textit{Infiltration Flow rates Adjustments}. For adjusting the mixing mass flow rates the set of equations for \textit{AdjustMixingOnly} method described above are used and for adjusting the zone total return air mass flow rate the equation for \textit{AdjustReturnOnly} method is used. 
 
-\textbf{AdjustReturnThenMixing:} first adjusts the zone total return air mass flow rate, then adjusts the zone mixing mass flow rates to enforce zone air mass flow balance. Infiltration air flow can also adjusted if required depending on user preference as specified in section \textit{Infiltration Flow rates Adjustments}. For adjusting the zone total return air mass flow rates the equations for \textit{AdjustReturnOnly} method described above is used and for adjusting the zone mixing mass flow rates the set of equations for \textit{AdjustMixingOnly} method are used.
+\textbf{AdjustReturnThenMixing:} first adjusts the zone total return air mass flow rate, then adjusts the zone mixing mass flow rates to enforce zone air mass flow balance. Infiltration air flow can also adjusted if required depending on user preference as specified in section \textit{Infiltration Flow rates Adjustments}. For adjusting the zone total return air mass flow rate the equation for \textit{AdjustReturnOnly} method described above is used and for adjusting the zone mixing mass flow rates the set of equations defined for \textit{AdjustMixingOnly} method are used.
 
 \subsection{Infiltration Flow Rate Adjustments}\label{infiltration-flow-rate-adjustments}
 

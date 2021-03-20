@@ -155,8 +155,8 @@ namespace EnergyPlus::PlantLoadProfile {
 
         this->OutletTemp = this->InletTemp - DeltaTemp;
 
-        this->UpdatePlantProfile();
-        this->ReportPlantProfile();
+        this->UpdatePlantProfile(state);
+        this->ReportPlantProfile(state);
 
     } // simulate()
 
@@ -177,7 +177,6 @@ namespace EnergyPlus::PlantLoadProfile {
         // actual available flow is set.
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -209,14 +208,15 @@ namespace EnergyPlus::PlantLoadProfile {
 
         if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
             // Clear node initial conditions
-            Node(OutletNode).Temp = 0.0;
+            state.dataLoopNodes->Node(OutletNode).Temp = 0.0;
 
             FluidDensityInit =
                 GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, DataGlobalConstants::InitConvTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
             Real64 MaxFlowMultiplier = GetScheduleMaxValue(state, this->FlowRateFracSchedule);
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier,
                                this->InletNode,
                                this->OutletNode,
@@ -234,7 +234,7 @@ namespace EnergyPlus::PlantLoadProfile {
 
         if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
-        this->InletTemp = Node(InletNode).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(InletNode).Temp;
         this->Power = GetCurrentScheduleValue(state, this->LoadSchedule);
 
         if (this->EMSOverridePower) this->Power = this->EMSPowerValue;
@@ -255,7 +255,7 @@ namespace EnergyPlus::PlantLoadProfile {
 
     } // InitPlantProfile()
 
-    void PlantProfileData::UpdatePlantProfile() const
+    void PlantProfileData::UpdatePlantProfile(EnergyPlusData &state) const
     {
 
         // SUBROUTINE INFORMATION:
@@ -268,10 +268,10 @@ namespace EnergyPlus::PlantLoadProfile {
         // Updates the node variables with local variables.
 
         // Set outlet node variables that are possibly changed
-        DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
     }
 
-    void PlantProfileData::ReportPlantProfile()
+    void PlantProfileData::ReportPlantProfile(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -284,7 +284,7 @@ namespace EnergyPlus::PlantLoadProfile {
         // Calculates report variables.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
 
         this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour;
@@ -351,9 +351,9 @@ namespace EnergyPlus::PlantLoadProfile {
                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant
 
                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(state,
-                    cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                    cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(state,
-                    cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                    cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).LoadSchedule = GetScheduleIndex(state, cAlphaArgs(4));
 

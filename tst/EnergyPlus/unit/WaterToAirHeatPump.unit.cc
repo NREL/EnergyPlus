@@ -194,18 +194,18 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     int HPNum(1);
     Real64 DesignAirflow(2.0);
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Temp = 5.0;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Enthalpy = 44650.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Temp = 5.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Enthalpy = 44650.0;
 
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMax = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMaxAvail = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMax = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMaxAvail = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
 
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate = DesignAirflow;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Temp = 26.0;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).HumRat = 0.007;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Enthalpy = 43970.75;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate = DesignAirflow;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Temp = 26.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).HumRat = 0.007;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Enthalpy = 43970.75;
 
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -264,18 +264,18 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum;
 
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Temp = 35.0;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Enthalpy = 43950.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Temp = 35.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Enthalpy = 43950.0;
 
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMax = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMaxAvail = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMax = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRateMaxAvail = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate;
 
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate = DesignAirflow;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Temp = 15.0;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).HumRat = 0.004;
-    DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Enthalpy = PsyHFnTdbW(15.0, 0.004);
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate = DesignAirflow;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Temp = 15.0;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).HumRat = 0.004;
+    state->dataLoopNodes->Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Enthalpy = PsyHFnTdbW(15.0, 0.004);
 
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
 

@@ -335,16 +335,16 @@ namespace PhotovoltaicThermalCollectors {
                                                                                   ErrorsFound,
                                                                                   DataIPShortCuts::cCurrentModuleObject,
                                                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                                                  DataLoopNode::NodeType_Water,
-                                                                                  DataLoopNode::NodeConnectionType_Inlet,
+                                                                                  DataLoopNode::NodeFluidType::Water,
+                                                                                  DataLoopNode::NodeConnectionType::Inlet,
                                                                                   1,
                                                                                   DataLoopNode::ObjectIsNotParent);
                 PVT(Item).PlantOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
-                                                                                   DataLoopNode::NodeType_Water,
-                                                                                   DataLoopNode::NodeConnectionType_Outlet,
+                                                                                   DataLoopNode::NodeFluidType::Water,
+                                                                                   DataLoopNode::NodeConnectionType::Outlet,
                                                                                    1,
                                                                                    DataLoopNode::ObjectIsNotParent);
 
@@ -362,16 +362,16 @@ namespace PhotovoltaicThermalCollectors {
                                                                                  ErrorsFound,
                                                                                  DataIPShortCuts::cCurrentModuleObject,
                                                                                  DataIPShortCuts::cAlphaArgs(1),
-                                                                                 DataLoopNode::NodeType_Air,
-                                                                                 DataLoopNode::NodeConnectionType_Inlet,
+                                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                                 DataLoopNode::NodeConnectionType::Inlet,
                                                                                  1,
                                                                                  DataLoopNode::ObjectIsNotParent);
                 PVT(Item).HVACOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(9),
                                                                                   ErrorsFound,
                                                                                   DataIPShortCuts::cCurrentModuleObject,
                                                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                                                  DataLoopNode::NodeType_Air,
-                                                                                  DataLoopNode::NodeConnectionType_Outlet,
+                                                                                  DataLoopNode::NodeFluidType::Air,
+                                                                                  DataLoopNode::NodeConnectionType::Outlet,
                                                                                   1,
                                                                                   DataLoopNode::ObjectIsNotParent);
 
@@ -510,19 +510,19 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
 
-        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag && DataHVACGlobals::DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag && state.dataHVACGlobal->DoSetPointTest) {
             for (int PVTindex = 1; PVTindex <= NumPVT; ++PVTindex) {
                 if (PVT(PVTindex).WorkingFluidType == WorkingFluidEnum::AIR) {
-                    if (DataLoopNode::Node(PVT(PVTindex).HVACOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
+                    if (state.dataLoopNodes->Node(PVT(PVTindex).HVACOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");
                             ShowContinueError(state, "Add a setpoint manager to outlet node of PVT named " + PVT(PVTindex).Name);
-                            DataHVACGlobals::SetPointErrorFlag = true;
+                            state.dataHVACGlobal->SetPointErrorFlag = true;
                         } else {
                             // need call to EMS to check node
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                PVT(PVTindex).HVACOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, DataHVACGlobals::SetPointErrorFlag);
-                            if (DataHVACGlobals::SetPointErrorFlag) {
+                                PVT(PVTindex).HVACOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                            if (state.dataHVACGlobal->SetPointErrorFlag) {
                                 ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");
                                 ShowContinueError(state, "Add a setpoint manager to outlet node of PVT named " + PVT(PVTindex).Name);
                                 ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node of PVT");
@@ -585,7 +585,8 @@ namespace PhotovoltaicThermalCollectors {
 
                     this->MaxMassFlowRate = this->DesignVolFlowRate * rho;
 
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                                        this->MaxMassFlowRate,
                                                        InletNode,
                                                        OutletNode,
@@ -619,7 +620,7 @@ namespace PhotovoltaicThermalCollectors {
                 PlantUtilities::SetComponentFlowRate(
                     state, this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
             } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
-                this->MassFlowRate = DataLoopNode::Node(InletNode).MassFlowRate;
+                this->MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             }
         }
     }
@@ -819,7 +820,7 @@ namespace PhotovoltaicThermalCollectors {
                 if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     //  Outlet node is required to have a setpoint.
-                    if (DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint > DataLoopNode::Node(this->HVACInletNodeNum).Temp) {
+                    if (state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint > state.dataLoopNodes->Node(this->HVACInletNodeNum).Temp) {
                         this->HeatingUseful = true;
                         this->CoolingUseful = false;
                         this->BypassDamperOff = true;
@@ -830,7 +831,7 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 } else {
                     // is cooling wanted?
-                    if (DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint < DataLoopNode::Node(this->HVACInletNodeNum).Temp) {
+                    if (state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint < state.dataLoopNodes->Node(this->HVACInletNodeNum).Temp) {
                         this->CoolingUseful = true;
                         this->HeatingUseful = false;
                         this->BypassDamperOff = true;
@@ -886,7 +887,7 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         Real64 mdot = this->MassFlowRate;
-        Real64 Tinlet = DataLoopNode::Node(InletNode).Temp;
+        Real64 Tinlet = state.dataLoopNodes->Node(InletNode).Temp;
 
         if (this->PVTModelType == SimplePVTmodel) {
 
@@ -911,7 +912,7 @@ namespace PhotovoltaicThermalCollectors {
                 Real64 PotentialHeatGain = state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) * Eff * this->AreaCol;
 
                 if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
-                    Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
+                    Real64 Winlet = state.dataLoopNodes->Node(InletNode).HumRat;
                     Real64 CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
                     if (mdot * CpInlet > 0.0) {
                         PotentialOutletTemp = Tinlet + PotentialHeatGain / (mdot * CpInlet);
@@ -919,15 +920,15 @@ namespace PhotovoltaicThermalCollectors {
                         PotentialOutletTemp = Tinlet;
                     }
                     // now compare heating potential to setpoint and figure bypass fraction
-                    if (PotentialOutletTemp > DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint) { // need to modulate
+                    if (PotentialOutletTemp > state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint) { // need to modulate
                         if (Tinlet != PotentialOutletTemp) {
                             BypassFraction =
-                                (DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint - PotentialOutletTemp) / (Tinlet - PotentialOutletTemp);
+                                (state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint - PotentialOutletTemp) / (Tinlet - PotentialOutletTemp);
                         } else {
                             BypassFraction = 0.0;
                         }
                         BypassFraction = max(0.0, BypassFraction);
-                        PotentialOutletTemp = DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint;
+                        PotentialOutletTemp = state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint;
                         PotentialHeatGain = mdot * Psychrometrics::PsyCpAirFnW(Winlet) * (PotentialOutletTemp - Tinlet);
 
                     } else {
@@ -946,7 +947,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermEfficiency = Eff;
                 this->Report.ThermHeatGain = PotentialHeatGain;
                 this->Report.ThermPower = this->Report.ThermHeatGain;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 this->Report.ThermHeatLoss = 0.0;
                 this->Report.TinletWorkFluid = Tinlet;
                 this->Report.MdotWorkFluid = mdot;
@@ -976,7 +977,7 @@ namespace PhotovoltaicThermalCollectors {
                 Real64 CpInlet(0.0);
 
                 if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
-                    Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
+                    Real64 Winlet = state.dataLoopNodes->Node(InletNode).HumRat;
                     CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
                     WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(state, Tinlet, Winlet, state.dataEnvrn->OutBaroPress, RoutineName);
                     DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(state, Tinlet, WetBulbInlet, state.dataEnvrn->OutBaroPress, RoutineName);
@@ -1012,7 +1013,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermHeatLoss = mdot * CpInlet * (Tinlet - this->Report.ToutletWorkFluid);
                 this->Report.ThermHeatGain = 0.0;
                 this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 this->Report.ThermEfficiency = 0.0;
                 this->Simple.LastCollectorTemp = Tcollector;
                 this->Report.BypassStatus = BypassFraction;
@@ -1050,26 +1051,26 @@ namespace PhotovoltaicThermalCollectors {
                 OutletNode = this->PlantOutletNodeNum;
 
                 PlantUtilities::SafeCopyPlantNode(state, InletNode, OutletNode);
-                DataLoopNode::Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
+                state.dataLoopNodes->Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
 
             } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
                 InletNode = this->HVACInletNodeNum;
                 OutletNode = this->HVACOutletNodeNum;
 
                 // Set the outlet nodes for properties that just pass through & not used
-                DataLoopNode::Node(OutletNode).Quality = DataLoopNode::Node(InletNode).Quality;
-                DataLoopNode::Node(OutletNode).Press = DataLoopNode::Node(InletNode).Press;
-                DataLoopNode::Node(OutletNode).MassFlowRate = DataLoopNode::Node(InletNode).MassFlowRate;
-                DataLoopNode::Node(OutletNode).MassFlowRateMin = DataLoopNode::Node(InletNode).MassFlowRateMin;
-                DataLoopNode::Node(OutletNode).MassFlowRateMax = DataLoopNode::Node(InletNode).MassFlowRateMax;
-                DataLoopNode::Node(OutletNode).MassFlowRateMinAvail = DataLoopNode::Node(InletNode).MassFlowRateMinAvail;
-                DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail = DataLoopNode::Node(InletNode).MassFlowRateMaxAvail;
+                state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
+                state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRateMin = state.dataLoopNodes->Node(InletNode).MassFlowRateMin;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataLoopNodes->Node(InletNode).MassFlowRateMax;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
 
                 // Set outlet node variables that are possibly changed
-                DataLoopNode::Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
-                DataLoopNode::Node(OutletNode).HumRat = DataLoopNode::Node(InletNode).HumRat; // assumes dewpoint bound on cooling ....
-                DataLoopNode::Node(OutletNode).Enthalpy =
-                    Psychrometrics::PsyHFnTdbW(this->Report.ToutletWorkFluid, DataLoopNode::Node(OutletNode).HumRat);
+                state.dataLoopNodes->Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
+                state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat; // assumes dewpoint bound on cooling ....
+                state.dataLoopNodes->Node(OutletNode).Enthalpy =
+                    Psychrometrics::PsyHFnTdbW(this->Report.ToutletWorkFluid, state.dataLoopNodes->Node(OutletNode).HumRat);
             }
         }
     }

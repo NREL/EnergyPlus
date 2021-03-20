@@ -610,7 +610,6 @@ namespace UtilityRoutines {
         using BranchNodeConnections::CheckNodeConnections;
         using BranchNodeConnections::TestCompSetInletOutletNodes;
         using ExternalInterface::CloseSocket;
-        using ExternalInterface::NumExternalInterfaces;
 
         using NodeInputManager::CheckMarkedNodes;
         using NodeInputManager::SetupNodeVarsForReporting;
@@ -687,18 +686,18 @@ namespace UtilityRoutines {
         NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
 
         // catch up with timings if in middle
-        Time_Finish = epElapsedTime();
-        if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
-        Elapsed_Time = Time_Finish - Time_Start;
+        state.dataSysVars->Time_Finish = epElapsedTime();
+        if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
+        state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
 #endif
-        if (Elapsed_Time < 0.0) Elapsed_Time = 0.0;
-        Hours = Elapsed_Time / 3600.0;
-        Elapsed_Time -= Hours * 3600.0;
-        Minutes = Elapsed_Time / 60.0;
-        Elapsed_Time -= Minutes * 60.0;
-        Seconds = Elapsed_Time;
+        if (state.dataSysVars->Elapsed_Time < 0.0) state.dataSysVars->Elapsed_Time = 0.0;
+        Hours = state.dataSysVars->Elapsed_Time / 3600.0;
+        state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
+        Minutes = state.dataSysVars->Elapsed_Time / 60.0;
+        state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
+        Seconds = state.dataSysVars->Elapsed_Time;
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
@@ -740,7 +739,7 @@ namespace UtilityRoutines {
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
         // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
         // indicating that E+ terminated with an error.
-        if (NumExternalInterfaces > 0) CloseSocket(-1);
+        if (state.dataExternalInterface->NumExternalInterfaces > 0) CloseSocket(state, -1);
 
         if (state.dataGlobal->eplusRunningViaAPI) {
             state.files.flushAll();
@@ -766,18 +765,13 @@ namespace UtilityRoutines {
         // Use INQUIRE to determine if file is open.
 
         // Using/Aliasing
-        using DataReportingFlags::DebugOutput;
         using DaylightingManager::CloseDFSFile;
         using DaylightingManager::CloseReportIllumMaps;
-
-        //      LOGICAL :: exists, opened
-        //      INTEGER :: UnitNumber
-        //      INTEGER :: ios
 
         CloseReportIllumMaps(state);
         CloseDFSFile(state);
 
-        if (DebugOutput || (state.files.debug.good() && state.files.debug.position() > 0)) {
+        if (state.dataReportFlag->DebugOutput || (state.files.debug.good() && state.files.debug.position() > 0)) {
             state.files.debug.close();
         } else {
             state.files.debug.del();
@@ -805,8 +799,6 @@ namespace UtilityRoutines {
         using namespace DataTimings;
         using namespace DataErrorTracking;
         using ExternalInterface::CloseSocket;
-        using ExternalInterface::haveExternalInterfaceBCVTB;
-        using ExternalInterface::NumExternalInterfaces;
 
         using SolarShading::ReportSurfaceErrors;
 
@@ -841,20 +833,20 @@ namespace UtilityRoutines {
         NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
         strip(NumSevereDuringSizing);
 
-        Time_Finish = epElapsedTime();
-        if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
-        Elapsed_Time = Time_Finish - Time_Start;
+        state.dataSysVars->Time_Finish = epElapsedTime();
+        if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
+        state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
         if (state.dataGlobal->createPerfLog) {
-            UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", Elapsed_Time));
+            UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
         }
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
 #endif
-        Hours = Elapsed_Time / 3600.0;
-        Elapsed_Time -= Hours * 3600.0;
-        Minutes = Elapsed_Time / 60.0;
-        Elapsed_Time -= Minutes * 60.0;
-        Seconds = Elapsed_Time;
+        Hours = state.dataSysVars->Elapsed_Time / 3600.0;
+        state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
+        Minutes = state.dataSysVars->Elapsed_Time / 60.0;
+        state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
+        Seconds = state.dataSysVars->Elapsed_Time;
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
@@ -894,7 +886,7 @@ namespace UtilityRoutines {
         std::cerr << "EnergyPlus Completed Successfully." << std::endl;
         // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
         // indicating that E+ finished its simulation
-        if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
+        if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
 
         if (state.dataGlobal->eplusRunningViaAPI) {
             state.files.flushAll();
@@ -1083,7 +1075,7 @@ namespace UtilityRoutines {
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
         ++state.dataErrTracking->TotalSevereErrors;
@@ -1126,7 +1118,7 @@ namespace UtilityRoutines {
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
         ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
@@ -1279,7 +1271,7 @@ namespace UtilityRoutines {
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
         ++state.dataErrTracking->TotalWarningErrors;
@@ -1316,7 +1308,7 @@ namespace UtilityRoutines {
         using namespace DataErrorTracking;
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
         ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
@@ -1361,7 +1353,7 @@ namespace UtilityRoutines {
         //  with count of occurrences and optional max, min, sum
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(Message, MessageSearch(Loop))) {
+            if (has(Message, MessageSearch[Loop])) {
                 ++state.dataErrTracking->MatchCounts(Loop);
                 break;
             }
@@ -1416,7 +1408,7 @@ namespace UtilityRoutines {
         //  with count of occurrences and optional max, min, sum
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(Message, MessageSearch(Loop))) {
+            if (has(Message, MessageSearch[Loop])) {
                 ++state.dataErrTracking->MatchCounts(Loop);
                 break;
             }
@@ -1471,7 +1463,7 @@ namespace UtilityRoutines {
         //  with count of occurrences and optional max, min, sum
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(Message, MessageSearch(Loop))) {
+            if (has(Message, MessageSearch[Loop])) {
                 ++state.dataErrTracking->MatchCounts(Loop);
                 break;
             }
@@ -1652,16 +1644,17 @@ namespace UtilityRoutines {
             ShowMessage(state, "The following error categories occurred.  Consider correcting or noting.");
             for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
                 if (state.dataErrTracking->MatchCounts(Loop) > 0) {
-                    ShowMessage(state, Summaries(Loop));
-                    if (MoreDetails(Loop) != "") {
+                    ShowMessage(state, Summaries[Loop]);
+                    std::string thisMoreDetails = MoreDetails[Loop];
+                    if (!thisMoreDetails.empty()) {
                         StartC = 0;
-                        EndC = len(MoreDetails(Loop)) - 1;
+                        EndC = len(thisMoreDetails) - 1;
                         while (EndC != std::string::npos) {
-                            EndC = index(MoreDetails(Loop).substr(StartC), "<CR");
-                            ShowMessage(state, ".." + MoreDetails(Loop).substr(StartC, EndC));
-                            if (MoreDetails(Loop).substr(StartC + EndC, 5) == "<CRE>") break;
+                            EndC = index(thisMoreDetails.substr(StartC), "<CR");
+                            ShowMessage(state, ".." + thisMoreDetails.substr(StartC, EndC));
+                            if (thisMoreDetails.substr(StartC + EndC, 5) == "<CRE>") break;
                             StartC += EndC + 4;
-                            EndC = len(MoreDetails(Loop).substr(StartC)) - 1;
+                            EndC = len(thisMoreDetails.substr(StartC)) - 1;
                         }
                     }
                 }

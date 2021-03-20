@@ -445,7 +445,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->ZoneSizingCalc = true;
-    EnergyPlus::createFacilityElectricPowerServiceObject();
+    EnergyPlus::createFacilityElectricPowerServiceObject(*state);
 
     SizingManager::ManageSizing(*state);
 

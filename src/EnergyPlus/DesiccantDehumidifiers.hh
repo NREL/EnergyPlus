@@ -272,9 +272,9 @@ namespace DesiccantDehumidifiers {
                                           bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void UpdateDesiccantDehumidifier(int const DesicDehumNum); // number of the current dehumidifier being simulated
+    void UpdateDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum); // number of the current dehumidifier being simulated
 
-    void ReportDesiccantDehumidifier(int const DesicDehumNum); // number of the current dehumidifier being simulated
+    void ReportDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum); // number of the current dehumidifier being simulated
 
     void CalcNonDXHeatingCoils(EnergyPlusData &state, int const DesicDehumNum,              // Desiccant dehumidifier unit index
                                bool const FirstHVACIteration,        // flag for first HVAC iteration in the time step

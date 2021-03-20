@@ -178,12 +178,12 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 6 - Zone Equipment, Induction Unit, add fan heat
-    Fans::Fan.allocate(1);
-    Fans::Fan(1).DeltaPress = 600.0;
-    Fans::Fan(1).MotEff = 0.9;
-    Fans::Fan(1).FanEff = 0.6;
-    Fans::Fan(1).MotInAirFrac = 0.5;
-    Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+    state->dataFans->Fan.allocate(1);
+    state->dataFans->Fan(1).DeltaPress = 600.0;
+    state->dataFans->Fan(1).MotEff = 0.9;
+    state->dataFans->Fan(1).FanEff = 0.6;
+    state->dataFans->Fan(1).MotInAirFrac = 0.5;
+    state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
     state->dataSize->DataFanIndex = 1;
     state->dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
     state->dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
@@ -262,7 +262,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;

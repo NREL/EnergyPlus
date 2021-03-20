@@ -104,12 +104,6 @@ namespace SteamBaseboardRadiator {
     // 2. SteamCoils module (Coil:Heating:Steam)
 
     using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
-    using DataLoopNode::Node;
-    using DataLoopNode::NodeConnectionType_Inlet;
-    using DataLoopNode::NodeConnectionType_Outlet;
-    using DataLoopNode::NodeType_Steam;
     using DataLoopNode::ObjectIsNotParent;
     using DataPlant::TypeOf_Baseboard_Rad_Conv_Steam;
     using DataZoneEquipment::CheckZoneEquipmentList;
@@ -197,8 +191,10 @@ namespace SteamBaseboardRadiator {
                     MaxSteamFlow = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRateMax;
                     MinSteamFlow = 0.0;
                 } else {
-                    MaxSteamFlow = Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).MassFlowRateMaxAvail;
-                    MinSteamFlow = Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).MassFlowRateMinAvail;
+                    MaxSteamFlow =
+                        state.dataLoopNodes->Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).MassFlowRateMaxAvail;
+                    MinSteamFlow =
+                        state.dataLoopNodes->Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).MassFlowRateMinAvail;
                 }
 
                 {
@@ -493,11 +489,11 @@ namespace SteamBaseboardRadiator {
 
             // Get inlet node number
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, cAlphaArgs(1), DataLoopNode::NodeFluidType::Steam, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             // Get outlet node number
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, cAlphaArgs(1), DataLoopNode::NodeFluidType::Steam, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Hot Steam Nodes");
 
             // Determine steam baseboard radiator system heating design capacity sizing method
@@ -845,12 +841,13 @@ namespace SteamBaseboardRadiator {
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
             // Initialize
             SteamInletNode = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode;
-            Node(SteamInletNode).Temp = 100.0;
-            Node(SteamInletNode).Press = 101325.0;
-            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, Node(SteamInletNode).Temp, 1.0, Node(SteamInletNode).FluidIndex, RoutineName);
-            StartEnthSteam = GetSatEnthalpyRefrig(state, fluidNameSteam, Node(SteamInletNode).Temp, 1.0, Node(SteamInletNode).FluidIndex, RoutineName);
+            state.dataLoopNodes->Node(SteamInletNode).Temp = 100.0;
+            state.dataLoopNodes->Node(SteamInletNode).Press = 101325.0;
+            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataLoopNodes->Node(SteamInletNode).Temp, 1.0, state.dataLoopNodes->Node(SteamInletNode).FluidIndex, RoutineName);
+            StartEnthSteam = GetSatEnthalpyRefrig(state, fluidNameSteam, state.dataLoopNodes->Node(SteamInletNode).Temp, 1.0, state.dataLoopNodes->Node(SteamInletNode).FluidIndex, RoutineName);
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRateMax = SteamDensity * state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax;
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRateMax,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode,
@@ -858,9 +855,9 @@ namespace SteamBaseboardRadiator {
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum);
-            Node(SteamInletNode).Enthalpy = StartEnthSteam;
-            Node(SteamInletNode).Quality = 1.0;
-            Node(SteamInletNode).HumRat = 0.0;
+            state.dataLoopNodes->Node(SteamInletNode).Enthalpy = StartEnthSteam;
+            state.dataLoopNodes->Node(SteamInletNode).Quality = 1.0;
+            state.dataLoopNodes->Node(SteamInletNode).HumRat = 0.0;
 
             // Initializes radiant sources
             state.dataSteamBaseboardRadiator->ZeroSourceSumHATsurf = 0.0;
@@ -889,11 +886,11 @@ namespace SteamBaseboardRadiator {
         // Do the every time step initializations
         SteamInletNode = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode;
         ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRate = Node(SteamInletNode).MassFlowRate;
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletTemp = Node(SteamInletNode).Temp;
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletEnthalpy = Node(SteamInletNode).Enthalpy;
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletPress = Node(SteamInletNode).Press;
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletQuality = Node(SteamInletNode).Quality;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRate = state.dataLoopNodes->Node(SteamInletNode).MassFlowRate;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletTemp = state.dataLoopNodes->Node(SteamInletNode).Temp;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletEnthalpy = state.dataLoopNodes->Node(SteamInletNode).Enthalpy;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletPress = state.dataLoopNodes->Node(SteamInletNode).Press;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletQuality = state.dataLoopNodes->Node(SteamInletNode).Quality;
 
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower = 0.0;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power = 0.0;
@@ -1157,9 +1154,9 @@ namespace SteamBaseboardRadiator {
 
         ZoneNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
         QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        SteamInletTemp = Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).Temp;
+        SteamInletTemp = state.dataLoopNodes->Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).Temp;
         SteamOutletTemp = SteamInletTemp;
-        SteamMassFlowRate = Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).MassFlowRate;
+        SteamMassFlowRate = state.dataLoopNodes->Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).MassFlowRate;
         SubcoolDeltaT = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DegOfSubcooling;
 
         if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && SteamMassFlowRate > 0.0 &&
@@ -1238,15 +1235,15 @@ namespace SteamBaseboardRadiator {
         int SteamOutletNode;
 
         // First, update the running average if necessary...
-        if (state.dataSteamBaseboardRadiator->LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {
+        if (state.dataSteamBaseboardRadiator->LastSysTimeElapsed(BaseboardNum) == state.dataHVACGlobal->SysTimeElapsed) {
             state.dataSteamBaseboardRadiator->QBBSteamRadSrcAvg(BaseboardNum) -= state.dataSteamBaseboardRadiator->LastQBBSteamRadSrc(BaseboardNum) * state.dataSteamBaseboardRadiator->LastTimeStepSys(BaseboardNum) / state.dataGlobal->TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        state.dataSteamBaseboardRadiator->QBBSteamRadSrcAvg(BaseboardNum) += state.dataSteamBaseboardRadiator->QBBSteamRadSource(BaseboardNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
+        state.dataSteamBaseboardRadiator->QBBSteamRadSrcAvg(BaseboardNum) += state.dataSteamBaseboardRadiator->QBBSteamRadSource(BaseboardNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
         state.dataSteamBaseboardRadiator->LastQBBSteamRadSrc(BaseboardNum) = state.dataSteamBaseboardRadiator->QBBSteamRadSource(BaseboardNum);
-        state.dataSteamBaseboardRadiator->LastSysTimeElapsed(BaseboardNum) = SysTimeElapsed;
-        state.dataSteamBaseboardRadiator->LastTimeStepSys(BaseboardNum) = TimeStepSys;
+        state.dataSteamBaseboardRadiator->LastSysTimeElapsed(BaseboardNum) = state.dataHVACGlobal->SysTimeElapsed;
+        state.dataSteamBaseboardRadiator->LastTimeStepSys(BaseboardNum) = state.dataHVACGlobal->TimeStepSys;
 
         SteamInletNode = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode;
         SteamOutletNode = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode;
@@ -1254,8 +1251,8 @@ namespace SteamBaseboardRadiator {
         // Set the outlet air nodes of the Baseboard
         // Set the outlet water nodes for the Coil
         SafeCopyPlantNode(state, SteamInletNode, SteamOutletNode);
-        Node(SteamOutletNode).Temp = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletTemp;
-        Node(SteamOutletNode).Enthalpy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletEnthalpy;
+        state.dataLoopNodes->Node(SteamOutletNode).Temp = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletTemp;
+        state.dataLoopNodes->Node(SteamOutletNode).Enthalpy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletEnthalpy;
     }
 
     void UpdateBBSteamRadSourceValAvg(EnergyPlusData &state, bool &SteamBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
@@ -1379,10 +1376,10 @@ namespace SteamBaseboardRadiator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Energy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Energy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
@@ -1445,7 +1442,7 @@ namespace SteamBaseboardRadiator {
                 }
             }
 
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;

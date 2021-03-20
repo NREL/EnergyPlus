@@ -136,7 +136,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
                 this->InitWatertoWaterHP(state, this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
                 this->CalcWatertoWaterHPCooling(state, CurLoad);
-                this->UpdateGSHPRecords();
+                this->UpdateGSHPRecords(state);
             } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
                 PlantUtilities::UpdateChillerComponentCondenserSide(state, this->SourceLoopNum,
                                                                     this->SourceLoopSideNum,
@@ -155,7 +155,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
                 this->InitWatertoWaterHP(state, this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
                 this->CalcWatertoWaterHPHeating(state, CurLoad);
-                this->UpdateGSHPRecords();
+                this->UpdateGSHPRecords(state);
             } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
                 PlantUtilities::UpdateChillerComponentCondenserSide(state, this->SourceLoopNum,
                                                                     this->SourceLoopSideNum,
@@ -344,8 +344,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                      ErrorsFound,
                                                                      HPEqFitCoolingUC,
                                                                      DataIPShortCuts::cAlphaArgs(1),
-                                                                     NodeType_Water,
-                                                                     NodeConnectionType_Inlet,
+                                                                     DataLoopNode::NodeFluidType::Water,
+                                                                     DataLoopNode::NodeConnectionType::Inlet,
                                                                      1,
                                                                      ObjectIsNotParent);
 
@@ -353,8 +353,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                       ErrorsFound,
                                                                       HPEqFitCoolingUC,
                                                                       DataIPShortCuts::cAlphaArgs(1),
-                                                                      NodeType_Water,
-                                                                      NodeConnectionType_Outlet,
+                                                                      DataLoopNode::NodeFluidType::Water,
+                                                                      DataLoopNode::NodeConnectionType::Outlet,
                                                                       1,
                                                                       ObjectIsNotParent);
 
@@ -362,8 +362,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                    ErrorsFound,
                                                                    HPEqFitCoolingUC,
                                                                    DataIPShortCuts::cAlphaArgs(1),
-                                                                   NodeType_Water,
-                                                                   NodeConnectionType_Inlet,
+                                                                   DataLoopNode::NodeFluidType::Water,
+                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                    2,
                                                                    ObjectIsNotParent);
 
@@ -371,8 +371,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                     ErrorsFound,
                                                                     HPEqFitCoolingUC,
                                                                     DataIPShortCuts::cAlphaArgs(1),
-                                                                    NodeType_Water,
-                                                                    NodeConnectionType_Outlet,
+                                                                    DataLoopNode::NodeFluidType::Water,
+                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                     2,
                                                                     ObjectIsNotParent);
 
@@ -503,8 +503,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                      ErrorsFound,
                                                                      HPEqFitHeatingUC,
                                                                      DataIPShortCuts::cAlphaArgs(1),
-                                                                     NodeType_Water,
-                                                                     NodeConnectionType_Inlet,
+                                                                     DataLoopNode::NodeFluidType::Water,
+                                                                     DataLoopNode::NodeConnectionType::Inlet,
                                                                      1,
                                                                      ObjectIsNotParent);
 
@@ -512,8 +512,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                       ErrorsFound,
                                                                       HPEqFitHeatingUC,
                                                                       DataIPShortCuts::cAlphaArgs(1),
-                                                                      NodeType_Water,
-                                                                      NodeConnectionType_Outlet,
+                                                                      DataLoopNode::NodeFluidType::Water,
+                                                                      DataLoopNode::NodeConnectionType::Outlet,
                                                                       1,
                                                                       ObjectIsNotParent);
 
@@ -521,8 +521,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                    ErrorsFound,
                                                                    HPEqFitHeatingUC,
                                                                    DataIPShortCuts::cAlphaArgs(1),
-                                                                   NodeType_Water,
-                                                                   NodeConnectionType_Inlet,
+                                                                   DataLoopNode::NodeFluidType::Water,
+                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                    2,
                                                                    ObjectIsNotParent);
 
@@ -530,8 +530,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                     ErrorsFound,
                                                                     HPEqFitHeatingUC,
                                                                     DataIPShortCuts::cAlphaArgs(1),
-                                                                    NodeType_Water,
-                                                                    NodeConnectionType_Outlet,
+                                                                    DataLoopNode::NodeFluidType::Water,
+                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                     2,
                                                                     ObjectIsNotParent);
 
@@ -677,7 +677,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         using DataPlant::TypeOf_HPWaterEFCooling;
         using DataPlant::TypeOf_HPWaterEFHeating;
         using FluidProperties::GetDensityGlycol;
@@ -779,7 +779,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                 this->SourceSideDesignMassFlow = this->RatedSourceVolFlowCool * rho;
             }
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                this->LoadSideDesignMassFlow,
                                this->LoadSideInletNodeNum,
                                this->LoadSideOutletNodeNum,
@@ -788,7 +789,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                this->LoadBranchNum,
                                this->LoadCompNum);
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                this->SourceSideDesignMassFlow,
                                this->SourceSideInletNodeNum,
                                this->SourceSideOutletNodeNum,
@@ -797,8 +799,9 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                this->SourceBranchNum,
                                this->SourceCompNum);
 
-            if (Node(this->SourceSideOutletNodeNum).TempSetPoint == SensedNodeFlagValue) Node(this->SourceSideOutletNodeNum).TempSetPoint = 0.0;
-            Node(this->SourceSideInletNodeNum).Temp = Node(this->SourceSideOutletNodeNum).TempSetPoint + 30;
+            if (state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint == SensedNodeFlagValue)
+                state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint = 0.0;
+            state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp = state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint + 30;
 
             this->MyEnvrnFlag = false;
         }
@@ -919,8 +922,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         }
 
         // Get inlet temps
-        this->reportLoadSideInletTemp = Node(LoadSideInletNode).Temp;
-        this->reportSourceSideInletTemp = Node(SourceSideInletNode).Temp;
+        this->reportLoadSideInletTemp = state.dataLoopNodes->Node(LoadSideInletNode).Temp;
+        this->reportSourceSideInletTemp = state.dataLoopNodes->Node(SourceSideInletNode).Temp;
 
         // Outlet variables
         this->reportPower = 0.0;
@@ -1620,7 +1623,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using CurveManager::CurveValue;
@@ -1780,7 +1783,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using CurveManager::CurveValue;
@@ -1920,7 +1923,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         this->reportSourceSideOutletTemp = SourceSideOutletTemp;
     }
 
-    void GshpSpecs::UpdateGSHPRecords()
+    void GshpSpecs::UpdateGSHPRecords(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Kenneth Tang
@@ -1941,8 +1944,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
             this->reportSourceSideOutletTemp = this->reportSourceSideInletTemp;
         }
 
-        Node(SourceSideOutletNode).Temp = this->reportSourceSideOutletTemp;
-        Node(LoadSideOutletNode).Temp = this->reportLoadSideOutletTemp;
+        state.dataLoopNodes->Node(SourceSideOutletNode).Temp = this->reportSourceSideOutletTemp;
+        state.dataLoopNodes->Node(LoadSideOutletNode).Temp = this->reportLoadSideOutletTemp;
     }
 
 } // namespace EnergyPlus

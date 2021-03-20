@@ -663,10 +663,10 @@ namespace ThermalChimney {
 
             for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).Width == majorW) {
-                    if (TempSurfIn(SurfNum) > TemporaryWallSurfTemp) {
-                        TemporaryWallSurfTemp = TempSurfIn(SurfNum);
+                    if (state.dataHeatBalSurf->TempSurfIn(SurfNum) > TemporaryWallSurfTemp) {
+                        TemporaryWallSurfTemp = state.dataHeatBalSurf->TempSurfIn(SurfNum);
                         ConvTransCoeffWallFluid = state.dataHeatBal->HConvIn(SurfNum);
-                        SurfTempAbsorberWall = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv;
+                        SurfTempAbsorberWall = state.dataHeatBalSurf->TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv;
                     }
                 }
             }
@@ -676,7 +676,7 @@ namespace ThermalChimney {
                     if (state.dataSurface->Surface(SurfNum).Width > TempmajorW) {
                         TempmajorW = state.dataSurface->Surface(SurfNum).Width;
                         ConvTransCoeffGlassFluid = state.dataHeatBal->HConvIn(SurfNum);
-                        SurfTempGlassCover = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv;
+                        SurfTempGlassCover = state.dataHeatBalSurf->TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv;
                     }
                 }
             }
@@ -864,7 +864,7 @@ namespace ThermalChimney {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine fills remaining report variables.
 
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         int ZoneLoop; // Counter for the # of zones (nz)
         Real64 AirDensity;

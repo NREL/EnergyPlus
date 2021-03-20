@@ -1154,8 +1154,6 @@ namespace DaylightingDevices {
         // REFERENCES:
         // See AnisoSkyViewFactors in SolarShading.cc.
 
-        using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
-
         // Return value
         Real64 CalcTDDTransSolAniso;
 
@@ -1172,7 +1170,7 @@ namespace DaylightingDevices {
 
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
-        if (!DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+        if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
             IsoSkyRad = state.dataHeatBal->MultIsoSky(DomeSurf) * state.dataHeatBal->DifShdgRatioIsoSky(DomeSurf);
             HorizonRad = state.dataHeatBal->MultHorizonZenith(DomeSurf) * state.dataHeatBal->DifShdgRatioHoriz(DomeSurf);
         } else {

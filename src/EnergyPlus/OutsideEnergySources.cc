@@ -206,16 +206,16 @@ namespace EnergyPlus::OutsideEnergySources {
                                                                                              ErrorsFound,
                                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                                              DataIPShortCuts::cAlphaArgs(1),
-                                                                                             DataLoopNode::NodeType_Water,
-                                                                                             DataLoopNode::NodeConnectionType_Inlet,
+                                                                                             DataLoopNode::NodeFluidType::Water,
+                                                                                             DataLoopNode::NodeConnectionType::Inlet,
                                                                                              1,
                                                                                              DataLoopNode::ObjectIsNotParent);
             state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                               ErrorsFound,
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               DataIPShortCuts::cAlphaArgs(1),
-                                                                                              DataLoopNode::NodeType_Water,
-                                                                                              DataLoopNode::NodeConnectionType_Outlet,
+                                                                                              DataLoopNode::NodeFluidType::Water,
+                                                                                              DataLoopNode::NodeConnectionType::Outlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
@@ -342,7 +342,8 @@ namespace EnergyPlus::OutsideEnergySources {
         // begin environment inits
         if (state.dataGlobal->BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
             // component model has not design flow rates, using data for overall plant loop
-            PlantUtilities::InitComponentNodes(state.dataPlnt->PlantLoop(this->LoopNum).MinMassFlowRate,
+            PlantUtilities::InitComponentNodes(state,
+                                               state.dataPlnt->PlantLoop(this->LoopNum).MinMassFlowRate,
                                                state.dataPlnt->PlantLoop(this->LoopNum).MaxMassFlowRate,
                                                this->InletNodeNum,
                                                this->OutletNodeNum,
@@ -363,7 +364,7 @@ namespace EnergyPlus::OutsideEnergySources {
         PlantUtilities::SetComponentFlowRate(
             state, TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
-        this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
         this->MassFlowRate = TempPlantMassFlow;
     }
 
@@ -499,9 +500,9 @@ namespace EnergyPlus::OutsideEnergySources {
             MyLoad = 0.0;
         }
         int const OutletNode = this->OutletNodeNum;
-        DataLoopNode::Node(OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
         this->EnergyRate = std::abs(MyLoad);
-        this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
 } // namespace EnergyPlus

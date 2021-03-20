@@ -102,7 +102,6 @@ namespace Humidifiers {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHVACGlobals::SetPointErrorFlag;
     using DataHVACGlobals::SmallMassFlow;
     using namespace ScheduleManager;
 
@@ -232,7 +231,7 @@ namespace Humidifiers {
 
         thisHum.UpdateHumidifier(state);
 
-        thisHum.ReportHumidifier();
+        thisHum.ReportHumidifier(state);
     }
 
     void GetHumidifierInput(EnergyPlusData &state)
@@ -340,9 +339,9 @@ namespace Humidifiers {
             Humidifier(HumNum).FanPower = Numbers(3);
             Humidifier(HumNum).StandbyPower = Numbers(4);
             Humidifier(HumNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             Humidifier(HumNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             //  A5; \field Name of Water Storage Tank
@@ -391,9 +390,9 @@ namespace Humidifiers {
             Humidifier(HumNum).FanPower = Numbers(4);
             Humidifier(HumNum).StandbyPower = Numbers(5);
             Humidifier(HumNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             Humidifier(HumNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Air Nodes");
 
             Humidifier(HumNum).EfficiencyCurvePtr = GetCurveIndex(state, Alphas(3));
@@ -617,7 +616,6 @@ namespace Humidifiers {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
         // Locals
@@ -642,22 +640,22 @@ namespace Humidifiers {
             MySizeFlag = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && state.dataHVACGlobal->DoSetPointTest) {
             if (AirOutNode > 0) {
-                if (Node(AirOutNode).HumRatMin == SensedNodeFlagValue) {
+                if (state.dataLoopNodes->Node(AirOutNode).HumRatMin == SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowSevereError(state, "Humidifiers: Missing humidity setpoint for " + HumidifierType(HumType_Code) + " = " + Name);
                         ShowContinueError(state, "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at the "
                                           "humidifier outlet node.");
-                        ShowContinueError(state, "  expecting it on Node=\"" + NodeID(AirOutNode) + "\".");
-                        SetPointErrorFlag = true;
+                        ShowContinueError(state, "  expecting it on Node=\"" + state.dataLoopNodes->NodeID(AirOutNode) + "\".");
+                        state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
-                        CheckIfNodeSetPointManagedByEMS(state, AirOutNode, EMSManager::SPControlType::iHumidityRatioMinSetPoint, SetPointErrorFlag);
-                        if (SetPointErrorFlag) {
+                        CheckIfNodeSetPointManagedByEMS(state, AirOutNode, EMSManager::SPControlType::iHumidityRatioMinSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                        if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state, "Humidifiers: Missing humidity setpoint for " + HumidifierType(HumType_Code) + " = " + Name);
                             ShowContinueError(state, "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at "
                                               "the humidifier outlet node.");
-                            ShowContinueError(state, "  expecting it on Node=\"" + NodeID(AirOutNode) + "\".");
+                            ShowContinueError(state, "  expecting it on Node=\"" + state.dataLoopNodes->NodeID(AirOutNode) + "\".");
                             ShowContinueError(state,
                                 "  or use an EMS actuator to control minimum humidity ratio to establish a setpoint at the humidifier outlet node.");
                         }
@@ -672,11 +670,11 @@ namespace Humidifiers {
         }
 
         // do these initializations every HVAC time step
-        HumRatSet = Node(AirOutNode).HumRatMin;
-        AirInTemp = Node(AirInNode).Temp;
-        AirInHumRat = Node(AirInNode).HumRat;
-        AirInEnthalpy = Node(AirInNode).Enthalpy;
-        AirInMassFlowRate = Node(AirInNode).MassFlowRate;
+        HumRatSet = state.dataLoopNodes->Node(AirOutNode).HumRatMin;
+        AirInTemp = state.dataLoopNodes->Node(AirInNode).Temp;
+        AirInHumRat = state.dataLoopNodes->Node(AirInNode).HumRat;
+        AirInEnthalpy = state.dataLoopNodes->Node(AirInNode).Enthalpy;
+        AirInMassFlowRate = state.dataLoopNodes->Node(AirInNode).MassFlowRate;
 
         WaterAdd = 0.0;
         ElecUseEnergy = 0.0;
@@ -1287,7 +1285,7 @@ namespace Humidifiers {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1338,28 +1336,28 @@ namespace Humidifiers {
         // Moves humidifier output to the outlet nodes.
 
         // Set the outlet air node of the humidifier
-        Node(AirOutNode).MassFlowRate = AirOutMassFlowRate;
-        Node(AirOutNode).Temp = AirOutTemp;
-        Node(AirOutNode).HumRat = AirOutHumRat;
-        Node(AirOutNode).Enthalpy = AirOutEnthalpy;
+        state.dataLoopNodes->Node(AirOutNode).MassFlowRate = AirOutMassFlowRate;
+        state.dataLoopNodes->Node(AirOutNode).Temp = AirOutTemp;
+        state.dataLoopNodes->Node(AirOutNode).HumRat = AirOutHumRat;
+        state.dataLoopNodes->Node(AirOutNode).Enthalpy = AirOutEnthalpy;
 
         // Set the outlet nodes for properties that just pass through & not used
-        Node(AirOutNode).Quality = Node(AirInNode).Quality;
-        Node(AirOutNode).Press = Node(AirInNode).Press;
-        Node(AirOutNode).MassFlowRateMin = Node(AirInNode).MassFlowRateMin;
-        Node(AirOutNode).MassFlowRateMax = Node(AirInNode).MassFlowRateMax;
-        Node(AirOutNode).MassFlowRateMinAvail = Node(AirInNode).MassFlowRateMinAvail;
-        Node(AirOutNode).MassFlowRateMaxAvail = Node(AirInNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(AirOutNode).Quality = state.dataLoopNodes->Node(AirInNode).Quality;
+        state.dataLoopNodes->Node(AirOutNode).Press = state.dataLoopNodes->Node(AirInNode).Press;
+        state.dataLoopNodes->Node(AirOutNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(AirOutNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(AirOutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(AirOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInNode).MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(AirOutNode).CO2 = Node(AirInNode).CO2;
+            state.dataLoopNodes->Node(AirOutNode).CO2 = state.dataLoopNodes->Node(AirInNode).CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(AirOutNode).GenContam = Node(AirInNode).GenContam;
+            state.dataLoopNodes->Node(AirOutNode).GenContam = state.dataLoopNodes->Node(AirInNode).GenContam;
         }
     }
 
-    void HumidifierData::ReportHumidifier() // number of the current humidifier being simulated
+    void HumidifierData::ReportHumidifier(EnergyPlusData &state) // number of the current humidifier being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -1371,29 +1369,8 @@ namespace Humidifiers {
         // PURPOSE OF THIS SUBROUTINE:
         // Fill remaining report variables
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         ElecUseEnergy = ElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour;
         WaterCons = WaterConsRate * TimeStepSys * DataGlobalConstants::SecInHour;

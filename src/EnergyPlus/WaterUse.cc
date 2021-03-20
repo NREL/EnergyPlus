@@ -420,16 +420,16 @@ namespace WaterUse {
                                                                                                    ErrorsFound,
                                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                                    DataIPShortCuts::cAlphaArgs(1),
-                                                                                                   DataLoopNode::NodeType_Water,
-                                                                                                   DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                   DataLoopNode::NodeFluidType::Water,
+                                                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                                                    1,
                                                                                                    DataLoopNode::ObjectIsNotParent);
                     state.dataWaterUse->WaterConnections(WaterConnNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                                     ErrorsFound,
                                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                                     DataIPShortCuts::cAlphaArgs(1),
-                                                                                                    DataLoopNode::NodeType_Water,
-                                                                                                    DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                    DataLoopNode::NodeFluidType::Water,
+                                                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                                                     1,
                                                                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -926,7 +926,7 @@ namespace WaterUse {
             } else {
                 this->SensibleRate = ScheduleManager::GetCurrentScheduleValue(state, this->SensibleFracSchedule) * this->TotalMassFlowRate *
                                      Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (this->MixedTemp - state.dataHeatBalFanSys->MAT(this->Zone));
-                this->SensibleEnergy = this->SensibleRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->SensibleEnergy = this->SensibleRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             }
 
             if (this->LatentFracSchedule == 0) {
@@ -939,14 +939,14 @@ namespace WaterUse {
                 Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(this->Zone), 0.0);
                 Real64 ZoneMassMax =
                     (ZoneHumRatSat - ZoneHumRat) * RhoAirDry * state.dataHeatBal->Zone(this->Zone).Volume; // Max water that can be evaporated to zone
-                Real64 FlowMassMax = this->TotalMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour; // Max water in flow
+                Real64 FlowMassMax = this->TotalMassFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // Max water in flow
                 Real64 MoistureMassMax = min(ZoneMassMax, FlowMassMax);
 
                 this->MoistureMass = ScheduleManager::GetCurrentScheduleValue(state, this->LatentFracSchedule) * MoistureMassMax;
-                this->MoistureRate = this->MoistureMass / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+                this->MoistureRate = this->MoistureMass / (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
 
                 this->LatentRate = this->MoistureRate * Psychrometrics::PsyHfgAirFnWTdb(ZoneHumRat, state.dataHeatBalFanSys->MAT(this->Zone));
-                this->LatentEnergy = this->LatentRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->LatentEnergy = this->LatentRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             }
 
             this->DrainMassFlowRate = this->TotalMassFlowRate - this->MoistureRate;
@@ -1024,7 +1024,8 @@ namespace WaterUse {
             if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
                 // Clear node initial conditions
                 if (this->InletNode > 0 && this->OutletNode > 0) {
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                                        this->PeakMassFlowRate,
                                                        this->InletNode,
                                                        this->OutletNode,
@@ -1033,7 +1034,7 @@ namespace WaterUse {
                                                        this->PlantLoopBranchNum,
                                                        this->PlantLoopCompNum);
 
-                    this->ReturnTemp = DataLoopNode::Node(this->InletNode).Temp;
+                    this->ReturnTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
                 }
 
                 this->Init = false;
@@ -1043,7 +1044,7 @@ namespace WaterUse {
 
             if (this->InletNode > 0) {
                 if (!state.dataGlobal->DoingSizing) {
-                    this->HotTemp = DataLoopNode::Node(this->InletNode).Temp;
+                    this->HotTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
                 } else {
                     // plant loop will not be running so need a value here.
                     // should change to use tank setpoint but water use connections don't have knowledge of the tank they are fed by
@@ -1287,7 +1288,7 @@ namespace WaterUse {
             PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode, this->PlantLoopNum);
 
             // Set outlet node variables that are possibly changed
-            DataLoopNode::Node(this->OutletNode).Temp = this->ReturnTemp;
+            state.dataLoopNodes->Node(this->OutletNode).Temp = this->ReturnTemp;
             // should add enthalpy update to return?
         }
     }
@@ -1310,9 +1311,9 @@ namespace WaterUse {
             thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
             thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
 
-            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            thisWEq.HotVolume = thisWEq.HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.HotVolume = thisWEq.HotVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
             if (thisWEq.Connections == 0) {
                 thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
@@ -1321,7 +1322,7 @@ namespace WaterUse {
                                 (thisWEq.HotTemp - state.dataWaterUse->WaterConnections(thisWEq.Connections).ReturnTemp);
             }
 
-            thisWEq.Energy = thisWEq.Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.Energy = thisWEq.Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         }
     }
 
@@ -1345,9 +1346,9 @@ namespace WaterUse {
             thisWEq.ColdVolFlowRate = thisWEq.ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
             thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
             thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
-            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            thisWEq.HotVolume = thisWEq.HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.HotVolume = thisWEq.HotVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
             if (thisWEq.Connections == 0) {
                 thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
@@ -1356,18 +1357,18 @@ namespace WaterUse {
                                 (thisWEq.HotTemp - state.dataWaterUse->WaterConnections(thisWEq.Connections).ReturnTemp);
             }
 
-            thisWEq.Energy = thisWEq.Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.Energy = thisWEq.Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         }
 
         this->ColdVolFlowRate = this->ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
         this->HotVolFlowRate = this->HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
         this->TotalVolFlowRate = this->ColdVolFlowRate + this->HotVolFlowRate;
-        this->ColdVolume = this->ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->HotVolume = this->HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->TotalVolume = this->TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ColdVolume = this->ColdVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->HotVolume = this->HotVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->TotalVolume = this->TotalVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->Power = this->HotMassFlowRate * Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (this->HotTemp - this->ReturnTemp);
-        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->RecoveryEnergy = this->RecoveryRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->RecoveryEnergy = this->RecoveryRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void CalcWaterUseZoneGains(EnergyPlusData &state)

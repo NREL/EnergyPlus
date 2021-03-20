@@ -619,9 +619,9 @@ namespace EnergyPlus::DXCoils {
                     state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp = PsyTdbFnHW(state.dataDXCoils->DXCoil(DXCoilNum).OutletAirEnthalpy, state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat);
                     // Check for saturation error and modify temperature at constant enthalpy
                     if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(PerfMode) != 0) {
-                        NodePress = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(PerfMode)).Press;
+                        NodePress = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(PerfMode)).Press;
                         // If node is not connected to anything, pressure = default, use weather data
-                        if (NodePress == DefaultNodeValues.Press) NodePress = state.dataEnvrn->OutBaroPress;
+                        if (NodePress == state.dataLoopNodes->DefaultNodeValues.Press) NodePress = state.dataEnvrn->OutBaroPress;
                         TSat = PsyTsatFnHPb(state, state.dataDXCoils->DXCoil(DXCoilNum).OutletAirEnthalpy, NodePress, RoutineName);
                         if (state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp < TSat) {
                             state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp = TSat;
@@ -752,7 +752,7 @@ namespace EnergyPlus::DXCoils {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetDXCoils: "); // include trailing blank space
-        static Real64 const minOATCompDXCooling = -25.0;      // min OAT for compressor operation for DX cooling coils
+        constexpr Real64 minOATCompDXCooling = -25.0;      // min OAT for compressor operation for DX cooling coils
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DXCoilIndex;                 // loop index
@@ -768,7 +768,7 @@ namespace EnergyPlus::DXCoils {
         int NumAlphas2;                  // Number of alphas in input for performance object
         int NumNumbers2;                 // Number of numeric items in input for performance object
         int IOStatus;                    // Input status returned from GetObjectItem
-        static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);         // Set to true if errors in input, fatal at end of routine
         int DXHPWaterHeaterCoilNum;      // Loop index for 1,NumDXHeatPumpWaterHeaterCoils
         int CapacityStageNum;            // Loop index for 1,Number of capacity stages
         int DehumidModeNum;              // Loop index for 1,Number of enhanced dehumidification modes
@@ -788,9 +788,9 @@ namespace EnergyPlus::DXCoils {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int MaxNumbers(0);        // Maximum number of numeric input fields
-        static int MaxAlphas(0);         // Maximum number of alpha input fields
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
+        int MaxNumbers(0);               // Maximum number of numeric input fields
+        int MaxAlphas(0);                // Maximum number of alpha input fields
+        int TotalArgs(0);                // Total number of alpha and numeric arguments (max) for a
         //   certain object in the input file
         Real64 MinCurveVal; // used for testing PLF curve output
         Real64 MinCurvePLR; // used for testing PLF curve output
@@ -962,10 +962,10 @@ namespace EnergyPlus::DXCoils {
             state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate(1) = Numbers(5);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -1163,8 +1163,8 @@ namespace EnergyPlus::DXCoils {
                                                                                ErrorsFound,
                                                                                CurrentModuleObject,
                                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                                               NodeType_Air,
-                                                                               NodeConnectionType_OutsideAirReference,
+                                                                               DataLoopNode::NodeFluidType::Air,
+                                                                               DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                1,
                                                                                ObjectIsNotParent);
 
@@ -1396,10 +1396,10 @@ namespace EnergyPlus::DXCoils {
             }
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -1690,8 +1690,8 @@ namespace EnergyPlus::DXCoils {
                                                                                                          ErrorsFound,
                                                                                                          PerfObjectType,
                                                                                                          PerfObjectName,
-                                                                                                         NodeType_Air,
-                                                                                                         NodeConnectionType_OutsideAirReference,
+                                                                                                         DataLoopNode::NodeFluidType::Air,
+                                                                                                         DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                                          1,
                                                                                                          ObjectIsNotParent);
                                 if (!CheckOutAirNodeNumber(state, state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(PerfModeNum))) {
@@ -1917,10 +1917,10 @@ namespace EnergyPlus::DXCoils {
             }
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -2226,8 +2226,8 @@ namespace EnergyPlus::DXCoils {
                                                                                ErrorsFound,
                                                                                CurrentModuleObject,
                                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                                               NodeType_Air,
-                                                                               NodeConnectionType_OutsideAirReference,
+                                                                               DataLoopNode::NodeFluidType::Air,
+                                                                               DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                1,
                                                                                ObjectIsNotParent);
                 // warn if not an outdoor node, but allow
@@ -2353,10 +2353,10 @@ namespace EnergyPlus::DXCoils {
             }
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -2606,8 +2606,8 @@ namespace EnergyPlus::DXCoils {
                                                                                ErrorsFound,
                                                                                CurrentModuleObject,
                                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                                               NodeType_Air,
-                                                                               NodeConnectionType_OutsideAirReference,
+                                                                               DataLoopNode::NodeFluidType::Air,
+                                                                               DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                1,
                                                                                ObjectIsNotParent);
                 if (!CheckOutAirNodeNumber(state, state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1))) {
@@ -2985,10 +2985,10 @@ namespace EnergyPlus::DXCoils {
 
             // Air nodes
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(5), Alphas(6), "Air Nodes");
 
@@ -2997,10 +2997,10 @@ namespace EnergyPlus::DXCoils {
 
             // Water nodes
             state.dataDXCoils->DXCoil(DXCoilNum).WaterInNode = GetOnlySingleNode(state,
-                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).WaterOutNode = GetOnlySingleNode(state,
-                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(7), Alphas(8), "Water Nodes");
 
@@ -3377,10 +3377,10 @@ namespace EnergyPlus::DXCoils {
 
             // Air nodes
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -3390,14 +3390,14 @@ namespace EnergyPlus::DXCoils {
             std::string const DummyCondenserInletName("DUMMY CONDENSER INLET " + state.dataDXCoils->DXCoil(DXCoilNum).Name);
             std::string const DummyCondenserOutletName("DUMMY CONDENSER OUTLET " + state.dataDXCoils->DXCoil(DXCoilNum).Name);
             state.dataDXCoils->DXCoil(DXCoilNum).WaterInNode = GetOnlySingleNode(state,
-                DummyCondenserInletName, ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                DummyCondenserInletName, ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).WaterOutNode = GetOnlySingleNode(state, DummyCondenserOutletName,
                                                                ErrorsFound,
                                                                CurrentModuleObject,
                                                                Alphas(1),
-                                                               NodeType_Water,
-                                                               NodeConnectionType_Outlet,
+                                                               DataLoopNode::NodeFluidType::Water,
+                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                2,
                                                                ObjectIsNotParent);
 
@@ -3672,10 +3672,10 @@ namespace EnergyPlus::DXCoils {
             }
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -3687,8 +3687,8 @@ namespace EnergyPlus::DXCoils {
                                                                                ErrorsFound,
                                                                                CurrentModuleObject,
                                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                                               NodeType_Air,
-                                                                               NodeConnectionType_OutsideAirReference,
+                                                                               DataLoopNode::NodeFluidType::Air,
+                                                                               DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                                                1,
                                                                                ObjectIsNotParent);
                 if (!CheckOutAirNodeNumber(state, state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1))) {
@@ -4196,10 +4196,10 @@ namespace EnergyPlus::DXCoils {
             }
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -4704,10 +4704,10 @@ namespace EnergyPlus::DXCoils {
             }
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(5), Alphas(6), "Air Nodes");
 
@@ -4774,10 +4774,10 @@ namespace EnergyPlus::DXCoils {
             state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = Numbers(2);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -4887,9 +4887,9 @@ namespace EnergyPlus::DXCoils {
             }
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) = Numbers(1);
@@ -4987,9 +4987,9 @@ namespace EnergyPlus::DXCoils {
             }
 
             state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) = Numbers(1);
@@ -5943,13 +5943,15 @@ namespace EnergyPlus::DXCoils {
         Real64 RatedHeatPumpIndoorHumRat;  // Inlet humidity ratio to heat pump evaporator at rated conditions [kgWater/kgDryAir]
         Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
         Real64 HPInletAirHumRat;           // Rated inlet air humidity ratio for heat pump water heater [kgWater/kgDryAir]
-        static bool ErrorsFound(false);    // TRUE when errors found
+        bool ErrorsFound(false);           // TRUE when errors found
         int CapacityStageNum;              // Loop index for 1,Number of capacity stages
         int DehumidModeNum;                // Loop index for 1,Number of enhanced dehumidification modes
         int Mode;                          // Performance mode for MultiMode DX coil; Always 1 for other coil types
         int DXCoilNumTemp;                 // Counter for crankcase heater report variable DO loop
         int AirInletNode;                  // Air inlet node number
         int SpeedNum;                      // Speed number for multispeed coils
+
+        auto & DXCT = state.dataHVACGlobal->DXCT;
 
         if (state.dataDXCoils->MyOneTimeFlag) {
             // initialize the environment and sizing flags
@@ -5973,21 +5975,21 @@ namespace EnergyPlus::DXCoils {
             SizeDXCoil(state, DXCoilNum);
 
             RatedVolFlowPerRatedTotCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(1) / state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap2;
-            if (((MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
-                ((RatedVolFlowPerRatedTotCap - MaxHeatVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
+            if (((state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
+                ((RatedVolFlowPerRatedTotCap - state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
                 ShowWarningError(state, state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType + " \"" + state.dataDXCoils->DXCoil(DXCoilNum).Name +
                                  "\": Rated air volume flow rate per watt of rated total water heating capacity is out of range");
                 ShowContinueError(state,
                                   format("Min Rated Vol Flow Per Watt=[{:.3T}], Rated Vol Flow Per Watt=[{:.3T}], Max Rated Vol Flow Per "
                                          "Watt=[{:.3T}]. See Input-Output Reference Manual for valid range.",
-                                         MinRatedVolFlowPerRatedTotCap(DXCT),
+                                         state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT),
                                          RatedVolFlowPerRatedTotCap,
-                                         MaxHeatVolFlowPerRatedTotCap(DXCT)));
+                                         state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT)));
             }
             HPInletAirHumRat =
                 PsyWFnTdbTwbPb(state, state.dataDXCoils->DXCoil(DXCoilNum).RatedInletDBTemp, state.dataDXCoils->DXCoil(DXCoilNum).RatedInletWBTemp, DataEnvironment::StdPressureSeaLevel, RoutineName);
-            HPWHInletDBTemp = state.dataDXCoils->DXCoil(DXCoilNum).RatedInletDBTemp;
-            HPWHInletWBTemp = state.dataDXCoils->DXCoil(DXCoilNum).RatedInletWBTemp;
+            state.dataHVACGlobal->HPWHInletDBTemp = state.dataDXCoils->DXCoil(DXCoilNum).RatedInletDBTemp;
+            state.dataHVACGlobal->HPWHInletWBTemp = state.dataDXCoils->DXCoil(DXCoilNum).RatedInletWBTemp;
             state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1) =
                 state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(1) *
                 PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, state.dataDXCoils->DXCoil(DXCoilNum).RatedInletDBTemp, HPInletAirHumRat, RoutineName);
@@ -6105,16 +6107,16 @@ namespace EnergyPlus::DXCoils {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num !=
                     CoilVRF_FluidTCtrl_Cooling) { // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
                     RatedVolFlowPerRatedTotCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) / state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
-                    if (((MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
-                        ((RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
+                    if (((state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
+                        ((RatedVolFlowPerRatedTotCap - state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
                         ShowWarningError(state, "Sizing: " + state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType + " \"" + state.dataDXCoils->DXCoil(DXCoilNum).Name +
                                          "\": Rated air volume flow rate per watt of rated total cooling capacity is out of range.");
                         ShowContinueError(state,
                                           format("Min Rated Vol Flow Per Watt=[{:.3T}], Rated Vol Flow Per Watt=[{:.3T}], Max Rated Vol Flow Per "
                                                  "Watt=[{:.3T}]. See Input Output Reference Manual for valid range.",
-                                                 MinRatedVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT),
                                                  RatedVolFlowPerRatedTotCap,
-                                                 MaxRatedVolFlowPerRatedTotCap(DXCT)));
+                                                 state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)));
                     }
                 }
 
@@ -6154,9 +6156,9 @@ namespace EnergyPlus::DXCoils {
                 state.dataEnvrn->OutHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) > 0) { // set condenser inlet node values
-                    Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp = RatedOutdoorAirTemp;
-                    Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).HumRat = state.dataEnvrn->OutHumRat;
-                    Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).OutAirWetBulb = ratedOutdoorAirWetBulb;
+                    state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp = RatedOutdoorAirTemp;
+                    state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).HumRat = state.dataEnvrn->OutHumRat;
+                    state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).OutAirWetBulb = ratedOutdoorAirWetBulb;
                 }
 
                 // calculate coil model at rating point
@@ -6175,7 +6177,7 @@ namespace EnergyPlus::DXCoils {
                 RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp, state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
-                coilSelectionReportObj->setRatedCoilConditions(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(state,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate, // this is the report variable
@@ -6221,16 +6223,16 @@ namespace EnergyPlus::DXCoils {
                         }
                         // Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
                         RatedVolFlowPerRatedTotCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) / state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
-                        if (((MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
-                            ((RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
+                        if (((state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
+                            ((RatedVolFlowPerRatedTotCap - state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
                             ShowWarningError(state, "Sizing: " + state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType + " \"" + state.dataDXCoils->DXCoil(DXCoilNum).Name +
                                              "\": Rated air volume flow rate per watt of rated total cooling capacity is out of range.");
                             ShowContinueError(state,
                                               format("Min Rated Vol Flow Per Watt=[{:.3T}], Rated Vol Flow Per Watt=[{:.3T}], Max Rated Vol Flow Per "
                                                      "Watt=[{:.3T}]. See Input Output Reference Manual for valid range.",
-                                                     MinRatedVolFlowPerRatedTotCap(DXCT),
+                                                     state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT),
                                                      RatedVolFlowPerRatedTotCap,
-                                                     MaxRatedVolFlowPerRatedTotCap(DXCT)));
+                                                     state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)));
                             ShowContinueError(state, "for CoilPerformance:DX:Cooling mode: " + state.dataDXCoils->DXCoil(DXCoilNum).CoilPerformanceName(Mode));
                         }
                         state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode) =
@@ -6274,16 +6276,16 @@ namespace EnergyPlus::DXCoils {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num !=
                     CoilVRF_FluidTCtrl_Heating) { // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
                     RatedVolFlowPerRatedTotCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) / state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
-                    if (((MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
-                        ((RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
+                    if (((state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
+                        ((RatedVolFlowPerRatedTotCap - state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
                         ShowWarningError(state, "Sizing: " + state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType + ' ' + state.dataDXCoils->DXCoil(DXCoilNum).Name +
                                          ": Rated air volume flow rate per watt of rated total heating capacity is out of range.");
                         ShowContinueError(state,
                                           format("Min Rated Vol Flow Per Watt=[{:.3T}], Rated Vol Flow Per Watt=[{:.3T}], Max Rated Vol Flow Per "
                                                  "Watt=[{:.3T}]. See Input-Output Reference Manual for valid range.",
-                                                 MinRatedVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT),
                                                  RatedVolFlowPerRatedTotCap,
-                                                 MaxRatedVolFlowPerRatedTotCap(DXCT)));
+                                                 state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)));
                     }
                 }
 
@@ -6312,9 +6314,9 @@ namespace EnergyPlus::DXCoils {
                     RatedOutdoorAirTempHeat, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
                 if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) > 0) { // set condenser inlet node values
-                    Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp = RatedOutdoorAirTempHeat;
-                    Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).HumRat = state.dataEnvrn->OutHumRat;
-                    Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).OutAirWetBulb = ratedOutdoorAirWetBulb;
+                    state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp = RatedOutdoorAirTempHeat;
+                    state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).HumRat = state.dataEnvrn->OutHumRat;
+                    state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).OutAirWetBulb = ratedOutdoorAirWetBulb;
                 }
 
                 // calculate coil model at rating point
@@ -6330,7 +6332,7 @@ namespace EnergyPlus::DXCoils {
                 RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp, state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
-                coilSelectionReportObj->setRatedCoilConditions(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(state,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                state.dataDXCoils->DXCoil(DXCoilNum).TotalHeatingEnergyRate, // this is the report variable
@@ -6357,16 +6359,16 @@ namespace EnergyPlus::DXCoils {
             if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                 // Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
                 RatedVolFlowPerRatedTotCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate2 / state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap2;
-                if (((MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
-                    ((RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
+                if (((state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
+                    ((RatedVolFlowPerRatedTotCap - state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
                     ShowWarningError(state, "Coil:Cooling:DX:TwoSpeed \"" + state.dataDXCoils->DXCoil(DXCoilNum).Name +
                                      "\": At low speed rated air volume flow rate per watt of rated total cooling capacity is out of range.");
                     ShowContinueError(state,
                                       format("Min Rated Vol Flow Per Watt=[{:.3T}], Rated Vol Flow Per Watt=[{:.3T}], Max Rated Vol Flow Per "
                                              "Watt=[{:.3T}]. See Input-Output Reference Manual for valid range.",
-                                             MinRatedVolFlowPerRatedTotCap(DXCT),
+                                             state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT),
                                              RatedVolFlowPerRatedTotCap,
-                                             MaxRatedVolFlowPerRatedTotCap(DXCT)));
+                                             state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)));
                 }
 
                 state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate2 =
@@ -6412,8 +6414,8 @@ namespace EnergyPlus::DXCoils {
                     }
                     // Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
                     RatedVolFlowPerRatedTotCap = state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(Mode);
-                    if (((MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
-                        ((RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
+                    if (((state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
+                        ((RatedVolFlowPerRatedTotCap - state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
                         ShowWarningError(
                             state,
                             format(
@@ -6424,9 +6426,9 @@ namespace EnergyPlus::DXCoils {
                         ShowContinueError(state,
                                           format("Min Rated Vol Flow Per Watt=[{:.3T}], Rated Vol Flow Per Watt=[{:.3T}], Max Rated Vol Flow Per "
                                                  "Watt=[{:.3T}]. See Input Output Reference Manual for valid range.",
-                                                 MinRatedVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT),
                                                  RatedVolFlowPerRatedTotCap,
-                                                 MaxRatedVolFlowPerRatedTotCap(DXCT)));
+                                                 state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)));
                     }
                     state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) =
                         state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) *
@@ -6454,8 +6456,8 @@ namespace EnergyPlus::DXCoils {
                         PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, RatedHeatPumpIndoorAirTemp, RatedHeatPumpIndoorHumRat, RoutineName);
                     // Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
                     RatedVolFlowPerRatedTotCap = state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(Mode);
-                    if (((MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
-                        ((RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
+                    if (((state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
+                        ((RatedVolFlowPerRatedTotCap - state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
                         ShowWarningError(state,
                                          format("Coil:Heating:DX:MultiSpeed {}: Rated air volume flow rate per watt of rated total heating capacity "
                                                 "is out of range at speed {}",
@@ -6464,9 +6466,9 @@ namespace EnergyPlus::DXCoils {
                         ShowContinueError(state,
                                           format("Min Rated Vol Flow Per Watt=[{:.3T}], Rated Vol Flow Per Watt=[{:.3T}], Max Rated Vol Flow Per "
                                                  "Watt=[{:.3T}]. See Input Output Reference Manual for valid range.",
-                                                 MinRatedVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT),
                                                  RatedVolFlowPerRatedTotCap,
-                                                 MaxRatedVolFlowPerRatedTotCap(DXCT)));
+                                                 state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)));
                     }
                 }
             }
@@ -6474,7 +6476,7 @@ namespace EnergyPlus::DXCoils {
             // store fan info for coil
             if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex > -1) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
@@ -6484,7 +6486,7 @@ namespace EnergyPlus::DXCoils {
 
             } else {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
@@ -6498,11 +6500,12 @@ namespace EnergyPlus::DXCoils {
 
         // Each iteration, load the coil data structure with the inlet conditions
 
-        state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate = Node(AirInletNode).MassFlowRate;
-        state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRateMax = max(Node(AirInletNode).MassFlowRateMax, Node(AirInletNode).MassFlowRate);
-        state.dataDXCoils->DXCoil(DXCoilNum).InletAirTemp = Node(AirInletNode).Temp;
-        state.dataDXCoils->DXCoil(DXCoilNum).InletAirHumRat = Node(AirInletNode).HumRat;
-        state.dataDXCoils->DXCoil(DXCoilNum).InletAirEnthalpy = Node(AirInletNode).Enthalpy;
+        state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
+        state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRateMax =
+            max(state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax, state.dataLoopNodes->Node(AirInletNode).MassFlowRate);
+        state.dataDXCoils->DXCoil(DXCoilNum).InletAirTemp = state.dataLoopNodes->Node(AirInletNode).Temp;
+        state.dataDXCoils->DXCoil(DXCoilNum).InletAirHumRat = state.dataLoopNodes->Node(AirInletNode).HumRat;
+        state.dataDXCoils->DXCoil(DXCoilNum).InletAirEnthalpy = state.dataLoopNodes->Node(AirInletNode).Enthalpy;
         //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
         //  DXCoil(DXCoilNum)%InletAirPressure        = Node(AirInletNode)%Press
 
@@ -6523,8 +6526,8 @@ namespace EnergyPlus::DXCoils {
             //   HPWH's that use an inlet air temperature schedule also need to have a valid barometric pressure
             //   The DX Coil used in HPWH's does not know if it is using a scheduled inlet temperature so check the node pressure
             if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) > 0) {
-                if (Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press == 0.0) {
-                    Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press = state.dataEnvrn->StdBaroPress;
+                if (state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press == 0.0) {
+                    state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press = state.dataEnvrn->StdBaroPress;
                 }
             }
         }
@@ -6875,7 +6878,7 @@ namespace EnergyPlus::DXCoils {
                     TempSize = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
                     SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [W]";
                     PrintFlag = false;
-                    Node(state.dataDXCoils->DXCoil(DXCoilNum).WaterInNode).Temp =
+                    state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).WaterInNode).Temp =
                         state.dataDXCoils->DXCoil(DXCoilNum).RatedInletWaterTemp; // set the rated water inlet node for HPWHs for use in CalcHPWHDXCoil
                 } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling) {
                     SizingMethod = CoolingCapacitySizing;
@@ -7980,9 +7983,9 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::DXCoilTotalCapacity;
-        using DataHVACGlobals::HPWHInletDBTemp;
-        using DataHVACGlobals::HPWHInletWBTemp;
+        auto & DXCoilTotalCapacity = state.dataHVACGlobal->DXCoilTotalCapacity;
+        auto & HPWHInletDBTemp = state.dataHVACGlobal->HPWHInletDBTemp;
+        auto & HPWHInletWBTemp = state.dataHVACGlobal->HPWHInletWBTemp;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcHPWHDXCoil");
@@ -8019,9 +8022,9 @@ namespace EnergyPlus::DXCoils {
 
         // References to Coil and Node struct
         DXCoilData &Coil = state.dataDXCoils->DXCoil(DXCoilNum);
-        NodeData &AirInletNode = Node(Coil.AirInNode);
-        NodeData &WaterInletNode = Node(Coil.WaterInNode);
-        NodeData &WaterOutletNode = Node(Coil.WaterOutNode);
+        NodeData &AirInletNode = state.dataLoopNodes->Node(Coil.AirInNode);
+        NodeData &WaterInletNode = state.dataLoopNodes->Node(Coil.WaterInNode);
+        NodeData &WaterOutletNode = state.dataLoopNodes->Node(Coil.WaterOutNode);
 
         // If heat pump water heater is OFF, set outlet to inlet and RETURN
         // Also set the heating energy rate to zero
@@ -8254,7 +8257,7 @@ namespace EnergyPlus::DXCoils {
         if (Coil.SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             locFanElecPower = HVACFan::fanObjs[Coil.SupplyFanIndex]->fanPower();
         } else {
-            locFanElecPower = Fans::GetFanPower(Coil.SupplyFanIndex);
+            locFanElecPower = Fans::GetFanPower(state, Coil.SupplyFanIndex);
         }
 
         // calculate evaporator total cooling capacity
@@ -8374,9 +8377,9 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::HPWHCrankcaseDBTemp;
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & HPWHCrankcaseDBTemp = state.dataHVACGlobal->HPWHCrankcaseDBTemp;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -8452,6 +8455,9 @@ namespace EnergyPlus::DXCoils {
         Real64 HeatRTF;                    // heating coil part-load ratio, used for cycling fan RH control
         Real64 HeatingCoilPLF;             // heating coil PLF (function of PLR), used for cycling fan RH control
 
+        auto & DXCT = state.dataHVACGlobal->DXCT;
+        auto & OnOffFanPartLoadFraction = state.dataHVACGlobal->OnOffFanPartLoadFraction;
+
         // If Performance mode not present, then set to 1.  Used only by Multimode/Multispeed DX coil (otherwise mode = 1)
         if (present(PerfMode)) {
             Mode = PerfMode;
@@ -8495,18 +8501,18 @@ namespace EnergyPlus::DXCoils {
 
         if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(Mode) != WaterHeater) {
             if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode) != 0) {
-                OutdoorPressure = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
+                OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
                 // If node is not connected to anything, pressure = default, use weather data
-                if (OutdoorPressure == DefaultNodeValues.Press) {
+                if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
                     OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                     OutdoorHumRat = state.dataEnvrn->OutHumRat;
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
                     OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 } else {
-                    OutdoorDryBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Temp;
-                    OutdoorHumRat = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
+                    OutdoorDryBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Temp;
+                    OutdoorHumRat = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
                     // this should use Node%WetBulbTemp or a PSYC function, not OAWB
-                    OutdoorWetBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).OutAirWetBulb;
+                    OutdoorWetBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).OutAirWetBulb;
                 }
             } else {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
@@ -8522,9 +8528,10 @@ namespace EnergyPlus::DXCoils {
             }
         } else {
             if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode) != 0) {
-                OutdoorPressure = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
+                OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
                 // If node is not connected to anything, pressure = default, use weather data
-                if (OutdoorPressure == DefaultNodeValues.Press) OutdoorPressure = state.dataEnvrn->OutBaroPress; // node not connected
+                if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press)
+                    OutdoorPressure = state.dataEnvrn->OutBaroPress; // node not connected
             } else {
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
             }
@@ -8658,7 +8665,7 @@ namespace EnergyPlus::DXCoils {
             }
             if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag && state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num != CoilDX_HeatPumpWaterHeaterPumped &&
                 state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num != CoilDX_HeatPumpWaterHeaterWrapped &&
-                ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap(DXCT)))) {
+                ((VolFlowperRatedTotCap < state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > state.dataHVACGlobal->MaxCoolVolFlowPerRatedTotCap(DXCT)))) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).ErrIndex1 == 0) {
                     ShowWarningMessage(
                         state,
@@ -8670,8 +8677,8 @@ namespace EnergyPlus::DXCoils {
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state,
                                       format("Expected range for VolumeFlowPerRatedTotalCapacity=[{:.3R}--{:.3R}]",
-                                             MinOperVolFlowPerRatedTotCap(DXCT),
-                                             MaxCoolVolFlowPerRatedTotCap(DXCT)));
+                                             state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT),
+                                             state.dataHVACGlobal->MaxCoolVolFlowPerRatedTotCap(DXCT)));
                     ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components,");
                     ShowContinueError(state, "or variable air volume [VAV] system using incorrect coil type.");
                 }
@@ -8683,8 +8690,8 @@ namespace EnergyPlus::DXCoils {
                     VolFlowperRatedTotCap);
             } else if (!state.dataGlobal->WarmupFlag && state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped &&
                        state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped &&
-                       ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) ||
-                        (VolFlowperRatedTotCap > MaxHeatVolFlowPerRatedTotCap(DXCT)))) {
+                       ((VolFlowperRatedTotCap < state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT)) ||
+                        (VolFlowperRatedTotCap > state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT)))) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).ErrIndex1 == 0) {
                     ShowWarningMessage(
                         state,
@@ -8696,8 +8703,8 @@ namespace EnergyPlus::DXCoils {
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state,
                                       format("Expected range for VolumeFlowPerRatedTotalCapacity=[{:.3R}--{:.3R}]",
-                                             MinOperVolFlowPerRatedTotCap(DXCT),
-                                             MaxHeatVolFlowPerRatedTotCap(DXCT)));
+                                             state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT),
+                                             state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT)));
                     ShowContinueError(state, "Possible causes may be that the parent object is calling for an actual supply air flow rate that is much "
                                       "higher or lower than the DX coil rated supply air flow rate.");
                 }
@@ -9328,8 +9335,8 @@ namespace EnergyPlus::DXCoils {
 
         // set outlet node conditions
         int airOutletNode = state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode;
-        Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
-        Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
 
         // calc secondary coil if specified
         if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -9385,9 +9392,8 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::HPWHCrankcaseDBTemp;
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9472,6 +9478,9 @@ namespace EnergyPlus::DXCoils {
             AirFlowRatio = 1.0;
         }
 
+        auto & DXCT = state.dataHVACGlobal->DXCT;
+        auto & OnOffFanPartLoadFraction = state.dataHVACGlobal->OnOffFanPartLoadFraction;
+
         MaxIter = 30;
         RF = 0.4;
         Counter = 0;
@@ -9490,23 +9499,23 @@ namespace EnergyPlus::DXCoils {
         state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterPower = 0.0;
 
         if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode) != 0) {
-            OutdoorDryBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Temp;
+            OutdoorDryBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Temp;
             if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(Mode) == WaterCooled) {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
-                OutdoorPressure = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
+                OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
                 // If node is not connected to anything, pressure = default, use weather data
-                if (OutdoorPressure == DefaultNodeValues.Press) {
+                if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
                     OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                     OutdoorHumRat = state.dataEnvrn->OutHumRat;
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
                     OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 } else {
-                    OutdoorHumRat = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
+                    OutdoorHumRat = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
                     // this should use Node%WetBulbTemp or a PSYC function, not OAWB
-                    OutdoorWetBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).OutAirWetBulb;
+                    OutdoorWetBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).OutAirWetBulb;
                 }
             }
         } else {
@@ -9634,7 +9643,7 @@ namespace EnergyPlus::DXCoils {
             }
 
             if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag &&
-                ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap(DXCT)))) {
+                ((VolFlowperRatedTotCap < state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > state.dataHVACGlobal->MaxCoolVolFlowPerRatedTotCap(DXCT)))) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).ErrIndex1 == 0) {
                     ShowWarningMessage(
                         state,
@@ -9645,8 +9654,8 @@ namespace EnergyPlus::DXCoils {
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state,
                                       format("...Expected range for VolumeFlowPerRatedTotalCapacity=[{:.3R}--{:.3R}]",
-                                             MinOperVolFlowPerRatedTotCap(DXCT),
-                                             MaxCoolVolFlowPerRatedTotCap(DXCT)));
+                                             state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT),
+                                             state.dataHVACGlobal->MaxCoolVolFlowPerRatedTotCap(DXCT)));
                     ShowContinueError(state, "...Possible causes include inconsistent air flow rates in system components,");
                     ShowContinueError(state, "...or mixing manual inputs with autosize inputs. Also check the following values and calculations.");
                     ShowContinueError(state, "...Volume Flow Rate per Rated Total Capacity = Volume Flow Rate / Rated Total Capacity");
@@ -10008,8 +10017,8 @@ namespace EnergyPlus::DXCoils {
 
         // set outlet node conditions
         int airOutletNode = state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode;
-        Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
-        Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
     }
 
     void CalcDXHeatingCoil(EnergyPlusData &state,
@@ -10117,9 +10126,11 @@ namespace EnergyPlus::DXCoils {
             AirFlowRatio = 1.0;
         }
 
+        auto & DXCT = state.dataHVACGlobal->DXCT;
+
         // Get condenser outdoor node info from DX Heating Coil
         if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) != 0) {
-            OutdoorDryBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp;
+            OutdoorDryBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp;
             CompAmbTemp = OutdoorDryBulb;
             if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(Mode) == WaterCooled) {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
@@ -10127,17 +10138,17 @@ namespace EnergyPlus::DXCoils {
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 CompAmbTemp = state.dataEnvrn->OutDryBulbTemp;
             } else {
-                OutdoorPressure = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press;
+                OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press;
                 // If node is not connected to anything, pressure = default, use weather data
-                if (OutdoorPressure == DefaultNodeValues.Press) {
+                if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
                     OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                     OutdoorHumRat = state.dataEnvrn->OutHumRat;
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
                     OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 } else {
-                    OutdoorHumRat = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).HumRat;
+                    OutdoorHumRat = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).HumRat;
                     // this should use Node%WetBulbTemp or a PSYC function, not OAWB
-                    OutdoorWetBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).OutAirWetBulb;
+                    OutdoorWetBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).OutAirWetBulb;
                 }
                 if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
                     OutdoorDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
@@ -10189,7 +10200,7 @@ namespace EnergyPlus::DXCoils {
             //  AirVolumeFlowRate = AirMassFlow/PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
             VolFlowperRatedTotCap = AirVolumeFlowRate / state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
 
-            if ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > MaxHeatVolFlowPerRatedTotCap(DXCT))) {
+            if ((VolFlowperRatedTotCap < state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT))) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).ErrIndex1 == 0) {
                     ShowWarningMessage(
                         state,
@@ -10200,8 +10211,8 @@ namespace EnergyPlus::DXCoils {
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state,
                                       format("Expected range for VolumeFlowPerRatedTotalCapacity=[{:.3R}--{:.3R}]",
-                                             MinOperVolFlowPerRatedTotCap(DXCT),
-                                             MaxHeatVolFlowPerRatedTotCap(DXCT)));
+                                             state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT),
+                                             state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT)));
                     ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                     ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
                 }
@@ -10430,7 +10441,7 @@ namespace EnergyPlus::DXCoils {
                 state.dataDXCoils->DXCoil(DXCoilNum).HeatingCoilRuntimeFraction = 1.0; // Reset coil runtime fraction to 1.0
             }
             // if cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
-            if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = PLF;
+            if (FanOpMode == CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
             state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingPower = TotCap * EIR * state.dataDXCoils->DXCoil(DXCoilNum).HeatingCoilRuntimeFraction * InputPowerMultiplier;
 
             // Calculate crankcase heater power using the runtime fraction for this DX heating coil only if there is no companion DX coil.
@@ -10488,8 +10499,8 @@ namespace EnergyPlus::DXCoils {
 
         // set outlet node conditions
         int airOutletNode = state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode;
-        Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
-        Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
 
         // calc secondary coil if specified
         if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -10599,16 +10610,16 @@ namespace EnergyPlus::DXCoils {
         }
 
         if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode) != 0) {
-            OutdoorPressure = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
+            OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
             // If node is not connected to anything, pressure = default, use weather data
-            if (OutdoorPressure == DefaultNodeValues.Press) {
+            if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
-                OutdoorDryBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Temp;
-                OutdoorHumRat = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
+                OutdoorDryBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Temp;
+                OutdoorHumRat = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
                 OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure);
             }
             CompAmbTemp = OutdoorDryBulb;
@@ -11000,8 +11011,8 @@ namespace EnergyPlus::DXCoils {
 
         // set outlet node conditions
         int airOutletNode = state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode;
-        Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
-        Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
 
         // calc secondary coil if specified
         if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -11156,6 +11167,8 @@ namespace EnergyPlus::DXCoils {
         Real64 adjustedSHR;                     // SHR calculated using adjusted outlet air properties []
         bool CBFErrors(false);                  // Set to true if errors in CBF calculation, fatal at end of routine
 
+        auto & DXCT = state.dataHVACGlobal->DXCT;
+
         AirMassFlowRate = AirVolFlowRate * PsyRhoAirFnPbTdbW(state, DataEnvironment::StdPressureSeaLevel, InletAirTemp, InletAirHumRat, RoutineName);
         DeltaH = TotCap / AirMassFlowRate;
         InletAirEnthalpy = PsyHFnTdbW(InletAirTemp, InletAirHumRat);
@@ -11183,8 +11196,8 @@ namespace EnergyPlus::DXCoils {
             ShowContinueError(state, format("...Air Mass Flow Rate used in calculation     = {:.6R} kg/s", AirMassFlowRate));
             ShowContinueError(state, format("...Air Volume Flow Rate used in calculation   = {:.6R} m3/s", AirVolFlowRate));
             if (TotCap > 0.0) {
-                if (((MinRatedVolFlowPerRatedTotCap(DXCT) - AirVolFlowRate / TotCap) > SmallDifferenceTest) ||
-                    ((AirVolFlowRate / TotCap - MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
+                if (((state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT) - AirVolFlowRate / TotCap) > SmallDifferenceTest) ||
+                    ((AirVolFlowRate / TotCap - state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
                     ShowContinueError(state,
                                       format("...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = {:.7R} m3/s/W",
                                              AirVolFlowRate / TotCap));
@@ -11220,8 +11233,8 @@ namespace EnergyPlus::DXCoils {
             ShowContinueError(state, format("...Air Mass Flow Rate used in calculation     = {:.6R} kg/s", AirMassFlowRate));
             ShowContinueError(state, format("...Air Volume Flow Rate used in calculation   = {:.6R} m3/s", AirVolFlowRate));
             if (TotCap > 0.0) {
-                if (((MinRatedVolFlowPerRatedTotCap(DXCT) - AirVolFlowRate / TotCap) > SmallDifferenceTest) ||
-                    ((AirVolFlowRate / TotCap - MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
+                if (((state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT) - AirVolFlowRate / TotCap) > SmallDifferenceTest) ||
+                    ((AirVolFlowRate / TotCap - state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
                     ShowContinueError(state,
                                       format("...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = {:.7R} m3/s/W",
                                              AirVolFlowRate / TotCap));
@@ -11248,8 +11261,8 @@ namespace EnergyPlus::DXCoils {
             ShowContinueError(state, format("...Air Mass Flow Rate used in calculation     = {:.6R} kg/s", AirMassFlowRate));
             ShowContinueError(state, format("...Air Volume Flow Rate used in calculation   = {:.6R} m3/s", AirVolFlowRate));
             if (TotCap > 0.0) {
-                if (((MinRatedVolFlowPerRatedTotCap(DXCT) - AirVolFlowRate / TotCap) > SmallDifferenceTest) ||
-                    ((AirVolFlowRate / TotCap - MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
+                if (((state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(DXCT) - AirVolFlowRate / TotCap) > SmallDifferenceTest) ||
+                    ((AirVolFlowRate / TotCap - state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(DXCT)) > SmallDifferenceTest)) {
                     ShowContinueError(state,
                                       format("...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = {:.7R} m3/s/W",
                                              AirVolFlowRate / TotCap));
@@ -11739,9 +11752,9 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::MSHPMassFlowRateHigh;
-        using DataHVACGlobals::MSHPMassFlowRateLow;
-        using DataHVACGlobals::MSHPWasteHeat;
+        auto & MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
+        auto & MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
+        auto & MSHPWasteHeat = state.dataHVACGlobal->MSHPWasteHeat;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -11826,17 +11839,19 @@ namespace EnergyPlus::DXCoils {
         Real64 AirVolumeFlowRate;     // Air volume flow rate across the heating coil
         Real64 VolFlowperRatedTotCap; // Air volume flow rate divided by rated total heating capacity
 
+        auto & DXCT = state.dataHVACGlobal->DXCT;
+
         if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(DXMode) != 0) {
-            OutdoorPressure = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(DXMode)).Press;
+            OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(DXMode)).Press;
             // If node is not connected to anything, pressure = default, use weather data
-            if (OutdoorPressure == DefaultNodeValues.Press) {
+            if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
-                OutdoorDryBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(DXMode)).Temp;
-                OutdoorHumRat = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(DXMode)).HumRat;
+                OutdoorDryBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(DXMode)).Temp;
+                OutdoorHumRat = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(DXMode)).HumRat;
                 OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, RoutineName);
             }
             if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -11940,7 +11955,7 @@ namespace EnergyPlus::DXCoils {
                 //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
                 //  AirVolumeFlowRate = AirMassFlow/PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
                 VolFlowperRatedTotCap = AirVolumeFlowRate / state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(SpeedNumLS);
-                if ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap(DXCT))) {
+                if ((VolFlowperRatedTotCap < state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > state.dataHVACGlobal->MaxCoolVolFlowPerRatedTotCap(DXCT))) {
                     if (state.dataDXCoils->DXCoil(DXCoilNum).MSErrIndex(SpeedNumLS) == 0) {
                         ShowWarningMessage(
                             state,
@@ -11951,8 +11966,8 @@ namespace EnergyPlus::DXCoils {
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state,
                                           format("Expected range for VolumeFlowPerRatedTotalCapacity=[{:.3R}--{:.3R}] Current value is {:.3R} m3/s/W",
-                                                 MinOperVolFlowPerRatedTotCap(DXCT),
-                                                 MaxCoolVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MaxCoolVolFlowPerRatedTotCap(DXCT),
                                                  VolFlowperRatedTotCap));
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
@@ -11972,7 +11987,7 @@ namespace EnergyPlus::DXCoils {
                 //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
                 //  AirVolumeFlowRate = AirMassFlow/PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
                 VolFlowperRatedTotCap = AirVolumeFlowRate / state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(SpeedNumHS);
-                if ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap(DXCT))) {
+                if ((VolFlowperRatedTotCap < state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > state.dataHVACGlobal->MaxCoolVolFlowPerRatedTotCap(DXCT))) {
                     if (state.dataDXCoils->DXCoil(DXCoilNum).MSErrIndex(SpeedNumHS) == 0) {
                         ShowWarningMessage(
                             state,
@@ -11983,8 +11998,8 @@ namespace EnergyPlus::DXCoils {
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state,
                                           format("Expected range for VolumeFlowPerRatedTotalCapacity=[{:.3R}--{:.3R}] Current value is {:.3R} m3/s/W",
-                                                 MinOperVolFlowPerRatedTotCap(DXCT),
-                                                 MaxCoolVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MaxCoolVolFlowPerRatedTotCap(DXCT),
                                                  VolFlowperRatedTotCap));
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
@@ -12182,7 +12197,7 @@ namespace EnergyPlus::DXCoils {
                 // Average outlet enthalpy
                 OutletAirEnthalpy = InletAirEnthalpy - state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate / state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate;
 
-                if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = 1.0;
+                if (FanOpMode == CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
                 // Update outlet conditions
                 if (SpeedRatio == 0.0 && FanOpMode == CycFanCycCoil) {
                     OutletAirEnthalpy = LSOutletAirEnthalpy;
@@ -12273,7 +12288,7 @@ namespace EnergyPlus::DXCoils {
                 //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
                 //  AirVolumeFlowRate = AirMassFlow/PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
                 VolFlowperRatedTotCap = AirVolumeFlowRate / state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(SpeedNum);
-                if ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap(DXCT))) {
+                if ((VolFlowperRatedTotCap < state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > state.dataHVACGlobal->MaxCoolVolFlowPerRatedTotCap(DXCT))) {
                     if (state.dataDXCoils->DXCoil(DXCoilNum).MSErrIndex(SpeedNum) == 0) {
                         ShowWarningMessage(
                             state,
@@ -12284,8 +12299,8 @@ namespace EnergyPlus::DXCoils {
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state,
                                           format("Expected range for VolumeFlowPerRatedTotalCapacity=[{:.3R}--{:.3R}] Current value is {:.3R} m3/s/W",
-                                                 MinOperVolFlowPerRatedTotCap(DXCT),
-                                                 MaxCoolVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MaxCoolVolFlowPerRatedTotCap(DXCT),
                                                  VolFlowperRatedTotCap));
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
@@ -12411,7 +12426,7 @@ namespace EnergyPlus::DXCoils {
                     LSOutletAirDryBulbTemp = PsyTdbFnHW(LSOutletAirEnthalpy, LSOutletAirHumRat);
                 }
 
-                if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = PLF;
+                if (FanOpMode == CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
                 // outlet conditions are average of inlet and low speed weighted by CycRatio
                 OutletAirEnthalpy = LSOutletAirEnthalpy;
                 OutletAirHumRat = LSOutletAirHumRat;
@@ -12552,8 +12567,8 @@ namespace EnergyPlus::DXCoils {
 
         // set outlet node conditions
         int airOutletNode = state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode;
-        Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
-        Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
 
         // calc secondary coil if specified
         if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -12588,9 +12603,9 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::MSHPMassFlowRateHigh;
-        using DataHVACGlobals::MSHPMassFlowRateLow;
-        using DataHVACGlobals::MSHPWasteHeat;
+        auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
+        auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
+        auto &MSHPWasteHeat = state.dataHVACGlobal->MSHPWasteHeat;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
@@ -12661,6 +12676,7 @@ namespace EnergyPlus::DXCoils {
         // Autodesk:Uninit Initialize variables used uninitialized
         FullLoadOutAirEnth = 0.0; // Autodesk:Uninit Force default initialization
 
+        auto & DXCT = state.dataHVACGlobal->DXCT;
 
         if (SpeedNum > 1) {
             SpeedNumLS = SpeedNum - 1;
@@ -12714,15 +12730,15 @@ namespace EnergyPlus::DXCoils {
 
         // Get condenser outdoor node info from DX Heating Coil
         if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) != 0) {
-            OutdoorPressure = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press;
+            OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press;
             // If node is not connected to anything, pressure = default, use weather data
-            if (OutdoorPressure == DefaultNodeValues.Press) {
+            if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
             } else {
-                OutdoorDryBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp;
-                OutdoorHumRat = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).HumRat;
+                OutdoorDryBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp;
+                OutdoorHumRat = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).HumRat;
             }
             if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
                 OutdoorDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
@@ -12769,7 +12785,7 @@ namespace EnergyPlus::DXCoils {
                 //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
                 //  AirVolumeFlowRate = AirMassFlow/PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
                 VolFlowperRatedTotCap = AirVolumeFlowRate / state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(SpeedNumLS);
-                if ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > MaxHeatVolFlowPerRatedTotCap(DXCT))) {
+                if ((VolFlowperRatedTotCap < state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT))) {
                     if (state.dataDXCoils->DXCoil(DXCoilNum).MSErrIndex(SpeedNumLS) == 0) {
                         ShowWarningMessage(
                             state,
@@ -12780,8 +12796,8 @@ namespace EnergyPlus::DXCoils {
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state,
                                           format("Expected range for VolumeFlowPerRatedTotalCapacity=[{:.3R}--{:.3R}] Current value is {:.3R} m3/s/W",
-                                                 MinOperVolFlowPerRatedTotCap(DXCT),
-                                                 MaxHeatVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT),
                                                  VolFlowperRatedTotCap));
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
@@ -12801,7 +12817,7 @@ namespace EnergyPlus::DXCoils {
                 //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
                 //  AirVolumeFlowRate = AirMassFlow/PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
                 VolFlowperRatedTotCap = AirVolumeFlowRate / state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(SpeedNumHS);
-                if ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > MaxHeatVolFlowPerRatedTotCap(DXCT))) {
+                if ((VolFlowperRatedTotCap < state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT))) {
                     if (state.dataDXCoils->DXCoil(DXCoilNum).MSErrIndex(SpeedNumHS) == 0) {
                         ShowWarningMessage(
                             state,
@@ -12812,8 +12828,8 @@ namespace EnergyPlus::DXCoils {
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state,
                                           format("Expected range for VolumeFlowPerRatedTotalCapacity=[{:.3R}--{:.3R}] Current value is {:.3R} m3/s/W",
-                                                 MinOperVolFlowPerRatedTotCap(DXCT),
-                                                 MaxHeatVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT),
                                                  VolFlowperRatedTotCap));
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
@@ -12972,7 +12988,7 @@ namespace EnergyPlus::DXCoils {
                 OutletAirHumRat = InletAirHumRat;
 
                 // if cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
-                if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = 1.0;
+                if (FanOpMode == CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
 
                 // Power calculation
                 if (!state.dataDXCoils->DXCoil(DXCoilNum).PLRImpact) {
@@ -13048,15 +13064,15 @@ namespace EnergyPlus::DXCoils {
                 //  AirVolumeFlowRate = AirMassFlow/PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
                 VolFlowperRatedTotCap = AirVolumeFlowRate / state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(SpeedNum);
 
-                if ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > MaxHeatVolFlowPerRatedTotCap(DXCT))) {
+                if ((VolFlowperRatedTotCap < state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT))) {
                     if (state.dataDXCoils->DXCoil(DXCoilNum).ErrIndex1 == 0) {
                         ShowWarningMessage(state, state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType + " \"" + state.dataDXCoils->DXCoil(DXCoilNum).Name +
                                            "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed 1.");
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state,
                                           format("Expected range for VolumeFlowPerRatedTotalCapacity=[{:.3R}--{:.3R}] Current value is {:.3R} m3/s/W",
-                                                 MinOperVolFlowPerRatedTotCap(DXCT),
-                                                 MaxHeatVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT),
+                                                 state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT),
                                                  VolFlowperRatedTotCap));
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
@@ -13213,7 +13229,7 @@ namespace EnergyPlus::DXCoils {
                     state.dataDXCoils->DXCoil(DXCoilNum).HeatingCoilRuntimeFraction = 1.0; // Reset coil runtime fraction to 1.0
                 }
                 // if cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
-                if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = PLF;
+                if (FanOpMode == CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
                 state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingPower = TotCap * EIR * state.dataDXCoils->DXCoil(DXCoilNum).HeatingCoilRuntimeFraction * InputPowerMultiplier;
 
                 // Calculate crankcase heater power using the runtime fraction for this DX heating coil only if there is no companion DX coil.
@@ -13292,8 +13308,8 @@ namespace EnergyPlus::DXCoils {
 
         // set outlet node conditions
         int airOutletNode = state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode;
-        Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
-        Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(airOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(airOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
 
         // calc secondary coil if specified
         if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -13318,23 +13334,23 @@ namespace EnergyPlus::DXCoils {
         AirOutletNode = state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode;
         AirInletNode = state.dataDXCoils->DXCoil(DXCoilNum).AirInNode;
         // changed outputs
-        Node(AirOutletNode).Enthalpy = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirEnthalpy;
-        Node(AirOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
-        Node(AirOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
-        Node(AirOutletNode).MassFlowRate = state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate;
+        state.dataLoopNodes->Node(AirOutletNode).Enthalpy = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirEnthalpy;
+        state.dataLoopNodes->Node(AirOutletNode).Temp = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(AirOutletNode).HumRat = state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate;
         // pass through outputs
-        Node(AirOutletNode).Quality = Node(AirInletNode).Quality;
-        Node(AirOutletNode).Press = Node(AirInletNode).Press;
-        Node(AirOutletNode).MassFlowRateMin = Node(AirInletNode).MassFlowRateMin;
-        Node(AirOutletNode).MassFlowRateMax = Node(AirInletNode).MassFlowRateMax;
-        Node(AirOutletNode).MassFlowRateMinAvail = Node(AirInletNode).MassFlowRateMinAvail;
-        Node(AirOutletNode).MassFlowRateMaxAvail = Node(AirInletNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
+        state.dataLoopNodes->Node(AirOutletNode).Press = state.dataLoopNodes->Node(AirInletNode).Press;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
+            state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
+            state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
         }
     }
 
@@ -13353,9 +13369,9 @@ namespace EnergyPlus::DXCoils {
         // Fills some of the report variables for the DX coils
 
         // Using/Aliasing
-        using DataHVACGlobals::DXElecCoolingPower;
-        using DataHVACGlobals::DXElecHeatingPower;
-        using DataHVACGlobals::TimeStepSys;
+        auto & DXElecCoolingPower = state.dataHVACGlobal->DXElecCoolingPower;
+        auto & DXElecHeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using Psychrometrics::RhoH2O;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -13369,7 +13385,7 @@ namespace EnergyPlus::DXCoils {
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 Real64 ratedSensCap(0.0);
                 ratedSensCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) * state.dataDXCoils->DXCoil(DXCoilNum).RatedSHR(1);
-                coilSelectionReportObj->setCoilFinalSizes(state,
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state,
                                                           state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                           state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                           state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1),
@@ -13629,22 +13645,23 @@ namespace EnergyPlus::DXCoils {
                 }
 
                 // set node state variables in preparation for fan model.
-                Node(FanInletNode).MassFlowRate = state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
-                Node(FanOutletNode).MassFlowRate = state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
-                Node(FanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
-                Node(FanInletNode).HumRat =
+                state.dataLoopNodes->Node(FanInletNode).MassFlowRate = state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
+                state.dataLoopNodes->Node(FanOutletNode).MassFlowRate = state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
+                state.dataLoopNodes->Node(FanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
+                state.dataLoopNodes->Node(FanInletNode).HumRat =
                     PsyWFnTdbTwbPb(state, CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, state.dataEnvrn->OutBaroPress, RoutineName);
-                Node(FanInletNode).Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, Node(FanInletNode).HumRat);
+                state.dataLoopNodes->Node(FanInletNode).Enthalpy =
+                    PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, state.dataLoopNodes->Node(FanInletNode).HumRat);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                     HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                     FanPowerCorrection = HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
                 } else {
                     Fans::SimulateFanComponents(
                         state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName, true, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
-                    FanPowerCorrection = Fans::GetFanPower(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
+                    FanPowerCorrection = Fans::GetFanPower(state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                 }
 
-                FanHeatCorrection = Node(FanOutletNode).Enthalpy - Node(FanInletNode).Enthalpy;
+                FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy;
 
                 NetCoolingCapRated = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
             }
@@ -13691,7 +13708,7 @@ namespace EnergyPlus::DXCoils {
 
         Real64 const heldOutDryBulb = state.dataEnvrn->OutDryBulbTemp;
         if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) != 0) {
-            Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp = OutdoorUnitInletAirDryBulbTempRated;
+            state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp = OutdoorUnitInletAirDryBulbTempRated;
         } else {
             state.dataEnvrn->OutDryBulbTemp = OutdoorUnitInletAirDryBulbTempRated;
         }
@@ -13704,7 +13721,8 @@ namespace EnergyPlus::DXCoils {
         for (PartLoadTestPoint = 1; PartLoadTestPoint <= 3; ++PartLoadTestPoint) {
             // determine minimum unloading capacity fraction at point B conditions.
             if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) != 0) {
-                Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp = OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint);
+                state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp =
+                    OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint);
             } else {
                 state.dataEnvrn->OutDryBulbTemp = OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint);
             }
@@ -13771,10 +13789,10 @@ namespace EnergyPlus::DXCoils {
 
                 if (state.dataDXCoils->DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
                     FanStaticPressureRise = state.dataDXCoils->DXCoil(DXCoilNum).InternalStaticPressureDrop + (ExternalStatic * pow_2(AirMassFlowRatio));
-                    Node(FanInletNode).MassFlowRate = PartLoadAirMassFlowRate;
-                    Node(FanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
-                    Node(FanInletNode).HumRat = SupplyAirHumRat;
-                    Node(FanInletNode).Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
+                    state.dataLoopNodes->Node(FanInletNode).MassFlowRate = PartLoadAirMassFlowRate;
+                    state.dataLoopNodes->Node(FanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
+                    state.dataLoopNodes->Node(FanInletNode).HumRat = SupplyAirHumRat;
+                    state.dataLoopNodes->Node(FanInletNode).Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
 
                     if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                         HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
@@ -13782,10 +13800,10 @@ namespace EnergyPlus::DXCoils {
                     } else {
                         Fans::SimulateFanComponents(
                             state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName, true, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
-                        FanPowerCorrection = Fans::GetFanPower(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
+                        FanPowerCorrection = Fans::GetFanPower(state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                     }
 
-                    FanHeatCorrection = Node(FanOutletNode).Enthalpy - Node(FanInletNode).Enthalpy;
+                    FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy;
 
                 } else {
                     FanPowerCorrection = FanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;
@@ -13979,7 +13997,7 @@ namespace EnergyPlus::DXCoils {
         // This routine looks up the given TwoSpeed DX coil and returns the companion supply fan index
 
         // Using/Aliasing
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const DXSystem(14);      // must match SimAirServingZones.cc (not public)
@@ -14129,11 +14147,12 @@ namespace EnergyPlus::DXCoils {
         if (state.dataDXCoils->DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
             // modify external static per AHRI 340/360, Table 6, note 1.
             FanStaticPressureRise = state.dataDXCoils->DXCoil(DXCoilNum).InternalStaticPressureDrop + (FanExternalStaticFull * pow_2(AirMassFlowRatio));
-            Node(FanInletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
-            Node(FanOutletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
-            Node(FanInletNodeNum).Temp = IndoorUnitInletDryBulb;
-            Node(FanInletNodeNum).HumRat = PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, state.dataEnvrn->OutBaroPress, RoutineName);
-            Node(FanInletNodeNum).Enthalpy = PsyHFnTdbW(IndoorUnitInletDryBulb, Node(FanInletNodeNum).HumRat);
+            state.dataLoopNodes->Node(FanInletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
+            state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
+            state.dataLoopNodes->Node(FanInletNodeNum).Temp = IndoorUnitInletDryBulb;
+            state.dataLoopNodes->Node(FanInletNodeNum).HumRat = PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, state.dataEnvrn->OutBaroPress, RoutineName);
+            state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy =
+                PsyHFnTdbW(IndoorUnitInletDryBulb, state.dataLoopNodes->Node(FanInletNodeNum).HumRat);
             if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
             } else {
@@ -14141,7 +14160,7 @@ namespace EnergyPlus::DXCoils {
                     state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName, true, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
             }
 
-            FanHeatCorrection = Node(FanOutletNodeNum).Enthalpy - Node(FanInletNodeNum).Enthalpy;
+            FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy;
 
         } else {
 
@@ -15160,17 +15179,17 @@ namespace EnergyPlus::DXCoils {
             state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum = SupplyFan_TypeNum;
             if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex > -1) {
                 if (SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                  HVACFan::fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->name,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                 } else {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
-                                                                 Fans::Fan(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex).FanName,
+                                                                 state.dataFans->Fan(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex).FanName,
                                                                  DataAirSystems::structArrayLegacyFanModels,
                                                                  state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                 }
@@ -15355,8 +15374,6 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::TimeStepSys;
-        using DataLoopNode::Node;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcSecondaryDXCoils");
@@ -15424,7 +15441,7 @@ namespace EnergyPlus::DXCoils {
                     if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0) &&
                         (EvapInletDryBulb > state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor)) { // coil is running
                         SecCoilFlowFraction = 1.0; // for single speed DX coil the secondary coil (condenser) flow fraction is 1.0
-                        CondInletDryBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp;
+                        CondInletDryBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp;
                         EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
                         EvapInletEnthalpy = PsyHFnTdbW(EvapInletDryBulb, EvapInletHumRat);
                         SecCoilSHRFT = state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSHRFT;
@@ -15495,7 +15512,7 @@ namespace EnergyPlus::DXCoils {
                     if ((EvapAirMassFlow > SmallMassFlow) && (MSSpeedRatio > 0.0 || MSCycRatio > 0.0) &&
                         (EvapInletDryBulb > state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor)) { // coil is running
                         SecCoilFlowFraction = 1.0; // for single speed DX coil the secondary coil (condenser) flow fraction is 1.0
-                        CondInletDryBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp;
+                        CondInletDryBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp;
                         EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
                         EvapInletEnthalpy = PsyHFnTdbW(EvapInletDryBulb, EvapInletHumRat);
                         // determine the current SHR
@@ -15633,8 +15650,6 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::TimeStepSys;
-        using DataLoopNode::Node;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIter(30);
@@ -15733,9 +15748,8 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::HPWHCrankcaseDBTemp;
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         using namespace HVACVariableRefrigerantFlow;
@@ -15817,22 +15831,22 @@ namespace EnergyPlus::DXCoils {
         state.dataDXCoils->DXCoil(DXCoilNum).EvaporatingTemp = state.dataHVACVarRefFlow->VRF(state.dataDXCoils->DXCoil(DXCoilNum).VRFOUPtr).IUEvaporatingTemp;
 
         if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode) != 0) {
-            OutdoorDryBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Temp;
+            OutdoorDryBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Temp;
             if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(Mode) == WaterCooled) {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
-                OutdoorPressure = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
+                OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
                 // If node is not connected to anything, pressure = default, use weather data
-                if (OutdoorPressure == DefaultNodeValues.Press) {
+                if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
                     OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                     OutdoorHumRat = state.dataEnvrn->OutHumRat;
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
                     OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 } else {
-                    OutdoorHumRat = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
-                    OutdoorWetBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).OutAirWetBulb;
+                    OutdoorHumRat = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
+                    OutdoorWetBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).OutAirWetBulb;
                 }
             }
         } else {
@@ -16076,7 +16090,7 @@ namespace EnergyPlus::DXCoils {
             }
 
             // If cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
-            if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = PLF;
+            if (FanOpMode == CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
 
             // Check for saturation error and modify temperature at constant enthalpy
             if (OutletAirTemp < PsyTsatFnHPb(state, OutletAirEnthalpy, OutdoorPressure)) {
@@ -16407,7 +16421,7 @@ namespace EnergyPlus::DXCoils {
             }
 
             // if cycling fan, send coil part-load fraction to on / off fan via HVACDataGlobals
-            if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = PLF;
+            if (FanOpMode == CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
             state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingPower = TotCap * EIR * state.dataDXCoils->DXCoil(DXCoilNum).HeatingCoilRuntimeFraction * InputPowerMultiplier;
 
             // Calculate crankcase heater power using the runtime fraction for this DX heating coil only if there is no companion DX coil.
@@ -16585,7 +16599,7 @@ namespace EnergyPlus::DXCoils {
                 Par(5) = BF;
 
                 FanSpdRatioMax = 1.0;
-                SolveRoot(1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
+                SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
                 if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
                 FanSpdRatio = Ratio1;
                 CoilOnOffRatio = 1.0;
@@ -16686,7 +16700,7 @@ namespace EnergyPlus::DXCoils {
                 Par(5) = BF;
 
                 FanSpdRatioMax = 1.0;
-                SolveRoot(1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
+                SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
                 // this will likely cause problems eventually, -1 and -2 mean different things
                 if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
                 FanSpdRatio = Ratio1;

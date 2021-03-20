@@ -85,8 +85,8 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         // Call initialize to set flow rates, run flag, and entering temperatures
         this->running = RunFlag;
 
-        this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
-        this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
+        this->loadSideInletTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+        this->sourceSideInletTemp = state.dataLoopNodes->Node(this->sourceSideNodes.inlet).Temp;
 
         if (this->waterSource) {
             this->setOperatingFlowRatesWSHP(state);
@@ -115,8 +115,8 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         }
 
         // update nodes
-        DataLoopNode::Node(this->loadSideNodes.outlet).Temp = this->loadSideOutletTemp;
-        DataLoopNode::Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
+        state.dataLoopNodes->Node(this->loadSideNodes.outlet).Temp = this->loadSideOutletTemp;
+        state.dataLoopNodes->Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
     }
 
     Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state) const
@@ -128,16 +128,16 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
             if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
                 // there will be a valid set-point on outlet
-                return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPoint;
+                return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPoint;
             } else { // use plant loop overall set-point
-                return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPoint;
+                return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPoint;
             }
         } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
             if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
                 // there will be a valid set-point on outlet
-                return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPointHi;
+                return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointHi;
             } else { // use plant loop overall set-point
-                return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
+                return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
             }
         } else {
             // there's no other enums for loop demand calcs, so I don't have a reasonable unit test for these
@@ -282,7 +282,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
     void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     {
 
-        Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
         // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
@@ -307,7 +307,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         // evaluate the actual current operating load side heat transfer rate
         auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum);
         Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(
-            state, thisLoadPlantLoop.FluidName, DataLoopNode::Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
+            state, thisLoadPlantLoop.FluidName, state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
         this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
         this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
 
@@ -330,7 +330,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         Real64 CpSrc = 0.0;
         if (this->waterSource) {
             CpSrc = FluidProperties::GetSpecificHeatGlycol(
-                state, thisLoadPlantLoop.FluidName, DataLoopNode::Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
+                state, thisLoadPlantLoop.FluidName, state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
         } else if (this->airSource) {
             CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         }
@@ -490,7 +490,8 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                            state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                            routineName);
             this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->loadSideDesignMassFlowRate,
                                                this->loadSideNodes.inlet,
                                                this->loadSideNodes.outlet,
@@ -506,7 +507,8 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                         state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
                                                         routineName);
                 this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->sourceSideDesignMassFlowRate,
                                                    this->sourceSideNodes.inlet,
                                                    this->sourceSideNodes.outlet,
@@ -1101,31 +1103,31 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                                                        nodeErrorsFound,
                                                                                        cCurrentModuleObject,
                                                                                        thisPLHP.name,
-                                                                                       DataLoopNode::NodeType_Water,
-                                                                                       DataLoopNode::NodeConnectionType_Inlet,
+                                                                                       DataLoopNode::NodeFluidType::Water,
+                                                                                       DataLoopNode::NodeConnectionType::Inlet,
                                                                                        flowPath1,
                                                                                        DataLoopNode::ObjectIsNotParent);
                     thisPLHP.loadSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state, loadSideOutletNodeName,
                                                                                         nodeErrorsFound,
                                                                                         cCurrentModuleObject,
                                                                                         thisPLHP.name,
-                                                                                        DataLoopNode::NodeType_Water,
-                                                                                        DataLoopNode::NodeConnectionType_Outlet,
+                                                                                        DataLoopNode::NodeFluidType::Water,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                                         flowPath1,
                                                                                         DataLoopNode::ObjectIsNotParent);
-                    int condenserNodeType = 0;
-                    int condenserNodeConnectionType_Inlet = 0;
-                    int condenserNodeConnectionType_Outlet = 0;
+                    DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::blank;
+                    DataLoopNode::NodeConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::blank;
+                    DataLoopNode::NodeConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::blank;
                     if (condenserType == "WATERSOURCE") {
                         thisPLHP.waterSource = true;
-                        condenserNodeType = DataLoopNode::NodeType_Water;
-                        condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType_Inlet;
-                        condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType_Outlet;
+                        condenserNodeType = DataLoopNode::NodeFluidType::Water;
+                        condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::Inlet;
+                        condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::Outlet;
                     } else if (condenserType == "AIRSOURCE") {
                         thisPLHP.airSource = true;
-                        condenserNodeType = DataLoopNode::NodeType_Air;
-                        condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType_OutsideAir;
-                        condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType_OutsideAir;
+                        condenserNodeType = DataLoopNode::NodeFluidType::Air;
+                        condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::OutsideAir;
+                        condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::OutsideAir;
                     } else {
                         // Again, this should be protected by the input processor
                         ShowErrorMessage(state, "Invalid heat pump condenser type (name=" + thisPLHP.name + // LCOV_EXCL_LINE
