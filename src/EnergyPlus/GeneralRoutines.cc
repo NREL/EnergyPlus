@@ -1324,7 +1324,7 @@ void TestAirPathIntegrity(EnergyPlusData &state,  bool &ErrFound)
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHVACGlobals::NumPrimaryAirSys;
+    auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1415,7 +1415,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     using namespace DataLoopNode;
     auto &GetZoneSplitterInput(SplitterComponent::GetSplitterInput);
     using namespace DataZoneEquipment;
-    using DataHVACGlobals::NumPrimaryAirSys;
+    auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Count;
@@ -1689,7 +1689,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     using namespace DataLoopNode;
     using namespace DataZoneEquipment;
     using namespace ZonePlenum;
-    using DataHVACGlobals::NumPrimaryAirSys;
+    auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     auto &GetZoneMixerInput(MixerComponent::GetMixerInput);
     using HVACSingleDuctInduc::FourPipeInductionUnitHasMixer;
     using PoweredInductionUnits::PIUnitHasMixer;

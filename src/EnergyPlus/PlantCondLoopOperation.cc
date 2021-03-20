@@ -101,8 +101,6 @@ namespace EnergyPlus::PlantCondLoopOperation {
 
     // Using/Aliasing
     using namespace DataPlant;
-    using DataHVACGlobals::NumCondLoops;
-    using DataHVACGlobals::NumPlantLoops;
     using DataHVACGlobals::SmallLoad;
     using FluidProperties::GetSpecificHeatGlycol;
 
@@ -363,7 +361,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
         // Load the Plant data structure
         for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             PlantOpSchemeName = state.dataPlnt->PlantLoop(LoopNum).OperationScheme;
-            if (LoopNum <= NumPlantLoops) {
+            if (LoopNum <= state.dataHVACGlobal->NumPlantLoops) {
                 CurrentModuleObject = "PlantEquipmentOperationSchemes";
                 PlantLoopObject = "PlantLoop";
             } else {

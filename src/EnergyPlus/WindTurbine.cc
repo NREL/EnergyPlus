@@ -1032,7 +1032,7 @@ namespace WindTurbine {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine fills remaining report variables.
 
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
     }

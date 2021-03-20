@@ -801,7 +801,7 @@ namespace BoilerSteam {
         // PURPOSE OF THIS SUBROUTINE:
         // Boiler simulation reporting
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         int BoilerInletNode = this->BoilerInletNodeNum;
         int BoilerOutletNode = this->BoilerOutletNodeNum;
 

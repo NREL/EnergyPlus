@@ -291,6 +291,7 @@ public: // methods
 
 private:                            // methods
     void simulateSimpleBucketModel( // request charge discharge and
+        EnergyPlusData &state,
         Real64 &powerCharge,
         Real64 &powerDischarge,
         bool &charging,

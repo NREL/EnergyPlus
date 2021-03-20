@@ -212,8 +212,8 @@ namespace GeneratorDynamicsManager {
         // controls specifications in Annex 42 model specs.
         // Using/Aliasing
         using namespace DataGlobalConstants;
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
 
@@ -762,7 +762,7 @@ namespace GeneratorDynamicsManager {
 
         // Using/Aliasing
         using namespace DataGlobalConstants;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MdotFuel;

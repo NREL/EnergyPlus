@@ -498,7 +498,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
     int OAControllerNum;
     int AirLoopNum;
 
-    DataHVACGlobals::NumPrimaryAirSys = 5; // will be reset in DataHVACGlobals::clear_state(); in EnergyPlusFixture
+    state->dataHVACGlobal->NumPrimaryAirSys = 5; // will be reset in DataHVACGlobals::clear_state(); in EnergyPlusFixture
     state->dataAirLoop->AirLoopControlInfo.allocate(5);        // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
     state->dataAirLoop->AirLoopFlow.allocate(5);               // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
     state->dataAirSystemsData->PrimaryAirSystems.allocate(5);          // will be deallocated by DataAirSystems::clear_state(); in EnergyPlusFixture
@@ -817,7 +817,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     state->dataMixedAir->OAMixer(1).Name = "OAMixer";
     state->dataMixedAir->OAMixer(1).InletNode = 2;
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Name = "PrimaryAirLoop";
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -1764,7 +1764,7 @@ TEST_F(EnergyPlusFixture, OAControllerMixedAirSPTest)
     state->dataMixedAir->OAMixer(1).Name = "OAMixer";
     state->dataMixedAir->OAMixer(1).InletNode = 2;
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Name = "PrimaryAirLoop";
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -6012,7 +6012,7 @@ TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
     int OAControllerNum(1);
     int AirLoopNum(1);
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataEnvrn->StdBaroPress = StdPressureSeaLevel;
     // assume dry air (zero humidity ratio)
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 20.0, 0.0);
@@ -6206,7 +6206,7 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
     int OAControllerNum(1);
     int AirLoopNum(1);
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataEnvrn->StdBaroPress = StdPressureSeaLevel;
     // assume dry air (zero humidity ratio)
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 20.0, 0.0);
@@ -6414,7 +6414,7 @@ TEST_F(EnergyPlusFixture, OAController_HighExhaustMassFlowTest)
     int OAControllerNum(1);
     int AirLoopNum(1);
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataEnvrn->StdBaroPress = DataEnvironment::StdPressureSeaLevel;
     // assume dry air (zero humidity ratio)
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 20.0, 0.0);
@@ -6665,7 +6665,7 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
     int OAControllerNum(1);
     int AirLoopNum(1);
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataEnvrn->StdBaroPress = DataEnvironment::StdPressureSeaLevel;
     // assume dry air (zero humidity ratio)
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 20.0, 0.0);

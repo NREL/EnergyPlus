@@ -173,7 +173,6 @@ namespace EnergyPlus::HVACControllers {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHVACGlobals::SetPointErrorFlag;
     using DataHVACGlobals::SmallWaterVolFlow;
     using namespace DataHVACControllers;
     using namespace DataRootFinder;
@@ -472,7 +471,7 @@ namespace EnergyPlus::HVACControllers {
         //        \units m3/s
 
         // Using/Aliasing
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using MixedAir::CheckForControllerWaterCoil;
         using NodeInputManager::GetOnlySingleNode;
@@ -857,7 +856,7 @@ namespace EnergyPlus::HVACControllers {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        using DataHVACGlobals::DoSetPointTest;
+        auto & DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::ScanPlantLoopsForNodeNum;
@@ -908,11 +907,11 @@ namespace EnergyPlus::HVACControllers {
                                 ShowContinueError(state, "Node Referenced (by Controller)=" + state.dataLoopNodes->NodeID(SensedNode));
                                 ShowContinueError(state, "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the "
                                                   "controller sensed node.");
-                                SetPointErrorFlag = true;
+                                state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 // call to check node is actuated by EMS
-                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
+                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state, "HVACControllers: Missing temperature setpoint for controller type=" +
                                                     ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                                     ControllerProps(ControllerIndex).ControllerName + "\"");
@@ -948,10 +947,10 @@ namespace EnergyPlus::HVACControllers {
                                 ShowContinueError(state, "Node referenced (by controller)=" + state.dataLoopNodes->NodeID(SensedNode));
                                 ShowContinueError(state, "  use a SetpointManager with the field Control Variable = \"MaximumHumidityRatio\" to establish a "
                                                   "setpoint at the controller sensed node.");
-                                SetPointErrorFlag = true;
+                                state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
-                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iHumidityRatioSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
+                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iHumidityRatioSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state, "HVACControllers: Missing humidity ratio setpoint for controller type=" +
                                                     ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                                     ControllerProps(ControllerIndex).ControllerName + "\"");
@@ -969,7 +968,7 @@ namespace EnergyPlus::HVACControllers {
                             ShowContinueError(state, "Node referenced (by controller)=" + state.dataLoopNodes->NodeID(SensedNode));
                             ShowContinueError(state, "  use a SetpointManager with the field Control Variable = \"MaximumHumidityRatio\" to establish a "
                                               "setpoint at the controller sensed node.");
-                            SetPointErrorFlag = true;
+                            state.dataHVACGlobal->SetPointErrorFlag = true;
                         }
                     } else if (SELECT_CASE_var == iCtrl::TemperatureAndHumidityRatio) { // 'TemperatureAndHumidityRatio'
                         if (state.dataLoopNodes->Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
@@ -980,11 +979,11 @@ namespace EnergyPlus::HVACControllers {
                                 ShowContinueError(state, "Node Referenced (by Controller)=" + state.dataLoopNodes->NodeID(SensedNode));
                                 ShowContinueError(state, "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the "
                                                   "controller sensed node.");
-                                SetPointErrorFlag = true;
+                                state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 // call to check node is actuated by EMS
-                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
+                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state, "HVACControllers: Missing temperature setpoint for controller type=" +
                                                     ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                                     ControllerProps(ControllerIndex).ControllerName + "\"");
@@ -1003,11 +1002,11 @@ namespace EnergyPlus::HVACControllers {
                                 ShowContinueError(state, "Node Referenced (by Controller)=" + state.dataLoopNodes->NodeID(SensedNode));
                                 ShowContinueError(state, "  use a SetpointManager with the field Control Variable = \"MaximumHumidityRatio\" to establish a "
                                                   "setpoint at the controller sensed node.");
-                                SetPointErrorFlag = true;
+                                state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 // call to check node is actuated by EMS
-                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
+                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state, "HVACControllers: Missing maximum humidity ratio setpoint for controller type=" +
                                                     ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                                     ControllerProps(ControllerIndex).ControllerName + "\"");
@@ -1027,11 +1026,11 @@ namespace EnergyPlus::HVACControllers {
                                 ShowContinueError(state, "Node Referenced (in Controller)=" + state.dataLoopNodes->NodeID(SensedNode));
                                 ShowContinueError(state, "  use a SetpointManager with the field Control Variable = \"MassFlowRate\" to establish a "
                                                   "setpoint at the controller sensed node.");
-                                SetPointErrorFlag = true;
+                                state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 // call to check node is actuated by EMS
-                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iMassFlowRateSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
+                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iMassFlowRateSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state, "HVACControllers: Missing mass flow rate setpoint for controller type=" +
                                                     ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                                     ControllerProps(ControllerIndex).ControllerName + "\"");
@@ -2073,9 +2072,6 @@ namespace EnergyPlus::HVACControllers {
         // Used to produce objective metrics when analyzing runtime performance
         // of HVAC controllers for different implementations.
 
-        // Using/Aliasing
-        using DataHVACGlobals::NumPrimaryAirSys;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         // See CONTROLLER_WARM_RESTART_<> parameters in DataHVACControllers.cc
         // If Status<0, no speculative warm restart.
@@ -2140,8 +2136,6 @@ namespace EnergyPlus::HVACControllers {
         // Used to produce objective metrics when analyzing runtime performance
         // of HVAC controllers for different implementations.
 
-        using DataHVACGlobals::NumPrimaryAirSys;
-
         // Corresponding index in ControllerProps array
         int ControlIndex;
         // Number of iterations needed to solve this controller
@@ -2185,7 +2179,7 @@ namespace EnergyPlus::HVACControllers {
         // Writes runtime statistics for controllers on all air loops
         // to a CSV file named "statistics.HVACControllers.csv".
 
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         // Detect if statistics have been generated or not for this run
         if (!state.dataSysVars->TrackAirLoopEnvFlag) {
@@ -2460,7 +2454,6 @@ namespace EnergyPlus::HVACControllers {
         // Writes current iteration time stamp to specified trace file.
 
         // Using/Aliasing
-        using DataHVACGlobals::FirstTimeStepSysFlag;
         using General::LogicalToInteger;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -2478,7 +2471,7 @@ namespace EnergyPlus::HVACControllers {
               CreateHVACTimeString(state),
               MakeHVACTimeIntervalString(state),
               LogicalToInteger(state.dataGlobal->BeginTimeStepFlag),
-              LogicalToInteger(FirstTimeStepSysFlag),
+              LogicalToInteger(state.dataHVACGlobal->FirstTimeStepSysFlag),
               LogicalToInteger(FirstHVACIteration),
               AirLoopPass,
               AirLoopNumCalls,
@@ -2805,7 +2798,7 @@ namespace EnergyPlus::HVACControllers {
         // setup data for sensed nodes and compare positions if on the same branch
 
         // Using/Aliasing
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirSysNum;

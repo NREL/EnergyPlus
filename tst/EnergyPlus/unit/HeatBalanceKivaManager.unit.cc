@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -64,6 +65,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
@@ -255,6 +257,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     Real64 expectedResult4 = kv4.instance.bcs->slabConvectiveTemp;
 
     EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover) {
+
+    // DERIVED TYPE DEFINITIONS:
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/HeatBalanceKivaManagerOSkyTest.epw";
+    state->dataWeatherManager->Missing.OpaqSkyCvr = 5;
+
+    HeatBalanceKivaManager::KivaManager km;
+    km.readWeatherData(*state);
+
+    Real64 TDewK = 264.25;
+    Real64 expected_OSky = 5;
+    Real64 expected_ESky = (0.787 + 0.764 * std::log(TDewK / DataGlobalConstants::KelvinConv)) * (1.0 + 0.0224 * expected_OSky - 0.0035 * pow_2(expected_OSky) + 0.00028 * pow_3(expected_OSky));;
+
+    EXPECT_NEAR(expected_ESky, km.kivaWeather.skyEmissivity[0], 0.01);
 }
 
 } // namespace EnergyPlus
