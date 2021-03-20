@@ -273,6 +273,8 @@ struct HVACHXAssistedCoolingCoilData : BaseGlobalStruct {
     Array1D_bool CheckEquipName;
     std::unordered_map<std::string, std::string> UniqueHXAssistedCoilNames;
 
+    Real64 CoilOutputTempLast = -99.0; // Exiting cooling coil temperature from last iteration
+
     Array1D<HVACHXAssistedCoolingCoil::HXAssistedCoilParameters> HXAssistedCoil;
 
     void clear_state() override
@@ -284,6 +286,7 @@ struct HVACHXAssistedCoolingCoilData : BaseGlobalStruct {
         this->HXAssistedCoilOutletHumRat.deallocate();
         this->GetCoilsInputFlag = true;
         this->CheckEquipName.deallocate();
+        this->CoilOutputTempLast = -99.0;
     }
 };
 

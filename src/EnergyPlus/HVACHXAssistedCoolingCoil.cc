@@ -282,7 +282,7 @@ namespace HVACHXAssistedCoolingCoil {
         int NumAlphas;                  // Number of alpha inputs
         int NumNums;                    // Number of number inputs
         int IOStat;                     // Return status from GetObjectItem call
-        static bool ErrorsFound(false); // set TRUE if errors detected in input
+        bool ErrorsFound(false); // set TRUE if errors detected in input
         int NumHXAssistedDXCoils;       // Number of HXAssistedCoolingCoil objects using a DX coil
         int NumHXAssistedWaterCoils;    // Number of HXAssistedCoolingCoil objects using a chilled water coil
         //    LOGICAL :: FanErrFlag              ! Error flag for fan operating mode mining call
@@ -302,9 +302,9 @@ namespace HVACHXAssistedCoolingCoil {
         Array1D<Real64> NumArray;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
-        static int MaxNums(0);            // Maximum number of numeric input fields
-        static int MaxAlphas(0);          // Maximum number of alpha input fields
-        static int TotalArgs(0);          // Total number of alpha and numeric arguments (max) for a
+        int MaxNums(0);            // Maximum number of numeric input fields
+        int MaxAlphas(0);          // Maximum number of alpha input fields
+        int TotalArgs(0);          // Total number of alpha and numeric arguments (max) for a
 
         NumHXAssistedDXCoils = inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted");
         NumHXAssistedWaterCoils = inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted");
@@ -852,7 +852,6 @@ namespace HVACHXAssistedCoolingCoil {
         //  na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 CoilOutputTempLast; // Exiting cooling coil temperature from last iteration
         Real64 AirMassFlow;               // Inlet air mass flow rate
         Real64 Error;                     // Error (exiting coil temp from last iteration minus current coil exiting temp)
         Real64 ErrorLast;                 // check for oscillations
@@ -863,8 +862,6 @@ namespace HVACHXAssistedCoolingCoil {
         Error = 1.0;       // Initialize error (CoilOutputTemp last iteration minus current CoilOutputTemp)
         ErrorLast = Error; // initialize variable used to test loop termination
         Iter = 0;          // Initialize iteration counter to zero
-
-        if (FirstHVACIteration) CoilOutputTempLast = -99.0; // Initialize coil output temp
 
         // Set mass flow rate at inlet of exhaust side of heat exchanger to supply side air mass flow rate entering this compound object
         state.dataLoopNodes->Node(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum).MassFlowRate = AirMassFlow;
@@ -941,13 +938,13 @@ namespace HVACHXAssistedCoolingCoil {
                     state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, FirstHVACIteration, state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex);
             }
 
-            Error = CoilOutputTempLast - state.dataLoopNodes->Node(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum).Temp;
+            Error = state.dataHVACAssistedCC->CoilOutputTempLast - state.dataLoopNodes->Node(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum).Temp;
             if (Iter > 40) { // check for oscillation (one of these being negative and one positive) before hitting max iteration limit
                 if (Error + ErrorLast < 0.000001)
                     Error = 0.0; // result bounced back and forth with same positive and negative result, no possible solution without this check
             }
             ErrorLast = Error;
-            CoilOutputTempLast = state.dataLoopNodes->Node(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum).Temp;
+            state.dataHVACAssistedCC->CoilOutputTempLast = state.dataLoopNodes->Node(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum).Temp;
             ++Iter;
         }
 
@@ -1099,7 +1096,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
-        static int ErrCount(0);
+        int ErrCount(0);
         bool errFlag;
 
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
@@ -1684,7 +1681,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
-        static int ErrCount(0);
+        int ErrCount(0);
 
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data
