@@ -1592,13 +1592,13 @@ namespace EnergyPlus::ChillerElectricEIR {
         this->ChillerEIRFPLR = 0.0;
 
         // calculate end time of current time step
-        CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
 
         // Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         // Wait for next time step to print warnings. If simulation iterates, print out
         // the warning for the last iteration only. Must wait for next time step to accomplish this.
         // If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > this->CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= this->TimeStepSysLast) {
+        if (CurrentEndTime > this->CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= this->TimeStepSysLast) {
             if (this->PrintMessage) {
                 ++this->MsgErrorCount;
                 //     Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -1613,7 +1613,7 @@ namespace EnergyPlus::ChillerElectricEIR {
         }
 
         // save last system time step and last end time of current time step (used to determine if warning is valid)
-        this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        this->TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
         this->CurrentEndTimeLast = CurrentEndTime;
 
         // If no loop demand or chiller OFF, return
@@ -2288,7 +2288,7 @@ namespace EnergyPlus::ChillerElectricEIR {
         //  Reporting
 
         // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (MyLoad >= 0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // Set node conditions
@@ -2360,15 +2360,15 @@ namespace EnergyPlus::ChillerElectricEIR {
 
             // Set node flow rates;  for these load based models
             // assume that sufficient evaporator flow rate is available
-            this->ChillerFalseLoad = this->ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            this->EvapEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            this->CondEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            this->ChillerFalseLoad = this->ChillerFalseLoadRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
             this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
             this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
-            this->CondenserFanEnergyConsumption = this->CondenserFanPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            this->CondenserFanEnergyConsumption = this->CondenserFanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             if (this->Power != 0.0) {
                 this->ActualCOP = (this->QEvaporator + this->ChillerFalseLoadRate) / this->Power;
             } else {
@@ -2382,7 +2382,7 @@ namespace EnergyPlus::ChillerElectricEIR {
             if (this->HeatRecActive) {
 
                 PlantUtilities::SafeCopyPlantNode(state, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
-                this->EnergyHeatRecovery = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
                 this->HeatRecInletTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
                 this->HeatRecMassFlow = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;

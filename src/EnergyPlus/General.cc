@@ -87,12 +87,11 @@ namespace EnergyPlus::General {
 
     // Using/Aliasing
     using DataHVACGlobals::Bisection;
-    using DataHVACGlobals::HVACSystemRootFinding;
 
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
 
-    void SolveRoot(Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
@@ -175,7 +174,7 @@ namespace EnergyPlus::General {
                 break;
             }
             // new estimation
-            switch (HVACSystemRootFinding.HVACSystemRootSolver) {
+            switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
                 XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 break;
@@ -185,7 +184,7 @@ namespace EnergyPlus::General {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-                if (NIte > HVACSystemRootFinding.NumOfIter) {
+                if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -193,7 +192,7 @@ namespace EnergyPlus::General {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-                if (NIte <= HVACSystemRootFinding.NumOfIter) {
+                if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -201,9 +200,9 @@ namespace EnergyPlus::General {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-                if (AltIte > HVACSystemRootFinding.NumOfIter) {
+                if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
-                    if (AltIte >= 2 * HVACSystemRootFinding.NumOfIter) AltIte = 0;
+                    if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
@@ -263,7 +262,7 @@ namespace EnergyPlus::General {
         XRes = XTemp;
     }
 
-    void SolveRoot(Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
@@ -341,7 +340,7 @@ namespace EnergyPlus::General {
                 break;
             }
             // new estimation
-            switch (HVACSystemRootFinding.HVACSystemRootSolver) {
+            switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
                 XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 break;
@@ -351,7 +350,7 @@ namespace EnergyPlus::General {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-                if (NIte > HVACSystemRootFinding.NumOfIter) {
+                if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -359,7 +358,7 @@ namespace EnergyPlus::General {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-                if (NIte <= HVACSystemRootFinding.NumOfIter) {
+                if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -367,9 +366,9 @@ namespace EnergyPlus::General {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-                if (AltIte > HVACSystemRootFinding.NumOfIter) {
+                if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
-                    if (AltIte >= 2 * HVACSystemRootFinding.NumOfIter) AltIte = 0;
+                    if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
@@ -565,7 +564,7 @@ namespace EnergyPlus::General {
         XX_1 = X1;
     }
 
-    void SolveRoot(Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x) = 0
@@ -642,7 +641,7 @@ namespace EnergyPlus::General {
                 break;
             }
             // new estimation
-            switch (HVACSystemRootFinding.HVACSystemRootSolver) {
+            switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
                 XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 break;
@@ -652,7 +651,7 @@ namespace EnergyPlus::General {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-                if (NIte > HVACSystemRootFinding.NumOfIter) {
+                if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -660,7 +659,7 @@ namespace EnergyPlus::General {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-                if (NIte <= HVACSystemRootFinding.NumOfIter) {
+                if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -668,9 +667,9 @@ namespace EnergyPlus::General {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-                if (AltIte > HVACSystemRootFinding.NumOfIter) {
+                if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
-                    if (AltIte >= 2 * HVACSystemRootFinding.NumOfIter) AltIte = 0;
+                    if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
@@ -1699,8 +1698,8 @@ namespace EnergyPlus::General {
         // time step.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Return value
         std::string OutputString;
@@ -1938,8 +1937,8 @@ namespace EnergyPlus::General {
         // external calculation.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Return value
         int ActualTimeMin; // calculated Minute for reporting
@@ -2028,8 +2027,8 @@ namespace EnergyPlus::General {
         // This routine returns the time in seconds at the end of the current HVAC step.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Return value
         Real64 GetCurrentHVACTime;
@@ -2059,7 +2058,7 @@ namespace EnergyPlus::General {
         // This routine returns the time in seconds at the beginning of the current HVAC step.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
 
         // Return value
         Real64 GetPreviousHVACTime;

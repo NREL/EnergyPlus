@@ -108,7 +108,6 @@ namespace EnergyPlus::PoweredInductionUnits {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHVACGlobals::PlenumInducedMassFlow;
     using DataHVACGlobals::SingleCoolingSetPoint;
     using DataHVACGlobals::SingleHeatingSetPoint;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -1517,8 +1516,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         Real64 mdot; // local plant fluid flow rate kg/s
         // Initialize local fan flags to global system flags
         bool PIUTurnFansOn =
-            (DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn); // If True, overrides fan schedule and cycles PIU fan on
-        bool PIUTurnFansOff = DataHVACGlobals::TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
+            (state.dataHVACGlobal->TurnFansOn || state.dataHVACGlobal->TurnZoneFansOnlyOn); // If True, overrides fan schedule and cycles PIU fan on
+        bool PIUTurnFansOff = state.dataHVACGlobal->TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
 
 
 
@@ -1723,11 +1722,11 @@ namespace EnergyPlus::PoweredInductionUnits {
             state.dataLoopNodes->Node(SecNode).MassFlowRate = 0.0;
         }
         if (state.dataPowerInductionUnits->PIU(PIUNum).InducesPlenumAir) {
-            PlenumInducedMassFlow = state.dataLoopNodes->Node(SecNode).MassFlowRate;
+            state.dataHVACGlobal->PlenumInducedMassFlow = state.dataLoopNodes->Node(SecNode).MassFlowRate;
         } else {
-            PlenumInducedMassFlow = 0.0;
+            state.dataHVACGlobal->PlenumInducedMassFlow = 0.0;
         }
-        state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
+        state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).MassFlowRatePlenInd = state.dataHVACGlobal->PlenumInducedMassFlow;
         state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow;
     }
 
@@ -1816,8 +1815,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
         // Initialize local fan flags to global system flags
         bool PIUTurnFansOn =
-            (DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn); // If True, overrides fan schedule and cycles PIU fan on
-        bool PIUTurnFansOff = DataHVACGlobals::TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
+            (state.dataHVACGlobal->TurnFansOn || state.dataHVACGlobal->TurnZoneFansOnlyOn); // If True, overrides fan schedule and cycles PIU fan on
+        bool PIUTurnFansOff = state.dataHVACGlobal->TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
 
         // On the first HVAC iteration the system values are given to the controller, but after that
         // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -1849,7 +1848,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                     PIUTurnFansOn = false;
                 } else {
                     SecAirMassFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
-                    PIUTurnFansOn = (DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn);
+                    PIUTurnFansOn = (state.dataHVACGlobal->TurnFansOn || state.dataHVACGlobal->TurnZoneFansOnlyOn);
                 }
             } else if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
                 // in deadband or very small load: set primary air flow to the minimum
@@ -2012,11 +2011,11 @@ namespace EnergyPlus::PoweredInductionUnits {
             state.dataLoopNodes->Node(SecNode).MassFlowRate = 0.0;
         }
         if (state.dataPowerInductionUnits->PIU(PIUNum).InducesPlenumAir) {
-            PlenumInducedMassFlow = state.dataLoopNodes->Node(SecNode).MassFlowRate;
+            state.dataHVACGlobal->PlenumInducedMassFlow = state.dataLoopNodes->Node(SecNode).MassFlowRate;
         } else {
-            PlenumInducedMassFlow = 0.0;
+            state.dataHVACGlobal->PlenumInducedMassFlow = 0.0;
         }
-        state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
+        state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).MassFlowRatePlenInd = state.dataHVACGlobal->PlenumInducedMassFlow;
         state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
     }
 
@@ -2039,7 +2038,7 @@ namespace EnergyPlus::PoweredInductionUnits {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

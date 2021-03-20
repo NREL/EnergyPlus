@@ -398,6 +398,8 @@ namespace EnergyPlus::SimAirServingZones {
         inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
 
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+
         // Find number of primary air systems
         NumPrimaryAirSys = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
         TestUniqueNodes.allocate(NumPrimaryAirSys * 4); // used to look at specific nodes that must be unique, fields A6-A9
@@ -416,7 +418,7 @@ namespace EnergyPlus::SimAirServingZones {
             state.dataAirLoop->AirLoopAFNInfo.allocate(NumPrimaryAirSys);
         }
 
-        DataHVACGlobals::GetAirPathDataDone = true; // used by UnitarySystem::getUnitarySystemInputData to determine if airloops are setup yet
+        state.dataHVACGlobal->GetAirPathDataDone = true; // used by UnitarySystem::getUnitarySystemInputData to determine if airloops are setup yet
         if (NumPrimaryAirSys <= 0) {
             TestUniqueNodes.deallocate();
             NodeNums.deallocate();
@@ -1438,6 +1440,8 @@ namespace EnergyPlus::SimAirServingZones {
 
         // Dimension the local subcomponent arrays
 
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+
         bool ErrorsFound;
         static Real64 OAReliefDiff(0.0); // local for massflow change across OA system, kg/s
         static Real64 MassFlowSetToler;
@@ -1447,7 +1451,7 @@ namespace EnergyPlus::SimAirServingZones {
         int ZoneNum;
 
         ErrorsFound = false;
-        AirLoopInit = true;
+        state.dataHVACGlobal->AirLoopInit = true;
 
         auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
         auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
@@ -2270,6 +2274,7 @@ namespace EnergyPlus::SimAirServingZones {
         // same airloop)
 
         auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
+        auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         if (!state.dataZoneEquip->ZoneEquipInputsFilled) return;
 
@@ -2462,21 +2467,21 @@ namespace EnergyPlus::SimAirServingZones {
 
         // Loop over all the primary air loop; simulate their components (equipment)
         // and controllers
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // NumPrimaryAirSys is the number of primary air loops
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) { // NumPrimaryAirSys is the number of primary air loops
 
             // Check to see if System Availability Managers are asking for fans to cycle on or shut off
             // and set fan on/off flags accordingly.
-            TurnFansOn = false;
-            TurnFansOff = false;
-            NightVentOn = false;
+            state.dataHVACGlobal->TurnFansOn = false;
+            state.dataHVACGlobal->TurnFansOff = false;
+            state.dataHVACGlobal->NightVentOn = false;
             if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == CycleOn) {
-                TurnFansOn = true;
+                state.dataHVACGlobal->TurnFansOn = true;
             }
             if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == ForceOff) {
-                TurnFansOff = true;
+                state.dataHVACGlobal->TurnFansOff = true;
             }
             if (AirLoopControlInfo(AirLoopNum).NightVent) {
-                NightVentOn = true;
+                state.dataHVACGlobal->NightVentOn = true;
             }
 
             //   Set current system number for sizing routines
@@ -2539,18 +2544,18 @@ namespace EnergyPlus::SimAirServingZones {
             }
 
             if (OAMassFLowrate > 0.0) {
-                for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // NumPrimaryAirSys is the number of primary air loops
-                    TurnFansOn = false;
-                    TurnFansOff = false;
-                    NightVentOn = false;
+                for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) { // NumPrimaryAirSys is the number of primary air loops
+                    state.dataHVACGlobal->TurnFansOn = false;
+                    state.dataHVACGlobal->TurnFansOff = false;
+                    state.dataHVACGlobal->NightVentOn = false;
                     if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == CycleOn) {
-                        TurnFansOn = true;
+                        state.dataHVACGlobal->TurnFansOn = true;
                     }
                     if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == ForceOff) {
-                        TurnFansOff = true;
+                        state.dataHVACGlobal->TurnFansOff = true;
                     }
                     if (AirLoopControlInfo(AirLoopNum).NightVent) {
-                        NightVentOn = true;
+                        state.dataHVACGlobal->NightVentOn = true;
                     }
 
                     //   Set current system number for sizing routines
@@ -3458,7 +3463,7 @@ namespace EnergyPlus::SimAirServingZones {
                 }
                 // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
                 // involved but the fan should really run like constant volume and not cycle with compressor
-                DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+                state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
                 HVACFan::fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
 
             } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
@@ -3846,7 +3851,7 @@ namespace EnergyPlus::SimAirServingZones {
         }
 
         //// Resimulate if the zone air mass flow conservation convergence critreon is not met
-        if (ZoneMassBalanceHVACReSim) SysReSim = true;
+        if (state.dataHVACGlobal->ZoneMassBalanceHVACReSim) SysReSim = true;
 
         // If mass balance failed, resimulation is needed. Impose a mass balance for the new simulation.
         if (SysReSim) {
@@ -4043,7 +4048,7 @@ namespace EnergyPlus::SimAirServingZones {
         auto &SysSizInput(state.dataSize->SysSizInput);
         auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
         auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
-
+        auto &NumPrimaryAirSys(state.dataHVACGlobal->NumPrimaryAirSys);
         // have moved a large number of std 62.1 variables to DataSizing.hh so they can be used outside of this routine
 
         // allocate arrays used to store values for standard 62.1 tabular report
@@ -4651,7 +4656,7 @@ namespace EnergyPlus::SimAirServingZones {
 
         // If the system design minimum outside air flow rate is autosized, calculate it from the zone data
         // Note that all TermUnitFinalZoneSizing values have already been scaled by air terminal sizing factors
-        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             MinOAFlow = 0.0;
             SysOAUnc = 0.0;
             ClgSupplyAirAdjustFactor = 1.0;
@@ -5180,6 +5185,7 @@ namespace EnergyPlus::SimAirServingZones {
         auto &CalcZoneSizing(state.dataSize->CalcZoneSizing);
         auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
         auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
+        auto &NumPrimaryAirSys(state.dataHVACGlobal->NumPrimaryAirSys);
 
         numOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
@@ -7447,8 +7453,8 @@ namespace EnergyPlus::SimAirServingZones {
             state.dataSimAirServingZones->GetAirLoopInputFlag = false;
         }
 
-        if (DataHVACGlobals::NumPrimaryAirSys > 0) {
-            for (int AirSysNum = 1; AirSysNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirSysNum) {
+        if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
+            for (int AirSysNum = 1; AirSysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirSysNum) {
                 for (int BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
                     for (int CompNum = 1; CompNum <= PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                         if ((CompTypeNum == PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num) &&

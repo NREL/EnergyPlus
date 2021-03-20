@@ -447,7 +447,7 @@ namespace HVACDXHeatPumpSystem {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::DoSetPointTest;
+        auto & DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -480,10 +480,10 @@ namespace HVACDXHeatPumpSystem {
                                 ShowSevereError(state, DXHeatPumpSystem(DXSysIndex).DXHeatPumpSystemType +
                                                 ": Missing temperature setpoint for DX unit= " + DXHeatPumpSystem(DXSysIndex).Name);
                                 ShowContinueError(state, "  use a Set Point Manager to establish a setpoint at the unit control node.");
-                                SetPointErrorFlag = true;
+                                state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
-                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
+                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state, DXHeatPumpSystem(DXSysIndex).DXHeatPumpSystemType +
                                                     ": Missing temperature setpoint for DX unit= " + DXHeatPumpSystem(DXSysIndex).Name);
                                     ShowContinueError(state, "  use a Set Point Manager to establish a setpoint at the unit control node.");

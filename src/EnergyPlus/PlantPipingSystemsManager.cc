@@ -210,7 +210,7 @@ namespace EnergyPlus {
                 thisDomain.Cur.CurSimTimeStepSize = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                 thisDomain.Cur.CurSimTimeSeconds = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                                                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
-                                                    DataHVACGlobals::SysTimeElapsed) * DataGlobalConstants::SecInHour;
+                                                    state.dataHVACGlobal->SysTimeElapsed) * DataGlobalConstants::SecInHour;
 
                 // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
                 if ((state.dataGlobal->BeginSimFlag && thisDomain.BeginSimInit) ||
@@ -2165,10 +2165,10 @@ namespace EnergyPlus {
             // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
             // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
             // which would be carried over from the previous environment
-            this->Cur.CurSimTimeStepSize = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            this->Cur.CurSimTimeStepSize = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             this->Cur.CurSimTimeSeconds = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                                           (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
-                                          DataHVACGlobals::SysTimeElapsed;
+                                          state.dataHVACGlobal->SysTimeElapsed;
 
             // There are also some inits that are "close to one time" inits...(one-time in standalone, each envrn in E+)
             if ((state.dataGlobal->BeginSimFlag && this->BeginSimInit) ||

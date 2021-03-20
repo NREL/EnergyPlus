@@ -285,7 +285,7 @@ namespace IceThermalStorage {
 
         this->UpdateDetailedIceStorage(state); // Update detailed ice storage
 
-        this->ReportDetailedIceStorage(); // Report detailed ice storage
+        this->ReportDetailedIceStorage(state); // Report detailed ice storage
     }
 
     void DetailedIceStorageData::SimDetailedIceStorage(EnergyPlusData &state)
@@ -431,7 +431,7 @@ namespace IceThermalStorage {
 
                 // Find initial guess at average fraction charged during time step
                 // Fraction of tank to be charged in the current time step
-                Real64 ChargeFrac = LocalLoad * DataHVACGlobals::TimeStepSys / this->NomCapacity;
+                Real64 ChargeFrac = LocalLoad * state.dataHVACGlobal->TimeStepSys / this->NomCapacity;
                 if ((this->IceFracRemaining + ChargeFrac) > 1.0) {
                     ChargeFrac = 1.0 - this->IceFracRemaining;
                 }
@@ -474,7 +474,7 @@ namespace IceThermalStorage {
                             Qstar = std::abs(CalcQstar(state, this->ChargeCurveNum, this->ChargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
                             // Now make sure that we don't go above 100% charged and calculate the new average fraction
-                            ChargeFrac = Qstar * (DataHVACGlobals::TimeStepSys / this->CurveFitTimeStep);
+                            ChargeFrac = Qstar * (state.dataHVACGlobal->TimeStepSys / this->CurveFitTimeStep);
                             if ((this->IceFracRemaining + ChargeFrac) > 1.0) {
                                 ChargeFrac = 1.0 - this->IceFracRemaining;
                                 Qstar = ChargeFrac;
@@ -580,7 +580,7 @@ namespace IceThermalStorage {
                 Real64 MassFlowstar = this->MassFlowRate / SIEquiv100GPMinMassFlowRate;
 
                 // Find initial guess at average fraction charged during time step
-                Real64 ChargeFrac = LocalLoad * DataHVACGlobals::TimeStepSys / this->NomCapacity;
+                Real64 ChargeFrac = LocalLoad * state.dataHVACGlobal->TimeStepSys / this->NomCapacity;
                 if ((this->IceFracRemaining - ChargeFrac) < 0.0) ChargeFrac = this->IceFracRemaining;
                 Real64 AvgFracCharged = this->IceFracRemaining - (ChargeFrac / 2.0);
 
@@ -615,7 +615,7 @@ namespace IceThermalStorage {
                             Qstar = std::abs(CalcQstar(state, this->DischargeCurveNum, this->DischargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
                             // Now make sure that we don't go below 100% discharged and calculate the new average fraction
-                            ChargeFrac = Qstar * (DataHVACGlobals::TimeStepSys / this->CurveFitTimeStep);
+                            ChargeFrac = Qstar * (state.dataHVACGlobal->TimeStepSys / this->CurveFitTimeStep);
                             if ((this->IceFracRemaining - ChargeFrac) < 0.0) {
                                 ChargeFrac = this->IceFracRemaining;
                                 Qstar = ChargeFrac;
@@ -1404,7 +1404,7 @@ namespace IceThermalStorage {
             max(min(((1.0 - EpsLimitForCharge) * QiceMax * TimeInterval / this->ITSNomCap), (1.0 - this->XCurIceFrac - EpsLimitForX)), 0.0);
 
         // Cannot charge more than the fraction that is left uncharged
-        Umax = min(Umax, (1.0 - this->IceFracRemain) / DataHVACGlobals::TimeStepSys);
+        Umax = min(Umax, (1.0 - this->IceFracRemain) / state.dataHVACGlobal->TimeStepSys);
         // First, check input U value.
         // Based on Umax and Umin, if necessary to run E+, calculate proper Uact.
         Real64 Uact;
@@ -1444,7 +1444,7 @@ namespace IceThermalStorage {
 
         this->Urate = Uact;
         this->ITSCoolingRate = -Qice;
-        this->ITSCoolingEnergy = this->ITSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ITSCoolingEnergy = this->ITSCoolingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     //******************************************************************************
@@ -1546,7 +1546,7 @@ namespace IceThermalStorage {
         Real64 Umyload = -myLoad * TimeInterval / this->ITSNomCap;
         // Calculate Umax and Umin
         // Cannot discharge more than the fraction that is left
-        Real64 Umax = -this->IceFracRemain / DataHVACGlobals::TimeStepSys;
+        Real64 Umax = -this->IceFracRemain / state.dataHVACGlobal->TimeStepSys;
         // Calculate Umin based on returned MyLoad from E+.
         Real64 Umin = min(Umyload, 0.0);
         // Based on Umax and Umin, if necessary to run E+, calculate proper Uact
@@ -1588,7 +1588,7 @@ namespace IceThermalStorage {
         this->Urate = Uact;
         // Calculate ITSCoolingEnergy [J]
         this->ITSCoolingRate = -Qice;
-        this->ITSCoolingEnergy = this->ITSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ITSCoolingEnergy = this->ITSCoolingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void SimpleIceStorageData::CalcQiceDischageMax(EnergyPlusData &state, Real64 &QiceMin)
@@ -1790,13 +1790,13 @@ namespace IceThermalStorage {
         // a system time step.
 
         for (auto &thisITS : state.dataIceThermalStorage->SimpleIceStorage) {
-            thisITS.IceFracRemain += thisITS.Urate * DataHVACGlobals::TimeStepSys;
+            thisITS.IceFracRemain += thisITS.Urate * state.dataHVACGlobal->TimeStepSys;
             if (thisITS.IceFracRemain <= 0.001) thisITS.IceFracRemain = 0.0;
             if (thisITS.IceFracRemain > 1.0) thisITS.IceFracRemain = 1.0;
         }
 
         for (auto &thisITS : state.dataIceThermalStorage->DetailedIceStorage) {
-            thisITS.IceFracRemaining += thisITS.IceFracChange - (thisITS.TankLossCoeff * DataHVACGlobals::TimeStepSys);
+            thisITS.IceFracRemaining += thisITS.IceFracChange - (thisITS.TankLossCoeff * state.dataHVACGlobal->TimeStepSys);
             if (thisITS.IceFracRemaining < 0.001) thisITS.IceFracRemaining = 0.0;
             if (thisITS.IceFracRemaining > 1.000) thisITS.IceFracRemaining = 1.0;
             // Reset the ice on the coil to zero for inside melt whenever discharging takes place.
@@ -1844,7 +1844,7 @@ namespace IceThermalStorage {
         state.dataLoopNodes->Node(OutNodeNum).Temp = this->OutletTemp;
     }
 
-    void DetailedIceStorageData::ReportDetailedIceStorage()
+    void DetailedIceStorageData::ReportDetailedIceStorage(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1877,8 +1877,8 @@ namespace IceThermalStorage {
             if (this->InletTemp < this->OutletTemp) { // Charging Mode
 
                 this->ChargingRate = this->CompLoad;
-                this->ChargingEnergy = this->CompLoad * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
-                this->IceFracChange = this->CompLoad * DataHVACGlobals::TimeStepSys / this->NomCapacity;
+                this->ChargingEnergy = this->CompLoad * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                this->IceFracChange = this->CompLoad * state.dataHVACGlobal->TimeStepSys / this->NomCapacity;
                 this->DischargingRate = 0.0;
                 this->DischargingEnergy = 0.0;
                 this->ParasiticElecRate = this->ChargeParaElecLoad * this->CompLoad;
@@ -1887,8 +1887,8 @@ namespace IceThermalStorage {
             } else { // (DetailedIceStorage(IceNum)%InletTemp < DetailedIceStorage(IceNum)%OutletTemp) Discharging Mode
 
                 this->DischargingRate = this->CompLoad;
-                this->DischargingEnergy = this->CompLoad * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
-                this->IceFracChange = -this->CompLoad * DataHVACGlobals::TimeStepSys / this->NomCapacity;
+                this->DischargingEnergy = this->CompLoad * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                this->IceFracChange = -this->CompLoad * state.dataHVACGlobal->TimeStepSys / this->NomCapacity;
                 this->ChargingRate = 0.0;
                 this->ChargingEnergy = 0.0;
                 this->ParasiticElecRate = this->DischargeParaElecLoad * this->CompLoad;

@@ -369,7 +369,7 @@ namespace PVWatts {
 
     void PVWattsGenerator::calc(EnergyPlusData& state)
     {
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // We only run this once for each zone time step.
         if (!state.dataGlobal->BeginTimeStepFlag) {

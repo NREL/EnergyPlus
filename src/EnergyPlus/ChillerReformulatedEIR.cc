@@ -1743,10 +1743,10 @@ namespace EnergyPlus::ChillerReformulatedEIR {
             state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
             // Set node flow rates;  for these load based models
             // assume that sufficient evaporator flow rate is available
-            this->ChillerFalseLoad = this->ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            this->EvapEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            this->CondEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            this->ChillerFalseLoad = this->ChillerFalseLoadRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
             this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
             this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
@@ -1759,7 +1759,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
             if (this->HeatRecActive) {
 
                 PlantUtilities::SafeCopyPlantNode(state, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
-                this->EnergyHeatRecovery = this->QHeatRecovery * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->EnergyHeatRecovery = this->QHeatRecovery * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
                 this->HeatRecInletTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
                 this->HeatRecOutletTemp = state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp;

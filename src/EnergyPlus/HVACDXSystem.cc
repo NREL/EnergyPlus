@@ -772,7 +772,7 @@ namespace HVACDXSystem {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::DoSetPointTest;
+        auto & DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
         // Locals
@@ -827,10 +827,10 @@ namespace HVACDXSystem {
                                 ShowSevereError(state, DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                                 ": Missing temperature setpoint for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
-                                SetPointErrorFlag = true;
+                                state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
-                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
+                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state, DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                                     ": Missing temperature setpoint for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
                                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
@@ -844,10 +844,10 @@ namespace HVACDXSystem {
                                 ShowSevereError(state, DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                                 ": Missing humidity ratio setpoint (HUMRATMAX) for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
-                                SetPointErrorFlag = true;
+                                state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
-                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
+                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state,
                                         DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                         ": Missing maximum humidity ratio setpoint (HUMRATMAX) for DX unit= " + DXCoolingSystem(DXSysIndex).Name);

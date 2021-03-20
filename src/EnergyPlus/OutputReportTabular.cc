@@ -3353,7 +3353,7 @@ namespace EnergyPlus::OutputReportTabular {
         //   timestep to the appropriate bin.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -3481,7 +3481,7 @@ namespace EnergyPlus::OutputReportTabular {
         //   holding the data that will be reported later.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
 
@@ -4238,9 +4238,6 @@ namespace EnergyPlus::OutputReportTabular {
         // The routine generates an annual table with the following columns which correspond to
         // the output variables and data structures shown.
 
-        // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
-
         state.dataHeatBal->SysTotalHVACReliefHeatLoss = 0;
         state.dataHeatBal->SysTotalHVACRejectHeatLoss = 0;
         auto &ort(state.dataOutRptTab);
@@ -4274,7 +4271,7 @@ namespace EnergyPlus::OutputReportTabular {
         // Using/Aliasing
         using DataHVACGlobals::AirCooled;
         using DataHVACGlobals::EvapCooled;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using DataHVACGlobals::WaterCooled;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
         using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
@@ -4519,7 +4516,7 @@ namespace EnergyPlus::OutputReportTabular {
         // The peak reports follow a similar example.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
 
@@ -5830,7 +5827,7 @@ namespace EnergyPlus::OutputReportTabular {
         //   any additional report entries for the predefined reports.
 
         // Using/Aliasing
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
         using DataOutputs::iNumberOfAutoCalcedFields;
         using DataOutputs::iNumberOfAutoSizedFields;
         using DataOutputs::iNumberOfDefaultedFields;
@@ -6122,7 +6119,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
         }
 
-        for (int iSys = 1; iSys <= DataHVACGlobals::NumPrimaryAirSys; ++iSys) {
+        for (int iSys = 1; iSys <= state.dataHVACGlobal->NumPrimaryAirSys; ++iSys) {
             // Total Outdoor Air by Airloop
             PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchOaTaAlMechVent,
@@ -7181,8 +7178,6 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::deviationFromSetPtThresholdClg;
-        using DataHVACGlobals::deviationFromSetPtThresholdHtg;
         using DataWater::StorageTankDataStruct;
         using ScheduleManager::GetScheduleName;
 
@@ -9063,11 +9058,12 @@ namespace EnergyPlus::OutputReportTabular {
                     rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
                     if (unitsStyle_cur != iUnitsStyle::InchPound) {
-                            tableBody(1, 1) = RealToStr(std::abs(deviationFromSetPtThresholdHtg), 2);
-                        tableBody(1, 2) = RealToStr(deviationFromSetPtThresholdClg, 2);
+                        tableBody(1, 1) = RealToStr(std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg), 2);
+                        tableBody(1, 2) = RealToStr(state.dataHVACGlobal->deviationFromSetPtThresholdClg, 2);
                     } else {
-                        tableBody(1, 1) = RealToStr(ConvertIPdelta(state, indexUnitConv, std::abs(deviationFromSetPtThresholdHtg)), 2);
-                        tableBody(1, 2) = RealToStr(ConvertIPdelta(state, indexUnitConv, deviationFromSetPtThresholdClg), 2);
+                        tableBody(1, 1) =
+                            RealToStr(ConvertIPdelta(state, indexUnitConv, std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg)), 2);
+                        tableBody(1, 2) = RealToStr(ConvertIPdelta(state, indexUnitConv, state.dataHVACGlobal->deviationFromSetPtThresholdClg), 2);
                     }
 
                     if (produceTabular) {
@@ -12490,7 +12486,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
             }
             if (ort->displayAirLoopComponentLoadSummary) {
-                for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
+                for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
                     AddTOCEntry(state, "AirLoop Component Load Summary", state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName);
                 }
             }
@@ -12781,7 +12777,7 @@ namespace EnergyPlus::OutputReportTabular {
         //   Save sequence of values for report during sizing.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int iZone(0);
@@ -12895,7 +12891,7 @@ namespace EnergyPlus::OutputReportTabular {
         //   formula used is:
         //       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
 
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
         auto &FinalSysSizing(state.dataSize->FinalSysSizing);
