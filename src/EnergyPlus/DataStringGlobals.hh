@@ -59,13 +59,6 @@ namespace EnergyPlus {
 
 namespace DataStringGlobals {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    extern std::string outputErrFileName;
-
-
     // MODULE PARAMETER DEFINITIONS:
 
     extern std::string const NL; // Platform newline
@@ -77,6 +70,7 @@ namespace DataStringGlobals {
 
 struct DataStringGlobalsData : BaseGlobalStruct {
 
+    std::string outputErrFileName;
     std::string outputMddFileName = "eplusout.mdd";
     std::string outputRddFileName = "eplusout.rdd";
     std::string outputShdFileName = "eplusout.shd";
@@ -159,6 +153,7 @@ struct DataStringGlobalsData : BaseGlobalStruct {
 
     void clear_state() override
     {
+        this->outputErrFileName.clear();
         this->outputMddFileName = "eplusout.mdd";
         this->outputRddFileName = "eplusout.rdd";
         this->outputShdFileName = "eplusout.shd";
