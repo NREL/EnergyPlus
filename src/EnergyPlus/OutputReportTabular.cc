@@ -4275,8 +4275,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHVACGlobals::WaterCooled;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
         using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
-        using HeatingCoils::HeatingCoil;
-        using HeatingCoils::NumHeatingCoils;
 
         static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataEnvrn->OutDryBulbTemp);
         static Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
@@ -4385,11 +4383,12 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // Heating coils - fuel
-        for (int iCoil = 1; iCoil <= NumHeatingCoils; ++iCoil) {
-            if (HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage ||
-                HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
-                state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
-                    HeatingCoil(iCoil).FuelUseLoad + HeatingCoil(iCoil).ParasiticFuelLoad - HeatingCoil(iCoil).HeatingCoilLoad;
+        for (int iCoil = 1; iCoil <= state.dataHeatingCoils->NumHeatingCoils; ++iCoil) {
+            if (state.dataHeatingCoils->HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage ||
+                state.dataHeatingCoils->HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataHeatingCoils->HeatingCoil(iCoil).FuelUseLoad +
+                                                                 state.dataHeatingCoils->HeatingCoil(iCoil).ParasiticFuelLoad -
+                                                                 state.dataHeatingCoils->HeatingCoil(iCoil).HeatingCoilLoad;
             }
         }
 
