@@ -139,7 +139,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
     EXPECT_DOUBLE_EQ(175.0, pvw3.getAzimuth());
     EXPECT_DOUBLE_EQ(21.0, pvw3.getTilt());
     EXPECT_DOUBLE_EQ(0.5, pvw3.getGroundCoverageRatio());
-    EXPECT_EQ(static_cast<int>(PVWattsGenerators.size()), 3);
+    EXPECT_EQ(static_cast<int>(state->dataPVWatts->PVWattsGenerators.size()), 3);
 }
 
 TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
@@ -169,7 +169,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     // 6/15 at 7am
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1.0;
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
     state->dataGlobal->BeginTimeStepFlag = true;
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -292,7 +292,7 @@ TEST_F(EnergyPlusFixture, PVWattsInverter_Constructor)
     auto eplc(ElectPowerLoadCenter(*state, 1));
     ASSERT_TRUE(eplc.inverterPresent);
     EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
     eplc.inverterObj->simulate(*state, 884.018);
     EXPECT_NEAR(eplc.inverterObj->aCPowerOut(), 842.527, 0.001);
 }

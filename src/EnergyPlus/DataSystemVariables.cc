@@ -142,7 +142,6 @@ namespace DataSystemVariables {
 
     // Shading methods
 
-    bool firstTime(true);
 
     // Functions
 
@@ -174,7 +173,7 @@ namespace DataSystemVariables {
         std::string InputFileName; // save for changing out path characters
         std::string::size_type pos;
 
-        if (firstTime) {
+        if (state.dataSysVars->firstTime) {
             state.files.audit.ensure_open(state, "CheckForActualFileName", state.files.outputControl.audit);
             get_environment_variable(cInputPath1, state.dataSysVars->envinputpath1);
             if (!state.dataSysVars->envinputpath1.empty()) {
@@ -183,7 +182,7 @@ namespace DataSystemVariables {
             }
             get_environment_variable(cInputPath2, state.dataSysVars->envinputpath2);
             get_environment_variable(cProgramPath, ProgramPath);
-            firstTime = false;
+            state.dataSysVars->firstTime = false;
         }
 
         FileFound = false;
@@ -235,11 +234,6 @@ namespace DataSystemVariables {
                 ShowContinueError(state, "    " + path.second +": \"" + path.first +"\"");
             }
         }
-    }
-
-    void clear_state()
-    {
-        firstTime = true;
     }
 
     void processEnvironmentVariables(EnergyPlusData &state) {

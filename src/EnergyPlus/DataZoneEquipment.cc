@@ -1665,7 +1665,7 @@ namespace EnergyPlus::DataZoneEquipment {
             }
         }
         // Set MinAirLoopIterationsAfterFirst for equipment that uses sequenced loads, based on zone equip load distribution scheme
-        int minIterations = DataHVACGlobals::MinAirLoopIterationsAfterFirst;
+        int minIterations = state.dataHVACGlobal->MinAirLoopIterationsAfterFirst;
         if (this->LoadDistScheme == DataZoneEquipment::LoadDist::SequentialLoading) {
             // Sequential needs one extra iterations up to the highest airterminal unit equipment number
             minIterations = max(coolingPriority, heatingPriority, minIterations);
@@ -1681,7 +1681,7 @@ namespace EnergyPlus::DataZoneEquipment {
             // SequentialUniformPLR needs one extra iterations up to the highest airterminal unit equipment number plus one more
             minIterations = max((coolingPriority + 1), (heatingPriority + 1), minIterations);
         }
-        DataHVACGlobals::MinAirLoopIterationsAfterFirst = minIterations;
+        state.dataHVACGlobal->MinAirLoopIterationsAfterFirst = minIterations;
     }
 
     Real64 EquipList::SequentialHeatingFraction(EnergyPlusData &state, const int equipNum)

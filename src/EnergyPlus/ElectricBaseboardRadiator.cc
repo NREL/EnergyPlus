@@ -218,7 +218,7 @@ namespace ElectricBaseboardRadiator {
         PowerMet = ElecBaseboard(BaseboardNum).TotPower;
 
         UpdateElectricBaseboard(state, BaseboardNum);
-        ReportElectricBaseboard(BaseboardNum);
+        ReportElectricBaseboard(state, BaseboardNum);
     }
 
     void GetElectricBaseboardInput(EnergyPlusData &state)
@@ -962,8 +962,8 @@ namespace ElectricBaseboardRadiator {
         //       MODIFIED       Feb 2010 Daeho Kang for radiant component
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // First, update the running average if necessary...
         if (LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {
@@ -1093,7 +1093,7 @@ namespace ElectricBaseboardRadiator {
         }
     }
 
-    void ReportElectricBaseboard(int const BaseboardNum)
+    void ReportElectricBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1101,7 +1101,7 @@ namespace ElectricBaseboardRadiator {
         //       DATE WRITTEN   Feb 2010
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         ElecBaseboard(BaseboardNum).ElecUseLoad = ElecBaseboard(BaseboardNum).ElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour;
         ElecBaseboard(BaseboardNum).TotEnergy = ElecBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour;

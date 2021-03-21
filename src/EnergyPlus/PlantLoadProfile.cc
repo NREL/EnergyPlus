@@ -156,7 +156,7 @@ namespace EnergyPlus::PlantLoadProfile {
         this->OutletTemp = this->InletTemp - DeltaTemp;
 
         this->UpdatePlantProfile(state);
-        this->ReportPlantProfile();
+        this->ReportPlantProfile(state);
 
     } // simulate()
 
@@ -271,7 +271,7 @@ namespace EnergyPlus::PlantLoadProfile {
         state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
     }
 
-    void PlantProfileData::ReportPlantProfile()
+    void PlantProfileData::ReportPlantProfile(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -284,7 +284,7 @@ namespace EnergyPlus::PlantLoadProfile {
         // Calculates report variables.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
 
         this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour;

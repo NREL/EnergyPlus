@@ -3102,7 +3102,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->MyOneTimeFlag = false;
         }
 
-        DXCT = 1; // hard-code to non-DOAS sizing routine for cfm/ton until .ISHundredPercentDOASDXCoil member from DXcoils.cc is added to
+        state.dataHVACGlobal->DXCT = 1; // hard-code to non-DOAS sizing routine for cfm/ton until .ISHundredPercentDOASDXCoil member from DXcoils.cc is added to
                   // VarSpeedCoil object
 
         // variable-speed heat pump water heating, begin
@@ -4607,10 +4607,10 @@ namespace VariableSpeedCoils {
                 }
             }
         } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
-            HPWHInletDBTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp;
-            HPWHInletWBTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletWBTemp;
+            state.dataHVACGlobal->HPWHInletDBTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp;
+            state.dataHVACGlobal->HPWHInletWBTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletWBTemp;
 
-            rhoA = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, HPWHInletDBTemp, HPInletAirHumRat, RoutineName);
+            rhoA = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, state.dataHVACGlobal->HPWHInletDBTemp, HPInletAirHumRat, RoutineName);
             for (Mode = 1; Mode <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++Mode) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;
                 // Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
@@ -4630,7 +4630,7 @@ namespace VariableSpeedCoils {
 
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCBF(Mode) = CalcCBF(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                                                   HPWHInletDBTemp,
+                                                                                                 state.dataHVACGlobal->HPWHInletDBTemp,
                                                                    HPInletAirHumRat,
                                                                    HPWHCoolCapacity,
                                                                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode),
@@ -4932,8 +4932,7 @@ namespace VariableSpeedCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::DXElecCoolingPower;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -5163,7 +5162,7 @@ namespace VariableSpeedCoils {
         CpAir_Unit = PsyCpAirFnW(LoadSideInletHumRat_Unit);
 
         RuntimeFrac = 1.0;
-        OnOffFanPartLoadFraction = 1.0;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 1.0;
         if ((SpeedNum == 1) && (PartLoadRatio < 1.0)) {
             PLF = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PLFFPLR, PartLoadRatio);
@@ -5171,7 +5170,7 @@ namespace VariableSpeedCoils {
                 PLF = 0.7;
             }
             if (CyclingScheme == CycFanCycCoil)
-                OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
+                state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
             // calculate the run time fraction
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = PartLoadRatio / PLF;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio = PartLoadRatio;
@@ -5504,7 +5503,7 @@ namespace VariableSpeedCoils {
         QWasteHeat *= PartLoadRatio;
 
         //  Add power to global variable so power can be summed by parent object
-        DXElecCoolingPower =  state.dataVariableSpeedCoils->Winput;
+        state.dataHVACGlobal->DXElecCoolingPower =  state.dataVariableSpeedCoils->Winput;
 
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure
@@ -5587,12 +5586,6 @@ namespace VariableSpeedCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::DXCoilTotalCapacity;
-        using DataHVACGlobals::HPWHInletDBTemp;
-        using DataHVACGlobals::HPWHInletWBTemp;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcVarSpeedHPWH");
@@ -5689,9 +5682,9 @@ namespace VariableSpeedCoils {
 
         // determine inlet air temperature type for curve objects
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType == WetBulbIndicator) {
-            InletAirTemp = HPWHInletWBTemp;
+            InletAirTemp = state.dataHVACGlobal->HPWHInletWBTemp;
         } else {
-            InletAirTemp = HPWHInletDBTemp;
+            InletAirTemp = state.dataHVACGlobal->HPWHInletDBTemp;
         }
 
         // check if indoor evaporator or outdoor evaporator
@@ -5743,7 +5736,7 @@ namespace VariableSpeedCoils {
 
         // part-load calculation
         RuntimeFrac = 1.0;
-        OnOffFanPartLoadFraction = 1.0;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 1.0;
         if ((SpeedNum == 1) && (PartLoadRatio < 1.0)) {
             PLF = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PLFFPLR, PartLoadRatio);
@@ -5751,7 +5744,7 @@ namespace VariableSpeedCoils {
                 PLF = 0.7;
             }
             if (CyclingScheme == CycFanCycCoil)
-                OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
+                state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
             // calculate the run time fraction
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = PartLoadRatio / PLF;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio = PartLoadRatio;
@@ -5960,7 +5953,7 @@ namespace VariableSpeedCoils {
 
         state.dataVariableSpeedCoils->QSource = TotalTankHeatingCapacity;
         state.dataVariableSpeedCoils->QLoadTotal = EvapCoolingCapacity;
-        DXCoilTotalCapacity = EvapCoolingCapacity; // for standard rating calculation
+        state.dataHVACGlobal->DXCoilTotalCapacity = EvapCoolingCapacity; // for standard rating calculation
         SHR = 1.0;
         // if indoor, calculate SHR
         if (EvapInletNode != 0) {
@@ -6047,9 +6040,9 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
 
         //  Add power to global variable so power can be summed by parent object
-        DXElecCoolingPower =  state.dataVariableSpeedCoils->Winput;
+        state.dataHVACGlobal->DXElecCoolingPower =  state.dataVariableSpeedCoils->Winput;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+        ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower * RuntimeFrac; // water heating pump power
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power =  state.dataVariableSpeedCoils->Winput;
@@ -6145,8 +6138,7 @@ namespace VariableSpeedCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::DXElecHeatingPower;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -6287,14 +6279,14 @@ namespace VariableSpeedCoils {
 
         RuntimeFrac = 1.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 1.0;
-        OnOffFanPartLoadFraction = 1.0;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
         if ((SpeedNum == 1) && (PartLoadRatio < 1.0)) {
             PLF = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PLFFPLR, PartLoadRatio);
             if (PLF < 0.7) {
                 PLF = 0.7;
             }
             if (CyclingScheme == CycFanCycCoil)
-                OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
+                state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
             // calculate the run time fraction
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = PartLoadRatio / PLF;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio = PartLoadRatio;
@@ -6520,7 +6512,7 @@ namespace VariableSpeedCoils {
         QWasteHeat *= PartLoadRatio;
 
         //  Add power to global variable so power can be summed by parent object
-        DXElecHeatingPower = state.dataVariableSpeedCoils->Winput;
+        state.dataHVACGlobal->DXElecHeatingPower = state.dataVariableSpeedCoils->Winput;
 
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure
@@ -7129,7 +7121,7 @@ namespace VariableSpeedCoils {
         // Data is moved from the HP data structure to the HP outlet nodes.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

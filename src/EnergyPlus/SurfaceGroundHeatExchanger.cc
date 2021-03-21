@@ -612,7 +612,7 @@ namespace SurfaceGroundHeatExchanger {
         int iter1;
 
         // check if we are in very first call for this zone time step
-        if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && this->firstTimeThrough) {
+        if (FirstHVACIteration && !state.dataHVACGlobal->ShortenTimeStepSys && this->firstTimeThrough) {
             this->firstTimeThrough = false;
             // calc temps and fluxes with past env. conditions and average source flux
             state.dataSurfaceGroundHeatExchangers->SourceFlux = this->QSrcAvg;
@@ -1313,8 +1313,8 @@ namespace SurfaceGroundHeatExchanger {
         // values to the running average.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
 
@@ -1377,7 +1377,7 @@ namespace SurfaceGroundHeatExchanger {
         // This subroutine simply produces output for Surface ground heat exchangers
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // update flows and temps from node data
         this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;

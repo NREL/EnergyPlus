@@ -2302,7 +2302,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         }
 
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElecCoolingPower = StandbyAncillaryPower;
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElecCoolingEnergy = StandbyAncillaryPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElecCoolingEnergy = StandbyAncillaryPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirOutletNodeNum).Temp = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
         state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat;
@@ -2351,7 +2351,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIter(30);
@@ -2640,7 +2640,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -3054,7 +3054,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -3423,7 +3423,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -3590,7 +3590,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -4228,8 +4228,8 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using WaterThermalTanks::WaterThermalTankData;
@@ -4343,8 +4343,8 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -4425,7 +4425,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         } else {
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectColdWeatherPower = 0.0;
         }
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectColdWeatherEnergy = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectColdWeatherPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectColdWeatherEnergy = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectColdWeatherPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void UpdateEvaporativeCondenserBasinHeater(EnergyPlusData &state, int const TESCoilNum)
@@ -4441,7 +4441,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         // determine basin heater electrical power and energy
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         CalcBasinHeaterPower(state,
                              state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).BasinHeaterPowerFTempDiff,
@@ -4489,10 +4489,10 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
             }
         }
 
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsump = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsumpRate * TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterStarvMakup = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterStarvMakupRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsump = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsumpRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterStarvMakup = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterStarvMakupRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecPower = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecNomPower * state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserRuntimeFraction;
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecConsumption = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecConsumption = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void

@@ -2470,7 +2470,7 @@ namespace EnergyPlus {
         EXPECT_NEAR(minFlow, 0.0, 0.0000001);
         EXPECT_NEAR(maxFlow, 0.09375, 0.0000001);
         MaxIte = 20;
-        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+        state->dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
         TempSolveRoot::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, minFlow, maxFlow, Par);
         EXPECT_EQ(3, SolFla);
     }
@@ -3515,7 +3515,7 @@ namespace EnergyPlus {
         CWCoil.WaterLoopBranchNum = 1;
         CWCoil.WaterLoopCompNum = 1;
         // electric heating coil
-        auto &eHCoil(HeatingCoils::HeatingCoil(1));
+        auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
         state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
@@ -3882,7 +3882,7 @@ namespace EnergyPlus {
         CWCoil.WaterLoopBranchNum = 1;
         CWCoil.WaterLoopCompNum = 1;
         // electric heating coil
-        auto &eHCoil(HeatingCoils::HeatingCoil(1));
+        auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
         state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
@@ -4249,7 +4249,7 @@ namespace EnergyPlus {
         CWCoil.WaterLoopBranchNum = 1;
         CWCoil.WaterLoopCompNum = 1;
         // electric heating coil
-        auto &eHCoil(HeatingCoils::HeatingCoil(1));
+        auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
         state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
@@ -4561,7 +4561,7 @@ namespace EnergyPlus {
         CWCoil.WaterLoopBranchNum = 1;
         CWCoil.WaterLoopCompNum = 1;
         // electric heating coil
-        auto &eHCoil(HeatingCoils::HeatingCoil(1));
+        auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
         state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 

@@ -5202,27 +5202,8 @@ namespace EnergyPlus::PollutionModule {
         //       Read Energy Results from the meters
         // This routine reads the meters for the energy used
 
-        // METHODOLOGY EMPLOYED:
-        // NA
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHVACGlobals::FracTimeStepZone;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
+        auto & FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto & Pollution = state.dataPollutionModule->Pollution;

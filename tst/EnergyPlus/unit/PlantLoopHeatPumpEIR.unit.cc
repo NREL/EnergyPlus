@@ -2700,7 +2700,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     state->dataLoopNodes->Node(5).TempSetPointHi = 5.436;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
 
-    DataHVACGlobals::TimeStepSys = 60;
+    state->dataHVACGlobal->TimeStepSys = 60;
 
     Real64 curLoad = -10000;
 

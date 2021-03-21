@@ -282,7 +282,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
     void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     {
 
-        Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
         // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly

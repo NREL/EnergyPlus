@@ -1726,7 +1726,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
+    OutputProcessor::SetupTimePointers(*state, "HVAC", state->dataHVACGlobal->TimeStepSys);
     PlantManager::CheckIfAnyPlant(*state);
     createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -1740,11 +1740,11 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
 
-    DataHVACGlobals::SimZoneEquipmentFlag = true;
-    DataHVACGlobals::SimNonZoneEquipmentFlag = false;
-    DataHVACGlobals::SimAirLoopsFlag = true;
-    DataHVACGlobals::SimPlantLoopsFlag = true;
-    DataHVACGlobals::SimElecCircuitsFlag = false;
+    state->dataHVACGlobal->SimZoneEquipmentFlag = true;
+    state->dataHVACGlobal->SimNonZoneEquipmentFlag = false;
+    state->dataHVACGlobal->SimAirLoopsFlag = true;
+    state->dataHVACGlobal->SimPlantLoopsFlag = true;
+    state->dataHVACGlobal->SimElecCircuitsFlag = false;
     bool FirstHVACIteration = true;
 
     // PlantManager::InitializeLoops( FirstHVACIteration );
@@ -3300,7 +3300,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
+    OutputProcessor::SetupTimePointers(*state, "HVAC", state->dataHVACGlobal->TimeStepSys);
     PlantManager::CheckIfAnyPlant(*state);
     createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
