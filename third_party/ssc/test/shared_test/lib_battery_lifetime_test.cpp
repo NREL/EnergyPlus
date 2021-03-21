@@ -348,80 +348,451 @@ TEST_F(lib_battery_lifetime_test, runCycleLifetimeTestWithRestPeriod) {
     EXPECT_NEAR(s.n_cycles, 2, tol);
 }
 
-TEST_F(lib_battery_lifetime_nmc_test, updateCapacityTest) {
-    size_t idx = 0;
-    double tol = 0.01;
-
-    //check lifetime_nmc_state_initialization
-    ASSERT_EQ(model->get_state().nmc_state->q_relative_neg, 100);
-    ASSERT_EQ(model->get_state().nmc_state->q_relative_li, 100);
-    ASSERT_EQ(model->get_state().nmc_state->b1_dt, 0);
-    ASSERT_EQ(model->get_state().nmc_state->b2_dt, 0);
-    ASSERT_EQ(model->get_state().nmc_state->b3_dt, 0);
-    ASSERT_EQ(model->get_state().day_age_of_battery, 0);
-
-    //check U_neg, and Voc functions (SOC as a fractional input)
-    ASSERT_NEAR(model->calculate_Uneg(0.1), 0.242, tol);
-    ASSERT_NEAR(model->calculate_Voc(0.1), 3.4679, tol);
-    ASSERT_NEAR(model->calculate_Uneg(0.5), 0.1726, tol);
-    ASSERT_NEAR(model->calculate_Voc(0.5), 3.6912, tol);
-    ASSERT_NEAR(model->calculate_Uneg(0.9), 0.1032, tol);
-    ASSERT_NEAR(model->calculate_Voc(0.9), 4.0818, tol);
-
-    // check number of cycles
-    while (idx < 876){
-        model->runLifetimeModels(idx, true, 5,95, 25);
-        model->runLifetimeModels(idx, true, 95, 5, 25);
-
-        auto state = model->get_state();
-
-        idx ++;
-    }
-
-    ASSERT_EQ(model->get_state().n_cycles, 875);
-
-}
-
-TEST_F(lib_battery_lifetime_nmc_test, NoCyclingCapacityTest) {
-    size_t idx = 0;
+TEST_F(lib_battery_lifetime_nmc_test, InitTest) {
     double tol = 0.001;
 
-    // check capacity degradation with no cycling
-    while (idx < 2400) {
-        model->runLifetimeModels(idx, false, 50, 50, 25);
-        idx++;
+    //check lifetime_nmc_state_initialization
+    auto lifetime_state = model->get_state();
+    EXPECT_NEAR(lifetime_state.nmc_li_neg->q_relative_neg, 100.853, tol);
+    EXPECT_NEAR(lifetime_state.nmc_li_neg->q_relative_li, 107.142, tol);
+    EXPECT_EQ(model->get_state().day_age_of_battery, 0);
+    EXPECT_EQ(model->get_state().n_cycles, 0);
+
+    //check U_neg, and Voc functions (SOC as a fractional input)
+    EXPECT_NEAR(model->calculate_Uneg(0.1), 0.242, tol);
+    EXPECT_NEAR(model->calculate_Voc(0.1), 3.4679, tol);
+    EXPECT_NEAR(model->calculate_Uneg(0.5), 0.1726, tol);
+    EXPECT_NEAR(model->calculate_Voc(0.5), 3.6912, tol);
+    EXPECT_NEAR(model->calculate_Uneg(0.9), 0.1032, tol);
+    EXPECT_NEAR(model->calculate_Voc(0.9), 4.0818, tol);
+}
+
+/// run at different days
+TEST_F(lib_battery_lifetime_nmc_test, StorageDays) {
+    std::vector<double> days = {0, 10, 50 , 500, 5000};
+    std::vector<double> expected_q_li = {106.50, 104.36, 103.97, 103.72, 102.93};
+
+    for (size_t i = 0; i < days.back() + 1; i++) {
+        for (size_t h = 0; h < 24; h++) {
+            size_t hr = i * 24 + h;
+            model->runLifetimeModels(hr, false, 50, 50, 25);
+        }
+        auto pos = std::find(days.begin(), days.end(), i);
+        if (pos != days.end()) {
+            auto state = model->get_state();
+            EXPECT_NEAR(state.nmc_li_neg->q_relative_li, expected_q_li[pos - days.begin()], 0.5);
+        }
+    }
+    EXPECT_EQ((size_t)model->get_state().day_age_of_battery, 5001);
+}
+
+/// Run with minute timestep instead
+TEST_F(lib_battery_lifetime_nmc_test, StorageMinuteTimestep) {
+    double dt_hr = 1. / 60;
+    model = std::unique_ptr<lifetime_nmc_t>(new lifetime_nmc_t(dt_hr));
+
+    std::vector<double> days = {0, 10, 50 , 500, 5000};
+    std::vector<double> expected_q_li = {106.50, 104.36, 103.97, 103.72, 102.93};
+
+    auto steps_per_day = (size_t)(24 / dt_hr);
+    for (size_t i = 0; i < days.back() + 1; i++) {
+        for (size_t h = 0; h < steps_per_day; h++) {
+            size_t hr = i * steps_per_day + h;
+            model->runLifetimeModels(hr, false, 50, 50, 25);
+        }
+        auto pos = std::find(days.begin(), days.end(), i);
+        if (pos != days.end()) {
+            auto state = model->get_state();
+            EXPECT_NEAR(state.nmc_li_neg->q_relative_li, expected_q_li[pos - days.begin()], 0.5);
+        }
+    }
+    EXPECT_EQ((size_t)model->get_state().day_age_of_battery, 5001);
+}
+
+/// run at different days at different temperatures
+TEST_F(lib_battery_lifetime_nmc_test, StorageTemp) {
+    std::vector<double> temps = {0, 10, 15, 40};
+    std::vector<double> expected_q_li = {81.73, 93.08, 97.43, 102.33};
+
+    for (size_t n = 3; n < temps.size(); n++) {
+        model = std::unique_ptr<lifetime_nmc_t>(new lifetime_nmc_t(dt_hour));
+        for (size_t d = 0; d < 5000 + 1; d++) {
+            for (size_t h = 0; h < 24; h++) {
+                size_t hr = d * 24 + h;
+                model->runLifetimeModels(hr, false, 50, 50, temps[n]);
+            }
+        }
+        auto state = model->get_state();
+        EXPECT_NEAR((size_t)state.nmc_li_neg->q_relative_li, expected_q_li[n], 1);
+    }
+}
+
+TEST_F(lib_battery_lifetime_nmc_test, CyclingHighDOD) {
+    size_t day = 0;
+    double T = 25.15;
+    while (day < 87) {
+        for (size_t i = 0; i < 24; i++) {
+            size_t idx = day * 24 + i;
+            if (i == 0)
+                model->runLifetimeModels(idx, false, 50, 90, T);
+            else if (i == 1)
+                model->runLifetimeModels(idx, true, 90, 10, T);
+            else if (i == 3)
+                model->runLifetimeModels(idx, true, 10, 50, T);
+            else
+                model->runLifetimeModels(idx, false, 50, 50, T);
+        }
+        day ++;
     }
 
     auto state = model->get_state();
-    EXPECT_EQ(state.n_cycles, 0);
-    EXPECT_NEAR(state.day_age_of_battery, 100, tol);
-    EXPECT_NEAR(state.q_relative, 98.825, tol);
-    EXPECT_NEAR(state.nmc_state->q_relative_li, 98.825, tol);
-    EXPECT_NEAR(state.nmc_state->q_relative_neg, 100, tol);
-    EXPECT_NEAR(state.nmc_state->dq_relative_li_old, 0.082, tol);
-    EXPECT_EQ(state.nmc_state->b1_dt, 0);
-    EXPECT_EQ(state.nmc_state->b2_dt, 0);
-    EXPECT_EQ(state.nmc_state->b3_dt, 0);
-    EXPECT_EQ(state.nmc_state->c2_dt, 0);
 
-    model = std::unique_ptr<lifetime_nmc_t>(new lifetime_nmc_t(dt_hour));
-    idx = 0;
+    EXPECT_EQ(state.n_cycles, 86);
+    EXPECT_EQ(state.nmc_li_neg->DOD_max, 50);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 103.23, 0.5);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 100.6, 0.5);
+    EXPECT_NEAR(state.day_age_of_battery, 87, 1e-3);
 
-    // simulate at battery temperature 35 C for 300 days
-    while (idx < 7200) {
-        model->runLifetimeModels(idx, false, 50, 50, 35);
-        idx++;
+    while (day < 870) {
+        for (size_t i = 0; i < 24; i++) {
+            size_t idx = day * 24 + i;
+            if (i == 0)
+                model->runLifetimeModels(idx, false, 50, 90, T);
+            else if (i == 1)
+                model->runLifetimeModels(idx, true, 90, 10, T);
+            else if (i == 3)
+                model->runLifetimeModels(idx, true, 10, 50, T);
+            else
+                model->runLifetimeModels(idx, false, 50, 50, T);
+        }
+        day ++;
     }
 
     state = model->get_state();
-    EXPECT_EQ(model->get_state().n_cycles, 0);
-    EXPECT_NEAR(state.day_age_of_battery, 300, tol);
-    EXPECT_NEAR(state.q_relative, 92.831, tol);
-    EXPECT_NEAR(state.nmc_state->q_relative_li, 92.831, tol);
-    EXPECT_NEAR(state.nmc_state->q_relative_neg, 100, tol);
-    EXPECT_NEAR(state.nmc_state->dq_relative_li_old, 0.142, tol);
-    EXPECT_EQ(state.nmc_state->b1_dt, 0);
-    EXPECT_EQ(state.nmc_state->b2_dt, 0);
-    EXPECT_EQ(state.nmc_state->b3_dt, 0);
-    EXPECT_EQ(state.nmc_state->c2_dt, 0);
+
+    EXPECT_EQ(state.n_cycles, 869);
+    EXPECT_EQ(state.nmc_li_neg->DOD_max, 50);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 99.6, 0.5);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 98.00, 0.5);
+    EXPECT_NEAR(state.day_age_of_battery, 870, 1e-3);
+
+    while (day < 8700) {
+        for (size_t i = 0; i < 24; i++) {
+            size_t idx = day * 24 + i;
+            if (i == 0)
+                model->runLifetimeModels(idx, false, 50, 90, T);
+            else if (i == 1)
+                model->runLifetimeModels(idx, true, 90, 10, T);
+            else if (i == 3)
+                model->runLifetimeModels(idx, true, 10, 50, T);
+            else
+                model->runLifetimeModels(idx, false, 50, 50, T);
+        }
+        day ++;
+    }
+
+    state = model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 8699);
+    EXPECT_EQ(state.nmc_li_neg->DOD_max, 50);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 84.19, 3);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 67.00, 0.5);
+    EXPECT_NEAR(state.day_age_of_battery, 8700, 1e-3);
+}
+
+TEST_F(lib_battery_lifetime_nmc_test, CyclingHighTemp) {
+    size_t day = 0;
+    double T = 35.;
+
+    while (day < 87) {
+        for (size_t i = 0; i < 24; i++) {
+            size_t idx = day * 24 + i;
+            if (i == 0)
+                model->runLifetimeModels(idx, false, 50, 70, T);
+            else if (i == 1)
+                model->runLifetimeModels(idx, true, 70, 30, T);
+            else if (i == 3)
+                model->runLifetimeModels(idx, true, 30, 50, T);
+            else
+                model->runLifetimeModels(idx, false, 50, 50, T);
+        }
+        day ++;
+    }
+
+    auto state = model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 86);
+    EXPECT_EQ(state.nmc_li_neg->DOD_max, 50);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 105.45, 0.6);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 103.79, 0.5);
+    EXPECT_NEAR(state.day_age_of_battery, 87, 1e-3);
+
+    while (day < 870) {
+        for (size_t i = 0; i < 24; i++) {
+            size_t idx = day * 24 + i;
+            if (i == 0)
+                model->runLifetimeModels(idx, false, 50, 70, T);
+            else if (i == 1)
+                model->runLifetimeModels(idx, true, 70, 30, T);
+            else if (i == 3)
+                model->runLifetimeModels(idx, true, 30, 50, T);
+            else
+                model->runLifetimeModels(idx, false, 50, 50, T);
+        }
+        day ++;
+    }
+
+    state = model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 869);
+    EXPECT_EQ(state.nmc_li_neg->DOD_max, 50);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 103.49, 0.5);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 103.35, 0.5);
+    EXPECT_NEAR(state.day_age_of_battery, 870, 1e-3);
+
+    while (day < 8700) {
+        for (size_t i = 0; i < 24; i++) {
+            size_t idx = day * 24 + i;
+            if (i == 0)
+                model->runLifetimeModels(idx, false, 50, 70, T);
+            else if (i == 1)
+                model->runLifetimeModels(idx, true, 70, 30, T);
+            else if (i == 3)
+                model->runLifetimeModels(idx, true, 30, 50, T);
+            else
+                model->runLifetimeModels(idx, false, 50, 50, T);
+        }
+        day ++;
+    }
+
+    state = model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 8699);
+    EXPECT_EQ(state.nmc_li_neg->DOD_max, 50);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 92.38, 0.5);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 98.93, 0.5);
+    EXPECT_NEAR(state.day_age_of_battery, 8700, 1e-3);
+}
+
+TEST_F(lib_battery_lifetime_nmc_test, CyclingCRate) {
+    size_t day = 0;
+
+    // 90 DOD cycle once per day, slower Crate than above
+    std::vector<double> DODs_day = {50., 56.67, 63.33, 70., 76.67, 83.33,
+                                    90., 83.33, 76.67, 70., 63.33, 56.67, 50., 43.33, 36.67, 30., 23.33, 16.67,
+                                    10., 16.67, 23.33, 30., 36.67, 43.33};
+
+    while (day < 87) {
+        for (size_t i = 0; i < DODs_day.size(); i++) {
+            size_t idx = day * 24 + i;
+            bool charge_changed = i == 7 || i == 19;
+            double prev_DOD = DODs_day[i % 24];
+            double DOD = DODs_day[i];
+            model->runLifetimeModels(idx, charge_changed, prev_DOD, DOD, 25);
+        }
+        day ++;
+    }
+
+    auto state = model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 86);
+    EXPECT_EQ(state.nmc_li_neg->DOD_max, 43.33);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 103, 1);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 100, 1);
+    EXPECT_NEAR(state.day_age_of_battery, 87, 1e-3);
+
+    while (day < 870) {
+        for (size_t i = 0; i < DODs_day.size(); i++) {
+            size_t idx = day * 24 + i;
+            bool charge_changed = i == 7 || i == 19;
+            double prev_DOD = DODs_day[i % 24];
+            double DOD = DODs_day[i];
+            model->runLifetimeModels(idx, charge_changed, prev_DOD, DOD, 25);
+        }
+        day ++;
+    }
+
+    state = model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 869);
+    EXPECT_EQ(state.nmc_li_neg->DOD_max, 43.33);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 97.61, 1);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 98, 1);
+    EXPECT_NEAR(state.day_age_of_battery, 870, 1e-3);
+}
+
+TEST_F(lib_battery_lifetime_nmc_test, CyclingCRateMinuteTimestep) {
+    double dt_hr = 1. / 60;
+    auto steps_per_day = (size_t)(24 / dt_hr);
+    model = std::unique_ptr<lifetime_nmc_t>(new lifetime_nmc_t(dt_hr));
+
+    size_t day = 0;
+    size_t idx = 0;
+    // 90 DOD cycle once per day, slower Crate than above
+    std::vector<double> DODs_day = {50., 56.67, 63.33, 70., 76.67, 83.33,
+                                    90., 83.33, 76.67, 70., 63.33, 56.67, 50., 43.33, 36.67, 30., 23.33, 16.67,
+                                    10., 16.67, 23.33, 30., 36.67, 43.33};
+
+    while (day < 87) {
+        for (size_t hr = 0; hr < DODs_day.size(); hr++) {
+            double prev_DOD = DODs_day[hr % 24];
+            double DOD = DODs_day[hr];
+            for (size_t min = 0; min < (size_t)(1. / dt_hr); min++) {
+                bool charge_changed = (hr == 7 || hr == 19) && min == 0;
+                if (min != 0)
+                    prev_DOD = DOD;
+                model->runLifetimeModels(idx, charge_changed, prev_DOD, DOD, 25);
+                idx ++;
+            }
+        }
+        day ++;
+    }
+
+    auto state = model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 86);
+    EXPECT_EQ(state.nmc_li_neg->DOD_max, 43.33);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 103, 1);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 100, 1);
+    EXPECT_NEAR(state.day_age_of_battery, 87, 1e-3);
+
+    while (day < 870) {
+        for (size_t hr = 0; hr < DODs_day.size(); hr++) {
+            double prev_DOD = DODs_day[hr % 24];
+            double DOD = DODs_day[hr];
+            for (size_t min = 0; min < (size_t)(1. / dt_hr); min++) {
+                bool charge_changed = (hr == 7 || hr == 19) && min == 0;
+                if (min != 0)
+                    prev_DOD = DOD;
+                model->runLifetimeModels(idx, charge_changed, prev_DOD, DOD, 25);
+                idx ++;
+            }
+        }
+        day ++;
+    }
+
+    state = model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 869);
+    EXPECT_EQ(state.nmc_li_neg->DOD_max, 43.33);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 97.61, 1);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 98, 1);
+    EXPECT_NEAR(state.day_age_of_battery, 870, 1e-3);
+}
+
+/// There's less accuracy since the degradation coefficients from the first day are lost when doing computation on day 2
+TEST_F(lib_battery_lifetime_nmc_test, CyclingEveryTwoDays) {
+    double T = 25.15;
+    size_t day = 0;
+    while (day < 87) {
+        for (size_t i = 0; i < 48; i++) {
+            size_t idx = day * 48 + i;
+            if (i == 0)
+                model->runLifetimeModels(idx, false, 50, 10, T);
+            else if (i == 1)
+                model->runLifetimeModels(idx, true, 10, 90, T);
+            else if (i == 46)
+                model->runLifetimeModels(idx, true, 90, 50, T);
+            else
+                model->runLifetimeModels(idx, false, 50, 50, T);
+        }
+        day += 2;
+    }
+
+    auto state = model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 43);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 103.29, 1);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 100.6, 0.5);
+    EXPECT_NEAR(state.day_age_of_battery, 88, 1e-3);
+}
+
+/** Test focusing on how different time steps affect the integration of a day's degradation in the NMC life model.
+ * The integration of degradation is done at the end of each day when the elapsed time, `cum_dt` is exactly 1.
+ * Check that if a simulation step has a timestep large enough that `cum_dt` passes from <1 to >1, that the effects
+ * on lifetime are the same by breaking that timestep up and accruing the degradation and `cum_dt` correctly
+ **/
+TEST_F(lib_battery_lifetime_nmc_test, IrregularTimeStep) {
+    double T = 35.15;
+    auto state = model->get_state();
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 106.213, 1);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 100.6, 0.5);
+
+    auto b_params = std::make_shared<lifetime_params>(model->get_params());
+    b_params->dt_hr = 0.5;
+    auto b_state = std::make_shared<lifetime_state>(model->get_state());
+    auto subhourly_model = std::unique_ptr<lifetime_nmc_t>(new lifetime_nmc_t(b_params, b_state));
+
+
+    // run hourly
+    size_t day = 0;
+    while (day < 87) {
+        size_t idx = 0;
+        while (idx < 48) {
+            size_t i = idx % 24;
+            if (i == 0)
+                model->runLifetimeModels(idx, false, 50, 70, T);
+            else if (i == 1)
+                model->runLifetimeModels(idx, true, 70, 30, T);
+            else if (i == 3)
+                model->runLifetimeModels(idx, true, 30, 50, T);
+            else
+                model->runLifetimeModels(idx, false, 50, 50, T);
+            idx += 1;
+        }
+        day += 2;
+    }
+    state = model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 87);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 105.966, 1e-3);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 103.829, 1e-3);
+    EXPECT_NEAR(state.day_age_of_battery, 88, 1e-3);
+
+    printf("\n");
+    // run 30min timesteps for 23.5 hours then hourly for 24, then 1 0.5 hr time idx
+    day = 0;
+    while (day < 87) {
+        size_t idx = 0;
+        while (idx < (size_t) (23.5 * 2)) {
+            size_t i = idx;
+            if (i <= 1)
+                subhourly_model->runLifetimeModels(idx, false, 50, 70, T);
+            else if (i <= 3)
+                subhourly_model->runLifetimeModels(idx, i == 2, 70, 30, T);
+            else if (i == 6 || i == 7)
+                subhourly_model->runLifetimeModels(idx, i == 6, 30, 50, T);
+            else
+                subhourly_model->runLifetimeModels(idx, false, 50, 50, T);
+            idx += 1;
+        }
+
+        b_params->dt_hr = 1;
+        b_state = std::make_shared<lifetime_state>(subhourly_model->get_state());
+        subhourly_model = std::unique_ptr<lifetime_nmc_t>(new lifetime_nmc_t(b_params, b_state));
+        idx = 0;
+        while (idx < 24) {
+            size_t i = idx % 24;
+            if (i == 0)
+                subhourly_model->runLifetimeModels(idx, false, 50, 70, T);
+            else if (i == 1)
+                subhourly_model->runLifetimeModels(idx, true, 70, 30, T);
+            else if (i == 3)
+                subhourly_model->runLifetimeModels(idx, true, 30, 50, T);
+            else
+                subhourly_model->runLifetimeModels(idx, false, 50, 50, T);
+            idx += 1;
+        }
+        b_params->dt_hr = 0.5;
+        b_state = std::make_shared<lifetime_state>(subhourly_model->get_state());
+        subhourly_model = std::unique_ptr<lifetime_nmc_t>(new lifetime_nmc_t(b_params, b_state));
+        subhourly_model->runLifetimeModels(idx, false, 50, 50, T);
+        day += 2;
+    }
+    state = subhourly_model->get_state();
+
+    EXPECT_EQ(state.n_cycles, 87);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_li, 105.965, 1e-3);
+    EXPECT_NEAR(state.nmc_li_neg->q_relative_neg, 103.829, 1e-3);
+    EXPECT_NEAR(state.day_age_of_battery, 88, 1e-3);
 }

@@ -287,7 +287,6 @@ public:
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
 
-        state->dataHVACGlobal->NumPrimaryAirSys = 0;
         Psychrometrics::cached_Twb.clear();
         Psychrometrics::cached_Psat.clear();
     }
@@ -6306,8 +6305,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInput)
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
-    HeatingCoils::GetCoilsInputFlag = true;
-    HeatingCoils::HeatingCoil.deallocate();
+    state->dataHeatingCoils->GetCoilsInputFlag = true;
+    state->dataHeatingCoils->HeatingCoil.deallocate();
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -6491,8 +6490,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInputSZVAV)
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
-    HeatingCoils::GetCoilsInputFlag = true;
-    HeatingCoils::HeatingCoil.deallocate();
+    state->dataHeatingCoils->GetCoilsInputFlag = true;
+    state->dataHeatingCoils->HeatingCoil.deallocate();
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -13087,7 +13086,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     EXPECT_TRUE(thisSys->m_HeatCoilExists);
 
     auto &thisClgCoil = state->dataDXCoils->DXCoil(1);
-    auto &thisHtgCoil = HeatingCoils::HeatingCoil(1);
+    auto &thisHtgCoil = state->dataHeatingCoils->HeatingCoil(1);
 
     EXPECT_EQ(thisClgCoil.RatedTotCap(1), DataSizing::AutoSize);
     EXPECT_EQ(thisHtgCoil.NominalCapacity, DataSizing::AutoSize);

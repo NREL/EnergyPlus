@@ -134,7 +134,7 @@ protected:
 private:
     void initialize();
 
-    friend class lifetime_t;
+    friend class lifetime_calendar_cycle_t;
 };
 
 /*
