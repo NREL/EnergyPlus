@@ -148,7 +148,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 {
     std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
-    ASSERT_TRUE(process_idf(string));
+    ASSERT_TRUE(process_idf(*state, string));
     // setup environment
     bool ErrorsFound(false);
     GetZoneData(*state, ErrorsFound);
@@ -1388,7 +1388,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_RuntimeFraction_Initi
 {
     std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
-    ASSERT_TRUE(process_idf(string));
+    ASSERT_TRUE(process_idf(*state, string));
     // setup environment
     bool ErrorsFound(false);
     GetZoneData(*state, ErrorsFound);

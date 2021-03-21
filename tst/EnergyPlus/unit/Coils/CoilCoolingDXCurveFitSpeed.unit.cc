@@ -61,7 +61,7 @@ using namespace EnergyPlus;
 TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedInput )
 {
     std::string idf_objects = this->getSpeedObjectString("speed1");
-    EXPECT_TRUE(process_idf( idf_objects, false ));
+    EXPECT_TRUE(process_idf(*state, idf_objects, false ));
     CoilCoolingDXCurveFitSpeed thisSpeed(*state, "speed1");
     EXPECT_EQ("SPEED1", thisSpeed.name);
 }
@@ -69,7 +69,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedInput )
 TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest )
 {
     std::string idf_objects = this->getSpeedObjectString("speed1");
-    EXPECT_TRUE(process_idf( idf_objects, false ));
+    EXPECT_TRUE(process_idf(*state, idf_objects, false ));
     CoilCoolingDXCurveFitSpeed thisSpeed(*state, "speed1");
     EXPECT_EQ("SPEED1", thisSpeed.name);
 

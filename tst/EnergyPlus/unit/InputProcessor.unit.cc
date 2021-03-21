@@ -226,7 +226,7 @@ TEST_F(InputProcessorFixture, decode_encode_1)
         ""
     });
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     std::string encoded = encodeIDF();
     EXPECT_EQ(idf, encoded);
 }
@@ -288,7 +288,7 @@ TEST_F(InputProcessorFixture, decode_encode_2)
         ""
     }));
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     std::string encoded = encodeIDF();
     EXPECT_EQ(expected, encoded);
 }
@@ -342,7 +342,7 @@ TEST_F(InputProcessorFixture, decode_encode_3)
       ""
     }));
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     std::string encoded = encodeIDF();
     EXPECT_EQ(expected, encoded);
 }
@@ -379,7 +379,7 @@ TEST_F(InputProcessorFixture, byte_order_mark)
         ""
     }));
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     std::string encoded = encodeIDF();
     EXPECT_EQ(expected, encoded);
 }
@@ -408,7 +408,7 @@ TEST_F(InputProcessorFixture, parse_empty_fields)
                          {"maximum_number_of_warmup_days", 25},
                          {"minimum_number_of_warmup_days", 6}}}}}};
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
     json tmp;
     for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -447,7 +447,7 @@ TEST_F(InputProcessorFixture, parse_utf_8)
                          {"maximum_number_of_warmup_days", 25},
                          {"minimum_number_of_warmup_days", 6}}}}}};
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
     json tmp;
     for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -519,7 +519,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_1)
       "}}"
     );
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
 
     EXPECT_ANY_THROW(epJSON.dump(-1, ' ', false, json::error_handler_t::strict));
@@ -565,7 +565,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_2)
       "}}"
     );
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
 
     auto const input_file = epJSON.dump(-1, ' ', false, json::error_handler_t::ignore);
@@ -613,7 +613,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
       "}}"
     );
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
 
     auto const input_file = epJSON.dump(-1, ' ', false, json::error_handler_t::replace);
@@ -632,7 +632,7 @@ TEST_F(InputProcessorFixture, parse_latin1_json)
         "    intonaco int calce;      !- Outside Layer"
     }));
 
-    EXPECT_FALSE(process_idf(idf, false)); // No assertions
+    EXPECT_FALSE(process_idf(*state, idf, false)); // No assertions
     const std::string error_string = delimited_string({
         "   ** Severe  ** <root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: '1\xB0piano'.",
         "   ** Severe  ** <root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded"
@@ -686,7 +686,7 @@ TEST_F(InputProcessorFixture, parse_malformed_idf)
         " ;                                                        !- Pump Flow Rate Schedule Name",
     }));
 
-    EXPECT_FALSE(process_idf(idf, false));
+    EXPECT_FALSE(process_idf(*state, idf, false));
     EXPECT_TRUE(compare_err_stream(delimited_string({
         "   ** Severe  ** Line: 16 Index: 9 - Field cannot be Autosize or Autocalculate",
         "   ** Severe  ** Line: 18 Index: 9 - Field cannot be Autosize or Autocalculate",
@@ -752,7 +752,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
                          {"use_weather_file_rain_indicators", "Yes"},
                          {"use_weather_file_snow_indicators", "Yes"}}}}}};
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
     json tmp;
     for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -820,7 +820,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_non_extensible_objects)
                          {"daylighting_reference_point_coordinate_system", "Relative"},
                          {"rectangular_surface_coordinate_system", "Relative"}}}}}};
 
-    EXPECT_FALSE(process_idf(idf, false));
+    EXPECT_FALSE(process_idf(*state, idf, false));
     json &epJSON = getEpJSON();
     json tmp;
     for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -946,7 +946,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                                               "  " + state->dataStrGlobals->MatchVersion + ";",
                                               ""}));
 
-    EXPECT_TRUE(process_idf(idf));
+    EXPECT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
     json tmp;
 
@@ -983,7 +983,7 @@ TEST_F(InputProcessorFixture, parse_idf_EMSProgram_required_prop_extensible)
 
     std::string const idf(delimited_string({"EnergyManagementSystem:Program,", "    ER_Main;                 !- Name"}));
 
-    EXPECT_FALSE(process_idf(idf, false));
+    EXPECT_FALSE(process_idf(*state, idf, false));
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** <root>[EnergyManagementSystem:Program][ER_Main] - Missing required property 'lines'.",
@@ -1056,7 +1056,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_required_extensible_fie
             {"maximum_number_of_warmup_days", 25},
             {"minimum_number_of_warmup_days", 6}}}}}};
 
-    EXPECT_FALSE(process_idf(idf, false));
+    EXPECT_FALSE(process_idf(*state, idf, false));
     json &epJSON = getEpJSON();
     json tmp;
     for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -1117,7 +1117,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_extensible)
                            {{"vertex_x_coordinate", 0.0}, {"vertex_y_coordinate", 10.0}, {"vertex_z_coordinate", 0}},
                            {{"vertex_x_coordinate", 10.0}, {"vertex_y_coordinate", 10.0}, {"vertex_z_coordinate", 0}}}}}}}}};
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
     json tmp;
     for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -1229,7 +1229,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_extensible_objects)
                          {"maximum_number_of_warmup_days", 25},
                          {"minimum_number_of_warmup_days", 6}}}}}};
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
     json tmp;
     for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -1304,7 +1304,7 @@ TEST_F(InputProcessorFixture, validate_two_extensible_objects_and_one_non_extens
         "    6;",
     }));
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     auto const &errors = validationErrors();
     auto const &warnings = validationWarnings();
     EXPECT_EQ(errors.size() + warnings.size(), 0ul);
@@ -1336,7 +1336,7 @@ TEST_F(InputProcessorFixture, parse_idf)
                            {"minimum_number_of_warmup_days", 6}},
                       }}}};
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
     json tmp;
     for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -1395,7 +1395,7 @@ TEST_F(InputProcessorFixture, parse_idf_two_objects)
                          {"maximum_number_of_warmup_days", 20},
                          {"minimum_number_of_warmup_days", 6}}}}}};
 
-    EXPECT_FALSE(process_idf(idf, false));
+    EXPECT_FALSE(process_idf(*state, idf, false));
     json &epJSON = getEpJSON();
     json tmp;
     for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -1445,7 +1445,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles)
                            {{"vertex_x_coordinate", 0.0}, {"vertex_y_coordinate", 10.0}, {"vertex_z_coordinate", 0}},
                            {{"vertex_x_coordinate", 10.0}, {"vertex_y_coordinate", 10.0}, {"vertex_z_coordinate", 0}}}}}}}}};
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
     json tmp;
     for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -1535,7 +1535,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects)
                            {{"vertex_x_coordinate", 0.0}, {"vertex_y_coordinate", 10.0}, {"vertex_z_coordinate", 0}},
                            {{"vertex_x_coordinate", 10.0}, {"vertex_y_coordinate", 10.0}, {"vertex_z_coordinate", 0}}}}}}}}};
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
     json &epJSON = getEpJSON();
     json tmp;
     for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -1578,7 +1578,7 @@ TEST_F(InputProcessorFixture, validate_epJSON_parametric_template)
                                             ",                        !- Constant Heating Setpoint {C}",
                                             "Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name",
                                             ";                        !- Constant Cooling Setpoint {C}"}));
-    EXPECT_FALSE(process_idf(idf, false));
+    EXPECT_FALSE(process_idf(*state, idf, false));
     std::string const error_string = delimited_string({
         "   ** Severe  ** Line: 1 You must run Parametric Preprocessor for \"Parametric:Logic\"",
         "   ** Severe  ** Line: 11 You must run the ExpandObjects program for \"HVACTemplate:Thermostat\"",
@@ -3920,7 +3920,7 @@ TEST_F(InputProcessorFixture, FalseDuplicates)
     }));
 
 
-    ASSERT_TRUE(process_idf(idf));
+    ASSERT_TRUE(process_idf(*state, idf));
 }
 
 TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel)
@@ -4000,7 +4000,7 @@ TEST_F(InputProcessorFixture, Duplicate_Name_Context)
     }));
 
 
-    EXPECT_FALSE(process_idf(idf, false)); // No assertions
+    EXPECT_FALSE(process_idf(*state, idf, false)); // No assertions
     const std::string error_string = delimited_string({
         "   ** Severe  ** Duplicate name found for object of type \"Exterior:Lights\" named \"ExtLights\". Overwriting existing object."
     });

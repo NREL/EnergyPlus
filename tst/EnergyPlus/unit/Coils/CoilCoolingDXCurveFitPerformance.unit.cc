@@ -58,7 +58,7 @@ using namespace EnergyPlus;
 TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInput )
 {
     std::string idf_objects = this->getPerformanceObjectString("coilPerformance", false, 2);
-    EXPECT_TRUE(process_idf( idf_objects, false ));
+    EXPECT_TRUE(process_idf(*state, idf_objects, false ));
     CoilCoolingDXCurveFitPerformance thisPerf(*state, "coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
@@ -68,7 +68,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInput )
 TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode )
 {
     std::string idf_objects = this->getPerformanceObjectString("coilPerformance", true, 2);
-    EXPECT_TRUE(process_idf( idf_objects, false ));
+    EXPECT_TRUE(process_idf(*state, idf_objects, false ));
     CoilCoolingDXCurveFitPerformance thisPerf(*state, "coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);

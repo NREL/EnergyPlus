@@ -537,7 +537,7 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
         "Schedule:Constant,MyScheduleOn,,1;",
         "Schedule:Constant,MyScheduleOff,,0;",
     }));
-    ASSERT_TRUE(process_idf(idf_contents));
+    ASSERT_TRUE(process_idf(*state, idf_contents));
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
     ScheduleManager::ProcessScheduleInput(*state);

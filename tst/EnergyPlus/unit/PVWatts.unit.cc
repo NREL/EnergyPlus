@@ -127,7 +127,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
                                                  ",",
                                                  "0.5;",
                                                  "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
-    process_idf(idfTxt);
+    process_idf(*state, idfTxt);
     EXPECT_FALSE(has_err_output());
     PVWattsGenerator &pvw1 = GetOrCreatePVWattsGenerator(*state, "PVWattsArray1");
     EXPECT_EQ(pvw1.getModuleType(), ModuleType::PREMIUM);
@@ -149,7 +149,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
                                                  "Primo,",          // misspelled
                                                  "FixedRoofMount,", // misspelled
                                                  ",", "asdf,", ",", ";", "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
-    EXPECT_FALSE(process_idf(idfTxt, false));
+    EXPECT_FALSE(process_idf(*state, idfTxt, false));
     ASSERT_THROW(GetOrCreatePVWattsGenerator(*state, "PVWattsArray1"), std::runtime_error);
     std::string const error_string = delimited_string(
         {"   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_geometry_type] - \"asdf\" - Failed to match against any enum values.",
@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, PVWattsInverter_Constructor)
                                                  ",",
                                                  ",",
                                                  ";"});
-    ASSERT_TRUE(process_idf(idfTxt));
+    ASSERT_TRUE(process_idf(*state, idfTxt));
     auto eplc(ElectPowerLoadCenter(*state, 1));
     ASSERT_TRUE(eplc.inverterPresent);
     EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);

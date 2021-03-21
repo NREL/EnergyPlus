@@ -61,7 +61,7 @@ using namespace EnergyPlus;
 TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitModeInput )
 {
     std::string idf_objects = this->getModeObjectString("mode1", 2);
-    EXPECT_TRUE(process_idf( idf_objects, false ));
+    EXPECT_TRUE(process_idf(*state, idf_objects, false ));
     CoilCoolingDXCurveFitOperatingMode thisMode(*state, "mode1");
     EXPECT_EQ("MODE1", thisMode.name);
     EXPECT_EQ("MODE1SPEED1", thisMode.speeds[0].name);
@@ -113,7 +113,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
         "  Coil Cooling DX Curve Fit Speed 1;      !- Speed Name 1",
     });
     idf_objects += this->getSpeedObjectString("Coil Cooling DX Curve Fit Speed 1");
-    EXPECT_TRUE(process_idf( idf_objects, false ));
+    EXPECT_TRUE(process_idf(*state, idf_objects, false ));
     CoilCoolingDXCurveFitOperatingMode thisMode(*state, "Coil Cooling DX Curve Fit Operating Mode 1");
     EXPECT_EQ(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED, thisMode.condenserType);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedEvapAirFlowRate);
