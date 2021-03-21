@@ -725,25 +725,27 @@ namespace OutputReportPredefined {
         s->pdchOaOccAlTmAt = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Time At Voz-sum-dyn [hr]"); 
         s->pdchOaOccAlTmAbove = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Time Above Voz-sum-dyn [hr]"); 
 
-        s->pdstOAtimeFactorsDurOcc = newPreDefSubTable(state, s->pdrOutsideAirDetails, "Times for Outdoor Air Limiting Factors During Occupancy");
+        s->pdstOAtimeFactorsDurOcc = newPreDefSubTable(state, s->pdrOutsideAirDetails, "Outdoor Air Controller Limiting Factors by AirLoop");
         s->pdchOaTmFctNoLimit = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "No Limiting Factor [hr]"); //todo
-        s->pdchOaTmFctHiHumid = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "High Humidity [hr]"); //todo
-        s->pdchOaTmFctNiteVent = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Night Ventilation [hr]"); //todo
-        s->pdchOaTmFctEcono = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Economizer [hr]"); //todo
-        s->pdchOaTmFctDCV = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Demand Controlled Ventilation [hr]"); //todo
-        s->pdchOaTmFctExhaust = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Exhaust Flow [hr]"); //todo
         s->pdchOaTmFctLimit = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Limits and Scheduled Limits [hr]"); //todo
+        s->pdchOaTmFctEcono = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Economizer [hr]"); //todo
+        s->pdchOaTmFctExhaust = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Exhaust Flow [hr]"); //todo
+        s->pdchOaTmFctMixedLimit = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Mixed Air Flow [hr]"); //todo
+        s->pdchOaTmFctHiHumid = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "High Humidity [hr]"); //todo
+        s->pdchOaTmFctDCV = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Demand Controlled Ventilation [hr]"); //todo
+        s->pdchOaTmFctNiteVent = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Night Ventilation [hr]"); //todo
         s->pdchOaTmFctDemand = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Demand Limiting [hr]"); //todo
         s->pdchOaTmFctEMS = newPreDefColumn(state, s->pdstOAtimeFactorsDurOcc, "Energy Management System [hr]"); //todo
 
-        s->pdstOAavgFactorsDurOcc = newPreDefSubTable(state, s->pdrOutsideAirDetails, "Average Outdoor Air for Outdoor Air Limiting Factors During Occupancy");
+        s->pdstOAavgFactorsDurOcc = newPreDefSubTable(state, s->pdrOutsideAirDetails, "Average Outdoor Air for Limiting Factors During Occupancy");
         s->pdchOaAvFctNoLimit = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "No Limiting Factor [m3/s]"); //todo
-        s->pdchOaAvFctHiHumid = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "High Humidity [m3/s]"); //todo
-        s->pdchOaAvFctNiteVent = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Night Ventilation [m3/s]"); //todo
-        s->pdchOaAvFctEcono = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Economizer [m3/s]"); //todo
-        s->pdchOaAvFctDCV = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Demand Controlled Ventilation [m3/s]"); //todo
-        s->pdchOaAvFctExhaust = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Exhaust Flow [m3/s]"); //todo
         s->pdchOaAvFctLimit = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Limits and Scheduled Limits [m3/s]"); //todo
+        s->pdchOaAvFctEcono = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Economizer [m3/s]"); //todo
+        s->pdchOaAvFctExhaust = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Exhaust Flow [m3/s]"); //todo
+        s->pdchOaAvFctMixedLimit = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Mixed Air Flow [m3/s]"); //todo
+        s->pdchOaAvFctHiHumid = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "High Humidity [m3/s]"); //todo
+        s->pdchOaAvFctDCV = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Demand Controlled Ventilation [m3/s]"); //todo
+        s->pdchOaAvFctNiteVent = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Night Ventilation [m3/s]"); //todo
         s->pdchOaAvFctDemand = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Demand Limiting [m3/s]"); //todo
         s->pdchOaAvFctEMS = newPreDefColumn(state, s->pdstOAavgFactorsDurOcc, "Energy Management System [m3/s]"); //todo
 
