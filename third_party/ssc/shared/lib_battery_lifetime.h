@@ -60,7 +60,7 @@ struct lifetime_state {
     std::shared_ptr<cycle_state> cycle;
 
     // NREL NMC model state
-    std::shared_ptr<lifetime_nmc_state> nmc_state;
+    std::shared_ptr<lifetime_nmc_state> nmc_li_neg;
 
     lifetime_state();
 

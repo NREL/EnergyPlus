@@ -180,7 +180,6 @@ public:
         double wave_resource_start_height = 0;
         double wave_resource_end_period = 0;
         double wave_resource_end_height = 0;
-        double row_check = 0;
 
         for (size_t l = 0; l < (size_t)wave_power_matrix.nrows(); l++) {
             for (size_t m = 0; m < (size_t)wave_power_matrix.ncols(); m++) {
