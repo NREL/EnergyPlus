@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -169,4 +170,75 @@ TEST_F(EnergyPlusFixture, GasAbsorption_GetInput_Test)
 
     // Additional tests for fuel type input
     EXPECT_EQ(state->dataChillerGasAbsorption->GasAbsorber(1).FuelType, "NaturalGas");
+}
+
+TEST_F(EnergyPlusFixture, GasAbsorption_getDesignCapacities_Test)
+{
+    state->dataPlnt->TotNumLoops = 3;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(3);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 100;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 111;
+
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 3;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(3);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 200;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 222;
+
+    state->dataPlnt->PlantLoop(3).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(3).LoopSide(1).TotalBranches = 4;
+    state->dataPlnt->PlantLoop(3).LoopSide(1).Branch.allocate(4);
+    state->dataPlnt->PlantLoop(3).LoopSide(1).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(3).LoopSide(1).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(3).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 300;
+    state->dataPlnt->PlantLoop(3).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 333;
+
+    GasAbsorberSpecs thisChillerHeater;
+    thisChillerHeater.ChillReturnNodeNum = 111;
+    thisChillerHeater.HeatReturnNodeNum = 222;
+    thisChillerHeater.CondReturnNodeNum = 333;
+
+    PlantLocation loc_1 = PlantLocation(1, 1, 1, 1);
+    Real64 maxload(-1.0);
+    Real64 minload(-1.0);
+    Real64 optload(-1.0);
+
+    thisChillerHeater.NomCoolingCap = 100000.0;
+    thisChillerHeater.MinPartLoadRat = 0.1;
+    thisChillerHeater.MaxPartLoadRat = 0.9;
+    thisChillerHeater.OptPartLoadRat = 0.8;
+
+    // Chiller
+    thisChillerHeater.getDesignCapacities(*state, loc_1, maxload, minload, optload);
+
+    EXPECT_NEAR(minload, 10000.0, 0.001);
+    EXPECT_NEAR(maxload, 90000.0, 0.001);
+    EXPECT_NEAR(optload, 80000.0, 0.001);
+
+    thisChillerHeater.NomHeatCoolRatio = 0.9;
+    PlantLocation loc_2 = PlantLocation(2, 1, 1, 1);
+
+    // Heater
+    thisChillerHeater.getDesignCapacities(*state, loc_2, maxload, minload, optload);
+
+    EXPECT_NEAR(minload, 9000.0, 0.001);
+    EXPECT_NEAR(maxload, 81000.0, 0.001);
+    EXPECT_NEAR(optload, 72000.0, 0.001);
+
+    PlantLocation loc_3 = PlantLocation(3, 1, 1, 1);
+
+    // Condenser
+    thisChillerHeater.getDesignCapacities(*state, loc_3, maxload, minload, optload);
+
+    EXPECT_NEAR(minload, 0.0, 0.001);
+    EXPECT_NEAR(maxload, 0.0, 0.001);
+    EXPECT_NEAR(optload, 0.0, 0.001);
 }

@@ -607,7 +607,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     CWCoil.WaterLoopBranchNum = 1;
     CWCoil.WaterLoopCompNum = 1;
     // electric heating coil
-    auto &eHCoil(HeatingCoils::HeatingCoil(1));
+    auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
     state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
     state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 

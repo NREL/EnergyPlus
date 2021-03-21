@@ -189,6 +189,15 @@ namespace EnergyPlus::DataPlant {
         DualOp,    // Constant for Cooling or Heating Operation
     };
 
+    // branch loop type for absorption chillerheater models
+    enum class BrLoopType
+    {
+        Chiller,
+        Heater,
+        Condenser,
+        NoMatch
+    };
+
     } // namespace EnergyPlus
 
 #endif

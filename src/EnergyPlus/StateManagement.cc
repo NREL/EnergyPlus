@@ -57,10 +57,8 @@
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -75,7 +73,6 @@
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
@@ -100,10 +97,8 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     AirflowNetwork::clear_state();
     DataIPShortCuts::clear_state();
     DataOutputs::clear_state();
-    DataPhotovoltaics::clear_state();
     DataViewFactorInformation::clear_state();
     DesiccantDehumidifiers::clear_state();
-    DualDuct::clear_state();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeFluidCoolers::clear_state();
     FluidProperties::clear_state();
@@ -111,7 +106,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
     HeatBalFiniteDiffManager::clear_state();
-    HeatingCoils::clear_state();
     Humidifiers::clear_state();
     HVACCooledBeam::clear_state();
     HVACDuct::clear_state();

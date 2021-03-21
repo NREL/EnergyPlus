@@ -804,20 +804,21 @@ namespace FaultsManager {
                     UtilityRoutines::SameString(SELECT_CASE_VAR, "Coil:Heating:Fuel") ||
                     UtilityRoutines::SameString(SELECT_CASE_VAR, "Coil:Heating:Desuperheater")) {
                     // Read in coil input if not done yet
-                    if (HeatingCoils::GetCoilsInputFlag) {
+                    if (state.dataHeatingCoils->GetCoilsInputFlag) {
                         HeatingCoils::GetHeatingCoilInput(state);
-                        HeatingCoils::GetCoilsInputFlag = false;
+                        state.dataHeatingCoils->GetCoilsInputFlag = false;
                     }
                     // Check the coil name and coil type
-                    int CoilNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName, HeatingCoils::HeatingCoil);
+                    int CoilNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
+                                                                  state.dataHeatingCoils->HeatingCoil);
                     if (CoilNum <= 0) {
                         ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
                         // Link the coil with the fault model
-                        HeatingCoils::HeatingCoil(CoilNum).FaultyCoilSATFlag = true;
-                        HeatingCoils::HeatingCoil(CoilNum).FaultyCoilSATIndex = jFault_CoilSAT;
+                        state.dataHeatingCoils->HeatingCoil(CoilNum).FaultyCoilSATFlag = true;
+                        state.dataHeatingCoils->HeatingCoil(CoilNum).FaultyCoilSATIndex = jFault_CoilSAT;
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Coil:Heating:Steam")) {

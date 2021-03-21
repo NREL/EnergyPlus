@@ -191,7 +191,6 @@ set(SRC
     DataMoistureBalanceEMPD.hh
     DataOutputs.cc
     DataOutputs.hh
-    DataPhotovoltaics.cc
     DataPhotovoltaics.hh
     DataPrecisionGlobals.hh
     DataReportingFlags.hh
