@@ -66,7 +66,7 @@ var_info vtab_battery_stateful_inputs[] = {
         { SSC_INPUT,        SSC_NUMBER,      "Cp",                                         "Battery specific heat capacity",                          "J/KgK",    "",                     "ParamsPack",       "*",                           "",                             "" },
         { SSC_INPUT,        SSC_NUMBER,      "h",                                          "Heat transfer between battery and environment",           "W/m2K",    "",                     "ParamsPack",       "*",                           "",                             "" },
         { SSC_INPUT,        SSC_NUMBER,      "T_room_init",                                "Temperature of storage room",                             "C",        "",                     "ParamsPack",       "*",                           "",                             "" },
-        { SSC_INPUT,        SSC_MATRIX,      "cap_vs_temp",                                "Table with Temperature and Capacity % as columns",        "[[C,%]]",  "",                     "ParamsPack",       "*",                           "",                             "" },
+        { SSC_INPUT,        SSC_MATRIX,      "cap_vs_temp",                                "Table with Temperature and Capacity % as columns",        "[[C,%]]",  "",                     "ParamsPack",       "life_model=0",                "",                             "" },
 
         // lifetime inputs
         { SSC_INPUT,		SSC_NUMBER,      "life_model",                                 "Battery life model specifier",                            "0/1",      "0=calendar/cycle,1=NMC", "ParamsCell",       "*",                                   "",                             "" },
@@ -156,13 +156,13 @@ var_info vtab_battery_state[] = {
 
 void write_battery_state(const battery_state& state, var_table* vt) {
     vt->assign_match_case("last_idx", (int)state.last_idx);
+    vt->assign_match_case("V", state.V);
+    vt->assign_match_case("Q", state.Q);
+    vt->assign_match_case("Q_max", state.Q_max);
     vt->assign_match_case("I", state.I);
     vt->assign_match_case("I_dischargeable", state.I_dischargeable);
     vt->assign_match_case("I_chargeable", state.I_chargeable);
-    vt->assign_match_case("V", state.V);
     vt->assign_match_case("P", state.P);
-    vt->assign_match_case("Q", state.Q);
-    vt->assign_match_case("Q_max", state.Q_max);
     vt->assign_match_case("P_dischargeable", state.P_dischargeable);
     vt->assign_match_case("P_chargeable", state.P_chargeable);
 
@@ -204,19 +204,30 @@ void write_battery_state(const battery_state& state, var_table* vt) {
     vt->assign_match_case("day_age_of_battery", lifetime->day_age_of_battery);
 
     vt_get_int(vt, "life_model", &choice);
+    vt->assign_match_case("q_relative_cycle", lifetime->cycle->q_relative_cycle);
+    if (!lifetime->cycle->rainflow_peaks.empty()) {
+        vt->assign_match_case("rainflow_peaks", lifetime->cycle->rainflow_peaks);
+    }
+    vt->assign_match_case("rainflow_Xlt", lifetime->cycle->rainflow_Xlt);
+    vt->assign_match_case("rainflow_Ylt", lifetime->cycle->rainflow_Ylt);
+    vt->assign_match_case("rainflow_jlt", lifetime->cycle->rainflow_jlt);
     if (choice == lifetime_params::CALCYC) {
-        vt->assign_match_case("q_relative_cycle", lifetime->cycle->q_relative_cycle);
-        vt->assign_match_case("rainflow_Xlt", lifetime->cycle->rainflow_Xlt);
-        vt->assign_match_case("rainflow_Ylt", lifetime->cycle->rainflow_Ylt);
-        vt->assign_match_case("rainflow_jlt", lifetime->cycle->rainflow_jlt);
-        if (!lifetime->cycle->rainflow_peaks.empty()) {
-            vt->assign_match_case("rainflow_peaks", lifetime->cycle->rainflow_peaks);
-        }
         vt->assign_match_case("q_relative_calendar", lifetime->calendar->q_relative_calendar);
         vt->assign_match_case("dq_relative_calendar_old", lifetime->calendar->dq_relative_calendar_old);
     }
-    else {
-
+    else if (choice == lifetime_params::NMCNREL) {
+        vt->assign_match_case("q_relative_li", lifetime->nmc_li_neg->q_relative_li);
+        vt->assign_match_case("q_relative_neg", lifetime->nmc_li_neg->q_relative_neg);
+        vt->assign_match_case("dq_relative_li_old", lifetime->nmc_li_neg->dq_relative_li_old);
+        vt->assign_match_case("dq_relative_neg_old", lifetime->nmc_li_neg->dq_relative_neg_old);
+        vt->assign_match_case("DOD_max", lifetime->nmc_li_neg->DOD_max);
+        vt->assign_match_case("n_cycles_prev_day", lifetime->nmc_li_neg->n_cycles_prev_day);
+        vt->assign_match_case("cum_dt", lifetime->nmc_li_neg->cum_dt);
+        vt->assign_match_case("b1_dt", lifetime->nmc_li_neg->b1_dt);
+        vt->assign_match_case("b2_dt", lifetime->nmc_li_neg->b2_dt);
+        vt->assign_match_case("b3_dt", lifetime->nmc_li_neg->b3_dt);
+        vt->assign_match_case("c0_dt", lifetime->nmc_li_neg->c0_dt);
+        vt->assign_match_case("c2_dt", lifetime->nmc_li_neg->c2_dt);
     }
 
     vt->assign_match_case("loss_kw", state.losses->loss_kw);
@@ -276,20 +287,31 @@ void read_battery_state(battery_state& state, var_table* vt) {
     vt_get_number(vt, "day_age_of_battery", &lifetime->day_age_of_battery);
 
     vt_get_int(vt, "life_model", &choice);
+    vt_get_number(vt, "rainflow_Xlt", &lifetime->cycle->rainflow_Xlt);
+    vt_get_number(vt, "rainflow_Ylt", &lifetime->cycle->rainflow_Ylt);
+    vt_get_int(vt, "rainflow_jlt", &lifetime->cycle->rainflow_jlt);
+    if (vt->is_assigned("rainflow_peaks"))
+    {
+        // If not assigned, leave empty
+        vt_get_array_vec(vt, "rainflow_peaks", lifetime->cycle->rainflow_peaks);
+    }
     if (choice == lifetime_params::CALCYC) {
-        vt_get_number(vt, "rainflow_Xlt", &lifetime->cycle->rainflow_Xlt);
-        vt_get_number(vt, "rainflow_Ylt", &lifetime->cycle->rainflow_Ylt);
-        vt_get_int(vt, "rainflow_jlt", &lifetime->cycle->rainflow_jlt);
-        if (vt->is_assigned("rainflow_peaks"))
-        {
-            vt_get_array_vec(vt, "rainflow_peaks", lifetime->cycle->rainflow_peaks);
-            // If not assigned, leave empty
-        }
         vt_get_number(vt, "q_relative_calendar", &lifetime->calendar->q_relative_calendar);
         vt_get_number(vt, "dq_relative_calendar_old", &lifetime->calendar->dq_relative_calendar_old);
     }
     else {
-
+        vt_get_number(vt, "q_relative_li", &lifetime->nmc_li_neg->q_relative_li);
+        vt_get_number(vt, "q_relative_neg", &lifetime->nmc_li_neg->q_relative_neg);
+        vt_get_number(vt, "dq_relative_li_old", &lifetime->nmc_li_neg->dq_relative_li_old);
+        vt_get_number(vt, "dq_relative_neg_old", &lifetime->nmc_li_neg->dq_relative_neg_old);
+        vt_get_number(vt, "DOD_max", &lifetime->nmc_li_neg->DOD_max);
+        vt_get_int(vt, "n_cycles_prev_day", &lifetime->nmc_li_neg->n_cycles_prev_day);
+        vt_get_number(vt, "cum_dt", &lifetime->nmc_li_neg->cum_dt);
+        vt_get_number(vt, "b1_dt", &lifetime->nmc_li_neg->b1_dt);
+        vt_get_number(vt, "b2_dt", &lifetime->nmc_li_neg->b2_dt);
+        vt_get_number(vt, "b3_dt", &lifetime->nmc_li_neg->b3_dt);
+        vt_get_number(vt, "c0_dt", &lifetime->nmc_li_neg->c0_dt);
+        vt_get_number(vt, "c2_dt", &lifetime->nmc_li_neg->c2_dt);
     }
 
     vt_get_number(vt, "loss_kw", &state.losses->loss_kw);
@@ -361,8 +383,10 @@ std::shared_ptr<battery_params> create_battery_params(var_table *vt, double dt_h
 
     // lifetime
     auto lifetime = params->lifetime;
+    vt_get_number(vt, "dt_hr", &lifetime->dt_hr);
     vt_get_int(vt, "life_model", &choice);
     lifetime->model_choice = static_cast<lifetime_params::MODEL_CHOICE>(choice);
+
     if (lifetime->model_choice == lifetime_params::CALCYC) {
         vt_get_int(vt, "calendar_choice", &choice);
         lifetime->cal_cyc->calendar_choice = static_cast<calendar_cycle_params::CALENDAR_CHOICE>(choice);
@@ -378,6 +402,10 @@ std::shared_ptr<battery_params> create_battery_params(var_table *vt, double dt_h
             vt_get_matrix(vt, "calendar_matrix", lifetime->cal_cyc->calendar_matrix);
         }
     }
+    else if (lifetime->model_choice == lifetime_params::NMCNREL) {
+        if (chem != battery_params::LITHIUM_ION)
+            throw exec_error("battery_stateful", "NMC life model (life_model=1) can only be used with Li-Ion chemistries (batt_chem=1).");
+    }
 
     // thermal
     auto thermal = params->thermal;
@@ -389,7 +417,13 @@ std::shared_ptr<battery_params> create_battery_params(var_table *vt, double dt_h
     vt_get_number(vt, "Cp", &thermal->Cp);
     vt_get_number(vt, "h", &thermal->h);
     vt_get_number(vt, "T_room_init", &thermal->T_room_init);
-    vt_get_matrix(vt, "cap_vs_temp", thermal->cap_vs_temp);
+    if (lifetime->model_choice == lifetime_params::CALCYC) {
+        vt_get_matrix(vt, "cap_vs_temp", thermal->cap_vs_temp);
+        thermal->en_cap_vs_temp = true;
+    }
+    else {
+        thermal->en_cap_vs_temp = false;
+    }
 
     // losses
     auto losses = params->losses;

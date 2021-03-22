@@ -254,7 +254,7 @@ namespace IceThermalStorage {
 
         void UpdateDetailedIceStorage(EnergyPlusData &state);
 
-        void ReportDetailedIceStorage();
+        void ReportDetailedIceStorage(EnergyPlusData &state);
 
         void setupOutputVars(EnergyPlusData &state);
     };

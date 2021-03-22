@@ -93,8 +93,8 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataScheduleMgr->Schedule.allocate(1);
 
-    MSHPMassFlowRateLow = 0.0;
-    MSHPMassFlowRateHigh = 0.0;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = 0.0;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = 0.0;
 
     state->dataFurnaces->Furnace.allocate(1);
 
@@ -155,8 +155,8 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->HeatingLoad = true;
     state->dataFurnaces->CoolingLoad = false;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.25, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(0.25, MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
     EXPECT_DOUBLE_EQ(0.25, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
@@ -167,8 +167,8 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->HeatingLoad = true;
     state->dataFurnaces->CoolingLoad = false;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.5, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(0.5, MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(0.5, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(0.5, state->dataHVACGlobal->MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
     EXPECT_DOUBLE_EQ(0.5, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
@@ -179,8 +179,8 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->HeatingLoad = true;
     state->dataFurnaces->CoolingLoad = false;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(1.0, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(1.0, MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(1.0, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(1.0, state->dataHVACGlobal->MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
     EXPECT_DOUBLE_EQ(1.0, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
@@ -191,8 +191,8 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->HeatingLoad = false;
     state->dataFurnaces->CoolingLoad = true;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.3, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(0.3, MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
     EXPECT_DOUBLE_EQ(0.3, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
@@ -203,8 +203,8 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->HeatingLoad = false;
     state->dataFurnaces->CoolingLoad = true;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.6, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(0.6, MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(0.6, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(0.6, state->dataHVACGlobal->MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
     EXPECT_DOUBLE_EQ(0.6, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
@@ -215,8 +215,8 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->HeatingLoad = false;
     state->dataFurnaces->CoolingLoad = true;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(1.2, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(1.2, MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(1.2, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(1.2, state->dataHVACGlobal->MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
     EXPECT_DOUBLE_EQ(1.2, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
@@ -230,8 +230,8 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->HeatingLoad = true;
     state->dataFurnaces->CoolingLoad = false;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_EQ(0.0, MSHPMassFlowRateLow);
-    EXPECT_EQ(0.0, MSHPMassFlowRateHigh);
+    EXPECT_EQ(0.0, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_EQ(0.0, state->dataHVACGlobal->MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.2, state->dataFurnaces->CompOffMassFlow);
     EXPECT_DOUBLE_EQ(0.5, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);

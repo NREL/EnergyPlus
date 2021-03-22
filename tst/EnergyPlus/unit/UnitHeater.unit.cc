@@ -1334,8 +1334,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataGlobal->DoingSizing = true;
 
-    ZoneCompTurnFansOn = true;
-    ZoneCompTurnFansOff = false;
+    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
@@ -2426,15 +2426,15 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     // first priority zone equipment is zone ADU
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipType, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipName, "MAIN ZONE ATU");
-    EXPECT_EQ(HeatingCoils::HeatingCoil(1).Name, "MAIN ZONE REHEAT COIL");
+    EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(1).Name, "MAIN ZONE REHEAT COIL");
     // second priority zone equipment is unit heater
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(2).EquipType, "ZONEHVAC:UNITHEATER");
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(2).EquipName, "UNITHEATER");
-    EXPECT_EQ(HeatingCoils::HeatingCoil(2).Name, "UNITHEATER_ELECTRICHEATER");
+    EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(2).Name, "UNITHEATER_ELECTRICHEATER");
     // check the reheat coil output
-    EXPECT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 7028.9, 1.0);
+    EXPECT_NEAR(state->dataHeatingCoils->HeatingCoil(1).HeatingCoilRate, 7028.9, 1.0);
     // check the unit heater heating coil output
-    EXPECT_EQ(HeatingCoils::HeatingCoil(2).HeatingCoilRate, 0.0);
+    EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(2).HeatingCoilRate, 0.0);
 
     // re-set the hour of the day
     state->dataGlobal->TimeStep = 1;
@@ -2456,11 +2456,11 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     // re-simulate the zone HVAC equipment per the priority order
     ZoneEquipmentManager::ManageZoneEquipment(*state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
     // check the reheat coil nominal capacity
-    EXPECT_NEAR(HeatingCoils::HeatingCoil(1).NominalCapacity, 17542.3, 1.0);
+    EXPECT_NEAR(state->dataHeatingCoils->HeatingCoil(1).NominalCapacity, 17542.3, 1.0);
     // check the reheat coil outputis the full capacity
-    EXPECT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 17542.3, 1.0);
+    EXPECT_NEAR(state->dataHeatingCoils->HeatingCoil(1).HeatingCoilRate, 17542.3, 1.0);
     // check the unit heater heating coil is handling the remaining load
-    EXPECT_NEAR(HeatingCoils::HeatingCoil(2).HeatingCoilRate, 213.9, 1.0);
+    EXPECT_NEAR(state->dataHeatingCoils->HeatingCoil(2).HeatingCoilRate, 213.9, 1.0);
     // finaly check that RemaingingOutputRequired is zero
     EXPECT_EQ(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired, 0.0);
 }

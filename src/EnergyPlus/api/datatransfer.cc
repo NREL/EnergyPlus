@@ -669,9 +669,9 @@ int hour(EnergyPlusState state) {
 
 Real64 currentTime(EnergyPlusState state) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    if (EnergyPlus::DataHVACGlobals::TimeStepSys < thisState->dataGlobal->TimeStepZone) {
+    if (thisState->dataHVACGlobal->TimeStepSys < thisState->dataGlobal->TimeStepZone) {
         // CurrentTime is for end of zone timestep, need to move back to beginning of current zone timestep, then add on system time elapsed already plus current system timestep
-        return thisState->dataGlobal->CurrentTime - thisState->dataGlobal->TimeStepZone + EnergyPlus::DataHVACGlobals::SysTimeElapsed + EnergyPlus::DataHVACGlobals::TimeStepSys;
+        return thisState->dataGlobal->CurrentTime - thisState->dataGlobal->TimeStepZone + thisState->dataHVACGlobal->SysTimeElapsed + thisState->dataHVACGlobal->TimeStepSys;
     } else {
         return thisState->dataGlobal->CurrentTime;
     }
@@ -736,8 +736,9 @@ Real64 zoneTimeStep(EnergyPlusState state) {
     return thisState->dataGlobal->TimeStepZone;
 }
 
-Real64 systemTimeStep(EnergyPlusState) {
-    return EnergyPlus::DataHVACGlobals::TimeStepSys;
+Real64 systemTimeStep(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataHVACGlobal->TimeStepSys;
 }
 
 int currentEnvironmentNum(EnergyPlusState state) {

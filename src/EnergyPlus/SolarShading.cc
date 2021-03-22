@@ -2941,7 +2941,7 @@ namespace EnergyPlus::SolarShading {
                                 AbsDiffTotWin += state.dataConstruction->Construct(ConstrNum).AbsDiffBack(Lay);
                             }
                         } else {
-                            for (Lay = 1; Lay <= CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).NL; ++Lay) {
+                            for (Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).NL; ++Lay) {
                                 AbsDiffTotWin += state.dataConstruction->Construct(ConstrNum).AbsDiffBackEQL(Lay);
                             }
                         }
@@ -2985,7 +2985,7 @@ namespace EnergyPlus::SolarShading {
                                     AbsDiffTotWin += state.dataConstruction->Construct(ConstrNum).AbsDiffBack(Lay);
                                 }
                             } else {
-                                for (Lay = 1; Lay <= CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).NL; ++Lay) {
+                                for (Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).NL; ++Lay) {
                                     AbsDiffTotWin += state.dataConstruction->Construct(ConstrNum).AbsDiffBackEQL(Lay);
                                 }
                             }
@@ -6305,7 +6305,7 @@ namespace EnergyPlus::SolarShading {
                         // determine the beam radiation absorptance and tranmittance of the
                         // the equivalent layer window model
                         WindowEquivalentLayer::CalcEQLOpticalProperty(state, SurfNum, isBEAM, AbsSolBeamEQL);
-
+                        auto & CFS = state.dataWindowEquivLayer->CFS;
                         // recalcuate the diffuse absorptance and transmittance of the
                         // the equivalent layer window model if there is shade control
                         int EQLNum = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).EQLConsPtr; // equivalent layer fenestration index
@@ -6319,13 +6319,13 @@ namespace EnergyPlus::SolarShading {
                         for (int Lay = 1; Lay <= CFS(EQLNum).NL + 1; ++Lay) {
                             // Factor for front beam radiation absorbed for equivalent layer window model
                             Real64 AbWinEQL = AbsSolBeamEQL(1, Lay) * CosInc * SunLitFract * state.dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(state.dataGlobal->HourOfDay);;
-                            if (CFS(EQLNum).L(1).LTYPE != ltyGLAZE) {
+                            if (CFS(EQLNum).L(1).LTYPE != LayerType::ltyGLAZE) {
                                 // if the first layer is not glazing (or it is a shade) do not
                                 state.dataSurface->SurfWinA(Lay, SurfNum) = AbWinEQL;
                             } else {
                                 // the first layer is a glazing, include the outside reveal reflection
                                 // and the inside reveal reflection until indoor shade layer is encountered.
-                                if (CFS(EQLNum).L(Lay).LTYPE == ltyGLAZE) {
+                                if (CFS(EQLNum).L(Lay).LTYPE == LayerType::ltyGLAZE) {
                                     state.dataSurface->SurfWinA(Lay, SurfNum) = AbWinEQL + state.dataSurface->SurfWinOutsRevealDiffOntoGlazing(SurfNum) * AbsSolBeamEQL(1, Lay) +
                                                              state.dataSurface->SurfWinInsRevealDiffOntoGlazing(SurfNum) * AbsSolDiffEQL(2, Lay);
                                 } else {
@@ -6432,9 +6432,9 @@ namespace EnergyPlus::SolarShading {
                     } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
                         // get ASHWAT fenestration model beam-beam and beam-diffuse properties
                         int EQLNum = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).EQLConsPtr; // equivalent layer fenestration index
-                        Real64 TBmBmEQL = AbsSolBeamEQL(1, CFS(EQLNum).NL + 1);
+                        Real64 TBmBmEQL = AbsSolBeamEQL(1, state.dataWindowEquivLayer->CFS(EQLNum).NL + 1);
                         // Beam-diffuse transmittance
-                        Real64 TBmDiffEQL = max(0.0, AbsSolBeamEQL(2, CFS(EQLNum).NL + 1));
+                        Real64 TBmDiffEQL = max(0.0, AbsSolBeamEQL(2, state.dataWindowEquivLayer->CFS(EQLNum).NL + 1));
                         // Beam-beam transmittance: difference between beam-total and beam-diffuse transmittance
                         TBmBmEQL = max(0.0, (TBmBmEQL - TBmDiffEQL));
                         TBmBm = TBmBmEQL;
@@ -7348,19 +7348,19 @@ namespace EnergyPlus::SolarShading {
 
                                     // call the ASHWAT fenestration model for beam radiation here
                                     WindowEquivalentLayer::CalcEQLOpticalProperty(state, BackSurfNum, isBEAM, AbsSolBeamBackEQL);
-
+                                    auto & CFS = state.dataWindowEquivLayer->CFS;
                                     int EQLNum = state.dataConstruction->Construct(ConstrNumBack).EQLConsPtr;
                                     AbsBeamWinEQL({ 1, CFS(EQLNum).NL }) = AbsSolBeamBackEQL(1, { 1, CFS(EQLNum).NL });
                                     // get the interior beam transmitted through back exterior or interior EQL window
                                     TransBeamWin = AbsSolBeamBackEQL(1, CFS(EQLNum).NL + 1);
                                     //   Absorbed by the interior shade layer of back exterior window
-                                    if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
+                                    if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != LayerType::ltyGLAZE) {
                                         IntBeamAbsByShadFac(BackSurfNum) = BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL) /
                                                                            (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
                                         BABSZone += BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL);
                                     }
                                     //   Absorbed by the exterior shade layer of back exterior window
-                                    if (CFS(EQLNum).L(1).LTYPE != ltyGLAZE) {
+                                    if (CFS(EQLNum).L(1).LTYPE != LayerType::ltyGLAZE) {
                                         IntBeamAbsByShadFac(BackSurfNum) =
                                                 BOverlap * AbsSolBeamBackEQL(1, 1) / (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
                                         BABSZone += BOverlap * AbsSolBeamBackEQL(1, 1);
@@ -7369,13 +7369,13 @@ namespace EnergyPlus::SolarShading {
                                     // determine the number of glass layers
                                     NBackGlass = 0;
                                     for (int Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
-                                        if (CFS(EQLNum).L(Lay).LTYPE != ltyGLAZE) continue;
+                                        if (CFS(EQLNum).L(Lay).LTYPE != LayerType::ltyGLAZE) continue;
                                         ++NBackGlass;
                                     }
                                     if (NBackGlass >= 2) {
                                         // If the number of glass is greater than 2, in between glass shade can be present
                                         for (int Lay = 2; Lay <= CFS(EQLNum).NL - 1; ++Lay) {
-                                            if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
+                                            if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != LayerType::ltyGLAZE) {
                                                 // if there is in between shade glass determine the shade absorptance
                                                 IntBeamAbsByShadFac(BackSurfNum) += BOverlap * AbsSolBeamBackEQL(1, Lay) / state.dataSurface->Surface(BackSurfNum).Area;
                                                 BABSZone += BOverlap * AbsSolBeamBackEQL(1, Lay);
@@ -8616,7 +8616,6 @@ namespace EnergyPlus::SolarShading {
         // na
 
         // Using/Aliasing
-        using DataWindowEquivalentLayer::CFS;
         using General::POLYF;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -8636,9 +8635,9 @@ namespace EnergyPlus::SolarShading {
                 state.dataSurface->SurfWinFracTimeShadingDeviceOn(ISurf) = 0.0;
                 if (state.dataSurface->SurfWinWindowModelType(ISurf) == WindowEQLModel) {
                     int EQLNum = state.dataConstruction->Construct(state.dataSurface->Surface(ISurf).Construction).EQLConsPtr;
-                    if (CFS(EQLNum).VBLayerPtr > 0) {
-                        if (CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL == state.dataWindowEquivalentLayer->lscNONE) {
-                            state.dataSurface->SurfWinSlatAngThisTSDeg(ISurf) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
+                    if (state.dataWindowEquivLayer->CFS(EQLNum).VBLayerPtr > 0) {
+                        if (state.dataWindowEquivLayer->CFS(EQLNum).L(state.dataWindowEquivLayer->CFS(EQLNum).VBLayerPtr).CNTRL == state.dataWindowEquivalentLayer->lscNONE) {
+                            state.dataSurface->SurfWinSlatAngThisTSDeg(ISurf) = state.dataWindowEquivLayer->CFS(EQLNum).L(state.dataWindowEquivLayer->CFS(EQLNum).VBLayerPtr).PHI_DEG;
                         } else {
                             state.dataSurface->SurfWinSlatAngThisTSDeg(ISurf) = 0.0;
                         }
@@ -11007,7 +11006,7 @@ namespace EnergyPlus::SolarShading {
                             WindowEquivalentLayer::CalcEQLOpticalProperty(state, HeatTransSurfNum, isDIFF, AbsSolDiffBackEQL);
 
                             EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
-                            for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
+                            for (Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(EQLNum).NL; ++Lay) {
 
                                 // Calc diffuse solar absorbed from the inside by each layer of EQL model [W]
                                 // WinDifSolLayAbsW = WinDifSolar(DifTransSurfNum)* ViewFactor * Construct(ConstrNum)%AbsDiffBack(Lay)
@@ -11060,7 +11059,7 @@ namespace EnergyPlus::SolarShading {
                                 // transmitted through this interior window to adjacent zone [W]
                                 // Transmitted diffuse solar [W] = current exterior window transmitted diffuse solar
                                 //    * view factor from current (sending) window DifTransSurfNum to current (receiving) surface HeatTransSurfNum
-                                DifSolarTransW = AbsSolDiffBackEQL(2, CFS(EQLNum).NL + 1) * ViewFactor;
+                                DifSolarTransW = AbsSolDiffBackEQL(2, state.dataWindowEquivLayer->CFS(EQLNum).NL + 1) * ViewFactor;
                                 //int AdjConstrNum = Surface(AdjSurfNum).Construction;
                                 // Get the adjacent zone index
                                 int adjEnclosureNum = state.dataSurface->Surface(AdjSurfNum).SolarEnclIndex;
@@ -11072,7 +11071,7 @@ namespace EnergyPlus::SolarShading {
                                 // Calc transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
                                 // This is not very effective since it assigns whatever distributed diffuse solar has not been
                                 // absorbed or reflected to transmitted.
-                                DifSolarTransW = AbsSolDiffBackEQL(2, CFS(EQLNum).NL + 1) * ViewFactor;
+                                DifSolarTransW = AbsSolDiffBackEQL(2, state.dataWindowEquivLayer->CFS(EQLNum).NL + 1) * ViewFactor;
 
                             } // this is an interior window surface
 

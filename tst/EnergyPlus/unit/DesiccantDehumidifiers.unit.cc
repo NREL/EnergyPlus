@@ -2840,12 +2840,12 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     RegCoilInletAirMassFlowRate = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
-    for (loop = 1; loop <= NumHeatingCoils; ++loop) {
-        if (HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+    for (loop = 1; loop <= state->dataHeatingCoils->NumHeatingCoils; ++loop) {
+        if (state->dataHeatingCoils->HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
-    EXPECT_EQ(RegCoilCapacity, HeatingCoil(CoilIndex).NominalCapacity);
+    EXPECT_EQ(RegCoilCapacity, state->dataHeatingCoils->HeatingCoil(CoilIndex).NominalCapacity);
 }
 
 TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
@@ -4020,12 +4020,12 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     RegCoilInletAirMassFlowRate = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
-    for (loop = 1; loop <= NumHeatingCoils; ++loop) {
-        if (HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+    for (loop = 1; loop <= state->dataHeatingCoils->NumHeatingCoils; ++loop) {
+        if (state->dataHeatingCoils->HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
-    EXPECT_EQ(RegCoilCapacity, HeatingCoil(CoilIndex).NominalCapacity);
+    EXPECT_EQ(RegCoilCapacity, state->dataHeatingCoils->HeatingCoil(CoilIndex).NominalCapacity);
 }
 
 TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
@@ -6685,11 +6685,11 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     RegCoilInletAirMassFlowRate = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
-    for (loop = 1; loop <= NumHeatingCoils; ++loop) {
-        if (HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+    for (loop = 1; loop <= state->dataHeatingCoils->NumHeatingCoils; ++loop) {
+        if (state->dataHeatingCoils->HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
-    EXPECT_EQ(RegCoilCapacity, HeatingCoil(CoilIndex).NominalCapacity);
+    EXPECT_EQ(RegCoilCapacity, state->dataHeatingCoils->HeatingCoil(CoilIndex).NominalCapacity);
 }
 } // namespace EnergyPlus

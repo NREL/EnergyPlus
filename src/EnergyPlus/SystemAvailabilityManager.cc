@@ -155,7 +155,7 @@ namespace SystemAvailabilityManager {
 
         InitSysAvailManagers(state);
 
-        for (PriAirSysNum = 1; PriAirSysNum <= NumPrimaryAirSys; ++PriAirSysNum) { // loop over the primary air systems
+        for (PriAirSysNum = 1; PriAirSysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++PriAirSysNum) { // loop over the primary air systems
 
             PreviousStatus = state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus; // Save the previous status for differential thermostat
             state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus = NoAction;       // initialize the availability to "take no action"
@@ -182,8 +182,8 @@ namespace SystemAvailabilityManager {
             } // end of availability manager loop
 
             // Add hybrid ventilation control
-            if (NumHybridVentSysAvailMgrs > 0) {
-                for (HybridVentNum = 1; HybridVentNum <= NumHybridVentSysAvailMgrs; ++HybridVentNum) {
+            if (state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0) {
+                for (HybridVentNum = 1; HybridVentNum <= state.dataHVACGlobal->NumHybridVentSysAvailMgrs; ++HybridVentNum) {
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum).AirLoopNum == PriAirSysNum &&
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum).VentilationCtrl == state.dataSystemAvailabilityManager->HybridVentCtrl_Open) {
                         state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus = ForceOff; // Force the system off
@@ -200,7 +200,7 @@ namespace SystemAvailabilityManager {
 
         } // end of primary air system loop
 
-        for (PlantNum = 1; PlantNum <= NumPlantLoops; ++PlantNum) {
+        for (PlantNum = 1; PlantNum <= state.dataHVACGlobal->NumPlantLoops; ++PlantNum) {
 
             PreviousStatus = state.dataPlnt->PlantAvailMgr(PlantNum).AvailStatus; // Save the previous status for differential thermostat
             state.dataPlnt->PlantAvailMgr(PlantNum).AvailStatus = NoAction;       // Initialize the availability to "take no action"
@@ -225,6 +225,7 @@ namespace SystemAvailabilityManager {
 
         } // end of plant loop
 
+        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents;
              ++ZoneEquipType) { // loop over the zone equipment types which allow system avail managers
             if (allocated(ZoneComp)) {
@@ -263,8 +264,8 @@ namespace SystemAvailabilityManager {
                             ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailStatus = NoAction;
                         }
                         if (ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).ZoneNum > 0) {
-                            if (NumHybridVentSysAvailMgrs > 0) {
-                                for (HybridVentNum = 1; HybridVentNum <= NumHybridVentSysAvailMgrs; ++HybridVentNum) {
+                            if (state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0) {
+                                for (HybridVentNum = 1; HybridVentNum <= state.dataHVACGlobal->NumHybridVentSysAvailMgrs; ++HybridVentNum) {
                                     if (!state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum).HybridVentMgrConnectedToAirLoop) {
                                         if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum).ActualZoneNum ==
                                             ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).ZoneNum) {
@@ -383,16 +384,16 @@ namespace SystemAvailabilityManager {
         rNumericArgs.dimension(maxNumbers, 0.0);
         lNumericFieldBlanks.dimension(maxNumbers, false);
 
-        if (!allocated(ZoneComp)) {
-            ZoneComp.allocate(NumValidSysAvailZoneComponents);
+        if (!allocated(state.dataHVACGlobal->ZoneComp)) {
+            state.dataHVACGlobal->ZoneComp.allocate(NumValidSysAvailZoneComponents);
         }
 
         for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
-            if (!allocated(ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)) {
+            if (!allocated(state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)) {
                 TotalNumComp = inputProcessor->getNumObjectsFound(state, cValidSysAvailManagerCompTypes(ZoneEquipType));
-                ZoneComp(ZoneEquipType).TotalNumComp = TotalNumComp;
+                state.dataHVACGlobal->ZoneComp(ZoneEquipType).TotalNumComp = TotalNumComp;
                 if (TotalNumComp > 0) {
-                    ZoneComp(ZoneEquipType).ZoneCompAvailMgrs.allocate(TotalNumComp);
+                    state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs.allocate(TotalNumComp);
                 }
             }
         }
@@ -1494,6 +1495,8 @@ namespace SystemAvailabilityManager {
         int Num;
         int CompNumAvailManagers; // Number of availability managers associated with a ZoneHVAC:* component
 
+        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
+
         if (state.dataSystemAvailabilityManager->GetAvailListsInput) {
             GetSysAvailManagerListInputs(state);
             state.dataSystemAvailabilityManager->GetAvailListsInput = false;
@@ -1671,9 +1674,9 @@ namespace SystemAvailabilityManager {
         }
         //  HybridVentSysAvailMgrData%AvailStatus= NoAction
         for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) { // loop over the zone equipment types
-            if (allocated(ZoneComp)) {
-                if (ZoneComp(ZoneEquipType).TotalNumComp > 0)
-                    for (auto &e : ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)
+            if (allocated(state.dataHVACGlobal->ZoneComp)) {
+                if (state.dataHVACGlobal->ZoneComp(ZoneEquipType).TotalNumComp > 0)
+                    for (auto &e : state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)
                         e.AvailStatus = NoAction;
             }
         }
@@ -1945,6 +1948,7 @@ namespace SystemAvailabilityManager {
         static Array1D_bool ZoneCompNCControlType;
         int CyclingRunTimeControlType;
 
+        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         if (present(ZoneEquipType)) {
             if (state.dataGlobal->WarmupFlag && state.dataGlobal->BeginDayFlag) {
                 // reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
@@ -2361,6 +2365,8 @@ namespace SystemAvailabilityManager {
             ATGUpdateTemp1 = OptStartMgr.ATGUpdateTemp1;
             ATGUpdateTemp2 = OptStartMgr.ATGUpdateTemp2;
         }
+
+        auto &OptStartData = state.dataHVACGlobal->OptStartData;
 
         // add or use a new variable OptStartSysAvailMgrData(SysAvailNum)%FanSchIndex
         if (state.dataGlobal->KickOffSimulation) {
@@ -3362,11 +3368,11 @@ namespace SystemAvailabilityManager {
         auto const &thisAirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum));
         for (int counter = 1; counter <= thisAirToZoneNodeInfo.NumZonesCooled; ++counter) {
             int actZoneNum = state.dataZoneEquip->ZoneEquipConfig(thisAirToZoneNodeInfo.CoolCtrlZoneNums(counter)).ActualZoneNum;
-            OptStartData.OptStartFlag(actZoneNum) = true;
+            state.dataHVACGlobal->OptStartData.OptStartFlag(actZoneNum) = true;
         }
         for (int counter = 1; counter <= thisAirToZoneNodeInfo.NumZonesHeated; ++counter) {
             int actZoneNum = state.dataZoneEquip->ZoneEquipConfig(thisAirToZoneNodeInfo.HeatCtrlZoneNums(counter)).ActualZoneNum;
-            OptStartData.OptStartFlag(actZoneNum) = true;
+            state.dataHVACGlobal->OptStartData.OptStartFlag(actZoneNum) = true;
         }
     }
     void CalcNVentSysAvailMgr(EnergyPlusData &state,
@@ -3665,13 +3671,13 @@ namespace SystemAvailabilityManager {
             state.dataSystemAvailabilityManager->GetHybridInputFlag = false;
         }
 
-        if (NumHybridVentSysAvailMgrs == 0) return;
+        if (state.dataHVACGlobal->NumHybridVentSysAvailMgrs == 0) return;
 
         InitHybridVentSysAvailMgr(state);
 
-        for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
+        for (SysAvailNum = 1; SysAvailNum <= state.dataHVACGlobal->NumHybridVentSysAvailMgrs; ++SysAvailNum) {
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
-                for (PriAirSysNum = 1; PriAirSysNum <= NumPrimaryAirSys; ++PriAirSysNum) {
+                for (PriAirSysNum = 1; PriAirSysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++PriAirSysNum) {
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum == PriAirSysNum) CalcHybridVentSysAvailMgr(state, SysAvailNum, PriAirSysNum);
                 }
             } else {
@@ -3723,6 +3729,14 @@ namespace SystemAvailabilityManager {
         Real64 CurveMin;                // Minimum value specified in a curve
         Real64 CurveMax;                // Maximum value specified in a curve
         Real64 CurveVal;                // Curve value
+
+        auto &NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
+        auto &HybridVentSysAvailAirLoopNum = state.dataHVACGlobal->HybridVentSysAvailAirLoopNum;
+        auto &HybridVentSysAvailActualZoneNum = state.dataHVACGlobal->HybridVentSysAvailActualZoneNum;
+        auto &HybridVentSysAvailVentCtrl = state.dataHVACGlobal->HybridVentSysAvailVentCtrl;
+        auto &HybridVentSysAvailANCtrlStatus = state.dataHVACGlobal->HybridVentSysAvailANCtrlStatus;
+        auto &HybridVentSysAvailMaster = state.dataHVACGlobal->HybridVentSysAvailMaster;
+        auto &HybridVentSysAvailWindModifier = state.dataHVACGlobal->HybridVentSysAvailWindModifier;
 
         // Get the number of occurrences of each type of System Availability Manager
         cCurrentModuleObject = "AvailabilityManager:HybridVentilation";
@@ -4237,6 +4251,14 @@ namespace SystemAvailabilityManager {
         int ZoneEquipType;
         int HybridVentNum;
 
+        auto &NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
+        auto &HybridVentSysAvailAirLoopNum = state.dataHVACGlobal->HybridVentSysAvailAirLoopNum;
+        auto &HybridVentSysAvailActualZoneNum = state.dataHVACGlobal->HybridVentSysAvailActualZoneNum;
+        auto &HybridVentSysAvailVentCtrl = state.dataHVACGlobal->HybridVentSysAvailVentCtrl;
+        auto &HybridVentSysAvailMaster = state.dataHVACGlobal->HybridVentSysAvailMaster;
+        auto &HybridVentSysAvailWindModifier = state.dataHVACGlobal->HybridVentSysAvailWindModifier;
+        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
+
         // One time initializations
         if (MyOneTimeFlag && allocated(state.dataZoneEquip->ZoneEquipConfig) && allocated(state.dataAirSystemsData->PrimaryAirSystems)) {
 
@@ -4256,7 +4278,7 @@ namespace SystemAvailabilityManager {
                     }
                 }
                 // Check air loop number
-                for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
+                for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
                     if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName)) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum = AirLoopNum;
                     }
@@ -4348,7 +4370,7 @@ namespace SystemAvailabilityManager {
             }
 
             // Ensure an airloop name is not used more than once in the hybrid ventilation control objects
-            for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
+            for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
                 AirLoopCount = 0;
                 for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
                     if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName)) {
@@ -4404,8 +4426,8 @@ namespace SystemAvailabilityManager {
             MyEnvrnFlag = true;
         }
         // check minimum operation time
-        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
-        if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
+        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
+        if (CurrentEndTime > CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= TimeStepSysLast) {
             for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == state.dataSystemAvailabilityManager->HybridVentCtrl_NoAction) {
                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeOperDuration = 0.0;
@@ -4425,7 +4447,7 @@ namespace SystemAvailabilityManager {
                 }
             }
         }
-        TimeStepSysLast = TimeStepSys;
+        TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
         CurrentEndTimeLast = CurrentEndTime;
     }
 
@@ -4621,8 +4643,8 @@ namespace SystemAvailabilityManager {
                         } else if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimHybridVentSysAvailMgr) {
                             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Open;
                             for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
-                                for (ZoneCompNum = 1; ZoneCompNum <= ZoneComp(ZoneEquipType).TotalNumComp; ++ZoneCompNum) {
-                                    if (ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == CycleOn) {
+                                for (ZoneCompNum = 1; ZoneCompNum <= state.dataHVACGlobal->ZoneComp(ZoneEquipType).TotalNumComp; ++ZoneCompNum) {
+                                    if (state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == CycleOn) {
                                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                                         break;
                                     }
@@ -4756,8 +4778,9 @@ namespace SystemAvailabilityManager {
             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
         }
         // Sent a signal to the AirflowNetwork to ensure large onpenings are close or open based on this logic
-        HybridVentSysAvailVentCtrl(SysAvailNum) = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl;
-        if (HybridVentSysAvailVentCtrl(SysAvailNum) < 0) {
+        state.dataHVACGlobal->HybridVentSysAvailVentCtrl(SysAvailNum) =
+            state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl;
+        if (state.dataHVACGlobal->HybridVentSysAvailVentCtrl(SysAvailNum) < 0) {
             // Fatal error
             ShowFatalError(state,
                 "Hybrid ventilation control: the ventilation control status is beyond the range. Please check input of control mode schedule");
@@ -4771,7 +4794,8 @@ namespace SystemAvailabilityManager {
 
         if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == state.dataSystemAvailabilityManager->HybridVentCtrl_Open &&
             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ANControlTypeSchedPtr > 0 && state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS > 0) {
-            HybridVentSysAvailWindModifier(SysAvailNum) = CurveValue(state, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, WindExt);
+            state.dataHVACGlobal->HybridVentSysAvailWindModifier(SysAvailNum) =
+                CurveValue(state, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, WindExt);
         }
 
         // Set up flags to control simple airflow objects
@@ -4870,7 +4894,7 @@ namespace SystemAvailabilityManager {
 
         VentControl = false;
 
-        for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
+        for (SysAvailNum = 1; SysAvailNum <= state.dataHVACGlobal->NumHybridVentSysAvailMgrs; ++SysAvailNum) {
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum == ZoneNum) {
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0) {
                     VentControl = true;

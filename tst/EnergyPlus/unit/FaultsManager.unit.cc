@@ -872,7 +872,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataHVACGlobals::TimeStepSys = 1;
+    state->dataHVACGlobal->TimeStepSys = 1;
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
 

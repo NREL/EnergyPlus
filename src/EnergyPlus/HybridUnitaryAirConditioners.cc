@@ -181,7 +181,7 @@ namespace EnergyPlus::HybridUnitaryAirConditioners {
         // Using/Aliasing
         using namespace DataLoopNode;
         using namespace Psychrometrics;
-        using DataHVACGlobals::ZoneComp;
+        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneHybridEvaporativeCooler_Num;
 

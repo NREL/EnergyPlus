@@ -134,38 +134,16 @@ namespace ScheduleManager {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of this should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool CheckScheduleValueMinMaxRunOnceOnly(true);
-        bool DoScheduleReportingSetup(true);
-    } // namespace
 
     // Derived Types Variables
 
     // Object Data
-    std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
-    std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
-    std::unordered_map<std::string, std::string> UniqueScheduleNames;
+
 
     // MODULE SUBROUTINES:
     //*************************************************************************
 
     // Functions
-
-    // Clears the global data in ScheduleManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        CheckScheduleValueMinMaxRunOnceOnly = true;
-        UniqueDayScheduleNames.clear();
-        UniqueWeekScheduleNames.clear();
-        UniqueScheduleNames.clear();
-        DoScheduleReportingSetup = true;
-    }
 
     void ProcessScheduleInput(EnergyPlusData &state)
     {
@@ -649,7 +627,7 @@ namespace ScheduleManager {
         state.dataScheduleMgr->ScheduleType.allocate({0, state.dataScheduleMgr->NumScheduleTypes});
 
         state.dataScheduleMgr->DaySchedule.allocate({0, state.dataScheduleMgr->NumDaySchedules});
-        UniqueDayScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumDaySchedules));
+        state.dataScheduleMgr->UniqueDayScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumDaySchedules));
         //    Initialize
         for (LoopIndex = 0; LoopIndex <= state.dataScheduleMgr->NumDaySchedules; ++LoopIndex) {
             state.dataScheduleMgr->DaySchedule(LoopIndex).TSValue.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
@@ -661,11 +639,11 @@ namespace ScheduleManager {
         }
 
         state.dataScheduleMgr->WeekSchedule.allocate({0, state.dataScheduleMgr->NumWeekSchedules});
-        UniqueWeekScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumWeekSchedules));
+        state.dataScheduleMgr->UniqueWeekScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumWeekSchedules));
 
         state.dataScheduleMgr->Schedule.allocate({-1, state.dataScheduleMgr->NumSchedules});
         //		UniqueScheduleNames.clear();
-        UniqueScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumSchedules));
+        state.dataScheduleMgr->UniqueScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumSchedules));
         state.dataScheduleMgr->Schedule(-1).ScheduleTypePtr = -1;
         state.dataScheduleMgr->Schedule(-1).WeekSchedulePointer = 1;
         state.dataScheduleMgr->Schedule(0).ScheduleTypePtr = 0;
@@ -777,7 +755,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
@@ -849,7 +827,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
@@ -960,7 +938,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
@@ -1112,7 +1090,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             state.dataScheduleMgr->WeekSchedule(LoopIndex).Name = Alphas(1);
             // Rest of Alphas are processed into Pointers
             for (InLoopIndex = 1; InLoopIndex <= MaxDayTypes; ++InLoopIndex) {
@@ -1147,7 +1125,7 @@ namespace ScheduleManager {
                                           cNumericFields);
             if (Count > 0) {
                 GlobalNames::VerifyUniqueInterObjectName(
-                    state, UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                    state, state.dataScheduleMgr->UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
             ++Count;
             state.dataScheduleMgr->WeekSchedule(Count).Name = Alphas(1);
@@ -1204,7 +1182,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             state.dataScheduleMgr->Schedule(LoopIndex).Name = Alphas(1);
             state.dataScheduleMgr->Schedule(LoopIndex).SchType = SchedType::ScheduleInput_year;
             // Validate ScheduleType
@@ -1332,7 +1310,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_compact;
@@ -1675,7 +1653,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
@@ -2018,7 +1996,7 @@ namespace ScheduleManager {
         for (auto &NameValue : CSVAllColumnNames) {
             curName = NameValue.first + "_shading";
             timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = curName;
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
@@ -2082,7 +2060,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_constant;
@@ -2146,7 +2124,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_external;
@@ -2209,14 +2187,14 @@ namespace ScheduleManager {
             if (NumExternalInterfaceSchedules >= 1) {
                 GlobalNames::VerifyUniqueInterObjectName(
                     state,
-                    UniqueScheduleNames,
+                    state.dataScheduleMgr->UniqueScheduleNames,
                     Alphas(1),
                     CurrentModuleObject,
                     cAlphaFields(1) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This "
                                       "will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport)",
                     ErrorsFound);
             } else {
-                GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
             ++SchNum;
             state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
@@ -2280,14 +2258,14 @@ namespace ScheduleManager {
             if (NumExternalInterfaceSchedules >= 1) {
                 GlobalNames::VerifyUniqueInterObjectName(
                     state,
-                    UniqueScheduleNames,
+                    state.dataScheduleMgr->UniqueScheduleNames,
                     Alphas(1),
                     CurrentModuleObject,
                     cAlphaFields(1) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This "
                                       "will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport)",
                     ErrorsFound);
             } else {
-                GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
 
             ++SchNum;
@@ -4001,12 +3979,12 @@ namespace ScheduleManager {
         // static bool RunOnceOnly( true );
         /////////////////////////////////////////////////
         // precompute the dayschedule max and min so that it is not in nested loop
-        if (CheckScheduleValueMinMaxRunOnceOnly) {
+        if (state.dataScheduleMgr->CheckScheduleValueMinMaxRunOnceOnly) {
             for (Loop = 0; Loop <= state.dataScheduleMgr->NumDaySchedules; ++Loop) {
                 state.dataScheduleMgr->DaySchedule(Loop).TSValMin = minval(state.dataScheduleMgr->DaySchedule(Loop).TSValue);
                 state.dataScheduleMgr->DaySchedule(Loop).TSValMax = maxval(state.dataScheduleMgr->DaySchedule(Loop).TSValue);
             }
-            CheckScheduleValueMinMaxRunOnceOnly = false;
+            state.dataScheduleMgr->CheckScheduleValueMinMaxRunOnceOnly = false;
         }
 
         if (ScheduleIndex == -1) {
@@ -4969,7 +4947,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
-        if (DoScheduleReportingSetup) { // CurrentModuleObject='Any Schedule'
+        if (state.dataScheduleMgr->DoScheduleReportingSetup) { // CurrentModuleObject='Any Schedule'
             for (int ScheduleIndex = 1; ScheduleIndex <= state.dataScheduleMgr->NumSchedules; ++ScheduleIndex) {
                 // Set Up Reporting
                 SetupOutputVariable(state,
@@ -4980,7 +4958,7 @@ namespace ScheduleManager {
                                     "Average",
                                     state.dataScheduleMgr->Schedule(ScheduleIndex).Name);
             }
-            DoScheduleReportingSetup = false;
+            state.dataScheduleMgr->DoScheduleReportingSetup = false;
         }
 
         // TODO: Is this needed?
