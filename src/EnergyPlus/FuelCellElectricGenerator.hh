@@ -537,10 +537,16 @@ namespace FuelCellElectricGenerator {
         bool MyWarmupFlag_Init;
         bool MyPlantScanFlag_Init;
 
+        int SolverErr_Type1_Iter;      // Iteration counter for Fuel Cell solver root finding Type 1 error warning messages
+        int SolverErr_Type1_IterIndex; // Index for Fuel Cell solver root finding Type 1 error warning messages
+        int SolverErr_Type2_Iter;      // Iteration counter for Fuel Cell solver root finding Type 2 error warning messages
+        int SolverErr_Type2_IterIndex; // Index for Fuel Cell solver root finding Type 2 error warning messages
+
         // Default Constructor
         FCDataStruct()
             : TypeOf(0), FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0),
-              DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true)
+              DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true),
+              SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0), SolverErr_Type2_Iter(0), SolverErr_Type2_IterIndex(0)
         {
         }
 
