@@ -89,7 +89,6 @@
 #include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
-#include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
@@ -129,7 +128,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
     PackagedThermalStorageCoil::clear_state();
-    Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
     Psychrometrics::clear_state();
     PVWatts::clear_state();
