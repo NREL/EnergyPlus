@@ -614,8 +614,8 @@ namespace EnergyPlus::DXCoils {
 
                     // Determine combined performance
                     state.dataDXCoils->DXCoil(DXCoilNum).OutletAirEnthalpy =
-                        (1.0 - S12RuntimeFraction) * S1OutletAirEnthalpy + S12RuntimeFraction * S12OutletAirEnthalpy;
-                    state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat = (1.0 - S12RuntimeFraction) * S1OutletAirHumRat + S12RuntimeFraction * S12OutletAirHumRat;
+                        (1.0 - S2PLR) * S1OutletAirEnthalpy + S2PLR * S12OutletAirEnthalpy;
+                    state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat = (1.0 - S2PLR) * S1OutletAirHumRat + S2PLR * S12OutletAirHumRat;
                     state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp = PsyTdbFnHW(state.dataDXCoils->DXCoil(DXCoilNum).OutletAirEnthalpy, state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat);
                     // Check for saturation error and modify temperature at constant enthalpy
                     if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(PerfMode) != 0) {
@@ -11835,7 +11835,6 @@ namespace EnergyPlus::DXCoils {
         Real64 LSElecCoolingPower;       // low speed power [W]
         Real64 HSElecCoolingPower;       // high speed power [W]
         Real64 CrankcaseHeatingPower;    // Power due to crank case heater
-        Real64 Hfg;
         Real64 AirVolumeFlowRate;     // Air volume flow rate across the heating coil
         Real64 VolFlowperRatedTotCap; // Air volume flow rate divided by rated total heating capacity
 
@@ -12208,14 +12207,9 @@ namespace EnergyPlus::DXCoils {
                     OutletAirHumRat = HSOutletAirHumRat;
                     OutletAirDryBulbTemp = HSOutletAirDryBulbTemp;
                 } else {
-                    if (FanOpMode == ContFanCycCoil) {
-                        Real64 MinAirHumRat(0.0); // set to zero because MinAirHumRat is unused argument
-                        Hfg = PsyHfgAirFnWTdb(MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + (1.0 - SpeedRatio) * LSOutletAirDryBulbTemp);
-                        // Average outlet HR
-                        OutletAirHumRat = InletAirHumRat - state.dataDXCoils->DXCoil(DXCoilNum).LatCoolingEnergyRate / Hfg / state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate;
-                    } else {
-                        OutletAirHumRat = (HSOutletAirHumRat * SpeedRatio) + (LSOutletAirHumRat * (1.0 - SpeedRatio));
-                    }
+                    OutletAirHumRat =
+                        ((HSOutletAirHumRat * SpeedRatio * MSHPMassFlowRateHigh) + (LSOutletAirHumRat * (1.0 - SpeedRatio) * MSHPMassFlowRateLow)) /
+                        state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate;
                     OutletAirDryBulbTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                     if (OutletAirDryBulbTemp < OutletAirDryBulbTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
                         OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
@@ -12241,6 +12235,9 @@ namespace EnergyPlus::DXCoils {
                     state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower = state.dataDXCoils->DXCoil(DXCoilNum).CoolingCoilRuntimeFraction * HSElecCoolingPower +
                                                          (1.0 - state.dataDXCoils->DXCoil(DXCoilNum).CoolingCoilRuntimeFraction) * LSElecCoolingPower;
                 }
+                // Now reset runtime fraction to 1.0 (because LS is running the full timestep)
+                state.dataDXCoils->DXCoil(DXCoilNum).CoolingCoilRuntimeFraction = 1.0;
+
                 //   Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
                 state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
 
@@ -12427,10 +12424,23 @@ namespace EnergyPlus::DXCoils {
                 }
 
                 if (FanOpMode == CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
-                // outlet conditions are average of inlet and low speed weighted by CycRatio
-                OutletAirEnthalpy = LSOutletAirEnthalpy;
-                OutletAirHumRat = LSOutletAirHumRat;
-                OutletAirDryBulbTemp = LSOutletAirDryBulbTemp;
+                if (FanOpMode == ContFanCycCoil) {
+                    // outlet conditions are average of inlet and low speed weighted by CycRatio
+                    // Continuous fan, cycling compressor
+                    Real64 CycAirFlowRatio =
+                        CycRatio * AirMassFlow /
+                        state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate; // ratio of compressor on airflow to average timestep airflow
+                    OutletAirEnthalpy =
+                        CycAirFlowRatio * LSOutletAirEnthalpy + (1.0 - CycAirFlowRatio) * InletAirEnthalpy;
+                    OutletAirHumRat =
+                        CycAirFlowRatio * LSOutletAirHumRat + (1.0 - CycAirFlowRatio) * InletAirHumRat;
+                    OutletAirDryBulbTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
+                } else {
+                    OutletAirHumRat = LSOutletAirHumRat;
+                    OutletAirDryBulbTemp = LSOutletAirDryBulbTemp;
+                    OutletAirEnthalpy = LSOutletAirEnthalpy;
+                }
+                
                 // get low speed EIR at current conditions
                 EIRTempModFacLS = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(SpeedNum), InletAirWetBulbC, CondInletTemp);
                 EIRFlowModFacLS = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow(SpeedNum), AirMassFlowRatioLS);
@@ -12451,25 +12461,7 @@ namespace EnergyPlus::DXCoils {
                 state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate * CycRatio;
                 state.dataDXCoils->DXCoil(DXCoilNum).SensCoolingEnergyRate = state.dataDXCoils->DXCoil(DXCoilNum).SensCoolingEnergyRate * CycRatio;
                 state.dataDXCoils->DXCoil(DXCoilNum).LatCoolingEnergyRate = state.dataDXCoils->DXCoil(DXCoilNum).LatCoolingEnergyRate * CycRatio;
-                if (FanOpMode == ContFanCycCoil) {
-                    OutletAirEnthalpy = InletAirEnthalpy - state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate / state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate;
-                    Real64 MinAirHumRat(0.0); // set to zero because MinAirHumRat is unused argument
-                    Hfg = PsyHfgAirFnWTdb(MinAirHumRat, OutletAirDryBulbTemp * CycRatio + (1.0 - CycRatio) * InletAirDryBulbTemp);
-                    OutletAirHumRat = InletAirHumRat - state.dataDXCoils->DXCoil(DXCoilNum).LatCoolingEnergyRate / Hfg / state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate;
-                    OutletAirDryBulbTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
-                    if (OutletAirDryBulbTemp < OutletAirDryBulbTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
-                        OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-                        OutletAirHumRat = PsyWFnTdbH(state, OutletAirDryBulbTemp, OutletAirEnthalpy, RoutineName);
-                        CalcComponentSensibleLatentOutput(state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate,
-                                                          InletAirDryBulbTemp,
-                                                          InletAirHumRat,
-                                                          OutletAirDryBulbTemp,
-                                                          OutletAirHumRat,
-                                                          state.dataDXCoils->DXCoil(DXCoilNum).SensCoolingEnergyRate,
-                                                          state.dataDXCoils->DXCoil(DXCoilNum).LatCoolingEnergyRate,
-                                                          state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate);
-                    }
-                }
+
                 //   Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
                 state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
                 state.dataDXCoils->DXCoil(DXCoilNum).OutletAirEnthalpy = OutletAirEnthalpy;
