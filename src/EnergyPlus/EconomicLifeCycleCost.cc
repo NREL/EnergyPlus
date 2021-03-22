@@ -1080,7 +1080,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> resourceCosts;
         for (int jMonth = 1; jMonth <= 12; ++jMonth) {
             std::map<DataGlobalConstants::ResourceType, Real64> monthMap;
-            for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+            for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
                 monthMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
             }
             resourceCosts.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>> (jMonth, monthMap));
@@ -1089,12 +1089,12 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         Array1D<Real64> curResourceCosts(12);
 
         std::map<DataGlobalConstants::ResourceType, bool> resourceCostNotZero;
-        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
             resourceCostNotZero.insert(std::pair<DataGlobalConstants::ResourceType, bool>(iResource, false));
         }
 
         std::map<DataGlobalConstants::ResourceType, Real64> resourceCostAnnual;
-        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
             resourceCostAnnual.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
         }
 
@@ -1127,7 +1127,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 
         // gather costs from EconomicTariff for each end use
         elcc->numResourcesUsed = 0;
-        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
             GetMonthlyCostForResource(state, iResource, curResourceCosts);
             annualCost = 0.0;
             for (int jMonth = 1; jMonth <= 12; ++jMonth) {
@@ -1145,7 +1145,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         // allocate the escalated energy cost arrays
         for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
             std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
-            for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+            for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
                 yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
             }
             elcc->EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
@@ -1232,7 +1232,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         // Put resource costs into cashflows
         // the first cash flow for resources should be after the categories, recurring and nonrecurring costs
         cashFlowCounter = countOfCostCat + elcc->numRecurringCosts + elcc->numNonrecurringCost;
-        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
             if (resourceCostNotZero.at(iResource)) {
                 ++cashFlowCounter;
 
@@ -1395,7 +1395,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 }
             }
         }
-        for (auto kResource : DataGlobalConstants::AllResourceTypes) {
+        for (auto kResource : state.dataGlobalConst->AllResourceTypes) {
             for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 elcc->EscalatedTotEnergy(jYear) += elcc->EscalatedEnergy.at(jYear).at(kResource);
             }
@@ -1472,7 +1472,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         elcc->SPV.allocate(elcc->lengthStudyYears);
         for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
             std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
-            for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+            for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
                 yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
             }
             elcc->energySPV.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
@@ -1503,7 +1503,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         }
         // use SPV as default values for all energy types
         for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-            for (auto kResource : DataGlobalConstants::AllResourceTypes) {
+            for (auto kResource : state.dataGlobalConst->AllResourceTypes) {
                 elcc->energySPV.at(jYear).at(kResource) = elcc->SPV(jYear);
             }
         }

@@ -63,7 +63,6 @@
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
@@ -101,7 +100,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     ElectricBaseboardRadiator::clear_state();
     EvaporativeFluidCoolers::clear_state();
     FluidProperties::clear_state();
-    GroundTemperatureManager::clear_state();
     HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
     Humidifiers::clear_state();

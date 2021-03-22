@@ -89,7 +89,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     // New shared pointer for this model object
     std::shared_ptr<SiteFCFactorMethodGroundTemps> thisModel(new SiteFCFactorMethodGroundTemps());
 
-    std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteFCFactorMethodGroundTemp);
+    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_SiteFCFactorMethodGroundTemp);
     int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;
@@ -137,7 +137,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     }
 
     if (found && !thisModel->errorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
         ShowContinueError(state, "Site:GroundTemperature:FCFactorMethod--Errors getting input for ground temperature model");

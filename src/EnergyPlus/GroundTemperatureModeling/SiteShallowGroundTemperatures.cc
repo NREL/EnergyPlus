@@ -87,7 +87,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     // New shared pointer for this model object
     std::shared_ptr<SiteShallowGroundTemps> thisModel(new SiteShallowGroundTemps());
 
-    std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteShallowGroundTemp);
+    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_SiteShallowGroundTemp);
     int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;
@@ -121,7 +121,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     write_ground_temps(state.files.eio, "Shallow", thisModel->surfaceGroundTemps);
 
     if (!thisModel->errorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
         ShowContinueError(state, "Site:GroundTemperature:Shallow--Errors getting input for ground temperature model");

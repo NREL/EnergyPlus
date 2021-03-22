@@ -89,7 +89,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     // New shared pointer for this model object
     std::shared_ptr<KusudaGroundTempsModel> thisModel(new KusudaGroundTempsModel());
 
-    std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_KusudaGroundTemp);
+    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_KusudaGroundTemp);
     int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
@@ -123,7 +123,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
                 Real64 maxSurfTemp(-100); // Set low initially but will get updated
 
                 std::shared_ptr<BaseGroundTempsModel> shallowObj =
-                    GetGroundTempModelAndInit(state, CurrentModuleObjects(objectType_SiteShallowGroundTemp), "");
+                    GetGroundTempModelAndInit(state, state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_SiteShallowGroundTemp), "");
 
                 for (int monthIndex = 1; monthIndex <= 12; ++monthIndex) {
                     Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths(state, 0.0, monthIndex);
@@ -160,7 +160,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     }
 
     if (found && !ErrorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
         ShowFatalError(state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach--Errors getting input for ground temperature model");

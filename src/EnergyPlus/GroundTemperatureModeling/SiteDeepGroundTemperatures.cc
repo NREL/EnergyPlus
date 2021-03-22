@@ -87,7 +87,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     // New shared pointer for this model object
     std::shared_ptr<SiteDeepGroundTemps> thisModel(new SiteDeepGroundTemps());
 
-    std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteDeepGroundTemp);
+    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_SiteDeepGroundTemp);
     int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;
@@ -122,7 +122,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     write_ground_temps(state.files.eio, "Deep", thisModel->deepGroundTemps);
 
     if (!thisModel->errorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
         ShowContinueError(state, "Site:GroundTemperature:Deep--Errors getting input for ground temperature model");
