@@ -134,17 +134,10 @@ namespace ScheduleManager {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    // Derived Types Variables
-
-    // Object Data
-
     // MODULE SUBROUTINES:
     //*************************************************************************
 
     // Functions
-
-    // Clears the global data in ScheduleManager.
-    // Needed for unit tests, should not be normally called.
 
     void ProcessScheduleInput(EnergyPlusData &state)
     {
@@ -643,7 +636,6 @@ namespace ScheduleManager {
         state.dataScheduleMgr->UniqueWeekScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumWeekSchedules));
 
         state.dataScheduleMgr->Schedule.allocate({-1, state.dataScheduleMgr->NumSchedules});
-        //		state.dataScheduleMgr->UniqueScheduleNames.clear();
         state.dataScheduleMgr->UniqueScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumSchedules));
         state.dataScheduleMgr->Schedule(-1).ScheduleTypePtr = -1;
         state.dataScheduleMgr->Schedule(-1).WeekSchedulePointer = 1;

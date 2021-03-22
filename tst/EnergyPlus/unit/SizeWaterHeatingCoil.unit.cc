@@ -1195,7 +1195,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupTemp = 16.7;
     state->dataSize->UnitarySysEqSizing(state->dataSize->CurSysNum).CoolingCapacity = false;
     state->dataSize->UnitarySysEqSizing(state->dataSize->CurSysNum).HeatingCapacity = false;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     SizeWaterCoil(*state, 1);
     EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate, .258323, 0.00001);
     EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 239.835, 0.01);

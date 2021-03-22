@@ -122,7 +122,6 @@ namespace WaterToAirHeatPumpSimple {
     using DataHVACGlobals::Cooling;
     using DataHVACGlobals::CycFanCycCoil;
     using DataHVACGlobals::Heating;
-    using DataHVACGlobals::TimeStepSys;
     using DataHVACGlobals::WaterConstant;
     using DataHVACGlobals::WaterConstantOnDemand;
     using DataHVACGlobals::WaterCycling;
@@ -2071,8 +2070,7 @@ namespace WaterToAirHeatPumpSimple {
         // with Constant Fan Operation ASHRAE Transactions 102 (1), pp. 266-274.
 
         // Using/Aliasing
-        using DataHVACGlobals::DXElecCoolingPower;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyCpAirFnW;
@@ -2286,7 +2284,7 @@ namespace WaterToAirHeatPumpSimple {
         state.dataHeatBal->HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = state.dataWaterToAirHeatPumpSimple->QSource;
 
         //  Add power to global variable so power can be summed by parent object
-        DXElecCoolingPower = state.dataWaterToAirHeatPumpSimple->Winput;
+        state.dataHVACGlobal->DXElecCoolingPower = state.dataWaterToAirHeatPumpSimple->Winput;
 
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimSimple_WAHPCoil(HPNum);
@@ -2388,8 +2386,7 @@ namespace WaterToAirHeatPumpSimple {
         // Oklahoma State University. (downloadable from www.hvac.okstate.edu)
 
         // Using/Aliasing
-        using DataHVACGlobals::DXElecHeatingPower;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyCpAirFnW;
@@ -2507,7 +2504,7 @@ namespace WaterToAirHeatPumpSimple {
         state.dataWaterToAirHeatPumpSimple->QSource = state.dataWaterToAirHeatPumpSimple->QLoadTotal - state.dataWaterToAirHeatPumpSimple->Winput;
 
         //  Add power to global variable so power can be summed by parent object
-        DXElecHeatingPower = state.dataWaterToAirHeatPumpSimple->Winput;
+        state.dataHVACGlobal->DXElecHeatingPower = state.dataWaterToAirHeatPumpSimple->Winput;
 
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure
@@ -2583,7 +2580,7 @@ namespace WaterToAirHeatPumpSimple {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
 
         // Locals

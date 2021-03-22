@@ -3441,6 +3441,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             }
         }
 
+        auto & TimeStepSys(state.dataHVACGlobal->TimeStepSys);
+
         // Update zone temperatures
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
@@ -3454,7 +3456,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Enthalpy = PsyHFnTdbW(state.dataHeatBalFanSys->XMAT(ZoneNum), state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum));
                 }
 
-                if (NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
+                if (state.dataHVACGlobal->NumOfSysTimeSteps != state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
 
                     //  state.dataHeatBalFanSys->MAT(ZoneNum),   state.dataHeatBalFanSys->XMAT(ZoneNum),   state.dataHeatBalFanSys->XM2T(ZoneNum),   state.dataHeatBalFanSys->XM3T(ZoneNum),   state.dataHeatBalFanSys->XM4T(ZoneNum), &
                     DownInterpolate4HistoryValues(PriorTimeStep,
@@ -3643,10 +3645,10 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             }
 
             // Exact solution or Euler method
-            ShortenTimeStepSysRoomAir = false;
+            state.dataHVACGlobal->ShortenTimeStepSysRoomAir = false;
             if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
                 if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
-                    if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
+                    if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                         state.dataHeatBalFanSys->ZoneT1(ZoneNum) = state.dataHeatBalFanSys->ZoneTM2(ZoneNum);
                         state.dataHeatBalFanSys->ZoneW1(ZoneNum) = state.dataHeatBalFanSys->ZoneWM2(ZoneNum);
                         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
@@ -3669,7 +3671,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             }
                         }
                     }
-                    ShortenTimeStepSysRoomAir = true;
+                    state.dataHVACGlobal->ShortenTimeStepSysRoomAir = true;
                 } else {
                     state.dataHeatBalFanSys->ZoneT1(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
                     state.dataHeatBalFanSys->ZoneW1(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
@@ -3828,17 +3830,17 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
                     // Change the room set point to occupied set point during optimum start period--------------
 
-                    if (allocated(OptStartData.OptStartFlag)) {
+                    if (allocated(state.dataHVACGlobal->OptStartData.OptStartFlag)) {
                         if (!allocated(DaySPValues)) {
                             DaySPValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
                         }
-                        if (OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
+                        if (state.dataHVACGlobal->OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
                             GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);
-                            OccStartTime = CEILING(OptStartData.OccStartTime(ActualZoneNum)) + 1;
+                            OccStartTime = CEILING(state.dataHVACGlobal->OptStartData.OccStartTime(ActualZoneNum)) + 1;
                             state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) = DaySPValues(1, OccStartTime);
                         }
 
-                        if (OptStartData.OptStartFlag(ActualZoneNum)) {
+                        if (state.dataHVACGlobal->OptStartData.OptStartFlag(ActualZoneNum)) {
                             state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
                             state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
                         }
@@ -3871,19 +3873,19 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
                     // Change the room set point to occupied set point during optimum start period--------------
 
-                    if (allocated(OptStartData.OptStartFlag)) {
+                    if (allocated(state.dataHVACGlobal->OptStartData.OptStartFlag)) {
                         if (!allocated(DaySPValues)) {
                             DaySPValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
                         }
-                        if (OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
+                        if (state.dataHVACGlobal->OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
                             GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);
-                            OccStartTime = CEILING(OptStartData.OccStartTime(ActualZoneNum)) + 1;
+                            OccStartTime = CEILING(state.dataHVACGlobal->OptStartData.OccStartTime(ActualZoneNum)) + 1;
                             state.dataZoneCtrls->OccRoomTSetPointCool(ActualZoneNum) = DaySPValues(1, OccStartTime);
                             GetScheduleValuesForDay(state, SetPointTempSchedIndexHot, DaySPValues);
                             state.dataZoneCtrls->OccRoomTSetPointHeat(ActualZoneNum) = DaySPValues(1, OccStartTime);
                         }
 
-                        if (OptStartData.OptStartFlag(ActualZoneNum)) {
+                        if (state.dataHVACGlobal->OptStartData.OptStartFlag(ActualZoneNum)) {
                             state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataZoneCtrls->OccRoomTSetPointCool(ActualZoneNum);
                             state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataZoneCtrls->OccRoomTSetPointHeat(ActualZoneNum);
                         }
@@ -4515,7 +4517,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             // to determine system added/subtracted moisture.
             LatentGain = state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
 
-            SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
+            SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
             // Calculate the coefficients for the 3rd Order derivative for final
             // zone humidity ratio.  The A, B, C coefficients are analogous to the heat balance.
@@ -4566,7 +4568,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 B = (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntLatentGain / H2OHtOfVap) +
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumLinkMW + state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARaW;
                 C = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir * state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirVolume *
-                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist / (DataGlobalConstants::SecInHour * TimeStepSys);
+                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist / (DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys);
             }
 
             // Use a 3rd Order derivative to predict zone moisture addition or removal and
@@ -4732,6 +4734,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // Initializations
         ZoneTempChange = DataPrecisionGlobals::constant_zero;
 
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+
         // Update zone temperatures
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
@@ -4739,7 +4743,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
             if (ShortenTimeStepSys) {
                 // time step has gotten smaller, use zone timestep history to interpolate new set of "DS" history terms.
-                if (NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
+                if (state.dataHVACGlobal->NumOfSysTimeSteps != state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
                     DownInterpolate4HistoryValues(PriorTimeStep,
                                                   TimeStepSys,
                                                   state.dataHeatBalFanSys->MAT(ZoneNum),
@@ -5458,7 +5462,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             LatentGainExceptPeople = state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(ZoneNum) + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
         }
 
-        SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
+        SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
         // Calculate the coefficients for the 3rd order derivative for final
         // zone humidity ratio.  The A, B, C coefficients are analogous to the
@@ -5695,8 +5699,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             state.dataHeatBalFanSys->ZT(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature; // Array1D<Real64> ZT -- Zone
                                                                  // Air Temperature Averaged over
                                                                  // the System Time Increment
-            if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_T && UseZoneTimeStepHistory) {
-
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_T && state.dataHVACGlobal->UseZoneTimeStepHistory) {
                 constexpr auto RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
 
                 if (state.dataHybridModel->HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
@@ -5748,7 +5751,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
             // Hybrid modeling internal thermal mass calcualtion start
             if (state.dataHybridModel->HybridModelZone(ZoneNum).InternalThermalMassCalc_T && SumSysMCpT == 0 && state.dataHeatBalFanSys->ZT(ZoneNum) != state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum) &&
-                UseZoneTimeStepHistory) { // HM calculation only when SumSysMCpT =0,
+                state.dataHVACGlobal->UseZoneTimeStepHistory) { // HM calculation only when SumSysMCpT =0,
                                           // TimeStepZone (not @ TimeStepSys)
                 TempDepCoef = SumHA + SumMCp + SumSysMCp;
                 TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SumSysMCpT +
@@ -5814,7 +5817,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             } // Hybrid model internal thermal mass calcualtion end
 
             // Hybrid model people count calculation
-            if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_T && UseZoneTimeStepHistory) {
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_T && state.dataHVACGlobal->UseZoneTimeStepHistory) {
                 state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneMeasuredTemperatureSchedulePtr);
                 state.dataHeatBal->Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
                 state.dataHeatBal->Zone(ZoneNum).ZonePeopleSensibleHeatFraction =
@@ -5923,7 +5926,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         Real64 M_inf(0.0);
         Real64 ACH_inf(0.0);
         Real64 SysTimeStepInSeconds(0.0);
-        SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
+        SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
         // Get measured zone humidity ratio
         state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneMeasuredHumidityRatioSchedulePtr);
@@ -5932,7 +5935,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio;
 
             // Hybrid Model calculate air infiltration rate
-            if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_H && UseZoneTimeStepHistory) {
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_H && state.dataHVACGlobal->UseZoneTimeStepHistory) {
                 // Conditionally calculate the time dependent and time independent terms
                 if (state.dataHybridModel->HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
@@ -5977,7 +5980,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             }
 
             // Hybrid Model calculate people count
-            if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_H && UseZoneTimeStepHistory) {
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_H && state.dataHVACGlobal->UseZoneTimeStepHistory) {
                 state.dataHeatBal->Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
                 state.dataHeatBal->Zone(ZoneNum).ZonePeopleSensibleHeatFraction =
                     GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleSensibleFractionSchedulePtr);
@@ -6465,8 +6468,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), ADUHeatAddRate);
                     state.dataDefineEquipment->AirDistUnit(ADUNum).HeatRate = max(0.0, ADUHeatAddRate);
                     state.dataDefineEquipment->AirDistUnit(ADUNum).CoolRate = std::abs(min(0.0, ADUHeatAddRate));
-                    state.dataDefineEquipment->AirDistUnit(ADUNum).HeatGain = state.dataDefineEquipment->AirDistUnit(ADUNum).HeatRate * TimeStepSys * DataGlobalConstants::SecInHour;
-                    state.dataDefineEquipment->AirDistUnit(ADUNum).CoolGain = state.dataDefineEquipment->AirDistUnit(ADUNum).CoolRate * TimeStepSys * DataGlobalConstants::SecInHour;
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).HeatGain = state.dataDefineEquipment->AirDistUnit(ADUNum).HeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).CoolGain = state.dataDefineEquipment->AirDistUnit(ADUNum).CoolRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 }
 
             } // NodeNum
@@ -6616,7 +6619,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
             if (SELECT_CASE_var == Use3rdOrder) {
                 CzdTdt = RhoAir * CpAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * (state.dataHeatBalFanSys->MAT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)) /
-                         (TimeStepSys * DataGlobalConstants::SecInHour);
+                         (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
                 // Exact solution
             } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                 CzdTdt = TempIndCoef - TempDepCoef * state.dataHeatBalFanSys->MAT(ZoneNum);
@@ -6636,7 +6639,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 if (state.dataHeatBal->Zone(ZoneNum).AirHBimBalanceErrIndex == 0) {
                     ShowWarningMessage(state, "Zone Air Heat Balance is out of balance for zone named " + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, format("Zone Air Heat Balance Deviation Rate is more than {:.1R} {{W}}", Threshold));
-                    if (TurnFansOn) {
+                    if (state.dataHVACGlobal->TurnFansOn) {
                         ShowContinueError(state, "Night cycle fan operation may be causing above error");
                     }
 
@@ -6768,6 +6771,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             }
             state.dataZoneTempPredictorCorrector->SetupOscillationOutputFlag = false;
         }
+
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         if (state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded) {
             // precalc the negative value for performance
             NegOscillateMagnitude = -OscillateMagnitude;

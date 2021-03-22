@@ -198,7 +198,7 @@ namespace EnergyPlus::CoolingPanelSimple {
 
             UpdateCoolingPanel(state, CoolingPanelNum);
 
-            state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ReportCoolingPanel();
+            state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ReportCoolingPanel(state);
 
         } else {
             ShowFatalError(state, "SimCoolingPanelSimple: Unit not found=" + EquipName);
@@ -1462,8 +1462,8 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Existing code for hot water baseboard models (radiant-convective variety)
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1619,7 +1619,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         }
     }
 
-    void CoolingPanelParams::ReportCoolingPanel()
+    void CoolingPanelParams::ReportCoolingPanel(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1629,7 +1629,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         // REFERENCES:
         // Existing code for hot water baseboard models (radiant-convective variety)
 
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // All of the power numbers are negative for cooling.  This is because they will have a negative
         // or cooling impact on the surfaces/zones.  However, the output variables are noted as cooling.

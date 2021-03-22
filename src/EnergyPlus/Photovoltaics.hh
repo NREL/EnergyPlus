@@ -81,7 +81,8 @@ namespace Photovoltaics {
                         Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on"
     );
 
-    void GetPVGeneratorResults(GeneratorType const GeneratorType, // type of Generator
+    void GetPVGeneratorResults(EnergyPlusData &state,
+                               GeneratorType const GeneratorType, // type of Generator
                                int const GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy

@@ -598,7 +598,7 @@ struct FurnacesData : BaseGlobalStruct {
         SaveCompressorPLR = 0.0;
         CurrentModuleObject = "";
         Iter = 0;
-        Furnace.clear();
+        Furnace.clear();\
 
         MyEnvrnFlag.clear();
         MySecondOneTimeFlag.clear();

@@ -470,7 +470,6 @@ namespace OutputReportTabular {
     };
 
     // Functions
-    void clear_state(EnergyPlusData &state);
 
     std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file = true);
 

@@ -172,9 +172,6 @@ namespace ScheduleManager {
 
     // Functions
 
-    // Clears the global data in ScheduleManager.
-    // Needed for unit tests, should not be normally called.
-
     void ProcessScheduleInput(EnergyPlusData &state);
 
     void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
@@ -351,6 +348,7 @@ struct ScheduleManagerData : BaseGlobalStruct
     bool ScheduleInputProcessed = false; // This is false until the Schedule Input has been processed.
     bool ScheduleDSTSFileWarningIssued = false;
     bool ScheduleFileShadingProcessed = false; // This is false unless there is a Schedule:File:Shading object.
+
 
     // Object Data
     Array1D<ScheduleManager::ScheduleTypeData> ScheduleType; // Allowed Schedule Types

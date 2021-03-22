@@ -136,7 +136,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     int NumOfAirNodes = 2;
     int ZoneNum = 1;
     int RoomAirNode;
-    TimeStepSys = 15.0 / 60.0;
+    state->dataHVACGlobal->TimeStepSys = 15.0 / 60.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens = 1;
 

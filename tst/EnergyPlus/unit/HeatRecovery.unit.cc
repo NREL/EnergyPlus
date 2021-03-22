@@ -89,8 +89,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
-    NumHeatExchangers = 1;
-    ExchCond.allocate(NumHeatExchangers);
+     state->dataHeatRecovery->NumHeatExchangers = 1;
+    state->dataHeatRecovery->ExchCond.allocate( state->dataHeatRecovery->NumHeatExchangers);
     state->dataLoopNodes->Node.allocate(4);
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -111,172 +111,193 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
 
-    ExchCond(ExchNum).NomSupAirVolFlow = 1.0;
-    ExchCond(ExchNum).SupInMassFlow = 1.0;
-    ExchCond(ExchNum).SecInMassFlow = 1.0;
-    ExchCond(ExchNum).SupInletNode = 1;
-    ExchCond(ExchNum).SupOutletNode = 2;
-    ExchCond(ExchNum).SecInletNode = 3;
-    ExchCond(ExchNum).SecOutletNode = 4;
-    ExchCond(ExchNum).SchedPtr = -1;
-    ExchCond(ExchNum).HeatEffectSensible75 = 0.75;
-    ExchCond(ExchNum).HeatEffectSensible100 = 0.75;
-    ExchCond(ExchNum).HeatEffectLatent75 = 0.0;
-    ExchCond(ExchNum).HeatEffectLatent100 = 0.0;
-    ExchCond(ExchNum).CoolEffectSensible75 = 0.75;
-    ExchCond(ExchNum).CoolEffectSensible100 = 0.75;
-    ExchCond(ExchNum).CoolEffectLatent75 = 0.0;
-    ExchCond(ExchNum).CoolEffectLatent100 = 0.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = 1.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).SupInMassFlow = 1.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).SecInMassFlow = 1.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode = 1;
+    state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = 2;
+    state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode = 3;
+    state->dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = 4;
+    state->dataHeatRecovery->ExchCond(ExchNum).SchedPtr = -1;
+    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible75 = 0.75;
+    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible100 = 0.75;
+    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent75 = 0.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent100 = 0.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 = 0.75;
+    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 = 0.75;
+    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent75 = 0.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent100 = 0.0;
 
-    ExchCond(ExchNum).Name = "Test Heat Recovery 1";
-    ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
-    ExchCond(ExchNum).SupInTemp = 24.0;
-    ExchCond(ExchNum).SecInTemp = 15.0;
-    ExchCond(ExchNum).SupInHumRat = 0.01;
-    ExchCond(ExchNum).SecInHumRat = 0.01;
-    ExchCond(ExchNum).SupInEnth = PsyHFnTdbW(ExchCond(ExchNum).SupInTemp, ExchCond(ExchNum).SupInHumRat);
-    ExchCond(ExchNum).SecInEnth = PsyHFnTdbW(ExchCond(ExchNum).SecInTemp, ExchCond(ExchNum).SecInHumRat);
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupInletNode).Temp = ExchCond(ExchNum).SupInTemp;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SecInletNode).Temp = ExchCond(ExchNum).SecInTemp;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupInletNode).HumRat = ExchCond(ExchNum).SupInHumRat;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SecInletNode).HumRat = ExchCond(ExchNum).SecInHumRat;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupInletNode).Enthalpy = ExchCond(ExchNum).SupInEnth;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SecInletNode).Enthalpy = ExchCond(ExchNum).SecInEnth;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupInletNode).MassFlowRate = ExchCond(ExchNum).SupInMassFlow;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SecInletNode).MassFlowRate = ExchCond(ExchNum).SecInMassFlow;
+    state->dataHeatRecovery->ExchCond(ExchNum).Name = "Test Heat Recovery 1";
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
+    state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp = 24.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp = 15.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat = 0.01;
+    state->dataHeatRecovery->ExchCond(ExchNum).SecInHumRat = 0.01;
+    state->dataHeatRecovery->ExchCond(ExchNum).SupInEnth =
+        PsyHFnTdbW(state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp, state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat);
+    state->dataHeatRecovery->ExchCond(ExchNum).SecInEnth =
+        PsyHFnTdbW(state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp, state->dataHeatRecovery->ExchCond(ExchNum).SecInHumRat);
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode).Temp = state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).Temp = state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode).HumRat =
+         state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat;
+     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).HumRat =
+         state->dataHeatRecovery->ExchCond(ExchNum).SecInHumRat;
+     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode).Enthalpy =
+         state->dataHeatRecovery->ExchCond(ExchNum).SupInEnth;
+     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).Enthalpy =
+         state->dataHeatRecovery->ExchCond(ExchNum).SecInEnth;
+     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode).MassFlowRate =
+         state->dataHeatRecovery->ExchCond(ExchNum).SupInMassFlow;
+     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).MassFlowRate =
+         state->dataHeatRecovery->ExchCond(ExchNum).SecInMassFlow;
 
-    HeatExchCondNumericFields.allocate(ExchNum);
-    HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(5);
-    BalDesDehumPerfNumericFields.allocate(BalDesDehumPerfDataIndex);
-    BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames.allocate(2);
+     state->dataHeatRecovery->HeatExchCondNumericFields.allocate(ExchNum);
+     state->dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(5);
+     state->dataHeatRecovery->BalDesDehumPerfNumericFields.allocate(BalDesDehumPerfDataIndex);
+     state->dataHeatRecovery->BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames.allocate(2);
 
     // HXUnitOn is false so expect outlet = inlet
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
-    Toutlet = ExchCond(ExchNum).SupInTemp;
-    Tnode = ExchCond(ExchNum).SupOutTemp;
+    Toutlet =  state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp;
+    Tnode =  state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
-    ExchCond(ExchNum).ControlToTemperatureSetPoint = false;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).TempSetPoint = SetPointTemp;
+    state->dataHeatRecovery->ExchCond(ExchNum).ControlToTemperatureSetPoint = false;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint = SetPointTemp;
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is false so expect outlet = temperature based on effectiveness
     HXUnitOn = true;
-    ExchCond(ExchNum).ExchConfigNum = Plate;
+     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
-    Toutlet = (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp)));
-    Tnode = ExchCond(ExchNum).SupOutTemp;
+    Toutlet = ( state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp + ( state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 * ( state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp -  state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp)));
+    Tnode =  state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
-    ExchCond(ExchNum).ExchConfigNum = Rotary;
+     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
-    Toutlet = (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp)));
-    Tnode = ExchCond(ExchNum).SupOutTemp;
+    Toutlet = ( state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp + ( state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 * ( state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp -  state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp)));
+    Tnode =  state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
-    ExchCond(ExchNum).ControlToTemperatureSetPoint = true;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).TempSetPoint = 19.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).ControlToTemperatureSetPoint = true;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint = 19.0;
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is true so expect outlet = set point temperature
     HXUnitOn = true;
-    ExchCond(ExchNum).ExchConfigNum = Plate;
+     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
     Toutlet = SetPointTemp;
-    Tnode = ExchCond(ExchNum).SupOutTemp;
+    Tnode =  state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
-    ExchCond(ExchNum).ExchConfigNum = Rotary;
+     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
-    Toutlet = state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).TempSetPoint;
-    Tnode = state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).Temp;
+    Toutlet = state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint;
+    Tnode = state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
-    ExchCond(ExchNum).Name = "Test Heat Recovery 2";
-    ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
-    ExchCond(ExchNum).SupInTemp = 15.0;
-    ExchCond(ExchNum).SecInTemp = 24.0;
-    ExchCond(ExchNum).SupInHumRat = 0.01;
-    ExchCond(ExchNum).SecInHumRat = 0.01;
-    ExchCond(ExchNum).SupInEnth = PsyHFnTdbW(ExchCond(ExchNum).SupInTemp, ExchCond(ExchNum).SupInHumRat);
-    ExchCond(ExchNum).SecInEnth = PsyHFnTdbW(ExchCond(ExchNum).SecInTemp, ExchCond(ExchNum).SecInHumRat);
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupInletNode).Temp = ExchCond(ExchNum).SupInTemp;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SecInletNode).Temp = ExchCond(ExchNum).SecInTemp;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupInletNode).HumRat = ExchCond(ExchNum).SupInHumRat;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SecInletNode).HumRat = ExchCond(ExchNum).SecInHumRat;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupInletNode).Enthalpy = ExchCond(ExchNum).SupInEnth;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SecInletNode).Enthalpy = ExchCond(ExchNum).SecInEnth;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupInletNode).MassFlowRate = ExchCond(ExchNum).SupInMassFlow;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SecInletNode).MassFlowRate = ExchCond(ExchNum).SecInMassFlow;
+    state->dataHeatRecovery->ExchCond(ExchNum).Name = "Test Heat Recovery 2";
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
+    state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp = 15.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp = 24.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat = 0.01;
+    state->dataHeatRecovery->ExchCond(ExchNum).SecInHumRat = 0.01;
+    state->dataHeatRecovery->ExchCond(ExchNum).SupInEnth =
+        PsyHFnTdbW(state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp, state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat);
+    state->dataHeatRecovery->ExchCond(ExchNum).SecInEnth =
+        PsyHFnTdbW(state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp, state->dataHeatRecovery->ExchCond(ExchNum).SecInHumRat);
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode).Temp = state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).Temp = state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode).HumRat =
+        state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).HumRat =
+        state->dataHeatRecovery->ExchCond(ExchNum).SecInHumRat;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode).Enthalpy =
+        state->dataHeatRecovery->ExchCond(ExchNum).SupInEnth;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).Enthalpy =
+        state->dataHeatRecovery->ExchCond(ExchNum).SecInEnth;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode).MassFlowRate =
+        state->dataHeatRecovery->ExchCond(ExchNum).SupInMassFlow;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).MassFlowRate =
+        state->dataHeatRecovery->ExchCond(ExchNum).SecInMassFlow;
 
     // HXUnitOn is false so expect outlet = inlet
     HXUnitOn = false;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
-    EXPECT_DOUBLE_EQ(ExchCond(ExchNum).SupInTemp, state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).Temp);
+    EXPECT_DOUBLE_EQ(state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp,
+                     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
-    ExchCond(ExchNum).ControlToTemperatureSetPoint = false;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).TempSetPoint = 19.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).ControlToTemperatureSetPoint = false;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint = 19.0;
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is false so expect outlet = temperature based on effectiveness
     HXUnitOn = true;
-    ExchCond(ExchNum).ExchConfigNum = Plate;
+     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
-    EXPECT_DOUBLE_EQ(
-        (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp))),
-        state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).Temp);
+    EXPECT_DOUBLE_EQ((state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
+                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+                       (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp))),
+                     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
-    ExchCond(ExchNum).ExchConfigNum = Rotary;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
-    EXPECT_DOUBLE_EQ(
-        (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp))),
-        state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).Temp);
+    EXPECT_DOUBLE_EQ((state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
+                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+                       (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp))),
+                     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
-    ExchCond(ExchNum).ControlToTemperatureSetPoint = true;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).TempSetPoint = 19.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).ControlToTemperatureSetPoint = true;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint = 19.0;
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is true so expect outlet = set point temperature
     HXUnitOn = true;
-    ExchCond(ExchNum).ExchConfigNum = Plate;
+     state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
-    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).TempSetPoint, state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).Temp);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint,
+                     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
-    ExchCond(ExchNum).ExchConfigNum = Rotary;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
-    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).TempSetPoint, state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).Temp);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint, state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
     // test cycling fan case
     FanOpMode = DataHVACGlobals::CycFanCycCoil;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SupInletNode).MassFlowRate = ExchCond(ExchNum).SupInMassFlow / 4.0;
-    state->dataLoopNodes->Node(ExchCond(ExchNum).SecInletNode).MassFlowRate = ExchCond(ExchNum).SecInMassFlow / 4.0;
-    ExchCond(ExchNum).ControlToTemperatureSetPoint = false;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode).MassFlowRate =  state->dataHeatRecovery->ExchCond(ExchNum).SupInMassFlow / 4.0;
+    state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).MassFlowRate =  state->dataHeatRecovery->ExchCond(ExchNum).SecInMassFlow / 4.0;
+     state->dataHeatRecovery->ExchCond(ExchNum).ControlToTemperatureSetPoint = false;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, PartLoadRatio);
     UpdateHeatRecovery(*state, ExchNum);
-    EXPECT_DOUBLE_EQ(
-        (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp))),
-        state->dataLoopNodes->Node(ExchCond(ExchNum).SupOutletNode).Temp);
+    EXPECT_DOUBLE_EQ((state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
+                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+                       (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp))),
+                     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 }
 
 TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
@@ -3816,18 +3837,19 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
     // OutputProcessor::TimeValue.allocate(2); //
     ManageSimulation(*state);                     // run the design day
 
-    ASSERT_EQ("DOAS HEAT RECOVERY", ExchCond(1).Name);                       // Name of Heat Recovery Exchange On Main Air Loop
-    ASSERT_EQ(ExchCond(1).Name, state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name); // Heat Recovery Exchange On Main Air Loop
+    ASSERT_EQ("DOAS HEAT RECOVERY",  state->dataHeatRecovery->ExchCond(1).Name);                       // Name of Heat Recovery Exchange On Main Air Loop
+    ASSERT_EQ( state->dataHeatRecovery->ExchCond(1).Name, state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name); // Heat Recovery Exchange On Main Air Loop
 
-    ASSERT_NEAR(-17.300, ExchCond(1).SupInTemp, 0.001);       // Heat Recovery Exchanger Primary Air Inlet Temp
-    ASSERT_GT(ExchCond(1).SupOutTemp, ExchCond(1).SupInTemp); // Heat Recovery Exchanger is On in heating mode
-    ASSERT_NEAR(23.000, ExchCond(1).SecInTemp, 0.001);        // Heat Recovery Exchanger Secondary Air Inlet Temp
-    ASSERT_LT(ExchCond(1).SecOutTemp, ExchCond(1).SecInTemp); // Heat Recovery Exchanger is On in heating mode
+    ASSERT_NEAR(-17.300,  state->dataHeatRecovery->ExchCond(1).SupInTemp, 0.001);       // Heat Recovery Exchanger Primary Air Inlet Temp
+    ASSERT_GT( state->dataHeatRecovery->ExchCond(1).SupOutTemp,  state->dataHeatRecovery->ExchCond(1).SupInTemp); // Heat Recovery Exchanger is On in heating mode
+    ASSERT_NEAR(23.000,  state->dataHeatRecovery->ExchCond(1).SecInTemp, 0.001);        // Heat Recovery Exchanger Secondary Air Inlet Temp
+    ASSERT_LT( state->dataHeatRecovery->ExchCond(1).SecOutTemp,  state->dataHeatRecovery->ExchCond(1).SecInTemp); // Heat Recovery Exchanger is On in heating mode
 
-    InletNode = ExchCond(1).SupInletNode;
-    OutletNode = ExchCond(1).SupOutletNode;
-    Qhr_HeatingRateTot = ExchCond(1).SupInMassFlow * (state->dataLoopNodes->Node(OutletNode).Enthalpy - state->dataLoopNodes->Node(InletNode).Enthalpy);
-    ASSERT_NEAR(Qhr_HeatingRateTot, ExchCond(1).TotHeatingRate, 0.01);
+    InletNode = state->dataHeatRecovery->ExchCond(1).SupInletNode;
+    OutletNode = state->dataHeatRecovery->ExchCond(1).SupOutletNode;
+    Qhr_HeatingRateTot = state->dataHeatRecovery->ExchCond(1).SupInMassFlow *
+                         (state->dataLoopNodes->Node(OutletNode).Enthalpy - state->dataLoopNodes->Node(InletNode).Enthalpy);
+    ASSERT_NEAR(Qhr_HeatingRateTot, state->dataHeatRecovery->ExchCond(1).TotHeatingRate, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, SizeHeatRecovery)
@@ -3847,22 +3869,22 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     state->dataSize->SysSizInput(state->dataSize->CurSysNum).AirLoopNum = 1;
 
     // initialize sizing required variables
-    ExchCond.allocate(ExchNum);
-    ExchCond(ExchNum).ExchTypeNum = HX_DESICCANT_BALANCED;
-    ExchCond(ExchNum).HeatExchPerfTypeNum = BALANCEDHX_PERFDATATYPE1;
-    ExchCond(ExchNum).NomSupAirVolFlow = AutoSize;
-    ExchCond(ExchNum).PerfDataIndex = BalDesDehumPerfDataIndex;
+     state->dataHeatRecovery->ExchCond.allocate(ExchNum);
+     state->dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_DESICCANT_BALANCED;
+     state->dataHeatRecovery->ExchCond(ExchNum).HeatExchPerfTypeNum = BALANCEDHX_PERFDATATYPE1;
+     state->dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = AutoSize;
+     state->dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex = BalDesDehumPerfDataIndex;
 
-    BalDesDehumPerfData.allocate(BalDesDehumPerfDataIndex);
-    BalDesDehumPerfNumericFields.allocate(BalDesDehumPerfDataIndex);
-    BalDesDehumPerfData(BalDesDehumPerfDataIndex).Name = "DehumPerformanceData";
-    BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames.allocate(2);
+     state->dataHeatRecovery->BalDesDehumPerfData.allocate(BalDesDehumPerfDataIndex);
+     state->dataHeatRecovery->BalDesDehumPerfNumericFields.allocate(BalDesDehumPerfDataIndex);
+     state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).Name = "DehumPerformanceData";
+     state->dataHeatRecovery->BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames.allocate(2);
 
     // autosize nominal vol flow and face velocity
-    BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames(1) = "Nominal Air Flow Rate";
-    BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomSupAirVolFlow = AutoSize;
-    BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames(2) = "Nominal Air Face Velocity";
-    BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomProcAirFaceVel = AutoSize;
+     state->dataHeatRecovery->BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames(1) = "Nominal Air Flow Rate";
+     state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomSupAirVolFlow = AutoSize;
+     state->dataHeatRecovery->BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames(2) = "Nominal Air Face Velocity";
+     state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomProcAirFaceVel = AutoSize;
 
     // initialize sizing variables
     state->dataSize->CurDuctType = DataHVACGlobals::Main;
@@ -3878,14 +3900,14 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     SizeHeatRecovery(*state, ExchNum);
 
     // test autosized nominal vol flow rate
-    EXPECT_EQ(1.0, BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomSupAirVolFlow); // m3/s
+    EXPECT_EQ(1.0,  state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomSupAirVolFlow); // m3/s
 
     // size nominal face velocity
-    SysVolFlow = BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomSupAirVolFlow;
+    SysVolFlow =  state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomSupAirVolFlow;
     FaceVelocity = 4.30551 + 0.01969 * SysVolFlow;
 
     // test autosized face velocity
-    EXPECT_EQ(FaceVelocity, BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomProcAirFaceVel); // m/s
+    EXPECT_EQ(FaceVelocity,  state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomProcAirFaceVel); // m/s
 }
 
 TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
@@ -3937,8 +3959,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
     SizeHeatRecovery(*state, ExchNum);
 
     // verify the name and autosized supply air flow rate
-    EXPECT_EQ(ExchCond(ExchNum).Name, "HEATRECOVERY HX IN ERV");
-    EXPECT_EQ(ExchCond(ExchNum).NomSupAirVolFlow, 1.0);
+    EXPECT_EQ( state->dataHeatRecovery->ExchCond(ExchNum).Name, "HEATRECOVERY HX IN ERV");
+    EXPECT_EQ( state->dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow, 1.0);
 }
 
 TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
@@ -4060,8 +4082,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     // get HR HX generic
     GetHeatRecoveryInput(*state);
     int ExchNum = 1;
-    auto &thisHX = HeatRecovery::ExchCond(ExchNum);
-    EXPECT_EQ(1, HeatRecovery::NumAirToAirGenericExchs);
+    auto &thisHX =  state->dataHeatRecovery->ExchCond(ExchNum);
+    EXPECT_EQ(1,  state->dataHeatRecovery->NumAirToAirGenericExchs);
     EXPECT_EQ(thisHX.Name, "HEATRECOVERY HX GENERIC");
     // initialize
     state->dataSize->CurSysNum = 1;
@@ -4166,7 +4188,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     // get HR HX generic
     GetHeatRecoveryInput(*state);
     int ExchNum = 1;
-    auto &thisHX = HeatRecovery::ExchCond(ExchNum);
+    auto &thisHX =  state->dataHeatRecovery->ExchCond(ExchNum);
     // check inputs
     EXPECT_EQ(thisHX.Name, "HEATRECOVERY HX GENERIC");
     EXPECT_EQ(thisHX.NomSupAirVolFlow, DataSizing::AutoSize);

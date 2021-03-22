@@ -4804,13 +4804,13 @@ namespace CondenserLoopTowers {
         this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
 
         //   calculate end time of current time step
-        Real64 const CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        Real64 const CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > this->CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= this->TimeStepSysLast) {
+        if (CurrentEndTime > this->CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= this->TimeStepSysLast) {
             if (state.dataCondenserLoopTowers->towers(this->VSTower).PrintLGMessage) {
                 ++state.dataCondenserLoopTowers->towers(this->VSTower).VSErrorCountFlowFrac;
                 //       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -4828,7 +4828,7 @@ namespace CondenserLoopTowers {
         }
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        this->TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
         this->CurrentEndTimeLast = CurrentEndTime;
 
         //   warn user on first occurrence if flow fraction is greater than maximum for the YorkCalc model, use recurring warning stats
@@ -5466,13 +5466,13 @@ namespace CondenserLoopTowers {
         WaterFlowRateRatioCapped = WaterFlowRateRatio;
 
         //   calculate end time of current time step
-        CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > this->CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= this->TimeStepSysLast) {
+        if (CurrentEndTime > this->CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= this->TimeStepSysLast) {
             if (state.dataCondenserLoopTowers->towers(this->VSTower).PrintTrMessage) {
                 ++state.dataCondenserLoopTowers->towers(this->VSTower).VSErrorCountTR;
                 if (state.dataCondenserLoopTowers->towers(this->VSTower).VSErrorCountTR < 2) {
@@ -5538,7 +5538,7 @@ namespace CondenserLoopTowers {
         }
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        this->TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
         this->CurrentEndTimeLast = CurrentEndTime;
 
         //   check boundaries of independent variables and post warnings to individual buffers to print at end of time step
@@ -5881,17 +5881,17 @@ namespace CondenserLoopTowers {
         //   total water usage
         // update report variables
         this->EvaporationVdot = EvapVdot;
-        this->EvaporationVol = EvapVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+        this->EvaporationVol = EvapVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
         this->DriftVdot = driftVdot;
-        this->DriftVol = driftVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+        this->DriftVol = driftVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
         this->BlowdownVdot = BlowDownVdot;
-        this->BlowdownVol = BlowDownVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+        this->BlowdownVol = BlowDownVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
         this->MakeUpVdot = makeUpVdot;
-        this->MakeUpVol = makeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+        this->MakeUpVol = makeUpVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
         this->TankSupplyVdot = tankSupplyVdot;
-        this->TankSupplyVol = tankSupplyVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+        this->TankSupplyVol = tankSupplyVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
         this->StarvedMakeUpVdot = StarvedVdot;
-        this->StarvedMakeUpVol = StarvedVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+        this->StarvedMakeUpVol = StarvedVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
     }
 
     void CoolingTower::update(EnergyPlusData &state)
@@ -5989,7 +5989,7 @@ namespace CondenserLoopTowers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the tower.
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (!RunFlag) {
             this->InletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;

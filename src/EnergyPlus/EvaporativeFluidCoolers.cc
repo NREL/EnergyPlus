@@ -2442,12 +2442,12 @@ namespace EvaporativeFluidCoolers {
 
         //   total water usage
         // update report variables
-        this->EvaporationVol = this->EvaporationVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
-        this->DriftVol = this->DriftVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
-        this->BlowdownVol = this->BlowdownVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
-        this->MakeUpVol = this->MakeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
-        this->TankSupplyVol = this->TankSupplyVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
-        this->StarvedMakeUpVol = this->StarvedMakeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+        this->EvaporationVol = this->EvaporationVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        this->DriftVol = this->DriftVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        this->BlowdownVol = this->BlowdownVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        this->MakeUpVol = this->MakeUpVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        this->TankSupplyVol = this->TankSupplyVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        this->StarvedMakeUpVol = this->StarvedMakeUpVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
     }
 
     void EvapFluidCoolerSpecs::UpdateEvapFluidCooler(EnergyPlusData &state)
@@ -2545,7 +2545,7 @@ namespace EvaporativeFluidCoolers {
 
         Real64 ReportingConstant;
 
-        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (!RunFlag) {
             this->fluidCoolerInletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;

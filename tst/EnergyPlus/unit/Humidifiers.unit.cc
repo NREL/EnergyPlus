@@ -149,7 +149,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
 {
     HumidifierData thisHum;
 
-    TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
 
@@ -193,7 +193,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     thisHum.CalcGasSteamHumidifier(*state, 0.040000010708118504);
     EXPECT_DOUBLE_EQ(103710.42776358133, thisHum.GasUseRate);
 
-    thisHum.ReportHumidifier();
+    thisHum.ReportHumidifier(*state);
     EXPECT_DOUBLE_EQ(93339384.987223208, thisHum.GasUseEnergy);
 }
 
@@ -239,7 +239,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
 
     HumidifierData thisHum;
 
-    TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
 

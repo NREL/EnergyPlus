@@ -740,6 +740,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     int pdchOaTmFctEcono = 0;
     int pdchOaTmFctDCV = 0;
     int pdchOaTmFctExhaust = 0;
+    int pdchOaTmFctMixedLimit = 0;
     int pdchOaTmFctLimit = 0;
     int pdchOaTmFctDemand = 0;
     int pdchOaTmFctEMS = 0;
@@ -751,6 +752,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     int pdchOaAvFctEcono = 0;
     int pdchOaAvFctDCV = 0;
     int pdchOaAvFctExhaust = 0;
+    int pdchOaAvFctMixedLimit = 0;
     int pdchOaAvFctLimit = 0;
     int pdchOaAvFctDemand = 0;
     int pdchOaAvFctEMS = 0;

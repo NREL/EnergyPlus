@@ -24,25 +24,15 @@ public:
         EXPECT_TRUE(mod);
     }
 
-    void CreateKokamModel()
+    void CreateKokamModel(double dt_hour = 1.)
     {
-        double dt_hour = 1.0 / 360.0;
         params_str = "{ \"control_mode\": 0, \"input_current\" : 0.0, \"chem\" : 1, \"nominal_energy\" : 0.272, \"nominal_voltage\" : 3.6, "
             "\"initial_SOC\" :0.66, \"maximum_SOC\" : 100.000, \"minimum_SOC\" : 0.000, \"dt_hr\" : 0.002777, \"leadacid_tn\" : 0.000,"
             "\"leadacid_qn\" : 0.000, \"leadacid_q10\" : 0.000, \"leadacid_q20\" : 0.000, \"voltage_choice\" : 0,"
             "\"Vnom_default\" : 3.6, \"resistance\" : 0.001155, \"Vfull\" : 4.200, \"Vexp\" : 3.529, \"Vnom\" : 3.35, \"Qfull\" : 75.56,"
             "\"Qexp\" : 60.75, \"Qnom\" : 73.58, \"C_rate\" : 0.200, \"mass\" : 1.55417, \"surface_area\" : 0.1548, \"Cp\" : 980,"
             "\"h\" : 8.066, \"cap_vs_temp\" : [[ 0,  80.200000000000003 ],[23, 100],[30, 103.09999999999999],[45, 105.40000000000001]], \"T_room_init\" : 23,"
-            "\"life_model\": 0, \"cycling_matrix\" : [[ 20,  0,  107 ],[20, 1000,  101],[20, 2000,  98.5],[20, 3000,  96.3],"
-            "[80, 0,  107],[80, 1000,  95.6],[80, 2000,  91.1],[80, 3000,  87.3],"
-            "[100, 0,  107],[100, 1000,  85.1],[100, 2000,  76.3],[100, 3000,  69.1]],"
-            "\"calendar_choice\" : 1, \"calendar_q0\" : 1.03127097 , \"calendar_a\" : 1.35973301e-03,"
-            "\"calendar_b\" : -9.93161754e+03, \"calendar_c\" : 1.65896984e+03, \"calendar_matrix\" : [[-3.1E+231]], \"loss_choice\" : 0,"
-            "\"monthly_charge_loss\" : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ,"
-            "\"monthly_discharge_loss\" : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ,"
-            "\"monthly_idle_loss\" : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] , \"schedule_loss\" : [] , \"replacement_option\" : 0,"
-            "\"replacement_capacity\" : 0.000, \"replacement_schedule\" : [] , \"replacement_schedule_percent\" : [] }";
-        //, \"last_idx\" : 0, \"I\" : 0
+            "\"life_model\": 1}";
 
         data = json_to_ssc_data(params_str.c_str());
         ssc_data_set_number(data, "dt_hr", dt_hour);

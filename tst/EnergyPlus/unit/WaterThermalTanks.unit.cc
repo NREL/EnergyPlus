@@ -542,8 +542,8 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 
 TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 {
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
+    auto & SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
+    auto & TimeStepSys = state->dataHVACGlobal->TimeStepSys;
     using FluidProperties::GetSpecificHeatGlycol;
     using FluidProperties::Water;
 
@@ -764,8 +764,8 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     SysTimeElapsed = 0.0;
     Tank.TimeElapsed = state->dataGlobal->HourOfDay + state->dataGlobal->TimeStep * state->dataGlobal->TimeStepZone + SysTimeElapsed;
 
-    DataHVACGlobals::HPWHInletDBTemp = 21.666666666666668;
-    DataHVACGlobals::HPWHInletWBTemp = 14.963459972723468;
+    state->dataHVACGlobal->HPWHInletDBTemp = 21.666666666666668;
+    state->dataHVACGlobal->HPWHInletWBTemp = 14.963459972723468;
     HPWH.SetPointTemp = 51.666666666666664;
     state->dataOutRptPredefined->pdstHeatCoil = -1;
     state->dataWaterThermalTanks->mdotAir = 0.0993699992873531;
@@ -1035,7 +1035,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     Real64 LatLoadMet = 0;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHVACGlobals::TimeStepSys = 1;
+    state->dataHVACGlobal->TimeStepSys = 1;
     SetPredefinedTables(*state);
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 20.0;
@@ -1393,7 +1393,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
 
-    DataHVACGlobals::TimeStepSys = 1;
+    state->dataHVACGlobal->TimeStepSys = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
     state->dataGlobal->TimeStep = 1;
@@ -1407,9 +1407,9 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
     WaterThermalTanks::HeatPumpWaterHeaterData &HeatPump = state->dataWaterThermalTanks->HPWaterHeater(1);
-    DataHVACGlobals::HPWHInletDBTemp = 30.0;
+    state->dataHVACGlobal->HPWHInletDBTemp = 30.0;
     state->dataEnvrn->WaterMainsTemp = 40.0;
-    DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
+    state->dataHVACGlobal->DXCoilTotalCapacity = 3500.0;
     state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
     state->dataLoopNodes->Node(3).Temp = 30.0;
@@ -1528,8 +1528,8 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 {
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
+    auto & SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
+    auto & TimeStepSys = state->dataHVACGlobal->TimeStepSys;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -1626,8 +1626,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 
 TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 {
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
+    auto & SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
+    auto & TimeStepSys = state->dataHVACGlobal->TimeStepSys;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -1752,8 +1752,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
 TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 {
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
+    auto & TimeStepSys = state->dataHVACGlobal->TimeStepSys;
 
     std::string const idf_objects = delimited_string({
         "  Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -1850,8 +1849,7 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 
 TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 {
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
+    auto & TimeStepSys = state->dataHVACGlobal->TimeStepSys;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Setpoint Temp Schedule, , 60.0;",
@@ -2047,8 +2045,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 
 TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 {
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
+    auto & TimeStepSys = state->dataHVACGlobal->TimeStepSys;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Setpoint Temp Schedule, , 60.0;",
@@ -2172,8 +2169,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 
 TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 {
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
+    auto & SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
+    auto & TimeStepSys = state->dataHVACGlobal->TimeStepSys;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2450,8 +2447,8 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 
 TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 {
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
+    auto & SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
+    auto & TimeStepSys = state->dataHVACGlobal->TimeStepSys;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2756,8 +2753,8 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
 TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 {
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
+    auto & SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
+    auto & TimeStepSys = state->dataHVACGlobal->TimeStepSys;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -3061,8 +3058,8 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
     state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
     state->dataDXCoils->DXCoil(1).InletAirMassFlowRate = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
-    DataHVACGlobals::MSHPMassFlowRateLow = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
+    state->dataHVACGlobal->MSHPMassFlowRateLow = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
 
     state->dataDXCoils->DXCoil(1).InletAirTemp = 27.0;
     state->dataDXCoils->DXCoil(1).InletAirHumRat = 0.005;
@@ -3128,8 +3125,6 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 
 TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 {
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
     using FluidProperties::GetDensityGlycol;
 
     std::string const idf_objects = delimited_string({
@@ -3301,7 +3296,7 @@ TEST_F(EnergyPlusFixture, MixedTank_WarnPotentialFreeze)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
-    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
 
     Tank.TankTemp = 2.0;
     Tank.AmbientTemp = -40;
@@ -3401,7 +3396,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
-    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
 
     Tank.TankTemp = 2.0;
     for (auto &node : Tank.Node) {
@@ -3441,8 +3436,8 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
 
 TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 {
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
+    auto & SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
+    auto & TimeStepSys = state->dataHVACGlobal->TimeStepSys;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -4431,7 +4426,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
 
-    DataHVACGlobals::TimeStepSys = 1;
+    state->dataHVACGlobal->TimeStepSys = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
     state->dataGlobal->TimeStep = 1;
@@ -4449,9 +4444,9 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         auto &HPWHTank = state->dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
         EXPECT_EQ(HPWHTank.Name, "HPWHTANK");
 
-        DataHVACGlobals::HPWHInletDBTemp = 30.0;
+        state->dataHVACGlobal->HPWHInletDBTemp = 30.0;
         state->dataEnvrn->WaterMainsTemp = 40.0;
-        DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
+        state->dataHVACGlobal->DXCoilTotalCapacity = 3500.0;
         state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
         state->dataLoopNodes->Node(3).Temp = 30.0;
@@ -4473,9 +4468,9 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(2);
         EXPECT_EQ(Tank.Name, "STANDALONE TANK");
         EXPECT_EQ(Tank.HeatPumpNum, 0);
-        DataHVACGlobals::HPWHInletDBTemp = 30.0;
+        state->dataHVACGlobal->HPWHInletDBTemp = 30.0;
         state->dataEnvrn->WaterMainsTemp = 40.0;
-        DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
+        state->dataHVACGlobal->DXCoilTotalCapacity = 3500.0;
         state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
         state->dataLoopNodes->Node(3).Temp = 30.0;

@@ -246,7 +246,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
             thisspeed.AirMassFlow = 0.0;
         }
     } else if (speedNum > 1) {
-        thisspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateHigh;
+        thisspeed.AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateHigh;
     }
     if (thisspeed.RatedAirMassFlowRate > 0.0) {
         // TODO: The original two-speed just grabbed the RatedAirMassFlowRate(mode1), not for a specific speed, so that's what I'll do too
@@ -280,7 +280,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
 
         // If multispeed, evaluate next lower speed using PLR, then combine with high speed for final outlet conditions
         auto &lowerspeed(this->speeds[max(speedNum - 2, 0)]);
-        lowerspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateLow;
+        lowerspeed.AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateLow;
 
         lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
 

@@ -1668,11 +1668,11 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                             state.dataContaminantBalance->GCZoneTimeMinus1(ZoneNum);
                 }
 
-                if (NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
+                if (state.dataHVACGlobal->NumOfSysTimeSteps != state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
 
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation)
                         DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      TimeStepSys,
+                                                      state.dataHVACGlobal->TimeStepSys,
                                                       state.dataContaminantBalance->CO2ZoneTimeMinus1(ZoneNum),
                                                       state.dataContaminantBalance->CO2ZoneTimeMinus2(ZoneNum),
                                                       state.dataContaminantBalance->CO2ZoneTimeMinus3(ZoneNum),
@@ -1685,7 +1685,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                                                       state.dataContaminantBalance->DSCO2ZoneTimeMinus4(ZoneNum));
                     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
                         DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      TimeStepSys,
+                                                      state.dataHVACGlobal->TimeStepSys,
                                                       state.dataContaminantBalance->GCZoneTimeMinus1(ZoneNum),
                                                       state.dataContaminantBalance->GCZoneTimeMinus2(ZoneNum),
                                                       state.dataContaminantBalance->GCZoneTimeMinus3(ZoneNum),
@@ -1731,25 +1731,25 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
 
             if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
-                        if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
+                    if (ShortenTimeStepSys && state.dataHVACGlobal->TimeStepSys < state.dataGlobal->TimeStepZone) {
+                        if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                             state.dataContaminantBalance->ZoneCO21(ZoneNum) = state.dataContaminantBalance->ZoneCO2M2(ZoneNum);
                         } else {
                             state.dataContaminantBalance->ZoneCO21(ZoneNum) = state.dataContaminantBalance->ZoneCO2MX(ZoneNum);
                         }
-                        ShortenTimeStepSysRoomAir = true;
+                        state.dataHVACGlobal->ShortenTimeStepSysRoomAir = true;
                     } else {
                         state.dataContaminantBalance->ZoneCO21(ZoneNum) = state.dataContaminantBalance->ZoneAirCO2(ZoneNum);
                     }
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
-                        if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
+                    if (ShortenTimeStepSys && state.dataHVACGlobal->TimeStepSys < state.dataGlobal->TimeStepZone) {
+                        if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                             state.dataContaminantBalance->ZoneGC1(ZoneNum) = state.dataContaminantBalance->ZoneGCM2(ZoneNum);
                         } else {
                             state.dataContaminantBalance->ZoneGC1(ZoneNum) = state.dataContaminantBalance->ZoneGCMX(ZoneNum);
                         }
-                        ShortenTimeStepSysRoomAir = true;
+                        state.dataHVACGlobal->ShortenTimeStepSysRoomAir = true;
                     } else {
                         state.dataContaminantBalance->ZoneGC1(ZoneNum) = state.dataContaminantBalance->ZoneAirGC(ZoneNum);
                     }
@@ -1810,7 +1810,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                     // to determine system added/subtracted moisture.
                     CO2Gain = state.dataContaminantBalance->ZoneCO2Gain(ZoneNum) * RhoAir * 1.0e6;
 
-                    SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
+                    SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
                     // Calculate the coefficients for the 3rd Order derivative for final
                     // zone CO2.  The A, B, C coefficients are analogous to the CO2 balance.
@@ -1917,7 +1917,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                     // to determine system added/subtracted moisture.
                     GCGain = state.dataContaminantBalance->ZoneGCGain(ZoneNum) * RhoAir * 1.0e6;
 
-                    SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
+                    SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
                     // Calculate the coefficients for the 3rd Order derivative for final
                     // zone GC.  The A, B, C coefficients are analogous to the GC balance.
@@ -2133,16 +2133,15 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         Real64 UpperBound(0.0); // Upper bound of number of people
 
         Real64 SysTimeStepInSeconds(0.0);
-        SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
+        SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
         state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
 
         if (state.dataEnvrn->DayOfYear >= state.dataHybridModel->HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= state.dataHybridModel->HybridModelZone(ZoneNum).HybridEndDayOfYear) {
             state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration;
 
-            if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_C && UseZoneTimeStepHistory) {
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_C && state.dataHVACGlobal->UseZoneTimeStepHistory) {
                 static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
-
                 // Conditionally calculate the CO2-dependent and CO2-independent terms.
                 if (state.dataHybridModel->HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
@@ -2186,11 +2185,10 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             }
 
             // Hybrid Model calculate people count
-            if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_C && UseZoneTimeStepHistory) {
+            if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_C && state.dataHVACGlobal->UseZoneTimeStepHistory) {
                 state.dataHeatBal->Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
                 ActivityLevel = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
                 CO2GenRate = GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZonePeopleCO2GenRateSchedulePtr);
-
                 if (ActivityLevel <= 0.0) {
                     ActivityLevel = 130.0; // 130.0 is the default people activity level [W]
                 }
@@ -2312,10 +2310,10 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             // Update variables
             if (ShortenTimeStepSys) {
                 // time step has gotten smaller, use zone timestep history to interpolate new set of "DS" history terms.
-                if (NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
+                if (state.dataHVACGlobal->NumOfSysTimeSteps != state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      TimeStepSys,
+                                                      state.dataHVACGlobal->TimeStepSys,
                                                       state.dataContaminantBalance->ZoneAirCO2(ZoneNum),
                                                       state.dataContaminantBalance->CO2ZoneTimeMinus1(ZoneNum),
                                                       state.dataContaminantBalance->CO2ZoneTimeMinus2(ZoneNum),
@@ -2329,7 +2327,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                     }
                     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      TimeStepSys,
+                                                      state.dataHVACGlobal->TimeStepSys,
                                                       state.dataContaminantBalance->ZoneAirGC(ZoneNum),
                                                       state.dataContaminantBalance->GCZoneTimeMinus1(ZoneNum),
                                                       state.dataContaminantBalance->GCZoneTimeMinus2(ZoneNum),
@@ -2475,7 +2473,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 ZoneMassFlowRate += Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate / ZoneMult;
             }
 
-            SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
+            SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
             // Calculate the coefficients for the 3rd order derivative for final
             // zone humidity ratio.  The A, B, C coefficients are analogous to the

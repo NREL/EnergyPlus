@@ -2082,7 +2082,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     Real64 actualEfficiencyPercentage;
 
     // Test 1: with autosize for max flow, nothing should happen
-    LowTempRadiantSystem::clear_state();
+    state->dataLowTempRadSys->clear_state();
     RadSysNum = 1;
     SystemType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     state->dataLowTempRadSys->NumOfCFloLowTempRadSys = 1;
@@ -2120,7 +2120,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     EXPECT_EQ(InitErrorFound, false);
 
     // Test 2: pump efficiency below 50%
-    LowTempRadiantSystem::clear_state();
+    state->dataLowTempRadSys->clear_state();
     RadSysNum = 1;
     SystemType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     state->dataLowTempRadSys->NumOfCFloLowTempRadSys = 1;
@@ -2147,6 +2147,8 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HeatingSystem = false;
 
     DesignObjectNum = 1;
+    state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes = 1;
+    state->dataLowTempRadSys->CflowRadiantSysDesign.allocate(state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes);
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).DesignObjectPtr = 1;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.0;
 
@@ -2162,7 +2164,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     EXPECT_EQ(InitErrorFound, false);
 
     // Test 3: pump efficiency between 95% and 100%
-    LowTempRadiantSystem::clear_state();
+    state->dataLowTempRadSys->clear_state();
     RadSysNum = 1;
     SystemType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     state->dataLowTempRadSys->NumOfCFloLowTempRadSys = 1;
@@ -2189,6 +2191,8 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HeatingSystem = false;
 
     DesignObjectNum = 1;
+    state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes = 1;
+    state->dataLowTempRadSys->CflowRadiantSysDesign.allocate(state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes);
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).DesignObjectPtr = 1;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.0;
 
@@ -2204,7 +2208,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     EXPECT_EQ(InitErrorFound, false);
 
     // Test 4: pump efficiency over 100%
-    LowTempRadiantSystem::clear_state();
+    state->dataLowTempRadSys->clear_state();
     RadSysNum = 1;
     SystemType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     state->dataLowTempRadSys->NumOfCFloLowTempRadSys = 1;
@@ -2231,6 +2235,8 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HeatingSystem = false;
 
     DesignObjectNum = 1;
+    state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes = 1;
+    state->dataLowTempRadSys->CflowRadiantSysDesign.allocate(state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes);
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).DesignObjectPtr = 1;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.0;
 
@@ -2360,7 +2366,7 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     Real64 Load;
 
     RadSysNum = 1;
-    LowTempRadiantSystem::clear_state();
+    state->dataLowTempRadSys->clear_state();
     SystemType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     state->dataLowTempRadSys->NumOfCFloLowTempRadSys = 1;
     state->dataLowTempRadSys->CFloRadSys.allocate(state->dataLowTempRadSys->NumOfCFloLowTempRadSys);
@@ -2424,7 +2430,7 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     Real64 Load;
 
     RadSysNum = 1;
-    LowTempRadiantSystem::clear_state();
+    state->dataLowTempRadSys->clear_state();
 
     //	SystemType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     state->dataLowTempRadSys->NumOfHydrLowTempRadSys = 1;
@@ -2484,7 +2490,7 @@ TEST_F(LowTempRadiantSystemTest, SizeRadSysTubeLengthTest)
     LowTempRadiantSystem::SystemType RadSysType;
 
     RadSysNum = 1;
-    LowTempRadiantSystem::clear_state();
+    state->dataLowTempRadSys->clear_state();
 
     state->dataLowTempRadSys->HydrRadSys.allocate(3);
     state->dataLowTempRadSys->CFloRadSys.allocate(3);
