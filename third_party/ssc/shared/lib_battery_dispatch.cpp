@@ -659,8 +659,9 @@ bool dispatch_automatic_t::check_constraints(double& I, size_t count)
 				I -= dI;
 			}
 		}
+
 		// Behind the meter
-		else if (m_batteryPower->meterPosition == dispatch_t::BEHIND)
+		if (m_batteryPower->meterPosition == dispatch_t::BEHIND)
 		{
 			// Don't let PV export to grid if can still charge battery (increase charging) (unless following custom dispatch)
 			if (_mode != dispatch_t::CUSTOM_DISPATCH && m_batteryPower->powerSystemToGrid  > tolerance && m_batteryPower->canSystemCharge &&
@@ -674,10 +675,14 @@ bool dispatch_automatic_t::check_constraints(double& I, size_t count)
 			// Don't let battery export to the grid if behind the meter
 			else if (m_batteryPower->powerBatteryToGrid > tolerance)
 			{
-				if (fabs(m_batteryPower->powerBatteryAC) < tolerance)
-					I -= (m_batteryPower->powerBatteryToGrid * util::kilowatt_to_watt / _Battery->V());
-				else
-					I -= (m_batteryPower->powerBatteryToGrid / fabs(m_batteryPower->powerBatteryAC)) * fabs(I);
+                if (fabs(m_batteryPower->powerBatteryAC) < tolerance) {
+                    I -= (m_batteryPower->powerBatteryToGrid * util::kilowatt_to_watt / _Battery->V());
+                }
+                else {
+                    I -= (m_batteryPower->powerBatteryToGrid / fabs(m_batteryPower->powerBatteryAC)) * fabs(I);
+                }
+                m_batteryPower->powerBatteryTarget -= m_batteryPower->powerBatteryToGrid;
+                m_batteryPower->powerBatteryAC -= m_batteryPower->powerBatteryToGrid; // Target was too large given PV, reduce
 			}
 			else
 				iterate = false;

@@ -2589,7 +2589,7 @@ namespace WeatherManager {
                     if (OpaqueSkyCover < 0.0) OpaqueSkyCover = 99.0;
                     if (Visibility < 0.0) Visibility = 9999.0;
                     if (CeilHeight < 0.0) CeilHeight = 9999.0;
-                    if (PresWeathObs < 0) PresWeathObs = 9.0;
+                    if (PresWeathObs < 0) PresWeathObs = 9;
                     if (PrecipWater < 0.0) PrecipWater = 999.0;
                     if (AerosolOptDepth < 0.0) AerosolOptDepth = 999.0;
                     if (SnowDepth < 0.0) SnowDepth = 999.0;
