@@ -126,7 +126,7 @@ namespace FileSystem {
         // If the path doesn't exist, find which of it's parents' paths does exist
         std::string parentPath = path;
         while (!pathExists(parentPath)) {
-            parentPath = getParentDirectoryPath(parentPath);
+            parentPath = getParentDirectoryPath(state, parentPath);
         }
 
         std::string pathTail;
