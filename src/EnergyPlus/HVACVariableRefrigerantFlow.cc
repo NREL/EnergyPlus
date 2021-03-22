@@ -72,6 +72,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -2226,7 +2227,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 ErrorsFound = true;
             }
 
-            if (lNumericFieldBlanks(23)) {
+            if (lAlphaFieldBlanks(23)) {
                 if (state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType == DataHVACGlobals::WaterCooled) {
                     ShowSevereError(state, cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cNumericFieldNames(23) + " is blank.");
                     ShowContinueError(state, "...input is required when " + cAlphaFieldNames(34) + " = " + cAlphaArgs(34));
@@ -2299,7 +2300,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             }
 
             if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatRecoveryUsed) {
-                if (lNumericFieldBlanks(29)) {
+                if (lAlphaFieldBlanks(29)) {
                     state.dataHVACVarRefFlow->VRF(VRFNum).MinOATHeatRecovery = max(state.dataHVACVarRefFlow->VRF(VRFNum).MinOATCooling, state.dataHVACVarRefFlow->VRF(VRFNum).MinOATHeating);
                 } else {
                     state.dataHVACVarRefFlow->VRF(VRFNum).MinOATHeatRecovery = rNumericArgs(29);
@@ -2315,7 +2316,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         ShowContinueError(state, format("... adjusted {} = {:.2T} C", cNumericFieldNames(29), state.dataHVACVarRefFlow->VRF(VRFNum).MinOATHeatRecovery));
                     }
                 }
-                if (lNumericFieldBlanks(30)) {
+                if (lAlphaFieldBlanks(30)) {
                     state.dataHVACVarRefFlow->VRF(VRFNum).MaxOATHeatRecovery = min(state.dataHVACVarRefFlow->VRF(VRFNum).MaxOATCooling, state.dataHVACVarRefFlow->VRF(VRFNum).MaxOATHeating);
                 } else {
                     state.dataHVACVarRefFlow->VRF(VRFNum).MaxOATHeatRecovery = rNumericArgs(30);
@@ -2602,7 +2603,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             state.dataHVACVarRefFlow->VRF(VRFNum).RefPipInsCon = rNumericArgs(22);
 
             // Check the RefPipEquLen
-            if (lNumericFieldBlanks(19) && !lNumericFieldBlanks(18)) {
+            if (lAlphaFieldBlanks(19) && !lNumericFieldBlanks(18)) {
                 state.dataHVACVarRefFlow->VRF(VRFNum).RefPipEquLen = 1.2 * state.dataHVACVarRefFlow->VRF(VRFNum).RefPipLen;
                 ShowWarningError(state, cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", \" " + cNumericFieldNames(19) + "\" is calculated based on");
                 ShowContinueError(state, "...the provided \"" + cNumericFieldNames(18) + "\" value.");
@@ -3027,7 +3028,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             state.dataHVACVarRefFlow->VRF(VRFNum).RefPipInsCon = rNumericArgs(29);
 
             // Check the RefPipEquLen
-            if (lNumericFieldBlanks(26) && !lNumericFieldBlanks(25)) {
+            if (lAlphaFieldBlanks(26) && !lNumericFieldBlanks(25)) {
                 state.dataHVACVarRefFlow->VRF(VRFNum).RefPipEquLen = 1.2 * state.dataHVACVarRefFlow->VRF(VRFNum).RefPipLen;
                 ShowWarningError(state, cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", \" " + cNumericFieldNames(26) + "\" is calculated based on");
                 ShowContinueError(state, "...the provided \"" + cNumericFieldNames(25) + "\" value.");

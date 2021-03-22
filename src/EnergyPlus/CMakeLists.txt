@@ -185,7 +185,6 @@ set(SRC
     DataHeatBalSurface.hh
     DataHeatBalance.cc
     DataHeatBalance.hh
-    DataIPShortCuts.cc
     DataIPShortCuts.hh
     DataLoopNode.hh
     DataMoistureBalance.hh

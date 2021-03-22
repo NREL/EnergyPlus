@@ -1178,7 +1178,6 @@ namespace OutputProcessor {
         // <etc>
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1229,6 +1228,7 @@ namespace OutputProcessor {
         std::string::size_type lbrackPos;
 
         BigErrorsFound = false;
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "Meter:Custom";
         NumCustomMeters = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -1241,35 +1241,35 @@ namespace OutputProcessor {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlpha,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            namesOfMeterCustom.emplace(UtilityRoutines::MakeUPPERCase(cAlphaArgs(1)));
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            namesOfMeterCustom.emplace(UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1)));
         }
 
         for (Loop = 1; Loop <= NumCustomMeters; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlpha,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            lbrackPos = index(cAlphaArgs(1), '[');
-            if (lbrackPos != std::string::npos) cAlphaArgs(1).erase(lbrackPos);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            lbrackPos = index(state.dataIPShortCut->cAlphaArgs(1), '[');
+            if (lbrackPos != std::string::npos) state.dataIPShortCut->cAlphaArgs(1).erase(lbrackPos);
             MeterCreated = false;
-            if (GlobalNames::VerifyUniqueInterObjectName(state, op->UniqueMeterNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+            if (GlobalNames::VerifyUniqueInterObjectName(state, op->UniqueMeterNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound)) {
                 continue;
             }
             if (allocated(VarsOnCustomMeter)) VarsOnCustomMeter.deallocate();
@@ -1280,63 +1280,63 @@ namespace OutputProcessor {
             // check if any fields reference another Meter:Custom
             int found = 0;
             for (fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2) {
-                if (namesOfMeterCustom.find(UtilityRoutines::MakeUPPERCase(cAlphaArgs(fldIndex))) != namesOfMeterCustom.end()) {
+                if (namesOfMeterCustom.find(UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(fldIndex))) != namesOfMeterCustom.end()) {
                     found = fldIndex;
                     break;
                 }
             }
             if (found != 0) {
-                ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", contains a reference to another " + cCurrentModuleObject +
-                                 " in field: " + cAlphaFieldNames(found) + "=\"" + cAlphaArgs(found) + "\".");
+                ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", contains a reference to another " + cCurrentModuleObject +
+                                 " in field: " + state.dataIPShortCut->cAlphaFieldNames(found) + "=\"" + state.dataIPShortCut->cAlphaArgs(found) + "\".");
                 continue;
             }
 
             for (fldIndex = 3; fldIndex <= NumAlpha; fldIndex += 2) {
-                if (cAlphaArgs(fldIndex) == "*" || lAlphaFieldBlanks(fldIndex)) {
+                if (state.dataIPShortCut->cAlphaArgs(fldIndex) == "*" || state.dataIPShortCut->lAlphaFieldBlanks(fldIndex)) {
                     KeyIsStar = true;
-                    cAlphaArgs(fldIndex) = "*";
+                    state.dataIPShortCut->cAlphaArgs(fldIndex) = "*";
                 } else {
                     KeyIsStar = false;
                 }
-                if (lAlphaFieldBlanks(fldIndex + 1)) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank " + cAlphaFieldNames(fldIndex + 1) + '.');
+                if (state.dataIPShortCut->lAlphaFieldBlanks(fldIndex + 1)) {
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", blank " + state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + '.');
                     ShowContinueError(state, "...cannot create custom meter.");
                     BigErrorsFound = true;
                     continue;
                 }
                 if (BigErrorsFound) continue;
                 // Don't build/check things out if there were errors anywhere.  Use "GetVariableKeys" to map to actual variables...
-                lbrackPos = index(cAlphaArgs(fldIndex + 1), '[');
-                if (lbrackPos != std::string::npos) cAlphaArgs(fldIndex + 1).erase(lbrackPos);
+                lbrackPos = index(state.dataIPShortCut->cAlphaArgs(fldIndex + 1), '[');
+                if (lbrackPos != std::string::npos) state.dataIPShortCut->cAlphaArgs(fldIndex + 1).erase(lbrackPos);
                 Tagged = false;
-                GetVariableKeyCountandType(state, cAlphaArgs(fldIndex + 1), KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
+                GetVariableKeyCountandType(state, state.dataIPShortCut->cAlphaArgs(fldIndex + 1), KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
                 if (TypeVar == VarType_NotFound) {
-                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(fldIndex + 1) + "=\"" +
-                                     cAlphaArgs(fldIndex + 1) + "\".");
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + "=\"" +
+                                     state.dataIPShortCut->cAlphaArgs(fldIndex + 1) + "\".");
                     ShowContinueError(state, "...will not be shown with the Meter results.");
                     continue;
                 }
                 if (!MeterCreated) {
                     MeterUnits = UnitsVar; // meter units are same as first variable on custom meter
-                    AddMeter(state, cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
+                    AddMeter(state, state.dataIPShortCut->cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
                     op->EnergyMeters(op->NumEnergyMeters).TypeOfMeter = MeterType_Custom;
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-                    GetStandardMeterResourceType(state, op->EnergyMeters(op->NumEnergyMeters).ResourceType, UtilityRoutines::MakeUPPERCase(cAlphaArgs(2)), errFlag);
+                    GetStandardMeterResourceType(state, op->EnergyMeters(op->NumEnergyMeters).ResourceType, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2)), errFlag);
                     if (errFlag) {
-                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
                         BigErrorsFound = true;
                     }
                     DetermineMeterIPUnits(state, op->EnergyMeters(op->NumEnergyMeters).RT_forIPUnits, op->EnergyMeters(op->NumEnergyMeters).ResourceType, UnitsVar, errFlag);
                     if (errFlag) {
-                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
                         ShowContinueError(state, "..requests for IP units from this meter will be ignored.");
                     }
                     //        EnergyMeters(NumEnergyMeters)%RT_forIPUnits=DetermineMeterIPUnits(EnergyMeters(NumEnergyMeters)%ResourceType,UnitsVar)
                     MeterCreated = true;
                 }
                 if (UnitsVar != MeterUnits) {
-                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", differing units in " + cAlphaFieldNames(fldIndex + 1) +
-                                     "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", differing units in " + state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) +
+                                     "=\"" + state.dataIPShortCut->cAlphaArgs(fldIndex + 1) + "\".");
                     ShowContinueError(state, "...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
                                       ", units for this variable=" + unitEnumToString(UnitsVar) + '.');
                     continue;
@@ -1345,7 +1345,7 @@ namespace OutputProcessor {
                     Tagged = true;
                     NamesOfKeys.allocate(KeyCount);
                     IndexesForKeyVar.allocate(KeyCount);
-                    GetVariableKeys(state, cAlphaArgs(fldIndex + 1), TypeVar, NamesOfKeys, IndexesForKeyVar);
+                    GetVariableKeys(state, state.dataIPShortCut->cAlphaArgs(fldIndex + 1), TypeVar, NamesOfKeys, IndexesForKeyVar);
                     iOnMeter = 0;
                     if (KeyIsStar) {
                         for (iKey = 1; iKey <= KeyCount; ++iKey) {
@@ -1357,13 +1357,13 @@ namespace OutputProcessor {
                             iOnMeter = 1;
                         }
                         if (iOnMeter == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (all keys) " +
-                                            cAlphaFieldNames(fldIndex + 1) + "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid (all keys) " +
+                                            state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + "=\"" + state.dataIPShortCut->cAlphaArgs(fldIndex + 1) + "\".");
                             ErrorsFound = true;
                         }
                     } else { // Key is not "*"
                         for (iKey = 1; iKey <= KeyCount; ++iKey) {
-                            if (NamesOfKeys(iKey) != cAlphaArgs(fldIndex)) continue;
+                            if (NamesOfKeys(iKey) != state.dataIPShortCut->cAlphaArgs(fldIndex)) continue;
                             ++NumVarsOnCustomMeter;
                             if (NumVarsOnCustomMeter > MaxVarsOnCustomMeter) {
                                 VarsOnCustomMeter.redimension(MaxVarsOnCustomMeter += 100, 0);
@@ -1372,8 +1372,8 @@ namespace OutputProcessor {
                             iOnMeter = 1;
                         }
                         if (iOnMeter == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaArgs(fldIndex) + ':' +
-                                            cAlphaArgs(fldIndex + 1));
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaArgs(fldIndex) + ':' +
+                                            state.dataIPShortCut->cAlphaArgs(fldIndex + 1));
                             ErrorsFound = true;
                         }
                     }
@@ -1384,7 +1384,7 @@ namespace OutputProcessor {
                     Tagged = true;
                     NamesOfKeys.allocate(KeyCount);
                     IndexesForKeyVar.allocate(KeyCount);
-                    GetVariableKeys(state, cAlphaArgs(fldIndex + 1), TypeVar, NamesOfKeys, IndexesForKeyVar);
+                    GetVariableKeys(state, state.dataIPShortCut->cAlphaArgs(fldIndex + 1), TypeVar, NamesOfKeys, IndexesForKeyVar);
                     WhichMeter = IndexesForKeyVar(1);
                     NamesOfKeys.deallocate();
                     IndexesForKeyVar.deallocate();
@@ -1400,8 +1400,8 @@ namespace OutputProcessor {
                 }
                 if (!Tagged) { // couldn't find place for this item on a meter
                     if (AvgSumVar != StoreType::Summed) {
-                        ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", variable not summed variable " +
-                                         cAlphaFieldNames(fldIndex + 1) + "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
+                        ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", variable not summed variable " +
+                                         state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + "=\"" + state.dataIPShortCut->cAlphaArgs(fldIndex + 1) + "\".");
                         ShowContinueError(state, "...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
                                           ", units for this variable=" + unitEnumToString(UnitsVar) + '.');
                     }
@@ -1413,7 +1413,7 @@ namespace OutputProcessor {
                 for (iKey1 = iKey + 1; iKey1 <= NumVarsOnCustomMeter; ++iKey1) {
                     if (iKey == iKey1) continue;
                     if (VarsOnCustomMeter(iKey) != VarsOnCustomMeter(iKey1)) continue;
-                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", duplicate name=\"" +
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", duplicate name=\"" +
                                      op->RVariableTypes(VarsOnCustomMeter(iKey1)).VarName + "\".");
                     ShowContinueError(state, "...only one value with this name will be shown with the Meter results.");
                     VarsOnCustomMeter(iKey1) = 0;
@@ -1425,7 +1425,7 @@ namespace OutputProcessor {
                 AttachCustomMeters(state, VarsOnCustomMeter(iKey), tmpVar.MeterArrayPtr, op->NumEnergyMeters);
             }
             if (NumVarsOnCustomMeter == 0) {
-                ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", no items assigned ");
+                ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", no items assigned ");
                 ShowContinueError(state,
                     "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.");
             }
@@ -1438,19 +1438,19 @@ namespace OutputProcessor {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlpha,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            lbrackPos = index(cAlphaArgs(1), '[');
-            if (lbrackPos != std::string::npos) cAlphaArgs(1).erase(lbrackPos);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            lbrackPos = index(state.dataIPShortCut->cAlphaArgs(1), '[');
+            if (lbrackPos != std::string::npos) state.dataIPShortCut->cAlphaArgs(1).erase(lbrackPos);
             MeterCreated = false;
-            if (GlobalNames::VerifyUniqueInterObjectName(state, op->UniqueMeterNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+            if (GlobalNames::VerifyUniqueInterObjectName(state, op->UniqueMeterNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound)) {
                 continue;
             }
             if (allocated(VarsOnCustomMeter)) VarsOnCustomMeter.deallocate();
@@ -1459,11 +1459,11 @@ namespace OutputProcessor {
             MaxVarsOnCustomMeter = 1000;
             NumVarsOnCustomMeter = 0;
 
-            lbrackPos = index(cAlphaArgs(3), '[');
-            if (lbrackPos != std::string::npos) cAlphaArgs(1).erase(lbrackPos);
-            WhichMeter = UtilityRoutines::FindItem(cAlphaArgs(3), op->EnergyMeters);
+            lbrackPos = index(state.dataIPShortCut->cAlphaArgs(3), '[');
+            if (lbrackPos != std::string::npos) state.dataIPShortCut->cAlphaArgs(1).erase(lbrackPos);
+            WhichMeter = UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(3), op->EnergyMeters);
             if (WhichMeter == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
                 ErrorsFound = true;
                 continue;
             }
@@ -1496,53 +1496,53 @@ namespace OutputProcessor {
             }
 
             for (fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2) {
-                if (cAlphaArgs(fldIndex) == "*" || lAlphaFieldBlanks(fldIndex)) {
+                if (state.dataIPShortCut->cAlphaArgs(fldIndex) == "*" || state.dataIPShortCut->lAlphaFieldBlanks(fldIndex)) {
                     KeyIsStar = true;
-                    cAlphaArgs(fldIndex) = "*";
+                    state.dataIPShortCut->cAlphaArgs(fldIndex) = "*";
                 } else {
                     KeyIsStar = false;
                 }
-                if (lAlphaFieldBlanks(fldIndex + 1)) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank " + cAlphaFieldNames(fldIndex + 1) + '.');
+                if (state.dataIPShortCut->lAlphaFieldBlanks(fldIndex + 1)) {
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", blank " + state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + '.');
                     ShowContinueError(state, "...cannot create custom meter.");
                     BigErrorsFound = true;
                     continue;
                 }
                 if (BigErrorsFound) continue;
                 Tagged = false;
-                lbrackPos = index(cAlphaArgs(fldIndex + 1), '[');
-                if (lbrackPos != std::string::npos) cAlphaArgs(fldIndex + 1).erase(lbrackPos);
+                lbrackPos = index(state.dataIPShortCut->cAlphaArgs(fldIndex + 1), '[');
+                if (lbrackPos != std::string::npos) state.dataIPShortCut->cAlphaArgs(fldIndex + 1).erase(lbrackPos);
                 // Don't build/check things out if there were errors anywhere.  Use "GetVariableKeys" to map to actual variables...
-                GetVariableKeyCountandType(state, cAlphaArgs(fldIndex + 1), KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
+                GetVariableKeyCountandType(state, state.dataIPShortCut->cAlphaArgs(fldIndex + 1), KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
                 if (TypeVar == VarType_NotFound) {
-                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(fldIndex + 1) + "=\"" +
-                                     cAlphaArgs(fldIndex + 1) + "\".");
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + "=\"" +
+                                     state.dataIPShortCut->cAlphaArgs(fldIndex + 1) + "\".");
                     ShowContinueError(state, "...will not be shown with the Meter results.");
                     continue;
                 }
                 if (!MeterCreated) {
                     MeterUnits = UnitsVar;
-                    AddMeter(state, cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
+                    AddMeter(state, state.dataIPShortCut->cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
                     op->EnergyMeters(op->NumEnergyMeters).TypeOfMeter = MeterType_CustomDec;
                     op->EnergyMeters(op->NumEnergyMeters).SourceMeter = WhichMeter;
 
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-                    GetStandardMeterResourceType(state, op->EnergyMeters(op->NumEnergyMeters).ResourceType, UtilityRoutines::MakeUPPERCase(cAlphaArgs(2)), errFlag);
+                    GetStandardMeterResourceType(state, op->EnergyMeters(op->NumEnergyMeters).ResourceType, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2)), errFlag);
                     if (errFlag) {
-                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
                         BigErrorsFound = true;
                     }
                     DetermineMeterIPUnits(state, op->EnergyMeters(op->NumEnergyMeters).RT_forIPUnits, op->EnergyMeters(op->NumEnergyMeters).ResourceType, UnitsVar, errFlag);
                     if (errFlag) {
-                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
                         ShowContinueError(state, "..requests for IP units from this meter will be ignored.");
                     }
                     //        EnergyMeters(NumEnergyMeters)%RT_forIPUnits=DetermineMeterIPUnits(EnergyMeters(NumEnergyMeters)%ResourceType,UnitsVar)
                     MeterCreated = true;
                 }
                 if (UnitsVar != MeterUnits) {
-                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", differing units in " + cAlphaFieldNames(fldIndex + 1) +
-                                     "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", differing units in " + state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) +
+                                     "=\"" + state.dataIPShortCut->cAlphaArgs(fldIndex + 1) + "\".");
                     ShowContinueError(state, "...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
                                       ", units for this variable=" + unitEnumToString(UnitsVar) + '.');
                     continue;
@@ -1551,7 +1551,7 @@ namespace OutputProcessor {
                     Tagged = true;
                     NamesOfKeys.allocate(KeyCount);
                     IndexesForKeyVar.allocate(KeyCount);
-                    GetVariableKeys(state, cAlphaArgs(fldIndex + 1), TypeVar, NamesOfKeys, IndexesForKeyVar);
+                    GetVariableKeys(state, state.dataIPShortCut->cAlphaArgs(fldIndex + 1), TypeVar, NamesOfKeys, IndexesForKeyVar);
                     iOnMeter = 0;
                     if (KeyIsStar) {
                         for (iKey = 1; iKey <= KeyCount; ++iKey) {
@@ -1563,13 +1563,13 @@ namespace OutputProcessor {
                             iOnMeter = 1;
                         }
                         if (iOnMeter == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (all keys) " +
-                                            cAlphaFieldNames(fldIndex + 1) + "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid (all keys) " +
+                                            state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + "=\"" + state.dataIPShortCut->cAlphaArgs(fldIndex + 1) + "\".");
                             ErrorsFound = true;
                         }
                     } else {
                         for (iKey = 1; iKey <= KeyCount; ++iKey) {
-                            if (NamesOfKeys(iKey) != cAlphaArgs(fldIndex)) continue;
+                            if (NamesOfKeys(iKey) != state.dataIPShortCut->cAlphaArgs(fldIndex)) continue;
                             ++NumVarsOnCustomMeter;
                             if (NumVarsOnCustomMeter > MaxVarsOnCustomMeter) {
                                 VarsOnCustomMeter.redimension(MaxVarsOnCustomMeter += 100, 0);
@@ -1578,8 +1578,8 @@ namespace OutputProcessor {
                             iOnMeter = 1;
                         }
                         if (iOnMeter == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaArgs(fldIndex) + ':' +
-                                            cAlphaArgs(fldIndex + 1));
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaArgs(fldIndex) + ':' +
+                                            state.dataIPShortCut->cAlphaArgs(fldIndex + 1));
                             ErrorsFound = true;
                         }
                     }
@@ -1590,7 +1590,7 @@ namespace OutputProcessor {
                     Tagged = true;
                     NamesOfKeys.allocate(KeyCount);
                     IndexesForKeyVar.allocate(KeyCount);
-                    GetVariableKeys(state, cAlphaArgs(fldIndex + 1), TypeVar, NamesOfKeys, IndexesForKeyVar);
+                    GetVariableKeys(state, state.dataIPShortCut->cAlphaArgs(fldIndex + 1), TypeVar, NamesOfKeys, IndexesForKeyVar);
                     WhichMeter = IndexesForKeyVar(1);
                     NamesOfKeys.deallocate();
                     IndexesForKeyVar.deallocate();
@@ -1611,8 +1611,8 @@ namespace OutputProcessor {
                 }
                 if (!Tagged) { // couldn't find place for this item on a meter
                     if (AvgSumVar != StoreType::Summed) {
-                        ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", variable not summed variable " +
-                                         cAlphaFieldNames(fldIndex + 1) + "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
+                        ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", variable not summed variable " +
+                                         state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + "=\"" + state.dataIPShortCut->cAlphaArgs(fldIndex + 1) + "\".");
                         ShowContinueError(state, "...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
                                           ", units for this variable=" + unitEnumToString(UnitsVar) + '.');
                     }
@@ -1624,7 +1624,7 @@ namespace OutputProcessor {
                 for (iKey1 = iKey + 1; iKey1 <= NumVarsOnCustomMeter; ++iKey1) {
                     if (iKey == iKey1) continue;
                     if (VarsOnCustomMeter(iKey) != VarsOnCustomMeter(iKey1)) continue;
-                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", duplicate name=\"" +
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", duplicate name=\"" +
                                      op->RVariableTypes(VarsOnCustomMeter(iKey1)).VarName + "\".");
                     ShowContinueError(state, "...only one value with this name will be shown with the Meter results.");
                     VarsOnCustomMeter(iKey1) = 0;
@@ -1641,8 +1641,8 @@ namespace OutputProcessor {
                 for (iKey1 = 1; iKey1 <= NumVarsOnSourceMeter; ++iKey1) {
                     if (any_eq(VarsOnSourceMeter, VarsOnCustomMeter(iKey))) break;
                     if (!errFlag) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid specification to " + cAlphaFieldNames(3) + "=\"" +
-                                        cAlphaArgs(3) + "\".");
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid specification to " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(3) + "\".");
                         errFlag = true;
                     }
                     ShowContinueError(state, "..Variable=" + op->RVariableTypes(VarsOnCustomMeter(iKey)).VarName);
@@ -1651,7 +1651,7 @@ namespace OutputProcessor {
                 }
             }
             if (NumVarsOnCustomMeter == 0) {
-                ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", no items assigned ");
+                ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", no items assigned ");
                 ShowContinueError(state, "...will not be shown with the Meter results");
             }
 
@@ -6552,8 +6552,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
     //        \note runperiod, environment, and annual are synonymous
 
     // Using/Aliasing
-    using namespace DataIPShortCuts;
-    using namespace OutputProcessor;
+        using namespace OutputProcessor;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
@@ -6600,6 +6599,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
         return meterIndex;
     };
 
+    auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Output:Meter";
     NumReqMeters = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -6613,10 +6613,10 @@ void UpdateMeterReporting(EnergyPlusData &state)
                                       Numbers,
                                       NumNumbers,
                                       IOStat,
-                                      lNumericFieldBlanks,
-                                      lAlphaFieldBlanks,
-                                      cAlphaFieldNames,
-                                      cNumericFieldNames);
+                                      state.dataIPShortCut->lNumericFieldBlanks,
+                                      state.dataIPShortCut->lAlphaFieldBlanks,
+                                      state.dataIPShortCut->cAlphaFieldNames,
+                                      state.dataIPShortCut->cNumericFieldNames);
 
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
@@ -6628,7 +6628,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
             // MeterFileOnlyIndicator is false, CumulativeIndicator is false
             SetInitialMeterReportingAndOutputNames(state, meterIndex, false, ReportFreq, false);
         } else {
-            ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+            ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }
     }
 
@@ -6644,10 +6644,10 @@ void UpdateMeterReporting(EnergyPlusData &state)
                                       Numbers,
                                       NumNumbers,
                                       IOStat,
-                                      lNumericFieldBlanks,
-                                      lAlphaFieldBlanks,
-                                      cAlphaFieldNames,
-                                      cNumericFieldNames);
+                                      state.dataIPShortCut->lNumericFieldBlanks,
+                                      state.dataIPShortCut->lAlphaFieldBlanks,
+                                      state.dataIPShortCut->cAlphaFieldNames,
+                                      state.dataIPShortCut->cNumericFieldNames);
 
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
@@ -6659,7 +6659,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
             // MeterFileOnlyIndicator is true, CumulativeIndicator is false
             SetInitialMeterReportingAndOutputNames(state, meterIndex, true, ReportFreq, false);
         } else {
-            ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+            ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }
     }
 
@@ -6676,10 +6676,10 @@ void UpdateMeterReporting(EnergyPlusData &state)
                                       Numbers,
                                       NumNumbers,
                                       IOStat,
-                                      lNumericFieldBlanks,
-                                      lAlphaFieldBlanks,
-                                      cAlphaFieldNames,
-                                      cNumericFieldNames);
+                                      state.dataIPShortCut->lNumericFieldBlanks,
+                                      state.dataIPShortCut->lAlphaFieldBlanks,
+                                      state.dataIPShortCut->cAlphaFieldNames,
+                                      state.dataIPShortCut->cNumericFieldNames);
 
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
@@ -6691,7 +6691,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
             // MeterFileOnlyIndicator is false, CumulativeIndicator is true
             SetInitialMeterReportingAndOutputNames(state, meterIndex, false, ReportFreq, true);
         } else {
-            ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+            ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }
     }
 
@@ -6707,10 +6707,10 @@ void UpdateMeterReporting(EnergyPlusData &state)
                                       Numbers,
                                       NumNumbers,
                                       IOStat,
-                                      lNumericFieldBlanks,
-                                      lAlphaFieldBlanks,
-                                      cAlphaFieldNames,
-                                      cNumericFieldNames);
+                                      state.dataIPShortCut->lNumericFieldBlanks,
+                                      state.dataIPShortCut->lAlphaFieldBlanks,
+                                      state.dataIPShortCut->cAlphaFieldNames,
+                                      state.dataIPShortCut->cNumericFieldNames);
 
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
@@ -6722,7 +6722,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
             // MeterFileOnlyIndicator is true, CumulativeIndicator is true
             SetInitialMeterReportingAndOutputNames(state, meterIndex, true, ReportFreq, true);
         } else {
-            ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+            ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }
     }
 

@@ -994,8 +994,7 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using ScheduleManager::GetScheduleIndex;
+                using ScheduleManager::GetScheduleIndex;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1062,10 +1061,10 @@ namespace EnergyPlus::OutputReportTabular {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             ort->OutputTableBinned(iInObj).keyValue = AlphArray(1);
             ort->OutputTableBinned(iInObj).varOrMeter = AlphArray(2);
             // if a schedule has been specified assign
@@ -1073,7 +1072,7 @@ namespace EnergyPlus::OutputReportTabular {
                 ort->OutputTableBinned(iInObj).ScheduleName = AlphArray(3);
                 ort->OutputTableBinned(iInObj).scheduleIndex = GetScheduleIndex(state, AlphArray(3));
                 if (ort->OutputTableBinned(iInObj).scheduleIndex == 0) {
-                    ShowWarningError(state, CurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" - not found.");
+                    ShowWarningError(state, CurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" - not found.");
                 }
             } else {
                 ort->OutputTableBinned(iInObj).scheduleIndex = 0; // flag value for no schedule used
@@ -1218,8 +1217,7 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using DataStringGlobals::CharComma;
+                using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
 
@@ -1267,10 +1265,10 @@ namespace EnergyPlus::OutputReportTabular {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             // ColumnSeparator
             if (UtilityRoutines::SameString(AlphArray(1), "Comma")) {
                 ort->numStyles = 1;
@@ -1329,7 +1327,7 @@ namespace EnergyPlus::OutputReportTabular {
                 ort->TableStyle(5) = iTableStyle::XML;
                 ort->del(5) = CharSpace; // space - this is not used much for XML output
             } else {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + AlphArray(1) + "\". Commas will be used.");
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + AlphArray(1) + "\". Commas will be used.");
                 ort->numStyles = 1;
                 ort->TableStyle(1) = iTableStyle::Comma;
                 ort->del(1) = CharComma; // comma
@@ -1339,7 +1337,7 @@ namespace EnergyPlus::OutputReportTabular {
             if (NumAlphas >= 2) {
                 ort->unitsStyle = SetUnitsStyleFromString(AlphArray(2));
                 if (ort->unitsStyle == iUnitsStyle::NotFound) {
-                    ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
+                    ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
                                      "\". No unit conversion will be performed. Normal SI units will be shown.");
                 }
             } else {
@@ -1404,8 +1402,7 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using DataStringGlobals::CharComma;
+                using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
 

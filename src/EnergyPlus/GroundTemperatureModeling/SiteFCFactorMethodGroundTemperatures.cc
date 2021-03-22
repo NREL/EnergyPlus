@@ -77,8 +77,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     // Reads input and creates instance of Site:GroundTemperature:FCfactorMethod object
 
     // USE STATEMENTS:
-    using namespace DataIPShortCuts;
-    using namespace GroundTemperatureManager;
+        using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -99,7 +98,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
             ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
@@ -108,7 +107,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
 
         // overwrite values read from weather file for the 0.5m set ground temperatures
         for (int i = 1; i <= 12; ++i) {
-            thisModel->fcFactorGroundTemps(i) = rNumericArgs(i);
+            thisModel->fcFactorGroundTemps(i) = state.dataIPShortCut->rNumericArgs(i);
         }
 
         state.dataEnvrn->FCGroundTemps = true;

@@ -77,8 +77,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     // Reads input and creates instance of Site:GroundTemperature:BuildingSurface object
 
     // USE STATEMENTS:
-    using namespace DataIPShortCuts;
-    using namespace GroundTemperatureManager;
+        using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -99,7 +98,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
             ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
@@ -108,7 +107,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
 
         // Assign the ground temps to the variable
         for (int i = 1; i <= 12; ++i) {
-            thisModel->buildingSurfaceGroundTemps(i) = rNumericArgs(i);
+            thisModel->buildingSurfaceGroundTemps(i) = state.dataIPShortCut->rNumericArgs(i);
             if (thisModel->buildingSurfaceGroundTemps(i) < 15.0 || thisModel->buildingSurfaceGroundTemps(i) > 25.0) genErrorMessage = true;
         }
 

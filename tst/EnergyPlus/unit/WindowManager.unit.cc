@@ -90,7 +90,7 @@ using namespace EnergyPlus::WindowManager;
 TEST_F(EnergyPlusFixture, WindowFrameTest)
 {
 
-    DataIPShortCuts::lAlphaFieldBlanks = true;
+    state->dataIPShortCut->lAlphaFieldBlanks = true;
 
     std::string const idf_objects =
         delimited_string({"Material,",
@@ -625,7 +625,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
 TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 {
-    DataIPShortCuts::lAlphaFieldBlanks = true;
+    state->dataIPShortCut->lAlphaFieldBlanks = true;
 
     std::string const idf_objects = delimited_string({
 

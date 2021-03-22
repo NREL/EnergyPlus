@@ -5993,7 +5993,6 @@ namespace EnergyPlus::MixedAir {
         // It must be either found on a AirLoopHVAC or AirLoopHVAC:OutdoorAirSystem.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CheckControllerLists");
@@ -6024,17 +6023,17 @@ namespace EnergyPlus::MixedAir {
 
         for (Item = 1; Item <= NumControllers; ++Item) {
 
-            inputProcessor->getObjectItem(state, CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat);
-            ControllerListName = cAlphaArgs(1);
+            inputProcessor->getObjectItem(state, CurrentModuleObject, Item, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStat);
+            ControllerListName = state.dataIPShortCut->cAlphaArgs(1);
             Count = 0;
 
             // Check AirLoopHVAC -- brute force, get each AirLoopHVAC
 
             for (Loop = 1; Loop <= NumAirLoop; ++Loop) {
-                inputProcessor->getObjectItem(state, AirLoopObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat);
-                if (cAlphaArgs(2) != ControllerListName) continue;
+                inputProcessor->getObjectItem(state, AirLoopObject, Loop, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStat);
+                if (state.dataIPShortCut->cAlphaArgs(2) != ControllerListName) continue;
                 ++Count;
-                if (Count == 1) AirLoopName = cAlphaArgs(1);
+                if (Count == 1) AirLoopName = state.dataIPShortCut->cAlphaArgs(1);
             }
 
             //  Now check AirLoopHVAC and AirLoopHVAC:OutdoorAirSystem

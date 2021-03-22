@@ -253,8 +253,7 @@ namespace EnergyPlus::SingleDuct {
         auto &GetHeatingCoilOutletNode(HeatingCoils::GetCoilOutletNode);
         using Fans::GetFanInletNode;
         using Fans::GetFanOutletNode;
-        using namespace DataIPShortCuts;
-        using namespace DataHeatBalance;
+                using namespace DataHeatBalance;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -5367,8 +5366,7 @@ namespace EnergyPlus::SingleDuct {
         using DataZoneEquipment::SubEquipmentData;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
-        using namespace DataIPShortCuts;
-        using BranchNodeConnections::SetUpCompSets;
+                using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
         using DataHVACGlobals::ATMixer_InletSide;
         using DataHVACGlobals::ATMixer_SupplySide;
@@ -5389,7 +5387,7 @@ namespace EnergyPlus::SingleDuct {
             return;
         }
         state.dataSingleDuct->GetATMixerFlag = false;
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "AirTerminal:SingleDuct:Mixer";
         state.dataSingleDuct->NumATMixers = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataSingleDuct->SysATMixer.allocate(state.dataSingleDuct->NumATMixers);
@@ -5401,113 +5399,113 @@ namespace EnergyPlus::SingleDuct {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ATMixerNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-            state.dataSingleDuct->SysATMixer(ATMixerNum).Name = cAlphaArgs(1);
-            if (cAlphaArgs(7) == "INLETSIDE") {
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            state.dataSingleDuct->SysATMixer(ATMixerNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            if (state.dataIPShortCut->cAlphaArgs(7) == "INLETSIDE") {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType = ATMixer_InletSide; // inlet side mixer
-            } else if (cAlphaArgs(7) == "SUPPLYSIDE") {
+            } else if (state.dataIPShortCut->cAlphaArgs(7) == "SUPPLYSIDE") {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType = ATMixer_SupplySide; // supply side mixer
             }
-            if (cAlphaArgs(2) == "ZONEHVAC:WATERTOAIRHEATPUMP") {
+            if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:WATERTOAIRHEATPUMP") {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitType = 1;
-            } else if (cAlphaArgs(2) == "ZONEHVAC:FOURPIPEFANCOIL") {
+            } else if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:FOURPIPEFANCOIL") {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitType = 2;
-            } else if (cAlphaArgs(2) == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER") {
+            } else if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER") {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitType = 3;
-            } else if (cAlphaArgs(2) == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP") {
+            } else if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP") {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitType = 4;
-            } else if (cAlphaArgs(2) == "ZONEHVAC:VARIABLEREFRIGERANTFLOW") {
+            } else if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:VARIABLEREFRIGERANTFLOW") {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitType = 5;
-            } else if (cAlphaArgs(2) == "AIRLOOPHVAC:UNITARYSYSTEM") {
+            } else if (state.dataIPShortCut->cAlphaArgs(2) == "AIRLOOPHVAC:UNITARYSYSTEM") {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitType = 6;
-            } else if (cAlphaArgs(2) == "ZONEHVAC:UNITVENTILATOR") {
+            } else if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:UNITVENTILATOR") {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitType = 7;
             }
 
-            state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitName = cAlphaArgs(3);
+            state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitName = state.dataIPShortCut->cAlphaArgs(3);
 
-            ValidateComponent(state, cAlphaArgs(2), state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitName, errFlag, cCurrentModuleObject);
+            ValidateComponent(state, state.dataIPShortCut->cAlphaArgs(2), state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitName, errFlag, cCurrentModuleObject);
 
-            state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode = GetOnlySingleNode(state, cAlphaArgs(4),
+            state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(4),
                                                                        ErrorsFound,
                                                                        cCurrentModuleObject,
-                                                                       cAlphaArgs(1),
+                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                        DataLoopNode::NodeFluidType::Air,
                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                        1,
                                                                        ObjectIsNotParent,
-                                                                       cAlphaFieldNames(4));
+                                                                       state.dataIPShortCut->cAlphaFieldNames(4));
 
-            state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode = GetOnlySingleNode(state, cAlphaArgs(5),
+            state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(5),
                                                                  ErrorsFound,
                                                                  cCurrentModuleObject,
-                                                                 cAlphaArgs(1),
+                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                  DataLoopNode::NodeFluidType::Air,
                                                                  DataLoopNode::NodeConnectionType::Inlet,
                                                                  1,
                                                                  ObjectIsNotParent,
-                                                                 cAlphaFieldNames(5));
-            state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode = GetOnlySingleNode(state, cAlphaArgs(6),
+                                                                 state.dataIPShortCut->cAlphaFieldNames(5));
+            state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(6),
                                                                  ErrorsFound,
                                                                  cCurrentModuleObject,
-                                                                 cAlphaArgs(1),
+                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                  DataLoopNode::NodeFluidType::Air,
                                                                  DataLoopNode::NodeConnectionType::Inlet,
                                                                  1,
                                                                  ObjectIsNotParent,
-                                                                 cAlphaFieldNames(6));
+                                                                 state.dataIPShortCut->cAlphaFieldNames(6));
 
-            if (lAlphaFieldBlanks(8)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = true;
             } else {
-                state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = UtilityRoutines::FindItemInList(cAlphaArgs(8), state.dataSize->OARequirements);
+                state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(8), state.dataSize->OARequirements);
                 if (state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
-                    ShowContinueError(state, "..invalid " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) + "\".");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowContinueError(state, "..invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + "=\"" + state.dataIPShortCut->cAlphaArgs(8) + "\".");
                     ErrorsFound = true;
                 } else {
                     state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
                 }
             }
 
-            if (lAlphaFieldBlanks(9)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
             } else {
-                if (cAlphaArgs(9) == "CURRENTOCCUPANCY") {
+                if (state.dataIPShortCut->cAlphaArgs(9) == "CURRENTOCCUPANCY") {
                     state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
-                } else if (cAlphaArgs(9) == "DESIGNOCCUPANCY") {
+                } else if (state.dataIPShortCut->cAlphaArgs(9) == "DESIGNOCCUPANCY") {
                     state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
                 } else {
                     state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
-                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
-                    ShowContinueError(state, "..invalid " + cAlphaFieldNames(9) + "=\"" + cAlphaArgs(9) +
+                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowContinueError(state, "..invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + "=\"" + state.dataIPShortCut->cAlphaArgs(9) +
                                       "\". The default input of CurrentOccupancy is assigned");
                 }
             }
 
             // Check for dupes in the three nodes.
             if (state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode == state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + state.dataSingleDuct->SysATMixer(ATMixerNum).Name + ' ' + cAlphaArgs(5) + " = " +
-                                state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode) + " duplicates the " + cAlphaArgs(4) + '.');
+                ShowSevereError(state, cCurrentModuleObject + " = " + state.dataSingleDuct->SysATMixer(ATMixerNum).Name + ' ' + state.dataIPShortCut->cAlphaArgs(5) + " = " +
+                                state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode) + " duplicates the " + state.dataIPShortCut->cAlphaArgs(4) + '.');
                 ErrorsFound = true;
             } else if (state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode == state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + state.dataSingleDuct->SysATMixer(ATMixerNum).Name + ' ' + cAlphaArgs(6) + " = " +
-                                state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode) + " duplicates the " + cAlphaArgs(4) + '.');
+                ShowSevereError(state, cCurrentModuleObject + " = " + state.dataSingleDuct->SysATMixer(ATMixerNum).Name + ' ' + state.dataIPShortCut->cAlphaArgs(6) + " = " +
+                                state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode) + " duplicates the " + state.dataIPShortCut->cAlphaArgs(4) + '.');
                 ErrorsFound = true;
             }
 
             if (state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode == state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + state.dataSingleDuct->SysATMixer(ATMixerNum).Name + ' ' + cAlphaArgs(6) + " = " +
-                                state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode) + " duplicates the " + cAlphaArgs(5) + '.');
+                ShowSevereError(state, cCurrentModuleObject + " = " + state.dataSingleDuct->SysATMixer(ATMixerNum).Name + ' ' + state.dataIPShortCut->cAlphaArgs(6) + " = " +
+                                state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode) + " duplicates the " + state.dataIPShortCut->cAlphaArgs(5) + '.');
                 ErrorsFound = true;
             }
 
@@ -5592,15 +5590,15 @@ namespace EnergyPlus::SingleDuct {
                     }
                 }
             }
-            TestCompSet(state, cCurrentModuleObject, state.dataSingleDuct->SysATMixer(ATMixerNum).Name, cAlphaArgs(5), cAlphaArgs(4), "Air Nodes");
+            TestCompSet(state, cCurrentModuleObject, state.dataSingleDuct->SysATMixer(ATMixerNum).Name, state.dataIPShortCut->cAlphaArgs(5), state.dataIPShortCut->cAlphaArgs(4), "Air Nodes");
 
             if (state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr == 0) {
                 if (state.dataSize->ZoneSizingInput.allocated()) {
                     for (int SizingInputNum = 1; SizingInputNum <= state.dataSize->NumZoneSizingInput; ++SizingInputNum) {
                         if (state.dataSize->ZoneSizingInput(SizingInputNum).ZoneNum == state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum) {
                             if (state.dataSize->ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex == 0) {
-                                ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
-                                ShowContinueError(state, cAlphaFieldNames(8) + " is blank in both the mixer and the Sizing:Zone object for the same zone.");
+                                ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(8) + " is blank in both the mixer and the Sizing:Zone object for the same zone.");
                                 ShowContinueError(state, "The mixer outdoor airflow rate is set to zero.");
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = 0.0;
                             } else {
@@ -5612,7 +5610,7 @@ namespace EnergyPlus::SingleDuct {
                         }
                     }
                 } else {
-                    ShowWarningError(state, cAlphaFieldNames(8) +
+                    ShowWarningError(state, state.dataIPShortCut->cAlphaFieldNames(8) +
                                      "is blank and there is no Sizing:Zone for the same zone. The mixer outdoor airflow rate is set to zero.");
                     state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = 0.0;
                 }

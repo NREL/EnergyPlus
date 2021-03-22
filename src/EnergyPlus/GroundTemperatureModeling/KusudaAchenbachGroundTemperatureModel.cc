@@ -76,8 +76,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     // Reads input and creates instance of Kusuda ground temps model
 
     // USE STATEMENTS:
-    using namespace DataIPShortCuts;
-    using namespace GroundTemperatureManager;
+        using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -95,22 +94,22 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
-        if (objectName == cAlphaArgs(1)) {
+        if (objectName == state.dataIPShortCut->cAlphaArgs(1)) {
 
             // Read input into object here
-            thisModel->objectName = cAlphaArgs(1);
+            thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
             thisModel->objectType = objectType;
-            thisModel->groundThermalDiffisivity = rNumericArgs(1) / (rNumericArgs(2) * rNumericArgs(3));
+            thisModel->groundThermalDiffisivity = state.dataIPShortCut->rNumericArgs(1) / (state.dataIPShortCut->rNumericArgs(2) * state.dataIPShortCut->rNumericArgs(3));
 
-            bool useGroundTempDataForKusuda = rNumericArgs(4) || rNumericArgs(5) || rNumericArgs(6);
+            bool useGroundTempDataForKusuda = state.dataIPShortCut->rNumericArgs(4) || state.dataIPShortCut->rNumericArgs(5) || state.dataIPShortCut->rNumericArgs(6);
 
             if (useGroundTempDataForKusuda) {
                 // Use Kusuda Parameters
-                thisModel->aveGroundTemp = rNumericArgs(4);
-                thisModel->aveGroundTempAmplitude = rNumericArgs(5);
-                thisModel->phaseShiftInSecs = rNumericArgs(6) * DataGlobalConstants::SecsInDay;
+                thisModel->aveGroundTemp = state.dataIPShortCut->rNumericArgs(4);
+                thisModel->aveGroundTempAmplitude = state.dataIPShortCut->rNumericArgs(5);
+                thisModel->phaseShiftInSecs = state.dataIPShortCut->rNumericArgs(6) * DataGlobalConstants::SecsInDay;
             } else {
                 // Use data from Site:GroundTemperature:Shallow to generate parameters
 

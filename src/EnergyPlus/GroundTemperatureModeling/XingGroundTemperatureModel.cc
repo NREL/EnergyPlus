@@ -75,8 +75,7 @@ std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(Energ
     // Reads input and creates instance of Xing ground temps model
 
     // USE STATEMENTS:
-    using namespace DataIPShortCuts;
-    using namespace GroundTemperatureManager;
+        using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -94,19 +93,19 @@ std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(Energ
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
-        if (objectName == cAlphaArgs(1)) {
+        if (objectName == state.dataIPShortCut->cAlphaArgs(1)) {
             // Read input into object here
 
-            thisModel->objectName = cAlphaArgs(1);
+            thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
             thisModel->objectType = objectType;
-            thisModel->groundThermalDiffisivity = rNumericArgs(1) / (rNumericArgs(2) * rNumericArgs(3));
-            thisModel->aveGroundTemp = rNumericArgs(4);
-            thisModel->surfTempAmplitude_1 = rNumericArgs(5);
-            thisModel->surfTempAmplitude_2 = rNumericArgs(6);
-            thisModel->phaseShift_1 = rNumericArgs(7);
-            thisModel->phaseShift_2 = rNumericArgs(8);
+            thisModel->groundThermalDiffisivity = state.dataIPShortCut->rNumericArgs(1) / (state.dataIPShortCut->rNumericArgs(2) * state.dataIPShortCut->rNumericArgs(3));
+            thisModel->aveGroundTemp = state.dataIPShortCut->rNumericArgs(4);
+            thisModel->surfTempAmplitude_1 = state.dataIPShortCut->rNumericArgs(5);
+            thisModel->surfTempAmplitude_2 = state.dataIPShortCut->rNumericArgs(6);
+            thisModel->phaseShift_1 = state.dataIPShortCut->rNumericArgs(7);
+            thisModel->phaseShift_2 = state.dataIPShortCut->rNumericArgs(8);
 
             found = true;
             break;

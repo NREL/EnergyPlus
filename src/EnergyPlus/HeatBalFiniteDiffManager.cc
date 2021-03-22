@@ -195,7 +195,6 @@ namespace HeatBalFiniteDiffManager {
         // MFD algorithm
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;                         // IO Status when calling get input subroutine
@@ -214,7 +213,7 @@ namespace HeatBalFiniteDiffManager {
         int vcMat;
         int inegptr;
         bool nonInc;
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // user settings for numerical parameters
         cCurrentModuleObject = "HeatBalanceSettings:ConductionFiniteDifference";
 
@@ -222,42 +221,42 @@ namespace HeatBalFiniteDiffManager {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           1,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
-            if (!lAlphaFieldBlanks(1)) {
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
 
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(1));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
 
                     if (SELECT_CASE_var == "CRANKNICHOLSONSECONDORDER") {
                         CondFDSchemeType = CrankNicholsonSecondOrder;
                     } else if (SELECT_CASE_var == "FULLYIMPLICITFIRSTORDER") {
                         CondFDSchemeType = FullyImplicitFirstOrder;
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered=" + cAlphaArgs(1) +
+                        ShowSevereError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " entered=" + state.dataIPShortCut->cAlphaArgs(1) +
                                         ", must match CrankNicholsonSecondOrder or FullyImplicitFirstOrder.");
                         ErrorsFound = true;
                     }
                 }
             }
 
-            if (!lNumericFieldBlanks(1)) {
-                SpaceDescritConstant = rNumericArgs(1);
+            if (!state.dataIPShortCut->lNumericFieldBlanks(1)) {
+                SpaceDescritConstant = state.dataIPShortCut->rNumericArgs(1);
             }
-            if (!lNumericFieldBlanks(2)) {
-                state.dataHeatBal->CondFDRelaxFactorInput = rNumericArgs(2);
+            if (!state.dataIPShortCut->lNumericFieldBlanks(2)) {
+                state.dataHeatBal->CondFDRelaxFactorInput = state.dataIPShortCut->rNumericArgs(2);
                 state.dataHeatBal->CondFDRelaxFactor = state.dataHeatBal->CondFDRelaxFactorInput;
             }
-            if (!lNumericFieldBlanks(3)) {
-                state.dataHeatBal->MaxAllowedDelTempCondFD = rNumericArgs(3);
+            if (!state.dataIPShortCut->lNumericFieldBlanks(3)) {
+                state.dataHeatBal->MaxAllowedDelTempCondFD = state.dataIPShortCut->rNumericArgs(3);
             }
 
         } // settings object
@@ -283,15 +282,15 @@ namespace HeatBalFiniteDiffManager {
                                               MaterialProps,
                                               MaterialNumProp,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
                 // Load the material derived type from the input data.
                 MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), state.dataMaterial->Material);
                 if (MaterNum == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
+                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
                                     ", must match to a valid Material name.");
                     ErrorsFound = true;
                     continue;
@@ -375,15 +374,15 @@ namespace HeatBalFiniteDiffManager {
                                               MaterialProps,
                                               MaterialNumProp,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
                 // Load the material derived type from the input data.
                 MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), state.dataMaterial->Material);
                 if (MaterNum == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
+                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
                                     ", must match to a valid Material name.");
                     ErrorsFound = true;
                     continue;

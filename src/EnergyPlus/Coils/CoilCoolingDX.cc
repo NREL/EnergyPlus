@@ -71,7 +71,6 @@
 #include <EnergyPlus/Fans.hh>
 
 using namespace EnergyPlus;
-using namespace DataIPShortCuts;
 
 namespace EnergyPlus {
 
@@ -110,18 +109,18 @@ void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state) {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(state, coilCoolingDXObjectName, coilNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+        inputProcessor->getObjectItem(state, coilCoolingDXObjectName, coilNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
         CoilCoolingDXInputSpecification input_specs;
-        input_specs.name = cAlphaArgs(1);
-        input_specs.evaporator_inlet_node_name = cAlphaArgs(2);
-        input_specs.evaporator_outlet_node_name = cAlphaArgs(3);
-        input_specs.availability_schedule_name = cAlphaArgs(4);
-        input_specs.condenser_zone_name = cAlphaArgs(5);
-        input_specs.condenser_inlet_node_name = cAlphaArgs(6);
-        input_specs.condenser_outlet_node_name = cAlphaArgs(7);
-        input_specs.performance_object_name = cAlphaArgs(8);
-        input_specs.condensate_collection_water_storage_tank_name = cAlphaArgs(9);
-        input_specs.evaporative_condenser_supply_water_storage_tank_name = cAlphaArgs(10);
+        input_specs.name = state.dataIPShortCut->cAlphaArgs(1);
+        input_specs.evaporator_inlet_node_name = state.dataIPShortCut->cAlphaArgs(2);
+        input_specs.evaporator_outlet_node_name = state.dataIPShortCut->cAlphaArgs(3);
+        input_specs.availability_schedule_name = state.dataIPShortCut->cAlphaArgs(4);
+        input_specs.condenser_zone_name = state.dataIPShortCut->cAlphaArgs(5);
+        input_specs.condenser_inlet_node_name = state.dataIPShortCut->cAlphaArgs(6);
+        input_specs.condenser_outlet_node_name = state.dataIPShortCut->cAlphaArgs(7);
+        input_specs.performance_object_name = state.dataIPShortCut->cAlphaArgs(8);
+        input_specs.condensate_collection_water_storage_tank_name = state.dataIPShortCut->cAlphaArgs(9);
+        input_specs.evaporative_condenser_supply_water_storage_tank_name = state.dataIPShortCut->cAlphaArgs(10);
         CoilCoolingDX thisCoil;
         thisCoil.instantiateFromInputSpec(state, input_specs);
         coilCoolingDXs.push_back(thisCoil);

@@ -254,8 +254,7 @@ namespace Humidifiers {
         using NodeInputManager::GetOnlySingleNode;
         using WaterManager::SetupTankDemandComponent;
         using WaterManager::SetupTankSupplyComponent;
-        using namespace DataIPShortCuts;
-        using CurveManager::GetCurveIndex;
+                using CurveManager::GetCurveIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetHumidifierInputs: "); // include trailing blank space

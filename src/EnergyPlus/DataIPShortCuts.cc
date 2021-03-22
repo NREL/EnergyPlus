@@ -78,12 +78,7 @@ namespace DataIPShortCuts {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        cAlphaFieldNames.deallocate();
-        cAlphaArgs.deallocate();
-        lAlphaFieldBlanks.deallocate();
-        cNumericFieldNames.deallocate();
-        rNumericArgs.deallocate();
-        lNumericFieldBlanks.deallocate();
+
     }
 
 } // namespace DataIPShortCuts
