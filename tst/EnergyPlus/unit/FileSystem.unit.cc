@@ -60,6 +60,9 @@
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+
+using namespace EnergyPlus;
 
 // We don't have a remove_all function since we do not use std::filesystem (or boost::filesystem), so make a very sketchy and crude one for testing
 // only
@@ -113,7 +116,7 @@ TEST(FileSystem, movefile_test)
     EnergyPlus::FileSystem::removeFile(filename_temp);
 }
 
-TEST(FileSystem, getAbsolutePath)
+TEST_F(EnergyPlusFixture, FileSystem_getAbsolutePath)
 {
     std::string pathName = "FileSystemTest.idf";
     std::string absPathName = EnergyPlus::FileSystem::getAbsolutePath(pathName);
@@ -125,7 +128,7 @@ TEST(FileSystem, getAbsolutePath)
     EXPECT_FALSE(absPathName.find(currentDirWithSep) != std::string::npos); // Make sure "./" doesn't appear in absolute path
 }
 
-TEST(FileSystem, Others)
+TEST_F(EnergyPlusFixture, FileSystem_Others)
 {
     std::string pathName = "folder/FileSystemTest.txt.idf";
     // The current implementation of getParentDirectoryPath relies on makeNativePath being called first
@@ -147,16 +150,16 @@ TEST(FileSystem, Others)
 
 }
 
-TEST(FileSystem, getProgramPath)
+TEST_F(EnergyPlusFixture, FileSystem_getProgramPath)
 {
     std::string programPath = EnergyPlus::FileSystem::getProgramPath();
     EXPECT_TRUE(EnergyPlus::FileSystem::pathExists(programPath));
     EXPECT_TRUE(programPath.find("energyplus_tests") != std::string::npos);
-    EXPECT_EQ("energyplus_tests" + EnergyPlus::FileSystem::exeExtension, EnergyPlus::FileSystem::getFileName(state, programPath));
+    EXPECT_EQ("energyplus_tests" + EnergyPlus::FileSystem::exeExtension, EnergyPlus::FileSystem::getFileName(*state, programPath));
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists(EnergyPlus::FileSystem::getParentDirectoryPath(*state, programPath)));
 }
 
-TEST(FileSystem, getParentDirectoryPath)
+TEST_F(EnergyPlusFixture, FileSystem_getParentDirectoryPath)
 {
     std::string expected = "/a/b/";
     EnergyPlus::FileSystem::makeNativePath(*state, expected);
@@ -170,7 +173,7 @@ TEST(FileSystem, getParentDirectoryPath)
     EXPECT_EQ(expected, EnergyPlus::FileSystem::getParentDirectoryPath(*state, test));
 }
 
-TEST(FileSystem, make_and_remove_Directory)
+TEST_F(EnergyPlusFixture, FileSystem_make_and_remove_Directory)
 {
     fs::remove_all("sandbox");
 
@@ -217,7 +220,7 @@ TEST(FileSystem, make_and_remove_Directory)
 }
 
 
-TEST(FileSystem, Elaborate)
+TEST_F(EnergyPlusFixture, FileSystem_Elaborate)
 {
     EnergyPlus::FileSystem::makeDirectory(*state, "sandbox");
     std::string pathName("sandbox/file1.txt.idf");
