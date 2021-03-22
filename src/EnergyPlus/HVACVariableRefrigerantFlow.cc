@@ -2603,7 +2603,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             state.dataHVACVarRefFlow->VRF(VRFNum).RefPipInsCon = rNumericArgs(22);
 
             // Check the RefPipEquLen
-            if (lAlphaFieldBlanks(19) && !lNumericFieldBlanks(18)) {
+            if (lNumericFieldBlanks(19) && !lNumericFieldBlanks(18)) {
                 state.dataHVACVarRefFlow->VRF(VRFNum).RefPipEquLen = 1.2 * state.dataHVACVarRefFlow->VRF(VRFNum).RefPipLen;
                 ShowWarningError(state, cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", \" " + cNumericFieldNames(19) + "\" is calculated based on");
                 ShowContinueError(state, "...the provided \"" + cNumericFieldNames(18) + "\" value.");
@@ -3028,7 +3028,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             state.dataHVACVarRefFlow->VRF(VRFNum).RefPipInsCon = rNumericArgs(29);
 
             // Check the RefPipEquLen
-            if (lAlphaFieldBlanks(26) && !lNumericFieldBlanks(25)) {
+            if (lNumericFieldBlanks(26) && !lNumericFieldBlanks(25)) {
                 state.dataHVACVarRefFlow->VRF(VRFNum).RefPipEquLen = 1.2 * state.dataHVACVarRefFlow->VRF(VRFNum).RefPipLen;
                 ShowWarningError(state, cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", \" " + cNumericFieldNames(26) + "\" is calculated based on");
                 ShowContinueError(state, "...the provided \"" + cNumericFieldNames(25) + "\" value.");
