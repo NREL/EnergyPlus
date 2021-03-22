@@ -90,12 +90,12 @@ struct DataStringGlobalsData : BaseGlobalStruct {
     std::string inputFileName;
     std::string inputIddFileName;
     std::string inputEpJSONSchemaFileName;
-    std::string FullName;               // Full name of file to open, including path
+    std::string FullName;                        // Full name of file to open, including path
     std::string weatherFileNameOnly;
-    std::string ProgramPath;          // Path for Program from INI file
-    std::string CurrentWorkingFolder; // Current working directory for run
-    std::string CurrentDateTime;      // For printing current date and time at start of run
-    std::string IDDVerString;         // Version information from the IDD (line 1)
+    std::string ProgramPath;                     // Path for Program from INI file
+    std::string CurrentWorkingFolder;            // Current working directory for run
+    std::string CurrentDateTime;                 // For printing current date and time at start of run
+    std::string IDDVerString;                    // Version information from the IDD (line 1)
 
     std::string VerString = "EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}";
     // String that represents version information
@@ -116,9 +116,9 @@ struct DataStringGlobalsData : BaseGlobalStruct {
     char const CharSpace = ' ';             // space
 
     #ifdef _WIN32
-    std::string const NL = "\r\n"; // Platform newline
+    std::string const NL = "\r\n";          // Platform newline
     #else
-    std::string const NL = "\n"; // Platform newline
+    std::string const NL = "\n";            // Platform newline
     #endif
 
     #ifdef _WIN32
