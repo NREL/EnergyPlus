@@ -108,7 +108,7 @@ namespace FileSystem {
         return tempPath;
     }
 
-    std::string getAbsolutePath(std::string const &path)
+    std::string getAbsolutePath(EnergyPlusData &state, std::string const &path)
     {
         /*
          * Returns the absolute path for a given relative path.
@@ -200,13 +200,13 @@ namespace FileSystem {
         // Create a directory if doesn't already exist
         if (pathExists(directoryPath)) { // path already exists
             if (!directoryExists(directoryPath)) {
-                std::cout << "ERROR: " + getAbsolutePath(directoryPath) + " is not a directory." << std::endl;
+                std::cout << "ERROR: " + getAbsolutePath(state, directoryPath) + " is not a directory." << std::endl;
                 std::exit(EXIT_FAILURE);
             }
         } else { // directory does not already exist
             std::string parentDirectoryPath = getParentDirectoryPath(state, directoryPath);
             if (!pathExists(parentDirectoryPath)) {
-                std::cout << "ERROR: " + getAbsolutePath(parentDirectoryPath) + " is not a directory." << std::endl;
+                std::cout << "ERROR: " + getAbsolutePath(state, parentDirectoryPath) + " is not a directory." << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 #ifdef _WIN32

@@ -52,8 +52,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -69,7 +67,7 @@ namespace FileSystem {
     // Returns the parent directory of a path, with the trailing pathChar included
     std::string getParentDirectoryPath(EnergyPlusData &state, std::string const &filePath);
 
-    std::string getAbsolutePath(std::string const &filePath);
+    std::string getAbsolutePath(EnergyPlusData &state, std::string const &filePath);
 
     std::string getProgramPath();
 

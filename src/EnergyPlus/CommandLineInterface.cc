@@ -167,7 +167,7 @@ namespace CommandLineInterface {
         opt.getUsage(usage);
 
         // Set path of EnergyPlus program path
-        state.dataStrGlobals->exeDirectory = FileSystem::getParentDirectoryPath(state, FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+        state.dataStrGlobals->exeDirectory = FileSystem::getParentDirectoryPath(state, FileSystem::getAbsolutePath(state, FileSystem::getProgramPath()));
 
         opt.get("-w")->getString(state.files.inputWeatherFileName.fileName);
 
@@ -571,7 +571,7 @@ namespace CommandLineInterface {
 
         // Check if specified files exist
         if (!FileSystem::fileExists(state.dataStrGlobals->inputFileName)) {
-            DisplayString(state, "ERROR: Could not find input data file: " + FileSystem::getAbsolutePath(state.dataStrGlobals->inputFileName) + ".");
+            DisplayString(state, "ERROR: Could not find input data file: " + FileSystem::getAbsolutePath(state, state.dataStrGlobals->inputFileName) + ".");
             DisplayString(state, errorFollowUp);
             if (eplusRunningViaAPI) {
                 return static_cast<int>(ReturnCodes::Failure);
@@ -582,7 +582,7 @@ namespace CommandLineInterface {
 
         if (opt.isSet("-w") && !state.dataGlobal->DDOnlySimulation) {
             if (!FileSystem::fileExists(state.files.inputWeatherFileName.fileName)) {
-                DisplayString(state, "ERROR: Could not find weather file: " + FileSystem::getAbsolutePath(state.files.inputWeatherFileName.fileName) + ".");
+                DisplayString(state, "ERROR: Could not find weather file: " + FileSystem::getAbsolutePath(state, state.files.inputWeatherFileName.fileName) + ".");
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
@@ -598,7 +598,7 @@ namespace CommandLineInterface {
         if (runEPMacro) {
             std::string epMacroPath = state.dataStrGlobals->exeDirectory + "EPMacro" + FileSystem::exeExtension;
             if (!FileSystem::fileExists(epMacroPath)) {
-                DisplayString(state, "ERROR: Could not find EPMacro executable: " + FileSystem::getAbsolutePath(epMacroPath) + ".");
+                DisplayString(state, "ERROR: Could not find EPMacro executable: " + FileSystem::getAbsolutePath(state, epMacroPath) + ".");
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
                 } else {
@@ -606,7 +606,7 @@ namespace CommandLineInterface {
                 }
             }
             std::string epMacroCommand = "\"" + epMacroPath + "\"";
-            bool inputFileNamedIn = (FileSystem::getAbsolutePath(state.dataStrGlobals->inputFileName) == FileSystem::getAbsolutePath("in.imf"));
+            bool inputFileNamedIn = (FileSystem::getAbsolutePath(state, state.dataStrGlobals->inputFileName) == FileSystem::getAbsolutePath(state, "in.imf"));
 
             if (!inputFileNamedIn) FileSystem::linkFile(state.dataStrGlobals->inputFileName.c_str(), "in.imf");
             DisplayString(state, "Running EPMacro...");
@@ -620,7 +620,7 @@ namespace CommandLineInterface {
         if (runExpandObjects) {
             std::string expandObjectsPath = state.dataStrGlobals->exeDirectory + "ExpandObjects" + FileSystem::exeExtension;
             if (!FileSystem::fileExists(expandObjectsPath)) {
-                DisplayString(state, "ERROR: Could not find ExpandObjects executable: " + FileSystem::getAbsolutePath(expandObjectsPath) + ".");
+                DisplayString(state, "ERROR: Could not find ExpandObjects executable: " + FileSystem::getAbsolutePath(state, expandObjectsPath) + ".");
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
                 } else {
@@ -628,12 +628,12 @@ namespace CommandLineInterface {
                 }
             }
             std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
-            bool inputFileNamedIn = (FileSystem::getAbsolutePath(state.dataStrGlobals->inputFileName) == FileSystem::getAbsolutePath("in.idf"));
+            bool inputFileNamedIn = (FileSystem::getAbsolutePath(state, state.dataStrGlobals->inputFileName) == FileSystem::getAbsolutePath(state, "in.idf"));
 
             // check if IDD actually exists since ExpandObjects still requires it
             if (!FileSystem::fileExists(state.dataStrGlobals->inputIddFileName)) {
                 DisplayString(state,
-                              "ERROR: Could not find input data dictionary: " + FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFileName) +
+                              "ERROR: Could not find input data dictionary: " + FileSystem::getAbsolutePath(state, state.dataStrGlobals->inputIddFileName) +
                                   ".");
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
@@ -644,7 +644,7 @@ namespace CommandLineInterface {
             }
 
             bool iddFileNamedEnergy =
-                (FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFileName) == FileSystem::getAbsolutePath("Energy+.idd"));
+                (FileSystem::getAbsolutePath(state, state.dataStrGlobals->inputIddFileName) == FileSystem::getAbsolutePath(state, "Energy+.idd"));
 
             if (!inputFileNamedIn) FileSystem::linkFile(state.dataStrGlobals->inputFileName.c_str(), "in.idf");
             if (!iddFileNamedEnergy) FileSystem::linkFile(state.dataStrGlobals->inputIddFileName, "Energy+.idd");
@@ -796,7 +796,7 @@ namespace CommandLineInterface {
             readVarsPath =
                 state.dataStrGlobals->exeDirectory + "PostProcess" + state.dataStrGlobals->pathChar + "ReadVarsESO" + FileSystem::exeExtension;
             if (!FileSystem::fileExists(readVarsPath)) {
-                DisplayString(state, "ERROR: Could not find ReadVarsESO executable: " + FileSystem::getAbsolutePath(readVarsPath) + ".");
+                DisplayString(state, "ERROR: Could not find ReadVarsESO executable: " + FileSystem::getAbsolutePath(state, readVarsPath) + ".");
                 return static_cast<int>(ReturnCodes::Failure);
             }
         }

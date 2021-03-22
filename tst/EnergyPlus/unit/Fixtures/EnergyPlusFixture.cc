@@ -369,7 +369,7 @@ bool EnergyPlusFixture::process_idd(EnergyPlusData &state, std::string const &id
     if (!idd.empty()) {
         idd_stream = std::unique_ptr<std::istringstream>(new std::istringstream(idd));
     } else {
-        static auto const exeDirectory = FileSystem::getParentDirectoryPath(state, FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+        static auto const exeDirectory = FileSystem::getParentDirectoryPath(state, FileSystem::getAbsolutePath(state, FileSystem::getProgramPath()));
         static auto idd_location = exeDirectory + "Energy+.schema.epJSON";
         static auto file_exists = FileSystem::fileExists(idd_location);
 

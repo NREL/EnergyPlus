@@ -118,12 +118,12 @@ TEST(FileSystem, movefile_test)
 TEST_F(EnergyPlusFixture, FileSystem_getAbsolutePath)
 {
     std::string pathName = "FileSystemTest.idf";
-    std::string absPathName = EnergyPlus::FileSystem::getAbsolutePath(pathName);
+    std::string absPathName = EnergyPlus::FileSystem::getAbsolutePath(*state, pathName);
     EXPECT_TRUE(absPathName.find(pathName) != std::string::npos); // Check that the path name appears in the absolute path
 
     std::string currentDirWithSep = std::string(".") + state->dataStrGlobals->pathChar;
     pathName =  currentDirWithSep + std::string("FileSystemTest.idf");  // e.g., "./FileSystemTest.idf"
-    absPathName = EnergyPlus::FileSystem::getAbsolutePath(pathName);
+    absPathName = EnergyPlus::FileSystem::getAbsolutePath(*state, pathName);
     EXPECT_FALSE(absPathName.find(currentDirWithSep) != std::string::npos); // Make sure "./" doesn't appear in absolute path
 }
 
@@ -229,7 +229,7 @@ TEST_F(EnergyPlusFixture, FileSystem_Elaborate)
     EXPECT_TRUE(EnergyPlus::FileSystem::pathExists("sandbox"));
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandbox"));
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandbox/"));
-    EXPECT_GT(EnergyPlus::FileSystem::getAbsolutePath(pathName).size(), pathName.size());
+    EXPECT_GT(EnergyPlus::FileSystem::getAbsolutePath(*state, pathName).size(), pathName.size());
     // Fails, ..../sandbox/ versus ..../sandbox
     //EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox/"),
               //EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName)));
@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, FileSystem_Elaborate)
               //EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName)));
     //EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox/"), EnergyPlus::FileSystem::getAbsolutePath("./sandbox/"));
 
-    EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("./"), EnergyPlus::FileSystem::getAbsolutePath("sandbox/../"));
+    EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath(*state, "./"), EnergyPlus::FileSystem::getAbsolutePath(*state, "sandbox/../"));
 
     // Fails, "/home/julien/Software/Others/EnergyPlus-build/." versus "/home/julien/Software/Others/EnergyPlus-build"
     //EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("."), EnergyPlus::FileSystem::getAbsolutePath("sandbox/.."));
