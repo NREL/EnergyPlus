@@ -2827,8 +2827,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                     } else if (ANY_BLIND(ShadeFlag)) { // Blind on
                                         int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
                                         Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
-                                        for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                                            if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
+                                        if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
+                                            for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                                 AbsDiffWin(Lay) = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).BlAbsDiff(SurfWinSlatsAngIndex, Lay),
                                                                                          state.dataConstruction->Construct(ConstrNumSh).BlAbsDiff(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1), Lay),
                                                                                          SurfWinSlatsAngInterpFac);
@@ -2838,25 +2838,29 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                                 AbsDiffWinSky(Lay) = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffSky(SurfWinSlatsAngIndex, Lay),
                                                                                             state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffSky(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1), Lay),
                                                                                             SurfWinSlatsAngInterpFac);
-                                            } else {
+                                            }
+                                        } else {
+                                            for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                                 AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiff(1, Lay);
                                                 AbsDiffWinGnd(Lay) = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffGnd(1, Lay);
                                                 AbsDiffWinSky(Lay) = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffSky(1, Lay);
                                             }
                                         }
-                                        Real64 AbsDiffBlind = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlind(1);
+                                        Real64 AbsDiffBlind;
                                         if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                                             AbsDiffBlind = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlind(SurfWinSlatsAngIndex),
                                                                                   state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlind(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                                                   SurfWinSlatsAngInterpFac);
+                                        } else {
+                                            AbsDiffBlind = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlind(1);
                                         }
                                         state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum) = AbsDiffBlind * (SkySolarInc + GndSolarInc);
 
 
                                         if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
                                             Real64 ACosTlt = std::abs(Surface(SurfNum).CosTilt);
-                                            Real64 AbsDiffBlindGnd = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlindGnd(1);
-                                            Real64 AbsDiffBlindSky = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlindSky(1);
+                                            Real64 AbsDiffBlindGnd;
+                                            Real64 AbsDiffBlindSky;
                                             if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                                                 AbsDiffBlindGnd = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlindGnd(SurfWinSlatsAngIndex),
                                                                                          state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlindGnd(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
@@ -2864,6 +2868,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                                 AbsDiffBlindSky = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlindSky(SurfWinSlatsAngIndex),
                                                                                          state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlindSky(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                                                          SurfWinSlatsAngInterpFac);
+                                            } else {
+                                                AbsDiffBlindGnd = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlindGnd(1);
+                                                AbsDiffBlindSky = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlindSky(1);
                                             }
                                             state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum) =
                                                     SkySolarInc * (0.5 * ACosTlt * AbsDiffBlindGnd + (1.0 - 0.5 * ACosTlt) * AbsDiffBlindSky) +
@@ -2896,8 +2903,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                         int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                                         if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
                                             Real64 ACosTlt = std::abs(Surface(SurfNum).CosTilt); // Absolute value of cosine of surface tilt angle
-                                            Real64 AbsDiffGlassLayGnd; // AbsDiffGlassLayGnd - System glass layer ground diffuse solar absorptance with blind on
-                                            Real64 AbsDiffGlassLaySky;  // AbsDiffGlassLaySky - System glass layer sky diffuse solar absorptance with blind on
+                                            Real64 AbsDiffGlassLayGnd; // System glass layer ground diffuse solar absorptance with blind on
+                                            Real64 AbsDiffGlassLaySky;  // System glass layer sky diffuse solar absorptance with blind on
                                             if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                                                 AbsDiffGlassLayGnd = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffGnd(state.dataSurface->SurfWinSlatsAngIndex(SurfNum), Lay),
                                                                                             state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffGnd(std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1), Lay),
@@ -4022,11 +4029,13 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
                         WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
                         Real64 AbsDiffTotWin = 0.0; // Sum of window layer short-wave absorptances
+
                         int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                         if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
                             ConstrNum = Surface(SurfNum).StormWinConstruction;
                             ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
                         }
+
                         Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum);
 
                         // Sum of absorptances of glass layers

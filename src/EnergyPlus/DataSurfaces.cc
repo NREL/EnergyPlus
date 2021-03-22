@@ -618,6 +618,7 @@ namespace EnergyPlus::DataSurfaces {
     }
 
     // Functions
+
     void SetSurfaceOutBulbTempAt(EnergyPlusData &state)
     {
         for (auto &surface : state.dataSurface->Surface) {

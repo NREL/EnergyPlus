@@ -9002,14 +9002,14 @@ namespace EnergyPlus::DaylightingManager {
                                 int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(IWin);
                                 Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(IWin);
                                 Real64 DaylIllFacSky = General::InterpGeneral(state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, ISky, ILB, loop),
-                                                                       state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->HourOfDay,std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, ILB, loop),
-                                                                       SurfWinSlatsAngInterpFac);
+                                                                              state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->HourOfDay,std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, ILB, loop),
+                                                                              SurfWinSlatsAngInterpFac);
                                 Real64 DaylBackFacSky = General::InterpGeneral(state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, ISky, ILB, loop),
-                                                                        state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->HourOfDay,std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, ILB, loop),
-                                                                        SurfWinSlatsAngInterpFac);
+                                                                               state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->HourOfDay,std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, ILB, loop),
+                                                                               SurfWinSlatsAngInterpFac);
                                 Real64 DaylSourceFacSky = General::InterpGeneral(state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, ISky, ILB, loop),
-                                                                          state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->HourOfDay,std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, ILB, loop),
-                                                                          SurfWinSlatsAngInterpFac);
+                                                                                 state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->HourOfDay,std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, ILB, loop),
+                                                                                 SurfWinSlatsAngInterpFac);
 
                                 DFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow * DaylIllFacSky + state.dataGlobal->WeightPreviousHour * DaylIllFacSky);
                                 BFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow * DaylBackFacSky + state.dataGlobal->WeightPreviousHour * DaylBackFacSky);

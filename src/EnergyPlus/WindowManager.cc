@@ -1359,12 +1359,12 @@ namespace WindowManager {
                     // Front absorptance coefficients for glass layers
                     state.dataWindowManager->DepVarCurveFit({1, TotalIPhi}) = state.dataWindowManager->solabsPhi(IGlass, {1, TotalIPhi});
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar, state.dataWindowManager->DepVarCurveFit, 6, 1, TotalIPhi, state.dataWindowManager->CoeffsCurveFit);
-                    state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(IGlass, {1, 6}) = state.dataWindowManager->CoeffsCurveFit;
+                    state.dataConstruction->Construct(ConstrNum).AbsBeamCoef({1, 6}, IGlass) = state.dataWindowManager->CoeffsCurveFit;
                     // Back absorptance coefficients for glass layers
                     IGlassBack = NGlass - IGlass + 1;
                     state.dataWindowManager->DepVarCurveFit({1, TotalIPhi}) = state.dataWindowManager->solabsBackPhi(IGlassBack, {1, TotalIPhi});
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar, state.dataWindowManager->DepVarCurveFit, 6, 1, TotalIPhi, state.dataWindowManager->CoeffsCurveFit);
-                    state.dataConstruction->Construct(ConstrNum).AbsBeamBackCoef(IGlass, {1, 6}) = state.dataWindowManager->CoeffsCurveFit;
+                    state.dataConstruction->Construct(ConstrNum).AbsBeamBackCoef({1, 6}, IGlass) = state.dataWindowManager->CoeffsCurveFit;
                 }
 
                 // To check goodness of fit //Tuned
@@ -6304,15 +6304,18 @@ namespace WindowManager {
                 state.dataWindowManager->emis(2 * IGlass) = state.dataMaterial->Material(LayPtr).AbsorpThermalBack;
                 state.dataWindowManager->tir(2 * IGlass - 1) = state.dataMaterial->Material(LayPtr).TransThermal;
                 state.dataWindowManager->tir(2 * IGlass) = state.dataMaterial->Material(LayPtr).TransThermal;
-                AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(IGlass, {1, 6}));
+                AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef({1, 6}, IGlass));
                 if (ShadeFlag == WinShadingType::IntBlind) { // Interior blind on
+                    AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef({1, 6}, IGlass));
                     AGlDiffBack = state.dataConstruction->Construct(ConstrNumBare).AbsDiffBack(IGlass);
                     AbsBeamNorm(IGlass) += TBmBm * AGlDiffBack * RhoBlFront / (1.0 - RhoBlFront * RGlDiffBack);
                 } else if (ShadeFlag == WinShadingType::ExtBlind) { // Exterior blind on
+                    AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef({1, 6}, IGlass));
                     AbsBeamNorm(IGlass) = TBlBmBm * AbsBeamNorm(IGlass) + (TBlBmBm * RGlFront * RhoBlBack + TBlBmDif) *
                                                                               state.dataConstruction->Construct(ConstrNumBare).AbsDiff(IGlass) /
                                                                               (1.0 - RGlDiffFront * RhoBlDiffBack);
                 } else if (ShadeFlag == WinShadingType::ExtScreen) { // Exterior screen on
+                    AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef({1, 6}, IGlass));
                     AbsBeamNorm(IGlass) = TScBmBm * AbsBeamNorm(IGlass) + (TScBmBm * RGlFront * RScBack + TScBmDif) *
                                                                               state.dataConstruction->Construct(ConstrNumBare).AbsDiff(IGlass) /
                                                                               (1.0 - RGlDiffFront * RScDifBack);
