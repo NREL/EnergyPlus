@@ -80,6 +80,8 @@ struct EnergyPlusData;
 
 namespace PluginManagement {
 
+    constexpr const char * programName = "python";
+
     void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
     void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment(EnergyPlusData &state);
