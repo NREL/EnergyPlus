@@ -298,8 +298,8 @@ namespace PhotovoltaicThermalCollectors {
                     ErrorsFound = true;
                 }
             }
-            if (allocated(DataPhotovoltaics::PVarray)) { // then PV input gotten... but don't expect this to be true.
-                PVT(Item).PVnum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), DataPhotovoltaics::PVarray);
+            if (allocated(state.dataPhotovoltaic->PVarray)) { // then PV input gotten... but don't expect this to be true.
+                PVT(Item).PVnum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), state.dataPhotovoltaic->PVarray);
                 // check PV
                 if (PVT(Item).PVnum == 0) {
                     ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + DataIPShortCuts::cAlphaArgs(4));
@@ -494,8 +494,8 @@ namespace PhotovoltaicThermalCollectors {
 
         // finish set up of PV, because PV get-input follows PVT's get input.
         if (!this->PVfound) {
-            if (allocated(DataPhotovoltaics::PVarray)) {
-                this->PVnum = UtilityRoutines::FindItemInList(this->PVname, DataPhotovoltaics::PVarray);
+            if (allocated(state.dataPhotovoltaic->PVarray)) {
+                this->PVnum = UtilityRoutines::FindItemInList(this->PVname, state.dataPhotovoltaic->PVarray);
                 if (this->PVnum == 0) {
                     ShowSevereError(state, "Invalid name for photovoltaic generator = " + this->PVname);
                     ShowContinueError(state, "Entered in flat plate photovoltaic-thermal collector = " + this->Name);
@@ -510,19 +510,19 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
 
-        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag && DataHVACGlobals::DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag && state.dataHVACGlobal->DoSetPointTest) {
             for (int PVTindex = 1; PVTindex <= NumPVT; ++PVTindex) {
                 if (PVT(PVTindex).WorkingFluidType == WorkingFluidEnum::AIR) {
                     if (state.dataLoopNodes->Node(PVT(PVTindex).HVACOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");
                             ShowContinueError(state, "Add a setpoint manager to outlet node of PVT named " + PVT(PVTindex).Name);
-                            DataHVACGlobals::SetPointErrorFlag = true;
+                            state.dataHVACGlobal->SetPointErrorFlag = true;
                         } else {
                             // need call to EMS to check node
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                PVT(PVTindex).HVACOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, DataHVACGlobals::SetPointErrorFlag);
-                            if (DataHVACGlobals::SetPointErrorFlag) {
+                                PVT(PVTindex).HVACOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                            if (state.dataHVACGlobal->SetPointErrorFlag) {
                                 ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");
                                 ShowContinueError(state, "Add a setpoint manager to outlet node of PVT named " + PVT(PVTindex).Name);
                                 ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node of PVT");
@@ -611,7 +611,7 @@ namespace PhotovoltaicThermalCollectors {
 
             if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
                 // heating only right now, so control flow requests based on incident solar;
-                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
                     this->MassFlowRate = this->MaxMassFlowRate;
                 } else {
                     this->MassFlowRate = 0.0;
@@ -817,7 +817,7 @@ namespace PhotovoltaicThermalCollectors {
         if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
 
             if (this->PVTModelType == SimplePVTmodel) {
-                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
                     // is heating wanted?
                     //  Outlet node is required to have a setpoint.
                     if (state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint > state.dataLoopNodes->Node(this->HVACInletNodeNum).Temp) {
@@ -845,7 +845,7 @@ namespace PhotovoltaicThermalCollectors {
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
             if (this->PVTModelType == SimplePVTmodel) {
-                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
                     // is heating wanted?
                     this->HeatingUseful = true;
                     this->BypassDamperOff = true;
@@ -947,7 +947,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermEfficiency = Eff;
                 this->Report.ThermHeatGain = PotentialHeatGain;
                 this->Report.ThermPower = this->Report.ThermHeatGain;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 this->Report.ThermHeatLoss = 0.0;
                 this->Report.TinletWorkFluid = Tinlet;
                 this->Report.MdotWorkFluid = mdot;
@@ -1013,7 +1013,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermHeatLoss = mdot * CpInlet * (Tinlet - this->Report.ToutletWorkFluid);
                 this->Report.ThermHeatGain = 0.0;
                 this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 this->Report.ThermEfficiency = 0.0;
                 this->Simple.LastCollectorTemp = Tcollector;
                 this->Report.BypassStatus = BypassFraction;

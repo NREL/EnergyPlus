@@ -926,7 +926,7 @@ namespace EnergyPlus::ChillerAbsorption {
         }
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::TimeStepSys) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= state.dataHVACGlobal->TimeStepSys) {
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
@@ -1030,7 +1030,7 @@ namespace EnergyPlus::ChillerAbsorption {
         }
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::TimeStepSys) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= state.dataHVACGlobal->TimeStepSys) {
                 tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
                 if (!this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = this->EvapVolFlowRate;
             } else {
@@ -1091,7 +1091,7 @@ namespace EnergyPlus::ChillerAbsorption {
         PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
-            if (this->EvapVolFlowRate >= DataHVACGlobals::TimeStepSys && tmpNomCap > 0.0) {
+            if (this->EvapVolFlowRate >= state.dataHVACGlobal->TimeStepSys && tmpNomCap > 0.0) {
                 //       QCondenser = QEvaporator + QGenerator + PumpingPower
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1170,7 +1170,7 @@ namespace EnergyPlus::ChillerAbsorption {
 
         if ((PltSizSteamNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeFluidType::Steam) ||
             (PltSizHeatingNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water)) {
-            if (this->EvapVolFlowRate >= DataHVACGlobals::TimeStepSys && tmpNomCap > 0.0) {
+            if (this->EvapVolFlowRate >= state.dataHVACGlobal->TimeStepSys && tmpNomCap > 0.0) {
                 if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                     Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                             state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
@@ -1732,10 +1732,10 @@ namespace EnergyPlus::ChillerAbsorption {
         } // IF(GeneratorInletNode .GT. 0)THEN
 
         // convert power to energy
-        this->GeneratorEnergy = this->QGenerator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->PumpingEnergy = this->PumpingPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->GeneratorEnergy = this->QGenerator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->PumpingEnergy = this->PumpingPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void BLASTAbsorberSpecs::updateRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag)

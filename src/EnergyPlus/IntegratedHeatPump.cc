@@ -2063,7 +2063,7 @@ namespace EnergyPlus::IntegratedHeatPump {
 
     void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
     {
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         int VSCoilIndex(0);
         Real64 ReportingConstant(0.0);
@@ -2186,7 +2186,7 @@ namespace EnergyPlus::IntegratedHeatPump {
 
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using WaterThermalTanks::GetWaterThermalTankInput;
 
         Real64 MyLoad(0.0);

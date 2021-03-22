@@ -115,8 +115,6 @@ namespace HWBaseboardRadiator {
     // Use statements for data only modules
     // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
     using DataPlant::TypeOf_Baseboard_Rad_Conv_Water;
     using DataZoneEquipment::CheckZoneEquipmentList;
 
@@ -273,7 +271,7 @@ namespace HWBaseboardRadiator {
 
             UpdateHWBaseboard(state, BaseboardNum);
 
-            ReportHWBaseboard(BaseboardNum);
+            ReportHWBaseboard(state, BaseboardNum);
 
         } else {
             ShowFatalError(state, "SimHWBaseboard: Unit not found=" + EquipName);
@@ -1524,15 +1522,15 @@ namespace HWBaseboardRadiator {
         }
 
         // First, update the running average if necessary...
-        if (LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {
+        if (LastSysTimeElapsed(BaseboardNum) == state.dataHVACGlobal->SysTimeElapsed) {
             QBBRadSrcAvg(BaseboardNum) -= LastQBBRadSrc(BaseboardNum) * LastTimeStepSys(BaseboardNum) / state.dataGlobal->TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        QBBRadSrcAvg(BaseboardNum) += QBBRadSource(BaseboardNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
+        QBBRadSrcAvg(BaseboardNum) += QBBRadSource(BaseboardNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
         LastQBBRadSrc(BaseboardNum) = QBBRadSource(BaseboardNum);
-        LastSysTimeElapsed(BaseboardNum) = SysTimeElapsed;
-        LastTimeStepSys(BaseboardNum) = TimeStepSys;
+        LastSysTimeElapsed(BaseboardNum) = state.dataHVACGlobal->SysTimeElapsed;
+        LastTimeStepSys(BaseboardNum) = state.dataHVACGlobal->TimeStepSys;
 
         WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
         WaterOutletNode = HWBaseboard(BaseboardNum).WaterOutletNode;
@@ -1681,7 +1679,7 @@ namespace HWBaseboardRadiator {
         }
     }
 
-    void ReportHWBaseboard(int const BaseboardNum)
+    void ReportHWBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1690,10 +1688,10 @@ namespace HWBaseboardRadiator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
-        HWBaseboard(BaseboardNum).ConvEnergy = HWBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).ConvEnergy = HWBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number

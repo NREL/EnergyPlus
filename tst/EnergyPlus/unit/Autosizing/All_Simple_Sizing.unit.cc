@@ -246,7 +246,7 @@ TEST_F(AutoSizingFixture, MaxHeaterOutletTempSizingGauntlet)
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -380,7 +380,7 @@ TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet)
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -514,7 +514,7 @@ TEST_F(AutoSizingFixture, ZoneHeatingLoadSizingGauntlet)
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -659,7 +659,7 @@ TEST_F(AutoSizingFixture, ASHRAEMinSATCoolingSizingGauntlet)
     state->dataSize->NumZoneSizingInput = 0;
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -827,7 +827,7 @@ TEST_F(AutoSizingFixture, ASHRAEMaxSATHeatingSizingGauntlet)
     state->dataSize->NumZoneSizingInput = 0;
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -987,7 +987,7 @@ TEST_F(AutoSizingFixture, DesiccantDehumidifierBFPerfDataFaceVelocitySizingGaunt
     state->dataSize->NumZoneSizingInput = 0;
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -1079,7 +1079,7 @@ TEST_F(AutoSizingFixture, HeatingCoilDesAirInletTempSizingGauntlet)
     state->dataSize->CurZoneEqNum = 0;
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -1195,7 +1195,7 @@ TEST_F(AutoSizingFixture, HeatingCoilDesAirOutletTempSizingGauntlet)
     state->dataSize->CurZoneEqNum = 0;
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -1300,7 +1300,7 @@ TEST_F(AutoSizingFixture, HeatingCoilDesAirInletHumRatSizingGauntlet)
     state->dataSize->CurZoneEqNum = 0;
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays

@@ -71,7 +71,7 @@ namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
 {
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataLoopNodes->Node.allocate(2);
 

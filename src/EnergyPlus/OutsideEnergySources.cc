@@ -502,7 +502,7 @@ namespace EnergyPlus::OutsideEnergySources {
         int const OutletNode = this->OutletNodeNum;
         state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
         this->EnergyRate = std::abs(MyLoad);
-        this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
 } // namespace EnergyPlus

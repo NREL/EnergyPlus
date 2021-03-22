@@ -84,7 +84,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->curOASysNum = state.dataSize->CurOASysNum;
     this->curZoneEqNum = state.dataSize->CurZoneEqNum;
     this->curDuctType = state.dataSize->CurDuctType;
-    this->numPrimaryAirSys = DataHVACGlobals::NumPrimaryAirSys;
+    this->numPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     this->numSysSizInput = state.dataSize->NumSysSizInput;
     this->doSystemSizing = state.dataGlobal->DoSystemSizing;
     this->numZoneSizingInput = state.dataSize->NumZoneSizingInput;

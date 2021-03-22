@@ -406,6 +406,11 @@ namespace EnergyPlus::PluginManagement {
         Py_SetPath(a);
         Py_SetPythonHome(a);
 
+        // must be called before Py_Initialize
+        // tells the interpreter the value of argv[0] to the main() function
+        // used by some functions to find run-time libraries relative to the interpreter executable
+        Py_SetProgramName((wchar_t*)programName);
+
         // now that we have set the path, we can initialize python
         // from https://docs.python.org/3/c-api/init.html
         // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.

@@ -74,11 +74,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace OutputReportTabularAnnual {
-
-    std::vector<AnnualTable> annualTables;
+namespace EnergyPlus::OutputReportTabularAnnual {
 
     void GetInputTabularAnnual(EnergyPlusData &state)
     {
@@ -106,6 +102,8 @@ namespace OutputReportTabularAnnual {
         std::string curAggTyp("");
         int curNumDgts(2);
         AnnualFieldSet::AggregationKind curAgg(AnnualFieldSet::AggregationKind::sumOrAvg);
+
+        auto &annualTables(state.dataOutputReportTabularAnnual->annualTables);
 
         objCount = inputProcessor->getNumObjectsFound(state, currentModuleObject);
         if (objCount > 0) {
@@ -246,6 +244,7 @@ namespace OutputReportTabularAnnual {
     {
         std::vector<AnnualTable>::iterator annualTableIt;
         bool invalidAggregationOrderFound = false;
+        auto &annualTables(state.dataOutputReportTabularAnnual->annualTables);
         if (!state.dataGlobal->DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
             return;
         }
@@ -309,6 +308,7 @@ namespace OutputReportTabularAnnual {
         // This function is not part of the class but acts as an interface between procedural code and the class by
         // gathering data for each of the AnnualTable objects
         std::vector<AnnualTable>::iterator annualTableIt;
+        auto &annualTables(state.dataOutputReportTabularAnnual->annualTables);
         for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
             annualTableIt->gatherForTimestep(state, kindOfTimeStep);
         }
@@ -566,12 +566,13 @@ namespace OutputReportTabularAnnual {
         }
     }
 
-    void ResetAnnualGathering()
+    void ResetAnnualGathering(EnergyPlusData &state)
     {
         // Jason Glazer, October 2015
         // This function is not part of the class but acts as an interface between procedural code and the class by
-        // reseting data for each of the AnnualTable objects
+        // resetting data for each of the AnnualTable objects
         std::vector<AnnualTable>::iterator annualTableIt;
+        auto &annualTables(state.dataOutputReportTabularAnnual->annualTables);
         for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
             annualTableIt->resetGathering();
         }
@@ -604,7 +605,7 @@ namespace OutputReportTabularAnnual {
     {
         Real64 elapsedTime;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
-            elapsedTime = DataHVACGlobals::TimeStepSys;
+            elapsedTime = state.dataHVACGlobal->TimeStepSys;
         } else {
             elapsedTime = state.dataGlobal->TimeStepZone;
         }
@@ -615,7 +616,7 @@ namespace OutputReportTabularAnnual {
     {
         Real64 secondsInTimeStep;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
-            secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            secondsInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         } else {
             secondsInTimeStep = state.dataGlobal->TimeStepZoneSec;
         }
@@ -624,6 +625,7 @@ namespace OutputReportTabularAnnual {
 
     void WriteAnnualTables(EnergyPlusData &state)
     {
+        auto &annualTables(state.dataOutputReportTabularAnnual->annualTables);
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
             OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
             bool produceTabular = true;
@@ -1170,12 +1172,13 @@ namespace OutputReportTabularAnnual {
         return str.substr(strBegin, strRange);
     }
 
-    void AddAnnualTableOfContents(std::ostream &nameOfStream)
+    void AddAnnualTableOfContents(EnergyPlusData &state, std::ostream &nameOfStream)
     {
         // Jason Glazer, August 2015
         // This function is not part of the class but acts as an interface between procedural code and the class by
         // invoking the writeTable member function for each of the AnnualTable objects
         std::vector<AnnualTable>::iterator annualTableIt;
+        auto &annualTables(state.dataOutputReportTabularAnnual->annualTables);
         for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
             annualTableIt->addTableOfContents(nameOfStream);
         }
@@ -1374,15 +1377,6 @@ namespace OutputReportTabularAnnual {
         }
     }
 
-    void clear_state()
-    { // for unit tests
-        std::vector<AnnualTable>::iterator annualTableIt;
-        for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
-            annualTableIt->clearTable();
-        }
-        annualTables.clear();
-    }
-
     void AnnualTable::clearTable()
     {
         m_name = "";
@@ -1443,7 +1437,5 @@ namespace OutputReportTabularAnnual {
         }
         return ret;
     }
-
-} // namespace OutputReportTabularAnnual
 
 } // namespace EnergyPlus

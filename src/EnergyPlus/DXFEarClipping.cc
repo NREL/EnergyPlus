@@ -77,16 +77,6 @@ namespace DXFEarClipping {
     // Methodology employed:
     // Ear clipping has turned out to be the simplest, most robust technique.
 
-    // Using/Aliasing
-    using namespace DataVectorTypes;
-
-    bool trackit(false);
-    // Subroutine specifications for module <module_name>:
-
-    // rest of routines are private.
-
-    // Functions
-
     bool InPolygon(Vector const &point, Array1D<Vector> &poly, int const nsides)
     {
         // this routine is not used in the current scheme
@@ -578,7 +568,7 @@ namespace DXFEarClipping {
                     earvert(2) = mvert;
                     earvert(3) = evert;
                 }
-                if (trackit) {
+                if (state.dataDXFEarClipping->trackit) {
                     print(state.files.debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
                 }
             }

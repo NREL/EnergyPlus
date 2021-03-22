@@ -1327,13 +1327,13 @@ namespace PlantChillers {
         this->ActualCOP = 0.0;
 
         //   calculate end time of current time step
-        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > this->CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= this->TimeStepSysLast) {
+        if (CurrentEndTime > this->CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= this->TimeStepSysLast) {
             if (this->PrintMessage) {
                 ++this->MsgErrorCount;
                 //       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -1348,7 +1348,7 @@ namespace PlantChillers {
         }
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        this->TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
         this->CurrentEndTimeLast = CurrentEndTime;
 
         // If no loop demand or chiller OFF, return
@@ -1837,9 +1837,9 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // check for problems (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -1958,7 +1958,7 @@ namespace PlantChillers {
         }
 
         this->QHeatRecovery = this->QHeatRecovered;
-        this->EnergyHeatRecovery = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
         this->HeatRecMdot = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;
         this->ChillerCondAvgTemp = this->AvgCondSinkTemp;
@@ -1970,7 +1970,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
@@ -3259,13 +3259,13 @@ namespace PlantChillers {
         }
 
         //   calculate end time of current time step
-        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > this->CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= this->TimeStepSysLast) {
+        if (CurrentEndTime > this->CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= this->TimeStepSysLast) {
             if (this->PrintMessage) {
                 ++this->MsgErrorCount;
                 //     Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -3280,7 +3280,7 @@ namespace PlantChillers {
         }
 
         // save last system time step and last end time of current time step (used to determine if warning is valid)
-        this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        this->TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
         this->CurrentEndTimeLast = CurrentEndTime;
 
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
@@ -3801,14 +3801,14 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->FuelEnergyUseRate = EngineDrivenFuelEnergy;
-        this->FuelEnergy = this->FuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->JacketEnergyRec = this->QJacketRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->LubeOilEnergyRec = this->QLubeOilRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->ExhaustEnergyRec = this->QExhaustRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->FuelEnergy = this->FuelEnergyUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->JacketEnergyRec = this->QJacketRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->LubeOilEnergyRec = this->QLubeOilRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ExhaustEnergyRec = this->QExhaustRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->QTotalHeatRecovered = this->QExhaustRecovered + this->QLubeOilRecovered + this->QJacketRecovered;
         this->TotalHeatEnergyRec = this->ExhaustEnergyRec + this->LubeOilEnergyRec + this->JacketEnergyRec;
         this->FuelEnergyUseRate = std::abs(this->FuelEnergyUseRate);
@@ -3908,7 +3908,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running
             // set node temperatures
@@ -5162,13 +5162,13 @@ namespace PlantChillers {
         this->ExhaustStackTemp = 0.0;
 
         // calculate end time of current time step
-        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
 
         // Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         // Wait for next time step to print warnings. If simulation iterates, print out
         // the warning for the last iteration only. Must wait for next time step to accomplish this.
         // If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > this->CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= this->TimeStepSysLast) {
+        if (CurrentEndTime > this->CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= this->TimeStepSysLast) {
             if (this->PrintMessage) {
                 ++this->MsgErrorCount;
                 // Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -5183,7 +5183,7 @@ namespace PlantChillers {
         }
 
         // save last system time step and last end time of current time step (used to determine if warning is valid)
-        this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        this->TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
         this->CurrentEndTimeLast = CurrentEndTime;
 
         // If Chiller load is 0 or chiller is not running then leave the subroutine.Before leaving
@@ -5715,14 +5715,14 @@ namespace PlantChillers {
 
         this->HeatRecOutletTemp = HeatRecOutTemp;
         this->HeatRecMdot = heatRecMdot;
-        this->HeatRecLubeEnergy = this->HeatRecLubeRate * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+        this->HeatRecLubeEnergy = this->HeatRecLubeRate * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
         this->FuelEnergyIn = std::abs(fuelEnergyIn);
         this->FuelMassUsedRate = std::abs(fuelEnergyIn) / (this->FuelHeatingValue * KJtoJ);
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -5762,7 +5762,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
@@ -5815,8 +5815,8 @@ namespace PlantChillers {
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
 
             this->FuelEnergyUsedRate = this->FuelEnergyIn;
-            this->FuelEnergyUsed = this->FuelEnergyUsedRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            this->FuelMassUsed = this->FuelMassUsedRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            this->FuelEnergyUsed = this->FuelEnergyUsedRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->FuelMassUsed = this->FuelMassUsedRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             if (this->FuelEnergyUsedRate != 0.0) {
                 this->FuelCOP = this->QEvaporator / this->FuelEnergyUsedRate;
             } else {
@@ -6807,13 +6807,13 @@ namespace PlantChillers {
         }
 
         //   calculate end time of current time step
-        CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > this->CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= this->TimeStepSysLast) {
+        if (CurrentEndTime > this->CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= this->TimeStepSysLast) {
             if (this->PrintMessage) {
                 ++this->MsgErrorCount;
                 //       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -6828,7 +6828,7 @@ namespace PlantChillers {
         }
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        this->TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
         this->CurrentEndTimeLast = CurrentEndTime;
 
         // otherwise the chiller is running...
@@ -7122,9 +7122,9 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -7154,7 +7154,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    October 1998
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             this->Power = 0.0;

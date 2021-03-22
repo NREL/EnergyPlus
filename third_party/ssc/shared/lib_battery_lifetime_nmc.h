@@ -27,6 +27,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "lib_util.h"
 #include "lib_battery_lifetime_calendar_cycle.h"
 
+/**
+ * NMC Life Model
+ *
+ * Based on the model developed by NREL:
+ *  K. Smith, A. Saxon, M. Keyser, B. Lundstrom, Ziwei Cao, A. Roc
+ *  Life prediction model for grid-connected li-ion battery energy storage system
+ *  2017 American Control Conference (ACC) (2017), pp. 4062-4068
+ *  https://ieeexplore.ieee.org/document/7963578
+ */
+
+// Gas Constant
+const double Rug = 8.314;       // J K mol-1
+const double T_ref = 298.15;    // K
+const double F = 96485;         // A s mol−1
+
+
 struct lifetime_nmc_state {
     double q_relative_li;                // %, SEI degradation
     double q_relative_neg;               // %, cycle degradation
@@ -38,9 +54,11 @@ struct lifetime_nmc_state {
     // for complex cycling of battery, b1 = summation of b1_dt * dt_day over a day
     // lifetime capacity updated after 24 hours elapse.
 
+    double cum_dt;      // cumulated dt elapsed
     double b1_dt;
     double b2_dt;
     double b3_dt;
+    double c0_dt;
     double c2_dt;
 
     friend std::ostream& operator<<(std::ostream& os, const lifetime_nmc_state& p);
@@ -51,6 +69,8 @@ public:
     lifetime_nmc_t(double dt_hr);
 
     lifetime_nmc_t(std::shared_ptr<lifetime_params> params_pt);
+
+    lifetime_nmc_t(std::shared_ptr<lifetime_params> params_pt, std::shared_ptr<lifetime_state> state_pt);
 
     lifetime_nmc_t(const lifetime_nmc_t& rhs);
 
@@ -75,40 +95,51 @@ protected:
 
     std::unique_ptr<lifetime_cycle_t> cycle_model;
 
+    /// Reference Anode and Cell potential
+    double Uneg_ref = 0.08;     // V
+    double V_ref = 3.7;         // V
+
+    /// Capacity degradation due to positive electrode-site-limit
+    double d0_ref = 75.1;       // Ah
+    double Ea_d0_1 = 4126.0;    // J/mol
+    double Ea_d0_2 = 9752000.0; // J/mol
+    double Ah_ref = 75.;        // Ah
+
     /// Capacity degradation due to SEI
-    double runQli();
+    double b0 = 1.07;           // 1
+    double b1_ref = 0.003503;   // day^-0.5
+    double Ea_b1 = 35392.;      // J mol^-1
+    double alpha_a_b1 = -1;     // 1
+    double beta_b1 = 2.157;     // 1
+    double gamma = 2.472;       // 1
+
+    double b2_ref = 0.00001541; // 1
+    double Ea_b_2 = -42800.;    // J mol^-1
+
+    double b3_ref = 0.02805;    // 1
+    double Ea_b3 = 42800.;      // J mol^-1
+    double alpha_a_b3 = 0.0066; // 1
+    double tau_b3 = 5;          // 1
+    double theta = 0.135;       // 1
+
+    double runQli(double T_battery_K);
 
     /// Capacity degradation due to cycles
-    double runQneg(double T_battery, double SOC);
+    double c0_ref = 75.64;      // Ah
+    double Ea_c0_ref = 2224.;   // J mol^-1
+    double c2_ref = 0.0039193;  // Ah cycle^-1
+    double Ea_c2 = -48260.;     // J mol^-1
+    double beta_c2 = 4.54;      // 1
+
+    double runQneg();
+
+    /// compute lifetime degradation coefficients for current time step
+    void integrateDegParams(double dt_day, double DOD, double T_battery);
+
+    /// Integrate degradation from QLi and Qneg over one day, resets `x_dt` values
+    void integrateDegLoss(double DOD, double T_battery);
 
     void initialize();
-
-    /// NMC Kandler Smith parameters
-    double Ea_d0_1 = 4126.0;
-    double b1_ref = 0.003503;
-    double Ea_b_1 = 35392.;
-    double Rug = 8.314;
-    double T_ref = 298.15;
-    double alpha_a_b1 = -1;
-    double F = 96485;
-    double U_ref = 0.08;
-    double gamma = 2.472;
-    double beta_b1 = 2.157;
-
-    double b2_ref = 0.00001541;
-    double Ea_b_2 = -42800.;
-
-    double b3_ref = 0.003503;
-    double Ea_b_3 = 42800.;
-    double alpha_a_b3 = 0.0066;
-    double V_ref = 3.7;
-    double theta = 0.135;
-    double tau_b3 = 5;
-
-    double c0_ref = 75.1;
-    double c2_ref = 0.0039193;
-    double Ea_c_2 = -48260;
-    double beta_c2 = 4.54;
 };
 
 

@@ -2369,7 +2369,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(3).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(4).IsControlled = false;
-    DataHVACGlobals::TimeStepSys = 0.1;
+    state->dataHVACGlobal->TimeStepSys = 0.1;
 
     state->dataAirflowNetwork->AirflowNetworkLinkSimu(1).FLOW2 = 0.1;
     state->dataAirflowNetwork->AirflowNetworkLinkSimu(10).FLOW2 = 0.15;
@@ -4432,7 +4432,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataEnvrn->OutBaroPress = 101000;
-    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -9083,7 +9083,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
-    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -17161,7 +17161,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataEnvrn->OutBaroPress = 101000;
-    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 

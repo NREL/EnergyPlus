@@ -92,7 +92,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
     state->dataHeatBal->TotCrossMixing = NumOfCrossMixing;
     state->dataZoneEquip->CrossMixingReportFlag(1) = true;
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
     state->dataHeatBalFanSys->MCPI = 0.0;
     state->dataHeatBalFanSys->MCPV = 0.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -158,7 +158,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataZoneEquip->VentMCP.allocate(1);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
     state->dataHeatBalFanSys->MCPI(1) = 1.0;
     state->dataHeatBalFanSys->MCPI(2) = 1.5;
     state->dataHeatBalFanSys->MCPV(1) = 2.0;
@@ -220,7 +220,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
     state->dataHeatBalFanSys->MCPI(1) = 1.0;
     state->dataHeatBalFanSys->MCPI(2) = 1.5;
     state->dataHeatBalFanSys->MCPV(1) = 2.0;
@@ -275,14 +275,14 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     state->dataGlobal->isPulseZoneSizing = false;
     state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
     state->dataGlobal->WarmupFlag = false;
-    DataHVACGlobals::AirLoopsSimOnce = true;
+    state->dataHVACGlobal->AirLoopsSimOnce = true;
     state->dataEnvrn->StdRhoAir = 1.0;
 
-    DataHVACGlobals::NumPrimaryAirSys = 2;
-    state->dataAirSystemsData->PrimaryAirSystems.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataHVACGlobal->NumPrimaryAirSys = 2;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     state->dataAirSystemsData->PrimaryAirSystems(1).Name = "System 1";
     state->dataAirSystemsData->PrimaryAirSystems(2).Name = "System 2";
-        state->dataAirLoop->AirLoopFlow.allocate(DataHVACGlobals::NumPrimaryAirSys);
+        state->dataAirLoop->AirLoopFlow.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     auto &thisAirLoopFlow1(state->dataAirLoop->AirLoopFlow(1));
     auto &thisAirLoopFlow2(state->dataAirLoop->AirLoopFlow(2));
 

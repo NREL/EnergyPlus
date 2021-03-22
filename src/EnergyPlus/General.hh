@@ -79,7 +79,7 @@ namespace WeatherManager {
 
 namespace General {
 
-    void SolveRoot(Real64 Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state, Real64 Eps, // required absolute accuracy
                    int MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
@@ -89,7 +89,7 @@ namespace General {
                    std::vector<Real64> const &Par // array with additional parameters used for function evaluation
     );
 
-    void SolveRoot(Real64 Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state, Real64 Eps, // required absolute accuracy
                    int MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
@@ -112,7 +112,7 @@ namespace General {
                    Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
     );
 
-    void SolveRoot(Real64 Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state, Real64 Eps, // required absolute accuracy
                    int MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x) = 0

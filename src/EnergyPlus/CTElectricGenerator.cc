@@ -609,16 +609,16 @@ namespace CTElectricGenerator {
 
         // Calculate Energy
         // Generator output (J)
-        Real64 ElectricEnergyGen = elecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // Amount of Fuel Energy Required to run COMBUSTION turbine (J)
-        Real64 FuelEnergyUsed = FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 FuelEnergyUsed = FuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // recovered lube oil heat (J)
-        Real64 lubeOilEnergyRec = QLubeOilRec * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // recovered exhaust heat (J)
-        Real64 exhaustEnergyRec = QExhaustRec * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         this->ElecPowerGenerated = elecPowerGenerated;
         this->ElecEnergyGenerated = ElectricEnergyGen;
