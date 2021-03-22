@@ -176,7 +176,6 @@ set(SRC
     DataGlobalConstants.cc
     DataGlobalConstants.hh
     DataGlobals.hh
-    DataHVACControllers.cc
     DataHVACControllers.hh
     DataHVACGlobals.cc
     DataHVACGlobals.hh

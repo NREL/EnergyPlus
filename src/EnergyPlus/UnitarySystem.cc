@@ -5058,7 +5058,7 @@ namespace UnitarySystems {
                             //  CALL CheckCoilWaterInletNode(thisSys%CoolCoilFluidInletNode,InletNodeNotControlled)
                             if (!InletNodeNotControlled) {
                                 ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                                ShowContinueError(state, DataHVACControllers::ControllerTypes(DataHVACControllers::ControllerSimple_Type) + " found for " +
+                                ShowContinueError(state, state.dataHVACCtrl->ControllerTypes(DataHVACControllers::ControllerSimple_Type) + " found for " +
                                                   loc_coolingCoilType + " = \"" + loc_m_CoolingCoilName + ".\"");
                                 ShowContinueError(state, "...water coil controllers are not used with " + thisSys.UnitType);
                                 errorsFound = true;
