@@ -81,9 +81,9 @@ protected:
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 
-    bool process_idd(std::string const &idd, bool &errors_found)
+    bool process_idd(EnergyPlusData &state, std::string const &idd, bool &errors_found)
     {
-        return EnergyPlusFixture::process_idd(idd, errors_found);
+        return EnergyPlusFixture::process_idd(state, idd, errors_found);
     }
 
     bool processErrors(EnergyPlusData &state)

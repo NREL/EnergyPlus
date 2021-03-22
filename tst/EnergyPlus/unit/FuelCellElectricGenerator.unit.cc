@@ -1736,7 +1736,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest_Zero_Cp_Fix)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(*state, idf_objects));
     bool process_err(false);
     process_err = has_err_output(true);
     EXPECT_FALSE(process_err);

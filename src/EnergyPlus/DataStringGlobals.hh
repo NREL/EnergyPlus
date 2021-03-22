@@ -57,17 +57,6 @@
 
 namespace EnergyPlus {
 
-namespace DataStringGlobals {
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    extern std::string const NL; // Platform newline
-    extern char const pathChar;
-    extern char const altpathChar;
-
-
-} // namespace DataStringGlobals
-
 struct DataStringGlobalsData : BaseGlobalStruct {
 
     std::string outputErrFileName;
