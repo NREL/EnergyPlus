@@ -836,12 +836,12 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     EXPECT_EQ(compName, thisSys->Name);
     EXPECT_NEAR(100.0, thisSys->m_AncillaryOnPower, 0.00000001);
     EXPECT_NEAR(50.0, thisSys->m_AncillaryOffPower, 0.00000001);
-    EXPECT_NEAR(0.49388, thisSys->m_PartLoadFrac, 0.000001);
+    EXPECT_NEAR(0.488072083, thisSys->m_PartLoadFrac, 0.000001);
     Real64 totalAncillaryPower =
         thisSys->m_AncillaryOnPower * thisSys->m_PartLoadFrac + thisSys->m_AncillaryOffPower * (1.0 - thisSys->m_PartLoadFrac);
     EXPECT_NEAR(totalAncillaryPower, thisSys->m_TotalAuxElecPower, 0.00000001);
     // at PLR very near 0.5, m_TotalAuxElecPower should be very near 75 W.
-    EXPECT_NEAR(74.694, thisSys->m_TotalAuxElecPower, 0.0001);
+    EXPECT_NEAR(74.4036, thisSys->m_TotalAuxElecPower, 0.0001);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
