@@ -231,9 +231,9 @@ namespace RoomAirModelAirflowNetwork {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool MyOneTimeFlag( true );  // one time setup flag // state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlag
-        // static bool MyOneTimeFlagConf( true ); // one time setup flag for zone configuration // state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf
-        // static bool MyEnvrnFlag( true ); // one time setup flag for zone configuration // state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkEnvrnFlag
+        // static bool MyOneTimeFlag( true );  // one time setup flag // InitRoomAirModelAirflowNetworkOneTimeFlag
+        // static bool MyOneTimeFlagConf( true ); // one time setup flag for zone configuration // InitRoomAirModelAirflowNetworkOneTimeFlagConf
+        // static bool MyEnvrnFlag( true ); // one time setup flag for zone configuration // InitRoomAirModelAirflowNetworkEnvrnFlag
         ////////////////////////////////////////////////////////////////////////////////////
         Real64 SumLinkMCp;
         Real64 SumLinkMCpT;
@@ -480,7 +480,7 @@ namespace RoomAirModelAirflowNetwork {
                     ShowFatalError(state, "GetRoomAirflowNetworkData: Errors found getting air model input.  Program terminates.");
                 }
             }
-        } // End of state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf
+        } // End of InitRoomAirModelAirflowNetworkOneTimeFlagConf
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkEnvrnFlag) {
             for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
@@ -829,7 +829,7 @@ namespace RoomAirModelAirflowNetwork {
         Real64 SumSysM;    //                !Zone sum of air system MassFlowRate
         Real64 SumSysMW;   //               !Zone sum of air system MassFlowRate*W
         int EquipLoop;     //              !Index of equipment loop
-        int Loop;          //                   !Index of state.dataRoomAirflowNetModel->RAFN node
+        int Loop;          //                   !Index of RAFN node
         bool Found;        //
         Real64 SumLinkM;   //               !Zone sum of MassFlowRate from the AirflowNetwork model
         Real64 SumLinkMW;  //             !Zone sum of MassFlowRate*W from the AirflowNetwork model

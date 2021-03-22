@@ -3968,7 +3968,7 @@ namespace ScheduleManager {
         Real64 MaxValue(0.0); // For total maximum
         bool MinValueOk(true);
         bool MaxValueOk(true);
-        /////////// hoisted into namespace state.dataScheduleMgr->CheckScheduleValueMinMaxRunOnceOnly////////////
+        /////////// hoisted into namespace CheckScheduleValueMinMaxRunOnceOnly////////////
         // static bool RunOnceOnly( true );
         /////////////////////////////////////////////////
         // precompute the dayschedule max and min so that it is not in nested loop

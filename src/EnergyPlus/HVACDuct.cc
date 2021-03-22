@@ -60,7 +60,7 @@ namespace EnergyPlus {
 
 namespace HVACDuct {
 
-    // Module containing the routines dealing with the state.dataHVACDuct->Duct component
+    // Module containing the routines dealing with the Duct component
     // in forced air air conditioning systems
 
     // MODULE INFORMATION:
@@ -241,7 +241,7 @@ namespace HVACDuct {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for initializations of the state.dataHVACDuct->Duct Components
+        // This subroutine is for initializations of the Duct Components
 
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations

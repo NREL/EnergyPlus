@@ -226,10 +226,10 @@ namespace HVACHXAssistedCoolingCoil {
         }
         CalcHXAssistedCoolingCoil(state, HXAssistedCoilNum, FirstHVACIteration, CompOp, PartLoadRatio, HXUnitOn, FanOpMode, AirFlowRatio, EconomizerFlag);
 
-        // Update the current state.dataHVACAssistedCC->HXAssistedCoil output
+        // Update the current HXAssistedCoil output
         //  Call UpdateHXAssistedCoolingCoil(HXAssistedCoilNum), not required. Updates done by the HX and cooling coil components.
 
-        // Report the current state.dataHVACAssistedCC->HXAssistedCoil output
+        // Report the current HXAssistedCoil output
         //  Call ReportHXAssistedCoolingCoil(HXAssistedCoilNum), not required. No reporting variables for this compound component.
 
         if (present(QTotOut)) {
@@ -599,9 +599,9 @@ namespace HVACHXAssistedCoolingCoil {
             } else if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate")) {
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType_Num = HX_AIRTOAIR_FLATPLATE;
                 //       balanced desiccant HX not allowed with water coils at this time
-                //       ELSEIF(UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType,'HeatExchanger:Desiccant:BalancedFlow'))
+                //       ELSEIF(UtilityRoutines::SameString(HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType,'HeatExchanger:Desiccant:BalancedFlow'))
                 //       THEN
-                //         state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType_Num = HX_DESICCANT_BALANCED
+                //         HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType_Num = HX_DESICCANT_BALANCED
             } else {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                 ShowContinueError(state, "Invalid " + cAlphaFields(2) + "=\"" + state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType + "\"");
@@ -969,7 +969,7 @@ namespace HVACHXAssistedCoolingCoil {
         state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(HXAssistedCoilNum) = state.dataLoopNodes->Node(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum).HumRat;
     }
 
-    //        End of Reporting subroutines for the state.dataHVACAssistedCC->HXAssistedCoil Module
+    //        End of Reporting subroutines for the HXAssistedCoil Module
     // *****************************************************************************
 
     void GetHXDXCoilIndex(EnergyPlusData &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
@@ -1828,7 +1828,7 @@ namespace HVACHXAssistedCoolingCoil {
         return Found;
     }
 
-    //        End of Utility subroutines for the state.dataHVACAssistedCC->HXAssistedCoil Module
+    //        End of Utility subroutines for the HXAssistedCoil Module
     // *****************************************************************************
 
 } // namespace HVACHXAssistedCoolingCoil

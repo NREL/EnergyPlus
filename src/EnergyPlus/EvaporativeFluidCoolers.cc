@@ -129,7 +129,7 @@ namespace EvaporativeFluidCoolers {
         //       RE-ENGINEERED    na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Obtains input data for evaporative fluid coolers and stores it in state.dataEvapFluidCoolers->SimpleEvapFluidCooler data structure.
+        // Obtains input data for evaporative fluid coolers and stores it in SimpleEvapFluidCooler data structure.
 
         // METHODOLOGY EMPLOYED:
         // Uses "Get" routines to read in the data.
