@@ -864,9 +864,9 @@ namespace EnergyPlus::General {
         XX_1 = X1;
     }
 
-    Real64 InterpSw(Real64 const SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
-                    Real64 const A,         // Glazing property in unswitched state
-                    Real64 const B          // Glazing property in fully switched state
+    inline Real64 InterpSw(Real64 const SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
+                           Real64 const A,         // Glazing property in unswitched state
+                           Real64 const B          // Glazing property in fully switched state
     )
     {
         // FUNCTION INFORMATION:

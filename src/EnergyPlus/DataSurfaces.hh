@@ -68,35 +68,6 @@
 #define BITF(B) (1 << (int(B)))
 #define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
 
-// IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
-// original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
-#define NOT_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::NoShade) | BITF(WinShadingType::ShadeOff))
-
-// IS_SHADED is the flag to indicate window has shade on or temporarily off but may be triggered on later to control daylight glare
-// original expression: SHADE_FLAG > ShadeOff
-#define IS_SHADED(SHADE_FLAG) !NOT_SHADED(SHADE_FLAG)
-
-// IS_SHADED_NO_GLARE is the flag to indicate window has shade and no daylight glare control
-// original expression: IntShade <= SHADE_FLAG <= BGBlind
-#define IS_SHADED_NO_GLARE_CTRL(SHADE_FLAG)                                                                                                          \
-    BITF_TEST_ANY(BITF(SHADE_FLAG),                                                                                                                  \
-                  BITF(WinShadingType::IntShade) | BITF(WinShadingType::SwitchableGlazing) | BITF(WinShadingType::ExtShade) |                        \
-                      BITF(WinShadingType::ExtScreen) | BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) |                            \
-                      BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind))
-
-// ANY_SHADE: if SHADE_FLAG is any of the shading types including interior, exterior or between glass shades
-#define ANY_SHADE(SHADE_FLAG)                                                                                                                        \
-    BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade))
-#define ANY_SHADE_SCREEN(SHADE_FLAG)                                                                                                                 \
-    BITF_TEST_ANY(BITF(SHADE_FLAG),                                                                                                                  \
-                  BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade) | BITF(WinShadingType::ExtScreen))
-#define ANY_BLIND(SHADE_FLAG)                                                                                                                        \
-    BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::BGBlind))
-#define ANY_INTERIOR_SHADE_BLIND(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::IntBlind))
-#define ANY_EXTERIOR_SHADE_BLIND_SCREEN(SHADE_FLAG)                                                                                                  \
-    BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::ExtScreen))
-#define ANY_BETWEENGLASS_SHADE_BLIND(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind))
-
 namespace EnergyPlus {
 
 // Forward declarations
@@ -283,6 +254,59 @@ namespace DataSurfaces {
         default:
             return "";
         }
+    }
+
+    // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
+    // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
+    constexpr bool NOT_SHADED(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag), BITF(WinShadingType::NoShade) | BITF(WinShadingType::ShadeOff));
+    }
+
+    // IS_SHADED is the flag to indicate window has shade on or temporarily off but may be triggered on later to control daylight glare
+    // original expression: SHADE_FLAG > ShadeOff
+    constexpr bool IS_SHADED(WinShadingType const ShadingFlag) {
+        return !NOT_SHADED(ShadingFlag);
+    }
+
+    // IS_SHADED_NO_GLARE is the flag to indicate window has shade and no daylight glare control
+    // original expression: IntShade <= SHADE_FLAG <= BGBlind
+    constexpr bool IS_SHADED_NO_GLARE_CTRL(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                         BITF(WinShadingType::IntShade) | BITF(WinShadingType::SwitchableGlazing) |
+                            BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtScreen) |
+                            BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) |
+                            BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind));
+    }
+
+    // ANY_SHADE: if SHADE_FLAG is any of the shading types including interior, exterior or between glass shades
+    constexpr bool ANY_SHADE(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                          BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade));
+    }
+
+    constexpr bool ANY_SHADE_SCREEN(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                          BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade) | BITF(WinShadingType::ExtScreen));
+    }
+
+    constexpr bool ANY_BLIND(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                          BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::BGBlind));
+    }
+
+    constexpr bool ANY_INTERIOR_SHADE_BLIND(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                             BITF(WinShadingType::IntShade) | BITF(WinShadingType::IntBlind));
+    }
+
+    constexpr bool ANY_EXTERIOR_SHADE_BLIND_SCREEN(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                             BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::ExtScreen));
+    }
+
+    constexpr bool ANY_BETWEENGLASS_SHADE_BLIND(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                             BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind));
     }
 
     // Parameters for classification of outside face of surfaces

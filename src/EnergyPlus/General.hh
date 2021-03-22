@@ -139,7 +139,7 @@ namespace General {
     )
     {
         return Lower + InterpFac * (Upper - Lower);
-    };
+    }
 
     constexpr Real64 InterpProfSlat(Real64 const SlatLower,
                                     Real64 const SlatUpper,
@@ -152,7 +152,7 @@ namespace General {
         Real64 ValA = SlatLower + SlatInterpFac * (SlatUpper - SlatLower);
         Real64 ValB = ProfLower + SlatInterpFac * (ProfUpper - ProfLower);
         return ValA + ProfInterpFac * (ValB - ValA);
-    };
+    }
     
     Real64 InterpSw(Real64 SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
                     Real64 A,         // Glazing property in unswitched state
