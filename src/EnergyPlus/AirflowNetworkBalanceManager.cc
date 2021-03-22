@@ -332,7 +332,10 @@ namespace AirflowNetworkBalanceManager {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
-                Real64 temperature{fields.at("reference_temperature")};
+                Real64 temperature(20.0);
+                if (fields.find("reference_temperature") != fields.end()) { // not required field, has default value
+                    temperature = fields.at("reference_temperature");
+                };
                 Real64 pressure(101325.0);
                 if (fields.find("reference_barometric_pressure") != fields.end()) { // not required field, has default value
                     pressure = fields.at("reference_barometric_pressure");

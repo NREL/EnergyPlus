@@ -20889,8 +20889,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZon
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
-TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceHumidityRatioLeftBlank) {
-    //unit test for the object of ReferenceCrackConditions when ReferenceHumidityRatio was left blank
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceConditionsLeftBlank) {
+    //unit test for the object of ReferenceCrackConditions when reference conditions was left blank
     bool ErrorsFound(false);
     
     std::string const idf_objects = delimited_string({
@@ -20981,8 +20981,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceHumidityRati
      "   Standard;                !- Single Sided Wind Pressure Coefficient Algorithm",
      "AirflowNetwork:MultiZone:ReferenceCrackConditions,",
      "   ReferenceCrackConditions, !- Name",
-     "   20.0, !- Reference Temperature{ C }",
-     "   101320, !- Reference Barometric Pressure{ Pa }",
+     "   , !- Reference Temperature{ C }",
+     "   , !- Reference Barometric Pressure{ Pa }",
      "   ;                   !- Reference Humidity Ratio{ kgWater / kgDryAir }",
      "AirflowNetwork:MultiZone:Surface,",
      "   Surface_1, !- Surface Name",
@@ -21032,7 +21032,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceHumidityRati
     EXPECT_FALSE(ErrorsFound);
     
     GetAirflowNetworkInput(*state);
-    //check correct values for reference humdity ratio of crack surface when the field was left blank.
+    //check correct values for reference conditions of crack surface when reference conditions were left blank.
+    EXPECT_EQ(20, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).StandardT);
+    EXPECT_EQ(101325, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).StandardP);
     EXPECT_EQ(0, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).StandardW);
-}
+    }
 } // namespace EnergyPlus
