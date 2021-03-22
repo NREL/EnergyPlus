@@ -221,7 +221,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
 
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSimAirServingZones->GetAirLoopInputFlag = false;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirToZoneNodeInfo.allocate(1);
@@ -412,7 +412,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
 
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSimAirServingZones->GetAirLoopInputFlag = false;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers = 1;
@@ -527,7 +527,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     state->dataMixedAir->OAMixer(1).Name = "OAMixer";
     state->dataMixedAir->OAMixer(1).InletNode = 2;
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Name = "PrimaryAirLoop";
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -659,7 +659,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     state->dataMixedAir->OAMixer(1).Name = "OAMixer";
     state->dataMixedAir->OAMixer(1).InletNode = 2;
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Name = "PrimaryAirLoop";
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -929,7 +929,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
 
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSimAirServingZones->GetAirLoopInputFlag = false;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirToZoneNodeInfo.allocate(1);

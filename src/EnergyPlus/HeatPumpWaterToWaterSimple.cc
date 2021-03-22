@@ -677,7 +677,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         using DataPlant::TypeOf_HPWaterEFCooling;
         using DataPlant::TypeOf_HPWaterEFHeating;
         using FluidProperties::GetDensityGlycol;
@@ -1623,7 +1623,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using CurveManager::CurveValue;
@@ -1783,7 +1783,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using CurveManager::CurveValue;

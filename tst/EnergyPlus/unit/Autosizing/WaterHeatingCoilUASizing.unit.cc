@@ -198,7 +198,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -216,7 +216,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
 
     // Test 4 - Airloop Equipment
     state->dataSize->CurSysNum = 1;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->FinalSysSizing.allocate(1);

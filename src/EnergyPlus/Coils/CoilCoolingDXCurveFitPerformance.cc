@@ -193,7 +193,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                                                 bool const singleMode,
                                                 Real64 LoadSHR)
 {
-    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->recoveredEnergyRate = 0.0;
     this->NormalSHR = 0.0;
 

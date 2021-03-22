@@ -141,15 +141,15 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
 
     state->dataRoomAirMod->CVJetRecFlows.allocate({0, MaxSurf}, 1);
 
-    DataUCSDSharedData::PosZ_Wall.allocate(2);
-    DataUCSDSharedData::PosZ_Wall(1) = 1;
-    DataUCSDSharedData::PosZ_Wall(2) = 4;
+    state->dataUCSDShared->PosZ_Wall.allocate(2);
+    state->dataUCSDShared->PosZ_Wall(1) = 1;
+    state->dataUCSDShared->PosZ_Wall(2) = 4;
 
-    DataUCSDSharedData::APos_Wall.allocate(12);
-    DataUCSDSharedData::APos_Wall(1) = 5;
-    DataUCSDSharedData::APos_Wall(2) = 7;
-    DataUCSDSharedData::APos_Wall(3) = 8;
-    DataUCSDSharedData::APos_Wall(4) = 10;
+    state->dataUCSDShared->APos_Wall.allocate(12);
+    state->dataUCSDShared->APos_Wall(1) = 5;
+    state->dataUCSDShared->APos_Wall(2) = 7;
+    state->dataUCSDShared->APos_Wall(3) = 8;
+    state->dataUCSDShared->APos_Wall(4) = 10;
 
     state->dataRoomAirMod->Droom.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->Droom(1) = 13.631070390838719;

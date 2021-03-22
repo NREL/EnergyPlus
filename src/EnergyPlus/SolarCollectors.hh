@@ -281,7 +281,7 @@ namespace SolarCollectors {
 
         void update(EnergyPlusData &state);
 
-        void report();
+        void report(EnergyPlusData &state);
     };
 
     void GetSolarCollectorInput(EnergyPlusData &state);

@@ -100,8 +100,8 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // One time run.  Must be run BEFORE anything gets parsed.
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         static Real64 tmpCurrentTime(0.0);
         static Real64 tmpMinutes(0.0);

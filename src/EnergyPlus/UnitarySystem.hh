@@ -756,6 +756,13 @@ namespace UnitarySystems {
     int getDesignSpecMSHPIndex(EnergyPlusData &state, std::string const &objectName);
     int getUnitarySystemIndex(EnergyPlusData &state, std::string const &objectName);
 
+    bool searchZoneInletNodes(EnergyPlusData &state, int nodeToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex);
+    bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
+    bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex);
+    bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
+    void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
+    bool searchTotalComponents(EnergyPlusData &state, std:: string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
+
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct {
 

@@ -162,7 +162,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     thisCoil.size(*state);
 
     // for speed > 1 we use the mshp rated high speed flow...
-    DataHVACGlobals::MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
 
     // we'll use this later
     auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
@@ -301,7 +301,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
     thisCoil.size(*state);
 
     // for speed > 1 we use the mshp rated high speed flow...
-    DataHVACGlobals::MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
 
     // we'll use this later
     auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
@@ -369,8 +369,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     int DXCoilNum(1);
     state->dataDXCoils->NumDXCoils = 1;
     state->dataCurveManager->NumCurves = 2;
-    DataHVACGlobals::MSHPMassFlowRateLow = 0.6;
-    DataHVACGlobals::MSHPMassFlowRateHigh = 1.0;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = 0.6;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = 1.0;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
     state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
@@ -459,8 +459,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
-    Coil.MSRatedAirMassFlowRate(1) = DataHVACGlobals::MSHPMassFlowRateLow;
-    Coil.MSRatedAirMassFlowRate(2) = DataHVACGlobals::MSHPMassFlowRateHigh;
+    Coil.MSRatedAirMassFlowRate(1) = state->dataHVACGlobal->MSHPMassFlowRateLow;
+    Coil.MSRatedAirMassFlowRate(2) = state->dataHVACGlobal->MSHPMassFlowRateHigh;
     // Match RatedCBF from new coil
     Coil.MSRatedCBF(1) = 0.32321692557501741;
     Coil.MSRatedCBF(2) = 0.037495280896632406;
@@ -497,7 +497,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     // Test 1 - dry coil - run the coil at low speed
     Real64 SpeedRatio = 0.0;
     Real64 CycRatio = 1.0;
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals low speed capacity
     EXPECT_NEAR(10710.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling rate at low speed
@@ -517,7 +517,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
 
     // run the coil at high speed
     SpeedRatio = 1.0;
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateHigh;
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateHigh;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(17850.0, Coil.TotalCoolingEnergyRate, 0.0001);   // total capacity at high speed
     EXPECT_NEAR(17850.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling rate at high speed
@@ -537,7 +537,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
 
     // Test 3 - dry coil - run the coil at speed ratio 0.75
     SpeedRatio = 0.75;
-    Coil.InletAirMassFlowRate = SpeedRatio * DataHVACGlobals::MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * DataHVACGlobals::MSHPMassFlowRateLow;
+    Coil.InletAirMassFlowRate = SpeedRatio * state->dataHVACGlobal->MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0 + 0.75 * (17850.0 - 10710.0), Coil.TotalCoolingEnergyRate, 0.0001); // total capacity
     EXPECT_NEAR(10710.0 + 0.75 * (17850.0 - 10710.0), Coil.SensCoolingEnergyRate, 0.0001);  // sensible cooling rate
@@ -566,7 +566,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     // Test 4 - wet coil - run coil at low speed
     SpeedRatio = 0.0;
     CycRatio = 1.0;
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals low speed cooling capacity
     EXPECT_NEAR(6908.14887, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at low speed
@@ -586,7 +586,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
 
     // Test 5 - wet coil - run the coil at high speed
     SpeedRatio = 1.0;
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateHigh;
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateHigh;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(17850.0, Coil.TotalCoolingEnergyRate, 0.0001);   // total capacity at high speed
     EXPECT_NEAR(13002.847055477625, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at high speed
@@ -606,7 +606,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
 
     // Test 6 - wet coil - run the coil at speed ratio 0.75
     SpeedRatio = 0.75;
-    Coil.InletAirMassFlowRate = SpeedRatio * DataHVACGlobals::MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * DataHVACGlobals::MSHPMassFlowRateLow;
+    Coil.InletAirMassFlowRate = SpeedRatio * state->dataHVACGlobal->MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0 + 0.75 * (17850.0 - 10710.0), Coil.TotalCoolingEnergyRate, 0.01);          // total capacity
     EXPECT_NEAR(6908.14887 + 0.75 * (13002.847055477625 - 6908.14887), Coil.SensCoolingEnergyRate, 0.01);  // sensible cooling rate
@@ -626,7 +626,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     Real64 MultiSpeedOutletTemp6 = AirOutletNode.Temp;
     Real64 MultiSpeedElecPower6 = Coil.ElecCoolingPower;
 
-    Real64 ratedVolFlowRate = DataHVACGlobals::MSHPMassFlowRateHigh / ratedRhoAir;
+    Real64 ratedVolFlowRate = state->dataHVACGlobal->MSHPMassFlowRateHigh / ratedRhoAir;
     std::string volFlowRateStr = format("{:.4R}",ratedVolFlowRate);
 
     std::string idf_objects = delimited_string({
@@ -686,7 +686,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     thisCoil.size(*state);
 
     // for speed > 1 we use the mshp rated high speed flow...
-    DataHVACGlobals::MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
 
     // we'll use this later
     auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
@@ -785,8 +785,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     int DXCoilNum(1);
     state->dataDXCoils->NumDXCoils = 1;
     state->dataCurveManager->NumCurves = 2;
-    DataHVACGlobals::MSHPMassFlowRateLow = 0.6;
-    DataHVACGlobals::MSHPMassFlowRateHigh = 1.0;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = 0.6;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = 1.0;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
     state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
@@ -875,8 +875,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
-    Coil.MSRatedAirMassFlowRate(1) = DataHVACGlobals::MSHPMassFlowRateLow;
-    Coil.MSRatedAirMassFlowRate(2) = DataHVACGlobals::MSHPMassFlowRateHigh;
+    Coil.MSRatedAirMassFlowRate(1) = state->dataHVACGlobal->MSHPMassFlowRateLow;
+    Coil.MSRatedAirMassFlowRate(2) = state->dataHVACGlobal->MSHPMassFlowRateHigh;
     // Match RatedCBF from new coil
     Coil.MSRatedCBF(1) = 0.32321692557501741;
     //    Coil.MSRatedCBF(2) = 0.32321692557501741;
@@ -914,7 +914,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     // Test 1 - dry coil - run the coil at low speed
     Real64 SpeedRatio = 0.0;
     Real64 CycRatio = 1.0;
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals low speed capacity
     EXPECT_NEAR(10710.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling rate at low speed
@@ -934,7 +934,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
 
     // run the coil at high speed
     SpeedRatio = 1.0;
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateHigh;
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateHigh;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(17850.0, Coil.TotalCoolingEnergyRate, 0.0001);   // total capacity at high speed
     EXPECT_NEAR(17850.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling rate at high speed
@@ -954,7 +954,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
 
     // Test 3 - dry coil - run the coil at speed ratio 0.75
     SpeedRatio = 0.75;
-    Coil.InletAirMassFlowRate = SpeedRatio * DataHVACGlobals::MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * DataHVACGlobals::MSHPMassFlowRateLow;
+    Coil.InletAirMassFlowRate = SpeedRatio * state->dataHVACGlobal->MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0 + 0.75 * (17850.0 - 10710.0), Coil.TotalCoolingEnergyRate, 0.0001); // total capacity
     EXPECT_NEAR(10710.0 + 0.75 * (17850.0 - 10710.0), Coil.SensCoolingEnergyRate, 0.0001);  // sensible cooling rate
@@ -983,7 +983,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     // Test 4 - wet coil - run coil at low speed
     SpeedRatio = 0.0;
     CycRatio = 1.0;
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals low speed cooling capacity
     EXPECT_NEAR(6908.14887, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at low speed
@@ -1003,7 +1003,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
 
     // Test 5 - wet coil - run the coil at high speed
     SpeedRatio = 1.0;
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateHigh;
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateHigh;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(17850.0, Coil.TotalCoolingEnergyRate, 0.0001);   // total capacity at high speed
     EXPECT_NEAR(13002.847055477625, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at high speed
@@ -1023,7 +1023,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
 
     // Test 6 - wet coil - run the coil at speed ratio 0.75
     SpeedRatio = 0.75;
-    Coil.InletAirMassFlowRate = SpeedRatio * DataHVACGlobals::MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * DataHVACGlobals::MSHPMassFlowRateLow;
+    Coil.InletAirMassFlowRate = SpeedRatio * state->dataHVACGlobal->MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0 + 0.75 * (17850.0 - 10710.0), Coil.TotalCoolingEnergyRate, 0.01);          // total capacity
     EXPECT_NEAR(6908.14887 + 0.75 * (13002.847055477625 - 6908.14887), Coil.SensCoolingEnergyRate, 0.01);  // sensible cooling rate
@@ -1043,7 +1043,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     Real64 MultiSpeedOutletTemp6 = AirOutletNode.Temp;
     Real64 MultiSpeedElecPower6 = Coil.ElecCoolingPower;
 
-    Real64 ratedVolFlowRate = DataHVACGlobals::MSHPMassFlowRateHigh / ratedRhoAir;
+    Real64 ratedVolFlowRate = state->dataHVACGlobal->MSHPMassFlowRateHigh / ratedRhoAir;
     std::string volFlowRateStr = format("{:.4R}", ratedVolFlowRate);
 
     std::string idf_objects = delimited_string({
@@ -1103,7 +1103,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     thisCoil.size(*state);
 
     // for speed > 1 we use the mshp rated high speed flow...
-    DataHVACGlobals::MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
 
     // we'll use this later
     auto& evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
@@ -1329,9 +1329,9 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     int SpeedNum = 2;
     Real64 SpeedRatio = 0.0;
     Real64 CycRatio = 1.0;
-    DataHVACGlobals::MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals low speed capacity
     EXPECT_NEAR(10710.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling rate at low speed
@@ -1352,9 +1352,9 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     // Test 2 - dry coil - run the coil at low speed (speednum=1, speedratio=0) - same result?
     SpeedNum = 1;
     SpeedRatio = 0.0;
-    DataHVACGlobals::MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(1);
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(1);
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate1, Coil.TotalCoolingEnergyRate, 0.0001);   // total capacity at high speed
     EXPECT_NEAR(MultiSpeedSensCoolingRate1, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling rate at high speed
@@ -1377,9 +1377,9 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     SpeedNum = 2;
     SpeedRatio = 0.0;
     CycRatio = 1.0;
-    DataHVACGlobals::MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals low speed cooling capacity
     EXPECT_NEAR(6908.14887, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at low speed
@@ -1400,9 +1400,9 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     // Test 4 - wet coil - run the coil at low speed (speednum=1, speedratio=0, CycFanCycCoil) - same result?
     SpeedNum = 1;
     SpeedRatio = 0.0;
-    DataHVACGlobals::MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(1);
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(1);
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate3, Coil.TotalCoolingEnergyRate, 0.0001);   // total capacity at high speed
     EXPECT_NEAR(MultiSpeedSensCoolingRate3, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at high speed
@@ -1416,9 +1416,9 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     // Test 5 - wet coil - run the coil at almost low speed (speednum=2, speedratio=0.00001, CycFanCycCoil) - same result?
     SpeedNum = 2;
     SpeedRatio = 0.00001;
-    DataHVACGlobals::MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
-    Coil.InletAirMassFlowRate = SpeedRatio * DataHVACGlobals::MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * DataHVACGlobals::MSHPMassFlowRateLow;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
+    Coil.InletAirMassFlowRate = SpeedRatio * state->dataHVACGlobal->MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate3, Coil.TotalCoolingEnergyRate, 0.1);   // total capacity at high speed
     EXPECT_NEAR(MultiSpeedSensCoolingRate3, Coil.SensCoolingEnergyRate, 0.1); // sensible cooling rate at high speed
@@ -1561,9 +1561,9 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     int SpeedNum = 2;
     Real64 SpeedRatio = 0.0;
     Real64 CycRatio = 1.0;
-    DataHVACGlobals::MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals low speed capacity
     EXPECT_NEAR(10710.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling rate at low speed
@@ -1584,9 +1584,9 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     // Test 2 - dry coil - run the coil at low speed (speednum=1, speedratio=0) - same result?
     SpeedNum = 1;
     SpeedRatio = 0.0;
-    DataHVACGlobals::MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(1);
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(1);
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate1, Coil.TotalCoolingEnergyRate, 0.0001);   // total capacity at high speed
     EXPECT_NEAR(MultiSpeedSensCoolingRate1, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling rate at high speed
@@ -1609,9 +1609,9 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     SpeedNum = 2;
     SpeedRatio = 0.0;
     CycRatio = 1.0;
-    DataHVACGlobals::MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals low speed cooling capacity
     EXPECT_NEAR(6908.14887, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at low speed
@@ -1632,9 +1632,9 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     // Test 4 - wet coil - run the coil at low speed (speednum=1, speedratio=0, CycFanCycCoil) - same result?
     SpeedNum = 1;
     SpeedRatio = 0.0;
-    DataHVACGlobals::MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(1);
-    Coil.InletAirMassFlowRate = DataHVACGlobals::MSHPMassFlowRateLow;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(1);
+    Coil.InletAirMassFlowRate = state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate3, Coil.TotalCoolingEnergyRate, 0.0001);   // total capacity at high speed
     EXPECT_NEAR(MultiSpeedSensCoolingRate3, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at high speed
@@ -1648,9 +1648,9 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     // Test 5 - wet coil - run the coil at almost low speed (speednum=2, speedratio=0.00001, CycFanCycCoil) - same result?
     SpeedNum = 2;
     SpeedRatio = 0.00001;
-    DataHVACGlobals::MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
-    Coil.InletAirMassFlowRate = SpeedRatio * DataHVACGlobals::MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * DataHVACGlobals::MSHPMassFlowRateLow;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
+    Coil.InletAirMassFlowRate = SpeedRatio * state->dataHVACGlobal->MSHPMassFlowRateHigh + (1.0 - SpeedRatio) * state->dataHVACGlobal->MSHPMassFlowRateLow;
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate3, Coil.TotalCoolingEnergyRate, 0.1);   // total capacity at high speed
     EXPECT_NEAR(MultiSpeedSensCoolingRate3, Coil.SensCoolingEnergyRate, 0.1); // sensible cooling rate at high speed

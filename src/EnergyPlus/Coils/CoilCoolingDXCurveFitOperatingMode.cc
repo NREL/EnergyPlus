@@ -300,7 +300,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
             thisspeed.AirMassFlow = 0.0;
         }
     } else if (speedNum > 1) {
-        thisspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateHigh;
+        thisspeed.AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateHigh;
     }
     // rated flow rate is adjusted by coil face area fraction so adjustment is before next IF
     thisspeed.AirMassFlow *= thisspeed.active_fraction_of_face_coil_area;
@@ -353,7 +353,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
 
         // If multispeed, evaluate next lower speed using PLR, then combine with high speed for final outlet conditions
         auto &lowerspeed(this->speeds[max(speedNum - 2, 0)]);
-        lowerspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateLow * lowerspeed.active_fraction_of_face_coil_area;
+        lowerspeed.AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateLow * lowerspeed.active_fraction_of_face_coil_area;
 
         lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
 

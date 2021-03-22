@@ -196,7 +196,7 @@ namespace PVWatts {
         DataSurfaces::SurfaceData &getSurface(EnergyPlusData &state);
         Real64 getGroundCoverageRatio();
 
-        Real64 getCellTempearture();
+        Real64 getCellTemperature();
         Real64 getPlaneOfArrayIrradiance();
         void setCellTemperature(Real64 cellTemp);
         void setPlaneOfArrayIrradiance(Real64 poa);
@@ -209,19 +209,17 @@ namespace PVWatts {
         void getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy);
     };
 
-    extern std::map<int, PVWattsGenerator> PVWattsGenerators;
-
     PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName);
-
-    void clear_state();
 
 } // namespace PVWatts
 
 struct PVWattsData : BaseGlobalStruct {
 
+    std::map<int, PVWatts::PVWattsGenerator> PVWattsGenerators;
+
     void clear_state() override
     {
-
+        this->PVWattsGenerators.clear();
     }
 };
 

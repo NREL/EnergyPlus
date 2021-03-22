@@ -102,14 +102,8 @@ namespace EnergyPlus::Pumps {
     // Using/Aliasing
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::ForceOff;
-    using DataHVACGlobals::NumCondLoops;
-    using DataHVACGlobals::NumPlantLoops;
     using DataHVACGlobals::SmallWaterVolFlow;
-    using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::ObjectIsNotParent;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
 
     std::string const cPump_VarSpeed("Pump:VariableSpeed");
     int const Pump_VarSpeed(101);
@@ -2130,16 +2124,16 @@ namespace EnergyPlus::Pumps {
             state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluid = state.dataPumps->PumpHeattoFluid;
             state.dataPumps->PumpEquipReport(PumpNum).OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
             state.dataPumps->PumpEquip(PumpNum).Power = state.dataPumps->Power;
-            state.dataPumps->PumpEquip(PumpNum).Energy = state.dataPumps->PumpEquip(PumpNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataPumps->PumpEquip(PumpNum).Energy = state.dataPumps->PumpEquip(PumpNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             state.dataPumps->PumpEquipReport(PumpNum).ShaftPower = state.dataPumps->ShaftPower;
-            state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluidEnergy = state.dataPumps->PumpHeattoFluid * TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluidEnergy = state.dataPumps->PumpHeattoFluid * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             if (PumpType == Pump_ConSpeed || PumpType == Pump_VarSpeed || PumpType == Pump_Cond) {
                 state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating = 1;
             } else if (PumpType == PumpBank_ConSpeed || PumpType == PumpBank_VarSpeed) {
                 state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating = state.dataPumps->NumPumpsRunning;
             }
             state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate = state.dataPumps->Power - state.dataPumps->PumpHeattoFluid;
-            state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainEnergy = state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate * TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainEnergy = state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate = (1 - state.dataPumps->PumpEquip(PumpNum).SkinLossRadFraction) * state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate;
             state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate = state.dataPumps->PumpEquip(PumpNum).SkinLossRadFraction * state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate;
         }

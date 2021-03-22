@@ -1075,7 +1075,7 @@ namespace UtilityRoutines {
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
         ++state.dataErrTracking->TotalSevereErrors;
@@ -1118,7 +1118,7 @@ namespace UtilityRoutines {
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
         ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
@@ -1271,7 +1271,7 @@ namespace UtilityRoutines {
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
         ++state.dataErrTracking->TotalWarningErrors;
@@ -1308,7 +1308,7 @@ namespace UtilityRoutines {
         using namespace DataErrorTracking;
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
         ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
@@ -1353,7 +1353,7 @@ namespace UtilityRoutines {
         //  with count of occurrences and optional max, min, sum
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(Message, MessageSearch(Loop))) {
+            if (has(Message, MessageSearch[Loop])) {
                 ++state.dataErrTracking->MatchCounts(Loop);
                 break;
             }
@@ -1408,7 +1408,7 @@ namespace UtilityRoutines {
         //  with count of occurrences and optional max, min, sum
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(Message, MessageSearch(Loop))) {
+            if (has(Message, MessageSearch[Loop])) {
                 ++state.dataErrTracking->MatchCounts(Loop);
                 break;
             }
@@ -1463,7 +1463,7 @@ namespace UtilityRoutines {
         //  with count of occurrences and optional max, min, sum
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(Message, MessageSearch(Loop))) {
+            if (has(Message, MessageSearch[Loop])) {
                 ++state.dataErrTracking->MatchCounts(Loop);
                 break;
             }
@@ -1644,16 +1644,17 @@ namespace UtilityRoutines {
             ShowMessage(state, "The following error categories occurred.  Consider correcting or noting.");
             for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
                 if (state.dataErrTracking->MatchCounts(Loop) > 0) {
-                    ShowMessage(state, Summaries(Loop));
-                    if (MoreDetails(Loop) != "") {
+                    ShowMessage(state, Summaries[Loop]);
+                    std::string thisMoreDetails = MoreDetails[Loop];
+                    if (!thisMoreDetails.empty()) {
                         StartC = 0;
-                        EndC = len(MoreDetails(Loop)) - 1;
+                        EndC = len(thisMoreDetails) - 1;
                         while (EndC != std::string::npos) {
-                            EndC = index(MoreDetails(Loop).substr(StartC), "<CR");
-                            ShowMessage(state, ".." + MoreDetails(Loop).substr(StartC, EndC));
-                            if (MoreDetails(Loop).substr(StartC + EndC, 5) == "<CRE>") break;
+                            EndC = index(thisMoreDetails.substr(StartC), "<CR");
+                            ShowMessage(state, ".." + thisMoreDetails.substr(StartC, EndC));
+                            if (thisMoreDetails.substr(StartC + EndC, 5) == "<CRE>") break;
                             StartC += EndC + 4;
-                            EndC = len(MoreDetails(Loop).substr(StartC)) - 1;
+                            EndC = len(thisMoreDetails.substr(StartC)) - 1;
                         }
                     }
                 }

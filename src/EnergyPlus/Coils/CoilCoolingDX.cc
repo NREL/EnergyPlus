@@ -635,7 +635,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
-    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     // update condensate collection tank
     if (this->condensateTankIndex > 0) {
@@ -725,7 +725,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
     // This appears to be the only location where airLoopNum gets used
     //DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     state.dataAirLoop->LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
-    DataHVACGlobals::DXElecCoolingPower = this->elecCoolingPower;
+    state.dataHVACGlobal->DXElecCoolingPower = this->elecCoolingPower;
     if (this->airLoopNum > 0) {
         state.dataAirLoop->AirLoopAFNInfo(this->airLoopNum).AFNLoopDXCoilRTF = this->coolingCoilRuntimeFraction;
         // The original calculation is below, but no heating yet

@@ -512,7 +512,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
     if (indexPLRFPLF > 0) {
         PLF = CurveManager::CurveValue(state, indexPLRFPLF, _PLR); // Calculate part-load factor
     }
-    if (fanOpMode == DataHVACGlobals::CycFanCycCoil) DataHVACGlobals::OnOffFanPartLoadFraction = PLF;
+    if (fanOpMode == DataHVACGlobals::CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
 
     Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
     if (indexEIRFT > 0) {

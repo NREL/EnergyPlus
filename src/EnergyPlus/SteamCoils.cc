@@ -1457,7 +1457,7 @@ namespace SteamCoils {
         // This subroutine updates the report variable for the coils.
 
         // Report the SteamCoil energy from this component
-        state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     // End of Reporting subroutines for the SteamCoil Module

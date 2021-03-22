@@ -311,8 +311,6 @@ namespace Furnaces {
 
     // Functions
 
-    void clear_state();
-
     void SimFurnace(EnergyPlusData &state, std::string const &FurnaceName,
                     bool const FirstHVACIteration,
                     int const AirLoopNum, // Primary air loop number
@@ -554,8 +552,16 @@ struct FurnacesData : BaseGlobalStruct {
     std::string CurrentModuleObject; // Object type for getting and error messages
     int Iter = 0;    // Iteration counter for CalcNewZoneHeatOnlyFlowRates
 
+
+
     // Object Data
     Array1D<Furnaces::FurnaceEquipConditions> Furnace;
+
+    bool GetFurnaceInputFlag = true; // Logical to allow "GetInput" only once per simulation
+    std::unordered_map<std::string, std::string> UniqueFurnaceNames;
+    bool InitFurnaceMyOneTimeFlag = true; // one time allocation flag
+    bool FlowFracFlagReady = true;        // one time flag for calculating flow fraction through controlled zone
+    bool MyAirLoopPass = true;            // one time allocation flag
 
     Array1D_bool MyEnvrnFlag;             // environment flag
     Array1D_bool MySecondOneTimeFlag;     // additional one time flag
@@ -588,7 +594,13 @@ struct FurnacesData : BaseGlobalStruct {
         SaveCompressorPLR = 0.0;
         CurrentModuleObject = "";
         Iter = 0;
-        Furnace.clear();
+        Furnace.clear();\
+
+        GetFurnaceInputFlag = true;
+        UniqueFurnaceNames.clear();
+        InitFurnaceMyOneTimeFlag = true;
+        FlowFracFlagReady = true; // one time flag for calculating flow fraction through controlled zone
+        MyAirLoopPass = true;
 
         MyEnvrnFlag.clear();
         MySecondOneTimeFlag.clear();
