@@ -816,7 +816,6 @@ namespace HWBaseboardRadiator {
         Real64 Cp;  // local fluid specific heat
         bool errFlag;
 
-        auto & NumHWBaseboardDesignObjs = state.dataHWBaseboardRad->NumHWBaseboardDesignObjs;
         auto & MySizeFlag = state.dataHWBaseboardRad->MySizeFlag;
         auto & ZeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf;
         auto & QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
