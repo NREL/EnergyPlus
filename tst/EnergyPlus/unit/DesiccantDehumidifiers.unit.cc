@@ -2827,21 +2827,21 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     state->dataSize->CurOASysNum = 1;
 
     GetDesiccantDehumidifierInput(*state);
-    EXPECT_EQ(1, NumDesicDehums);
-    EXPECT_EQ("OA DESICCANT SYSTEM", DesicDehum(DesicDehumNum).Name);
-    EXPECT_EQ("OA DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
+    EXPECT_EQ(1, state->dataDesiccantDehumidifiers->NumDesicDehums);
+    EXPECT_EQ("OA DESICCANT SYSTEM", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name);
+    EXPECT_EQ("OA DESICCANT REGEN COIL", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName);
 
-    CompName = DesicDehum(DesicDehumNum).Name;
-    CompIndex = NumGenericDesicDehums;
+    CompName = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name;
+    CompIndex = state->dataDesiccantDehumidifiers->NumGenericDesicDehums;
     SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
 
     RegCoilDesInletTemp = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatRetTemp;
-    RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
+    RegCoilDesOutletTemp = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenSetPointTemp;
     RegCoilInletAirMassFlowRate = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     for (loop = 1; loop <= state->dataHeatingCoils->NumHeatingCoils; ++loop) {
-        if (state->dataHeatingCoils->HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+        if (state->dataHeatingCoils->HeatingCoil(loop).Name == state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
@@ -4007,21 +4007,21 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     state->dataSize->CurOASysNum = 0;
 
     GetDesiccantDehumidifierInput(*state);
-    EXPECT_EQ(1, NumDesicDehums);
-    EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
-    EXPECT_EQ("DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
+    EXPECT_EQ(1, state->dataDesiccantDehumidifiers->NumDesicDehums);
+    EXPECT_EQ("DESICCANT 1", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name);
+    EXPECT_EQ("DESICCANT REGEN COIL", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName);
 
-    CompName = DesicDehum(DesicDehumNum).Name;
-    CompIndex = NumGenericDesicDehums;
+    CompName = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name;
+    CompIndex = state->dataDesiccantDehumidifiers->NumGenericDesicDehums;
     SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
 
     RegCoilDesInletTemp = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp;
-    RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
+    RegCoilDesOutletTemp = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenSetPointTemp;
     RegCoilInletAirMassFlowRate = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     for (loop = 1; loop <= state->dataHeatingCoils->NumHeatingCoils; ++loop) {
-        if (state->dataHeatingCoils->HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+        if (state->dataHeatingCoils->HeatingCoil(loop).Name == state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
@@ -5425,18 +5425,18 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     state->dataSize->CurOASysNum = 0;
 
     GetDesiccantDehumidifierInput(*state);
-    EXPECT_EQ(1, NumDesicDehums);
-    EXPECT_EQ(1, NumGenericDesicDehums);
-    EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
-    EXPECT_EQ("DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
-    EXPECT_EQ("COIL:HEATING:WATER", DesicDehum(DesicDehumNum).RegenCoilType);
+    EXPECT_EQ(1, state->dataDesiccantDehumidifiers->NumDesicDehums);
+    EXPECT_EQ(1, state->dataDesiccantDehumidifiers->NumGenericDesicDehums);
+    EXPECT_EQ("DESICCANT 1", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name);
+    EXPECT_EQ("DESICCANT REGEN COIL", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName);
+    EXPECT_EQ("COIL:HEATING:WATER", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilType);
 
-    CompName = DesicDehum(DesicDehumNum).Name;
-    CompIndex = NumGenericDesicDehums;
+    CompName = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name;
+    CompIndex = state->dataDesiccantDehumidifiers->NumGenericDesicDehums;
     // set design parameters and calculate HW coil design capacity
     RegCoilDesInletTemp = 8.5;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp = RegCoilDesInletTemp;
-    RegCoilDesOutletTemp = DesiccantDehumidifiers::DesicDehum(DesicDehumNum).RegenSetPointTemp;
+    RegCoilDesOutletTemp = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenSetPointTemp;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.07;
     RegCoilInletAirMassFlowRate = state->dataEnvrn->StdRhoAir * state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
@@ -5444,7 +5444,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     // simulate to determine HW coil design capacity
     SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
     for (loop = 1; loop <= state->dataWaterCoils->NumWaterCoils; ++loop) {
-        if (state->dataWaterCoils->WaterCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+        if (state->dataWaterCoils->WaterCoil(loop).Name == state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
@@ -6668,25 +6668,25 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     state->dataSize->CurOASysNum = 0;
 
     GetDesiccantDehumidifierInput(*state);
-    EXPECT_EQ(1, NumDesicDehums);
-    EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
-    EXPECT_EQ("DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
+    EXPECT_EQ(1, state->dataDesiccantDehumidifiers->NumDesicDehums);
+    EXPECT_EQ("DESICCANT 1", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name);
+    EXPECT_EQ("DESICCANT REGEN COIL", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName);
 
-    EXPECT_EQ(DesicDehum(DesicDehumNum).coolingCoil_TypeNum, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).coolingCoil_TypeNum, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
 
-    EXPECT_EQ(DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide, 1);
+    EXPECT_EQ(state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide, 1);
 
-    CompName = DesicDehum(DesicDehumNum).Name;
-    CompIndex = NumGenericDesicDehums;
+    CompName = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name;
+    CompIndex = state->dataDesiccantDehumidifiers->NumGenericDesicDehums;
     SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
 
     RegCoilDesInletTemp = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp;
-    RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
+    RegCoilDesOutletTemp = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenSetPointTemp;
     RegCoilInletAirMassFlowRate = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     for (loop = 1; loop <= state->dataHeatingCoils->NumHeatingCoils; ++loop) {
-        if (state->dataHeatingCoils->HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+        if (state->dataHeatingCoils->HeatingCoil(loop).Name == state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }

@@ -93,7 +93,7 @@ namespace DesiccantDehumidifiers {
     };
 
     //  Desiccant heat exchanger type
-    int constexpr BalancedHX; // HeatExchanger:Desiccant:BalancedFlow = 1
+    int constexpr BalancedHX(1); // HeatExchanger:Desiccant:BalancedFlow = 1
 
     struct DesiccantDehumidifierData
     {
