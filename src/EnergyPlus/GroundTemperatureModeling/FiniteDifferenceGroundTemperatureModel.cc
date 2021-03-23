@@ -90,8 +90,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     // Read input and creates instance of finite difference ground temp model
 
     // USE STATEMENTS:
-    using namespace DataIPShortCuts;
-    using namespace GroundTemperatureManager;
+        using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -105,24 +104,24 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
     // Search through finite diff models here
-    std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_FiniteDiffGroundTemp);
+    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_FiniteDiffGroundTemp);
     int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
-        if (objectName == cAlphaArgs(1)) {
+        if (objectName == state.dataIPShortCut->cAlphaArgs(1)) {
             // Read input into object here
 
             thisModel->objectType = objectType;
-            thisModel->objectName = cAlphaArgs(1);
-            thisModel->baseConductivity = rNumericArgs(1);
-            thisModel->baseDensity = rNumericArgs(2);
-            thisModel->baseSpecificHeat = rNumericArgs(3);
-            thisModel->waterContent = rNumericArgs(4) / 100.0;
-            thisModel->saturatedWaterContent = rNumericArgs(5) / 100.0;
-            thisModel->evapotransCoeff = rNumericArgs(6);
+            thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
+            thisModel->baseConductivity = state.dataIPShortCut->rNumericArgs(1);
+            thisModel->baseDensity = state.dataIPShortCut->rNumericArgs(2);
+            thisModel->baseSpecificHeat = state.dataIPShortCut->rNumericArgs(3);
+            thisModel->waterContent = state.dataIPShortCut->rNumericArgs(4) / 100.0;
+            thisModel->saturatedWaterContent = state.dataIPShortCut->rNumericArgs(5) / 100.0;
+            thisModel->evapotransCoeff = state.dataIPShortCut->rNumericArgs(6);
 
             found = true;
             break;
@@ -130,7 +129,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     }
 
     if (found && !ErrorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
 
         // Simulate
         thisModel->initAndSim(state);

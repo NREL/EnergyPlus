@@ -174,16 +174,80 @@ namespace DataGlobalConstants {
     ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);
     std::string GetResourceTypeChar(ResourceType ResourceTypeNum);
 
-    extern std::vector<ResourceType> AllResourceTypes;
-    extern std::map<EndUse, int> iEndUse;
-
 } // namespace DataGlobalConstants
 
 struct DataGlobalConstantsData : BaseGlobalStruct {
+    std::map<DataGlobalConstants::EndUse, int> iEndUse = {{DataGlobalConstants::EndUse::Heating, 1},
+                                     {DataGlobalConstants::EndUse::Cooling, 2},
+                                     {DataGlobalConstants::EndUse::InteriorLights, 3},
+                                     {DataGlobalConstants::EndUse::ExteriorLights, 4},
+                                     {DataGlobalConstants::EndUse::InteriorEquipment, 5},
+                                     {DataGlobalConstants::EndUse::ExteriorEquipment, 6},
+                                     {DataGlobalConstants::EndUse::Fans, 7},
+                                     {DataGlobalConstants::EndUse::Pumps, 8},
+                                     {DataGlobalConstants::EndUse::HeatRejection, 9},
+                                     {DataGlobalConstants::EndUse::Humidification, 10},
+                                     {DataGlobalConstants::EndUse::HeatRecovery, 11},
+                                     {DataGlobalConstants::EndUse::WaterSystem, 12},
+                                     {DataGlobalConstants::EndUse::Refrigeration, 13},
+                                     {DataGlobalConstants::EndUse::Cogeneration, 14},
+    };
+    static int constexpr iEndUseSize = 14;
+
+    std::vector<DataGlobalConstants::ResourceType> AllResourceTypes =
+            {
+                DataGlobalConstants::ResourceType::None,
+                DataGlobalConstants::ResourceType::Electricity,
+                DataGlobalConstants::ResourceType::Natural_Gas,
+                DataGlobalConstants::ResourceType::Gasoline,
+                DataGlobalConstants::ResourceType::Diesel,
+                DataGlobalConstants::ResourceType::Coal,
+                DataGlobalConstants::ResourceType::FuelOil_1,
+                DataGlobalConstants::ResourceType::FuelOil_2,
+                DataGlobalConstants::ResourceType::Propane,
+                DataGlobalConstants::ResourceType::Water,
+                DataGlobalConstants::ResourceType::EnergyTransfer,
+                DataGlobalConstants::ResourceType::Steam,
+                DataGlobalConstants::ResourceType::DistrictCooling,
+                DataGlobalConstants::ResourceType::DistrictHeating,
+                DataGlobalConstants::ResourceType::ElectricityProduced,
+                DataGlobalConstants::ResourceType::ElectricityPurchased,
+                DataGlobalConstants::ResourceType::ElectricitySurplusSold,
+                DataGlobalConstants::ResourceType::ElectricityNet,
+                DataGlobalConstants::ResourceType::SolarWater,
+                DataGlobalConstants::ResourceType::SolarAir,
+                DataGlobalConstants::ResourceType::SO2,
+                DataGlobalConstants::ResourceType::NOx,
+                DataGlobalConstants::ResourceType::N2O,
+                DataGlobalConstants::ResourceType::PM,
+                DataGlobalConstants::ResourceType::PM2_5,
+                DataGlobalConstants::ResourceType::PM10,
+                DataGlobalConstants::ResourceType::CO,
+                DataGlobalConstants::ResourceType::CO2,
+                DataGlobalConstants::ResourceType::CH4,
+                DataGlobalConstants::ResourceType::NH3,
+                DataGlobalConstants::ResourceType::NMVOC,
+                DataGlobalConstants::ResourceType::Hg,
+                DataGlobalConstants::ResourceType::Pb,
+                DataGlobalConstants::ResourceType::NuclearHigh,
+                DataGlobalConstants::ResourceType::NuclearLow,
+                DataGlobalConstants::ResourceType::WaterEnvironmentalFactors,
+                DataGlobalConstants::ResourceType::CarbonEquivalent,
+                DataGlobalConstants::ResourceType::Source,
+                DataGlobalConstants::ResourceType::PlantLoopHeatingDemand,
+                DataGlobalConstants::ResourceType::PlantLoopCoolingDemand,
+                DataGlobalConstants::ResourceType::OnSiteWater,
+                DataGlobalConstants::ResourceType::MainsWater,
+                DataGlobalConstants::ResourceType::RainWater,
+                DataGlobalConstants::ResourceType::WellWater,
+                DataGlobalConstants::ResourceType::Condensate,
+                DataGlobalConstants::ResourceType::OtherFuel1,
+                DataGlobalConstants::ResourceType::OtherFuel2
+            };
 
     void clear_state() override
     {
-
+        // nothing to clear
     }
 };
 

@@ -255,39 +255,39 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         int facilityPowerInTransformerIDFObjNum = 0;
         bool foundInFromGridTransformer = false;
 
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Transformer";
+        state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
         for (auto loopTransformer = 1; loopTransformer <= numTransformers_; ++loopTransformer) {
             inputProcessor->getObjectItem(state,
-                                          DataIPShortCuts::cCurrentModuleObject,
+                                          state.dataIPShortCut->cCurrentModuleObject,
                                           loopTransformer,
-                                          DataIPShortCuts::cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           numAlphas,
-                                          DataIPShortCuts::rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           numNums,
                                           iOStat,
-                                          DataIPShortCuts::lNumericFieldBlanks,
-                                          DataIPShortCuts::lAlphaFieldBlanks,
-                                          DataIPShortCuts::cAlphaFieldNames,
-                                          DataIPShortCuts::cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
-            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "PowerInFromGrid")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerInFromGrid")) {
                 if (!foundInFromGridTransformer) {
                     foundInFromGridTransformer = true;
                     facilityPowerInTransformerIDFObjNum = loopTransformer;
-                    facilityPowerInTransformerName_ = DataIPShortCuts::cAlphaArgs(1);
+                    facilityPowerInTransformerName_ = state.dataIPShortCut->cAlphaArgs(1);
                     facilityPowerInTransformerPresent_ = true;
                 } else {
                     // should only have one transformer in input that is PowerInFromGrid
-                    ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowWarningError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                      "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
+                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
                     ShowContinueError(state, "Only one transformer with Usage PowerInFromGrid can be used, first one in input file will be used and the "
                                       "simulation continues...");
                 }
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "PowerOutToGrid")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerOutToGrid")) {
                 if (powerOutTransformerObj_ == nullptr) {
                     ++numPowerOutTransformers_;
-                    powerOutTransformerName_ = DataIPShortCuts::cAlphaArgs(1);
+                    powerOutTransformerName_ = state.dataIPShortCut->cAlphaArgs(1);
                     powerOutTransformerObj_ = std::unique_ptr<ElectricTransformer>(new ElectricTransformer(state, powerOutTransformerName_));
 
                 } else {
@@ -624,131 +624,131 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     int IOStat;    // IO Status when calling get input subroutine
     bool errorsFound;
 
-    DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Distribution";
+    state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Distribution";
     errorsFound = false;
     if (objectNum > 0) {
         inputProcessor->getObjectItem(state,
-                                      DataIPShortCuts::cCurrentModuleObject,
+                                      state.dataIPShortCut->cCurrentModuleObject,
                                       objectNum,
-                                      DataIPShortCuts::cAlphaArgs,
+                                      state.dataIPShortCut->cAlphaArgs,
                                       numAlphas,
-                                      DataIPShortCuts::rNumericArgs,
+                                      state.dataIPShortCut->rNumericArgs,
                                       numNums,
                                       IOStat,
-                                      DataIPShortCuts::lNumericFieldBlanks,
-                                      DataIPShortCuts::lAlphaFieldBlanks,
-                                      DataIPShortCuts::cAlphaFieldNames,
-                                      DataIPShortCuts::cNumericFieldNames);
+                                      state.dataIPShortCut->lNumericFieldBlanks,
+                                      state.dataIPShortCut->lAlphaFieldBlanks,
+                                      state.dataIPShortCut->cAlphaFieldNames,
+                                      state.dataIPShortCut->cNumericFieldNames);
 
-        name_ = DataIPShortCuts::cAlphaArgs(1);
+        name_ = state.dataIPShortCut->cAlphaArgs(1);
         // how to verify names are unique across objects? add to GlobalNames?
 
-        if (!DataIPShortCuts::lAlphaFieldBlanks(2)) {
-            generatorListName_ = DataIPShortCuts::cAlphaArgs(2);
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+            generatorListName_ = state.dataIPShortCut->cAlphaArgs(2);
             // check that
 
             int testIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Generators", generatorListName_);
             if (testIndex == 0) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                 errorsFound = true;
             }
         }
 
-        if (!DataIPShortCuts::lAlphaFieldBlanks(3)) {
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
             // Load the Generator Control Operation Scheme
-            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "Baseload")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Baseload")) {
                 genOperationScheme_ = GeneratorOpScheme::baseLoad;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "DemandLimit")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DemandLimit")) {
                 genOperationScheme_ = GeneratorOpScheme::demandLimit;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "TrackElectrical")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "TrackElectrical")) {
                 genOperationScheme_ = GeneratorOpScheme::trackElectrical;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "TrackSchedule")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "TrackSchedule")) {
                 genOperationScheme_ = GeneratorOpScheme::trackSchedule;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "TrackMeter")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "TrackMeter")) {
                 genOperationScheme_ = GeneratorOpScheme::trackMeter;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "FollowThermal")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "FollowThermal")) {
                 genOperationScheme_ = GeneratorOpScheme::thermalFollow;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "FollowThermalLimitElectrical")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "FollowThermalLimitElectrical")) {
                 genOperationScheme_ = GeneratorOpScheme::thermalFollowLimitElectrical;
             } else {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
                 errorsFound = true;
             }
         }
 
-        demandLimit_ = DataIPShortCuts::rNumericArgs(1);
+        demandLimit_ = state.dataIPShortCut->rNumericArgs(1);
 
-        trackSchedPtr_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(4));
+        trackSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
         if ((trackSchedPtr_ == 0) && (genOperationScheme_ == GeneratorOpScheme::trackSchedule)) {
-            if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + DataIPShortCuts::cAlphaArgs(4));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
             } else {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + " = blank field.");
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = blank field.");
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Generator Operation Scheme=TrackSchedule");
             errorsFound = true;
         }
 
-        demandMeterName_ = UtilityRoutines::MakeUPPERCase(DataIPShortCuts::cAlphaArgs(5));
+        demandMeterName_ = UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5));
         // meters may not be "loaded" yet, defered check to later subroutine
 
-        if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "AlternatingCurrent")) {
+        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "AlternatingCurrent")) {
             bussType = ElectricBussType::aCBuss;
-            DataIPShortCuts::cAlphaArgs(6) = "AlternatingCurrent";
-        } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "DirectCurrentWithInverter")) {
+            state.dataIPShortCut->cAlphaArgs(6) = "AlternatingCurrent";
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "DirectCurrentWithInverter")) {
             bussType = ElectricBussType::dCBussInverter;
             inverterPresent = true;
-            DataIPShortCuts::cAlphaArgs(6) = "DirectCurrentWithInverter";
-        } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "AlternatingCurrentWithStorage")) {
+            state.dataIPShortCut->cAlphaArgs(6) = "DirectCurrentWithInverter";
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "AlternatingCurrentWithStorage")) {
             bussType = ElectricBussType::aCBussStorage;
             storagePresent_ = true;
-            DataIPShortCuts::cAlphaArgs(6) = "AlternatingCurrentWithStorage";
-        } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "DirectCurrentWithInverterDCStorage")) {
+            state.dataIPShortCut->cAlphaArgs(6) = "AlternatingCurrentWithStorage";
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "DirectCurrentWithInverterDCStorage")) {
             bussType = ElectricBussType::dCBussInverterDCStorage;
             inverterPresent = true;
             storagePresent_ = true;
-            DataIPShortCuts::cAlphaArgs(6) = "DirectCurrentWithInverterDCStorage";
-        } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "DirectCurrentWithInverterACStorage")) {
+            state.dataIPShortCut->cAlphaArgs(6) = "DirectCurrentWithInverterDCStorage";
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "DirectCurrentWithInverterACStorage")) {
             bussType = ElectricBussType::dCBussInverterACStorage;
             inverterPresent = true;
             storagePresent_ = true;
-            DataIPShortCuts::cAlphaArgs(6) = "DirectCurrentWithInverterACStorage";
-        } else if (DataIPShortCuts::cAlphaArgs(6).empty()) {
+            state.dataIPShortCut->cAlphaArgs(6) = "DirectCurrentWithInverterACStorage";
+        } else if (state.dataIPShortCut->cAlphaArgs(6).empty()) {
             bussType = ElectricBussType::aCBuss;
-            DataIPShortCuts::cAlphaArgs(6) = "AlternatingCurrent (field was blank)";
+            state.dataIPShortCut->cAlphaArgs(6) = "AlternatingCurrent (field was blank)";
         } else {
-            ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
+            ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
             errorsFound = true;
         }
 
         if (inverterPresent) {
-            if (!DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                inverterName = DataIPShortCuts::cAlphaArgs(7);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                inverterName = state.dataIPShortCut->cAlphaArgs(7);
             } else {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(7) + " is blank, but buss type requires inverter.");
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(7) + " is blank, but buss type requires inverter.");
                 errorsFound = true;
             }
         }
 
         if (storagePresent_) {
-            if (!DataIPShortCuts::lAlphaFieldBlanks(8)) {
-                storageName_ = DataIPShortCuts::cAlphaArgs(8);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                storageName_ = state.dataIPShortCut->cAlphaArgs(8);
             } else {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(8) + " is blank, but buss type requires storage.");
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(8) + " is blank, but buss type requires storage.");
                 errorsFound = true;
             }
         }
 
-        if (!DataIPShortCuts::lAlphaFieldBlanks(9)) {
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
             // process transformer
-            transformerName_ = DataIPShortCuts::cAlphaArgs(9);
+            transformerName_ = state.dataIPShortCut->cAlphaArgs(9);
             // only transformers of use type powerFromLoadCenterToBldg are really held in a load center, The legacy applications for transformers are
             // held at the higher Electric service level
             transformerPresent_ = true;
@@ -756,114 +756,114 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
         // Begin new content for grid supply and more control over storage
         // user selected storage operation scheme
-        if (!DataIPShortCuts::lAlphaFieldBlanks(10)) {
-            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(10), "TrackFacilityElectricDemandStoreExcessOnSite")) {
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "TrackFacilityElectricDemandStoreExcessOnSite")) {
                 storageScheme_ = StorageOpScheme::facilityDemandStoreExcessOnSite;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(10), "TrackMeterDemandStoreExcessOnSite")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "TrackMeterDemandStoreExcessOnSite")) {
                 storageScheme_ = StorageOpScheme::meterDemandStoreExcessOnSite;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(10), "TrackChargeDischargeSchedules")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "TrackChargeDischargeSchedules")) {
                 storageScheme_ = StorageOpScheme::chargeDischargeSchedules;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(10), "FacilityDemandLeveling")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "FacilityDemandLeveling")) {
                 storageScheme_ = StorageOpScheme::facilityDemandLeveling;
             } else {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + " = " + DataIPShortCuts::cAlphaArgs(10));
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + " = " + state.dataIPShortCut->cAlphaArgs(10));
                 errorsFound = true;
             }
         } else { // blank (preserve legacy behavior for short files)
             storageScheme_ = StorageOpScheme::facilityDemandStoreExcessOnSite;
         }
 
-        if (!DataIPShortCuts::lAlphaFieldBlanks(11)) {
-            trackSorageOpMeterName_ = DataIPShortCuts::cAlphaArgs(11);
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+            trackSorageOpMeterName_ = state.dataIPShortCut->cAlphaArgs(11);
 
         } else {
             if (storageScheme_ == StorageOpScheme::meterDemandStoreExcessOnSite) { // throw error
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(11) +
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) +
                                   ", cannot be blank when storage operation scheme is TrackMeterDemandStoreExcessOnSite");
                 errorsFound = true;
             }
         }
 
-        if (!DataIPShortCuts::lAlphaFieldBlanks(12)) {
-            converterName_ = DataIPShortCuts::cAlphaArgs(12);
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+            converterName_ = state.dataIPShortCut->cAlphaArgs(12);
             converterPresent_ = true;
         } else {
             if (storageScheme_ == StorageOpScheme::chargeDischargeSchedules || storageScheme_ == StorageOpScheme::facilityDemandLeveling) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + ", cannot be blank when storage scheme is " +
-                                  DataIPShortCuts::cAlphaArgs(10));
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + ", cannot be blank when storage scheme is " +
+                                  state.dataIPShortCut->cAlphaArgs(10));
                 errorsFound = true;
             }
         }
 
-        if (DataIPShortCuts::lNumericFieldBlanks(2)) {
+        if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
             maxStorageSOCFraction_ = 1.0;
         } else {
-            maxStorageSOCFraction_ = DataIPShortCuts::rNumericArgs(2);
+            maxStorageSOCFraction_ = state.dataIPShortCut->rNumericArgs(2);
         }
-        if (DataIPShortCuts::lNumericFieldBlanks(3)) {
+        if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
             minStorageSOCFraction_ = 0.0;
         } else {
-            minStorageSOCFraction_ = DataIPShortCuts::rNumericArgs(3);
+            minStorageSOCFraction_ = state.dataIPShortCut->rNumericArgs(3);
         }
-        if (DataIPShortCuts::lNumericFieldBlanks(4)) {
+        if (state.dataIPShortCut->lNumericFieldBlanks(4)) {
             designStorageChargePowerWasSet_ = false;
         } else {
             designStorageChargePowerWasSet_ = true;
-            designStorageChargePower_ = DataIPShortCuts::rNumericArgs(4);
+            designStorageChargePower_ = state.dataIPShortCut->rNumericArgs(4);
         }
-        if (DataIPShortCuts::lNumericFieldBlanks(5)) {
+        if (state.dataIPShortCut->lNumericFieldBlanks(5)) {
             designStorageDischargePowerWasSet_ = false;
         } else {
             designStorageDischargePowerWasSet_ = true;
-            designStorageDischargePower_ = DataIPShortCuts::rNumericArgs(5);
+            designStorageDischargePower_ = state.dataIPShortCut->rNumericArgs(5);
         }
 
-        if (DataIPShortCuts::lNumericFieldBlanks(6)) {
+        if (state.dataIPShortCut->lNumericFieldBlanks(6)) {
             if (storageScheme_ == StorageOpScheme::facilityDemandLeveling) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(6) + " = blank field.");
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(6) + " = blank field.");
                 errorsFound = true;
             }
         } else {
-            facilityDemandTarget_ = DataIPShortCuts::rNumericArgs(6);
+            facilityDemandTarget_ = state.dataIPShortCut->rNumericArgs(6);
         }
-        storageChargeModSchedIndex_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(13));
+        storageChargeModSchedIndex_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
         if (storageChargeModSchedIndex_ == 0 && storageScheme_ == StorageOpScheme::chargeDischargeSchedules) {
-            if (!DataIPShortCuts::lAlphaFieldBlanks(13)) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(13) + " = " + DataIPShortCuts::cAlphaArgs(13));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + " = " + state.dataIPShortCut->cAlphaArgs(13));
             } else {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(13) + " = blank field.");
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + " = blank field.");
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Storage Operation Scheme = TrackChargeDischargeSchedules");
             errorsFound = true;
         }
 
-        storageDischargeModSchedIndex_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(14));
+        storageDischargeModSchedIndex_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(14));
         if (storageDischargeModSchedIndex_ == 0 && storageScheme_ == StorageOpScheme::chargeDischargeSchedules) {
-            if (!DataIPShortCuts::lAlphaFieldBlanks(14)) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(14) + " = " + DataIPShortCuts::cAlphaArgs(14));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + " = " + state.dataIPShortCut->cAlphaArgs(14));
             } else {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(14) + " = blank field.");
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + " = blank field.");
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Storage Operation Scheme = TrackChargeDischargeSchedules");
             errorsFound = true;
         }
 
-        facilityDemandTargetModSchedIndex_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(15));
+        facilityDemandTargetModSchedIndex_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(15));
         if (facilityDemandTargetModSchedIndex_ == 0 && storageScheme_ == StorageOpScheme::facilityDemandLeveling) {
-            if (!DataIPShortCuts::lAlphaFieldBlanks(15)) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(15) + " = " + DataIPShortCuts::cAlphaArgs(15));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + " = " + state.dataIPShortCut->cAlphaArgs(15));
             } else {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(15) + " = blank field.");
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + " = blank field.");
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Storage Operation Scheme = FacilityDemandLeveling");
             errorsFound = true;
@@ -874,21 +874,21 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     }
 
     // now that we are done with processing get input for ElectricLoadCenter:Distribution we can call child input objects without IP shortcut problems
-    DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Generators";
-    int genListObjectNum = inputProcessor->getObjectItemNum(state, DataIPShortCuts::cCurrentModuleObject, generatorListName_);
+    state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Generators";
+    int genListObjectNum = inputProcessor->getObjectItemNum(state, state.dataIPShortCut->cCurrentModuleObject, generatorListName_);
     if (genListObjectNum > 0) {
         inputProcessor->getObjectItem(state,
-                                      DataIPShortCuts::cCurrentModuleObject,
+                                      state.dataIPShortCut->cCurrentModuleObject,
                                       genListObjectNum,
-                                      DataIPShortCuts::cAlphaArgs,
+                                      state.dataIPShortCut->cAlphaArgs,
                                       numAlphas,
-                                      DataIPShortCuts::rNumericArgs,
+                                      state.dataIPShortCut->rNumericArgs,
                                       numNums,
                                       IOStat,
-                                      DataIPShortCuts::lNumericFieldBlanks,
-                                      DataIPShortCuts::lAlphaFieldBlanks,
-                                      DataIPShortCuts::cAlphaFieldNames,
-                                      DataIPShortCuts::cNumericFieldNames);
+                                      state.dataIPShortCut->lNumericFieldBlanks,
+                                      state.dataIPShortCut->lAlphaFieldBlanks,
+                                      state.dataIPShortCut->cAlphaFieldNames,
+                                      state.dataIPShortCut->cNumericFieldNames);
 
         // Calculate the number of generators in list
         numGenerators = numNums / 2; // note IDD needs Min Fields = 6
@@ -898,11 +898,11 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             // call constructor in place
             generatorsPresent_ = true;
             elecGenCntrlObj.emplace_back(new GeneratorController(state,
-                                                                 DataIPShortCuts::cAlphaArgs(alphaCount),
-                                                                 DataIPShortCuts::cAlphaArgs(alphaCount + 1),
-                                                                 DataIPShortCuts::rNumericArgs(2 * genCount - 1),
-                                                                 DataIPShortCuts::cAlphaArgs(alphaCount + 2),
-                                                                 DataIPShortCuts::rNumericArgs(2 * genCount)));
+                                                                 state.dataIPShortCut->cAlphaArgs(alphaCount),
+                                                                 state.dataIPShortCut->cAlphaArgs(alphaCount + 1),
+                                                                 state.dataIPShortCut->rNumericArgs(2 * genCount - 1),
+                                                                 state.dataIPShortCut->cAlphaArgs(alphaCount + 2),
+                                                                 state.dataIPShortCut->rNumericArgs(2 * genCount)));
             ++alphaCount;
             ++alphaCount;
             ++alphaCount;
@@ -915,7 +915,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                 if (g->nominalThermElectRatio <= 0.0) {
                     ShowWarningError(state, "Generator operation needs to be based on following thermal loads and needs values for Rated Thermal to "
                                      "Electrical Power Ratio in " +
-                                     DataIPShortCuts::cCurrentModuleObject + " named " + DataIPShortCuts::cAlphaArgs(1));
+                                     state.dataIPShortCut->cCurrentModuleObject + " named " + state.dataIPShortCut->cAlphaArgs(1));
                 }
             }
         }
@@ -957,27 +957,27 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
     if (!errorsFound && transformerPresent_) {
 
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Transformer";
-        int transformerItemNum = inputProcessor->getObjectItemNum(state, DataIPShortCuts::cCurrentModuleObject, transformerName_);
+        state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
+        int transformerItemNum = inputProcessor->getObjectItemNum(state, state.dataIPShortCut->cCurrentModuleObject, transformerName_);
         int iOStat;
         if (transformerItemNum > 0) {
             inputProcessor->getObjectItem(state,
-                                          DataIPShortCuts::cCurrentModuleObject,
+                                          state.dataIPShortCut->cCurrentModuleObject,
                                           transformerItemNum,
-                                          DataIPShortCuts::cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           numAlphas,
-                                          DataIPShortCuts::rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           numNums,
                                           iOStat,
-                                          DataIPShortCuts::lNumericFieldBlanks,
-                                          DataIPShortCuts::lAlphaFieldBlanks,
-                                          DataIPShortCuts::cAlphaFieldNames,
-                                          DataIPShortCuts::cNumericFieldNames);
-            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "LoadCenterPowerConditioning")) { // this is the right kind of transformer
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "LoadCenterPowerConditioning")) { // this is the right kind of transformer
                 transformerObj = std::unique_ptr<ElectricTransformer>(new ElectricTransformer(state, transformerName_));
             } else {
                 ShowWarningError(state, "Transformer named " + transformerName_ + " associated with the load center named " + name_ + " should have " +
-                                 DataIPShortCuts::cAlphaFieldNames(3) + " set to LoadCenterPowerConditioning.");
+                                 state.dataIPShortCut->cAlphaFieldNames(3) + " set to LoadCenterPowerConditioning.");
             }
         } else {
             ShowSevereError(state, "Transformer named " + transformerName_ + ", was not found for the load center named " + name_);
@@ -2028,7 +2028,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         compGenTypeOf_Num = GeneratorType::WindTurbine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Other;
     } else {
-        ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + " invalid entry.");
+        ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + " invalid entry.");
         ShowContinueError(state, "Invalid " + objectType + " associated with generator = " + objectName);
     }
 
@@ -2038,16 +2038,16 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     } else {
         availSchedPtr = ScheduleManager::GetScheduleIndex(state, availSchedName);
         if (availSchedPtr <= 0) {
-            ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + ", invalid entry.");
+            ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + ", invalid entry.");
             ShowContinueError(state, "Invalid availability schedule = " + availSchedName);
             ShowContinueError(state, "Schedule was not found ");
         } else {
             if (generatorType == GeneratorType::PVWatts) {
-                ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + ", Availability Schedule for Generator:PVWatts '" + objectName +  "' will be be ignored (runs all the time).");
+                ShowWarningError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + ", Availability Schedule for Generator:PVWatts '" + objectName +  "' will be be ignored (runs all the time).");
             } else if (generatorType == GeneratorType::PV) {
                 // It should only warn if Performance type is SimplePV (DataPhotovoltaics::iSimplePVModel).
                 // Except you need GetPVInput to have run already etc
-                // Note: you can't use DataIPShortCuts::cAlphaArgs etc or it'll override what will still need to be processed in
+                // Note: you can't use state.dataIPShortCut->cAlphaArgs etc or it'll override what will still need to be processed in
                 // ElectPowerLoadCenter::ElectPowerLoadCenter after this function is called
                 int PVNum = inputProcessor->getObjectItemNum(state, objectType, UtilityRoutines::MakeUPPERCase(objectName));
                 int NumAlphas; // Number of PV Array parameter alpha names being passed
@@ -2064,7 +2064,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                                               NumNums,
                                               IOStat);
                 if (UtilityRoutines::SameString(Alphas(3), "PhotovoltaicPerformance:Simple")) {
-                    ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + ", Availability Schedule for Generator:Photovoltaics '" + objectName + "' of Type PhotovoltaicPerformance:Simple will be be ignored (runs all the time).");
+                    ShowWarningError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + ", Availability Schedule for Generator:Photovoltaics '" + objectName + "' of Type PhotovoltaicPerformance:Simple will be be ignored (runs all the time).");
                     ShowContinueError(state, "To limit this Generator:Photovoltaic's output, please use the Inverter's availability schedule instead.");
                 }
             }
@@ -2266,47 +2266,47 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
     if (testInvertIndex > 0) {
         foundInverter = true;
         invertIDFObjectNum = testInvertIndex;
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Inverter:LookUpTable";
+        state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Inverter:LookUpTable";
         modelType_ = InverterModelType::cECLookUpTableModel;
     }
     testInvertIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Inverter:FunctionOfPower", objectName);
     if (testInvertIndex > 0) {
         foundInverter = true;
         invertIDFObjectNum = testInvertIndex;
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Inverter:FunctionOfPower";
+        state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Inverter:FunctionOfPower";
         modelType_ = InverterModelType::curveFuncOfPower;
     }
     testInvertIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Inverter:Simple", objectName);
     if (testInvertIndex > 0) {
         foundInverter = true;
         invertIDFObjectNum = testInvertIndex;
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Inverter:Simple";
+        state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Inverter:Simple";
         modelType_ = InverterModelType::simpleConstantEff;
     }
     testInvertIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Inverter:PVWatts", objectName);
     if (testInvertIndex > 0) {
         foundInverter = true;
         invertIDFObjectNum = testInvertIndex;
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Inverter:PVWatts";
+        state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Inverter:PVWatts";
         modelType_ = InverterModelType::pvWatts;
     }
 
     if (foundInverter) {
 
         inputProcessor->getObjectItem(state,
-                                      DataIPShortCuts::cCurrentModuleObject,
+                                      state.dataIPShortCut->cCurrentModuleObject,
                                       invertIDFObjectNum,
-                                      DataIPShortCuts::cAlphaArgs,
+                                      state.dataIPShortCut->cAlphaArgs,
                                       NumAlphas,
-                                      DataIPShortCuts::rNumericArgs,
+                                      state.dataIPShortCut->rNumericArgs,
                                       NumNums,
                                       IOStat,
-                                      DataIPShortCuts::lNumericFieldBlanks,
-                                      DataIPShortCuts::lAlphaFieldBlanks,
-                                      DataIPShortCuts::cAlphaFieldNames,
-                                      DataIPShortCuts::cNumericFieldNames);
+                                      state.dataIPShortCut->lNumericFieldBlanks,
+                                      state.dataIPShortCut->lAlphaFieldBlanks,
+                                      state.dataIPShortCut->cAlphaFieldNames,
+                                      state.dataIPShortCut->cNumericFieldNames);
 
-        name_ = DataIPShortCuts::cAlphaArgs(1);
+        name_ = state.dataIPShortCut->cAlphaArgs(1);
         // how to verify names are unique across objects? add to GlobalNames?
 
         if (modelType_ == InverterModelType::pvWatts) {
@@ -2315,69 +2315,69 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             heatLossesDestination_ = ThermalLossDestination::lostToOutside;
             zoneRadFract_ = 0;
         } else {
-            if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
+                availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (availSchedPtr_ == 0) {
-                    ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
+                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                     errorsFound = true;
                 }
             }
 
-            zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), state.dataHeatBal->Zone);
+            zoneNum_ = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
             if (zoneNum_ == 0) {
-                if (DataIPShortCuts::lAlphaFieldBlanks(3)) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                     heatLossesDestination_ = ThermalLossDestination::lostToOutside;
                 } else {
                     heatLossesDestination_ = ThermalLossDestination::lostToOutside;
-                    ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowWarningError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                      "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
+                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
                     ShowContinueError(state, "Zone name not found. Inverter heat losses will not be added to a zone");
                     // continue with simulation but inverter losses not sent to a zone.
                 }
             }
-            zoneRadFract_ = DataIPShortCuts::rNumericArgs(1);
+            zoneRadFract_ = state.dataIPShortCut->rNumericArgs(1);
         }
 
         // now the input objects differ depending on class type
         switch (modelType_) {
         case InverterModelType::cECLookUpTableModel: {
-            ratedPower_ = DataIPShortCuts::rNumericArgs(2);
-            standbyPower_ = DataIPShortCuts::rNumericArgs(3);
+            ratedPower_ = state.dataIPShortCut->rNumericArgs(2);
+            standbyPower_ = state.dataIPShortCut->rNumericArgs(3);
 
-            nominalVoltage_ = DataIPShortCuts::rNumericArgs(4);
-            nomVoltEfficiencyARR_[0] = DataIPShortCuts::rNumericArgs(5);
-            nomVoltEfficiencyARR_[1] = DataIPShortCuts::rNumericArgs(6);
-            nomVoltEfficiencyARR_[2] = DataIPShortCuts::rNumericArgs(7);
-            nomVoltEfficiencyARR_[3] = DataIPShortCuts::rNumericArgs(8);
-            nomVoltEfficiencyARR_[4] = DataIPShortCuts::rNumericArgs(9);
-            nomVoltEfficiencyARR_[5] = DataIPShortCuts::rNumericArgs(10);
+            nominalVoltage_ = state.dataIPShortCut->rNumericArgs(4);
+            nomVoltEfficiencyARR_[0] = state.dataIPShortCut->rNumericArgs(5);
+            nomVoltEfficiencyARR_[1] = state.dataIPShortCut->rNumericArgs(6);
+            nomVoltEfficiencyARR_[2] = state.dataIPShortCut->rNumericArgs(7);
+            nomVoltEfficiencyARR_[3] = state.dataIPShortCut->rNumericArgs(8);
+            nomVoltEfficiencyARR_[4] = state.dataIPShortCut->rNumericArgs(9);
+            nomVoltEfficiencyARR_[5] = state.dataIPShortCut->rNumericArgs(10);
             break;
         }
         case InverterModelType::curveFuncOfPower: {
-            curveNum_ = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(4));
+            curveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (curveNum_ == 0) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + DataIPShortCuts::cAlphaArgs(4));
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
                 ShowContinueError(state, "Curve was not found");
                 errorsFound = true;
             }
 
-            ratedPower_ = DataIPShortCuts::rNumericArgs(2);
-            minEfficiency_ = DataIPShortCuts::rNumericArgs(3);
-            maxEfficiency_ = DataIPShortCuts::rNumericArgs(4);
-            minPower_ = DataIPShortCuts::rNumericArgs(5);
-            maxPower_ = DataIPShortCuts::rNumericArgs(6);
-            standbyPower_ = DataIPShortCuts::rNumericArgs(7);
+            ratedPower_ = state.dataIPShortCut->rNumericArgs(2);
+            minEfficiency_ = state.dataIPShortCut->rNumericArgs(3);
+            maxEfficiency_ = state.dataIPShortCut->rNumericArgs(4);
+            minPower_ = state.dataIPShortCut->rNumericArgs(5);
+            maxPower_ = state.dataIPShortCut->rNumericArgs(6);
+            standbyPower_ = state.dataIPShortCut->rNumericArgs(7);
             break;
         }
         case InverterModelType::simpleConstantEff: {
-            efficiency_ = DataIPShortCuts::rNumericArgs(2);
+            efficiency_ = state.dataIPShortCut->rNumericArgs(2);
             break;
         }
         case InverterModelType::notYetSet: {
@@ -2385,8 +2385,8 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             break;
         }
         case InverterModelType::pvWatts: {
-            pvWattsDCtoACSizeRatio_ = DataIPShortCuts::rNumericArgs(1);
-            pvWattsInverterEfficiency_ = DataIPShortCuts::rNumericArgs(2);
+            pvWattsDCtoACSizeRatio_ = state.dataIPShortCut->rNumericArgs(1);
+            pvWattsInverterEfficiency_ = state.dataIPShortCut->rNumericArgs(2);
             break;
         }
 
@@ -2700,57 +2700,57 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
     int testConvertIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:Converter", objectName);
 
     if (testConvertIndex > 0) {
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Storage:Converter";
+        state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Storage:Converter";
 
         inputProcessor->getObjectItem(state,
-                                      DataIPShortCuts::cCurrentModuleObject,
+                                      state.dataIPShortCut->cCurrentModuleObject,
                                       testConvertIndex,
-                                      DataIPShortCuts::cAlphaArgs,
+                                      state.dataIPShortCut->cAlphaArgs,
                                       NumAlphas,
-                                      DataIPShortCuts::rNumericArgs,
+                                      state.dataIPShortCut->rNumericArgs,
                                       NumNums,
                                       IOStat,
-                                      DataIPShortCuts::lNumericFieldBlanks,
-                                      DataIPShortCuts::lAlphaFieldBlanks,
-                                      DataIPShortCuts::cAlphaFieldNames,
-                                      DataIPShortCuts::cNumericFieldNames);
+                                      state.dataIPShortCut->lNumericFieldBlanks,
+                                      state.dataIPShortCut->lAlphaFieldBlanks,
+                                      state.dataIPShortCut->cAlphaFieldNames,
+                                      state.dataIPShortCut->cNumericFieldNames);
 
-        name_ = DataIPShortCuts::cAlphaArgs(1);
+        name_ = state.dataIPShortCut->cAlphaArgs(1);
         // need a new general approach for verify names are unique across objects,  next gen GlobalNames
 
-        if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
+        if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn;
         } else {
-            availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
+            availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (availSchedPtr_ == 0) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                 errorsFound = true;
             }
         }
 
-        if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "SimpleFixed")) {
+        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "SimpleFixed")) {
             modelType_ = ConverterModelType::simpleConstantEff;
-        } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "FunctionOfPower")) {
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "FunctionOfPower")) {
             modelType_ = ConverterModelType::curveFuncOfPower;
         } else {
-            ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
+            ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
             errorsFound = true;
         }
 
         switch (modelType_) {
         case ConverterModelType::simpleConstantEff: {
-            efficiency_ = DataIPShortCuts::rNumericArgs(1);
+            efficiency_ = state.dataIPShortCut->rNumericArgs(1);
             break;
         }
 
         case ConverterModelType::curveFuncOfPower: {
-            maxPower_ = DataIPShortCuts::rNumericArgs(2);
-            curveNum_ = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(4));
+            maxPower_ = state.dataIPShortCut->rNumericArgs(2);
+            curveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (curveNum_ == 0) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + DataIPShortCuts::cAlphaArgs(4));
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
                 ShowContinueError(state, "Curve was not found");
                 errorsFound = true;
             }
@@ -2761,22 +2761,22 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         }
         } // end switch
 
-        standbyPower_ = DataIPShortCuts::rNumericArgs(3);
+        standbyPower_ = state.dataIPShortCut->rNumericArgs(3);
 
-        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(5), state.dataHeatBal->Zone);
+        zoneNum_ = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
         if (zoneNum_ == 0) {
-            if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 heatLossesDestination_ = ThermalLossDestination::lostToOutside;
             } else {
                 heatLossesDestination_ = ThermalLossDestination::lostToOutside;
-                ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + DataIPShortCuts::cAlphaArgs(5));
+                ShowWarningError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
                 ShowContinueError(state, "Zone name not found. Inverter heat losses will not be added to a zone");
                 // continue with simulation but inverter losses not sent to a zone.
             }
         }
-        zoneRadFract_ = DataIPShortCuts::rNumericArgs(4);
+        zoneRadFract_ = state.dataIPShortCut->rNumericArgs(4);
 
         SetupOutputVariable(state, "Converter AC to DC Efficiency", OutputProcessor::Unit::None, efficiency_, "System", "Average", name_);
         SetupOutputVariable(state, "Converter AC Input Electricity Rate", OutputProcessor::Unit::W, aCPowerIn_, "System", "Average", name_);
@@ -2969,7 +2969,7 @@ ElectricStorage::ElectricStorage( // main constructor
         if (testStorageIndex > 0) {
             foundStorage = true;
             storageIDFObjectNum = testStorageIndex;
-            DataIPShortCuts::cCurrentModuleObject = item.first;
+            state.dataIPShortCut->cCurrentModuleObject = item.first;
             storageModelMode_ = item.second;
             break;
         }
@@ -2977,56 +2977,56 @@ ElectricStorage::ElectricStorage( // main constructor
 
     if (foundStorage) {
         inputProcessor->getObjectItem(state,
-                                      DataIPShortCuts::cCurrentModuleObject,
+                                      state.dataIPShortCut->cCurrentModuleObject,
                                       storageIDFObjectNum,
-                                      DataIPShortCuts::cAlphaArgs,
+                                      state.dataIPShortCut->cAlphaArgs,
                                       numAlphas,
-                                      DataIPShortCuts::rNumericArgs,
+                                      state.dataIPShortCut->rNumericArgs,
                                       numNums,
                                       iOStat,
-                                      DataIPShortCuts::lNumericFieldBlanks,
-                                      DataIPShortCuts::lAlphaFieldBlanks,
-                                      DataIPShortCuts::cAlphaFieldNames,
-                                      DataIPShortCuts::cNumericFieldNames);
+                                      state.dataIPShortCut->lNumericFieldBlanks,
+                                      state.dataIPShortCut->lAlphaFieldBlanks,
+                                      state.dataIPShortCut->cAlphaFieldNames,
+                                      state.dataIPShortCut->cNumericFieldNames);
 
-        name_ = DataIPShortCuts::cAlphaArgs(1);
+        name_ = state.dataIPShortCut->cAlphaArgs(1);
         // how to verify names are unique across objects? add to GlobalNames?
 
-        if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
+        if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn;
         } else {
-            availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
+            availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (availSchedPtr_ == 0) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                 errorsFound = true;
             }
         }
 
-        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), state.dataHeatBal->Zone);
+        zoneNum_ = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
         if (zoneNum_ == 0) {
-            if (DataIPShortCuts::lAlphaFieldBlanks(3)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 heatLossesDestination_ = ThermalLossDestination::lostToOutside;
             } else {
                 heatLossesDestination_ = ThermalLossDestination::lostToOutside;
-                ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
+                ShowWarningError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
                 ShowContinueError(state, "Zone name not found. Storage heat losses will not be added to a zone");
                 // continue with simulation but storage losses not sent to a zone.
             }
         }
-        zoneRadFract_ = DataIPShortCuts::rNumericArgs(1);
+        zoneRadFract_ = state.dataIPShortCut->rNumericArgs(1);
 
         switch (storageModelMode_) {
 
         case StorageModelType::simpleBucketStorage: {
-            energeticEfficCharge_ = DataIPShortCuts::rNumericArgs(2);
-            energeticEfficDischarge_ = DataIPShortCuts::rNumericArgs(3);
-            maxEnergyCapacity_ = DataIPShortCuts::rNumericArgs(4);
-            maxPowerDraw_ = DataIPShortCuts::rNumericArgs(5);
-            maxPowerStore_ = DataIPShortCuts::rNumericArgs(6);
-            startingEnergyStored_ = DataIPShortCuts::rNumericArgs(7);
+            energeticEfficCharge_ = state.dataIPShortCut->rNumericArgs(2);
+            energeticEfficDischarge_ = state.dataIPShortCut->rNumericArgs(3);
+            maxEnergyCapacity_ = state.dataIPShortCut->rNumericArgs(4);
+            maxPowerDraw_ = state.dataIPShortCut->rNumericArgs(5);
+            maxPowerStore_ = state.dataIPShortCut->rNumericArgs(6);
+            startingEnergyStored_ = state.dataIPShortCut->rNumericArgs(7);
             SetupOutputVariable(state, "Electric Storage Simple Charge State",
                                 OutputProcessor::Unit::J,
                                 electEnergyinStorage_,
@@ -3037,65 +3037,65 @@ ElectricStorage::ElectricStorage( // main constructor
         }
 
         case StorageModelType::kiBaMBattery: {
-            chargeCurveNum_ = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(4)); // voltage calculation for charging
-            if (chargeCurveNum_ == 0 && !DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + DataIPShortCuts::cAlphaArgs(4));
+            chargeCurveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // voltage calculation for charging
+            if (chargeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
                 errorsFound = true;
-            } else if (DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + " cannot be blank. But no entry found.");
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " cannot be blank. But no entry found.");
                 errorsFound = true;
             } else {
                 errorsFound |= CurveManager::CheckCurveDims(state,
                     chargeCurveNum_,   // Curve index
                     {1},               // Valid dimensions
                     routineName,       // Routine name
-                    DataIPShortCuts::cCurrentModuleObject,  // Object Type
+                    state.dataIPShortCut->cCurrentModuleObject,  // Object Type
                     name_,             // Object Name
-                    DataIPShortCuts::cAlphaFieldNames(4));  // Field Name
+                    state.dataIPShortCut->cAlphaFieldNames(4));  // Field Name
             }
-            dischargeCurveNum_ = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(5)); // voltage calculation for discharging
-            if (dischargeCurveNum_ == 0 && !DataIPShortCuts::lAlphaFieldBlanks(5)) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + DataIPShortCuts::cAlphaArgs(5));
+            dischargeCurveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5)); // voltage calculation for discharging
+            if (dischargeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
                 errorsFound = true;
-            } else if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + " cannot be blank. But no entry found.");
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " cannot be blank. But no entry found.");
                 errorsFound = true;
             } else {
                 errorsFound |= CurveManager::CheckCurveDims(state,
                     dischargeCurveNum_,   // Curve index
                     {1},               // Valid dimensions
                     routineName,       // Routine name
-                    DataIPShortCuts::cCurrentModuleObject,  // Object Type
+                    state.dataIPShortCut->cCurrentModuleObject,  // Object Type
                     name_,             // Object Name
-                    DataIPShortCuts::cAlphaFieldNames(5));  // Field Name
+                    state.dataIPShortCut->cAlphaFieldNames(5));  // Field Name
             }
 
-            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "Yes")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "Yes")) {
                 lifeCalculation_ = BatteryDegradationModelType::lifeCalculationYes;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "No")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "No")) {
                 lifeCalculation_ = BatteryDegradationModelType::lifeCalculationNo;
             } else {
-                ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
+                ShowWarningError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
                 ShowContinueError(state, "Yes or No should be selected. Default value No is used to continue simulation");
                 lifeCalculation_ = BatteryDegradationModelType::lifeCalculationNo;
             }
 
             if (lifeCalculation_ == BatteryDegradationModelType::lifeCalculationYes) {
-                lifeCurveNum_ = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(7)); // Battery life calculation
-                if (lifeCurveNum_ == 0 && !DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                    ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                lifeCurveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // Battery life calculation
+                if (lifeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                    ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
+                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
                     errorsFound = true;
-                } else if (DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                    ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                } else if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                    ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + " cannot be blank when " + DataIPShortCuts::cAlphaArgs(6) +
+                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + " cannot be blank when " + state.dataIPShortCut->cAlphaArgs(6) +
                                       " = Yes. But no entry found.");
                     errorsFound = true;
                 } else {
@@ -3103,12 +3103,12 @@ ElectricStorage::ElectricStorage( // main constructor
                         lifeCurveNum_,   // Curve index
                         {1},               // Valid dimensions
                         routineName,       // Routine name
-                        DataIPShortCuts::cCurrentModuleObject,  // Object Type
+                        state.dataIPShortCut->cCurrentModuleObject,  // Object Type
                         name_,             // Object Name
-                        DataIPShortCuts::cAlphaFieldNames(7));  // Field Name
+                        state.dataIPShortCut->cAlphaFieldNames(7));  // Field Name
                 }
 
-                cycleBinNum_ = DataIPShortCuts::rNumericArgs(14);
+                cycleBinNum_ = state.dataIPShortCut->rNumericArgs(14);
 
                 if (!errorsFound) { // life cycle calculation for this battery, allocate arrays for degradation calculation
                                     // std::vector is zero base instead of 1, so first index is now 0.
@@ -3119,62 +3119,62 @@ ElectricStorage::ElectricStorage( // main constructor
                 }
             }
 
-            parallelNum_ = DataIPShortCuts::rNumericArgs(2);
-            seriesNum_ = DataIPShortCuts::rNumericArgs(3);
+            parallelNum_ = state.dataIPShortCut->rNumericArgs(2);
+            seriesNum_ = state.dataIPShortCut->rNumericArgs(3);
             numBattery_ = parallelNum_ * seriesNum_;
-            maxAhCapacity_ = DataIPShortCuts::rNumericArgs(4);
-            startingSOC_ = DataIPShortCuts::rNumericArgs(5);
-            availableFrac_ = DataIPShortCuts::rNumericArgs(6);
-            chargeConversionRate_ = DataIPShortCuts::rNumericArgs(7);
-            chargedOCV_ = DataIPShortCuts::rNumericArgs(8);
-            dischargedOCV_ = DataIPShortCuts::rNumericArgs(9);
-            internalR_ = DataIPShortCuts::rNumericArgs(10);
-            maxDischargeI_ = DataIPShortCuts::rNumericArgs(11);
-            cutoffV_ = DataIPShortCuts::rNumericArgs(12);
-            maxChargeRate_ = DataIPShortCuts::rNumericArgs(13);
+            maxAhCapacity_ = state.dataIPShortCut->rNumericArgs(4);
+            startingSOC_ = state.dataIPShortCut->rNumericArgs(5);
+            availableFrac_ = state.dataIPShortCut->rNumericArgs(6);
+            chargeConversionRate_ = state.dataIPShortCut->rNumericArgs(7);
+            chargedOCV_ = state.dataIPShortCut->rNumericArgs(8);
+            dischargedOCV_ = state.dataIPShortCut->rNumericArgs(9);
+            internalR_ = state.dataIPShortCut->rNumericArgs(10);
+            maxDischargeI_ = state.dataIPShortCut->rNumericArgs(11);
+            cutoffV_ = state.dataIPShortCut->rNumericArgs(12);
+            maxChargeRate_ = state.dataIPShortCut->rNumericArgs(13);
 
             break;
         }
         case StorageModelType::liIonNmcBattery: {
-            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(4), "KandlerSmith") or DataIPShortCuts::lAlphaFieldBlanks(4)) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "KandlerSmith") or state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 lifeCalculation_ = BatteryDegradationModelType::lifeCalculationYes;
             } else {
                 lifeCalculation_ = BatteryDegradationModelType::lifeCalculationNo;
             }
-            seriesNum_ = static_cast<int>(DataIPShortCuts::rNumericArgs(2));
-            parallelNum_ = static_cast<int>(DataIPShortCuts::rNumericArgs(3));
-            startingSOC_ = DataIPShortCuts::lNumericFieldBlanks(4) ? 0.5 : DataIPShortCuts::rNumericArgs(4);
-            liIon_dcToDcChargingEff_ = DataIPShortCuts::lNumericFieldBlanks(5) ? 0.95 : DataIPShortCuts::rNumericArgs(5);
-            liIon_mass_ = DataIPShortCuts::rNumericArgs(6);
-            liIon_surfaceArea_ = DataIPShortCuts::rNumericArgs(7);
-            liIon_Cp_ = DataIPShortCuts::lNumericFieldBlanks(8) ? 1500.0 : DataIPShortCuts::rNumericArgs(8);
-            liIon_heatTransferCoef_ = DataIPShortCuts::lNumericFieldBlanks(9) ? 7.5 : DataIPShortCuts::rNumericArgs(9);
-            liIon_Vfull_ = DataIPShortCuts::lNumericFieldBlanks(10) ? 4.2 : DataIPShortCuts::rNumericArgs(10);
-            liIon_Vexp_ = DataIPShortCuts::lNumericFieldBlanks(11) ? 3.53 : DataIPShortCuts::rNumericArgs(11);
-            liIon_Vnom_ = DataIPShortCuts::lNumericFieldBlanks(12) ? 3.342 : DataIPShortCuts::rNumericArgs(12);
+            seriesNum_ = static_cast<int>(state.dataIPShortCut->rNumericArgs(2));
+            parallelNum_ = static_cast<int>(state.dataIPShortCut->rNumericArgs(3));
+            startingSOC_ = state.dataIPShortCut->lNumericFieldBlanks(4) ? 0.5 : state.dataIPShortCut->rNumericArgs(4);
+            liIon_dcToDcChargingEff_ = state.dataIPShortCut->lNumericFieldBlanks(5) ? 0.95 : state.dataIPShortCut->rNumericArgs(5);
+            liIon_mass_ = state.dataIPShortCut->rNumericArgs(6);
+            liIon_surfaceArea_ = state.dataIPShortCut->rNumericArgs(7);
+            liIon_Cp_ = state.dataIPShortCut->lNumericFieldBlanks(8) ? 1500.0 : state.dataIPShortCut->rNumericArgs(8);
+            liIon_heatTransferCoef_ = state.dataIPShortCut->lNumericFieldBlanks(9) ? 7.5 : state.dataIPShortCut->rNumericArgs(9);
+            liIon_Vfull_ = state.dataIPShortCut->lNumericFieldBlanks(10) ? 4.2 : state.dataIPShortCut->rNumericArgs(10);
+            liIon_Vexp_ = state.dataIPShortCut->lNumericFieldBlanks(11) ? 3.53 : state.dataIPShortCut->rNumericArgs(11);
+            liIon_Vnom_ = state.dataIPShortCut->lNumericFieldBlanks(12) ? 3.342 : state.dataIPShortCut->rNumericArgs(12);
             if (liIon_Vfull_ < liIon_Vexp_ or liIon_Vexp_ < liIon_Vnom_) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(10) + " must be greater than " + DataIPShortCuts::cNumericFieldNames(11) + ",");
-                ShowContinueError(state, "which must be greater than " + DataIPShortCuts::cNumericFieldNames(12) + ".");
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(10) + " must be greater than " + state.dataIPShortCut->cNumericFieldNames(11) + ",");
+                ShowContinueError(state, "which must be greater than " + state.dataIPShortCut->cNumericFieldNames(12) + ".");
                 for (int i = 10; i <= 12; ++i) {
-                    ShowContinueError(state, format("{} = {:.3R}", DataIPShortCuts::cNumericFieldNames(i), DataIPShortCuts::rNumericArgs(i)));
+                    ShowContinueError(state, format("{} = {:.3R}", state.dataIPShortCut->cNumericFieldNames(i), state.dataIPShortCut->rNumericArgs(i)));
                 }
                 errorsFound = true;
             }
-            liIon_Vnom_default_ = DataIPShortCuts::lNumericFieldBlanks(13) ? 3.342 : DataIPShortCuts::rNumericArgs(13);
-            liIon_Qfull_ = DataIPShortCuts::lNumericFieldBlanks(14) ? 3.2 : DataIPShortCuts::rNumericArgs(14);
-            liIon_Qexp_ = DataIPShortCuts::lNumericFieldBlanks(15) ? 0.8075 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(15) * liIon_Qfull_;
-            liIon_Qnom_ = DataIPShortCuts::lNumericFieldBlanks(16) ? 0.976875 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(16) * liIon_Qfull_;
+            liIon_Vnom_default_ = state.dataIPShortCut->lNumericFieldBlanks(13) ? 3.342 : state.dataIPShortCut->rNumericArgs(13);
+            liIon_Qfull_ = state.dataIPShortCut->lNumericFieldBlanks(14) ? 3.2 : state.dataIPShortCut->rNumericArgs(14);
+            liIon_Qexp_ = state.dataIPShortCut->lNumericFieldBlanks(15) ? 0.8075 * liIon_Qfull_ : state.dataIPShortCut->rNumericArgs(15) * liIon_Qfull_;
+            liIon_Qnom_ = state.dataIPShortCut->lNumericFieldBlanks(16) ? 0.976875 * liIon_Qfull_ : state.dataIPShortCut->rNumericArgs(16) * liIon_Qfull_;
             if (liIon_Qexp_ >= liIon_Qnom_) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(16) + " must be greater than " + DataIPShortCuts::cNumericFieldNames(15) + ".");
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(16) + " must be greater than " + state.dataIPShortCut->cNumericFieldNames(15) + ".");
                 for (int i = 15; i <= 16; ++i) {
-                    ShowContinueError(state, format("{} = {:.3R}", DataIPShortCuts::cNumericFieldNames(i), DataIPShortCuts::rNumericArgs(i)));
+                    ShowContinueError(state, format("{} = {:.3R}", state.dataIPShortCut->cNumericFieldNames(i), state.dataIPShortCut->rNumericArgs(i)));
                 }
                 errorsFound = true;
             }
-            liIon_C_rate_ = DataIPShortCuts::lNumericFieldBlanks(17) ? 1.0 : DataIPShortCuts::rNumericArgs(17);
-            internalR_ = DataIPShortCuts::lNumericFieldBlanks(18) ? 0.09 : DataIPShortCuts::rNumericArgs(18);
+            liIon_C_rate_ = state.dataIPShortCut->lNumericFieldBlanks(17) ? 1.0 : state.dataIPShortCut->rNumericArgs(17);
+            internalR_ = state.dataIPShortCut->lNumericFieldBlanks(18) ? 0.09 : state.dataIPShortCut->rNumericArgs(18);
 
             maxAhCapacity_ = liIon_Qfull_ * parallelNum_;
 
@@ -4165,122 +4165,122 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
     int IOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     int transformerIDFObjectNum = 0;
-    DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Transformer";
+    state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
 
     transformerIDFObjectNum = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Transformer", objectName);
     if (transformerIDFObjectNum > 0) {
         inputProcessor->getObjectItem(state,
-                                      DataIPShortCuts::cCurrentModuleObject,
+                                      state.dataIPShortCut->cCurrentModuleObject,
                                       transformerIDFObjectNum,
-                                      DataIPShortCuts::cAlphaArgs,
+                                      state.dataIPShortCut->cAlphaArgs,
                                       numAlphas,
-                                      DataIPShortCuts::rNumericArgs,
+                                      state.dataIPShortCut->rNumericArgs,
                                       numNums,
                                       IOStat,
-                                      DataIPShortCuts::lNumericFieldBlanks,
-                                      DataIPShortCuts::lAlphaFieldBlanks,
-                                      DataIPShortCuts::cAlphaFieldNames,
-                                      DataIPShortCuts::cNumericFieldNames);
-        name_ = DataIPShortCuts::cAlphaArgs(1);
+                                      state.dataIPShortCut->lNumericFieldBlanks,
+                                      state.dataIPShortCut->lAlphaFieldBlanks,
+                                      state.dataIPShortCut->cAlphaFieldNames,
+                                      state.dataIPShortCut->cNumericFieldNames);
+        name_ = state.dataIPShortCut->cAlphaArgs(1);
         // how to verify names are unique across objects? add to GlobalNames?
-        if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
+        if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn;
         } else {
-            availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
+            availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (availSchedPtr_ == 0) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                 errorsFound = true;
             }
         }
 
-        if (DataIPShortCuts::lAlphaFieldBlanks(3)) {
+        if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
             usageMode_ = TransformerUse::powerInFromGrid; // default
-        } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "PowerInFromGrid")) {
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerInFromGrid")) {
             usageMode_ = TransformerUse::powerInFromGrid;
-        } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "PowerOutToGrid")) {
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerOutToGrid")) {
             usageMode_ = TransformerUse::powerOutFromBldgToGrid;
-        } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(3), "LoadCenterPowerConditioning")) {
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "LoadCenterPowerConditioning")) {
             usageMode_ = TransformerUse::powerBetweenLoadCenterAndBldg;
 
         } else {
-            ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
+            ShowWarningError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
             errorsFound = true;
         }
 
-        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), state.dataHeatBal->Zone);
+        zoneNum_ = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
         if (zoneNum_ == 0) {
-            if (DataIPShortCuts::lAlphaFieldBlanks(4)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 heatLossesDestination_ = ThermalLossDestination::lostToOutside;
             } else {
                 heatLossesDestination_ = ThermalLossDestination::lostToOutside;
-                ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + DataIPShortCuts::cAlphaArgs(4));
+                ShowWarningError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
                 ShowContinueError(state, "Zone name not found. Transformer heat losses will not be added to a zone");
                 // continue with simulation but storage losses not sent to a zone.
             }
         }
-        zoneRadFrac_ = DataIPShortCuts::rNumericArgs(1);
-        ratedCapacity_ = DataIPShortCuts::rNumericArgs(2);
-        phase_ = DataIPShortCuts::rNumericArgs(3);
+        zoneRadFrac_ = state.dataIPShortCut->rNumericArgs(1);
+        ratedCapacity_ = state.dataIPShortCut->rNumericArgs(2);
+        phase_ = state.dataIPShortCut->rNumericArgs(3);
 
-        if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "Copper")) {
+        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Copper")) {
             factorTempCoeff_ = 234.5;
-        } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "Aluminum")) {
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Aluminum")) {
             factorTempCoeff_ = 225.0;
         } else {
-            ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + DataIPShortCuts::cAlphaArgs(5));
+            ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
             errorsFound = true;
         }
-        tempRise_ = DataIPShortCuts::rNumericArgs(4);
-        eddyFrac_ = DataIPShortCuts::rNumericArgs(5);
+        tempRise_ = state.dataIPShortCut->rNumericArgs(4);
+        eddyFrac_ = state.dataIPShortCut->rNumericArgs(5);
 
-        if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "RatedLosses")) {
+        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "RatedLosses")) {
             performanceInputMode_ = TransformerPerformanceInput::lossesMethod;
-        } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "NominalEfficiency")) {
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "NominalEfficiency")) {
             performanceInputMode_ = TransformerPerformanceInput::efficiencyMethod;
         } else {
-            ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
+            ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
             errorsFound = true;
         }
         if (ratedCapacity_ == 0) {
             if (performanceInputMode_ == TransformerPerformanceInput::lossesMethod) {
-                ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\".");
-                ShowContinueError(state, "Specified " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
-                ShowContinueError(state, format("Specified {} = {:.1R}", DataIPShortCuts::cNumericFieldNames(2), ratedCapacity_));
+                ShowWarningError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowContinueError(state, "Specified " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+                ShowContinueError(state, format("Specified {} = {:.1R}", state.dataIPShortCut->cNumericFieldNames(2), ratedCapacity_));
                 ShowContinueError(state, "Transformer load and no load losses cannot be calculated with 0.0 rated capacity.");
                 ShowContinueError(state, "Simulation continues but transformer losses will be set to zero.");
             }
         }
-        ratedNL_ = DataIPShortCuts::rNumericArgs(6);
-        ratedLL_ = DataIPShortCuts::rNumericArgs(7);
-        ratedEfficiency_ = DataIPShortCuts::rNumericArgs(8);
-        ratedPUL_ = DataIPShortCuts::rNumericArgs(9);
-        ratedTemp_ = DataIPShortCuts::rNumericArgs(10);
-        maxPUL_ = DataIPShortCuts::rNumericArgs(11);
+        ratedNL_ = state.dataIPShortCut->rNumericArgs(6);
+        ratedLL_ = state.dataIPShortCut->rNumericArgs(7);
+        ratedEfficiency_ = state.dataIPShortCut->rNumericArgs(8);
+        ratedPUL_ = state.dataIPShortCut->rNumericArgs(9);
+        ratedTemp_ = state.dataIPShortCut->rNumericArgs(10);
+        maxPUL_ = state.dataIPShortCut->rNumericArgs(11);
         // Check the input for MaxPUL if the performance input method is EfficiencyMethod
         if (performanceInputMode_ == TransformerPerformanceInput::efficiencyMethod) {
-            if (DataIPShortCuts::lNumericFieldBlanks(11)) {
+            if (state.dataIPShortCut->lNumericFieldBlanks(11)) {
                 maxPUL_ = ratedPUL_;
             } else if (maxPUL_ <= 0 || maxPUL_ > 1) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, format("Invalid {}=[{:.3R}].", DataIPShortCuts::cNumericFieldNames(11), DataIPShortCuts::rNumericArgs(11)));
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, format("Invalid {}=[{:.3R}].", state.dataIPShortCut->cNumericFieldNames(11), state.dataIPShortCut->rNumericArgs(11)));
                 ShowContinueError(state, "Entered value must be > 0 and <= 1.");
                 errorsFound = true;
             }
         }
-        if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "Yes")) {
+        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Yes")) {
             considerLosses_ = true;
-        } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "No")) {
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
             considerLosses_ = false;
         } else {
             if (usageMode_ == TransformerUse::powerInFromGrid) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + " = " + DataIPShortCuts::cAlphaArgs(7));
+                ShowSevereError(state, routineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
                 errorsFound = true;
             }
         }
@@ -4302,7 +4302,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
 
             // Meter check deferred because they may have not been "loaded" yet,
             for (auto loopCount = 0; loopCount < numWiredMeters; ++loopCount) {
-                wiredMeterNames_[loopCount] = UtilityRoutines::MakeUPPERCase(DataIPShortCuts::cAlphaArgs(loopCount + numAlphaBeforeMeter + 1));
+                wiredMeterNames_[loopCount] = UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(loopCount + numAlphaBeforeMeter + 1));
                 // Assign SpecialMeter as TRUE if the meter name is Electricity:Facility or Electricity:HVAC
                 if (UtilityRoutines::SameString(wiredMeterNames_[loopCount], "Electricity:Facility") ||
                     UtilityRoutines::SameString(wiredMeterNames_[loopCount], "Electricity:HVAC")) {

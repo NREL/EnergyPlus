@@ -304,7 +304,7 @@ namespace HVACControllers {
 
     void DumpAirLoopStatistics(EnergyPlusData &state);
 
-    void WriteAirLoopStatistics(InputOutputFile &statisticsFile,
+    void WriteAirLoopStatistics(EnergyPlusData &state, InputOutputFile &statisticsFile,
                                 DefinePrimaryAirSystem const &ThisPrimaryAirSystem,
                                 AirLoopStatsType const &ThisAirLoopStats);
 

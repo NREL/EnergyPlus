@@ -122,9 +122,6 @@ namespace MatrixDataManager {
         // PURPOSE OF THIS SUBROUTINE:
         // get input for Matrix objects
 
-        // Using/Aliasing
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumTwoDimMatrix;            // count of Matrix:TwoDimension objects
         int MatIndex;                   // do loop counter
@@ -136,6 +133,7 @@ namespace MatrixDataManager {
         int NumRows;
         int NumCols;
         int NumElements;
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "Matrix:TwoDimension";
         NumTwoDimMatrix = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -149,34 +147,34 @@ namespace MatrixDataManager {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           MatIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
+                                          state.dataIPShortCut->lNumericFieldBlanks,
                                           _,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             ++MatNum;
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            MatData(MatNum).Name = cAlphaArgs(1);
-            NumRows = std::floor(rNumericArgs(1));
-            NumCols = std::floor(rNumericArgs(2));
+            MatData(MatNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            NumRows = std::floor(state.dataIPShortCut->rNumericArgs(1));
+            NumCols = std::floor(state.dataIPShortCut->rNumericArgs(2));
             NumElements = NumRows * NumCols;
 
             // test
             if (NumElements < 1) {
-                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
-                ShowContinueError(state, "Check " + cNumericFieldNames(1) + " and " + cNumericFieldNames(2) +
+                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Check " + state.dataIPShortCut->cNumericFieldNames(1) + " and " + state.dataIPShortCut->cNumericFieldNames(2) +
                                   " total number of elements in matrix must be 1 or more");
                 ErrorsFound = true;
             }
             if ((NumNumbers - 2) < NumElements) {
-                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
-                ShowContinueError(state, "Check input, total number of elements does not agree with " + cNumericFieldNames(1) + " and " +
-                                  cNumericFieldNames(2));
+                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Check input, total number of elements does not agree with " + state.dataIPShortCut->cNumericFieldNames(1) + " and " +
+                                  state.dataIPShortCut->cNumericFieldNames(2));
                 ErrorsFound = true;
             }
             MatData(MatNum).MatrixType = TwoDimensional;
@@ -187,7 +185,7 @@ namespace MatrixDataManager {
             for (int ElementNum = 1; ElementNum <= NumElements; ++ElementNum, l += matrix.size()) {
                 int const RowIndex = (ElementNum - 1) / NumCols + 1;
                 int const ColIndex = mod((ElementNum - 1), NumCols) + 1;
-                matrix(ColIndex, RowIndex) = rNumericArgs(ElementNum + 2); // Matrix is read in row-by-row
+                matrix(ColIndex, RowIndex) = state.dataIPShortCut->rNumericArgs(ElementNum + 2); // Matrix is read in row-by-row
             }
         }
 

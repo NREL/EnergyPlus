@@ -211,8 +211,7 @@ void GetPurchasedAir(EnergyPlusData &state)
     using NodeInputManager::InitUniqueNodeCheck;
     using OutAirNodeManager::CheckAndAddAirNodeNumber;
     using namespace DataLoopNode;
-    using namespace DataIPShortCuts;
-    using ZonePlenum::GetReturnPlenumIndex;
+        using ZonePlenum::GetReturnPlenumIndex;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PurchAirNum;
@@ -225,7 +224,7 @@ void GetPurchasedAir(EnergyPlusData &state)
     bool ErrorsFound(false);                                   // If errors detected in input
     bool IsOANodeListed;                                       // Flag for OA node name listed in OutdoorAir:Node or Nodelist
     bool UniqueNodeError;                                      // Flag for non-unique node error(s)
-
+    auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "ZoneHVAC:IdealLoadsAirSystem";
 
     auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
@@ -245,217 +244,217 @@ void GetPurchasedAir(EnergyPlusData &state)
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           PurchAirNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames.allocate(NumNums);
             state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames = "";
-            state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames = cNumericFieldNames;
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            PurchAir(PurchAirNum).Name = cAlphaArgs(1);
+            PurchAir(PurchAirNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             // get optional  availability schedule
-            PurchAir(PurchAirNum).AvailSched = cAlphaArgs(2);
-            if (lAlphaFieldBlanks(2)) {
+            PurchAir(PurchAirNum).AvailSched = state.dataIPShortCut->cAlphaArgs(2);
+            if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 PurchAir(PurchAirNum).AvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                PurchAir(PurchAirNum).AvailSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
+                PurchAir(PurchAirNum).AvailSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (PurchAir(PurchAirNum).AvailSchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                    ShowContinueError(state, "Invalid-not found " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                    ShowContinueError(state, "Invalid-not found " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
             }
             // Purchased air supply air node is an outlet node
             PurchAir(PurchAirNum).ZoneSupplyAirNodeNum = GetOnlySingleNode(state,
-                                                                           cAlphaArgs(3),
+                                                                           state.dataIPShortCut->cAlphaArgs(3),
                                                                            ErrorsFound,
                                                                            cCurrentModuleObject,
-                                                                           cAlphaArgs(1),
+                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Air,
                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                            1,
                                                                            ObjectIsNotParent);
             UniqueNodeError = false;
-            CheckUniqueNodes(state, cAlphaFieldNames(3), "NodeName", UniqueNodeError, cAlphaArgs(3), _, cAlphaArgs(1));
+            CheckUniqueNodes(state, state.dataIPShortCut->cAlphaFieldNames(3), "NodeName", UniqueNodeError, state.dataIPShortCut->cAlphaArgs(3), _, state.dataIPShortCut->cAlphaArgs(1));
             if (UniqueNodeError) ErrorsFound = true;
             // If new (optional) exhaust air node name is present, then register it as inlet
-            if (!lAlphaFieldBlanks(4)) {
-                if (lAlphaFieldBlanks(5)) {
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                     PurchAir(PurchAirNum).ZoneExhaustAirNodeNum = GetOnlySingleNode(state,
-                                                                                    cAlphaArgs(4),
+                                                                                    state.dataIPShortCut->cAlphaArgs(4),
                                                                                     ErrorsFound,
                                                                                     cCurrentModuleObject,
-                                                                                    cAlphaArgs(1),
+                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Inlet,
                                                                                     1,
                                                                                     ObjectIsNotParent);
                 } else {
                     PurchAir(PurchAirNum).ZoneExhaustAirNodeNum = GetOnlySingleNode(state,
-                                                                                    cAlphaArgs(4),
+                                                                                    state.dataIPShortCut->cAlphaArgs(4),
                                                                                     ErrorsFound,
                                                                                     cCurrentModuleObject,
-                                                                                    cAlphaArgs(1),
+                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                     1,
                                                                                     ObjectIsNotParent);
                 }
                 UniqueNodeError = false;
-                CheckUniqueNodes(state, cAlphaFieldNames(4), "NodeName", UniqueNodeError, cAlphaArgs(4), _, cAlphaArgs(1));
+                CheckUniqueNodes(state, state.dataIPShortCut->cAlphaFieldNames(4), "NodeName", UniqueNodeError, state.dataIPShortCut->cAlphaArgs(4), _, state.dataIPShortCut->cAlphaArgs(1));
                 if (UniqueNodeError) ErrorsFound = true;
             }
-            if (!lAlphaFieldBlanks(5)) {
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 PurchAir(PurchAirNum).PlenumExhaustAirNodeNum = GetOnlySingleNode(state,
-                                                                                  cAlphaArgs(5),
+                                                                                  state.dataIPShortCut->cAlphaArgs(5),
                                                                                   ErrorsFound,
                                                                                   cCurrentModuleObject,
-                                                                                  cAlphaArgs(1),
+                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
                                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                                   1,
                                                                                   ObjectIsNotParent);
             }
-            PurchAir(PurchAirNum).MaxHeatSuppAirTemp = rNumericArgs(1);
-            PurchAir(PurchAirNum).MinCoolSuppAirTemp = rNumericArgs(2);
-            PurchAir(PurchAirNum).MaxHeatSuppAirHumRat = rNumericArgs(3);
-            PurchAir(PurchAirNum).MinCoolSuppAirHumRat = rNumericArgs(4);
+            PurchAir(PurchAirNum).MaxHeatSuppAirTemp = state.dataIPShortCut->rNumericArgs(1);
+            PurchAir(PurchAirNum).MinCoolSuppAirTemp = state.dataIPShortCut->rNumericArgs(2);
+            PurchAir(PurchAirNum).MaxHeatSuppAirHumRat = state.dataIPShortCut->rNumericArgs(3);
+            PurchAir(PurchAirNum).MinCoolSuppAirHumRat = state.dataIPShortCut->rNumericArgs(4);
 
-            if (UtilityRoutines::SameString(cAlphaArgs(6), "NoLimit")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "NoLimit")) {
                 PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(6), "LimitFlowRate")) {
-                if (lNumericFieldBlanks(5)) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitFlowRate")) {
+                if (state.dataIPShortCut->lNumericFieldBlanks(5)) {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitFlowRate;
                 }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(6), "LimitCapacity")) {
-                if (lNumericFieldBlanks(6)) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitCapacity")) {
+                if (state.dataIPShortCut->lNumericFieldBlanks(6)) {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitCapacity;
                 }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(6), "LimitFlowRateAndCapacity")) {
-                if (lNumericFieldBlanks(5) && lNumericFieldBlanks(6)) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitFlowRateAndCapacity")) {
+                if (state.dataIPShortCut->lNumericFieldBlanks(5) && state.dataIPShortCut->lNumericFieldBlanks(6)) {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
-                } else if (lNumericFieldBlanks(5)) {
+                } else if (state.dataIPShortCut->lNumericFieldBlanks(5)) {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitCapacity;
-                } else if (lNumericFieldBlanks(6)) {
+                } else if (state.dataIPShortCut->lNumericFieldBlanks(6)) {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitFlowRate;
                 } else {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitFlowRateAndCapacity;
                 }
             } else {
-                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                ShowContinueError(state, "Invalid-entry " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
+                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                ShowContinueError(state, "Invalid-entry " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + state.dataIPShortCut->cAlphaArgs(6) + "\".");
                 ShowContinueError(state, "Valid entries are NoLimit, LimitFlowRate, LimitCapacity, or LimitFlowRateAndCapacity");
                 ErrorsFound = true;
             }
-            PurchAir(PurchAirNum).MaxHeatVolFlowRate = rNumericArgs(5);
-            PurchAir(PurchAirNum).MaxHeatSensCap = rNumericArgs(6);
+            PurchAir(PurchAirNum).MaxHeatVolFlowRate = state.dataIPShortCut->rNumericArgs(5);
+            PurchAir(PurchAirNum).MaxHeatSensCap = state.dataIPShortCut->rNumericArgs(6);
 
-            if (UtilityRoutines::SameString(cAlphaArgs(7), "NoLimit")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "NoLimit")) {
                 PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "LimitFlowRate")) {
-                if (lNumericFieldBlanks(7)) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitFlowRate")) {
+                if (state.dataIPShortCut->lNumericFieldBlanks(7)) {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::LimitFlowRate;
                 }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "LimitCapacity")) {
-                if (lNumericFieldBlanks(8)) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitCapacity")) {
+                if (state.dataIPShortCut->lNumericFieldBlanks(8)) {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::LimitCapacity;
                 }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "LimitFlowRateAndCapacity")) {
-                if (lNumericFieldBlanks(7) && lNumericFieldBlanks(8)) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitFlowRateAndCapacity")) {
+                if (state.dataIPShortCut->lNumericFieldBlanks(7) && state.dataIPShortCut->lNumericFieldBlanks(8)) {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
-                } else if (lNumericFieldBlanks(7)) {
+                } else if (state.dataIPShortCut->lNumericFieldBlanks(7)) {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::LimitCapacity;
-                } else if (lNumericFieldBlanks(8)) {
+                } else if (state.dataIPShortCut->lNumericFieldBlanks(8)) {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::LimitFlowRate;
                 } else {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::LimitFlowRateAndCapacity;
                 }
             } else {
-                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                ShowContinueError(state, "Invalid-entry " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
+                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                ShowContinueError(state, "Invalid-entry " + state.dataIPShortCut->cAlphaFieldNames(7) + "=\"" + state.dataIPShortCut->cAlphaArgs(7) + "\".");
                 ShowContinueError(state, "Valid entries are NoLimit, LimitFlowRate, LimitCapacity, or LimitFlowRateAndCapacity");
                 ErrorsFound = true;
             }
-            PurchAir(PurchAirNum).MaxCoolVolFlowRate = rNumericArgs(7);
-            PurchAir(PurchAirNum).MaxCoolTotCap = rNumericArgs(8);
+            PurchAir(PurchAirNum).MaxCoolVolFlowRate = state.dataIPShortCut->rNumericArgs(7);
+            PurchAir(PurchAirNum).MaxCoolTotCap = state.dataIPShortCut->rNumericArgs(8);
 
             // get optional heating availability schedule
-            PurchAir(PurchAirNum).HeatSched = cAlphaArgs(8);
-            if (lAlphaFieldBlanks(8)) {
+            PurchAir(PurchAirNum).HeatSched = state.dataIPShortCut->cAlphaArgs(8);
+            if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                 PurchAir(PurchAirNum).HeatSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                PurchAir(PurchAirNum).HeatSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
+                PurchAir(PurchAirNum).HeatSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
                 if (PurchAir(PurchAirNum).HeatSchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                    ShowContinueError(state, "Invalid-not found " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) + "\".");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                    ShowContinueError(state, "Invalid-not found " + state.dataIPShortCut->cAlphaFieldNames(8) + "=\"" + state.dataIPShortCut->cAlphaArgs(8) + "\".");
                     ErrorsFound = true;
                 }
             }
             // get optional cooling availability schedule
-            PurchAir(PurchAirNum).CoolSched = cAlphaArgs(9);
-            if (lAlphaFieldBlanks(9)) {
+            PurchAir(PurchAirNum).CoolSched = state.dataIPShortCut->cAlphaArgs(9);
+            if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                 PurchAir(PurchAirNum).CoolSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                PurchAir(PurchAirNum).CoolSchedPtr = GetScheduleIndex(state, cAlphaArgs(9));
+                PurchAir(PurchAirNum).CoolSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
                 if (PurchAir(PurchAirNum).CoolSchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                    ShowContinueError(state, "Invalid-not found " + cAlphaFieldNames(9) + "=\"" + cAlphaArgs(9) + "\".");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                    ShowContinueError(state, "Invalid-not found " + state.dataIPShortCut->cAlphaFieldNames(9) + "=\"" + state.dataIPShortCut->cAlphaArgs(9) + "\".");
                     ErrorsFound = true;
                 }
             }
             // get Dehumidification control type
-            if (UtilityRoutines::SameString(cAlphaArgs(10), "None")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "None")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::None;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(10), "ConstantSensibleHeatRatio")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "ConstantSensibleHeatRatio")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::ConstantSensibleHeatRatio;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(10), "Humidistat")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "Humidistat")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::Humidistat;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(10), "ConstantSupplyHumidityRatio")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "ConstantSupplyHumidityRatio")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::ConstantSupplyHumidityRatio;
             } else {
-                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                ShowContinueError(state, "Invalid-entry " + cAlphaFieldNames(10) + "=\"" + cAlphaArgs(10) + "\".");
+                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                ShowContinueError(state, "Invalid-entry " + state.dataIPShortCut->cAlphaFieldNames(10) + "=\"" + state.dataIPShortCut->cAlphaArgs(10) + "\".");
                 ShowContinueError(state, "Valid entries are ConstantSensibleHeatRatio, Humidistat, or ConstantSupplyHumidityRatio");
                 ErrorsFound = true;
             }
-            PurchAir(PurchAirNum).CoolSHR = rNumericArgs(9);
+            PurchAir(PurchAirNum).CoolSHR = state.dataIPShortCut->rNumericArgs(9);
 
             // get Humidification control type
-            if (UtilityRoutines::SameString(cAlphaArgs(11), "None")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "None")) {
                 PurchAir(PurchAirNum).HumidCtrlType = HumControl::None;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(11), "Humidistat")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "Humidistat")) {
                 PurchAir(PurchAirNum).HumidCtrlType = HumControl::Humidistat;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(11), "ConstantSupplyHumidityRatio")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "ConstantSupplyHumidityRatio")) {
                 PurchAir(PurchAirNum).HumidCtrlType = HumControl::ConstantSupplyHumidityRatio;
             } else {
-                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                ShowContinueError(state, "Invalid-entry " + cAlphaFieldNames(11) + "=\"" + cAlphaArgs(11) + "\".");
+                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                ShowContinueError(state, "Invalid-entry " + state.dataIPShortCut->cAlphaFieldNames(11) + "=\"" + state.dataIPShortCut->cAlphaArgs(11) + "\".");
                 ShowContinueError(state, "Valid entries are None, Humidistat, or ConstantSupplyHumidityRatio");
                 ErrorsFound = true;
             }
 
             // get Design specification outdoor air object
-            if (!lAlphaFieldBlanks(12)) {
-                PurchAir(PurchAirNum).OARequirementsPtr = UtilityRoutines::FindItemInList(cAlphaArgs(12), state.dataSize->OARequirements);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                PurchAir(PurchAirNum).OARequirementsPtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataSize->OARequirements);
                 if (PurchAir(PurchAirNum).OARequirementsPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                    ShowContinueError(state, "Invalid-not found" + cAlphaFieldNames(12) + "=\"" + cAlphaArgs(12) + "\".");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                    ShowContinueError(state, "Invalid-not found" + state.dataIPShortCut->cAlphaFieldNames(12) + "=\"" + state.dataIPShortCut->cAlphaArgs(12) + "\".");
                     ErrorsFound = true;
                 } else {
                     PurchAir(PurchAirNum).OutdoorAir = true;
@@ -464,25 +463,25 @@ void GetPurchasedAir(EnergyPlusData &state)
 
             // If outdoor air specified, then get Outdoor air inlet node and other outdoor air inputs
             if (PurchAir(PurchAirNum).OutdoorAir) {
-                if (lAlphaFieldBlanks(13)) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                     // If there is outdoor air and outdoor air inlet node is blank, then create one
-                    if (len(cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength - 23) { // protect against long name leading to > 100 chars
-                        cAlphaArgs(13) = cAlphaArgs(1) + " OUTDOOR AIR INLET NODE";
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength - 23) { // protect against long name leading to > 100 chars
+                        state.dataIPShortCut->cAlphaArgs(13) = state.dataIPShortCut->cAlphaArgs(1) + " OUTDOOR AIR INLET NODE";
                     } else {
-                        cAlphaArgs(13) = cAlphaArgs(1).substr(0, 75) + " OUTDOOR AIR INLET NODE";
+                        state.dataIPShortCut->cAlphaArgs(13) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 75) + " OUTDOOR AIR INLET NODE";
                     }
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field");
-                        ShowContinueError(state, cAlphaFieldNames(13) + " is blank, but there is outdoor air requested for this system.");
-                        ShowContinueError(state, "Creating node name =" + cAlphaArgs(13));
+                        ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " blank field");
+                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(13) + " is blank, but there is outdoor air requested for this system.");
+                        ShowContinueError(state, "Creating node name =" + state.dataIPShortCut->cAlphaArgs(13));
                     }
                 }
                 // Register OA node
                 PurchAir(PurchAirNum).OutdoorAirNodeNum = GetOnlySingleNode(state,
-                                                                            cAlphaArgs(13),
+                                                                            state.dataIPShortCut->cAlphaArgs(13),
                                                                             ErrorsFound,
                                                                             cCurrentModuleObject,
-                                                                            cAlphaArgs(1),
+                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Air,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                             1,
@@ -490,60 +489,60 @@ void GetPurchasedAir(EnergyPlusData &state)
                 // Check if OA node is initialized in OutdoorAir:Node or OutdoorAir:Nodelist
                 CheckAndAddAirNodeNumber(state, PurchAir(PurchAirNum).OutdoorAirNodeNum, IsOANodeListed);
                 if ((!IsOANodeListed) && state.dataGlobal->DisplayExtraWarnings) {
-                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " missing data");
-                    ShowContinueError(state, cAlphaArgs(13) + " does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
-                    ShowContinueError(state, "Adding OutdoorAir:Node=" + cAlphaArgs(13));
+                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " missing data");
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaArgs(13) + " does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
+                    ShowContinueError(state, "Adding OutdoorAir:Node=" + state.dataIPShortCut->cAlphaArgs(13));
                 }
                 UniqueNodeError = false;
-                CheckUniqueNodes(state, cAlphaFieldNames(13), "NodeName", UniqueNodeError, cAlphaArgs(13), _, cAlphaArgs(1));
+                CheckUniqueNodes(state, state.dataIPShortCut->cAlphaFieldNames(13), "NodeName", UniqueNodeError, state.dataIPShortCut->cAlphaArgs(13), _, state.dataIPShortCut->cAlphaArgs(1));
                 if (UniqueNodeError) ErrorsFound = true;
 
                 // get Demand controlled ventilation type
-                if (UtilityRoutines::SameString(cAlphaArgs(14), "None")) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "None")) {
                     PurchAir(PurchAirNum).DCVType = DCV::NoDCV;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(14), "OccupancySchedule")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "OccupancySchedule")) {
                     PurchAir(PurchAirNum).DCVType = DCV::OccupancySchedule;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(14), "CO2Setpoint")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "CO2Setpoint")) {
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         PurchAir(PurchAirNum).DCVType = DCV::CO2SetPoint;
                     } else {
                         PurchAir(PurchAirNum).DCVType = DCV::NoDCV;
-                        ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                        ShowContinueError(state, cAlphaFieldNames(14) + '=' + cAlphaArgs(14) + " but CO2 simulation is not active.");
-                        ShowContinueError(state, "Resetting " + cAlphaFieldNames(14) + " to NoDCV");
+                        ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(14) + '=' + state.dataIPShortCut->cAlphaArgs(14) + " but CO2 simulation is not active.");
+                        ShowContinueError(state, "Resetting " + state.dataIPShortCut->cAlphaFieldNames(14) + " to NoDCV");
                         ShowContinueError(state,
                                           "To activate CO2 simulation, use ZoneAirContaminantBalance object and specify \"Carbon Dioxide "
                                           "Concentration\"=\"Yes\".");
                     }
                 } else {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                    ShowContinueError(state, "Invalid-entry " + cAlphaFieldNames(14) + '=' + cAlphaArgs(14));
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                    ShowContinueError(state, "Invalid-entry " + state.dataIPShortCut->cAlphaFieldNames(14) + '=' + state.dataIPShortCut->cAlphaArgs(14));
                     ShowContinueError(state, "Valid entries are None, OccupancySchedule, or CO2Setpoint");
                     ErrorsFound = true;
                 }
                 // get Outdoor air economizer type
-                if (UtilityRoutines::SameString(cAlphaArgs(15), "NoEconomizer")) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "NoEconomizer")) {
                     PurchAir(PurchAirNum).EconomizerType = Econ::NoEconomizer;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(15), "DifferentialDryBulb")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "DifferentialDryBulb")) {
                     PurchAir(PurchAirNum).EconomizerType = Econ::DifferentialDryBulb;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(15), "DifferentialEnthalpy")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "DifferentialEnthalpy")) {
                     PurchAir(PurchAirNum).EconomizerType = Econ::DifferentialEnthalpy;
                 } else {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                    ShowContinueError(state, "Invalid-entry " + cAlphaFieldNames(15) + '=' + cAlphaArgs(15));
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                    ShowContinueError(state, "Invalid-entry " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + state.dataIPShortCut->cAlphaArgs(15));
                     ShowContinueError(state, "Valid entries are NoEconomizer, DifferentialDryBulb, or DifferentialEnthalpy");
                     ErrorsFound = true;
                 }
                 // get Outdoor air heat recovery type and effectiveness
-                if (UtilityRoutines::SameString(cAlphaArgs(16), "None")) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "None")) {
                     PurchAir(PurchAirNum).HtRecType = HeatRecovery::NoHeatRecovery;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(16), "Sensible")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "Sensible")) {
                     PurchAir(PurchAirNum).HtRecType = HeatRecovery::Sensible;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(16), "Enthalpy")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "Enthalpy")) {
                     PurchAir(PurchAirNum).HtRecType = HeatRecovery::Enthalpy;
                 } else {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                    ShowContinueError(state, "Invalid-entry " + cAlphaFieldNames(16) + '=' + cAlphaArgs(16));
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
+                    ShowContinueError(state, "Invalid-entry " + state.dataIPShortCut->cAlphaFieldNames(16) + '=' + state.dataIPShortCut->cAlphaArgs(16));
                     ShowContinueError(state, "Valid entries are None, Sensible, or Enthalpy");
                     ErrorsFound = true;
                 }
@@ -553,8 +552,8 @@ void GetPurchasedAir(EnergyPlusData &state)
                 PurchAir(PurchAirNum).HtRecType = HeatRecovery::NoHeatRecovery;
             }
 
-            PurchAir(PurchAirNum).HtRecSenEff = rNumericArgs(10);
-            PurchAir(PurchAirNum).HtRecLatEff = rNumericArgs(11);
+            PurchAir(PurchAirNum).HtRecSenEff = state.dataIPShortCut->rNumericArgs(10);
+            PurchAir(PurchAirNum).HtRecLatEff = state.dataIPShortCut->rNumericArgs(11);
 
             for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
@@ -566,10 +565,10 @@ void GetPurchasedAir(EnergyPlusData &state)
             }
 
             PurchAir(PurchAirNum).HVACSizingIndex = 0;
-            if (!lAlphaFieldBlanks(17)) {
-                PurchAir(PurchAirNum).HVACSizingIndex = UtilityRoutines::FindItemInList(cAlphaArgs(17), state.dataSize->ZoneHVACSizing);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+                PurchAir(PurchAirNum).HVACSizingIndex = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(17), state.dataSize->ZoneHVACSizing);
                 if (PurchAir(PurchAirNum).HVACSizingIndex == 0) {
-                    ShowSevereError(state, cAlphaFieldNames(17) + " = " + cAlphaArgs(17) + " not found.");
+                    ShowSevereError(state, state.dataIPShortCut->cAlphaFieldNames(17) + " = " + state.dataIPShortCut->cAlphaArgs(17) + " not found.");
                     ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + PurchAir(PurchAirNum).Name);
                     ErrorsFound = true;
                 }
