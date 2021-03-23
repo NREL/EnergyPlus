@@ -57,6 +57,8 @@
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGParams.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
 
 namespace EnergyPlus {
 

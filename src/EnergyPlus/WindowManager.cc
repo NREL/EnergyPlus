@@ -2089,10 +2089,10 @@ namespace WindowManager {
         // New variables for thermochromic windows calc
         Real64 locTCSpecTemp;  // The temperature corresponding to the specified optical properties of the TC layer
         Real64 locTCLayerTemp; // TC layer temperature at each time step. C
-        Array1D<Real64> deltaTemp(100, 0.0);
         int i;
-        Array1D_int iMinDT(1, 0);
-        Array1D_int IDConst(100, 0);
+        auto & deltaTemp = state.dataWindowManager->deltaTemp;
+        auto &iMinDT = state.dataWindowManager->iMinDT;
+        auto &IDConst = state.dataWindowManager->IDConst;
         Real64 dT0(0.0);
         Real64 dT1(0.0);
         Real64 SurfOutsideEmiss; // temporary for result of outside surface emissivity
@@ -2830,20 +2830,25 @@ namespace WindowManager {
 
         int ZoneNum;             // Zone number corresponding to SurfNum
         int i;                   // Counter
-        Array1D<Real64> hgap(5); // Gap gas conductance (W/m2-K)
         Real64 gr;               // Grashof number of gas in a gap
         Real64 con;              // Gap gas conductivity
         Real64 pr;               // Gap gas Prandtl number
         Real64 nu;               // Gap gas Nusselt number
-        Array1D<Real64> hr(10);  // Radiative conductance (W/m2-K)
         Real64 d;                // +1 if number of row interchanges is even,
         // -1 if odd (in LU decomposition)
-        Array1D_int indx(10);          // Vector of row permutations in LU decomposition
-        Array2D<Real64> Aface(10, 10); // Coefficient in equation Aface*thetas = Bface
-        Array1D<Real64> Bface(10);     // Coefficient in equation Aface*thetas = Bface
-
+        
+        auto &hgap = state.dataWindowManager->hgap;
+        auto &hr = state.dataWindowManager->hr;
+        auto &indx = state.dataWindowManager->indx;
+        auto &Aface = state.dataWindowManager->Aface;
+        auto &Bface = state.dataWindowManager->Bface;
+        auto &hrprev = state.dataWindowManager->hrprev;
+        auto &TGapNewBG = state.dataWindowManager->TGapNewBG;
+        auto &hcvBG = state.dataWindowManager->hcvBG;
+        auto &AbsRadShadeFace = state.dataWindowManager->AbsRadShadeFace;
+        auto &RhoIR = state.dataWindowManager->RhoIR;
+        
         int iter;                   // Iteration number
-        Array1D<Real64> hrprev(10); // Value of hr from previous iteration
         Real64 errtemp;             // Absolute value of sum of face temperature differences
         //   between iterations, divided by number of faces
         Real64 VGap;                  // Air velocity in gap between glass and shade/blind (m/s)
@@ -2854,13 +2859,9 @@ namespace WindowManager {
         Real64 TGapOutlet;            // Temperature of air leaving gap between glass and shade/blind (K)
         Real64 TAirflowGapOutlet;     // Temperature of air leaving airflow gap between glass panes (K)
         Real64 TAirflowGapOutletC;    // Temperature of air leaving airflow gap between glass panes (C)
-        Array1D<Real64> TGapNewBG(2); // For between-glass shade/blind, average gas temp in gaps on either
-        //  side of shade/blind (K)
         Real64 hcv;               // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
         Real64 hcvAirflowGap;     // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
         Real64 hcvPrev;           // Value of hcv from previous iteration
-        Array1D<Real64> hcvBG(2); // For between-glass shade/blind, convection coefficient from gap glass or
-        //  shade/blind to gap gas on either side of shade/blind (W/m2-K)
         Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
         Real64 ConvHeatFlowForced;  // Convective heat flow from forced airflow gap (W)
         Real64 ShGlReflFacIR;       // Factor for long-wave inter-reflection between shade/blind and adjacent glass
@@ -2876,7 +2877,6 @@ namespace WindowManager {
         Real64 TauShIR;                     // Long-wave transmittance of isolated shade/blind
         Real64 sconsh;                      // shade/blind conductance (W/m2-K)
         WinShadingType ShadeFlag;           // Shading flag
-        Array1D<Real64> AbsRadShadeFace(2); // Solar radiation, short-wave radiation from lights, and long-wave
         //  radiation from lights and zone equipment absorbed by faces of shade/blind (W/m2)
         Real64 ShadeArea;          // shade/blind area (m2)
         Real64 CondHeatGainGlass;  // Conduction through inner glass layer, outside to inside (W)
@@ -2891,7 +2891,6 @@ namespace WindowManager {
         int ConstrNum;        // Construction number, bare and with shading device
         int ConstrNumSh;
         Real64 TransDiff;             // Diffuse shortwave transmittance
-        Array1D<Real64> RhoIR(10);    // Face IR reflectance
         Real64 FacRhoIR25;            // Intermediate variable
         Real64 FacRhoIR63;            // Intermediate variable
         Real64 RhoIRfp;               // Intermediate variable
@@ -4206,7 +4205,7 @@ namespace WindowManager {
         int k;
         int imax; // Temporary variable
         //   as output: decomposed matrix
-        Array1D<Real64> vv(10); // Stores the implicit scaling of each row
+        auto &vv = state.dataWindowManager->vv;
         Real64 aamax;                  // Absolute value of largest element of matrix
         Real64 dum;                    // Temporary variable
         Real64 sum;                    // Sum of products of matrix elements
@@ -4354,14 +4353,20 @@ namespace WindowManager {
         int j;
         int NMix;                    // Number of gases in a mixture
         Real64 molmix;               // Molecular weight of mixture
-        Array1D<Real64> kprime(10);  // Monotonic thermal conductivity
-        Array1D<Real64> kdblprm(10); // Conductivity term accounting for additional energy moved by
-        //  the diffusional transport of internal energy in polyatomic gases.
-        Real64 kpmix; // Monotonic thermal conductivity of mixture
+
+        auto &kprime = state.dataWindowManager->kprime;
+        auto &kdblprm = state.dataWindowManager->kdblprm;
+        auto &mukpdwn = state.dataWindowManager->mukpdwn;
+        auto &kpdown = state.dataWindowManager->kpdown;
+        auto &kdpdown = state.dataWindowManager->kdpdown;
+        auto &frct = state.dataWindowManager->frct;
+        auto &fvis = state.dataWindowManager->fvis;
+        auto &fcon = state.dataWindowManager->fcon;
+        auto &fdens = state.dataWindowManager->fdens;
+        auto &fcp = state.dataWindowManager->fcp;
+
+        Real64 kpmix;              // Monotonic thermal conductivity of mixture
         Real64 kdpmix;
-        Array1D<Real64> mukpdwn(10); // Denominator term
-        Array1D<Real64> kpdown(10);  // Denominator terms
-        Array1D<Real64> kdpdown(10);
         Real64 kmix;               // For accumulating conductance of gas mixture
         Real64 mumix;              // For accumulating viscosity of gas mixture
         Real64 visc(0.0);          // Dynamic viscosity of mixture at tmean (g/m-s)
@@ -4374,12 +4379,7 @@ namespace WindowManager {
         Real64 psiterm;            // Factor
         Real64 phikup;             // Numerator factor
         Real64 rhomix;             // Density of gas mixture (kg/m3)
-        Array1D<Real64> frct(10);  // Fraction of each gas in a mixture
-        Array1D<Real64> fvis(10);  // Viscosity of each gas in a mixture (g/m-s)
-        Array1D<Real64> fcon(10);  // Conductance of each gas in a mixture (W/m2-K)
-        Array1D<Real64> fdens(10); // Density of each gas in a mixture (kg/m3)
-        Array1D<Real64> fcp(10);   // Specific heat of each gas in a mixture (J/m3-K)
-
+        
         NMix = state.dataWindowManager->gnmix(IGap); // Autodesk:Logic Either assert NMix>0 or handle NMix<=0 in logic so that con and locals guar. initialized before use
 
         for (IMix = 1; IMix <= NMix; ++IMix) {
