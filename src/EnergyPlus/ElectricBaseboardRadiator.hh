@@ -188,9 +188,10 @@ namespace ElectricBaseboardRadiator {
 
 struct ElectricBaseboardRadiatorData : BaseGlobalStruct {
 
+    Array1D_bool MyEnvrnFlag;
     void clear_state() override
     {
-
+        this->MyEnvrnFlag.clear();
     }
 };
 

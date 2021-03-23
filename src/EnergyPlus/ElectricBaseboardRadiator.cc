@@ -592,12 +592,11 @@ namespace ElectricBaseboardRadiator {
         int ZoneNode;
         int ZoneNum;
         int Loop;
-        static Array1D_bool MyEnvrnFlag;
 
         // Do the one time initializations
         if (MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(NumElecBaseboards);
+            state.dataElectBaseboardRad->MyEnvrnFlag.allocate(NumElecBaseboards);
             MySizeFlag.allocate(NumElecBaseboards);
             ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             QBBElecRadSource.dimension(NumElecBaseboards, 0.0);
@@ -605,7 +604,7 @@ namespace ElectricBaseboardRadiator {
             LastQBBElecRadSrc.dimension(NumElecBaseboards, 0.0);
             LastSysTimeElapsed.dimension(NumElecBaseboards, 0.0);
             LastTimeStepSys.dimension(NumElecBaseboards, 0.0);
-            MyEnvrnFlag = true;
+            state.dataElectBaseboardRad->MyEnvrnFlag = true;
             MySizeFlag = true;
 
             MyOneTimeFlag = false;
@@ -630,7 +629,7 @@ namespace ElectricBaseboardRadiator {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataElectBaseboardRad->MyEnvrnFlag(BaseboardNum)) {
             // Initialize
             ZeroSourceSumHATsurf = 0.0;
             QBBElecRadSource = 0.0;
@@ -639,11 +638,11 @@ namespace ElectricBaseboardRadiator {
             LastSysTimeElapsed = 0.0;
             LastTimeStepSys = 0.0;
 
-            MyEnvrnFlag(BaseboardNum) = false;
+            state.dataElectBaseboardRad->MyEnvrnFlag(BaseboardNum) = false;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(BaseboardNum) = true;
+            state.dataElectBaseboardRad->MyEnvrnFlag(BaseboardNum) = true;
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
