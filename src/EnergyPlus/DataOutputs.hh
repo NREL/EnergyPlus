@@ -67,6 +67,27 @@ namespace EnergyPlus {
 
 namespace DataOutputs {
 
+    // Using/Aliasing
+
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    extern int const NumMonthlyReports;
+    extern Array1D_string const MonthlyNamedReports;
+
+    // DERIVED TYPE DEFINITIONS:
+
+    // MODULE VARIABLE DECLARATIONS:
+    extern int MaxConsideredOutputVariables; // Max Array size for OutputVariable pre-scanned
+    extern int NumConsideredOutputVariables; // Number of variables - pre-scanned, allowed for output
+    extern int iNumberOfRecords;             // Number of records in input
+    extern int iNumberOfDefaultedFields;     // number of defaulted fields
+    extern int iTotalFieldsWithDefaults;     // number of fields that can be defaulted
+    extern int iNumberOfAutoSizedFields;     // number of autosized fields
+    extern int iTotalAutoSizableFields;      // number of fields that can be autosized
+    extern int iNumberOfAutoCalcedFields;    // number of autocalculated fields
+    extern int iTotalAutoCalculatableFields; // number of fields that can be autocalculated
+
+    // Types
     struct OutputReportingVariables
     {
         OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName);
@@ -78,108 +99,32 @@ namespace DataOutputs {
         std::unique_ptr<RE2> case_insensitive_pattern;
     };
 
+
+
+    // Outer map has a Key of Variable Name, and value is inner map of Key=KeyValue, Value=struct OutputReportingVariables
+    // All of the string are considered as case insenstive (If we search for "ZONE MEAN AIR TEMPERATURE" it would find "Zone Mean Air Temperature")
+    extern std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables,
+                                                              UtilityRoutines::case_insensitive_hasher,
+                                                              UtilityRoutines::case_insensitive_comparator>,
+                               UtilityRoutines::case_insensitive_hasher,
+                               UtilityRoutines::case_insensitive_comparator> OutputVariablesForSimulation;
+
+    // Functions
+
+    // Clears the global data in DataOutputs.
+    // Needed for unit tests, should not be normally called.
+    void clear_state();
+
     // Check if a KeyValue/VariableName is inside the map OutputVariablesForSimulation
-    bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue, std::string const &VariableName);
+    bool FindItemInVariableList(std::string const &KeyedValue, std::string const &VariableName);
 
 } // namespace DataOutputs
 
 struct OutputsData : BaseGlobalStruct {
 
-    static int constexpr NumMonthlyReports = 63;
-    Array1D_string const MonthlyNamedReports = Array1D_string(NumMonthlyReports,
-                                                              {"ZONECOOLINGSUMMARYMONTHLY",
-                                                               "ZONEHEATINGSUMMARYMONTHLY",
-                                                               "ZONEELECTRICSUMMARYMONTHLY",
-                                                               "SPACEGAINSMONTHLY",
-                                                               "PEAKSPACEGAINSMONTHLY",
-                                                               "SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY",
-                                                               "ENERGYCONSUMPTIONELECTRICITYNATURALGASMONTHLY",
-                                                               "ENERGYCONSUMPTIONELECTRICITYGENERATEDPROPANEMONTHLY",
-                                                               "ENERGYCONSUMPTIONDIESELFUELOILMONTHLY",
-                                                               "ENERGYCONSUMPTIONDISTRICTHEATINGCOOLINGMONTHLY",
-                                                               "ENERGYCONSUMPTIONCOALGASOLINEMONTHLY",
-                                                               "ENERGYCONSUMPTIONOTHERFUELSMONTHLY",
-                                                               "ENDUSEENERGYCONSUMPTIONELECTRICITYMONTHLY",
-                                                               "ENDUSEENERGYCONSUMPTIONNATURALGASMONTHLY",
-                                                               "ENDUSEENERGYCONSUMPTIONDIESELMONTHLY",
-                                                               "ENDUSEENERGYCONSUMPTIONFUELOILMONTHLY",
-                                                               "ENDUSEENERGYCONSUMPTIONCOALMONTHLY",
-                                                               "ENDUSEENERGYCONSUMPTIONPROPANEMONTHLY",
-                                                               "ENDUSEENERGYCONSUMPTIONGASOLINEMONTHLY",
-                                                               "ENDUSEENERGYCONSUMPTIONOTHERFUELSMONTHLY",
-                                                               "PEAKENERGYENDUSEELECTRICITYPART1MONTHLY",
-                                                               "PEAKENERGYENDUSEELECTRICITYPART2MONTHLY",
-                                                               "ELECTRICCOMPONENTSOFPEAKDEMANDMONTHLY",
-                                                               "PEAKENERGYENDUSENATURALGASMONTHLY",
-                                                               "PEAKENERGYENDUSEDIESELMONTHLY",
-                                                               "PEAKENERGYENDUSEFUELOILMONTHLY",
-                                                               "PEAKENERGYENDUSECOALMONTHLY",
-                                                               "PEAKENERGYENDUSEPROPANEMONTHLY",
-                                                               "PEAKENERGYENDUSEGASOLINEMONTHLY",
-                                                               "PEAKENERGYENDUSEOTHERFUELSMONTHLY",
-                                                               "SETPOINTSNOTMETWITHTEMPERATURESMONTHLY",
-                                                               "COMFORTREPORTSIMPLE55MONTHLY",
-                                                               "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY",
-                                                               "OCCUPANTCOMFORTDATASUMMARYMONTHLY",
-                                                               "CHILLERREPORTMONTHLY",
-                                                               "TOWERREPORTMONTHLY",
-                                                               "BOILERREPORTMONTHLY",
-                                                               "DXREPORTMONTHLY",
-                                                               "WINDOWREPORTMONTHLY",
-                                                               "WINDOWENERGYREPORTMONTHLY",
-                                                               "WINDOWZONESUMMARYMONTHLY",
-                                                               "WINDOWENERGYZONESUMMARYMONTHLY",
-                                                               "AVERAGEOUTDOORCONDITIONSMONTHLY",
-                                                               "OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY",
-                                                               "OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY",
-                                                               "OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY",
-                                                               "OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY",
-                                                               "OUTDOORGROUNDCONDITIONSMONTHLY",
-                                                               "WINDOWACREPORTMONTHLY",
-                                                               "WATERHEATERREPORTMONTHLY",
-                                                               "GENERATORREPORTMONTHLY",
-                                                               "DAYLIGHTINGREPORTMONTHLY",
-                                                               "COILREPORTMONTHLY",
-                                                               "PLANTLOOPDEMANDREPORTMONTHLY",
-                                                               "FANREPORTMONTHLY",
-                                                               "PUMPREPORTMONTHLY",
-                                                               "CONDLOOPDEMANDREPORTMONTHLY",
-                                                               "ZONETEMPERATUREOSCILLATIONREPORTMONTHLY",
-                                                               "AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY",
-                                                               "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY",
-                                                               "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY",
-                                                               "MECHANICALVENTILATIONLOADSMONTHLY",
-                                                               "HEATEMISSIONSREPORTMONTHLY"});
-
-    int MaxConsideredOutputVariables = 0; // Max Array size for OutputVariable pre-scanned
-    int NumConsideredOutputVariables = 0; // Number of variables - pre-scanned, allowed for output
-    int iNumberOfRecords;                // Number of records in input
-    int iNumberOfDefaultedFields;        // number of defaulted fields
-    int iTotalFieldsWithDefaults;        // number of fields that can be defaulted
-    int iNumberOfAutoSizedFields;        // number of autosized fields
-    int iTotalAutoSizableFields;         // number of fields that can be autosized
-    int iNumberOfAutoCalcedFields;       // number of autocalculated fields
-    int iTotalAutoCalculatableFields;    // number of fields that can be autocalculated
-
-    // Object Data
-    std::unordered_map<std::string, std::unordered_map<std::string, DataOutputs::OutputReportingVariables,
-            UtilityRoutines::case_insensitive_hasher,
-            UtilityRoutines::case_insensitive_comparator>,
-            UtilityRoutines::case_insensitive_hasher,
-            UtilityRoutines::case_insensitive_comparator> OutputVariablesForSimulation;
-
     void clear_state() override
     {
-        this->MaxConsideredOutputVariables = 0;
-        this->NumConsideredOutputVariables = 0;
-        this->iNumberOfRecords = int();
-        this->iNumberOfDefaultedFields = int();
-        this->iTotalFieldsWithDefaults = int();
-        this->iNumberOfAutoSizedFields = int();
-        this->iTotalAutoSizableFields = int();
-        this->iNumberOfAutoCalcedFields = int();
-        this->iTotalAutoCalculatableFields = int();
-        this->OutputVariablesForSimulation.clear();
+
     }
 };
 

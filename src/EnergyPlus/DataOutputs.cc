@@ -49,7 +49,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -71,6 +70,106 @@ namespace DataOutputs {
     // PURPOSE OF THIS MODULE:
     // The module contains structure for output variables that are used in a small number of modules.
 
+    // METHODOLOGY EMPLOYED:
+    // na
+
+    // REFERENCES:
+    // na
+
+    // OTHER NOTES:
+    // na
+
+    // Using/Aliasing
+
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    int const NumMonthlyReports(63);
+    Array1D_string const MonthlyNamedReports(NumMonthlyReports,
+                                             {"ZONECOOLINGSUMMARYMONTHLY",
+                                              "ZONEHEATINGSUMMARYMONTHLY",
+                                              "ZONEELECTRICSUMMARYMONTHLY",
+                                              "SPACEGAINSMONTHLY",
+                                              "PEAKSPACEGAINSMONTHLY",
+                                              "SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY",
+                                              "ENERGYCONSUMPTIONELECTRICITYNATURALGASMONTHLY",
+                                              "ENERGYCONSUMPTIONELECTRICITYGENERATEDPROPANEMONTHLY",
+                                              "ENERGYCONSUMPTIONDIESELFUELOILMONTHLY",
+                                              "ENERGYCONSUMPTIONDISTRICTHEATINGCOOLINGMONTHLY",
+                                              "ENERGYCONSUMPTIONCOALGASOLINEMONTHLY",
+                                              "ENERGYCONSUMPTIONOTHERFUELSMONTHLY",
+                                              "ENDUSEENERGYCONSUMPTIONELECTRICITYMONTHLY",
+                                              "ENDUSEENERGYCONSUMPTIONNATURALGASMONTHLY",
+                                              "ENDUSEENERGYCONSUMPTIONDIESELMONTHLY",
+                                              "ENDUSEENERGYCONSUMPTIONFUELOILMONTHLY",
+                                              "ENDUSEENERGYCONSUMPTIONCOALMONTHLY",
+                                              "ENDUSEENERGYCONSUMPTIONPROPANEMONTHLY",
+                                              "ENDUSEENERGYCONSUMPTIONGASOLINEMONTHLY",
+                                              "ENDUSEENERGYCONSUMPTIONOTHERFUELSMONTHLY",
+                                              "PEAKENERGYENDUSEELECTRICITYPART1MONTHLY",
+                                              "PEAKENERGYENDUSEELECTRICITYPART2MONTHLY",
+                                              "ELECTRICCOMPONENTSOFPEAKDEMANDMONTHLY",
+                                              "PEAKENERGYENDUSENATURALGASMONTHLY",
+                                              "PEAKENERGYENDUSEDIESELMONTHLY",
+                                              "PEAKENERGYENDUSEFUELOILMONTHLY",
+                                              "PEAKENERGYENDUSECOALMONTHLY",
+                                              "PEAKENERGYENDUSEPROPANEMONTHLY",
+                                              "PEAKENERGYENDUSEGASOLINEMONTHLY",
+                                              "PEAKENERGYENDUSEOTHERFUELSMONTHLY",
+                                              "SETPOINTSNOTMETWITHTEMPERATURESMONTHLY",
+                                              "COMFORTREPORTSIMPLE55MONTHLY",
+                                              "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY",
+                                              "OCCUPANTCOMFORTDATASUMMARYMONTHLY",
+                                              "CHILLERREPORTMONTHLY",
+                                              "TOWERREPORTMONTHLY",
+                                              "BOILERREPORTMONTHLY",
+                                              "DXREPORTMONTHLY",
+                                              "WINDOWREPORTMONTHLY",
+                                              "WINDOWENERGYREPORTMONTHLY",
+                                              "WINDOWZONESUMMARYMONTHLY",
+                                              "WINDOWENERGYZONESUMMARYMONTHLY",
+                                              "AVERAGEOUTDOORCONDITIONSMONTHLY",
+                                              "OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY",
+                                              "OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY",
+                                              "OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY",
+                                              "OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY",
+                                              "OUTDOORGROUNDCONDITIONSMONTHLY",
+                                              "WINDOWACREPORTMONTHLY",
+                                              "WATERHEATERREPORTMONTHLY",
+                                              "GENERATORREPORTMONTHLY",
+                                              "DAYLIGHTINGREPORTMONTHLY",
+                                              "COILREPORTMONTHLY",
+                                              "PLANTLOOPDEMANDREPORTMONTHLY",
+                                              "FANREPORTMONTHLY",
+                                              "PUMPREPORTMONTHLY",
+                                              "CONDLOOPDEMANDREPORTMONTHLY",
+                                              "ZONETEMPERATUREOSCILLATIONREPORTMONTHLY",
+                                              "AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY",
+                                              "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY",
+                                              "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY",
+                                              "MECHANICALVENTILATIONLOADSMONTHLY",
+                                              "HEATEMISSIONSREPORTMONTHLY"});
+
+    // DERIVED TYPE DEFINITIONS:
+
+    // MODULE VARIABLE DECLARATIONS:
+    int MaxConsideredOutputVariables(0); // Max Array size for OutputVariable pre-scanned
+    int NumConsideredOutputVariables(0); // Number of variables - pre-scanned, allowed for output
+    int iNumberOfRecords;                // Number of records in input
+    int iNumberOfDefaultedFields;        // number of defaulted fields
+    int iTotalFieldsWithDefaults;        // number of fields that can be defaulted
+    int iNumberOfAutoSizedFields;        // number of autosized fields
+    int iTotalAutoSizableFields;         // number of fields that can be autosized
+    int iNumberOfAutoCalcedFields;       // number of autocalculated fields
+    int iTotalAutoCalculatableFields;    // number of fields that can be autocalculated
+
+    // Object Data
+    std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables,
+                                                      UtilityRoutines::case_insensitive_hasher,
+                                                      UtilityRoutines::case_insensitive_comparator>,
+                       UtilityRoutines::case_insensitive_hasher,
+                       UtilityRoutines::case_insensitive_comparator> OutputVariablesForSimulation;
+    // Functions
+
     OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName)
         : key(KeyValue), variableName(VariableName)
     {
@@ -90,7 +189,23 @@ namespace DataOutputs {
         }
     }
 
-    bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue, std::string const &VariableName)
+    // Clears the global data in DataOutputs.
+    // Needed for unit tests, should not be normally called.
+    void clear_state()
+    {
+        MaxConsideredOutputVariables = 0;
+        NumConsideredOutputVariables = 0;
+        iNumberOfRecords = int();
+        iNumberOfDefaultedFields = int();
+        iTotalFieldsWithDefaults = int();
+        iNumberOfAutoSizedFields = int();
+        iTotalAutoSizableFields = int();
+        iNumberOfAutoCalcedFields = int();
+        iTotalAutoCalculatableFields = int();
+        OutputVariablesForSimulation.clear();
+    }
+
+    bool FindItemInVariableList(std::string const &KeyedValue, std::string const &VariableName)
     {
 
         // FUNCTION INFORMATION:
@@ -103,8 +218,8 @@ namespace DataOutputs {
         // This function looks up a key and variable name value and determines if they are
         // in the list of required variables for a simulation.
 
-        auto const found_variable = state.dataOutput->OutputVariablesForSimulation.find(VariableName);
-        if (found_variable == state.dataOutput->OutputVariablesForSimulation.end()) return false;
+        auto const found_variable = OutputVariablesForSimulation.find(VariableName);
+        if (found_variable == OutputVariablesForSimulation.end()) return false;
 
         auto found_key = found_variable->second.find(KeyedValue);
         if (found_key != found_variable->second.end()) return true;

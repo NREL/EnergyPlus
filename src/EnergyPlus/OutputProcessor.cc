@@ -5268,7 +5268,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     }
 
     // DataOutputs::OutputVariablesForSimulation is case-insensitive
-    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(state, KeyedValue, VarName);
+    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
     bool OnMeter = false; // True if this variable is on a meter
 
     for (Loop = 1; Loop <= op->NumExtraVars; ++Loop) {
@@ -5503,7 +5503,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     }
 
     // DataOutputs::OutputVariablesForSimulation is case-insentitive
-    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(state, KeyedValue, VarName);
+    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
 
     for (Loop = 1; Loop <= op->NumExtraVars; ++Loop) {
 

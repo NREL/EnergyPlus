@@ -70,25 +70,45 @@ struct EnergyPlusData;
 
 namespace HVACDXSystem {
 
-    Real64 constexpr MinAirMassFlow(0.001);
-    Real64 constexpr LatCapTimeConst(45.0);
+    // Using/Aliasing
 
-    // Dehumidification control modes (DehumidControlMode)
-    int constexpr DehumidControl_None(0);
-    int constexpr DehumidControl_Multimode(1);
-    int constexpr DehumidControl_CoolReheat(2);
-
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    extern Real64 const MinAirMassFlow;
     // Compressor operation
     constexpr int On(1);  // normal compressor operation
     constexpr int Off(0); // signal DXCoil that compressor shouldn't run
+    // Dehumidification control modes (DehumidControlMode)
+    extern int const DehumidControl_None;
+    extern int const DehumidControl_Multimode;
+    extern int const DehumidControl_CoolReheat;
+    extern bool GetInputFlag; // Flag to get input only once
 
     // packaged TES modes
-    int constexpr OffMode(0);
-    int constexpr CoolingOnlyMode(1);
-    int constexpr CoolingAndChargeMode(2);
-    int constexpr CoolingAndDischargeMode(3);
-    int constexpr ChargeOnlyMode(4);
-    int constexpr DischargeOnlyMode(5);
+    extern int const OffMode;
+    extern int const CoolingOnlyMode;
+    extern int const CoolingAndChargeMode;
+    extern int const CoolingAndDischargeMode;
+    extern int const ChargeOnlyMode;
+    extern int const DischargeOnlyMode;
+
+    // DERIVED TYPE DEFINITIONS
+
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumDXSystem;     // The Number of DXCoolingSystems found in the Input
+    extern bool EconomizerFlag; // holds air loop economizer status
+
+    // Make this type allocatable
+    extern Array1D_bool CheckEquipName;
+
+    // Subroutine Specifications for the Module
+    // Driver/Manager Routines
+
+    // Get Input routines for module
+
+    // Update routine to check convergence and update nodes
+
+    // Types
 
     struct DXCoolingConditions
     {
@@ -194,6 +214,13 @@ namespace HVACDXSystem {
         {
         }
     };
+
+    // Object Data
+    extern Array1D<DXCoolingConditions> DXCoolingSystem;
+
+    // Functions
+
+    void clear_state();
 
     void SimDXCoolingSystem(EnergyPlusData &state, std::string const &DXCoolingSystemName,    // Name of DXSystem:Airloop object
                             bool const FirstHVACIteration,             // True when first HVAC iteration
@@ -334,19 +361,10 @@ namespace HVACDXSystem {
 } // namespace HVACDXSystem
 
 struct HVACDXSystemData : BaseGlobalStruct {
-    int NumDXSystem = 0;     // The Number of DXCoolingSystems found in the Input
-    bool EconomizerFlag = false; // holds air loop economizer status
-    bool GetInputFlag = true; // Flag to get input only once
-    Array1D_bool CheckEquipName;
-    Array1D<HVACDXSystem::DXCoolingConditions> DXCoolingSystem;
 
     void clear_state() override
     {
-        this->NumDXSystem = 0;
-        this->EconomizerFlag = false;
-        this->GetInputFlag = true;
-        this->CheckEquipName.deallocate();
-        this->DXCoolingSystem.deallocate();
+
     }
 };
 
