@@ -2498,7 +2498,6 @@ namespace WindowComplexManager {
         auto &sumsol = state.dataWindowComplexManager->sumsol;
         auto &theta = state.dataWindowComplexManager->theta;
         auto &q = state.dataWindowComplexManager->q;
-        auto &qprim = state.dataWindowComplexManager->qprim;
         auto &qv = state.dataWindowComplexManager->qv;
         auto &hcgap = state.dataWindowComplexManager->hcgap;
         auto &hrgap = state.dataWindowComplexManager->hrgap;
@@ -2509,16 +2508,13 @@ namespace WindowComplexManager {
         auto &Nu = state.dataWindowComplexManager->Nu;
         auto &Keff = state.dataWindowComplexManager->Keff;
         auto &ShadeGapKeffConv = state.dataWindowComplexManager->ShadeGapKeffConv;
-        auto &deltaTemp = state.dataWindowComplexManager->deltaTemp;
-        auto &iMinDT = state.dataWindowComplexManager->iMinDT;
-        auto &IDConst = state.dataWindowComplexManager->IDConst;
 
         Real64 totsol(0.0);                       // Total solar transmittance of the IGU
         Real64 tilt(0.0);                         // Window tilt [degrees]
         Real64 height(0.0);                       // IGU cavity height [m]
         Real64 heightt(0.0);                      // Total window height [m]
         Real64 width(0.0);                        // Window width [m]
-        
+
         // Deflection
         // Tarcog requires deflection as input parameters.  Deflection is NOT used in EnergyPlus simulations
         int CalcDeflection; // Deflection calculation flag:
