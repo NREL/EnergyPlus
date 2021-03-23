@@ -86,36 +86,17 @@ namespace FluidProperties {
     extern std::string const Steam;
     extern std::string const EthyleneGlycol;
     extern std::string const PropyleneGlycol;
-    extern int const EthyleneGlycolIndex;
-    extern int const PropyleneGlycolIndex;
-    extern int const iRefrig;
-    extern int const iGlycol;
-
+    int constexpr EthyleneGlycolIndex = -2;
+    int constexpr PropyleneGlycolIndex = -1;
+    int constexpr iRefri = 1;
+    int constexpr iGlyco = 1;
     // DERIVED TYPE DEFINITIONS
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
 
     // MODULE VARIABLE DECLARATIONS
-    extern bool GetInput;         // Used to get the input once only
-    extern int NumOfRefrigerants; // Total number of refrigerants input by user
-    extern int NumOfGlycols;      // Total number of glycols input by user
-    extern bool DebugReportGlycols;
-    extern bool DebugReportRefrigerants;
-    extern int GlycolErrorLimitTest;      // how many times error is printed with details before recurring called
-    extern int RefrigerantErrorLimitTest; // how many times error is printed with details before recurring called
-    extern Array1D_bool RefrigUsed;
-    extern Array1D_bool GlycolUsed;
-    extern int FluidIndex_Water;
-    extern int FluidIndex_EthyleneGlycol;
-    extern int FluidIndex_PropoleneGlycol;
 
-
-#ifdef EP_cache_GlycolSpecificHeat
-    extern int const t_sh_cache_size;
-    extern int const t_sh_precision_bits;
-    extern Int64 const t_sh_cache_mask;
-#endif
     // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTONS:
 
     // Types
@@ -366,21 +347,10 @@ namespace FluidProperties {
     };
 
     // Object Data
-    extern Array1D<FluidPropsRefrigerantData> RefrigData;
-    extern Array1D<FluidPropsRefrigErrors> RefrigErrorTracking;
-    extern Array1D<FluidPropsGlycolRawData> GlyRawData;
-    extern Array1D<FluidPropsGlycolData> GlycolData;
-    extern Array1D<FluidPropsGlycolErrors> GlycolErrorTracking;
-
-#ifdef EP_cache_GlycolSpecificHeat
-    extern Array1D<cached_tsh> cached_t_sh;
-#endif
 
     // Functions
 
-    void clear_state();
-
-    void InitializeGlycRoutines();
+    void InitializeGlycRoutines(EnergyPlusData &state);
 
     void GetFluidPropertiesData(EnergyPlusData &state);
 
@@ -671,7 +641,7 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    std::string GetGlycolNameByIndex(int Idx); // carries in substance index
+    std::string GetGlycolNameByIndex(EnergyPlusData &state, int Idx); // carries in substance index
 
     //*****************************************************************************
 
@@ -760,8 +730,58 @@ namespace FluidProperties {
 
 struct FluidPropertiesData : BaseGlobalStruct {
 
+    bool GetInput = true;      // Used to get the input once only
+    int NumOfRefrigerants = 0; // Total number of refrigerants input by user
+    int NumOfGlycols = 0;      // Total number of glycols input by user
+    bool DebugReportGlycols = false;
+    bool DebugReportRefrigerants = false;
+    int GlycolErrorLimitTest = 1;      // how many times error is printed with details before recurring called
+    int RefrigerantErrorLimitTest = 1; // how many times error is printed with details before recurring called
+    Array1D_bool RefrigUsed;
+    Array1D_bool GlycolUsed;
+    int FluidIndex_Water = 0;
+    int FluidIndex_EthyleneGlycol = 0;
+    int FluidIndex_PropoleneGlycol = 0;
+
+#ifdef EP_cache_GlycolSpecificHeat
+    int const t_sh_cache_size = 1024 * 1024;
+    int const t_sh_precision_bits = 24;
+    Int64 const t_sh_cache_mask = (t_sh_cache_size - 1);
+#endif
+
+    Array1D<FluidProperties::FluidPropsRefrigerantData> RefrigData;
+    Array1D<FluidProperties::FluidPropsRefrigErrors> RefrigErrorTracking;
+    Array1D<FluidProperties::FluidPropsGlycolRawData> GlyRawData;
+    Array1D<FluidProperties::FluidPropsGlycolData> GlycolData;
+    Array1D<FluidProperties::FluidPropsGlycolErrors> GlycolErrorTracking;
+
+#ifdef EP_cache_GlycolSpecificHeat
+    Array1D<FluidProperties::cached_tsh> cached_t_sh; // DIMENSION(t_sh_cache_size)
+#endif
+
     void clear_state() override
     {
+        this->GetInput = true;
+        this->NumOfRefrigerants = 0;
+        this->NumOfGlycols = 0;
+        this->DebugReportGlycols = false;
+        this->DebugReportRefrigerants = false;
+        this->GlycolErrorLimitTest = 1;
+        this->RefrigerantErrorLimitTest = 1;
+        this->RefrigUsed.deallocate();
+        this->GlycolUsed.deallocate();
+        this->FluidIndex_Water = 0;
+        this->FluidIndex_EthyleneGlycol = 0;
+        this->FluidIndex_PropoleneGlycol = 0;
+
+        this->RefrigData.deallocate();
+        this->RefrigErrorTracking.deallocate();
+        this->GlyRawData.deallocate();
+        this->GlycolData.deallocate();
+        this->GlycolErrorTracking.deallocate();
+#ifdef EP_cache_GlycolSpecificHeat
+        cached_t_sh.deallocate();
+#endif
 
     }
 };
