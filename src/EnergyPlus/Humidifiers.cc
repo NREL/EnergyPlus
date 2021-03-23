@@ -231,7 +231,7 @@ namespace Humidifiers {
         int MaxNums;                     // maximum Number of Numbers for each GetObjectItem call
         int MaxAlphas;                   // maximum Number of Numbers for each GetObjectItem call
         int IOStatus;                    // Used in GetObjectItem
-        static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
@@ -711,7 +711,7 @@ namespace Humidifiers {
         Real64 WaterSatEnthalpy;        // enthalpy of saturated water at 100C, J/kg
         bool IsAutoSize;                // Indicator to autosize
         bool HardSizeNoDesRun;          // Indicator to a hard-sized field with no design sizing data
-        static bool ErrorsFound(false); // TRUE if errors detected in input
+        bool ErrorsFound(false); // TRUE if errors detected in input
         Real64 NomPowerDes;             // Autosized nominal power for reporting
         Real64 NomPowerUser;            // Hardsized nominal power for reporting
         Real64 MassFlowDes;             // Design air mass flow rate

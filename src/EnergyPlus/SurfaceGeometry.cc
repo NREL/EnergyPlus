@@ -6996,10 +6996,10 @@ namespace SurfaceGeometry {
         int CountHTAlgoObjectsMultiSurf;
         int CountHTAlgoObjectsSurfList;
         int IOStatus; // Used in GetObjectItem
-        static bool ErrorsFoundSingleSurf(false);
-        static bool ErrorsFoundMultiSurf(false);
-        static bool ErrorsFoundSurfList(false);
-        static bool ErrorsFoundByConstruct(false);
+        bool ErrorsFoundSingleSurf(false);
+        bool ErrorsFoundMultiSurf(false);
+        bool ErrorsFoundSurfList(false);
+        bool ErrorsFoundByConstruct(false);
         DataSurfaces::iHeatTransferModel tmpAlgoInput;
         int Item;
         int Item1;

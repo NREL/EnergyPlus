@@ -120,7 +120,7 @@ namespace ExteriorEnergyUse {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int NumFuelEq;                  // Temporary -- number of ExteriorFuelEquipment statements
         int NumWtrEq;                   // Temporary -- number of ExteriorWaterEquipment statements
         std::string TypeString;         // Fuel Type string (returned from Validation)

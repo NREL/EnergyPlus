@@ -396,7 +396,7 @@ namespace HVACDXSystem {
         int NumNums;
         int IOStat;
         static std::string const RoutineName("GetDXCoolingSystemInput: "); // include trailing blank space
-        static bool ErrorsFound(false);                                    // If errors detected in input
+        bool ErrorsFound(false);                                    // If errors detected in input
         static bool ErrFound(false);                                       // used for mining functions
         bool IsNotOK;                                                      // Flag to verify name
         int DXCoolSysNum;

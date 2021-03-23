@@ -493,7 +493,7 @@ namespace EMSManager {
         int NumNums;     // Number of elements in the numeric array
         int AlphaNum;
         int IOStat; // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;

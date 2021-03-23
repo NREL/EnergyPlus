@@ -440,7 +440,7 @@ namespace EnergyPlus::HybridUnitaryAirConditioners {
         int NumNumbers;                   // Number of Numbers for each GetObjectItem call
         int NumFields;                    // Total number of fields in object
         int IOStatus;                     // Used in GetObjectItem
-        static bool ErrorsFound(false);   // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);   // Set to true if errors in input, fatal at end of routine
         bool IsNotOK;                     // Flag to verify name
         bool IsBlank;                     // Flag for blank name
         int UnitLoop;

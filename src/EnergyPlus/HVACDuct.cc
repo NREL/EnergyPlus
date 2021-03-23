@@ -204,8 +204,8 @@ namespace HVACDuct {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        auto& cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Duct";
         NumDucts = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         Duct.allocate(NumDucts);
