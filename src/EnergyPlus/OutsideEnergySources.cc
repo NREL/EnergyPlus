@@ -166,14 +166,14 @@ namespace EnergyPlus::OutsideEnergySources {
             int typeOf;
             int thisIndex;
             if (EnergySourceNum <= NumDistrictUnitsHeat) {
-                DataIPShortCuts::cCurrentModuleObject = "DistrictHeating";
+                state.dataIPShortCut->cCurrentModuleObject = "DistrictHeating";
                 reportVarPrefix = "District Heating ";
                 nodeNames = "Hot Water Nodes";
                 typeOf = DataPlant::TypeOf_PurchHotWater;
                 heatIndex++;
                 thisIndex = heatIndex;
             } else {
-                DataIPShortCuts::cCurrentModuleObject = "DistrictCooling";
+                state.dataIPShortCut->cCurrentModuleObject = "DistrictCooling";
                 reportVarPrefix = "District Cooling ";
                 nodeNames = "Chilled Water Nodes";
                 typeOf = DataPlant::TypeOf_PurchChilledWater;
@@ -183,63 +183,63 @@ namespace EnergyPlus::OutsideEnergySources {
 
             int NumAlphas = 0, NumNums = 0, IOStat = 0;
             inputProcessor->getObjectItem(state,
-                                          DataIPShortCuts::cCurrentModuleObject,
+                                          state.dataIPShortCut->cCurrentModuleObject,
                                           thisIndex,
-                                          DataIPShortCuts::cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          DataIPShortCuts::rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
                                           _,
-                                          DataIPShortCuts::lAlphaFieldBlanks,
-                                          DataIPShortCuts::cAlphaFieldNames);
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames);
 
             if (EnergySourceNum > 1) {
                 GlobalNames::VerifyUniqueInterObjectName(state, state.dataOutsideEnergySrcs->EnergySourceUniqueNames,
-                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                         DataIPShortCuts::cCurrentModuleObject,
-                                                         DataIPShortCuts::cAlphaFieldNames(1),
+                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                         state.dataIPShortCut->cCurrentModuleObject,
+                                                         state.dataIPShortCut->cAlphaFieldNames(1),
                                                          ErrorsFound);
             }
-            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name = DataIPShortCuts::cAlphaArgs(1);
-            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(2),
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(2),
                                                                                              ErrorsFound,
-                                                                                             DataIPShortCuts::cCurrentModuleObject,
-                                                                                             DataIPShortCuts::cAlphaArgs(1),
+                                                                                             state.dataIPShortCut->cCurrentModuleObject,
+                                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                                              1,
                                                                                              DataLoopNode::ObjectIsNotParent);
-            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(3),
                                                                                               ErrorsFound,
-                                                                                              DataIPShortCuts::cCurrentModuleObject,
-                                                                                              DataIPShortCuts::cAlphaArgs(1),
+                                                                                              state.dataIPShortCut->cCurrentModuleObject,
+                                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                               DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cAlphaArgs(2),
-                                               DataIPShortCuts::cAlphaArgs(3),
+            BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(2),
+                                               state.dataIPShortCut->cAlphaArgs(3),
                                                nodeNames);
-            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).NomCap = DataIPShortCuts::rNumericArgs(1);
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).NomCap = state.dataIPShortCut->rNumericArgs(1);
             if (state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).NomCap == DataSizing::AutoSize) {
                 state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).NomCapWasAutoSized = true;
             }
             state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyTransfer = 0.0;
             state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyRate = 0.0;
             state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyType = typeOf;
-            if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(4));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
                 if (state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum == 0) {
-                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name + "\", is not valid");
-                    ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) + "\" was not found.");
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name + "\", is not valid");
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\" was not found.");
                     ErrorsFound = true;
                 }
                 if (!ScheduleManager::CheckScheduleValueMinMax(state, state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum, ">=", 0.0)) {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name + "\", is not valid");
-                    ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) +
+                    ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name + "\", is not valid");
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
                                       "\" should not have negative values.");
                     ShowContinueError(state, "Negative values will be treated as zero, and the simulation continues.");
                 }
@@ -249,7 +249,7 @@ namespace EnergyPlus::OutsideEnergySources {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject +
+            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject +
                            ", Preceding condition caused termination.");
         }
     }

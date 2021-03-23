@@ -60,27 +60,11 @@ namespace EnergyPlus {
 
 namespace HVACCooledBeam {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const Passive_Cooled_Beam;
-    extern int const Active_Cooled_Beam;
-    extern Real64 const NomMassFlowPerBeam; // nominal water mass flow rate per beam [kg/s]
-    extern Real64 const MinWaterVel;        // minimum water velocity [m/s]
-    extern Real64 const Coeff2;
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_bool CheckEquipName;
-
-    // INTEGER :: NumPassiveCB = 0
-    // INTEGER :: NumActiveCB = 0
-    extern int NumCB;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HVACCooledBeam:
-
-    // Types
+    int constexpr Passive_Cooled_Beam(1);
+    int constexpr Active_Cooled_Beam(2);
+    Real64 constexpr NomMassFlowPerBeam(0.07); // nominal water mass flow rate per beam [kg/s]
+    Real64 constexpr MinWaterVel(0.2);         // minimum water velocity [m/s]
+    Real64 constexpr Coeff2(10000.0);
 
     struct CoolBeamData
     {
@@ -158,13 +142,6 @@ namespace HVACCooledBeam {
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
     };
 
-    // Object Data
-    extern Array1D<CoolBeamData> CoolBeam;
-
-    // Functions
-
-    void clear_state();
-
     void SimCoolBeam(EnergyPlusData &state,
                      std::string const &CompName,   // name of the cooled beam unit
                      bool FirstHVACIteration, // TRUE if first HVAC iteration in time step
@@ -210,10 +187,19 @@ namespace HVACCooledBeam {
 } // namespace HVACCooledBeam
 
 struct HVACCooledBeamData : BaseGlobalStruct {
+    Array1D_bool CheckEquipName;
+    int NumCB;
+    Array1D<HVACCooledBeam::CoolBeamData> CoolBeam;
+    bool GetInputFlag = true;              // First time, input is "gotten"
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
     void clear_state() override
     {
-
+        this->CheckEquipName.clear();
+        this->NumCB = 0;
+        this->CoolBeam.clear();
+        this->GetInputFlag = true;
+        this->ZoneEquipmentListChecked = false;
     }
 };
 

@@ -335,9 +335,9 @@ namespace DesiccantDehumidifiers {
         int NumAlphas;                         // Number of Alphas for each GetObjectItem call
         int NumNumbers;                        // Number of Numbers for each GetObjectItem call
         int IOStatus;                          // Used in GetObjectItem
-        static bool ErrorsFound(false);        // Set to true if errors in input, fatal at end of routine
-        static bool ErrorsFound2(false);       // Set to true if errors in input, fatal at end of routine
-        static bool ErrorsFoundGeneric(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);               // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound2(false);              // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFoundGeneric(false);        // Set to true if errors in input, fatal at end of routine
         bool IsNotOK;                          // Flag to verify name
         bool OANodeError;                      // Flag for check on outside air node
         std::string RegenFanInlet;             // Desiccant system regeneration air fan inlet node
@@ -1755,7 +1755,7 @@ namespace DesiccantDehumidifiers {
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
 
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int SteamIndex;                 // steam coil index
         Real64 FluidDensity;            // steam or water coil fluid density
         Real64 CoilMaxVolFlowRate;      // water or steam max volumetric water flow rate

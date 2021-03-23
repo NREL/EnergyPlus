@@ -233,7 +233,7 @@ namespace DualDuct {
         Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
         std::string CurrentModuleObject;             // for ease in getting objects
-        static bool ErrorsFound(false);              // If errors detected in input
+        bool ErrorsFound(false);              // If errors detected in input
         int CtrlZone;                                // controlled zone do loop index
         int SupAirIn;                                // controlled zone supply air inlet index
         int ADUNum;                                  // loop control to search Air Distribution Units

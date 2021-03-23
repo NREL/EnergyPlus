@@ -509,31 +509,31 @@ namespace EnergyPlus {
                 inputProcessor->getObjectItem(state,
                                               ObjName_ug_GeneralDomain,
                                               DomainNum,
-                                              DataIPShortCuts::cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum - 1];
 
                 // Get the name, validate
-                thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
-                UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
+                thisDomain.Name = state.dataIPShortCut->cAlphaArgs(1);
+                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject,
                                              ErrorsFound);
                 // Mesh extents, validated by IP
-                thisDomain.Extents.xMax = DataIPShortCuts::rNumericArgs(1);
-                thisDomain.Extents.yMax = DataIPShortCuts::rNumericArgs(2);
-                thisDomain.Extents.zMax = DataIPShortCuts::rNumericArgs(3);
+                thisDomain.Extents.xMax = state.dataIPShortCut->rNumericArgs(1);
+                thisDomain.Extents.yMax = state.dataIPShortCut->rNumericArgs(2);
+                thisDomain.Extents.zMax = state.dataIPShortCut->rNumericArgs(3);
 
                 // X direction mesh inputs, validated by IP
-                thisDomain.Mesh.X.RegionMeshCount = static_cast<int>(DataIPShortCuts::rNumericArgs(4));
+                thisDomain.Mesh.X.RegionMeshCount = static_cast<int>(state.dataIPShortCut->rNumericArgs(4));
                 {
-                    auto const meshDistribution(uppercased(DataIPShortCuts::cAlphaArgs(2)));
+                    auto const meshDistribution(uppercased(state.dataIPShortCut->cAlphaArgs(2)));
                     if (meshDistribution == "UNIFORM") {
                         thisDomain.Mesh.X.thisMeshDistribution = MeshDistribution::Uniform;
                     } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
@@ -545,25 +545,25 @@ namespace EnergyPlus {
                                     "An ODD-valued X mesh count was found in the input for symmetric geometric configuration.");
                             ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
                             ++thisDomain.Mesh.X.RegionMeshCount;
-                            thisDomain.Mesh.X.GeometricSeriesCoefficient = DataIPShortCuts::rNumericArgs(5);
+                            thisDomain.Mesh.X.GeometricSeriesCoefficient = state.dataIPShortCut->rNumericArgs(5);
                         } else {
                             thisDomain.Mesh.X.GeometricSeriesCoefficient = 1.0;
                         }
                     } else {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaFieldNames(2),
-                                                   DataIPShortCuts::cAlphaArgs(2),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(2),
+                                                   state.dataIPShortCut->cAlphaArgs(2),
                                                    "Use a choice from the available mesh type keys.",
                                                    ErrorsFound);
                     }
                 }
 
                 // Y direction mesh inputs, validated by IP
-                thisDomain.Mesh.Y.RegionMeshCount = static_cast<int>(DataIPShortCuts::rNumericArgs(6));
+                thisDomain.Mesh.Y.RegionMeshCount = static_cast<int>(state.dataIPShortCut->rNumericArgs(6));
                 {
-                    auto const meshDistribution(stripped(DataIPShortCuts::cAlphaArgs(3)));
+                    auto const meshDistribution(stripped(state.dataIPShortCut->cAlphaArgs(3)));
                     if (meshDistribution == "UNIFORM") {
                         thisDomain.Mesh.Y.thisMeshDistribution = MeshDistribution::Uniform;
                     } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
@@ -575,25 +575,25 @@ namespace EnergyPlus {
                                     "An ODD-valued Y mesh count was found in the input for symmetric geometric configuration.");
                             ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
                             ++thisDomain.Mesh.Y.RegionMeshCount;
-                            thisDomain.Mesh.Y.GeometricSeriesCoefficient = DataIPShortCuts::rNumericArgs(7);
+                            thisDomain.Mesh.Y.GeometricSeriesCoefficient = state.dataIPShortCut->rNumericArgs(7);
                         } else {
                             thisDomain.Mesh.Y.GeometricSeriesCoefficient = 1.0;
                         }
                     } else {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaFieldNames(3),
-                                                   DataIPShortCuts::cAlphaArgs(3),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(3),
+                                                   state.dataIPShortCut->cAlphaArgs(3),
                                                    "Use a choice from the available mesh type keys.",
                                                    ErrorsFound);
                     }
                 }
 
                 // Z direction mesh inputs, validated by IP
-                thisDomain.Mesh.Z.RegionMeshCount = static_cast<int>(DataIPShortCuts::rNumericArgs(8));
+                thisDomain.Mesh.Z.RegionMeshCount = static_cast<int>(state.dataIPShortCut->rNumericArgs(8));
                 {
-                    auto const meshDistribution(stripped(DataIPShortCuts::cAlphaArgs(4)));
+                    auto const meshDistribution(stripped(state.dataIPShortCut->cAlphaArgs(4)));
                     if (meshDistribution == "UNIFORM") {
                         thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::Uniform;
                     } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
@@ -605,41 +605,41 @@ namespace EnergyPlus {
                                     "An ODD-valued Z mesh count was found in the input for symmetric geometric configuration.");
                             ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
                             ++thisDomain.Mesh.Z.RegionMeshCount;
-                            thisDomain.Mesh.Z.GeometricSeriesCoefficient = DataIPShortCuts::rNumericArgs(9);
+                            thisDomain.Mesh.Z.GeometricSeriesCoefficient = state.dataIPShortCut->rNumericArgs(9);
                         } else {
                             thisDomain.Mesh.Z.GeometricSeriesCoefficient = 1.0;
                         }
                     } else {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaFieldNames(4),
-                                                   DataIPShortCuts::cAlphaArgs(4),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(4),
+                                                   state.dataIPShortCut->cAlphaArgs(4),
                                                    "Use a choice from the available mesh type keys.",
                                                    ErrorsFound);
                     }
                 }
 
                 // Soil properties, validated min/max by IP
-                thisDomain.GroundProperties.Conductivity = DataIPShortCuts::rNumericArgs(10);
-                thisDomain.GroundProperties.Density = DataIPShortCuts::rNumericArgs(11);
-                thisDomain.GroundProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(12);
+                thisDomain.GroundProperties.Conductivity = state.dataIPShortCut->rNumericArgs(10);
+                thisDomain.GroundProperties.Density = state.dataIPShortCut->rNumericArgs(11);
+                thisDomain.GroundProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(12);
 
                 // Moisture properties, validated min/max by IP, and converted to a fraction for computation here
-                thisDomain.Moisture.Theta_liq = DataIPShortCuts::rNumericArgs(13) / 100.0;
-                thisDomain.Moisture.Theta_sat = DataIPShortCuts::rNumericArgs(14) / 100.0;
+                thisDomain.Moisture.Theta_liq = state.dataIPShortCut->rNumericArgs(13) / 100.0;
+                thisDomain.Moisture.Theta_sat = state.dataIPShortCut->rNumericArgs(14) / 100.0;
 
                 // check if there is a basement
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "YES")) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "YES")) {
                     thisDomain.HasBasement = true;
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "NO")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "NO")) {
                     thisDomain.HasBasement = false;
                 } else {
                     IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ug_GeneralDomain,
-                                               DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cAlphaFieldNames(7),
-                                               DataIPShortCuts::cAlphaArgs(7),
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(7),
+                                               state.dataIPShortCut->cAlphaArgs(7),
                                                "Must enter either yes or no.",
                                                ErrorsFound);
                 }
@@ -649,11 +649,11 @@ namespace EnergyPlus {
 
                     // check if there are blank inputs related to the basement,
                     // IP can't catch this because they are inherently optional if there ISN'T a basement
-                    if (DataIPShortCuts::lNumericFieldBlanks(15) || DataIPShortCuts::lNumericFieldBlanks(16) ||
-                        DataIPShortCuts::lAlphaFieldBlanks(8) || DataIPShortCuts::lAlphaFieldBlanks(9) ||
-                        DataIPShortCuts::lAlphaFieldBlanks(10)) {
+                    if (state.dataIPShortCut->lNumericFieldBlanks(15) || state.dataIPShortCut->lNumericFieldBlanks(16) ||
+                        state.dataIPShortCut->lAlphaFieldBlanks(8) || state.dataIPShortCut->lAlphaFieldBlanks(9) ||
+                        state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                         ShowSevereError(state, "Erroneous basement inputs for " + ObjName_ug_GeneralDomain + '=' +
-                                        DataIPShortCuts::cAlphaArgs(1));
+                                        state.dataIPShortCut->cAlphaArgs(1));
                         ShowContinueError(state,
                                 "Object specified to have a basement, while at least one basement input was left blank.");
                         ErrorsFound = true;
@@ -661,57 +661,57 @@ namespace EnergyPlus {
 
                     // get dimensions for meshing
                     CurIndex = 15;
-                    thisDomain.BasementZone.Width = DataIPShortCuts::rNumericArgs(CurIndex);
+                    thisDomain.BasementZone.Width = state.dataIPShortCut->rNumericArgs(CurIndex);
                     if (thisDomain.BasementZone.Width <= 0.0) {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cNumericFieldNames(CurIndex),
-                                                   DataIPShortCuts::rNumericArgs(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cNumericFieldNames(CurIndex),
+                                                   state.dataIPShortCut->rNumericArgs(CurIndex),
                                                    "Basement width must be a positive nonzero value.",
                                                    ErrorsFound);
                     }
 
                     CurIndex = 16;
-                    thisDomain.BasementZone.Depth = DataIPShortCuts::rNumericArgs(CurIndex);
+                    thisDomain.BasementZone.Depth = state.dataIPShortCut->rNumericArgs(CurIndex);
                     if (thisDomain.BasementZone.Depth <= 0.0) {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cNumericFieldNames(CurIndex),
-                                                   DataIPShortCuts::rNumericArgs(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cNumericFieldNames(CurIndex),
+                                                   state.dataIPShortCut->rNumericArgs(CurIndex),
                                                    "Basement depth must be a positive nonzero value.",
                                                    ErrorsFound);
                     }
 
                     // check for dimension shift
                     CurIndex = 8;
-                    if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(CurIndex), "YES")) {
+                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(CurIndex), "YES")) {
                         thisDomain.BasementZone.ShiftPipesByWidth = true;
-                    } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(CurIndex), "NO")) {
+                    } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(CurIndex), "NO")) {
                         thisDomain.BasementZone.ShiftPipesByWidth = false;
                     } else {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                                   DataIPShortCuts::cAlphaArgs(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(CurIndex),
                                                    "Must enter either yes or no.",
                                                    ErrorsFound);
                     }
 
                     // get boundary condition model names and indices --error check
                     CurIndex = 9;
-                    thisDomain.BasementZone.WallBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
+                    thisDomain.BasementZone.WallBoundaryOSCMName = state.dataIPShortCut->cAlphaArgs(CurIndex);
                     thisDomain.BasementZone.WallBoundaryOSCMIndex =
                             UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName,
                                                             state.dataSurface->OSCM);
                     if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                                   DataIPShortCuts::cAlphaArgs(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(CurIndex),
                                                    "Could not match with an Other Side Conditions Model input object.",
                                                    ErrorsFound);
                     } else {
@@ -721,9 +721,9 @@ namespace EnergyPlus {
                             IssueSevereInputFieldError(state,
                                     RoutineName,
                                     ObjName_ug_GeneralDomain,
-                                    DataIPShortCuts::cAlphaArgs(1),
-                                    DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                    DataIPShortCuts::cAlphaArgs(CurIndex),
+                                    state.dataIPShortCut->cAlphaArgs(1),
+                                    state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                    state.dataIPShortCut->cAlphaArgs(CurIndex),
                                     "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                                     ErrorsFound);
                         } else {
@@ -732,16 +732,16 @@ namespace EnergyPlus {
                     }
 
                     CurIndex = 10;
-                    thisDomain.BasementZone.FloorBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
+                    thisDomain.BasementZone.FloorBoundaryOSCMName = state.dataIPShortCut->cAlphaArgs(CurIndex);
                     thisDomain.BasementZone.FloorBoundaryOSCMIndex =
                             UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName,
                                                             state.dataSurface->OSCM);
                     if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                                   DataIPShortCuts::cAlphaArgs(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(CurIndex),
                                                    "Could not match with an Other Side Conditions Model input object.",
                                                    ErrorsFound);
                     } else {
@@ -751,9 +751,9 @@ namespace EnergyPlus {
                             IssueSevereInputFieldError(state,
                                     RoutineName,
                                     ObjName_ug_GeneralDomain,
-                                    DataIPShortCuts::cAlphaArgs(1),
-                                    DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                    DataIPShortCuts::cAlphaArgs(CurIndex),
+                                    state.dataIPShortCut->cAlphaArgs(1),
+                                    state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                    state.dataIPShortCut->cAlphaArgs(CurIndex),
                                     "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                                     ErrorsFound);
                         } else {
@@ -763,34 +763,34 @@ namespace EnergyPlus {
                 }
 
                 // get some convergence tolerances, minimum/maximum are enforced by the IP, along with default values if user left them blank
-                thisDomain.SimControls.Convergence_CurrentToPrevIteration = DataIPShortCuts::rNumericArgs(17);
-                thisDomain.SimControls.MaxIterationsPerTS = static_cast<int>(DataIPShortCuts::rNumericArgs(18));
+                thisDomain.SimControls.Convergence_CurrentToPrevIteration = state.dataIPShortCut->rNumericArgs(17);
+                thisDomain.SimControls.MaxIterationsPerTS = static_cast<int>(state.dataIPShortCut->rNumericArgs(18));
 
                 // additional evapotranspiration parameter, min/max validated by IP
-                thisDomain.Moisture.GroundCoverCoefficient = DataIPShortCuts::rNumericArgs(19);
+                thisDomain.Moisture.GroundCoverCoefficient = state.dataIPShortCut->rNumericArgs(19);
 
                 // Allocate the circuit placeholder arrays
-                int const NumCircuitsInThisDomain = int(DataIPShortCuts::rNumericArgs(20));
+                int const NumCircuitsInThisDomain = int(state.dataIPShortCut->rNumericArgs(20));
 
                 // Need to store the ground temp stuff because it will get wiped out in the call to the circuit factory
-                std::string const groundTempType = DataIPShortCuts::cAlphaArgs(5);
-                std::string const groundTempName = DataIPShortCuts::cAlphaArgs(6);
+                std::string const groundTempType = state.dataIPShortCut->cAlphaArgs(5);
+                std::string const groundTempName = state.dataIPShortCut->cAlphaArgs(6);
 
                 // Need to loop once to store the names ahead of time because calling the segment factory will override cAlphaArgs
                 std::vector<std::string> circuitNamesToFind;
                 int const NumAlphasBeforePipeCircOne = 10;
                 for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                     CurIndex = CircuitCtr + NumAlphasBeforePipeCircOne;
-                    if (DataIPShortCuts::lAlphaFieldBlanks(CurIndex)) {
+                    if (state.dataIPShortCut->lAlphaFieldBlanks(CurIndex)) {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_Segment,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                                   DataIPShortCuts::cAlphaArgs(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(CurIndex),
                                                    "Expected a pipe circuit name, check pipe circuit count input field.",
                                                    ErrorsFound);
                     }
-                    circuitNamesToFind.push_back(DataIPShortCuts::cAlphaArgs(CurIndex));
+                    circuitNamesToFind.push_back(state.dataIPShortCut->cAlphaArgs(CurIndex));
                 }
                 // then we can loop through and allow the factory to be called and carry on
                 for (auto &circuitNameToFind : circuitNamesToFind) {
@@ -835,58 +835,58 @@ namespace EnergyPlus {
                 inputProcessor->getObjectItem(state,
                                               ObjName_ZoneCoupled_Slab,
                                               ZoneCoupledDomainCtr,
-                                              DataIPShortCuts::cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainCtr - 1];
 
                 // Get the name, validate
                 // Domain name
-                thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
+                thisDomain.Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 GlobalNames::VerifyUniqueInterObjectName(state,
-                        state.dataPlantPipingSysMgr->GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Slab,
-                        DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
+                        state.dataPlantPipingSysMgr->GroundDomainUniqueNames, state.dataIPShortCut->cAlphaArgs(1), ObjName_ZoneCoupled_Slab,
+                        state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
 
                 // Read in the rest of the inputs into the local type for clarity during transition
-                thisDomain.Extents.yMax = DataIPShortCuts::rNumericArgs(1);
-                thisDomain.PerimeterOffset = DataIPShortCuts::rNumericArgs(3);
-                thisDomain.GroundProperties.Conductivity = DataIPShortCuts::rNumericArgs(4);
-                thisDomain.GroundProperties.Density = DataIPShortCuts::rNumericArgs(5);
-                thisDomain.GroundProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(6);
-                thisDomain.Moisture.Theta_liq = DataIPShortCuts::rNumericArgs(7) / 100.0;
-                thisDomain.Moisture.Theta_sat = DataIPShortCuts::rNumericArgs(8) / 100.0;
-                thisDomain.Moisture.GroundCoverCoefficient = DataIPShortCuts::rNumericArgs(9);
-                thisDomain.HorizInsWidth = DataIPShortCuts::rNumericArgs(10);
-                thisDomain.VertInsDepth = DataIPShortCuts::rNumericArgs(11);
+                thisDomain.Extents.yMax = state.dataIPShortCut->rNumericArgs(1);
+                thisDomain.PerimeterOffset = state.dataIPShortCut->rNumericArgs(3);
+                thisDomain.GroundProperties.Conductivity = state.dataIPShortCut->rNumericArgs(4);
+                thisDomain.GroundProperties.Density = state.dataIPShortCut->rNumericArgs(5);
+                thisDomain.GroundProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(6);
+                thisDomain.Moisture.Theta_liq = state.dataIPShortCut->rNumericArgs(7) / 100.0;
+                thisDomain.Moisture.Theta_sat = state.dataIPShortCut->rNumericArgs(8) / 100.0;
+                thisDomain.Moisture.GroundCoverCoefficient = state.dataIPShortCut->rNumericArgs(9);
+                thisDomain.HorizInsWidth = state.dataIPShortCut->rNumericArgs(10);
+                thisDomain.VertInsDepth = state.dataIPShortCut->rNumericArgs(11);
 
                 // Set flag for slab in-grade or slab on-grade
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "INGRADE")) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "INGRADE")) {
                     thisDomain.SlabInGradeFlag = true;
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "ONGRADE")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "ONGRADE")) {
                     thisDomain.SlabInGradeFlag = false;
                 } else {
                     ShowSevereError(state,
-                            "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "=" + DataIPShortCuts::cAlphaArgs(5));
+                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "=" + state.dataIPShortCut->cAlphaArgs(5));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
                 // Get slab material properties
                 if (thisDomain.SlabInGradeFlag) {
-                    thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
+                    thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6),
                                                                                  state.dataMaterial->Material,
                                                                                  state.dataHeatBal->TotMaterials);
                     if (thisDomain.SlabMaterialNum == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
-                                        DataIPShortCuts::cAlphaArgs(6));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=" +
+                                        state.dataIPShortCut->cAlphaArgs(6));
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
@@ -902,13 +902,13 @@ namespace EnergyPlus {
 
                 // set flag for horizontal insulation
                 if (thisDomain.SlabInGradeFlag) {
-                    if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "NO")) {
+                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "NO")) {
                         thisDomain.HorizInsPresentFlag = false;
-                    } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "YES")) {
+                    } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "YES")) {
                         thisDomain.HorizInsPresentFlag = true;
                     } else {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + "=" +
-                                        DataIPShortCuts::cAlphaArgs(7));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + "=" +
+                                        state.dataIPShortCut->cAlphaArgs(7));
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
@@ -916,12 +916,12 @@ namespace EnergyPlus {
 
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
-                    thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(8),
+                    thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(8),
                                                                                      state.dataMaterial->Material,
                                                                                      state.dataHeatBal->TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + "=" +
-                                        DataIPShortCuts::cAlphaArgs(8));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + "=" +
+                                        state.dataIPShortCut->cAlphaArgs(8));
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
@@ -935,24 +935,24 @@ namespace EnergyPlus {
                                 thisDomain.HorizInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
-                            SiteGroundDomainNoMassMatError(state, DataIPShortCuts::cAlphaFieldNames(8), DataIPShortCuts::cAlphaArgs(8), thisDomain.Name);
+                            SiteGroundDomainNoMassMatError(state, state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), thisDomain.Name);
                         }
                     }
 
                     // Set flag for horizontal insulation extents
-                    if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "PERIMETER")) {
+                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "PERIMETER")) {
                         thisDomain.FullHorizInsPresent = false;
                         // Horizontal insulation perimeter width
                         if (thisDomain.HorizInsWidth <= 0.0) {
-                            ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(10));
+                            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(10));
                             ShowContinueError(state, "Found in: " + thisDomain.Name);
                             ErrorsFound = true;
                         }
-                    } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "FULL")) {
+                    } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "FULL")) {
                         thisDomain.FullHorizInsPresent = true;
                     } else {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + "=" +
-                                        DataIPShortCuts::cAlphaArgs(9));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + "=" +
+                                        state.dataIPShortCut->cAlphaArgs(9));
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
@@ -960,25 +960,25 @@ namespace EnergyPlus {
                 }
 
                 // set flag for vertical insulation
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(10), "NO")) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "NO")) {
                     thisDomain.VertInsPresentFlag = false;
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(10), "YES")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "YES")) {
                     thisDomain.VertInsPresentFlag = true;
                 } else {
                     ShowSevereError(state,
-                            "Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" + DataIPShortCuts::cAlphaArgs(10));
+                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + "=" + state.dataIPShortCut->cAlphaArgs(10));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
                 // Get vertical insulation material properties
                 if (thisDomain.VertInsPresentFlag) {
-                    thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(11),
+                    thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(11),
                                                                                     state.dataMaterial->Material,
                                                                                     state.dataHeatBal->TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" +
-                                        DataIPShortCuts::cAlphaArgs(11));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + "=" +
+                                        state.dataIPShortCut->cAlphaArgs(11));
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
@@ -992,26 +992,26 @@ namespace EnergyPlus {
                                 thisDomain.VertInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
-                            SiteGroundDomainNoMassMatError(state, DataIPShortCuts::cAlphaFieldNames(11), DataIPShortCuts::cAlphaArgs(11), thisDomain.Name);
+                            SiteGroundDomainNoMassMatError(state, state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11), thisDomain.Name);
                         }
                     }
 
                     // vertical insulation depth
                     if (thisDomain.VertInsDepth > thisDomain.Extents.yMax || thisDomain.VertInsDepth <= 0.0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(11));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(11));
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
                 }
 
                 // Set simulation interval flag
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(12), "TIMESTEP")) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(12), "TIMESTEP")) {
                     thisDomain.SimTimeStepFlag = true;
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(12), "HOURLY")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(12), "HOURLY")) {
                     thisDomain.SimHourlyFlag = true;
                 } else {
                     ShowSevereError(state,
-                            "Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + "=" + DataIPShortCuts::cAlphaArgs(12));
+                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + "=" + state.dataIPShortCut->cAlphaArgs(12));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
@@ -1022,13 +1022,13 @@ namespace EnergyPlus {
                 thisDomain.HasZoneCoupledSlab = true;
 
                 // get boundary condition model names and indices -- error check
-                thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), state.dataSurface->OSCM);
+                thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->OSCM);
                 if (thisDomain.ZoneCoupledOSCMIndex <= 0) {
                     IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Slab,
-                                               DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cAlphaFieldNames(4),
-                                               DataIPShortCuts::cAlphaArgs(4),
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(4),
+                                               state.dataIPShortCut->cAlphaArgs(4),
                                                "Could not match with an Other Side Conditions Model input object.",
                                                ErrorsFound);
                     ErrorsFound = true;
@@ -1038,9 +1038,9 @@ namespace EnergyPlus {
                         IssueSevereInputFieldError(state,
                                 RoutineName,
                                 ObjName_ZoneCoupled_Slab,
-                                DataIPShortCuts::cAlphaArgs(1),
-                                DataIPShortCuts::cAlphaFieldNames(4),
-                                DataIPShortCuts::cAlphaArgs(4),
+                                state.dataIPShortCut->cAlphaArgs(1),
+                                state.dataIPShortCut->cAlphaFieldNames(4),
+                                state.dataIPShortCut->cAlphaArgs(4),
                                 "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                                 ErrorsFound);
                         ErrorsFound = true;
@@ -1057,7 +1057,7 @@ namespace EnergyPlus {
                 thisDomain.SlabArea = ThisArea / 4; // We are only interested in 1/4 of total area due to symmetry
 
                 // Surface dimensions
-                Real64 thisAspectRatio = DataIPShortCuts::rNumericArgs(2);
+                Real64 thisAspectRatio = state.dataIPShortCut->rNumericArgs(2);
                 thisDomain.SlabWidth = std::sqrt(ThisArea / thisAspectRatio);
                 thisDomain.SlabLength = thisDomain.SlabWidth * thisAspectRatio;
 
@@ -1088,13 +1088,13 @@ namespace EnergyPlus {
                 thisDomain.Mesh.Y.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
                 thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
 
-                Real64 MeshCoefficient = DataIPShortCuts::rNumericArgs(12);
+                Real64 MeshCoefficient = state.dataIPShortCut->rNumericArgs(12);
                 if (MeshCoefficient == 0.0) MeshCoefficient = 1.6;
                 thisDomain.Mesh.X.GeometricSeriesCoefficient = MeshCoefficient;
                 thisDomain.Mesh.Y.GeometricSeriesCoefficient = MeshCoefficient;
                 thisDomain.Mesh.Z.GeometricSeriesCoefficient = MeshCoefficient;
 
-                int MeshCount = static_cast<int>(DataIPShortCuts::rNumericArgs(13));
+                int MeshCount = static_cast<int>(state.dataIPShortCut->rNumericArgs(13));
                 if (MeshCount == 0.0) MeshCount = 6;
                 thisDomain.Mesh.X.RegionMeshCount = MeshCount;
                 thisDomain.Mesh.Y.RegionMeshCount = MeshCount;
@@ -1104,8 +1104,8 @@ namespace EnergyPlus {
                         thisDomain.Mesh.Y.RegionMeshCount; // Need to clean this out at some point
 
                 // Farfield model
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(2),
-                                                                                DataIPShortCuts::cAlphaArgs(3));
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, state.dataIPShortCut->cAlphaArgs(2),
+                                                                                state.dataIPShortCut->cAlphaArgs(3));
 
                 // Other parameters
                 thisDomain.SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -1151,74 +1151,74 @@ namespace EnergyPlus {
                 inputProcessor->getObjectItem(state,
                                               ObjName_ZoneCoupled_Basement,
                                               BasementCtr,
-                                              DataIPShortCuts::cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum - 1];
 
                 // Get the name, validate
-                thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
+                thisDomain.Name = state.dataIPShortCut->cAlphaArgs(1);
                 GlobalNames::VerifyUniqueInterObjectName(state,
-                        state.dataPlantPipingSysMgr->GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Basement,
-                        DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
+                        state.dataPlantPipingSysMgr->GroundDomainUniqueNames, state.dataIPShortCut->cAlphaArgs(1), ObjName_ZoneCoupled_Basement,
+                        state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
 
                 // Read in the some of the inputs into the local type for clarity during transition
-                thisDomain.Extents.yMax = DataIPShortCuts::rNumericArgs(1);
-                Real64 const thisAspectRatio = DataIPShortCuts::rNumericArgs(2);
-                thisDomain.PerimeterOffset = DataIPShortCuts::rNumericArgs(3);
-                thisDomain.HorizInsWidth = DataIPShortCuts::rNumericArgs(10);
-                thisDomain.VertInsDepth = DataIPShortCuts::rNumericArgs(12);
+                thisDomain.Extents.yMax = state.dataIPShortCut->rNumericArgs(1);
+                Real64 const thisAspectRatio = state.dataIPShortCut->rNumericArgs(2);
+                thisDomain.PerimeterOffset = state.dataIPShortCut->rNumericArgs(3);
+                thisDomain.HorizInsWidth = state.dataIPShortCut->rNumericArgs(10);
+                thisDomain.VertInsDepth = state.dataIPShortCut->rNumericArgs(12);
 
                 // Other inputs
-                thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
+                thisDomain.Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Soil properties, validated min/max by IP
-                thisDomain.GroundProperties.Conductivity = DataIPShortCuts::rNumericArgs(4);
-                thisDomain.GroundProperties.Density = DataIPShortCuts::rNumericArgs(5);
-                thisDomain.GroundProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(6);
+                thisDomain.GroundProperties.Conductivity = state.dataIPShortCut->rNumericArgs(4);
+                thisDomain.GroundProperties.Density = state.dataIPShortCut->rNumericArgs(5);
+                thisDomain.GroundProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(6);
 
                 // Moisture properties, validated min/max by IP, and converted to a fraction for computation here
-                thisDomain.Moisture.Theta_liq = DataIPShortCuts::rNumericArgs(7) / 100.0;
-                thisDomain.Moisture.Theta_sat = DataIPShortCuts::rNumericArgs(8) / 100.0;
+                thisDomain.Moisture.Theta_liq = state.dataIPShortCut->rNumericArgs(7) / 100.0;
+                thisDomain.Moisture.Theta_sat = state.dataIPShortCut->rNumericArgs(8) / 100.0;
 
                 // check if there are blank inputs related to the basement,
-                if (DataIPShortCuts::lNumericFieldBlanks(11) || DataIPShortCuts::lAlphaFieldBlanks(5) ||
-                    DataIPShortCuts::lAlphaFieldBlanks(10)) {
+                if (state.dataIPShortCut->lNumericFieldBlanks(11) || state.dataIPShortCut->lAlphaFieldBlanks(5) ||
+                    state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                     ShowSevereError(state, "Erroneous basement inputs for " + ObjName_ZoneCoupled_Basement + '=' +
-                                    DataIPShortCuts::cAlphaArgs(1));
+                                    state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "At least one basement input was left blank.");
                     ErrorsFound = true;
                 }
 
                 // Basement zone depth
                 CurIndex = 11;
-                thisDomain.BasementZone.Depth = DataIPShortCuts::rNumericArgs(CurIndex);
+                thisDomain.BasementZone.Depth = state.dataIPShortCut->rNumericArgs(CurIndex);
                 if (thisDomain.BasementZone.Depth >= thisDomain.Extents.yMax ||
                     thisDomain.BasementZone.Depth <= 0.0) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(CurIndex));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(CurIndex));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
                 // get boundary condition model names and indices --error check
                 CurIndex = 4;
-                thisDomain.BasementZone.FloorBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
+                thisDomain.BasementZone.FloorBoundaryOSCMName = state.dataIPShortCut->cAlphaArgs(CurIndex);
                 thisDomain.BasementZone.FloorBoundaryOSCMIndex =
                         UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName,
                                                         state.dataSurface->OSCM);
                 if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
                     IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Basement,
-                                               DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                               DataIPShortCuts::cAlphaArgs(CurIndex),
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                               state.dataIPShortCut->cAlphaArgs(CurIndex),
                                                "Could not match with an Other Side Conditions Model input object.",
                                                ErrorsFound);
                 } else {
@@ -1227,9 +1227,9 @@ namespace EnergyPlus {
                         IssueSevereInputFieldError(state,
                                 RoutineName,
                                 ObjName_ZoneCoupled_Basement,
-                                DataIPShortCuts::cAlphaArgs(1),
-                                DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                DataIPShortCuts::cAlphaArgs(CurIndex),
+                                state.dataIPShortCut->cAlphaArgs(1),
+                                state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                state.dataIPShortCut->cAlphaArgs(CurIndex),
                                 "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                                 ErrorsFound);
                     } else {
@@ -1241,16 +1241,16 @@ namespace EnergyPlus {
                 }
 
                 CurIndex = 8;
-                thisDomain.BasementZone.WallBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
+                thisDomain.BasementZone.WallBoundaryOSCMName = state.dataIPShortCut->cAlphaArgs(CurIndex);
                 thisDomain.BasementZone.WallBoundaryOSCMIndex =
                         UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName,
                                                         state.dataSurface->OSCM);
                 if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
                     IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Basement,
-                                               DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                               DataIPShortCuts::cAlphaArgs(CurIndex),
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                               state.dataIPShortCut->cAlphaArgs(CurIndex),
                                                "Could not match with an Other Side Conditions Model input object.",
                                                ErrorsFound);
                     ErrorsFound = true;
@@ -1260,9 +1260,9 @@ namespace EnergyPlus {
                         IssueSevereInputFieldError(state,
                                 RoutineName,
                                 ObjName_ZoneCoupled_Basement,
-                                DataIPShortCuts::cAlphaArgs(1),
-                                DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                DataIPShortCuts::cAlphaArgs(CurIndex),
+                                state.dataIPShortCut->cAlphaArgs(1),
+                                state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                state.dataIPShortCut->cAlphaArgs(CurIndex),
                                 "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                                 ErrorsFound);
                         ErrorsFound = true;
@@ -1276,14 +1276,14 @@ namespace EnergyPlus {
                 thisDomain.SimControls.MaxIterationsPerTS = 250;
 
                 // additional evapotranspiration parameter, min/max validated by IP
-                thisDomain.Moisture.GroundCoverCoefficient = DataIPShortCuts::rNumericArgs(9);
+                thisDomain.Moisture.GroundCoverCoefficient = state.dataIPShortCut->rNumericArgs(9);
 
                 // assign the mesh count
                 int meshCount;
-                if (DataIPShortCuts::lNumericFieldBlanks(13)) {
+                if (state.dataIPShortCut->lNumericFieldBlanks(13)) {
                     meshCount = 4;
                 } else {
-                    meshCount = static_cast<int>(DataIPShortCuts::rNumericArgs(13));
+                    meshCount = static_cast<int>(state.dataIPShortCut->rNumericArgs(13));
                 }
                 thisDomain.Mesh.X.RegionMeshCount = meshCount;
                 thisDomain.Mesh.Y.RegionMeshCount = meshCount;
@@ -1299,26 +1299,26 @@ namespace EnergyPlus {
                 thisDomain.BasementInterfaceProperties.Density = 1.0;
 
                 // set flag for horizontal insulation
-                // Check DataIPShortCuts::cAlphaArgs value
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "NO")) {
+                // Check state.dataIPShortCut->cAlphaArgs value
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "NO")) {
                     thisDomain.HorizInsPresentFlag = false;
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "YES")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "YES")) {
                     thisDomain.HorizInsPresentFlag = true;
                 } else {
                     ShowSevereError(state,
-                            "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "=" + DataIPShortCuts::cAlphaArgs(5));
+                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "=" + state.dataIPShortCut->cAlphaArgs(5));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
-                    thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
+                    thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6),
                                                                                      state.dataMaterial->Material,
                                                                                      state.dataHeatBal->TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
-                                        DataIPShortCuts::cAlphaArgs(6));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=" +
+                                        state.dataIPShortCut->cAlphaArgs(6));
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
@@ -1332,37 +1332,37 @@ namespace EnergyPlus {
                                 thisDomain.HorizInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
-                            SiteGroundDomainNoMassMatError(state, DataIPShortCuts::cAlphaFieldNames(6), DataIPShortCuts::cAlphaArgs(6), thisDomain.Name);
+                            SiteGroundDomainNoMassMatError(state, state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), thisDomain.Name);
                         }
                     }
 
                     // Set flag for horizontal insulation extents
-                    if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "PERIMETER")) {
+                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "PERIMETER")) {
                         thisDomain.FullHorizInsPresent = false;
                         // Horizontal insulation perimeter width
                         if (thisDomain.HorizInsWidth <= 0.0) {
-                            ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(10));
+                            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(10));
                             ShowContinueError(state, "Found in: " + thisDomain.Name);
                             ErrorsFound = true;
                         }
-                    } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "FULL")) {
+                    } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "FULL")) {
                         thisDomain.FullHorizInsPresent = true;
                     } else {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + "=" +
-                                        DataIPShortCuts::cAlphaArgs(7));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + "=" +
+                                        state.dataIPShortCut->cAlphaArgs(7));
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
                 }
 
                 // set flag for vertical insulation
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "NO")) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "NO")) {
                     thisDomain.VertInsPresentFlag = false;
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "YES")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "YES")) {
                     thisDomain.VertInsPresentFlag = true;
                 } else {
                     ShowSevereError(state,
-                            "Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + "=" + DataIPShortCuts::cAlphaArgs(9));
+                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + "=" + state.dataIPShortCut->cAlphaArgs(9));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
@@ -1371,16 +1371,16 @@ namespace EnergyPlus {
                 if (thisDomain.VertInsPresentFlag) {
                     // Check if vertical insulation is in domain
                     if (thisDomain.VertInsDepth >= thisDomain.Extents.yMax || thisDomain.VertInsDepth <= 0.0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(12));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(12));
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
-                    thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10),
+                    thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(10),
                                                                                     state.dataMaterial->Material,
                                                                                     state.dataHeatBal->TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" +
-                                        DataIPShortCuts::cAlphaArgs(10));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + "=" +
+                                        state.dataIPShortCut->cAlphaArgs(10));
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
@@ -1394,27 +1394,27 @@ namespace EnergyPlus {
                                 thisDomain.VertInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
-                            SiteGroundDomainNoMassMatError(state, DataIPShortCuts::cAlphaFieldNames(10), DataIPShortCuts::cAlphaArgs(10), thisDomain.Name);
+                            SiteGroundDomainNoMassMatError(state, state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), thisDomain.Name);
                         }
                     }
                 }
 
                 // Set simulation interval flag
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(11), "TIMESTEP")) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "TIMESTEP")) {
                     thisDomain.SimTimeStepFlag = true;
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(11), "HOURLY")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "HOURLY")) {
                     thisDomain.SimHourlyFlag = true;
                 } else {
                     ShowSevereError(state,
-                            "Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" + DataIPShortCuts::cAlphaArgs(11));
+                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + "=" + state.dataIPShortCut->cAlphaArgs(11));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
                 // Farfield ground temperature model -- note this will overwrite the DataIPShortCuts variables
                 // so any other processing below this line won't have access to the cAlphaArgs, etc., here
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(2),
-                                                                                DataIPShortCuts::cAlphaArgs(3));
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, state.dataIPShortCut->cAlphaArgs(2),
+                                                                                state.dataIPShortCut->cAlphaArgs(3));
 
                 // Total surface area
                 Real64 ThisArea = 0.0;
@@ -1509,85 +1509,85 @@ namespace EnergyPlus {
                 inputProcessor->getObjectItem(state,
                                               ObjName_Circuit,
                                               PipeCircuitCounter,
-                                              DataIPShortCuts::cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
                 Circuit thisCircuit = Circuit();
 
                 // Get the name, validate
-                thisCircuit.Name = DataIPShortCuts::cAlphaArgs(1);
-                UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
+                thisCircuit.Name = state.dataIPShortCut->cAlphaArgs(1);
+                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject,
                                              ErrorsFound);
 
                 // Read pipe thermal properties, validated by IP
-                thisCircuit.PipeProperties.Conductivity = DataIPShortCuts::rNumericArgs(1);
-                thisCircuit.PipeProperties.Density = DataIPShortCuts::rNumericArgs(2);
-                thisCircuit.PipeProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(3);
+                thisCircuit.PipeProperties.Conductivity = state.dataIPShortCut->rNumericArgs(1);
+                thisCircuit.PipeProperties.Density = state.dataIPShortCut->rNumericArgs(2);
+                thisCircuit.PipeProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(3);
 
                 // Read pipe sizing, validated individually by IP, validated comparison here
-                thisCircuit.PipeSize.InnerDia = DataIPShortCuts::rNumericArgs(4);
-                thisCircuit.PipeSize.OuterDia = DataIPShortCuts::rNumericArgs(5);
+                thisCircuit.PipeSize.InnerDia = state.dataIPShortCut->rNumericArgs(4);
+                thisCircuit.PipeSize.OuterDia = state.dataIPShortCut->rNumericArgs(5);
                 if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                     CurIndex = 5;
                     IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_Circuit,
-                                               DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cNumericFieldNames(CurIndex),
-                                               DataIPShortCuts::rNumericArgs(CurIndex),
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cNumericFieldNames(CurIndex),
+                                               state.dataIPShortCut->rNumericArgs(CurIndex),
                                                "Outer diameter must be greater than inner diameter.",
                                                ErrorsFound);
                 }
 
                 // Read design flow rate, validated positive by IP
-                thisCircuit.DesignVolumeFlowRate = DataIPShortCuts::rNumericArgs(6);
+                thisCircuit.DesignVolumeFlowRate = state.dataIPShortCut->rNumericArgs(6);
 
                 // Read inlet and outlet node names and validate them
-                thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
+                thisCircuit.InletNodeName = state.dataIPShortCut->cAlphaArgs(2);
                 thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                        DataIPShortCuts::cAlphaArgs(2), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
+                        state.dataIPShortCut->cAlphaArgs(2), ErrorsFound, ObjName_Circuit, state.dataIPShortCut->cAlphaArgs(1),
                         DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1,
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
                     CurIndex = 2;
                     IssueSevereInputFieldError(state,
-                            RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
-                            DataIPShortCuts::cAlphaFieldNames(CurIndex), DataIPShortCuts::cAlphaArgs(CurIndex),
+                            RoutineName, ObjName_Circuit, state.dataIPShortCut->cAlphaArgs(1),
+                            state.dataIPShortCut->cAlphaFieldNames(CurIndex), state.dataIPShortCut->cAlphaArgs(CurIndex),
                             "Bad node name.", ErrorsFound);
                 }
-                thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
+                thisCircuit.OutletNodeName = state.dataIPShortCut->cAlphaArgs(3);
                 thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                        DataIPShortCuts::cAlphaArgs(3), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
+                        state.dataIPShortCut->cAlphaArgs(3), ErrorsFound, ObjName_Circuit, state.dataIPShortCut->cAlphaArgs(1),
                         DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1,
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {
                     CurIndex = 3;
                     IssueSevereInputFieldError(state,
-                            RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
-                            DataIPShortCuts::cAlphaFieldNames(CurIndex), DataIPShortCuts::cAlphaArgs(CurIndex),
+                            RoutineName, ObjName_Circuit, state.dataIPShortCut->cAlphaArgs(1),
+                            state.dataIPShortCut->cAlphaFieldNames(CurIndex), state.dataIPShortCut->cAlphaArgs(CurIndex),
                             "Bad node name.", ErrorsFound);
                 }
-                BranchNodeConnections::TestCompSet(state, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaArgs(2), DataIPShortCuts::cAlphaArgs(3),
+                BranchNodeConnections::TestCompSet(state, ObjName_Circuit, state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(3),
                                                    "Piping System Circuit Nodes");
 
                 // Convergence tolerance values, validated by IP
-                thisCircuit.Convergence_CurrentToPrevIteration = DataIPShortCuts::rNumericArgs(7);
-                thisCircuit.MaxIterationsPerTS = static_cast<int>(DataIPShortCuts::rNumericArgs(8));
+                thisCircuit.Convergence_CurrentToPrevIteration = state.dataIPShortCut->rNumericArgs(7);
+                thisCircuit.MaxIterationsPerTS = static_cast<int>(state.dataIPShortCut->rNumericArgs(8));
 
                 // Radial mesh inputs, validated by IP
                 // -- mesh thickness should be considered slightly dangerous until mesh dev engine can trap erroneous values
-                thisCircuit.NumRadialCells = static_cast<int>(DataIPShortCuts::rNumericArgs(9));
-                thisCircuit.RadialMeshThickness = DataIPShortCuts::rNumericArgs(10);
+                thisCircuit.NumRadialCells = static_cast<int>(state.dataIPShortCut->rNumericArgs(9));
+                thisCircuit.RadialMeshThickness = state.dataIPShortCut->rNumericArgs(10);
 
                 // Read number of pipe segments for this circuit, allocate arrays
-                int const NumPipeSegments = static_cast<int>(DataIPShortCuts::rNumericArgs(11));
+                int const NumPipeSegments = static_cast<int>(state.dataIPShortCut->rNumericArgs(11));
 
                 // Need to loop once to store the names ahead of time because calling the segment factory will override cAlphaArgs
                 std::vector<std::string> segmentNamesToFind;
@@ -1595,16 +1595,16 @@ namespace EnergyPlus {
                 for (int ThisCircuitPipeSegmentCounter = 1;
                      ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                     CurIndex = ThisCircuitPipeSegmentCounter + NumAlphasBeforeSegmentOne;
-                    if (DataIPShortCuts::lAlphaFieldBlanks(CurIndex)) {
+                    if (state.dataIPShortCut->lAlphaFieldBlanks(CurIndex)) {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_Circuit,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                                   DataIPShortCuts::cAlphaArgs(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(CurIndex),
                                                    "Expected a pipe segment name, check pipe segment count input field.",
                                                    ErrorsFound);
                     }
-                    segmentNamesToFind.push_back(DataIPShortCuts::cAlphaArgs(CurIndex));
+                    segmentNamesToFind.push_back(state.dataIPShortCut->cAlphaArgs(CurIndex));
                 }
                 // then we can loop through and allow the factory to be called and carry on
                 for (auto &segmentNameToFind : segmentNamesToFind) {
@@ -1626,33 +1626,33 @@ namespace EnergyPlus {
                 inputProcessor->getObjectItem(state,
                                               ObjName_HorizTrench,
                                               HorizontalGHXCtr,
-                                              DataIPShortCuts::cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
-                std::string thisTrenchName = DataIPShortCuts::cAlphaArgs(1);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
+                std::string thisTrenchName = state.dataIPShortCut->cAlphaArgs(1);
 
                 Circuit thisCircuit;
                 thisCircuit.IsActuallyPartOfAHorizontalTrench = true;
                 thisCircuit.Name = thisTrenchName;
 
                 // Read pipe thermal properties
-                thisCircuit.PipeProperties.Conductivity = DataIPShortCuts::rNumericArgs(11);
-                thisCircuit.PipeProperties.Density = DataIPShortCuts::rNumericArgs(12);
-                thisCircuit.PipeProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(13);
+                thisCircuit.PipeProperties.Conductivity = state.dataIPShortCut->rNumericArgs(11);
+                thisCircuit.PipeProperties.Density = state.dataIPShortCut->rNumericArgs(12);
+                thisCircuit.PipeProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(13);
 
                 // Pipe sizing
-                thisCircuit.PipeSize.InnerDia = DataIPShortCuts::rNumericArgs(5);
-                thisCircuit.PipeSize.OuterDia = DataIPShortCuts::rNumericArgs(6);
+                thisCircuit.PipeSize.InnerDia = state.dataIPShortCut->rNumericArgs(5);
+                thisCircuit.PipeSize.OuterDia = state.dataIPShortCut->rNumericArgs(6);
 
                 // Issue a severe if Inner >= Outer diameter
                 if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
-                    ShowSevereError(state, RoutineName + ": " + ObjName_HorizTrench + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has invalid pipe diameters.");
+                    ShowSevereError(state, RoutineName + ": " + ObjName_HorizTrench + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid pipe diameters.");
                     ShowContinueError(state,
                                       format("Outer diameter [{:.3T}] must be greater than inner diameter [{:.3T}].",
                                              thisCircuit.PipeSize.OuterDia,
@@ -1661,10 +1661,10 @@ namespace EnergyPlus {
                 }
 
                 // Read design flow rate, validated positive by IP
-                thisCircuit.DesignVolumeFlowRate = DataIPShortCuts::rNumericArgs(1);
+                thisCircuit.DesignVolumeFlowRate = state.dataIPShortCut->rNumericArgs(1);
 
                 // Read inlet and outlet node names and validate them
-                thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
+                thisCircuit.InletNodeName = state.dataIPShortCut->cAlphaArgs(2);
                 thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state, thisCircuit.InletNodeName,
                                                                                ErrorsFound,
                                                                                ObjName_HorizTrench,
@@ -1676,7 +1676,7 @@ namespace EnergyPlus {
                 if (thisCircuit.InletNodeNum == 0) {
                     CurIndex = 2;
                 }
-                thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
+                thisCircuit.OutletNodeName = state.dataIPShortCut->cAlphaArgs(3);
                 thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, thisCircuit.OutletNodeName,
                                                                                 ErrorsFound,
                                                                                 ObjName_HorizTrench,
@@ -1771,31 +1771,31 @@ namespace EnergyPlus {
                 inputProcessor->getObjectItem(state,
                                               ObjName_Segment,
                                               SegmentCtr,
-                                              DataIPShortCuts::cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
                 Segment thisSegment;
 
                 // Get the name, validate
-                thisSegment.Name = DataIPShortCuts::cAlphaArgs(1);
-                UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
+                thisSegment.Name = state.dataIPShortCut->cAlphaArgs(1);
+                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject,
                                              ErrorsFound);
                 // Read in the pipe location, validated as positive by IP
                 // -- note that these values will be altered by the main GetInput routine in two ways:
                 //   1) shift for basement wall if selected
                 //   2) invert y direction to be measured from domain bottom surface for calculations
-                thisSegment.PipeLocation = PointF(DataIPShortCuts::rNumericArgs(1), DataIPShortCuts::rNumericArgs(2));
+                thisSegment.PipeLocation = PointF(state.dataIPShortCut->rNumericArgs(1), state.dataIPShortCut->rNumericArgs(2));
 
                 // Read in the flow direction
                 {
-                    auto const SELECT_CASE_var(stripped(DataIPShortCuts::cAlphaArgs(2)));
+                    auto const SELECT_CASE_var(stripped(state.dataIPShortCut->cAlphaArgs(2)));
                     if (SELECT_CASE_var == "INCREASINGZ") {
                         thisSegment.FlowDirection = SegmentFlow::IncreasingZ;
                     } else if (SELECT_CASE_var == "DECREASINGZ") {
@@ -1804,9 +1804,9 @@ namespace EnergyPlus {
                         CurIndex = 2;
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_Segment,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                                   DataIPShortCuts::cAlphaArgs(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                                   state.dataIPShortCut->cAlphaArgs(CurIndex),
                                                    "Invalid flow direction, use one of the available keys.",
                                                    ErrorsFound);
                     }
@@ -1855,26 +1855,26 @@ namespace EnergyPlus {
                 inputProcessor->getObjectItem(state,
                                               ObjName_HorizTrench,
                                               HorizontalGHXCtr,
-                                              DataIPShortCuts::cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainCtr - 1];
 
                 // Get the name, validate
-                std::string thisTrenchName = DataIPShortCuts::cAlphaArgs(1);
-                UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
+                std::string thisTrenchName = state.dataIPShortCut->cAlphaArgs(1);
+                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject,
                                              ErrorsFound);
 
-                int const NumPipeSegments = static_cast<int>(DataIPShortCuts::rNumericArgs(3));
-                Real64 const thisInterPipeSpacing = DataIPShortCuts::rNumericArgs(4);
-                Real64 const thisBurialDepth = DataIPShortCuts::rNumericArgs(7);
+                int const NumPipeSegments = static_cast<int>(state.dataIPShortCut->rNumericArgs(3));
+                Real64 const thisInterPipeSpacing = state.dataIPShortCut->rNumericArgs(4);
+                Real64 const thisBurialDepth = state.dataIPShortCut->rNumericArgs(7);
 
                 //******* We'll first set up the domain ********
                 // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
@@ -1882,7 +1882,7 @@ namespace EnergyPlus {
                 thisDomain.Name = format("HorizontalTrenchDomain{:4}", HorizontalGHXCtr);
                 thisDomain.Extents.xMax = (double(NumPipeSegments) + 1.0) * thisInterPipeSpacing;
                 thisDomain.Extents.yMax = 2.0 * thisBurialDepth;
-                thisDomain.Extents.zMax = DataIPShortCuts::rNumericArgs(2);
+                thisDomain.Extents.zMax = state.dataIPShortCut->rNumericArgs(2);
 
                 // set up the mesh with some default parameters
                 thisDomain.Mesh.X.RegionMeshCount = 4;
@@ -1893,20 +1893,20 @@ namespace EnergyPlus {
                 thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::Uniform;
 
                 // Soil properties
-                thisDomain.GroundProperties.Conductivity = DataIPShortCuts::rNumericArgs(8);
-                thisDomain.GroundProperties.Density = DataIPShortCuts::rNumericArgs(9);
-                thisDomain.GroundProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(10);
+                thisDomain.GroundProperties.Conductivity = state.dataIPShortCut->rNumericArgs(8);
+                thisDomain.GroundProperties.Density = state.dataIPShortCut->rNumericArgs(9);
+                thisDomain.GroundProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(10);
 
                 // Moisture properties
-                thisDomain.Moisture.Theta_liq = DataIPShortCuts::rNumericArgs(14) / 100.0;
-                thisDomain.Moisture.Theta_sat = DataIPShortCuts::rNumericArgs(15) / 100.0;
+                thisDomain.Moisture.Theta_liq = state.dataIPShortCut->rNumericArgs(14) / 100.0;
+                thisDomain.Moisture.Theta_sat = state.dataIPShortCut->rNumericArgs(15) / 100.0;
 
                 // Other parameters
                 thisDomain.SimControls.Convergence_CurrentToPrevIteration = 0.001;
                 thisDomain.SimControls.MaxIterationsPerTS = 250;
 
                 // additional evapotranspiration parameter, min/max validated by IP
-                thisDomain.Moisture.GroundCoverCoefficient = DataIPShortCuts::rNumericArgs(16);
+                thisDomain.Moisture.GroundCoverCoefficient = state.dataIPShortCut->rNumericArgs(16);
 
                 //******* We'll next set up the circuit ********
                 // then we can loop through and allow the factory to be called and carry on
@@ -1914,8 +1914,8 @@ namespace EnergyPlus {
 
                 // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
                 // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(4),
-                                                                                DataIPShortCuts::cAlphaArgs(5));
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, state.dataIPShortCut->cAlphaArgs(4),
+                                                                                state.dataIPShortCut->cAlphaArgs(5));
 
                 //******* Then we'll do the segments *******!
                 for (int ThisCircuitPipeSegmentCounter = 1;

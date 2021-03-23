@@ -12440,7 +12440,7 @@ namespace EnergyPlus::DXCoils {
                     OutletAirDryBulbTemp = LSOutletAirDryBulbTemp;
                     OutletAirEnthalpy = LSOutletAirEnthalpy;
                 }
-                
+
                 // get low speed EIR at current conditions
                 EIRTempModFacLS = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(SpeedNum), InletAirWetBulbC, CondInletTemp);
                 EIRFlowModFacLS = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow(SpeedNum), AirMassFlowRatioLS);
@@ -13556,7 +13556,7 @@ namespace EnergyPlus::DXCoils {
         int Iter;
         Real64 ExternalStatic;
         Real64 FanStaticPressureRise;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         Real64 FanHeatCorrection;
         Real64 FanPowerCorrection;
         Real64 FanPowerPerEvapAirFlowRate;
@@ -14001,7 +14001,7 @@ namespace EnergyPlus::DXCoils {
         int AirSysNum;
         int BranchNum;
         int CompNum;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         FoundBranch = 0;
         FoundAirSysNum = 0;

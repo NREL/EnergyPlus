@@ -409,7 +409,6 @@ namespace EnergyPlus::MixedAir {
         using Humidifiers::SimHumidifier;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
-        using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using SimAirServingZones::SolveWaterCoilController;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -541,11 +540,11 @@ namespace EnergyPlus::MixedAir {
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
-                                             HXAssistedCoil(CompIndex).ControllerName,
-                                             HXAssistedCoil(CompIndex).ControllerIndex,
+                                             state.dataHVACAssistedCC->HXAssistedCoil(CompIndex).ControllerName,
+                                             state.dataHVACAssistedCC->HXAssistedCoil(CompIndex).ControllerIndex,
                                              true);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    state.dataHVACControllers->ControllerProps(HXAssistedCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    state.dataHVACControllers->ControllerProps(state.dataHVACAssistedCC->HXAssistedCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
@@ -823,7 +822,7 @@ namespace EnergyPlus::MixedAir {
         int InListNum;
         int ListNum;
         int NumSimpControllers; // number of Controller:Simple objects in an OA System
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         std::string CurrentModuleObject; // Object type for getting and messages
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
@@ -1198,7 +1197,7 @@ namespace EnergyPlus::MixedAir {
         Array1D_string cNumericFields;   // Numeric field names
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static bool ErrorsFound(false);  // Flag identifying errors found during get input
+        bool ErrorsFound(false);  // Flag identifying errors found during get input
         int ZoneListNum;                 // Index to Zone List
         int MechVentZoneCount;           // Index counter for zones with mechanical ventilation
         int NumArg;                      // Number of arguments from GetObjectDefMaxArgs call
@@ -1938,7 +1937,7 @@ namespace EnergyPlus::MixedAir {
         Array1D_string cNumericFields;   // Numeric field names
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         if (!state.dataMixedAir->GetOAMixerInputFlag) return;
 
@@ -5024,7 +5023,7 @@ namespace EnergyPlus::MixedAir {
     // Beginning Utility Section of the Module
     //******************************************************************************
 
-    Real64 MixedAirControlTempResidual(EnergyPlusData &state, 
+    Real64 MixedAirControlTempResidual(EnergyPlusData &state,
                                        Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
                                        Array1D<Real64> const &Par // par(1) = mixed node number
     )
@@ -5993,7 +5992,6 @@ namespace EnergyPlus::MixedAir {
         // It must be either found on a AirLoopHVAC or AirLoopHVAC:OutdoorAirSystem.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CheckControllerLists");
@@ -6024,17 +6022,17 @@ namespace EnergyPlus::MixedAir {
 
         for (Item = 1; Item <= NumControllers; ++Item) {
 
-            inputProcessor->getObjectItem(state, CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat);
-            ControllerListName = cAlphaArgs(1);
+            inputProcessor->getObjectItem(state, CurrentModuleObject, Item, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStat);
+            ControllerListName = state.dataIPShortCut->cAlphaArgs(1);
             Count = 0;
 
             // Check AirLoopHVAC -- brute force, get each AirLoopHVAC
 
             for (Loop = 1; Loop <= NumAirLoop; ++Loop) {
-                inputProcessor->getObjectItem(state, AirLoopObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat);
-                if (cAlphaArgs(2) != ControllerListName) continue;
+                inputProcessor->getObjectItem(state, AirLoopObject, Loop, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStat);
+                if (state.dataIPShortCut->cAlphaArgs(2) != ControllerListName) continue;
                 ++Count;
-                if (Count == 1) AirLoopName = cAlphaArgs(1);
+                if (Count == 1) AirLoopName = state.dataIPShortCut->cAlphaArgs(1);
             }
 
             //  Now check AirLoopHVAC and AirLoopHVAC:OutdoorAirSystem

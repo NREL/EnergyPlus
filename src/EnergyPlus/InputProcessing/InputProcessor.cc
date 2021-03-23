@@ -346,12 +346,12 @@ void InputProcessor::processInput(EnergyPlusData &state)
     int MaxNumeric = 0;
     getMaxSchemaArgs(MaxArgs, MaxAlpha, MaxNumeric);
 
-    DataIPShortCuts::cAlphaFieldNames.allocate(MaxAlpha);
-    DataIPShortCuts::cAlphaArgs.allocate(MaxAlpha);
-    DataIPShortCuts::lAlphaFieldBlanks.dimension(MaxAlpha, false);
-    DataIPShortCuts::cNumericFieldNames.allocate(MaxNumeric);
-    DataIPShortCuts::rNumericArgs.dimension(MaxNumeric, 0.0);
-    DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
+    state.dataIPShortCut->cAlphaFieldNames.allocate(MaxAlpha);
+    state.dataIPShortCut->cAlphaArgs.allocate(MaxAlpha);
+    state.dataIPShortCut->lAlphaFieldBlanks.dimension(MaxAlpha, false);
+    state.dataIPShortCut->cNumericFieldNames.allocate(MaxNumeric);
+    state.dataIPShortCut->rNumericArgs.dimension(MaxNumeric, 0.0);
+    state.dataIPShortCut->lNumericFieldBlanks.dimension(MaxNumeric, false);
 
     reportIDFRecordsStats(state);
 }
@@ -1558,62 +1558,62 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
     int CountM;
     std::string Multiples;
 
-    DataIPShortCuts::cCurrentModuleObject = "Output:PreprocessorMessage";
-    NumPrePM = getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+    state.dataIPShortCut->cCurrentModuleObject = "Output:PreprocessorMessage";
+    NumPrePM = getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
     if (NumPrePM > 0) {
-        getObjectDefMaxArgs(state, DataIPShortCuts::cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
-        DataIPShortCuts::cAlphaArgs({1, NumAlphas}) = BlankString;
+        getObjectDefMaxArgs(state, state.dataIPShortCut->cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        state.dataIPShortCut->cAlphaArgs({1, NumAlphas}) = BlankString;
         for (CountP = 1; CountP <= NumPrePM; ++CountP) {
             getObjectItem(state,
-                          DataIPShortCuts::cCurrentModuleObject,
+                          state.dataIPShortCut->cCurrentModuleObject,
                           CountP,
-                          DataIPShortCuts::cAlphaArgs,
+                          state.dataIPShortCut->cAlphaArgs,
                           NumAlphas,
-                          DataIPShortCuts::rNumericArgs,
+                          state.dataIPShortCut->rNumericArgs,
                           NumNumbers,
                           IOStat,
-                          DataIPShortCuts::lNumericFieldBlanks,
-                          DataIPShortCuts::lAlphaFieldBlanks,
-                          DataIPShortCuts::cAlphaFieldNames,
-                          DataIPShortCuts::cNumericFieldNames);
-            if (DataIPShortCuts::cAlphaArgs(1).empty()) DataIPShortCuts::cAlphaArgs(1) = "Unknown";
+                          state.dataIPShortCut->lNumericFieldBlanks,
+                          state.dataIPShortCut->lAlphaFieldBlanks,
+                          state.dataIPShortCut->cAlphaFieldNames,
+                          state.dataIPShortCut->cNumericFieldNames);
+            if (state.dataIPShortCut->cAlphaArgs(1).empty()) state.dataIPShortCut->cAlphaArgs(1) = "Unknown";
             if (NumAlphas > 3) {
                 Multiples = "s";
             } else {
                 Multiples = BlankString;
             }
-            if (DataIPShortCuts::cAlphaArgs(2).empty()) DataIPShortCuts::cAlphaArgs(2) = "Unknown";
+            if (state.dataIPShortCut->cAlphaArgs(2).empty()) state.dataIPShortCut->cAlphaArgs(2) = "Unknown";
             {
-                auto const errorType(uppercased(DataIPShortCuts::cAlphaArgs(2)));
+                auto const errorType(uppercased(state.dataIPShortCut->cAlphaArgs(2)));
                 if (errorType == "INFORMATION") {
-                    ShowMessage(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowMessage(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                 "\" has the following Information message" + Multiples + ':');
                 } else if (errorType == "WARNING") {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                      "\" has the following Warning condition" + Multiples + ':');
                 } else if (errorType == "SEVERE") {
-                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\" has the following Severe condition" + Multiples + ':');
                 } else if (errorType == "FATAL") {
-                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\" has the following Fatal condition" + Multiples + ':');
                     PreP_Fatal = true;
                 } else {
-                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has the following " +
-                                    DataIPShortCuts::cAlphaArgs(2) + " condition" + Multiples + ':');
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has the following " +
+                                    state.dataIPShortCut->cAlphaArgs(2) + " condition" + Multiples + ':');
                 }
             }
             CountM = 3;
             if (CountM > NumAlphas) {
-                ShowContinueError(state, DataIPShortCuts::cCurrentModuleObject + " was blank.  Check " + DataIPShortCuts::cAlphaArgs(1) +
+                ShowContinueError(state, state.dataIPShortCut->cCurrentModuleObject + " was blank.  Check " + state.dataIPShortCut->cAlphaArgs(1) +
                                   " audit trail or error file for possible reasons.");
             }
             while (CountM <= NumAlphas) {
-                if (len(DataIPShortCuts::cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength) {
-                    ShowContinueError(state, DataIPShortCuts::cAlphaArgs(CountM) + DataIPShortCuts::cAlphaArgs(CountM + 1));
+                if (len(state.dataIPShortCut->cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength) {
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaArgs(CountM) + state.dataIPShortCut->cAlphaArgs(CountM + 1));
                     CountM += 2;
                 } else {
-                    ShowContinueError(state, DataIPShortCuts::cAlphaArgs(CountM));
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaArgs(CountM));
                     ++CountM;
                 }
             }

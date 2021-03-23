@@ -76,8 +76,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     // Reads input and creates instance of Kusuda ground temps model
 
     // USE STATEMENTS:
-    using namespace DataIPShortCuts;
-    using namespace GroundTemperatureManager;
+        using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -90,27 +89,27 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     // New shared pointer for this model object
     std::shared_ptr<KusudaGroundTempsModel> thisModel(new KusudaGroundTempsModel());
 
-    std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_KusudaGroundTemp);
+    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_KusudaGroundTemp);
     int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
-        if (objectName == cAlphaArgs(1)) {
+        if (objectName == state.dataIPShortCut->cAlphaArgs(1)) {
 
             // Read input into object here
-            thisModel->objectName = cAlphaArgs(1);
+            thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
             thisModel->objectType = objectType;
-            thisModel->groundThermalDiffisivity = rNumericArgs(1) / (rNumericArgs(2) * rNumericArgs(3));
+            thisModel->groundThermalDiffisivity = state.dataIPShortCut->rNumericArgs(1) / (state.dataIPShortCut->rNumericArgs(2) * state.dataIPShortCut->rNumericArgs(3));
 
-            bool useGroundTempDataForKusuda = rNumericArgs(4) || rNumericArgs(5) || rNumericArgs(6);
+            bool useGroundTempDataForKusuda = state.dataIPShortCut->rNumericArgs(4) || state.dataIPShortCut->rNumericArgs(5) || state.dataIPShortCut->rNumericArgs(6);
 
             if (useGroundTempDataForKusuda) {
                 // Use Kusuda Parameters
-                thisModel->aveGroundTemp = rNumericArgs(4);
-                thisModel->aveGroundTempAmplitude = rNumericArgs(5);
-                thisModel->phaseShiftInSecs = rNumericArgs(6) * DataGlobalConstants::SecsInDay;
+                thisModel->aveGroundTemp = state.dataIPShortCut->rNumericArgs(4);
+                thisModel->aveGroundTempAmplitude = state.dataIPShortCut->rNumericArgs(5);
+                thisModel->phaseShiftInSecs = state.dataIPShortCut->rNumericArgs(6) * DataGlobalConstants::SecsInDay;
             } else {
                 // Use data from Site:GroundTemperature:Shallow to generate parameters
 
@@ -124,7 +123,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
                 Real64 maxSurfTemp(-100); // Set low initially but will get updated
 
                 std::shared_ptr<BaseGroundTempsModel> shallowObj =
-                    GetGroundTempModelAndInit(state, CurrentModuleObjects(objectType_SiteShallowGroundTemp), "");
+                    GetGroundTempModelAndInit(state, state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_SiteShallowGroundTemp), "");
 
                 for (int monthIndex = 1; monthIndex <= 12; ++monthIndex) {
                     Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths(state, 0.0, monthIndex);
@@ -161,7 +160,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     }
 
     if (found && !ErrorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
         ShowFatalError(state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach--Errors getting input for ground temperature model");

@@ -799,8 +799,7 @@ namespace EnergyPlus::ConvectionCoefficients {
         //   < Remainder fields are a repeat of A2, A3, N1, A4>
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using CurveManager::GetCurveIndex;
+                using CurveManager::GetCurveIndex;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
 
@@ -914,18 +913,18 @@ namespace EnergyPlus::ConvectionCoefficients {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Loop,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           Status,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name = cAlphaArgs(1);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
             {
-                auto const SELECT_CASE_var(cAlphaArgs(2));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
                 if (SELECT_CASE_var == "MEANAIRTEMPERATURE") {
                     state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = RefTempMeanAirTemp;
                 } else if (SELECT_CASE_var == "ADJACENTAIRTEMPERATURE") {
@@ -934,16 +933,16 @@ namespace EnergyPlus::ConvectionCoefficients {
                     state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = RefTempSupplyAirTemp;
                 } else {
                     ShowSevereError(state, "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " +
-                                    cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                                    state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
                     ErrorsFound = true;
                 }
             }
 
-            if (!lAlphaFieldBlanks(3)) {
-                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffCurveNum = GetCurveIndex(state, cAlphaArgs(3));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffCurveNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffCurveNum == 0) {
                     ShowSevereError(state, "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " +
-                                    cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
                     ErrorsFound = true;
                 } else {                                                                                      // check type
                     ErrorsFound |= CurveManager::CheckCurveDims(state,
@@ -952,17 +951,17 @@ namespace EnergyPlus::ConvectionCoefficients {
                                                                 RoutineName,                                  // Routine name
                                                                 CurrentModuleObject,                          // Object Type
                                                                 state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name,                 // Object Name
-                                                                cAlphaFieldNames(3));                         // Field Name
+                                                                state.dataIPShortCut->cAlphaFieldNames(3));                         // Field Name
                 }
             } else {
                 state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffCurveNum = 0;
             }
 
-            if (!lAlphaFieldBlanks(4)) {
-                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffDivHeightCurveNum = GetCurveIndex(state, cAlphaArgs(4));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffDivHeightCurveNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
                 if (state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffDivHeightCurveNum == 0) {
                     ShowSevereError(state, "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " +
-                                    cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                                    state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
                     ErrorsFound = true;
                 } else {                                                                                               // check type
                     ErrorsFound |= CurveManager::CheckCurveDims(state,
@@ -971,17 +970,17 @@ namespace EnergyPlus::ConvectionCoefficients {
                                                                 RoutineName,                                           // Routine name
                                                                 CurrentModuleObject,                                   // Object Type
                                                                 state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name,                          // Object Name
-                                                                cAlphaFieldNames(4));                                  // Field Name
+                                                                state.dataIPShortCut->cAlphaFieldNames(4));                                  // Field Name
                 }
             } else {
                 state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffDivHeightCurveNum = 0;
             }
 
-            if (!lAlphaFieldBlanks(5)) {
-                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHCurveNum = GetCurveIndex(state, cAlphaArgs(5));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHCurveNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
                 if (state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHCurveNum == 0) {
                     ShowSevereError(state, "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " +
-                                    cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                                    state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
                     ErrorsFound = true;
                 } else {                                                                                 // check type
                     ErrorsFound |= CurveManager::CheckCurveDims(state,
@@ -990,17 +989,17 @@ namespace EnergyPlus::ConvectionCoefficients {
                                                                 RoutineName,                             // Routine name
                                                                 CurrentModuleObject,                     // Object Type
                                                                 state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name,            // Object Name
-                                                                cAlphaFieldNames(5));                    // Field Name
+                                                                state.dataIPShortCut->cAlphaFieldNames(5));                    // Field Name
                 }
             } else {
                 state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHCurveNum = 0;
             }
 
-            if (!lAlphaFieldBlanks(6)) {
-                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHDivPerimLengthCurveNum = GetCurveIndex(state, cAlphaArgs(6));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHDivPerimLengthCurveNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
                 if (state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHDivPerimLengthCurveNum == 0) {
                     ShowSevereError(state, "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " +
-                                    cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
+                                    state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
                     ErrorsFound = true;
                 } else {                                                                                               // check type
                     ErrorsFound |= CurveManager::CheckCurveDims(state,
@@ -1009,7 +1008,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                                                 RoutineName,                                           // Routine name
                                                                 CurrentModuleObject,                                   // Object Type
                                                                 state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name,                          // Object Name
-                                                                cAlphaFieldNames(6));                                  // Field Name
+                                                                state.dataIPShortCut->cAlphaFieldNames(6));                                  // Field Name
                 }
             } else {
                 state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHDivPerimLengthCurveNum = 0;
@@ -1024,19 +1023,19 @@ namespace EnergyPlus::ConvectionCoefficients {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Loop,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           Status,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name = cAlphaArgs(1);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
             {
-                auto const SELECT_CASE_var(cAlphaArgs(2));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
 
                 if (SELECT_CASE_var == "WEATHERFILE") {
                     state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = RefWindWeatherFile;
@@ -1048,17 +1047,17 @@ namespace EnergyPlus::ConvectionCoefficients {
                     state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = RefWindParallCompAtZ;
                 } else {
                     ShowSevereError(state, "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " +
-                                    cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                                    state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
                     ErrorsFound = true;
                 }
             }
 
             // A3 , \field Hf Function of Wind Speed Curve Name
-            if (!lAlphaFieldBlanks(3)) {
-                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HfFnWindSpeedCurveNum = GetCurveIndex(state, cAlphaArgs(3));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HfFnWindSpeedCurveNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HfFnWindSpeedCurveNum == 0) {
                     ShowSevereError(state, "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " +
-                                    cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
                     ErrorsFound = true;
                 } else {                                                                                        // check type
                     ErrorsFound |= CurveManager::CheckCurveDims(state,
@@ -1067,18 +1066,18 @@ namespace EnergyPlus::ConvectionCoefficients {
                                                                 RoutineName,                                    // Routine name
                                                                 CurrentModuleObject,                            // Object Type
                                                                 state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name,                  // Object Name
-                                                                cAlphaFieldNames(3));                           // Field Name
+                                                                state.dataIPShortCut->cAlphaFieldNames(3));                           // Field Name
                 }
             } else {
                 state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HfFnWindSpeedCurveNum = 0;
             }
 
             //  A4 , \field Hn Function of Temperature Difference Curve Name
-            if (!lAlphaFieldBlanks(4)) {
-                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffCurveNum = GetCurveIndex(state, cAlphaArgs(4));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffCurveNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
                 if (state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffCurveNum == 0) {
                     ShowSevereError(state, "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " +
-                                    cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                                    state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
                     ErrorsFound = true;
                 } else {                                                                                       // check type
                     ErrorsFound |= CurveManager::CheckCurveDims(state,
@@ -1087,18 +1086,18 @@ namespace EnergyPlus::ConvectionCoefficients {
                                                                 RoutineName,                                   // Routine name
                                                                 CurrentModuleObject,                           // Object Type
                                                                 state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name,                 // Object Name
-                                                                cAlphaFieldNames(4));                          // Field Name
+                                                                state.dataIPShortCut->cAlphaFieldNames(4));                          // Field Name
                 }
             } else {
                 state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffCurveNum = 0;
             }
 
             //  A5 , \field Hn Function of Temperature Difference Divided by Height Curve Name
-            if (!lAlphaFieldBlanks(5)) {
-                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffDivHeightCurveNum = GetCurveIndex(state, cAlphaArgs(5));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffDivHeightCurveNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
                 if (state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffDivHeightCurveNum == 0) {
                     ShowSevereError(state, "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Name Entered, for " +
-                                    cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                                    state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
                     ErrorsFound = true;
                 } else {                                                                                                // check type
                     ErrorsFound |= CurveManager::CheckCurveDims(state,
@@ -1107,7 +1106,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                                                 RoutineName,                                            // Routine name
                                                                 CurrentModuleObject,                                    // Object Type
                                                                 state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name,                          // Object Name
-                                                                cAlphaFieldNames(5));                                   // Field Name
+                                                                state.dataIPShortCut->cAlphaFieldNames(5));                                   // Field Name
                 }
             } else {
                 state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffDivHeightCurveNum = 0;
@@ -1129,10 +1128,10 @@ namespace EnergyPlus::ConvectionCoefficients {
                                           Numbers,
                                           NumNumbers,
                                           Status,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             if (Alphas(2) == "INSIDE") {
                 ++state.dataSurface->TotIntConvCoeff;
             }
@@ -1145,13 +1144,13 @@ namespace EnergyPlus::ConvectionCoefficients {
             if (Alphas(6) == "OUTSIDE") {
                 ++state.dataSurface->TotExtConvCoeff;
             }
-            if (NumAlphas >= 2 && lAlphaFieldBlanks(2)) {
-                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
-                ShowContinueError(state, cAlphaFieldNames(2) + " is blank and rest of fields will not be processed.");
+            if (NumAlphas >= 2 && state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + Alphas(1));
+                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(2) + " is blank and rest of fields will not be processed.");
             }
-            if (NumAlphas >= 6 && lAlphaFieldBlanks(6)) {
-                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
-                ShowContinueError(state, cAlphaFieldNames(6) + " is blank and rest of fields will not be processed.");
+            if (NumAlphas >= 6 && state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + Alphas(1));
+                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(6) + " is blank and rest of fields will not be processed.");
             }
         }
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
@@ -1165,10 +1164,10 @@ namespace EnergyPlus::ConvectionCoefficients {
                                           Numbers,
                                           NumNumbers,
                                           Status,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             if (Alphas(2) == "INSIDE") {
                 ++state.dataSurface->TotIntConvCoeff;
             }
@@ -1181,13 +1180,13 @@ namespace EnergyPlus::ConvectionCoefficients {
             if (Alphas(6) == "OUTSIDE") {
                 ++state.dataSurface->TotExtConvCoeff;
             }
-            if (NumAlphas >= 2 && lAlphaFieldBlanks(2)) {
-                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
-                ShowContinueError(state, cAlphaFieldNames(2) + " is blank and rest of fields will not be processed.");
+            if (NumAlphas >= 2 && state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + Alphas(1));
+                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(2) + " is blank and rest of fields will not be processed.");
             }
-            if (NumAlphas >= 6 && lAlphaFieldBlanks(6)) {
-                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
-                ShowContinueError(state, cAlphaFieldNames(6) + " is blank and rest of fields will not be processed.");
+            if (NumAlphas >= 6 && state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + Alphas(1));
+                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(6) + " is blank and rest of fields will not be processed.");
             }
         }
 
@@ -1209,13 +1208,13 @@ namespace EnergyPlus::ConvectionCoefficients {
                                           Numbers,
                                           NumNumbers,
                                           Status,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             Found = UtilityRoutines::FindItemInList(Alphas(1), Surface);
             if (Found == 0) {
-                ShowSevereError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", illegal value for " + cAlphaFieldNames(1) + '=' +
+                ShowSevereError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
                                 Alphas(1));
                 ErrorsFound = true;
                 continue;
@@ -1250,9 +1249,9 @@ namespace EnergyPlus::ConvectionCoefficients {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
                                                       format("{}={}, {}=[{:.5R}].",
-                                                             cAlphaFieldNames(Ptr),
+                                                             state.dataIPShortCut->cAlphaFieldNames(Ptr),
                                                              Alphas(Ptr),
-                                                             cNumericFieldNames(NumField),
+                                                             state.dataIPShortCut->cNumericFieldNames(NumField),
                                                              Numbers(NumField)));
                                     ShowContinueError(
                                         state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit));
@@ -1261,9 +1260,9 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 }
                                 state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefValue;
                                 state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
-                                if (!lAlphaFieldBlanks(Ptr + 2)) {
+                                if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
-                                    ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
+                                    ShowContinueError(state, "Since VALUE is used for \"" + state.dataIPShortCut->cAlphaFieldNames(FieldNo + 2) + "\", " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) +
                                                       '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
                                 PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
@@ -1275,7 +1274,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
                                 if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
+                                    ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
                                     state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
@@ -1290,7 +1289,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                     UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
                                 if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
+                                    ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
                                 PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
@@ -1333,9 +1332,9 @@ namespace EnergyPlus::ConvectionCoefficients {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
                                                       format("{}={}, {}=[{:.5R}].",
-                                                             cAlphaFieldNames(Ptr),
+                                                             state.dataIPShortCut->cAlphaFieldNames(Ptr),
                                                              Alphas(Ptr),
-                                                             cNumericFieldNames(NumField),
+                                                             state.dataIPShortCut->cNumericFieldNames(NumField),
                                                              Numbers(NumField)));
                                     ShowContinueError(
                                         state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit));
@@ -1344,10 +1343,10 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 }
                                 state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefValue;
                                 state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
-                                if (!lAlphaFieldBlanks(Ptr + 2)) {
+                                if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
-                                    ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 1) + "\", " +
-                                                      cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
+                                    ShowContinueError(state, "Since VALUE is used for \"" + state.dataIPShortCut->cAlphaFieldNames(FieldNo + 1) + "\", " +
+                                                      state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
                                 PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
                             } else if (equationName == "SCHEDULE") {
@@ -1358,7 +1357,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
                                 if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
+                                    ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
                                     state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
@@ -1373,7 +1372,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                     UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcInsideUserCurve);
                                 if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
+                                    ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
                                 PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
@@ -1391,14 +1390,14 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 if (UtilityRoutines::SameString(Alphas(Ptr + 1), "CEILINGDIFFUSER") ||
                                     UtilityRoutines::SameString(Alphas(Ptr + 1), "TROMBEWALL")) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, "Invalid Value Entered, for " + cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
-                                    ShowContinueError(state, "invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1) +
+                                    ShowContinueError(state, "Invalid Value Entered, for " + state.dataIPShortCut->cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
+                                    ShowContinueError(state, "invalid value in " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1) +
                                                       "\". This type is only applicable at a Zone level.");
                                     ErrorsFound = true;
                                 } else { // really invalid
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, "Invalid Value Entered, for " + cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
-                                    ShowContinueError(state, "invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1));
+                                    ShowContinueError(state, "Invalid Value Entered, for " + state.dataIPShortCut->cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
+                                    ShowContinueError(state, "invalid value in " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1415,7 +1414,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                        ShowContinueError(state, "Invalid Value Entered, for " + cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
+                        ShowContinueError(state, "Invalid Value Entered, for " + state.dataIPShortCut->cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
                         ErrorsFound = true;
                     }
                 }
@@ -1437,14 +1436,14 @@ namespace EnergyPlus::ConvectionCoefficients {
                                           Numbers,
                                           NumNumbers,
                                           Status,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             // Check Field 1 for validity
             if (ValidSurfaceTypes.find(Alphas(1)) == ValidSurfaceTypes.end()){
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                ShowContinueError(state, "illegal value for " + cAlphaFieldNames(1) + '=' + Alphas(1));
+                ShowContinueError(state, "illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + Alphas(1));
                 ErrorsFound = true;
             }
             Ptr = 2;
@@ -1469,9 +1468,9 @@ namespace EnergyPlus::ConvectionCoefficients {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
                                                       format("{}={}, {}=[{:.5R}].",
-                                                             cAlphaFieldNames(Ptr),
+                                                             state.dataIPShortCut->cAlphaFieldNames(Ptr),
                                                              Alphas(Ptr),
-                                                             cNumericFieldNames(NumField),
+                                                             state.dataIPShortCut->cNumericFieldNames(NumField),
                                                              Numbers(NumField)));
                                     ShowContinueError(
                                         state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit));
@@ -1480,10 +1479,10 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 }
                                 state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefValue;
                                 state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
-                                if (!lAlphaFieldBlanks(Ptr + 2)) {
+                                if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
-                                    ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " +
-                                                      cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
+                                    ShowContinueError(state, "Since VALUE is used for \"" + state.dataIPShortCut->cAlphaFieldNames(FieldNo + 2) + "\", " +
+                                                      state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
                                 ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
                             } else if (equationName == "SCHEDULE") {
@@ -1494,7 +1493,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
                                 if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
+                                    ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
                                     state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
@@ -1509,7 +1508,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                     UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
                                 if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
+                                    ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
                                 PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
@@ -1555,9 +1554,9 @@ namespace EnergyPlus::ConvectionCoefficients {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
                                                       format("{}={}, {}=[{:.5R}].",
-                                                             cAlphaFieldNames(Ptr),
+                                                             state.dataIPShortCut->cAlphaFieldNames(Ptr),
                                                              Alphas(Ptr),
-                                                             cNumericFieldNames(NumField),
+                                                             state.dataIPShortCut->cNumericFieldNames(NumField),
                                                              Numbers(NumField)));
                                     ShowContinueError(
                                         state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit));
@@ -1566,9 +1565,9 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 }
                                 state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefValue;
                                 state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
-                                if (!lAlphaFieldBlanks(Ptr + 2)) {
+                                if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
-                                    ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
+                                    ShowContinueError(state, "Since VALUE is used for \"" + state.dataIPShortCut->cAlphaFieldNames(FieldNo + 2) + "\", " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) +
                                                       '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
                                 ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
@@ -1580,7 +1579,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
                                 if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
+                                    ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
                                     state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
@@ -1596,7 +1595,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
 
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
+                                    ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
                                 PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
@@ -1616,13 +1615,13 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 if (UtilityRoutines::SameString(Alphas(Ptr + 1), "CEILINGDIFFUSER") ||
                                     UtilityRoutines::SameString(Alphas(Ptr + 1), "TROMBEWALL")) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
-                                    ShowContinueError(state, "invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1) +
+                                    ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
+                                    ShowContinueError(state, "invalid value in " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1) +
                                                       "\". This type is only applicable at a Zone level.");
                                     ErrorsFound = true;
                                 } else { // really invalid
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                    ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 1) + " entered=" + Alphas(Ptr + 1));
+                                    ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 1) + " entered=" + Alphas(Ptr + 1));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1631,7 +1630,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
                     } else { // Error Case
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                        ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
+                        ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
                         ErrorsFound = true;
                     }
                 }
@@ -1707,16 +1706,16 @@ namespace EnergyPlus::ConvectionCoefficients {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           1,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           Status,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.Name = cAlphaArgs(1); // not used by E+, unique object
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.Name = state.dataIPShortCut->cAlphaArgs(1); // not used by E+, unique object
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
 
             // The following array maps the inputs for the SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections algorithm input fields
@@ -1776,10 +1775,10 @@ namespace EnergyPlus::ConvectionCoefficients {
                 ErrorsFound = SetAdaptiveConvectionAlgoCoefficient(state,
                                                                    HcInt_ConvectionTypesMap,
                                                                    AdaptiveConvectionAlgoInsideDefaults[(i/2)-1],
-                                                                   cAlphaArgs(i),
-                                                                   cAlphaArgs(i+1),
-                                                                   cAlphaFieldNames(i),
-                                                                   cAlphaFieldNames(i+1),
+                                                                   state.dataIPShortCut->cAlphaArgs(i),
+                                                                   state.dataIPShortCut->cAlphaArgs(i+1),
+                                                                   state.dataIPShortCut->cAlphaFieldNames(i),
+                                                                   state.dataIPShortCut->cAlphaFieldNames(i+1),
                                                                    RoutineName,
                                                                    CurrentModuleObject);
             }
@@ -1792,16 +1791,16 @@ namespace EnergyPlus::ConvectionCoefficients {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           1,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           Status,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.Name = cAlphaArgs(1); // not used by E+, unique object
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.Name = state.dataIPShortCut->cAlphaArgs(1); // not used by E+, unique object
             state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
             std::array<int* const, 6> AdaptiveConvectionAlgoOutsideDefaults =
                 {
@@ -1819,10 +1818,10 @@ namespace EnergyPlus::ConvectionCoefficients {
                 ErrorsFound = SetAdaptiveConvectionAlgoCoefficient(state,
                                                                    HcExt_ConvectionTypesMap,
                                                                    AdaptiveConvectionAlgoOutsideDefaults[(i/2)-1],
-                                                                   cAlphaArgs(i),
-                                                                   cAlphaArgs(i+1),
-                                                                   cAlphaFieldNames(i),
-                                                                   cAlphaFieldNames(i+1),
+                                                                   state.dataIPShortCut->cAlphaArgs(i),
+                                                                   state.dataIPShortCut->cAlphaArgs(i+1),
+                                                                   state.dataIPShortCut->cAlphaFieldNames(i),
+                                                                   state.dataIPShortCut->cAlphaFieldNames(i+1),
                                                                    RoutineName,
                                                                    CurrentModuleObject);
             }

@@ -499,7 +499,6 @@ namespace HeatBalanceIntRadExchange {
         // the grey interchange between surfaces in an enclosure.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         using General::ScanForReports;
 
@@ -508,7 +507,7 @@ namespace HeatBalanceIntRadExchange {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool NoUserInputF;            // Logical flag signifying no input F's for zone
         static bool ViewFactorReport; // Flag to output view factor report in eio file
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         Real64 CheckValue1;
         Real64 CheckValue2;
         Real64 FinalCheckValue;
@@ -1100,7 +1099,6 @@ namespace HeatBalanceIntRadExchange {
         // This routine gets the user view factor info.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // Argument array dimensioning
         F.dim(N, N);
@@ -1118,22 +1116,22 @@ namespace HeatBalanceIntRadExchange {
 
         NoUserInputF = true;
         UserFZoneIndex = inputProcessor->getObjectItemNum(state, "ZoneProperty:UserViewFactors", ZoneName);
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         if (UserFZoneIndex > 0) {
             NoUserInputF = false;
 
             inputProcessor->getObjectItem(state,
                                           "ZoneProperty:UserViewFactors",
                                           UserFZoneIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             if (NumNums < 3 * pow_2(N)) {
                 ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values.");
@@ -1143,9 +1141,9 @@ namespace HeatBalanceIntRadExchange {
             }
             F = 0.0;
             for (index = 1; index <= NumNums; index += 3) {
-                inx1 = rNumericArgs(index);
-                inx2 = rNumericArgs(index + 1);
-                F(inx2, inx1) = rNumericArgs(index + 2);
+                inx1 = state.dataIPShortCut->rNumericArgs(index);
+                inx2 = state.dataIPShortCut->rNumericArgs(index + 1);
+                F(inx2, inx1) = state.dataIPShortCut->rNumericArgs(index + 2);
             }
         }
     }
@@ -1285,7 +1283,6 @@ namespace HeatBalanceIntRadExchange {
         // This routine gets the user view factor info for an enclosure which could be a zone or a group of zones
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // Argument array dimensioning
         F.dim(N, N);
@@ -1301,7 +1298,7 @@ namespace HeatBalanceIntRadExchange {
         int inx1;
         int inx2;
         Array1D_string enclosureSurfaceNames;
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         NoUserInputF = true;
         UserFZoneIndex = inputProcessor->getObjectItemNum(state, "ZoneProperty:UserViewFactors:BySurfaceName", "zone_or_zonelist_name", EnclosureName);
 
@@ -1315,15 +1312,15 @@ namespace HeatBalanceIntRadExchange {
             inputProcessor->getObjectItem(state,
                                           "ZoneProperty:UserViewFactors:BySurfaceName",
                                           UserFZoneIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             if (NumNums < pow_2(N)) {
                 ShowWarningError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
@@ -1337,20 +1334,20 @@ namespace HeatBalanceIntRadExchange {
             numinx1 = 0;
 
             for (index = 2; index <= NumAlphas; index += 2) {
-                inx1 = UtilityRoutines::FindItemInList(cAlphaArgs(index), enclosureSurfaceNames, N);
-                inx2 = UtilityRoutines::FindItemInList(cAlphaArgs(index + 1), enclosureSurfaceNames, N);
+                inx1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), enclosureSurfaceNames, N);
+                inx2 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), enclosureSurfaceNames, N);
                 if (inx1 == 0) {
                     ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                    ShowContinueError(state, "...Surface name=\"" + cAlphaArgs(index) + "\", not in this zone or enclosure.");
+                    ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 if (inx2 == 0) {
                     ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                    ShowContinueError(state, "...Surface name=\"" + cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
+                    ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 ++numinx1;
-                if (inx1 > 0 && inx2 > 0) F(inx2, inx1) = rNumericArgs(numinx1);
+                if (inx1 > 0 && inx2 > 0) F(inx2, inx1) = state.dataIPShortCut->rNumericArgs(numinx1);
             }
             enclosureSurfaceNames.deallocate();
         }
