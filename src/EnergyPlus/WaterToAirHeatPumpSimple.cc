@@ -2365,7 +2365,7 @@ namespace WaterToAirHeatPumpSimple {
         using CurveManager::CurveValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Tref(283.15); // Reference Temperature for performance curves,10C [K]
+        constexpr Real64 Tref(283.15); // Reference Temperature for performance curves,10C [K]
         static std::string const RoutineName("CalcHPHeatingSimple");
         static std::string const RoutineNameSourceSideInletTemp("CalcHPHeatingSimple:SourceSideInletTemp");
 

@@ -266,6 +266,9 @@ namespace WaterToAirHeatPump {
 
         Array1D<WaterToAirHeatPump::WatertoAirHPEquipConditions> WatertoAirHP;
 
+        Array1D_bool MyPlantScanFlag;
+        Array1D_bool MyEnvrnFlag;
+
         void clear_state() override
         {
             this->NumWatertoAirHPs = 0;
@@ -276,6 +279,8 @@ namespace WaterToAirHeatPump {
             this->MyOneTimeFlag = true;
             this->firstTime = true;
             this->WatertoAirHP.clear();
+            this->MyPlantScanFlag.deallocate();
+            this->MyEnvrnFlag.deallocate();
         }
 
         // Default Constructor

@@ -231,10 +231,10 @@ namespace WaterToAirHeatPump {
         int NumAlphas;
         int NumParams;
         int NumNums;
-        static int MaxNums(0);   // Maximum number of numeric input fields
-        static int MaxAlphas(0); // Maximum number of alpha input fields
+        int MaxNums(0);   // Maximum number of numeric input fields
+        int MaxAlphas(0); // Maximum number of alpha input fields
         int IOStat;
-        bool ErrorsFound(false);  // If errors detected in input
+        bool ErrorsFound(false);         // If errors detected in input
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string AlphArray;        // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
@@ -242,8 +242,6 @@ namespace WaterToAirHeatPump {
         Array1D<Real64> NumArray;        // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-
-
 
         NumCool = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation");
         NumHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation");
@@ -805,35 +803,25 @@ namespace WaterToAirHeatPump {
         // shut off after compressor cycle off  [s]
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        // REAL(r64), PARAMETER        :: CpWater=4210.d0          ! Specific heat of water J/kg_C
         static std::string const RoutineName("InitWatertoAirHP");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  INTEGER             :: WatertoAirHPNum          ! heat pump number
         int AirInletNode;   // air inlet node number
         int WaterInletNode; // water inlet node number
         int PlantOutletNode;
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyEnvrnFlag;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
         bool errFlag;
 
         if (state.dataWaterToAirHeatPump->MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(state.dataWaterToAirHeatPump->NumWatertoAirHPs);
-            MyPlantScanFlag.allocate(state.dataWaterToAirHeatPump->NumWatertoAirHPs);
-            MyEnvrnFlag = true;
-            MyPlantScanFlag = true;
+            state.dataWaterToAirHeatPump->MyEnvrnFlag.allocate(state.dataWaterToAirHeatPump->NumWatertoAirHPs);
+            state.dataWaterToAirHeatPump->MyPlantScanFlag.allocate(state.dataWaterToAirHeatPump->NumWatertoAirHPs);
+            state.dataWaterToAirHeatPump->MyEnvrnFlag = true;
+            state.dataWaterToAirHeatPump->MyPlantScanFlag = true;
             state.dataWaterToAirHeatPump->MyOneTimeFlag = false;
         }
 
-        if (MyPlantScanFlag(HPNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (state.dataWaterToAirHeatPump->MyPlantScanFlag(HPNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
@@ -871,11 +859,11 @@ namespace WaterToAirHeatPump {
                 ShowFatalError(state, "InitWatertoAirHP: Program terminated for previous conditions.");
             }
 
-            MyPlantScanFlag(HPNum) = false;
+            state.dataWaterToAirHeatPump->MyPlantScanFlag(HPNum) = false;
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataWaterToAirHeatPump->MyEnvrnFlag(HPNum) && !state.dataWaterToAirHeatPump->MyPlantScanFlag(HPNum)) {
             // Do the initializations to start simulation
             // Set water and air inlet nodes
             AirInletNode = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum;
@@ -945,11 +933,11 @@ namespace WaterToAirHeatPump {
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = true;
 
-            MyEnvrnFlag(HPNum) = false;
+            state.dataWaterToAirHeatPump->MyEnvrnFlag(HPNum) = false;
         } // End If for the Begin Environment initializations
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(HPNum) = true;
+            state.dataWaterToAirHeatPump->MyEnvrnFlag(HPNum) = true;
         }
 
         // Do the following initializations (every time step): This should be the info from
@@ -1129,26 +1117,16 @@ namespace WaterToAirHeatPump {
         Real64 LoadSideOutletHumRat;     // Load Side Outlet Humidity Ratio [kg/kg]
         Real64 LoadSideAirInletEnth;     // Load Side Inlet Enthalpy [J/kg]
         Real64 LoadSideAirOutletEnth;    // Load Side Outlet Enthalpy [J/kg]
-        //      REAL(r64)        :: EffectiveSurfaceTemp1    ! Effective Surface Temperature Guess #1 [C]
-        //      REAL(r64)        :: EffectiveSurfaceTemp2    ! Effective Surface Temperature Guess #2 [C]
-        static Real64 EffectiveSurfaceTemp; // Effective Surface Temperature [C]
-        Real64 EffectiveSatEnth;            // Saturated Enthalpy of Air Corresponding to the Effective Surface
-        // Temperature [J/kg]
-        //      REAL(r64)        :: EffectiveSatEnth1        ! Guess of the Saturated Enthalpy of Air Corresponding to the
-        //                                                   ! Effective Surface Temperature [J/kg]
+        Real64 EffectiveSurfaceTemp;     // Effective Surface Temperature [C]
+        Real64 EffectiveSatEnth;            // Saturated Enthalpy of Air Corresponding to the Effective Surface Temperature [J/kg]
         Real64 QSource;    // Source Side Heat Transfer Rate [W]
         Real64 QLoadTotal; // Load Side Total Heat Transfer Rate [W]
         Real64 QSensible;  // Load Side Sensible Heat Transfer Rate [W]
         Real64 Power;      // Power Consumption [W]
-        //      REAL(r64)        :: EvapTemp1                ! Evaporating Temperature Guess #1 [C]
-        //      REAL(r64)        :: EvapTemp2                ! Evaporating Temperature Guess #2 [C]
-        static Real64 EvapTemp; // Evaporating Temperature [C]
+        Real64 EvapTemp; // Evaporating Temperature [C]
         Real64 ANTUWET;         // Number of Transfer Unit for Wet Condition
         Real64 EffectWET;       // Load Side Heat Exchanger Effectiveness
-        Real64 EvapSatEnth;     // Saturated Enthalpy of Air Corresponding to the Evaporating
-        // Temperature [J/kg]
-        //      REAL(r64)        :: EvapSatEnth1             ! Guess of the Saturated Enthalpy of Air Corresponding to the
-        //                                                   ! Evaporating Temperature [J/kg]
+        Real64 EvapSatEnth;     // Saturated Enthalpy of Air Corresponding to the Evaporating Temperature [J/kg]
         Real64 SourceSideEffect;         // Source Side Heat Exchanger Effectiveness
         Real64 SourceSideTemp;           // Source Side Saturated Refrigerant Temperature [C]
         Real64 LoadSideTemp;             // Load Side Saturated Refrigerant Temperature [C]
@@ -1161,16 +1139,14 @@ namespace WaterToAirHeatPump {
         Real64 SourceSideOutletEnth;     // Enthalpy of Refrigerant leaving the Source Side Heat Exchanger [J/kg]
         Real64 LoadSideOutletEnth;       // Enthalpy of Refrigerant leaving the Load Side Heat Exchanger [J/kg]
         Real64 CpAir;                    // Specific Heat of Air [J/kg_C]
-        static Real64 initialQSource;    // Guess Source Side Heat Transfer Rate [W]
-        static Real64 initialQLoadTotal; // Guess Load Side Heat Transfer rate [W]
+        Real64 initialQSource;    // Guess Source Side Heat Transfer Rate [W]
+        Real64 initialQLoadTotal; // Guess Load Side Heat Transfer rate [W]
         Real64 SuperHeatEnth;            // Enthalpy of the Superheated Refrigerant [J/kg]
-        Real64 CompSuctionTemp1;         // Guess of the Temperature of the Refrigerant Entering the
-        // Compressor #1 [C]
-        Real64 CompSuctionTemp2; // Guess of the Temperature of the Refrigerant Entering the
-        // Compressor #2 [C]
-        static Real64 CompSuctionTemp; // Temperature of the Refrigerant Entering the Compressor [C]
+        Real64 CompSuctionTemp1;         // Guess of the Temperature of the Refrigerant Entering the Compressor #1 [C]
+        Real64 CompSuctionTemp2; // Guess of the Temperature of the Refrigerant Entering the Compressor #2 [C]
+        Real64 CompSuctionTemp; // Temperature of the Refrigerant Entering the Compressor [C]
         Real64 CompSuctionEnth;        // Enthalpy of the Refrigerant Entering the Compressor [J/kg]
-        Real64 CompSuctionDensity;     // Density of the Refrigerant Entering the Compressorkg/m3
+        Real64 CompSuctionDensity;     // Density of the Refrigerant Entering the Compressor [kg/m3]
         Real64 CompSuctionSatTemp;     // Temperature of Saturated Refrigerant at Compressor Suction Pressure [C]
         Real64 Twet_Rated;             // Twet at rated conditions (coil air flow rate and air temperatures), sec
         Real64 Gamma_Rated;            // Gamma at rated conditions (coil air flow rate and air temperatures)
@@ -1184,9 +1160,9 @@ namespace WaterToAirHeatPump {
         Real64 SHReff;          // Effective sensible heat ratio at part-load condition
         Array1D<Real64> Par(4); // Parameter array passed to RegulaFalsi function
         int SolFlag;            // Solution flag returned from RegulaFalsi function
-        static Real64 LoadSideInletDBTemp_Init;  // rated conditions
-        static Real64 LoadSideInletHumRat_Init;  // rated conditions
-        static Real64 LoadSideAirInletEnth_Init; // rated conditions
+        Real64 LoadSideInletDBTemp_Init;  // rated conditions
+        Real64 LoadSideInletHumRat_Init;  // rated conditions
+        Real64 LoadSideAirInletEnth_Init; // rated conditions
         Real64 LoadSideInletDBTemp_Unit;         // calc conditions for unit
         Real64 LoadSideInletHumRat_Unit;         // calc conditions for unit
         Real64 LoadSideAirInletEnth_Unit;        // calc conditions for unit
@@ -1815,8 +1791,8 @@ namespace WaterToAirHeatPump {
         Real64 MassRef;               // Mass Flow Rate of Refrigerant [kg/s]
         Real64 SourceSideOutletEnth;  // Enthalpy of Refrigerant leaving the Source Side Heat Exchanger [J/kg]
         Real64 LoadSideOutletEnth;    // Enthalpy of Refrigerant leaving the Load Side Heat Exchanger [J/kg]
-        static Real64 initialQSource; // Guess Source Side Heat Transfer Rate [W]
-        static Real64 initialQLoad;   // Guess Load Side Heat Transfer rate [W]
+        Real64 initialQSource;        // Guess Source Side Heat Transfer Rate [W]
+        Real64 initialQLoad;          // Guess Load Side Heat Transfer rate [W]
         Real64 SuperHeatEnth;         // Enthalpy of the Superheated Refrigerant [J/kg]
         Real64 CompSuctionTemp1;      // Guess of the Temperature of the Refrigerant Entering the
         // Compressor #1 [C]
