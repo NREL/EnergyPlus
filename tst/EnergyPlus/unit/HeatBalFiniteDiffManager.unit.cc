@@ -69,7 +69,7 @@ namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
 {
-
+    auto & SurfaceFD = state->dataHeatBalFiniteDiffMgr->SurfaceFD;
     int const numNodes(4);
     int nodeNum(0);
     SurfaceFD.allocate(1);
@@ -212,6 +212,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
     // allocate a finite difference surface object and needed member variables
     int const surfaceIndex = 1;
     int const finiteDiffLayerIndex = 1;
+    auto & SurfaceFD = state->dataHeatBalFiniteDiffMgr->SurfaceFD;
     SurfaceFD.allocate(1);
     SurfaceFD(surfaceIndex).PhaseChangeTemperatureReverse.allocate(1);
     SurfaceFD(surfaceIndex).PhaseChangeTemperatureReverse(finiteDiffLayerIndex) = 20.0;
@@ -226,7 +227,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
 
     // create local variables to calculate and call the new worker function
     Real64 newSpecificHeat, newDensity, newThermalConductivity;
-    adjustPropertiesForPhaseChange(finiteDiffLayerIndex, surfaceIndex, material, 20.0, 20.1, newSpecificHeat, newDensity, newThermalConductivity);
+    adjustPropertiesForPhaseChange(*state, finiteDiffLayerIndex, surfaceIndex, material, 20.0, 20.1, newSpecificHeat, newDensity, newThermalConductivity);
 
     // check the values are correct
     EXPECT_NEAR(10187.3, newSpecificHeat, 0.1);
@@ -321,8 +322,8 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalFiniteDiffManager_skipNotUsedConstruct
     state->dataConstruction->Construct(3).IsUsed = true;
 
     //call the function for initialization of finite difference calculation
-    InitialInitHeatBalFiniteDiff(*state);  
-     
+    InitialInitHeatBalFiniteDiff(*state);
+    auto & ConstructFD = state->dataHeatBalFiniteDiffMgr->ConstructFD;
     // check the values are correct
     EXPECT_EQ(0, ConstructFD(1).Name.size());
     EXPECT_EQ(3, ConstructFD(2).Name.size());

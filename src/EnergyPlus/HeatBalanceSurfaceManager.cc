@@ -192,7 +192,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // the other drivers and simulation algorithms.
 
         using HeatBalanceAirManager::ManageAirHeatBalance;
-        using HeatBalFiniteDiffManager::SurfaceFD;
         using OutputReportTabular::GatherComponentLoadsSurface; // for writing tabular component loads output reports
         using ThermalComfort::ManageThermalComfort;
 
@@ -232,7 +231,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 ConstrNum = Surface(SurfNum).Construction;
                 if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
                 if (Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
-                SurfaceFD(SurfNum).UpdateMoistureBalance();
+                state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).UpdateMoistureBalance();
             }
         }
 
@@ -4381,28 +4380,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // change construction on surface if overriden by EMS
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using HeatBalFiniteDiffManager::ConstructFD;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool SurfConstructOverridesPresent(false); // detect if EMS ever used for this and inits need to execute
 
@@ -4497,18 +4474,18 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                             state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
                             state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-                            if (ConstructFD(Surface(SurfNum).Construction).TotNodes !=
-                                ConstructFD(Surface(SurfNum).EMSConstructionOverrideValue).TotNodes) {
+                            if (state.dataHeatBalFiniteDiffMgr->ConstructFD(Surface(SurfNum).Construction).TotNodes !=
+                                    state.dataHeatBalFiniteDiffMgr->ConstructFD(Surface(SurfNum).EMSConstructionOverrideValue).TotNodes) {
                                 // thow warning, and do not allow
                                 ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
                                 ShowContinueError(state,
                                                   format("Construction named = {} has number of finite difference nodes ={}",
                                                          state.dataConstruction->Construct(Surface(SurfNum).Construction).Name,
-                                                         ConstructFD(Surface(SurfNum).Construction).TotNodes));
+                                                         state.dataHeatBalFiniteDiffMgr->ConstructFD(Surface(SurfNum).Construction).TotNodes));
                                 ShowContinueError(state,
                                                   format("While construction named = {}has number of finite difference nodes ={}",
                                                          state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name,
-                                                         ConstructFD(Surface(SurfNum).EMSConstructionOverrideValue).TotNodes));
+                                                         state.dataHeatBalFiniteDiffMgr->ConstructFD(Surface(SurfNum).EMSConstructionOverrideValue).TotNodes));
                                 ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                                   ", and the simulation continues without the override");
 
@@ -7001,7 +6978,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 MaxDelTemp = max(std::abs(state.dataHeatBalSurf->TempSurfIn(SurfNum) - state.dataHeatBalSurf->TempInsOld(SurfNum)), MaxDelTemp);
                 if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                     // also check all internal nodes as well as surface faces
-                    MaxDelTemp = max(MaxDelTemp, HeatBalFiniteDiffManager::SurfaceFD(SurfNum).MaxNodeDelTemp);
+                    MaxDelTemp = max(MaxDelTemp, state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).MaxNodeDelTemp);
                 }
             } // ...end of loop to check for convergence
 

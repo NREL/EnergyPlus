@@ -182,8 +182,8 @@ namespace EnergyPlus::PondGroundHeatExchanger {
         int NumNumbers; // Number of Numbers for each GetObjectItem call
 
         // Initializations and allocations
-        DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:Pond";
-        state.dataPondGHE->NumOfPondGHEs = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+        state.dataIPShortCut->cCurrentModuleObject = "GroundHeatExchanger:Pond";
+        state.dataPondGHE->NumOfPondGHEs = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
         // allocate data structures
         if (allocated(state.dataPondGHE->PondGHE)) state.dataPondGHE->PondGHE.deallocate();
 
@@ -194,135 +194,135 @@ namespace EnergyPlus::PondGroundHeatExchanger {
 
             // get the input data
             inputProcessor->getObjectItem(state,
-                                          DataIPShortCuts::cCurrentModuleObject,
+                                          state.dataIPShortCut->cCurrentModuleObject,
                                           Item,
-                                          DataIPShortCuts::cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          DataIPShortCuts::rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
                                           _,
                                           _,
-                                          DataIPShortCuts::cAlphaFieldNames,
-                                          DataIPShortCuts::cNumericFieldNames);
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             state.dataPondGHE->PondGHE(Item).WaterIndex = FluidProperties::FindGlycol(state, fluidNameWater);
 
             // General user input data
-            state.dataPondGHE->PondGHE(Item).Name = DataIPShortCuts::cAlphaArgs(1);
+            state.dataPondGHE->PondGHE(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
 
             // get inlet node data
-            state.dataPondGHE->PondGHE(Item).InletNode = DataIPShortCuts::cAlphaArgs(2);
+            state.dataPondGHE->PondGHE(Item).InletNode = state.dataIPShortCut->cAlphaArgs(2);
             state.dataPondGHE->PondGHE(Item).InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                             DataIPShortCuts::cAlphaArgs(2),
+                                                                             state.dataIPShortCut->cAlphaArgs(2),
                                                                              ErrorsFound,
-                                                                             DataIPShortCuts::cCurrentModuleObject,
-                                                                             DataIPShortCuts::cAlphaArgs(1),
+                                                                             state.dataIPShortCut->cCurrentModuleObject,
+                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsNotParent);
             if (state.dataPondGHE->PondGHE(Item).InletNodeNum == 0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
             // get outlet node data
-            state.dataPondGHE->PondGHE(Item).OutletNode = DataIPShortCuts::cAlphaArgs(3);
-            state.dataPondGHE->PondGHE(Item).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
+            state.dataPondGHE->PondGHE(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(3);
+            state.dataPondGHE->PondGHE(Item).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(3),
                                                                               ErrorsFound,
-                                                                              DataIPShortCuts::cCurrentModuleObject,
-                                                                              DataIPShortCuts::cAlphaArgs(1),
+                                                                              state.dataIPShortCut->cCurrentModuleObject,
+                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                               1,
                                                                               DataLoopNode::ObjectIsNotParent);
             if (state.dataPondGHE->PondGHE(Item).OutletNodeNum == 0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                               DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cAlphaArgs(2),
-                                               DataIPShortCuts::cAlphaArgs(3),
+            BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(2),
+                                               state.dataIPShortCut->cAlphaArgs(3),
                                                "Condenser Water Nodes");
 
             // pond geometry data
-            state.dataPondGHE->PondGHE(Item).Depth = DataIPShortCuts::rNumericArgs(1);
-            state.dataPondGHE->PondGHE(Item).Area = DataIPShortCuts::rNumericArgs(2);
-            if (DataIPShortCuts::rNumericArgs(1) <= 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+            state.dataPondGHE->PondGHE(Item).Depth = state.dataIPShortCut->rNumericArgs(1);
+            state.dataPondGHE->PondGHE(Item).Area = state.dataIPShortCut->rNumericArgs(2);
+            if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) {
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
-            if (DataIPShortCuts::rNumericArgs(2) <= 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(2), DataIPShortCuts::rNumericArgs(2)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+            if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
 
             // tube data
-            state.dataPondGHE->PondGHE(Item).TubeInDiameter = DataIPShortCuts::rNumericArgs(3);
-            state.dataPondGHE->PondGHE(Item).TubeOutDiameter = DataIPShortCuts::rNumericArgs(4);
+            state.dataPondGHE->PondGHE(Item).TubeInDiameter = state.dataIPShortCut->rNumericArgs(3);
+            state.dataPondGHE->PondGHE(Item).TubeOutDiameter = state.dataIPShortCut->rNumericArgs(4);
 
-            if (DataIPShortCuts::rNumericArgs(3) <= 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(3), DataIPShortCuts::rNumericArgs(3)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+            if (state.dataIPShortCut->rNumericArgs(3) <= 0.0) {
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(3), state.dataIPShortCut->rNumericArgs(3)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
-            if (DataIPShortCuts::rNumericArgs(4) <= 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(4), DataIPShortCuts::rNumericArgs(4)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+            if (state.dataIPShortCut->rNumericArgs(4) <= 0.0) {
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(4), state.dataIPShortCut->rNumericArgs(4)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
-            if (DataIPShortCuts::rNumericArgs(3) > DataIPShortCuts::rNumericArgs(4)) { // error
-                ShowSevereError(state, "For " + DataIPShortCuts::cCurrentModuleObject + ": " + DataIPShortCuts::cAlphaArgs(1));
+            if (state.dataIPShortCut->rNumericArgs(3) > state.dataIPShortCut->rNumericArgs(4)) { // error
+                ShowSevereError(state, "For " + state.dataIPShortCut->cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state,
                                   format("{} [{:.2R}] > {} [{:.2R}]",
-                                         DataIPShortCuts::cNumericFieldNames(3),
-                                         DataIPShortCuts::rNumericArgs(3),
-                                         DataIPShortCuts::cNumericFieldNames(4),
-                                         DataIPShortCuts::rNumericArgs(4)));
+                                         state.dataIPShortCut->cNumericFieldNames(3),
+                                         state.dataIPShortCut->rNumericArgs(3),
+                                         state.dataIPShortCut->cNumericFieldNames(4),
+                                         state.dataIPShortCut->rNumericArgs(4)));
                 ErrorsFound = true;
             }
 
             // thermal conductivity data
-            state.dataPondGHE->PondGHE(Item).TubeConductivity = DataIPShortCuts::rNumericArgs(5);
-            state.dataPondGHE->PondGHE(Item).GrndConductivity = DataIPShortCuts::rNumericArgs(6);
+            state.dataPondGHE->PondGHE(Item).TubeConductivity = state.dataIPShortCut->rNumericArgs(5);
+            state.dataPondGHE->PondGHE(Item).GrndConductivity = state.dataIPShortCut->rNumericArgs(6);
 
-            if (DataIPShortCuts::rNumericArgs(5) <= 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.4R}", DataIPShortCuts::cNumericFieldNames(5), DataIPShortCuts::rNumericArgs(5)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+            if (state.dataIPShortCut->rNumericArgs(5) <= 0.0) {
+                ShowSevereError(state, format("Invalid {}={:.4R}", state.dataIPShortCut->cNumericFieldNames(5), state.dataIPShortCut->rNumericArgs(5)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
-            if (DataIPShortCuts::rNumericArgs(6) <= 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.4R}", DataIPShortCuts::cNumericFieldNames(6), DataIPShortCuts::rNumericArgs(6)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+            if (state.dataIPShortCut->rNumericArgs(6) <= 0.0) {
+                ShowSevereError(state, format("Invalid {}={:.4R}", state.dataIPShortCut->cNumericFieldNames(6), state.dataIPShortCut->rNumericArgs(6)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
 
             // circuits
-            state.dataPondGHE->PondGHE(Item).NumCircuits = DataIPShortCuts::rNumericArgs(7);
+            state.dataPondGHE->PondGHE(Item).NumCircuits = state.dataIPShortCut->rNumericArgs(7);
 
-            if (DataIPShortCuts::rNumericArgs(7) <= 0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(7), DataIPShortCuts::rNumericArgs(7)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+            if (state.dataIPShortCut->rNumericArgs(7) <= 0) {
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(7), state.dataIPShortCut->rNumericArgs(7)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
-            state.dataPondGHE->PondGHE(Item).CircuitLength = DataIPShortCuts::rNumericArgs(8);
-            if (DataIPShortCuts::rNumericArgs(8) <= 0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(8), DataIPShortCuts::rNumericArgs(8)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+            state.dataPondGHE->PondGHE(Item).CircuitLength = state.dataIPShortCut->rNumericArgs(8);
+            if (state.dataIPShortCut->rNumericArgs(8) <= 0) {
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(8), state.dataIPShortCut->rNumericArgs(8)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
@@ -331,7 +331,7 @@ namespace EnergyPlus::PondGroundHeatExchanger {
 
         // final error check
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
         }
 
         if (!state.dataEnvrn->GroundTemp_DeepObjInput) {

@@ -237,12 +237,12 @@ namespace EnergyPlus::ChillerAbsorption {
         int IOStat = 0;      // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        DataIPShortCuts::cCurrentModuleObject = moduleObjectType;
+        state.dataIPShortCut->cCurrentModuleObject = moduleObjectType;
 
-        state.dataChillerAbsorber->numAbsorbers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerAbsorber->numAbsorbers = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataChillerAbsorber->numAbsorbers <= 0) {
-            ShowSevereError(state, "No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
             // See if load distribution manager has already gotten the input
             ErrorsFound = true;
         }
@@ -254,92 +254,92 @@ namespace EnergyPlus::ChillerAbsorption {
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
         for (int AbsorberNum = 1; AbsorberNum <= state.dataChillerAbsorber->numAbsorbers; ++AbsorberNum) {
             inputProcessor->getObjectItem(state,
-                                          DataIPShortCuts::cCurrentModuleObject,
+                                          state.dataIPShortCut->cCurrentModuleObject,
                                           AbsorberNum,
-                                          DataIPShortCuts::cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          DataIPShortCuts::rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
                                           _,
-                                          DataIPShortCuts::lAlphaFieldBlanks,
-                                          DataIPShortCuts::cAlphaFieldNames,
-                                          DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
-                DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
+                state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, state.dataIPShortCut->cCurrentModuleObject + " Name");
 
             auto &thisChiller = state.dataChillerAbsorber->absorptionChillers(AbsorberNum);
-            thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
-            thisChiller.NomCap = DataIPShortCuts::rNumericArgs(1);
+            thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
+            thisChiller.NomCap = state.dataIPShortCut->rNumericArgs(1);
             if (thisChiller.NomCap == DataSizing::AutoSize) {
                 thisChiller.NomCapWasAutoSized = true;
             }
-            thisChiller.NomPumpPower = DataIPShortCuts::rNumericArgs(2);
+            thisChiller.NomPumpPower = state.dataIPShortCut->rNumericArgs(2);
             if (thisChiller.NomPumpPower == DataSizing::AutoSize) {
                 thisChiller.NomPumpPowerWasAutoSized = true;
             }
-            if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+            if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
             // Assign Node Numbers to specified nodes
-            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(2),
+            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(2),
                                                                                               ErrorsFound,
-                                                                                              DataIPShortCuts::cCurrentModuleObject,
-                                                                                              DataIPShortCuts::cAlphaArgs(1),
+                                                                                              state.dataIPShortCut->cCurrentModuleObject,
+                                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType::Inlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
-            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
+            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(3),
                                                                                                ErrorsFound,
-                                                                                               DataIPShortCuts::cCurrentModuleObject,
-                                                                                               DataIPShortCuts::cAlphaArgs(1),
+                                                                                               state.dataIPShortCut->cCurrentModuleObject,
+                                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType::Outlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                               DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cAlphaArgs(2),
-                                               DataIPShortCuts::cAlphaArgs(3),
+            BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(2),
+                                               state.dataIPShortCut->cAlphaArgs(3),
                                                "Chilled Water Nodes");
 
-            thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
+            thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(4),
                                                                                               ErrorsFound,
-                                                                                              DataIPShortCuts::cCurrentModuleObject,
-                                                                                              DataIPShortCuts::cAlphaArgs(1),
+                                                                                              state.dataIPShortCut->cCurrentModuleObject,
+                                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType::Inlet,
                                                                                               2,
                                                                                               DataLoopNode::ObjectIsNotParent);
-            thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
+            thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(5),
                                                                                                ErrorsFound,
-                                                                                               DataIPShortCuts::cCurrentModuleObject,
-                                                                                               DataIPShortCuts::cAlphaArgs(1),
+                                                                                               state.dataIPShortCut->cCurrentModuleObject,
+                                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType::Outlet,
                                                                                                2,
                                                                                                DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                               DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cAlphaArgs(4),
-                                               DataIPShortCuts::cAlphaArgs(5),
+            BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(4),
+                                               state.dataIPShortCut->cAlphaArgs(5),
                                                "Condenser (not tested) Nodes");
 
             if (NumAlphas > 8) {
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "HotWater") ||
-                    UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "HotWater")) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater") ||
+                    UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater")) {
                     thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Water;
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), fluidNameSteam) || DataIPShortCuts::cAlphaArgs(9).empty()) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), fluidNameSteam) || state.dataIPShortCut->cAlphaArgs(9).empty()) {
                     thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
                 } else {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + DataIPShortCuts::cAlphaArgs(9));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "...Generator heat source type must be Steam or Hot Water.");
                     ErrorsFound = true;
                 }
@@ -347,64 +347,64 @@ namespace EnergyPlus::ChillerAbsorption {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
             }
 
-            if (!DataIPShortCuts::lAlphaFieldBlanks(6) && !DataIPShortCuts::lAlphaFieldBlanks(7)) {
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6) && !state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                 thisChiller.GenInputOutputNodesUsed = true;
                 if (thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
-                    thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
+                    thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(6),
                                                                                                            ErrorsFound,
-                                                                                                           DataIPShortCuts::cCurrentModuleObject,
-                                                                                                           DataIPShortCuts::cAlphaArgs(1),
+                                                                                                           state.dataIPShortCut->cCurrentModuleObject,
+                                                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                                                            DataLoopNode::NodeFluidType::Water,
                                                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                                                            3,
                                                                                                            DataLoopNode::ObjectIsNotParent);
-                    thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
+                    thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(7),
                                                                                                             ErrorsFound,
-                                                                                                            DataIPShortCuts::cCurrentModuleObject,
-                                                                                                            DataIPShortCuts::cAlphaArgs(1),
+                                                                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                                                             DataLoopNode::NodeFluidType::Water,
                                                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                                                             3,
                                                                                                             DataLoopNode::ObjectIsNotParent);
-                    BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                                       DataIPShortCuts::cAlphaArgs(1),
-                                                       DataIPShortCuts::cAlphaArgs(6),
-                                                       DataIPShortCuts::cAlphaArgs(7),
+                    BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataIPShortCut->cAlphaArgs(6),
+                                                       state.dataIPShortCut->cAlphaArgs(7),
                                                        "Hot Water Nodes");
                 } else {
                     thisChiller.SteamFluidIndex = FluidProperties::FindRefrigerant(state, fluidNameSteam);
-                    thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
+                    thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(6),
                                                                                                            ErrorsFound,
-                                                                                                           DataIPShortCuts::cCurrentModuleObject,
-                                                                                                           DataIPShortCuts::cAlphaArgs(1),
+                                                                                                           state.dataIPShortCut->cCurrentModuleObject,
+                                                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                                                            DataLoopNode::NodeFluidType::Steam,
                                                                                                            DataLoopNode::NodeConnectionType::Inlet,
                                                                                                            3,
                                                                                                            DataLoopNode::ObjectIsNotParent);
-                    thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
+                    thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(7),
                                                                                                             ErrorsFound,
-                                                                                                            DataIPShortCuts::cCurrentModuleObject,
-                                                                                                            DataIPShortCuts::cAlphaArgs(1),
+                                                                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                                                             DataLoopNode::NodeFluidType::Steam,
                                                                                                             DataLoopNode::NodeConnectionType::Outlet,
                                                                                                             3,
                                                                                                             DataLoopNode::ObjectIsNotParent);
-                    BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                                       DataIPShortCuts::cAlphaArgs(1),
-                                                       DataIPShortCuts::cAlphaArgs(6),
-                                                       DataIPShortCuts::cAlphaArgs(7),
+                    BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataIPShortCut->cAlphaArgs(6),
+                                                       state.dataIPShortCut->cAlphaArgs(7),
                                                        "Steam Nodes");
                 }
-            } else if ((DataIPShortCuts::lAlphaFieldBlanks(6) && !DataIPShortCuts::lAlphaFieldBlanks(7)) ||
-                       (!DataIPShortCuts::lAlphaFieldBlanks(6) && DataIPShortCuts::lAlphaFieldBlanks(7))) {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
+            } else if ((state.dataIPShortCut->lAlphaFieldBlanks(6) && !state.dataIPShortCut->lAlphaFieldBlanks(7)) ||
+                       (!state.dataIPShortCut->lAlphaFieldBlanks(6) && state.dataIPShortCut->lAlphaFieldBlanks(7))) {
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + ", Name=" + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "...Generator fluid nodes must both be entered (or both left blank).");
-                ShowContinueError(state, "..." + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
-                ShowContinueError(state, "..." + DataIPShortCuts::cAlphaFieldNames(7) + " = " + DataIPShortCuts::cAlphaArgs(7));
+                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
                 ErrorsFound = true;
             } else {
                 if (thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
+                    ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + ", Name=" + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "...Generator fluid type must be Steam if generator inlet/outlet nodes are blank.");
                     ShowContinueError(state, "...Generator fluid type is set to Steam and the simulation continues.");
                     thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
@@ -412,28 +412,28 @@ namespace EnergyPlus::ChillerAbsorption {
             }
 
             // Get remaining data
-            thisChiller.MinPartLoadRat = DataIPShortCuts::rNumericArgs(3);
-            thisChiller.MaxPartLoadRat = DataIPShortCuts::rNumericArgs(4);
-            thisChiller.OptPartLoadRat = DataIPShortCuts::rNumericArgs(5);
-            thisChiller.TempDesCondIn = DataIPShortCuts::rNumericArgs(6);
-            thisChiller.EvapVolFlowRate = DataIPShortCuts::rNumericArgs(7);
+            thisChiller.MinPartLoadRat = state.dataIPShortCut->rNumericArgs(3);
+            thisChiller.MaxPartLoadRat = state.dataIPShortCut->rNumericArgs(4);
+            thisChiller.OptPartLoadRat = state.dataIPShortCut->rNumericArgs(5);
+            thisChiller.TempDesCondIn = state.dataIPShortCut->rNumericArgs(6);
+            thisChiller.EvapVolFlowRate = state.dataIPShortCut->rNumericArgs(7);
             if (thisChiller.EvapVolFlowRate == DataSizing::AutoSize) {
                 thisChiller.EvapVolFlowRateWasAutoSized = true;
             }
-            thisChiller.CondVolFlowRate = DataIPShortCuts::rNumericArgs(8);
+            thisChiller.CondVolFlowRate = state.dataIPShortCut->rNumericArgs(8);
             if (thisChiller.CondVolFlowRate == DataSizing::AutoSize) {
                 thisChiller.CondVolFlowRateWasAutoSized = true;
             }
-            thisChiller.SteamLoadCoef(1) = DataIPShortCuts::rNumericArgs(9);
-            thisChiller.SteamLoadCoef(2) = DataIPShortCuts::rNumericArgs(10);
-            thisChiller.SteamLoadCoef(3) = DataIPShortCuts::rNumericArgs(11);
-            thisChiller.PumpPowerCoef(1) = DataIPShortCuts::rNumericArgs(12);
-            thisChiller.PumpPowerCoef(2) = DataIPShortCuts::rNumericArgs(13);
-            thisChiller.PumpPowerCoef(3) = DataIPShortCuts::rNumericArgs(14);
-            thisChiller.TempLowLimitEvapOut = DataIPShortCuts::rNumericArgs(15);
+            thisChiller.SteamLoadCoef(1) = state.dataIPShortCut->rNumericArgs(9);
+            thisChiller.SteamLoadCoef(2) = state.dataIPShortCut->rNumericArgs(10);
+            thisChiller.SteamLoadCoef(3) = state.dataIPShortCut->rNumericArgs(11);
+            thisChiller.PumpPowerCoef(1) = state.dataIPShortCut->rNumericArgs(12);
+            thisChiller.PumpPowerCoef(2) = state.dataIPShortCut->rNumericArgs(13);
+            thisChiller.PumpPowerCoef(3) = state.dataIPShortCut->rNumericArgs(14);
+            thisChiller.TempLowLimitEvapOut = state.dataIPShortCut->rNumericArgs(15);
 
             {
-                auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(8));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(8));
                 if (SELECT_CASE_var == "CONSTANTFLOW") {
                     thisChiller.FlowMode = DataPlant::FlowMode::Constant;
                 } else if (SELECT_CASE_var == "LEAVINGSETPOINTMODULATED") {
@@ -441,8 +441,8 @@ namespace EnergyPlus::ChillerAbsorption {
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
                 } else {
-                    ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-                    ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + DataIPShortCuts::cAlphaArgs(8));
+                    ShowSevereError(state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
                     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
@@ -450,7 +450,7 @@ namespace EnergyPlus::ChillerAbsorption {
             }
 
             if (NumNums > 15) {
-                thisChiller.GeneratorVolFlowRate = DataIPShortCuts::rNumericArgs(16);
+                thisChiller.GeneratorVolFlowRate = state.dataIPShortCut->rNumericArgs(16);
                 if (thisChiller.GeneratorVolFlowRate == DataSizing::AutoSize) {
                     thisChiller.GeneratorVolFlowRateWasAutoSized = true;
                 }
@@ -458,27 +458,27 @@ namespace EnergyPlus::ChillerAbsorption {
 
             if (thisChiller.GeneratorVolFlowRate == 0.0 &&
                 thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(16), DataIPShortCuts::rNumericArgs(16)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(16), state.dataIPShortCut->rNumericArgs(16)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "...Generator water flow rate must be greater than 0 when absorber generator fluid type is hot water.");
                 ErrorsFound = true;
             }
 
             if (NumNums > 16) {
-                thisChiller.GeneratorSubcool = DataIPShortCuts::rNumericArgs(17);
+                thisChiller.GeneratorSubcool = state.dataIPShortCut->rNumericArgs(17);
             } else {
                 thisChiller.GeneratorSubcool = 1.0;
             }
 
             if (NumNums > 17) {
-                thisChiller.SizFac = DataIPShortCuts::rNumericArgs(18);
+                thisChiller.SizFac = state.dataIPShortCut->rNumericArgs(18);
             } else {
                 thisChiller.SizFac = 1.0;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
         }
     }
 

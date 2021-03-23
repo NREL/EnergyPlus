@@ -100,7 +100,6 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 
     // Using/Aliasing
     using namespace DataGlobalConstants;
-    using namespace DataIPShortCuts;
 
     // Functions
 
@@ -200,10 +199,10 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -230,7 +229,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 elcc->discountConvention = iDiscConv::BeginOfYear;
             } else {
                 elcc->discountConvention = iDiscConv::EndOfYear;
-                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphaArray(2) + "\". EndOfYear will be used.");
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) + "\". EndOfYear will be used.");
             }
             // A3,  \field Inflation Approach
             //      \type choice
@@ -243,40 +242,40 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 elcc->inflationApproach = iInflAppr::CurrentDollar;
             } else {
                 elcc->inflationApproach = iInflAppr::ConstantDollar;
-                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". ConstantDollar will be used.");
             }
             // N1,  \field Real Discount Rate
             //      \type real
             elcc->realDiscountRate = NumArray(1);
-            if ((elcc->inflationApproach == iInflAppr::ConstantDollar) && lNumericFieldBlanks(1)) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(1) +
+            if ((elcc->inflationApproach == iInflAppr::ConstantDollar) && state.dataIPShortCut->lNumericFieldBlanks(1)) {
+                ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + state.dataIPShortCut->cNumericFieldNames(1) +
                                  " to be blank when ConstantDollar analysis is be used.");
             }
             if ((elcc->realDiscountRate > 0.30) || (elcc->realDiscountRate < -0.30)) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(1) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(1) +
                                  ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
             }
             // N2,  \field Nominal Discount Rate
             //      \type real
             elcc->nominalDiscountRate = NumArray(2);
-            if ((elcc->inflationApproach == iInflAppr::CurrentDollar) && lNumericFieldBlanks(2)) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(2) +
+            if ((elcc->inflationApproach == iInflAppr::CurrentDollar) && state.dataIPShortCut->lNumericFieldBlanks(2)) {
+                ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + state.dataIPShortCut->cNumericFieldNames(2) +
                                  " to be blank when CurrentDollar analysis is be used.");
             }
             if ((elcc->nominalDiscountRate > 0.30) || (elcc->nominalDiscountRate < -0.30)) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
                                  ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
             }
             // N3,  \field Inflation
             //      \type real
             elcc->inflation = NumArray(3);
-            if ((elcc->inflationApproach == iInflAppr::ConstantDollar) && (!lNumericFieldBlanks(3))) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(3) +
+            if ((elcc->inflationApproach == iInflAppr::ConstantDollar) && (!state.dataIPShortCut->lNumericFieldBlanks(3))) {
+                ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + state.dataIPShortCut->cNumericFieldNames(3) +
                                  " contain a value when ConstantDollar analysis is be used.");
             }
             if ((elcc->inflation > 0.30) || (elcc->inflation < -0.30)) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
                                  ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
             }
             // A4,  \field Base Date Month
@@ -301,11 +300,11 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //      \maximum 2100
             elcc->baseDateYear = int(NumArray(4));
             if (elcc->baseDateYear > 2100) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(4) +
                                  ".  Value greater than 2100 yet it is representing a year. ");
             }
             if (elcc->baseDateYear < 1900) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(4) +
                                  ".  Value less than 1900 yet it is representing a year. ");
             }
             // A5,  \field Service Date Month
@@ -330,11 +329,11 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //      \maximum 2100
             elcc->serviceDateYear = int(NumArray(5));
             if (elcc->serviceDateYear > 2100) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(5) +
                                  ".  Value greater than 2100 yet it is representing a year. ");
             }
             if (elcc->serviceDateYear < 1900) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(5) +
                                  ".  Value less than 1900 yet it is representing a year. ");
             }
             // N6,  \field Length of Study Period in Years
@@ -343,11 +342,11 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //      \maximum 100
             elcc->lengthStudyYears = int(NumArray(6));
             if (elcc->lengthStudyYears > 100) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(6) +
                                  ".  A value greater than 100 is not reasonable for an economic evaluation. ");
             }
             if (elcc->lengthStudyYears < 1) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(6) +
                                  ".  A value less than 1 is not reasonable for an economic evaluation. ");
             }
             elcc->lengthStudyTotalMonths = elcc->lengthStudyYears * 12;
@@ -355,8 +354,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //      \type real
             //      \minimum 0.0
             elcc->taxRate = NumArray(7);
-            if (elcc->taxRate < 0.0 && (!lNumericFieldBlanks(7))) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(10) +
+            if (elcc->taxRate < 0.0 && (!state.dataIPShortCut->lNumericFieldBlanks(7))) {
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(10) +
                                  ".  A value less than 0 is not reasonable for a tax rate. ");
             }
             // A6;  \field Depreciation Method
@@ -395,12 +394,12 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 elcc->depreciationMethod = iDeprMethod::Straight40;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "None")) {
                 elcc->depreciationMethod = iDeprMethod::None;
-            } else if (lAlphaFieldBlanks(6)) {
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                 elcc->depreciationMethod = iDeprMethod::None;
-                ShowWarningError(state, CurrentModuleObject + ": The input field " + cAlphaFieldNames(6) + "is blank. \"None\" will be used.");
+                ShowWarningError(state, CurrentModuleObject + ": The input field " + state.dataIPShortCut->cAlphaFieldNames(6) + "is blank. \"None\" will be used.");
             } else {
                 elcc->depreciationMethod = iDeprMethod::None;
-                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(6) + "=\"" + AlphaArray(6) + R"(". "None" will be used.)");
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + AlphaArray(6) + R"(". "None" will be used.)");
             }
             // compute derived variables
             elcc->lastDateMonth = elcc->baseDateMonth - 1; // same month of the year for first and last month
@@ -451,10 +450,10 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -493,7 +492,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 elcc->RecurringCosts(iInObj).category = costCatOtherOperational;
             } else {
                 elcc->RecurringCosts(iInObj).category = costCatMaintenance;
-                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
                                  "\". The category of Maintenance will be used.");
             }
             //   N1,  \field Cost
@@ -510,7 +509,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 elcc->RecurringCosts(iInObj).startOfCosts = iStartCosts::BasePeriod;
             } else {
                 elcc->RecurringCosts(iInObj).startOfCosts = iStartCosts::ServicePeriod;
-                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". The start of the service period will be used.");
             }
             //   N2,  \field Years from Start
@@ -520,12 +519,12 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             elcc->RecurringCosts(iInObj).yearsFromStart = int(NumArray(2));
             if (elcc->RecurringCosts(iInObj).yearsFromStart > 100) {
                 ShowWarningError(state,
-                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
+                    CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
                     ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. ");
             }
             if (elcc->RecurringCosts(iInObj).yearsFromStart < 0) {
                 ShowWarningError(state,
-                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
+                    CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
                     ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. ");
             }
             //   N3,  \field Months from Start
@@ -534,13 +533,13 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //        \maximum 1200
             elcc->RecurringCosts(iInObj).monthsFromStart = int(NumArray(3));
             if (elcc->RecurringCosts(iInObj).monthsFromStart > 1200) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
                                  ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an "
                                  "economic evaluation. ");
             }
             if (elcc->RecurringCosts(iInObj).monthsFromStart < 0) {
                 ShowWarningError(state,
-                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
+                    CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
                     ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. ");
             }
             //   N4,  \field Repeat Period Years
@@ -549,12 +548,12 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //        \maximum 100
             elcc->RecurringCosts(iInObj).repeatPeriodYears = int(NumArray(4));
             if (elcc->RecurringCosts(iInObj).repeatPeriodYears > 100) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(4) +
                                  ".  This value is the number of years between occurrences of the cost so a value greater than 100 is not reasonable "
                                  "for an economic evaluation. ");
             }
             if (elcc->RecurringCosts(iInObj).repeatPeriodYears < 1) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(4) +
                                  ".  This value is the number of years between occurrences of the cost so a value less than 1 is not reasonable for "
                                  "an economic evaluation. ");
             }
@@ -564,28 +563,28 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //        \maximum 1200
             elcc->RecurringCosts(iInObj).repeatPeriodMonths = int(NumArray(5));
             if (elcc->RecurringCosts(iInObj).repeatPeriodMonths > 1200) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(5) +
                                  ".  This value is the number of months between occurrences of the cost so a value greater than 1200 is not "
                                  "reasonable for an economic evaluation. ");
             }
             if (elcc->RecurringCosts(iInObj).repeatPeriodMonths < 0) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(5) +
                                  ".  This value is the number of months between occurrences of the cost so a value less than 0 is not reasonable for "
                                  "an economic evaluation. ");
             }
             if ((elcc->RecurringCosts(iInObj).repeatPeriodMonths == 0) && (elcc->RecurringCosts(iInObj).repeatPeriodYears == 0)) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in fields " + cNumericFieldNames(5) + " and " + cNumericFieldNames(4) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in fields " + state.dataIPShortCut->cNumericFieldNames(5) + " and " + state.dataIPShortCut->cNumericFieldNames(4) +
                                  ".  The repeat period must not be zero months and zero years. ");
             }
             //   N6;  \field Annual escalation rate
             //        \type real
             elcc->RecurringCosts(iInObj).annualEscalationRate = int(NumArray(6));
             if (elcc->RecurringCosts(iInObj).annualEscalationRate > 0.30) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(6) +
                                  ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. ");
             }
             if (elcc->RecurringCosts(iInObj).annualEscalationRate < -0.30) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(6) +
                                  ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. ");
             }
             // express the years and months fields in total months
@@ -640,10 +639,10 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -670,7 +669,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 elcc->NonrecurringCost(iInObj).category = costCatOtherCapital;
             } else {
                 elcc->NonrecurringCost(iInObj).category = costCatConstruction;
-                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
                                  "\". The category of Construction will be used.");
             }
             // N1,  \field Cost
@@ -687,7 +686,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 elcc->NonrecurringCost(iInObj).startOfCosts = iStartCosts::BasePeriod;
             } else {
                 elcc->NonrecurringCost(iInObj).startOfCosts = iStartCosts::ServicePeriod;
-                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". The start of the service period will be used.");
             }
             // N2,  \field Years from Start
@@ -697,12 +696,12 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             elcc->NonrecurringCost(iInObj).yearsFromStart = int(NumArray(2));
             if (elcc->NonrecurringCost(iInObj).yearsFromStart > 100) {
                 ShowWarningError(state,
-                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
+                    CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
                     ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. ");
             }
             if (elcc->NonrecurringCost(iInObj).yearsFromStart < 0) {
                 ShowWarningError(state,
-                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
+                    CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
                     ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. ");
             }
             //  N3;  \field Months from Start
@@ -711,13 +710,13 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //       \maximum 11
             elcc->NonrecurringCost(iInObj).monthsFromStart = int(NumArray(3));
             if (elcc->NonrecurringCost(iInObj).monthsFromStart > 1200) {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
+                ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
                                  ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an "
                                  "economic evaluation. ");
             }
             if (elcc->NonrecurringCost(iInObj).monthsFromStart < 0) {
                 ShowWarningError(state,
-                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
+                    CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
                     ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. ");
             }
             // express the years and months fields in total months
@@ -769,10 +768,10 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                               NumArray,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 // check to make sure none of the values are another life cycle cost object
                 for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                     if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -810,11 +809,11 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 //      \maximum 2100
                 elcc->UsePriceEscalation(iInObj).escalationStartYear = int(NumArray(1));
                 if (elcc->UsePriceEscalation(iInObj).escalationStartYear > 2100) {
-                    ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(1) +
+                    ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(1) +
                                      ".  Value greater than 2100 yet it is representing a year. ");
                 }
                 if (elcc->UsePriceEscalation(iInObj).escalationStartYear < 1900) {
-                    ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(1) +
+                    ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(1) +
                                      ".  Value less than 1900 yet it is representing a year. ");
                 }
                 // A3,  \field Escalation Start Month
@@ -907,10 +906,10 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                               NumArray,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 // check to make sure none of the values are another life cycle cost object
                 for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                     if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -1081,7 +1080,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> resourceCosts;
         for (int jMonth = 1; jMonth <= 12; ++jMonth) {
             std::map<DataGlobalConstants::ResourceType, Real64> monthMap;
-            for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+            for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
                 monthMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
             }
             resourceCosts.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>> (jMonth, monthMap));
@@ -1090,12 +1089,12 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         Array1D<Real64> curResourceCosts(12);
 
         std::map<DataGlobalConstants::ResourceType, bool> resourceCostNotZero;
-        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
             resourceCostNotZero.insert(std::pair<DataGlobalConstants::ResourceType, bool>(iResource, false));
         }
 
         std::map<DataGlobalConstants::ResourceType, Real64> resourceCostAnnual;
-        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
             resourceCostAnnual.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
         }
 
@@ -1128,7 +1127,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 
         // gather costs from EconomicTariff for each end use
         elcc->numResourcesUsed = 0;
-        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
             GetMonthlyCostForResource(state, iResource, curResourceCosts);
             annualCost = 0.0;
             for (int jMonth = 1; jMonth <= 12; ++jMonth) {
@@ -1146,7 +1145,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         // allocate the escalated energy cost arrays
         for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
             std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
-            for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+            for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
                 yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
             }
             elcc->EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
@@ -1233,7 +1232,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         // Put resource costs into cashflows
         // the first cash flow for resources should be after the categories, recurring and nonrecurring costs
         cashFlowCounter = countOfCostCat + elcc->numRecurringCosts + elcc->numNonrecurringCost;
-        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
             if (resourceCostNotZero.at(iResource)) {
                 ++cashFlowCounter;
 
@@ -1396,7 +1395,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 }
             }
         }
-        for (auto kResource : DataGlobalConstants::AllResourceTypes) {
+        for (auto kResource : state.dataGlobalConst->AllResourceTypes) {
             for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 elcc->EscalatedTotEnergy(jYear) += elcc->EscalatedEnergy.at(jYear).at(kResource);
             }
@@ -1473,7 +1472,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         elcc->SPV.allocate(elcc->lengthStudyYears);
         for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
             std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
-            for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+            for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
                 yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
             }
             elcc->energySPV.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
@@ -1504,7 +1503,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         }
         // use SPV as default values for all energy types
         for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-            for (auto kResource : DataGlobalConstants::AllResourceTypes) {
+            for (auto kResource : state.dataGlobalConst->AllResourceTypes) {
                 elcc->energySPV.at(jYear).at(kResource) = elcc->SPV(jYear);
             }
         }

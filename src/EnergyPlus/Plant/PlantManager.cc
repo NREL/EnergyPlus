@@ -284,7 +284,6 @@ namespace EnergyPlus::PlantManager {
             // calls the Input Processor to retrieve data from input file.
 
             // Using/Aliasing
-            using namespace DataIPShortCuts; // Data for field names, blank numerics
             using ScheduleManager::GetScheduleIndex;
             using SetPointManager::IsNodeOnSetPtManager;
             auto localTempSetPt = SetPointManager::iCtrlVarType::Temp;
@@ -355,10 +354,10 @@ namespace EnergyPlus::PlantManager {
                                                   Num,
                                                   NumNums,
                                                   IOStat,
-                                                  lNumericFieldBlanks,
-                                                  lAlphaFieldBlanks,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
+                                                  state.dataIPShortCut->lNumericFieldBlanks,
+                                                  state.dataIPShortCut->lAlphaFieldBlanks,
+                                                  state.dataIPShortCut->cAlphaFieldNames,
+                                                  state.dataIPShortCut->cNumericFieldNames);
                 } else {
                     CondLoopNum = LoopNum - state.dataHVACGlobal->NumPlantLoops;
                     this_loop.TypeOfLoop = LoopType::Condenser;
@@ -371,10 +370,10 @@ namespace EnergyPlus::PlantManager {
                                                   Num,
                                                   NumNums,
                                                   IOStat,
-                                                  lNumericFieldBlanks,
+                                                  state.dataIPShortCut->lNumericFieldBlanks,
                                                   _,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
+                                                  state.dataIPShortCut->cAlphaFieldNames,
+                                                  state.dataIPShortCut->cNumericFieldNames);
                 }
                 UtilityRoutines::IsNameEmpty(state, Alpha(1), CurrentModuleObject, ErrorsFound);
                 this_loop.Name = Alpha(1); // Load the Plant Loop Name
@@ -404,7 +403,7 @@ namespace EnergyPlus::PlantManager {
                         }
                     }
                 } else {
-                    ShowWarningError(state, "Input error: " + cAlphaFieldNames(2) + '=' + Alpha(2) + " entered, in " +
+                    ShowWarningError(state, "Input error: " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + Alpha(2) + " entered, in " +
                                      CurrentModuleObject + '=' + Alpha(1));
                     ShowContinueError(state, "Will default to Water.");
 
@@ -428,12 +427,12 @@ namespace EnergyPlus::PlantManager {
                 // correct loop temperature step.  Loop data is read in supply side, but the volume is not used in
                 // a calculation there.
                 this_loop.Volume = Num(5);
-                if (lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate;
+                if (state.dataIPShortCut->lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate;
                 if (this_loop.Volume == DataGlobalConstants::AutoCalculate) {
                     this_loop.VolumeWasAutoSized = true;
                 }
                 // circulation time used to autocalculate loop volume
-                if (lNumericFieldBlanks(6)) {
+                if (state.dataIPShortCut->lNumericFieldBlanks(6)) {
                     this_loop.CirculationTime = 2.0; // default
                 } else {
                     this_loop.CirculationTime = Num(6);
@@ -484,7 +483,7 @@ namespace EnergyPlus::PlantManager {
                     this_loop.LoadDistribution = DataPlant::iLoadingScheme::SequentialUniformPLR;
                 } else {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                    ShowContinueError(state, "..." + cAlphaFieldNames(14) + "=\"" + Alpha(14) + "\".");
+                    ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(14) + "=\"" + Alpha(14) + "\".");
                     ShowContinueError(state, "Will default to SequentialLoad."); // TODO rename point
                     this_loop.LoadDistribution = DataPlant::iLoadingScheme::Sequential;
                 }
@@ -498,9 +497,9 @@ namespace EnergyPlus::PlantManager {
                         if (this_loop.FluidType == DataLoopNode::NodeFluidType::Steam) {
                             ShowWarningError(state,
                                     RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                            ShowContinueError(state, cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\" not valid for " +
-                                              cAlphaFieldNames(2) + "= Steam");
-                            ShowContinueError(state, "Will reset " + cAlphaFieldNames(16) +
+                            ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\" not valid for " +
+                                              state.dataIPShortCut->cAlphaFieldNames(2) + "= Steam");
+                            ShowContinueError(state, "Will reset " + state.dataIPShortCut->cAlphaFieldNames(16) +
                                               " = SingleSetPoint and simulation will continue.");
                             this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                         } else {
@@ -510,7 +509,7 @@ namespace EnergyPlus::PlantManager {
                         this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                     } else {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                        ShowContinueError(state, "..." + cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\".");
+                        ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\".");
                         ShowContinueError(state, "Will default to SingleSetPoint."); // TODO rename point
                         this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                     }
@@ -524,11 +523,11 @@ namespace EnergyPlus::PlantManager {
                         this_loop.CommonPipeType = DataPlant::iCommonPipeType::Single;
                     } else if (UtilityRoutines::SameString(Alpha(17), "TwoWayCommonPipe")) {
                         this_loop.CommonPipeType = DataPlant::iCommonPipeType::TwoWay;
-                    } else if (UtilityRoutines::SameString(Alpha(17), "None") || lAlphaFieldBlanks(17)) {
+                    } else if (UtilityRoutines::SameString(Alpha(17), "None") || state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                         this_loop.CommonPipeType = DataPlant::iCommonPipeType::No;
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                        ShowContinueError(state, "Invalid " + cAlphaFieldNames(17) + "=\"" + Alpha(17) + "\".");
+                        ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(17) + "=\"" + Alpha(17) + "\".");
                         ShowContinueError(state, "Refer to I/O reference document for more details.");
                         ErrorsFound = true;
                     }
@@ -596,7 +595,7 @@ namespace EnergyPlus::PlantManager {
                             // We have an erroneous input, alert user
                             ShowSevereError(state,
                                     RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(PressSimAlphaIndex) + "=\"" +
+                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(PressSimAlphaIndex) + "=\"" +
                                               Alpha(PressSimAlphaIndex) + "\".");
                             ShowContinueError(state, "Currently only options are: ");
                             ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::NoPressure)));
@@ -619,7 +618,7 @@ namespace EnergyPlus::PlantManager {
                         ShowSevereError(state,
                                 RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                         ShowContinueError(state,
-                                "Invalid " + cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) +
+                                "Invalid " + state.dataIPShortCut->cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) +
                                 "\".");
                         ErrorsFound = true;
                     }
@@ -638,9 +637,9 @@ namespace EnergyPlus::PlantManager {
 
                 if (GetFirstBranchInletNodeName(state, this_demand_side.BranchList) != this_demand_side.NodeNameIn) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-                    ShowContinueError(state, "The inlet node of the first branch in the " + cAlphaFieldNames(12) + '=' +
+                    ShowContinueError(state, "The inlet node of the first branch in the " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' +
                                       Alpha(12));                                                          //"Plant Demand Side Branch List"
-                    ShowContinueError(state, "is not the same as the " + cAlphaFieldNames(10) + '=' +
+                    ShowContinueError(state, "is not the same as the " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' +
                                       Alpha(10)); // "Plant Demand Side Inlet Node Name"
                     ShowContinueError(state, "Branch List Inlet Node Name=" +
                                       GetFirstBranchInletNodeName(state, this_demand_side.BranchList)); // TODO rename point
@@ -655,9 +654,9 @@ namespace EnergyPlus::PlantManager {
                     //"Plant Demand Side Branch List"
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(state,
-                            "The outlet node of the last branch in the " + cAlphaFieldNames(12) + '=' + Alpha(12));
+                            "The outlet node of the last branch in the " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + Alpha(12));
                     //"Plant Demand Side Outlet Node Name"
-                    ShowContinueError(state, "is not the same as the " + cAlphaFieldNames(11) + '=' + Alpha(11));
+                    ShowContinueError(state, "is not the same as the " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + Alpha(11));
                     ShowContinueError(state, "Branch List Outlet Node Name=" +
                                       GetLastBranchOutletNodeName(state, this_demand_side.BranchList)); // TODO rename point
                     // TODO rename point
@@ -670,9 +669,9 @@ namespace EnergyPlus::PlantManager {
                     //"Plant Supply Side Branch List"
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(state,
-                            "The inlet node of the first branch in the " + cAlphaFieldNames(8) + '=' + Alpha(8));
+                            "The inlet node of the first branch in the " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + Alpha(8));
                     //"Plant Supply Side Inlet Node Name
-                    ShowContinueError(state, "is not the same as the " + cAlphaFieldNames(6) + '=' + Alpha(6));
+                    ShowContinueError(state, "is not the same as the " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + Alpha(6));
                     ShowContinueError(state, "Branch List Inlet Node Name=" +
                                       GetFirstBranchInletNodeName(state, this_supply_side.BranchList)); // TODO rename point
                     // TODO rename point
@@ -685,9 +684,9 @@ namespace EnergyPlus::PlantManager {
                     //"Plant Supply Side Branch List"
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(state,
-                            "The outlet node of the last branch in the " + cAlphaFieldNames(8) + '=' + Alpha(8));
+                            "The outlet node of the last branch in the " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + Alpha(8));
                     //"Plant Supply Side Outlet Node Name"
-                    ShowContinueError(state, "is not the same as the " + cAlphaFieldNames(7) + '=' + Alpha(7));
+                    ShowContinueError(state, "is not the same as the " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + Alpha(7));
                     ShowContinueError(state, "Branch List Outlet Node Name=" +
                                       GetLastBranchOutletNodeName(state, this_supply_side.BranchList)); // TODO rename point
                     // TODO rename point
@@ -4242,11 +4241,10 @@ namespace EnergyPlus::PlantManager {
             // use input processor ot find number of plant loops
 
             // Using/Aliasing
-            using namespace DataIPShortCuts;
-            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+                        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int numPlantLoopsCheck;
             int numCondenserLoopsCheck;
-
+            auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
             cCurrentModuleObject = "PlantLoop";
             numPlantLoopsCheck = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 

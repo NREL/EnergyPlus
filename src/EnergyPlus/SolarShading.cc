@@ -360,8 +360,7 @@ namespace EnergyPlus::SolarShading {
 
         // Using/Aliasing
 
-        using namespace DataIPShortCuts;
-        using DataSystemVariables::ShadingMethod;
+                using DataSystemVariables::ShadingMethod;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumItems;
@@ -369,10 +368,10 @@ namespace EnergyPlus::SolarShading {
         int NumAlphas;
         int IOStat;
         int Found = 0;
-
-        rNumericArgs({1, 4}) = 0.0; // so if nothing gotten, defaults will be maintained.
-        cAlphaArgs(1) = "";
-        cAlphaArgs(2) = "";
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        state.dataIPShortCut->rNumericArgs({1, 4}) = 0.0; // so if nothing gotten, defaults will be maintained.
+        state.dataIPShortCut->cAlphaArgs(1) = "";
+        state.dataIPShortCut->cAlphaArgs(2) = "";
         cCurrentModuleObject = "ShadowCalculation";
         NumItems = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         NumAlphas = 0;
@@ -385,16 +384,16 @@ namespace EnergyPlus::SolarShading {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           1,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            state.dataSolarShading->ShadowingCalcFrequency = rNumericArgs(1);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataSolarShading->ShadowingCalcFrequency = state.dataIPShortCut->rNumericArgs(1);
         }
 
         if (state.dataSolarShading->ShadowingCalcFrequency <= 0) {
@@ -402,12 +401,12 @@ namespace EnergyPlus::SolarShading {
             state.dataSolarShading->ShadowingCalcFrequency = 20;
         }
         if (state.dataSolarShading->ShadowingCalcFrequency > 31) {
-            ShowWarningError(state, cCurrentModuleObject + ": suspect " + cNumericFieldNames(1));
-            ShowContinueError(state, format("Value entered=[{:.0R}], Shadowing Calculations will be inaccurate.", rNumericArgs(1)));
+            ShowWarningError(state, cCurrentModuleObject + ": suspect " + state.dataIPShortCut->cNumericFieldNames(1));
+            ShowContinueError(state, format("Value entered=[{:.0R}], Shadowing Calculations will be inaccurate.", state.dataIPShortCut->rNumericArgs(1)));
         }
 
-        if (rNumericArgs(2) > 199.0) {
-            state.dataSolarShading->MaxHCS = rNumericArgs(2);
+        if (state.dataIPShortCut->rNumericArgs(2) > 199.0) {
+            state.dataSolarShading->MaxHCS = state.dataIPShortCut->rNumericArgs(2);
         } else {
             state.dataSolarShading->MaxHCS = 15000;
         }
@@ -415,34 +414,34 @@ namespace EnergyPlus::SolarShading {
         int aNum = 1;
         unsigned pixelRes = 512u;
         if (NumAlphas >= aNum) {
-            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Scheduled")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Scheduled")) {
                 state.dataSysVars->shadingMethod = ShadingMethod::Scheduled;
-                cAlphaArgs(aNum) = "Scheduled";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Imported")) {
+                state.dataIPShortCut->cAlphaArgs(aNum) = "Scheduled";
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Imported")) {
                 if (state.dataScheduleMgr->ScheduleFileShadingProcessed) {
                     state.dataSysVars->shadingMethod = ShadingMethod::Imported;
-                    cAlphaArgs(aNum) = "Imported";
+                    state.dataIPShortCut->cAlphaArgs(aNum) = "Imported";
                 } else {
-                    ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
-                    ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) +
+                    ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(aNum));
+                    ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) +
                                       "\" while no Schedule:File:Shading object is defined, InternalCalculation will be used.");
                 }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "PolygonClipping")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PolygonClipping")) {
                 state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
-                cAlphaArgs(aNum) = "PolygonClipping";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "PixelCounting")) {
+                state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PixelCounting")) {
                 state.dataSysVars->shadingMethod = ShadingMethod::PixelCounting;
-                cAlphaArgs(aNum) = "PixelCounting";
+                state.dataIPShortCut->cAlphaArgs(aNum) = "PixelCounting";
                 if (NumNumbers >= 3) {
-                    pixelRes = (unsigned)rNumericArgs(3);
+                    pixelRes = (unsigned) state.dataIPShortCut->rNumericArgs(3);
                 }
 #ifdef EP_NO_OPENGL
-                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
-                ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) + "\"");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(aNum));
+                ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\"");
                 ShowContinueError(state, "This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)");
                 ShowContinueError(state, "PolygonClipping will be used instead");
                 state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
-                cAlphaArgs(aNum) = "PolygonClipping";
+                state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
 #else
                 auto error_callback = [](const int messageType, const std::string & message, void *contextPtr){
                     auto *state = (EnergyPlusData*) contextPtr;
@@ -460,118 +459,118 @@ namespace EnergyPlus::SolarShading {
                     ShowWarningError(state, "No GPU found (required for PixelCounting)");
                     ShowContinueError(state, "PolygonClipping will be used instead");
                     state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
-                    cAlphaArgs(aNum) = "PolygonClipping";
+                    state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
                 }
 #endif
             } else {
-                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
-                ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) + "\", PolygonClipping will be used.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(aNum));
+                ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\", PolygonClipping will be used.");
             }
         } else {
-            cAlphaArgs(aNum) = "PolygonClipping";
+            state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
             state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
         }
 
         aNum++;
         if (NumAlphas >= aNum) {
-            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Periodic")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Periodic")) {
                 state.dataSysVars->DetailedSolarTimestepIntegration = false;
-                cAlphaArgs(aNum) = "Periodic";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Timestep")) {
+                state.dataIPShortCut->cAlphaArgs(aNum) = "Periodic";
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Timestep")) {
                 state.dataSysVars->DetailedSolarTimestepIntegration = true;
-                cAlphaArgs(aNum) = "Timestep";
+                state.dataIPShortCut->cAlphaArgs(aNum) = "Timestep";
             } else {
-                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
-                ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) + "\", Periodic will be used.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(aNum));
+                ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\", Periodic will be used.");
                 state.dataSysVars->DetailedSolarTimestepIntegration = false;
-                cAlphaArgs(aNum) = "Periodic";
+                state.dataIPShortCut->cAlphaArgs(aNum) = "Periodic";
             }
         } else {
             state.dataSysVars->DetailedSolarTimestepIntegration = false;
-            cAlphaArgs(aNum) = "Periodic";
+            state.dataIPShortCut->cAlphaArgs(aNum) = "Periodic";
         }
 
         aNum++;
         if (NumAlphas >= aNum) {
-            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "SutherlandHodgman")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SutherlandHodgman")) {
                 state.dataSysVars->SutherlandHodgman = true;
-                cAlphaArgs(aNum) = "SutherlandHodgman";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "ConvexWeilerAtherton")) {
+                state.dataIPShortCut->cAlphaArgs(aNum) = "SutherlandHodgman";
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "ConvexWeilerAtherton")) {
                 state.dataSysVars->SutherlandHodgman = false;
-                cAlphaArgs(aNum) = "ConvexWeilerAtherton";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "SlaterBarskyandSutherlandHodgman")) {
+                state.dataIPShortCut->cAlphaArgs(aNum) = "ConvexWeilerAtherton";
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SlaterBarskyandSutherlandHodgman")) {
                 state.dataSysVars->SutherlandHodgman = true;
                 state.dataSysVars->SlaterBarsky = true;
-                cAlphaArgs(aNum) = "SlaterBarskyandSutherlandHodgman";
-            } else if (lAlphaFieldBlanks(aNum)) {
+                state.dataIPShortCut->cAlphaArgs(aNum) = "SlaterBarskyandSutherlandHodgman";
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(aNum)) {
                 if (!state.dataSysVars->SutherlandHodgman) { // if already set.
-                    cAlphaArgs(aNum) = "ConvexWeilerAtherton";
+                    state.dataIPShortCut->cAlphaArgs(aNum) = "ConvexWeilerAtherton";
                 } else {
                     if (!state.dataSysVars->SlaterBarsky) {
-                        cAlphaArgs(aNum) = "SutherlandHodgman";
+                        state.dataIPShortCut->cAlphaArgs(aNum) = "SutherlandHodgman";
                     } else {
-                        cAlphaArgs(aNum) = "SlaterBarskyandSutherlandHodgman";
+                        state.dataIPShortCut->cAlphaArgs(aNum) = "SlaterBarskyandSutherlandHodgman";
                     }
                 }
             } else {
-                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(aNum));
                 if (!state.dataSysVars->SutherlandHodgman) {
-                    ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) + "\", ConvexWeilerAtherton will be used.");
+                    ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\", ConvexWeilerAtherton will be used.");
                 } else {
                     if (!state.dataSysVars->SlaterBarsky) {
-                        ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) + "\", SutherlandHodgman will be used.");
+                        ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\", SutherlandHodgman will be used.");
                     } else {
-                        ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) + "\", SlaterBarskyandSutherlandHodgman will be used.");
+                        ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\", SlaterBarskyandSutherlandHodgman will be used.");
                     }
 
                 }
             }
         } else {
             if (!state.dataSysVars->SutherlandHodgman) {
-                cAlphaArgs(aNum) = "ConvexWeilerAtherton";
+                state.dataIPShortCut->cAlphaArgs(aNum) = "ConvexWeilerAtherton";
             } else {
                 if (!state.dataSysVars->SlaterBarsky) {
-                    cAlphaArgs(aNum) = "SutherlandHodgman";
+                    state.dataIPShortCut->cAlphaArgs(aNum) = "SutherlandHodgman";
                 } else {
-                    cAlphaArgs(aNum) = "SlaterBarskyandSutherlandHodgman";
+                    state.dataIPShortCut->cAlphaArgs(aNum) = "SlaterBarskyandSutherlandHodgman";
                 }
             }
         }
 
         aNum++;
         if (NumAlphas >= aNum) {
-            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "SimpleSkyDiffuseModeling")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SimpleSkyDiffuseModeling")) {
                 state.dataSysVars->DetailedSkyDiffuseAlgorithm = false;
-                cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "DetailedSkyDiffuseModeling")) {
+                state.dataIPShortCut->cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "DetailedSkyDiffuseModeling")) {
                 state.dataSysVars->DetailedSkyDiffuseAlgorithm = true;
-                cAlphaArgs(aNum) = "DetailedSkyDiffuseModeling";
-            } else if (lAlphaFieldBlanks(3)) {
+                state.dataIPShortCut->cAlphaArgs(aNum) = "DetailedSkyDiffuseModeling";
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 state.dataSysVars->DetailedSkyDiffuseAlgorithm = false;
-                cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
+                state.dataIPShortCut->cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
             } else {
-                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
-                ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) + "\", SimpleSkyDiffuseModeling will be used.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(aNum));
+                ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\", SimpleSkyDiffuseModeling will be used.");
             }
         } else {
-            cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
+            state.dataIPShortCut->cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
             state.dataSysVars->DetailedSkyDiffuseAlgorithm = false;
         }
 
         aNum++;
         if (NumAlphas >= aNum) {
-            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Yes")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
                 state.dataSysVars->ReportExtShadingSunlitFrac = true;
-                cAlphaArgs(aNum) = "Yes";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "No")) {
+                state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
                 state.dataSysVars->ReportExtShadingSunlitFrac = false;
-                cAlphaArgs(aNum) = "No";
+                state.dataIPShortCut->cAlphaArgs(aNum) = "No";
             } else {
-                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
-                ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) + "\", InternalCalculation will be used.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(aNum));
+                ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\", InternalCalculation will be used.");
             }
         } else {
-            cAlphaArgs(aNum) = "No";
+            state.dataIPShortCut->cAlphaArgs(aNum) = "No";
             state.dataSysVars->ReportExtShadingSunlitFrac = false;
         }
         int ExtShadingSchedNum;
@@ -593,32 +592,32 @@ namespace EnergyPlus::SolarShading {
 
         aNum++;
         if (NumAlphas >= aNum) {
-            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Yes")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
                 DisableSelfShadingWithinGroup = true;
-                cAlphaArgs(aNum) = "Yes";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "No")) {
-                cAlphaArgs(aNum) = "No";
+                state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
+                state.dataIPShortCut->cAlphaArgs(aNum) = "No";
             } else {
-                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
-                ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) + "\", all shading effects would be considered.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(aNum));
+                ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\", all shading effects would be considered.");
             }
         } else {
-            cAlphaArgs(aNum) = "No";
+            state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         }
 
         aNum++;
         if (NumAlphas >= aNum) {
-            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Yes")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
                 DisableSelfShadingBetweenGroup = true;
-                cAlphaArgs(aNum) = "Yes";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "No")) {
-                cAlphaArgs(aNum) = "No";
+                state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
+                state.dataIPShortCut->cAlphaArgs(aNum) = "No";
             } else {
-                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
-                ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) + "\", all shading effects would be considered.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(aNum));
+                ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\", all shading effects would be considered.");
             }
         } else {
-            cAlphaArgs(aNum) = "No";
+            state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         }
 
         if (DisableSelfShadingBetweenGroup && DisableSelfShadingWithinGroup) {
@@ -637,7 +636,7 @@ namespace EnergyPlus::SolarShading {
                 NumOfShadingGroups = NumAlphas - (aNum - 1);
                 DisableSelfShadingGroups.allocate(NumOfShadingGroups);
                 for (int i = 1; i <= NumOfShadingGroups; i++) {
-                    Found = UtilityRoutines::FindItemInList(cAlphaArgs(i + (aNum - 1)), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
+                    Found = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(i + (aNum - 1)), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
                     if (Found != 0) DisableSelfShadingGroups(i) = Found;
                 }
 
@@ -688,9 +687,9 @@ namespace EnergyPlus::SolarShading {
                              cCurrentModuleObject + " object to remove this warning.");
             ShowContinueError(state, "Simulation has been reset to use DetailedSkyDiffuseModeling. Simulation continues.");
             state.dataSysVars->DetailedSkyDiffuseAlgorithm = true;
-            cAlphaArgs(2) = "DetailedSkyDiffuseModeling";
+            state.dataIPShortCut->cAlphaArgs(2) = "DetailedSkyDiffuseModeling";
             if (state.dataSolarShading->ShadowingCalcFrequency > 1) {
-                ShowContinueError(state, "Better accuracy may be gained by setting the " + cNumericFieldNames(1) + " to 1 in the " + cCurrentModuleObject +
+                ShowContinueError(state, "Better accuracy may be gained by setting the " + state.dataIPShortCut->cNumericFieldNames(1) + " to 1 in the " + cCurrentModuleObject +
                                   " object.");
             }
         } else if (state.dataSysVars->DetailedSkyDiffuseAlgorithm) {
@@ -712,16 +711,16 @@ namespace EnergyPlus::SolarShading {
               "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones\n");
         print(state.files.eio,
               "Shadowing/Sun Position Calculations Annual Simulations,{},{},{},{},{},{},{},{},{},{}\n",
-              cAlphaArgs(1),
-              cAlphaArgs(2),
+              state.dataIPShortCut->cAlphaArgs(1),
+              state.dataIPShortCut->cAlphaArgs(2),
               state.dataSolarShading->ShadowingCalcFrequency,
               state.dataSolarShading->MaxHCS,
-              cAlphaArgs(3),
+              state.dataIPShortCut->cAlphaArgs(3),
               pixelRes,
-              cAlphaArgs(4),
-              cAlphaArgs(5),
-              cAlphaArgs(6),
-              cAlphaArgs(7));
+              state.dataIPShortCut->cAlphaArgs(4),
+              state.dataIPShortCut->cAlphaArgs(5),
+              state.dataIPShortCut->cAlphaArgs(6),
+              state.dataIPShortCut->cAlphaArgs(7));
     }
 
     void AllocateModuleArrays(EnergyPlusData &state)
@@ -6081,7 +6080,7 @@ namespace EnergyPlus::SolarShading {
                 Real64 FrontBeamAbs; // Blind solar front beam absorptance
                 Real64 BackBeamAbs; // Blind solar back beam absorptance
 
-                if (ANY_BLIND(ShadeFlag)) {
+                if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowEQLModel && ANY_BLIND(ShadeFlag)) {
                     int SlatsAngIndexLower = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
                     int ProfAngIndexLower = state.dataSurface->SurfWinProfAngIndex(SurfNum);
                     int SlatsAngIndexUpper = std::min(MaxProfAngs, SlatsAngIndexLower + 1);
@@ -9312,7 +9311,7 @@ namespace EnergyPlus::SolarShading {
                         PermeabilityA = std::sin(SlatAng) - state.dataHeatBal->Blind(BlNum).SlatThickness / state.dataHeatBal->Blind(BlNum).SlatSeparation;
                         PermeabilityB = 1.0 - (std::abs(state.dataHeatBal->Blind(BlNum).SlatWidth * std::cos(SlatAng)) +
                                                state.dataHeatBal->Blind(BlNum).SlatThickness * std::sin(SlatAng)) /
-                                              state.dataHeatBal->Blind(BlNum).SlatSeparation;
+                                               state.dataHeatBal->Blind(BlNum).SlatSeparation;
                         state.dataSurface->SurfWinBlindAirFlowPermeability(ISurf) = min(1.0, max(0.0, PermeabilityA, PermeabilityB));
                         state.dataSurface->SurfWinBlindBmBmTrans(ISurf) = General::BlindBeamBeamTrans(ProfAng, SlatAng,
                                                                                                       state.dataHeatBal->Blind(BlNum).SlatWidth,

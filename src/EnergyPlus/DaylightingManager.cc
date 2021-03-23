@@ -3992,8 +3992,7 @@ namespace EnergyPlus::DaylightingManager {
         // This subroutine provides a simple structure to get all daylighting
         // parameters.
 
-        using namespace DataIPShortCuts;
-        using namespace DElightManagerF; // Module for managing DElight subroutines
+                using namespace DElightManagerF; // Module for managing DElight subroutines
 
         int TotDaylightingControls;  // Total Daylighting:Controls inputs (splitflux or delight type)
         bool ErrorsFound;            // Error flag
@@ -4008,7 +4007,7 @@ namespace EnergyPlus::DaylightingManager {
         int IOStat;
 
         auto &Zone(state.dataHeatBal->Zone);
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         ErrorsFound = false;
         cCurrentModuleObject = "Daylighting:Controls";
         TotDaylightingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -4273,18 +4272,18 @@ namespace EnergyPlus::DaylightingManager {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           1,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumNames,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            if (has_prefix(cAlphaArgs(1), "SIZINGDAYS")) {
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            if (has_prefix(state.dataIPShortCut->cAlphaArgs(1), "SIZINGDAYS")) {
                 state.dataDaylightingData->DFSReportSizingDays = true;
-            } else if (has_prefix(cAlphaArgs(1), "ALLSHADOWCALCULATIONDAYS")) {
+            } else if (has_prefix(state.dataIPShortCut->cAlphaArgs(1), "ALLSHADOWCALCULATIONDAYS")) {
                 state.dataDaylightingData->DFSReportAllShadowCalculationDays = true;
             }
         }
@@ -4296,8 +4295,7 @@ namespace EnergyPlus::DaylightingManager {
     {
         // Perform the GetInput function for the Output:IlluminanceMap
         // Glazer - June 2016 (moved from GetDaylightingControls)
-        using namespace DataIPShortCuts;
-        using DataStringGlobals::CharComma;
+                using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
 
@@ -4344,7 +4342,7 @@ namespace EnergyPlus::DaylightingManager {
         NewAspectRatio = 1.0;
 
         CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Output:IlluminanceMap";
         state.dataDaylightingData->TotIllumMaps = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -4357,20 +4355,20 @@ namespace EnergyPlus::DaylightingManager {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               MapNum,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlpha,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumber,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
-                state.dataDaylightingData->IllumMap(MapNum).Name = cAlphaArgs(1);
-                state.dataDaylightingData->IllumMap(MapNum).Zone = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
+                state.dataDaylightingData->IllumMap(MapNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+                state.dataDaylightingData->IllumMap(MapNum).Zone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), Zone);
 
                 if (state.dataDaylightingData->IllumMap(MapNum).Zone == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                     "\".");
                     ErrorsFound = true;
                 }
@@ -4379,46 +4377,46 @@ namespace EnergyPlus::DaylightingManager {
                 if (state.dataDaylightingData->IllumMap(MapNum).Zone != 0) {
                     ++ZoneMapCount(state.dataDaylightingData->IllumMap(MapNum).Zone);
                 }
-                state.dataDaylightingData->IllumMap(MapNum).Z = rNumericArgs(1);
+                state.dataDaylightingData->IllumMap(MapNum).Z = state.dataIPShortCut->rNumericArgs(1);
 
-                state.dataDaylightingData->IllumMap(MapNum).Xmin = rNumericArgs(2);
-                state.dataDaylightingData->IllumMap(MapNum).Xmax = rNumericArgs(3);
-                if (rNumericArgs(2) > rNumericArgs(3)) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                state.dataDaylightingData->IllumMap(MapNum).Xmin = state.dataIPShortCut->rNumericArgs(2);
+                state.dataDaylightingData->IllumMap(MapNum).Xmax = state.dataIPShortCut->rNumericArgs(3);
+                if (state.dataIPShortCut->rNumericArgs(2) > state.dataIPShortCut->rNumericArgs(3)) {
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
                     ShowContinueError(
                         state,
-                        format("...{}[:.2R] must be <= {} [:.2R].", cNumericFieldNames(2), rNumericArgs(2), cNumericFieldNames(3), rNumericArgs(3)));
+                        format("...{}[:.2R] must be <= {} [:.2R].", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2), state.dataIPShortCut->cNumericFieldNames(3), state.dataIPShortCut->rNumericArgs(3)));
                     ErrorsFound = true;
                 }
-                state.dataDaylightingData->IllumMap(MapNum).Xnum = rNumericArgs(4);
+                state.dataDaylightingData->IllumMap(MapNum).Xnum = state.dataIPShortCut->rNumericArgs(4);
                 if (state.dataDaylightingData->IllumMap(MapNum).Xnum != 1) {
                     state.dataDaylightingData->IllumMap(MapNum).Xinc = (state.dataDaylightingData->IllumMap(MapNum).Xmax - state.dataDaylightingData->IllumMap(MapNum).Xmin) / (state.dataDaylightingData->IllumMap(MapNum).Xnum - 1);
                 } else {
                     state.dataDaylightingData->IllumMap(MapNum).Xinc = 0.0;
                 }
 
-                state.dataDaylightingData->IllumMap(MapNum).Ymin = rNumericArgs(5);
-                state.dataDaylightingData->IllumMap(MapNum).Ymax = rNumericArgs(6);
-                if (rNumericArgs(5) > rNumericArgs(6)) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                state.dataDaylightingData->IllumMap(MapNum).Ymin = state.dataIPShortCut->rNumericArgs(5);
+                state.dataDaylightingData->IllumMap(MapNum).Ymax = state.dataIPShortCut->rNumericArgs(6);
+                if (state.dataIPShortCut->rNumericArgs(5) > state.dataIPShortCut->rNumericArgs(6)) {
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
                     ShowContinueError(
                         state,
-                        format("...{}[:.2R] must be <= {} [:.2R].", cNumericFieldNames(5), rNumericArgs(5), cNumericFieldNames(6), rNumericArgs(6)));
+                        format("...{}[:.2R] must be <= {} [:.2R].", state.dataIPShortCut->cNumericFieldNames(5), state.dataIPShortCut->rNumericArgs(5), state.dataIPShortCut->cNumericFieldNames(6), state.dataIPShortCut->rNumericArgs(6)));
                     ErrorsFound = true;
                 }
-                state.dataDaylightingData->IllumMap(MapNum).Ynum = rNumericArgs(7);
+                state.dataDaylightingData->IllumMap(MapNum).Ynum = state.dataIPShortCut->rNumericArgs(7);
                 if (state.dataDaylightingData->IllumMap(MapNum).Ynum != 1) {
                     state.dataDaylightingData->IllumMap(MapNum).Yinc = (state.dataDaylightingData->IllumMap(MapNum).Ymax - state.dataDaylightingData->IllumMap(MapNum).Ymin) / (state.dataDaylightingData->IllumMap(MapNum).Ynum - 1);
                 } else {
                     state.dataDaylightingData->IllumMap(MapNum).Yinc = 0.0;
                 }
                 if (state.dataDaylightingData->IllumMap(MapNum).Xnum * state.dataDaylightingData->IllumMap(MapNum).Ynum > DataDaylighting::MaxMapRefPoints) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", too many map points specified.");
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", too many map points specified.");
                     ShowContinueError(state,
                                       format("...{}[{}] * {}[{}].= [{}] must be <= [{}].",
-                                             cNumericFieldNames(4),
+                                             state.dataIPShortCut->cNumericFieldNames(4),
                                              state.dataDaylightingData->IllumMap(MapNum).Xnum,
-                                             cNumericFieldNames(7),
+                                             state.dataIPShortCut->cNumericFieldNames(7),
                                              state.dataDaylightingData->IllumMap(MapNum).Ynum,
                                              state.dataDaylightingData->IllumMap(MapNum).Xnum * state.dataDaylightingData->IllumMap(MapNum).Ynum,
                                              DataDaylighting::MaxMapRefPoints));
@@ -4429,39 +4427,39 @@ namespace EnergyPlus::DaylightingManager {
             MapStyleIn = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             if (MapStyleIn == 0) {
-                cAlphaArgs(1) = "COMMA";
+                state.dataIPShortCut->cAlphaArgs(1) = "COMMA";
                 state.dataDaylightingData->MapColSep = CharComma; // comma
             } else if (MapStyleIn == 1) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               1,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlpha,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumber,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
-                if (cAlphaArgs(1) == "COMMA") {
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
+                if (state.dataIPShortCut->cAlphaArgs(1) == "COMMA") {
                     state.dataDaylightingData->MapColSep = CharComma; // comma
-                } else if (cAlphaArgs(1) == "TAB") {
+                } else if (state.dataIPShortCut->cAlphaArgs(1) == "TAB") {
                     state.dataDaylightingData->MapColSep = CharTab; // tab
-                } else if (cAlphaArgs(1) == "FIXED" || cAlphaArgs(1) == "SPACE") {
+                } else if (state.dataIPShortCut->cAlphaArgs(1) == "FIXED" || state.dataIPShortCut->cAlphaArgs(1) == "SPACE") {
                     state.dataDaylightingData->MapColSep = CharSpace; // space
                 } else {
                     state.dataDaylightingData->MapColSep = CharComma; // comma
-                    ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) +
+                    ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                      "\", Commas will be used to separate fields.");
-                    cAlphaArgs(1) = "COMMA";
+                    state.dataIPShortCut->cAlphaArgs(1) = "COMMA";
                 }
             }
             print(state.files.eio, "! <Daylighting:Illuminance Maps>,#Maps,Style\n");
-            ConvertCaseToLower(cAlphaArgs(1), cAlphaArgs(2));
-            cAlphaArgs(1).erase(1);
-            cAlphaArgs(1) += cAlphaArgs(2).substr(1);
-            print(state.files.eio, "Daylighting:Illuminance Maps,{},{}\n", state.dataDaylightingData->TotIllumMaps, cAlphaArgs(1));
+            ConvertCaseToLower(state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cAlphaArgs(2));
+            state.dataIPShortCut->cAlphaArgs(1).erase(1);
+            state.dataIPShortCut->cAlphaArgs(1) += state.dataIPShortCut->cAlphaArgs(2).substr(1);
+            print(state.files.eio, "Daylighting:Illuminance Maps,{},{}\n", state.dataDaylightingData->TotIllumMaps, state.dataIPShortCut->cAlphaArgs(1));
         }
         for (Loop1 = 1; Loop1 <= state.dataGlobal->NumOfZones; ++Loop1) {
             state.dataDaylightingData->ZoneDaylight(Loop1).ZoneToMap.allocate(ZoneMapCount(Loop1));
@@ -4710,7 +4708,6 @@ namespace EnergyPlus::DaylightingManager {
         //       DATE WRITTEN   March 2002
         //       MODIFIED       Glazer - July 2016 - Move geometry transformation portion, rearrange input, allow more than three reference points
         // Obtain the user input data for Daylighting:Controls object in the input file.
-        using namespace DataIPShortCuts;
 
         int IOStat;
         int NumAlpha;
@@ -4721,50 +4718,50 @@ namespace EnergyPlus::DaylightingManager {
         //   constexpr Real64 FractionTolerance(4 * std::numeric_limits<Real64>::epsilon());
         // Instead, we use a 0.001 = 0.1% tolerance
         constexpr Real64 FractionTolerance(0.001);
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Daylighting:Controls";
         for (int iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl) {
-            cAlphaArgs = "";
-            rNumericArgs = 0.0;
+            state.dataIPShortCut->cAlphaArgs = "";
+            state.dataIPShortCut->rNumericArgs = 0.0;
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           iDaylCntrl,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlpha,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            int const ZoneFound = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            int const ZoneFound = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (ZoneFound == 0) {
-                ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                ShowSevereError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
                 continue;
             }
             auto &zone_daylight(state.dataDaylightingData->ZoneDaylight(ZoneFound));
-            zone_daylight.Name = cAlphaArgs(1);     // Field: Name
-            zone_daylight.ZoneName = cAlphaArgs(2); // Field: Zone Name
+            zone_daylight.Name = state.dataIPShortCut->cAlphaArgs(1);     // Field: Name
+            zone_daylight.ZoneName = state.dataIPShortCut->cAlphaArgs(2); // Field: Zone Name
 
-            if (UtilityRoutines::SameString(cAlphaArgs(3), "SPLITFLUX")) { // Field: Daylighting Method
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "SPLITFLUX")) { // Field: Daylighting Method
                 zone_daylight.DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(3), "DELIGHT")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DELIGHT")) {
                 zone_daylight.DaylightMethod = DataDaylighting::iDaylightingMethod::DElightDaylighting;
-            } else if (lAlphaFieldBlanks(3)) {
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 zone_daylight.DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
             } else {
-                ShowWarningError(state, "Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3) + ", occurs in " + cCurrentModuleObject + "object for " +
-                                 cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3) + ", occurs in " + cCurrentModuleObject + "object for " +
+                                 cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "SplitFlux assumed, and the simulation continues.");
             }
 
-            if (!lAlphaFieldBlanks(4)) { // Field: Availability Schedule Name
-                zone_daylight.AvailSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) { // Field: Availability Schedule Name
+                zone_daylight.AvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
                 if (zone_daylight.AvailSchedNum == 0) {
-                    ShowWarningError(state, "Invalid " + cAlphaFieldNames(4) + " = " + cAlphaArgs(4) + ", occurs in " + cCurrentModuleObject +
-                                     "object for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                    ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4) + ", occurs in " + cCurrentModuleObject +
+                                     "object for " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "Schedule was not found so controls will always be available, and the simulation continues.");
                     zone_daylight.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
                 }
@@ -4772,57 +4769,57 @@ namespace EnergyPlus::DaylightingManager {
                 zone_daylight.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
             }
 
-            if (UtilityRoutines::SameString(cAlphaArgs(5), "CONTINUOUS")) { // Field: Lighting Control Type
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "CONTINUOUS")) { // Field: Lighting Control Type
                 zone_daylight.LightControlType = DataDaylighting::iLtgCtrlType::Continuous;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(5), "STEPPED")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "STEPPED")) {
                 zone_daylight.LightControlType = DataDaylighting::iLtgCtrlType::Stepped;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(5), "CONTINUOUSOFF")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "CONTINUOUSOFF")) {
                 zone_daylight.LightControlType = DataDaylighting::iLtgCtrlType::ContinuousOff;
-            } else if (lAlphaFieldBlanks(5)) {
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 zone_daylight.LightControlType = DataDaylighting::iLtgCtrlType::Continuous;
             } else {
-                ShowWarningError(state, "Invalid " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5) + ", occurs in " + cCurrentModuleObject + "object for " +
-                                 cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5) + ", occurs in " + cCurrentModuleObject + "object for " +
+                                 cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "Continuous assumed, and the simulation continues.");
             }
 
-            zone_daylight.MinPowerFraction = rNumericArgs(1);  // Field: Minimum Input Power Fraction for Continuous Dimming Control
-            zone_daylight.MinLightFraction = rNumericArgs(2);  // Field: Minimum Light Output Fraction for Continuous Dimming Control
-            zone_daylight.LightControlSteps = rNumericArgs(3); // Field: Number of Stepped Control Steps
+            zone_daylight.MinPowerFraction = state.dataIPShortCut->rNumericArgs(1);  // Field: Minimum Input Power Fraction for Continuous Dimming Control
+            zone_daylight.MinLightFraction = state.dataIPShortCut->rNumericArgs(2);  // Field: Minimum Light Output Fraction for Continuous Dimming Control
+            zone_daylight.LightControlSteps = state.dataIPShortCut->rNumericArgs(3); // Field: Number of Stepped Control Steps
             zone_daylight.LightControlProbability =
-                rNumericArgs(4); // Field: Probability Lighting will be Reset When Needed in Manual Stepped Control
+                    state.dataIPShortCut->rNumericArgs(4); // Field: Probability Lighting will be Reset When Needed in Manual Stepped Control
 
-            if (!lAlphaFieldBlanks(6)) { // Field: Glare Calculation Daylighting Reference Point Name
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) { // Field: Glare Calculation Daylighting Reference Point Name
                 zone_daylight.glareRefPtNumber = UtilityRoutines::FindItemInList(
-                    cAlphaArgs(6), state.dataDaylightingData->DaylRefPt, &DataDaylighting::RefPointData::Name); // Field: Glare Calculation Daylighting Reference Point Name
+                    state.dataIPShortCut->cAlphaArgs(6), state.dataDaylightingData->DaylRefPt, &DataDaylighting::RefPointData::Name); // Field: Glare Calculation Daylighting Reference Point Name
                 if (zone_daylight.glareRefPtNumber == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) +
-                                    "\" for object named: " + cAlphaArgs(1));
+                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + state.dataIPShortCut->cAlphaArgs(6) +
+                                    "\" for object named: " + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                     continue;
                 }
             } else if (zone_daylight.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
-                ShowWarningError(state, "No " + cAlphaFieldNames(6) + " provided for object named: " + cAlphaArgs(1));
+                ShowWarningError(state, "No " + state.dataIPShortCut->cAlphaFieldNames(6) + " provided for object named: " + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "No glare calculation performed, and the simulation continues.");
             }
 
-            if (!lNumericFieldBlanks(5)) {
+            if (!state.dataIPShortCut->lNumericFieldBlanks(5)) {
                 zone_daylight.ViewAzimuthForGlare =
-                    rNumericArgs(5); // Field: Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
+                        state.dataIPShortCut->rNumericArgs(5); // Field: Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
             } else {
                 zone_daylight.ViewAzimuthForGlare = 0.;
             }
 
-            zone_daylight.MaxGlareallowed = rNumericArgs(6);           // Field: Maximum Allowable Discomfort Glare Index
-            zone_daylight.DElightGriddingResolution = rNumericArgs(7); // Field: DElight Gridding Resolution
+            zone_daylight.MaxGlareallowed = state.dataIPShortCut->rNumericArgs(6);           // Field: Maximum Allowable Discomfort Glare Index
+            zone_daylight.DElightGriddingResolution = state.dataIPShortCut->rNumericArgs(7); // Field: DElight Gridding Resolution
 
             int curTotalDaylRefPts = NumAlpha - 6; // first six alpha fields are not part of extensible group
             zone_daylight.TotalDaylRefPoints = curTotalDaylRefPts;
             if ((NumNumber - 7) / 2 != zone_daylight.TotalDaylRefPoints) {
                 ShowSevereError(state, cCurrentModuleObject +
-                                "The number of extensible numeric fields and alpha fields is inconsistent for: " + cAlphaArgs(1));
+                                "The number of extensible numeric fields and alpha fields is inconsistent for: " + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state,
-                    "For each field: " + cAlphaFieldNames(NumAlpha) +
+                    "For each field: " + state.dataIPShortCut->cAlphaFieldNames(NumAlpha) +
                     " there needs to be the following fields: Fraction Controlled by Reference Point and Illuminance Setpoint at Reference Point");
                 ErrorsFound = true;
             }
@@ -4855,17 +4852,17 @@ namespace EnergyPlus::DaylightingManager {
             int countRefPts = 0;
             for (int refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum) {
                 zone_daylight.DaylRefPtNum(refPtNum) = UtilityRoutines::FindItemInList(
-                    cAlphaArgs(6 + refPtNum), state.dataDaylightingData->DaylRefPt, &DataDaylighting::RefPointData::Name); // Field: Daylighting Reference Point Name
+                    state.dataIPShortCut->cAlphaArgs(6 + refPtNum), state.dataDaylightingData->DaylRefPt, &DataDaylighting::RefPointData::Name); // Field: Daylighting Reference Point Name
                 if (zone_daylight.DaylRefPtNum(refPtNum) == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6 + refPtNum) + "=\"" + cAlphaArgs(6 + refPtNum) +
-                                    "\" for object named: " + cAlphaArgs(1));
+                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(6 + refPtNum) + "=\"" + state.dataIPShortCut->cAlphaArgs(6 + refPtNum) +
+                                    "\" for object named: " + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                     continue;
                 } else {
                     ++countRefPts;
                 }
-                zone_daylight.FracZoneDaylit(refPtNum) = rNumericArgs(6 + refPtNum * 2); // Field: Fraction Controlled by Reference Point
-                zone_daylight.IllumSetPoint(refPtNum) = rNumericArgs(7 + refPtNum * 2);  // Field: Illuminance Setpoint at Reference Point
+                zone_daylight.FracZoneDaylit(refPtNum) = state.dataIPShortCut->rNumericArgs(6 + refPtNum * 2); // Field: Fraction Controlled by Reference Point
+                zone_daylight.IllumSetPoint(refPtNum) = state.dataIPShortCut->rNumericArgs(7 + refPtNum * 2);  // Field: Illuminance Setpoint at Reference Point
 
                 if (zone_daylight.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
                     SetupOutputVariable(state,
@@ -4910,21 +4907,21 @@ namespace EnergyPlus::DaylightingManager {
                 ShowContinueError(state,
                                   format("..discovered in \"{}\" for Zone=\"{}\", only {:.3R} of the zone is controlled.",
                                          cCurrentModuleObject,
-                                         cAlphaArgs(2),
+                                         state.dataIPShortCut->cAlphaArgs(2),
                                          sum(zone_daylight.FracZoneDaylit)));
             } else if ((sumFracs - 1.0) > FractionTolerance) {
                 ShowSevereError(state, "GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.");
                 ShowContinueError(state,
                                   format("..discovered in \"{}\" for Zone=\"{}\", trying to control {:.3R} of the zone.",
                                          cCurrentModuleObject,
-                                         cAlphaArgs(2),
+                                         state.dataIPShortCut->cAlphaArgs(2),
                                          sum(zone_daylight.FracZoneDaylit)));
                 ErrorsFound = true;
             }
 
             if (zone_daylight.LightControlType == DataDaylighting::iLtgCtrlType::Stepped && zone_daylight.LightControlSteps <= 0) {
                 ShowWarningError(state, "GetDaylightingControls: For Stepped Control, the number of steps must be > 0");
-                ShowContinueError(state, "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", will use 1");
+                ShowContinueError(state, "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\", will use 1");
                 zone_daylight.LightControlSteps = 1;
             }
             SetupOutputVariable(state, "Daylighting Lighting Power Multiplier",
@@ -5108,13 +5105,12 @@ namespace EnergyPlus::DaylightingManager {
     {
         // Perform GetInput function for the Daylighting:ReferencePoint object
         // Glazer - July 2016
-        using namespace DataIPShortCuts;
 
         int RefPtNum = 0;
         int IOStat;
         int NumAlpha;
         int NumNumber;
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Daylighting:ReferencePoint";
         state.dataDaylightingData->TotRefPoints = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataDaylightingData->DaylRefPt.allocate(state.dataDaylightingData->TotRefPoints);
@@ -5122,24 +5118,24 @@ namespace EnergyPlus::DaylightingManager {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ++RefPtNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlpha,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            pt.Name = cAlphaArgs(1);
-            pt.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            pt.Name = state.dataIPShortCut->cAlphaArgs(1);
+            pt.ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (pt.ZoneNum == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             }
-            pt.x = rNumericArgs(1);
-            pt.y = rNumericArgs(2);
-            pt.z = rNumericArgs(3);
+            pt.x = state.dataIPShortCut->rNumericArgs(1);
+            pt.y = state.dataIPShortCut->rNumericArgs(2);
+            pt.z = state.dataIPShortCut->rNumericArgs(3);
         }
     }
 
@@ -5252,7 +5248,6 @@ namespace EnergyPlus::DaylightingManager {
         // Engineering Society of North America, 1993.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -5268,7 +5263,7 @@ namespace EnergyPlus::DaylightingManager {
         Real64 AreaWell;       // Well area (at bottom of well) (m2)
         Real64 VisReflWell;    // Area-weighted visible reflectance of well walls
         Real64 WellCavRatio;   // Well cavity ratio
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // Get the total number of Light Well objects
         cCurrentModuleObject = "DaylightingDevice:LightWell";
         TotLightWells = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -5279,19 +5274,19 @@ namespace EnergyPlus::DaylightingManager {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           loop,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlpha,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumProp,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
-            SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(1), state.dataSurface->Surface);
+            SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
             if (SurfNum == 0) {
-                ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" not found.");
+                ShowSevereError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" not found.");
             }
 
             // Check that associated surface is an exterior window
@@ -5299,7 +5294,7 @@ namespace EnergyPlus::DaylightingManager {
             if (SurfNum != 0) {
                 if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window && state.dataSurface->Surface(SurfNum).ExtBoundCond != ExternalEnvironment) WrongSurfaceType = true;
                 if (WrongSurfaceType) {
-                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) +
+                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\" - not an exterior window.");
                     ErrorsFound = true;
                 }
@@ -5310,14 +5305,14 @@ namespace EnergyPlus::DaylightingManager {
                 // Associated surface is an exterior window; calculate light well efficiency.
 
                 state.dataSurface->SurfWinLightWellEff(SurfNum) = 1.0;
-                HeightWell = rNumericArgs(1);
-                PerimWell = rNumericArgs(2);
-                AreaWell = rNumericArgs(3);
-                VisReflWell = rNumericArgs(4);
+                HeightWell = state.dataIPShortCut->rNumericArgs(1);
+                PerimWell = state.dataIPShortCut->rNumericArgs(2);
+                AreaWell = state.dataIPShortCut->rNumericArgs(3);
+                VisReflWell = state.dataIPShortCut->rNumericArgs(4);
 
                 // Warning if light well area is less than window area
                 if (AreaWell < (state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum) - 0.1)) {
-                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" - Areas.");
+                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" - Areas.");
                     ShowContinueError(
                         state, format("has Area of Bottom of Well={:.1R} that is less than window area={:.1R}", state.dataSurface->Surface(SurfNum).Area, AreaWell));
                 }
@@ -10095,8 +10090,7 @@ namespace EnergyPlus::DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        // Locals
+                // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -10131,15 +10125,15 @@ namespace EnergyPlus::DaylightingManager {
                                           rNumerics,
                                           NNum,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             OldAspectRatio = rNumerics(1);
             NewAspectRatio = rNumerics(2);
             transformPlane = cAlphas(1);
             if (transformPlane != "XY") {
-                ShowWarningError(state, CurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + cAlphas(1) + "...ignored.");
+                ShowWarningError(state, CurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + cAlphas(1) + "...ignored.");
             }
             doTransform = true;
             state.dataSurface->AspectTransform = true;

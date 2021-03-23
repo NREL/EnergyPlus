@@ -81,7 +81,6 @@
 
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DataIPShortCuts;
 using namespace EnergyPlus::ZoneEquipmentManager;
 using namespace EnergyPlus::HeatBalanceAirManager;
 using namespace EnergyPlus::ScheduleManager;
@@ -223,84 +222,84 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
     int NumAlphas(2);
     int NumNumbers(9);
 
-    cCurrentModuleObject = "Zone";
+    state->dataIPShortCut->cCurrentModuleObject = "Zone";
     state->dataGlobal->NumOfZones = 2;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
     // Set up a Zone object
     NumAlphas = 2;
     NumNumbers = 9;
-    lNumericFieldBlanks.allocate(NumNumbers);
-    lAlphaFieldBlanks.allocate(NumAlphas);
-    cAlphaFieldNames.allocate(NumAlphas);
-    cNumericFieldNames.allocate(NumNumbers);
-    cAlphaArgs.allocate(NumAlphas);
-    rNumericArgs.allocate(NumNumbers);
-    lNumericFieldBlanks = false;
-    lAlphaFieldBlanks = false;
-    cAlphaFieldNames = " ";
-    cNumericFieldNames = " ";
-    cAlphaArgs = " ";
-    rNumericArgs = 0.0;
+    state->dataIPShortCut->lNumericFieldBlanks.allocate(NumNumbers);
+    state->dataIPShortCut->lAlphaFieldBlanks.allocate(NumAlphas);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(NumAlphas);
+    state->dataIPShortCut->cNumericFieldNames.allocate(NumNumbers);
+    state->dataIPShortCut->cAlphaArgs.allocate(NumAlphas);
+    state->dataIPShortCut->rNumericArgs.allocate(NumNumbers);
+    state->dataIPShortCut->lNumericFieldBlanks = false;
+    state->dataIPShortCut->lAlphaFieldBlanks = false;
+    state->dataIPShortCut->cAlphaFieldNames = " ";
+    state->dataIPShortCut->cNumericFieldNames = " ";
+    state->dataIPShortCut->cAlphaArgs = " ";
+    state->dataIPShortCut->rNumericArgs = 0.0;
 
     ZoneNum = 1;
-    cAlphaArgs(1) = "Zone One";                    // Name
-    rNumericArgs(1) = 0.0;                         // Direction of Relative North[deg]
-    rNumericArgs(2) = 0.0;                         // X [m]
-    rNumericArgs(3) = 0.0;                         // Y [m]
-    rNumericArgs(4) = 0.0;                         // Z [m]
-    rNumericArgs(5) = 0.0;                         // Type
-    rNumericArgs(6) = 0.0;                         // Multiplier
-    lNumericFieldBlanks(7) = true;                 // Ceiling Height{ m }
-    lNumericFieldBlanks(8) = true;                 // Volume{ m3 }
-    lNumericFieldBlanks(9) = true;                 // Floor Area{ m2 }
-    cAlphaArgs(2) = "ADAPTIVECONVECTIONALGORITHM"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
+    state->dataIPShortCut->cAlphaArgs(1) = "Zone One";                    // Name
+    state->dataIPShortCut->rNumericArgs(1) = 0.0;                         // Direction of Relative North[deg]
+    state->dataIPShortCut->rNumericArgs(2) = 0.0;                         // X [m]
+    state->dataIPShortCut->rNumericArgs(3) = 0.0;                         // Y [m]
+    state->dataIPShortCut->rNumericArgs(4) = 0.0;                         // Z [m]
+    state->dataIPShortCut->rNumericArgs(5) = 0.0;                         // Type
+    state->dataIPShortCut->rNumericArgs(6) = 0.0;                         // Multiplier
+    state->dataIPShortCut->lNumericFieldBlanks(7) = true;                 // Ceiling Height{ m }
+    state->dataIPShortCut->lNumericFieldBlanks(8) = true;                 // Volume{ m3 }
+    state->dataIPShortCut->lNumericFieldBlanks(9) = true;                 // Floor Area{ m2 }
+    state->dataIPShortCut->cAlphaArgs(2) = "ADAPTIVECONVECTIONALGORITHM"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
 
     ErrorsFound = false;
-    ProcessZoneData(*state, cCurrentModuleObject,
+    ProcessZoneData(*state, state->dataIPShortCut->cCurrentModuleObject,
                     ZoneNum,
-                    cAlphaArgs,
+                    state->dataIPShortCut->cAlphaArgs,
                     NumAlphas,
-                    rNumericArgs,
+                    state->dataIPShortCut->rNumericArgs,
                     NumNumbers,
-                    lNumericFieldBlanks,
-                    lAlphaFieldBlanks,
-                    cAlphaFieldNames,
-                    cNumericFieldNames,
+                    state->dataIPShortCut->lNumericFieldBlanks,
+                    state->dataIPShortCut->lAlphaFieldBlanks,
+                    state->dataIPShortCut->cAlphaFieldNames,
+                    state->dataIPShortCut->cNumericFieldNames,
                     ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ZoneNum = 2;
-    cAlphaArgs(1) = "Zone Two";      // Name
-    cAlphaArgs(2) = "InvalidChoice"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
+    state->dataIPShortCut->cAlphaArgs(1) = "Zone Two";      // Name
+    state->dataIPShortCut->cAlphaArgs(2) = "InvalidChoice"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
     ErrorsFound = false;
-    ProcessZoneData(*state, cCurrentModuleObject,
+    ProcessZoneData(*state, state->dataIPShortCut->cCurrentModuleObject,
                     ZoneNum,
-                    cAlphaArgs,
+                    state->dataIPShortCut->cAlphaArgs,
                     NumAlphas,
-                    rNumericArgs,
+                    state->dataIPShortCut->rNumericArgs,
                     NumNumbers,
-                    lNumericFieldBlanks,
-                    lAlphaFieldBlanks,
-                    cAlphaFieldNames,
-                    cNumericFieldNames,
+                    state->dataIPShortCut->lNumericFieldBlanks,
+                    state->dataIPShortCut->lAlphaFieldBlanks,
+                    state->dataIPShortCut->cAlphaFieldNames,
+                    state->dataIPShortCut->cNumericFieldNames,
                     ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 
     ZoneNum = 2;
-    cAlphaArgs(1) = "Zone Two"; // Name
-    cAlphaArgs(2) = "TARP";     // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
+    state->dataIPShortCut->cAlphaArgs(1) = "Zone Two"; // Name
+    state->dataIPShortCut->cAlphaArgs(2) = "TARP";     // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
     ErrorsFound = false;
-    ProcessZoneData(*state, cCurrentModuleObject,
+    ProcessZoneData(*state, state->dataIPShortCut->cCurrentModuleObject,
                     ZoneNum,
-                    cAlphaArgs,
+                    state->dataIPShortCut->cAlphaArgs,
                     NumAlphas,
-                    rNumericArgs,
+                    state->dataIPShortCut->rNumericArgs,
                     NumNumbers,
-                    lNumericFieldBlanks,
-                    lAlphaFieldBlanks,
-                    cAlphaFieldNames,
-                    cNumericFieldNames,
+                    state->dataIPShortCut->lNumericFieldBlanks,
+                    state->dataIPShortCut->lAlphaFieldBlanks,
+                    state->dataIPShortCut->cAlphaFieldNames,
+                    state->dataIPShortCut->cNumericFieldNames,
                     ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -1363,7 +1362,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
 TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
 {
 
-    DataIPShortCuts::lAlphaFieldBlanks = true;
+    state->dataIPShortCut->lAlphaFieldBlanks = true;
 
     std::string const idf_objects = delimited_string({
         "  SimulationControl,",
@@ -1957,7 +1956,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisec
 TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
 {
 
-    DataIPShortCuts::lAlphaFieldBlanks = true;
+    state->dataIPShortCut->lAlphaFieldBlanks = true;
 
     std::string const idf_objects = delimited_string({
         "Version,9.3;",

@@ -107,8 +107,7 @@ namespace GeneratorFuelSupply {
         //                      reuse with both Annex 42 models,
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using CurveManager::GetCurveIndex;
+                using CurveManager::GetCurveIndex;
         using DataLoopNode::ObjectIsNotParent;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
@@ -124,6 +123,7 @@ namespace GeneratorFuelSupply {
         int FuelSupNum;
         std::string ObjMSGName;
         int ConstitNum;
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         if (state.dataGeneratorFuelSupply->MyOneTimeFlag) {
             cCurrentModuleObject = "Generator:FuelSupply";
@@ -138,7 +138,7 @@ namespace GeneratorFuelSupply {
 
             for (FuelSupNum = 1; FuelSupNum <= state.dataGenerator->NumGeneratorFuelSups; ++FuelSupNum) {
                 inputProcessor->getObjectItem(
-                    state, cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames);
+                    state, cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, state.dataIPShortCut->cAlphaFieldNames, state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).Name = AlphArray(1);
@@ -148,7 +148,7 @@ namespace GeneratorFuelSupply {
                 } else if (UtilityRoutines::SameString("Scheduled", AlphArray(2))) {
                     state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode = DataGenerators::FuelTemperatureMode::FuelInTempSchedule;
                 } else {
-                    ShowSevereError(state, "Invalid, " + cAlphaFieldNames(2) + " = " + AlphArray(2));
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -159,7 +159,7 @@ namespace GeneratorFuelSupply {
 
                 state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
                 if ((state.dataGenerator->FuelSupply(FuelSupNum).SchedNum == 0) && (state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode == DataGenerators::FuelTemperatureMode::FuelInTempSchedule)) {
-                    ShowSevereError(state, "Invalid, " + cAlphaFieldNames(4) + " = " + AlphArray(4));
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Schedule named was not found");
                     ErrorsFound = true;
@@ -167,7 +167,7 @@ namespace GeneratorFuelSupply {
 
                 state.dataGenerator->FuelSupply(FuelSupNum).CompPowerCurveID = GetCurveIndex(state, AlphArray(5));
                 if (state.dataGenerator->FuelSupply(FuelSupNum).CompPowerCurveID == 0) {
-                    ShowSevereError(state, "Invalid, " + cAlphaFieldNames(5) + " = " + AlphArray(5));
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + AlphArray(5));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Curve named was not found ");
                     ErrorsFound = true;
@@ -181,7 +181,7 @@ namespace GeneratorFuelSupply {
                 } else if (UtilityRoutines::SameString(AlphArray(6), "LiquidGeneric")) {
                     state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::fuelModeGenericLiquid;
                 } else {
-                    ShowSevereError(state, "Invalid, " + cAlphaFieldNames(6) + " = " + AlphArray(6));
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }

@@ -78,6 +78,10 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
     Real64 LoadMet;
     int BBNum;
 
+    auto & HWBaseboard = state->dataHWBaseboardRad->HWBaseboard;
+    auto & QBBRadSource = state->dataHWBaseboardRad->QBBRadSource;
+    auto & HWBaseboardDesignObject = state->dataHWBaseboardRad->HWBaseboardDesignObject;
+
     state->dataLoopNodes->Node.allocate(1);
     HWBaseboard.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
@@ -128,6 +132,9 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
 
     BBNum = 1;
     LoadMet = 0.0;
+    auto & HWBaseboard = state->dataHWBaseboardRad->HWBaseboard;
+    auto & QBBRadSource = state->dataHWBaseboardRad->QBBRadSource;
+    auto & HWBaseboardDesignObject = state->dataHWBaseboardRad->HWBaseboardDesignObject;
 
     state->dataLoopNodes->Node.allocate(2);
     HWBaseboard.allocate(1);
