@@ -689,8 +689,6 @@ namespace DElightManagerF {
         // Perform GetInput function for the Daylighting:DELight:ComplexFenestration object
         // Glazer - July 2016
 
-        using namespace DataIPShortCuts; // Gives access to commonly dimensioned field names, etc for getinput
-
         int NumAlpha;
         int NumNumber;
         int IOStat;
@@ -704,30 +702,30 @@ namespace DElightManagerF {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ++CFSNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlpha,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            cfs.Name = cAlphaArgs(1);
-            cfs.ComplexFeneType = cAlphaArgs(2);
-            cfs.surfName = cAlphaArgs(3);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            cfs.Name = state.dataIPShortCut->cAlphaArgs(1);
+            cfs.ComplexFeneType = state.dataIPShortCut->cAlphaArgs(2);
+            cfs.surfName = state.dataIPShortCut->cAlphaArgs(3);
             if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
-                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + cAlphaFieldNames(3) + "=\"" + cfs.surfName + "\"."));
+                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + cfs.surfName + "\"."));
                 ErrorsFound = true;
             }
-            cfs.wndwName = cAlphaArgs(4);
+            cfs.wndwName = state.dataIPShortCut->cAlphaArgs(4);
             if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
-                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + cAlphaFieldNames(4) + "=\"" + cfs.wndwName + "\"."));
+                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + cfs.wndwName + "\"."));
                 ErrorsFound = true;
             }
-            cfs.feneRota = rNumericArgs(1);
+            cfs.feneRota = state.dataIPShortCut->rNumericArgs(1);
             if (cfs.feneRota < 0. || cfs.feneRota > 360.) {
-                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + cNumericFieldNames(1) + " outside of range 0 to 360."));
+                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + state.dataIPShortCut->cNumericFieldNames(1) + " outside of range 0 to 360."));
                 ErrorsFound = true;
             }
         }
@@ -750,7 +748,6 @@ namespace DElightManagerF {
         //  change them to reflect a different aspect
         // ratio for the entire building based on user input.
 
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr auto CurrentModuleObject("GeometryTransform");
@@ -777,14 +774,14 @@ namespace DElightManagerF {
                                           rNumerics,
                                           NNum,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             OldAspectRatio = rNumerics(1);
             NewAspectRatio = rNumerics(2);
             if (cAlphas(1) != "XY") {
-                ShowWarningError(state, format("{}{}", CurrentModuleObject, ": invalid " + cAlphaFieldNames(1) + "=" + cAlphas(1) + "...ignored."));
+                ShowWarningError(state, format("{}{}", CurrentModuleObject, ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=" + cAlphas(1) + "...ignored."));
             }
             doTransform = true;
             state.dataSurface->AspectTransform = true;

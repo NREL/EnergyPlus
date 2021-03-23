@@ -151,7 +151,6 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         // heat balance using the EMPD model.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;                       // IO Status when calling get input subroutine
@@ -170,6 +169,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         int ConstrNum;         // Construction number
         Array1D_bool EMPDzone; // EMPD property check for each zone
         static int ErrCount(0);
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         // Load the additional EMPD Material properties
         cCurrentModuleObject = "MaterialProperty:MoisturePenetrationDepth:Settings";
@@ -191,15 +191,15 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
                                           MaterialProps,
                                           MaterialNumProp,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             // Load the material derived type from the input data.
             MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), state.dataMaterial->Material);
             if (MaterNum == 0) {
-                ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
+                ShowSevereError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
                                 ", must match to a valid Material name.");
                 ErrorsFound = true;
                 continue;
@@ -232,12 +232,12 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
             material.MoistBCoeff = MaterialProps(3);
             material.MoistCCoeff = MaterialProps(4);
             material.MoistDCoeff = MaterialProps(5);
-            if (lNumericFieldBlanks(6) || MaterialProps(6) == DataGlobalConstants::AutoCalculate) {
+            if (state.dataIPShortCut->lNumericFieldBlanks(6) || MaterialProps(6) == DataGlobalConstants::AutoCalculate) {
                 material.EMPDSurfaceDepth = CalcDepthFromPeriod(state, 24 * 3600, material); // 1 day
             } else {
                 material.EMPDSurfaceDepth = MaterialProps(6);
             }
-            if (lNumericFieldBlanks(7) || MaterialProps(7) == DataGlobalConstants::AutoCalculate) {
+            if (state.dataIPShortCut->lNumericFieldBlanks(7) || MaterialProps(7) == DataGlobalConstants::AutoCalculate) {
                 material.EMPDDeepDepth = CalcDepthFromPeriod(state, 21 * 24 * 3600, material); // 3 weeks
             } else {
                 material.EMPDDeepDepth = MaterialProps(7);

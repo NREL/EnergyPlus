@@ -68,7 +68,7 @@ using namespace EnergyPlus;
 TEST_F(EnergyPlusFixture, WCEClear)
 {
 
-    DataIPShortCuts::lAlphaFieldBlanks = true;
+    state->dataIPShortCut->lAlphaFieldBlanks = true;
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
@@ -129,7 +129,7 @@ TEST_F(EnergyPlusFixture, WCEClear)
 TEST_F(EnergyPlusFixture, WCEVenetian)
 {
 
-    DataIPShortCuts::lAlphaFieldBlanks = true;
+    state->dataIPShortCut->lAlphaFieldBlanks = true;
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
@@ -221,7 +221,7 @@ TEST_F(EnergyPlusFixture, WCEVenetian)
 TEST_F(EnergyPlusFixture, WCEShade)
 {
 
-    DataIPShortCuts::lAlphaFieldBlanks = true;
+    state->dataIPShortCut->lAlphaFieldBlanks = true;
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({

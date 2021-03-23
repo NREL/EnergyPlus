@@ -243,8 +243,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using General::CheckCreatedZoneItemName;
+                using General::CheckCreatedZoneItemName;
         using General::FindNumberInList;
 
         using ScheduleManager::CheckScheduleValue;
@@ -336,7 +335,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         static constexpr auto Header("! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier\n");
         static constexpr auto Format_701("Zone Volume Capacitance Multiplier,{:8.3F} ,{:8.3F},{:8.3F},{:8.3F}\n");
 
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TStat));
         state.dataZoneCtrls->NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataZoneCtrls->TStatObjects.allocate(state.dataZoneCtrls->NumTStatStatements);
@@ -347,21 +346,21 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneCtrls->TStatObjects(Item).Name = cAlphaArgs(1);
-            Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+            state.dataZoneCtrls->TStatObjects(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
+            Item1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             ZLItem = 0;
-            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
             if (Item1 > 0) {
                 state.dataZoneCtrls->TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
                 ++state.dataZoneCtrls->NumTempControlledZones;
@@ -375,7 +374,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 state.dataZoneCtrls->TStatObjects(Item).ZoneListActive = true;
                 state.dataZoneCtrls->TStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
@@ -398,35 +397,35 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Item,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 for (Item1 = 1; Item1 <= state.dataZoneCtrls->TStatObjects(Item).NumOfZones; ++Item1) {
                     ++TempControlledZoneNum;
                     if (state.dataZoneCtrls->TStatObjects(Item).ZoneListActive) {
-                        cAlphaArgs(2) = state.dataHeatBal->Zone(state.dataHeatBal->ZoneList(state.dataZoneCtrls->TStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
+                        state.dataIPShortCut->cAlphaArgs(2) = state.dataHeatBal->Zone(state.dataHeatBal->ZoneList(state.dataZoneCtrls->TStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                     }
                     ZoneAssigned =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataZoneCtrls->TempControlledZone, &ZoneTempControls::ZoneName, TempControlledZoneNum - 1);
+                        UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataZoneCtrls->TempControlledZone, &ZoneTempControls::ZoneName, TempControlledZoneNum - 1);
                     if (ZoneAssigned == 0) {
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneName = cAlphaArgs(2);
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
                         if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ActualZoneNum == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" +
-                                            cAlphaArgs(2) + "\" not found.");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(2) + "\" not found.");
                             ErrorsFound = true;
                         } else {
                             state.dataHeatBal->Zone(state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ActualZoneNum).TempControlledZoneIndex = TempControlledZoneNum;
                         }
                     } else {
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneName = cAlphaArgs(2); // for continuity
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2); // for continuity
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                         "\" zone previously assigned.");
                         ShowContinueError(state, "...Zone was previously assigned to Thermostat=\"" + state.dataZoneCtrls->TempControlledZone(ZoneAssigned).Name + "\".");
                         ErrorsFound = true;
@@ -434,7 +433,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     }
 
                     if (!state.dataZoneCtrls->TStatObjects(Item).ZoneListActive) {
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).Name = cAlphaArgs(1);
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                     } else {
                         CheckCreatedZoneItemName(state, RoutineName,
                                                  cCurrentModuleObject,
@@ -448,31 +447,31 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                         if (errFlag) ErrorsFound = true;
                     }
 
-                    state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlTypeSchedName = cAlphaArgs(3);
-                    state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).CTSchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
+                    state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlTypeSchedName = state.dataIPShortCut->cAlphaArgs(3);
+                    state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).CTSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (Item1 == 1) { // only show error on first of several if zone list
                         if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).CTSchedIndex == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" +
-                                            cAlphaArgs(3) + "\" not found.");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(3) + "\" not found.");
                             ErrorsFound = true;
                         } else {
                             // Check validity of control types.
                             ValidScheduleControlType =
                                 CheckScheduleValueMinMax(state, state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).CTSchedIndex, ">=", 0.0, "<=", 4.0);
                             if (!ValidScheduleControlType) {
-                                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(2) + "=\"" +
-                                                cAlphaArgs(2) + "\"");
+                                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid range " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(2) + "\"");
                                 ShowContinueError(state, "..contains values outside of range [0,4].");
                                 ErrorsFound = true;
                             }
                         }
                     }
 
-                    if (lAlphaFieldBlanks(7)) {
+                    if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                         NumAlphas = 5;
-                    } else if (lAlphaFieldBlanks(9)) {
+                    } else if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                         NumAlphas = 7;
-                    } else if (lAlphaFieldBlanks(11)) {
+                    } else if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         NumAlphas = 9;
                     }
 
@@ -483,33 +482,33 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
                     for (ControlTypeNum = 1; ControlTypeNum <= state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).NumControlTypes; ++ControlTypeNum) {
 
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum) = cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 3));
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlTypeName(ControlTypeNum) = cAlphaArgs(nint(2.0 * ControlTypeNum + 3));
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum) = state.dataIPShortCut->cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 3));
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlTypeName(ControlTypeNum) = state.dataIPShortCut->cAlphaArgs(nint(2.0 * ControlTypeNum + 3));
 
                         if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum) != "") {
                             CTIndex = UtilityRoutines::FindItem(
                                 state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum), ValidControlTypes, 4);
                             if (CTIndex == 0) {
-                                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
-                                                cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 3)) + "=\"" +
-                                                cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 3)) + "\"");
+                                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                                state.dataIPShortCut->cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 3)) + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 3)) + "\"");
                                 ErrorsFound = true;
                             }
                         } else {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
-                                            cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 3)) + "=\"<blank>\"");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                            state.dataIPShortCut->cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 3)) + "=\"<blank>\"");
                             ErrorsFound = true;
                         }
                         state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlTypeSchIndx(ControlTypeNum) = 0;
                     }
                     if (NumNums > 0) {
-                        if (rNumericArgs(1) >= 0.0) {
-                            state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DeltaTCutSet = rNumericArgs(1);
-                            if (rNumericArgs(1) > 0.0) state.dataZoneTempPredictorCorrector->NumOnOffCtrZone++;
+                        if (state.dataIPShortCut->rNumericArgs(1) >= 0.0) {
+                            state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DeltaTCutSet = state.dataIPShortCut->rNumericArgs(1);
+                            if (state.dataIPShortCut->rNumericArgs(1) > 0.0) state.dataZoneTempPredictorCorrector->NumOnOffCtrZone++;
                         } else {
                             ShowSevereError(
                                 state,
-                                format("{}=\"{} invalid {}=[{:.0T}].", cCurrentModuleObject, cAlphaArgs(1), cNumericFieldNames(1), rNumericArgs(1)));
+                                format("{}=\"{} invalid {}=[{:.0T}].", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
                             ShowContinueError(state, "..Allowable values must be greater or equal to 0");
                             ErrorsFound = true;
                         }
@@ -518,7 +517,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                         for (ControlTypeNum = 1; ControlTypeNum <= state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).NumControlTypes; ++ControlTypeNum) {
                             if (UtilityRoutines::SameString(state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum),
                                                             "ThermostatSetpoint:SingleHeatingOrCooling")) {
-                                ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                                  ": The choice of Temperature Difference Between Cutout And Setpoint will not be applied to "
                                                  "ThermostatSetpoint:SingleHeatingOrCooling.");
                             }
@@ -537,22 +536,22 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleTempHeatingControlNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
@@ -568,22 +567,22 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleTempCoolingControlNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+            state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
@@ -599,20 +598,20 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleTempHeatCoolControlNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
@@ -628,29 +627,29 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           DualTempHeatCoolControlNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
-            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName = cAlphaArgs(3);
-            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName = state.dataIPShortCut->cAlphaArgs(3);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
             if (state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
@@ -889,46 +888,46 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           HumidControlledZoneNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).ControlName = cAlphaArgs(1);
+            state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).ControlName = state.dataIPShortCut->cAlphaArgs(1);
             GlobalNames::IntraObjUniquenessCheck(state,
-                cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), state.dataZoneTempPredictorCorrector->HumidityControlZoneUniqueNames, ErrorsFound);
+                state.dataIPShortCut->cAlphaArgs(2), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(2), state.dataZoneTempPredictorCorrector->HumidityControlZoneUniqueNames, ErrorsFound);
 
-            state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).ZoneName = cAlphaArgs(2);
-            state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItem(cAlphaArgs(2), state.dataHeatBal->Zone);
+            state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).ActualZoneNum == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
-            state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).HumidifyingSched = cAlphaArgs(3);
-            state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).HumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
+            state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).HumidifyingSched = state.dataIPShortCut->cAlphaArgs(3);
+            state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).HumidifyingSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
             if (state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).HumidifyingSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
             if (NumAlphas == 4) {
-                state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).DehumidifyingSched = cAlphaArgs(4);
-                state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).DehumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(4));
+                state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).DehumidifyingSched = state.dataIPShortCut->cAlphaArgs(4);
+                state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).DehumidifyingSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
                 if (state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).DehumidifyingSchedIndex == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
                                     "\" not found.");
                     ErrorsFound = true;
                 }
             } else {
-                state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).DehumidifyingSched = cAlphaArgs(3);
-                state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).DehumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
+                state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).DehumidifyingSched = state.dataIPShortCut->cAlphaArgs(3);
+                state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).DehumidifyingSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
             }
 
         } // HumidControlledZoneNum
@@ -945,21 +944,21 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+            Item1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             ZLItem = 0;
-            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
-            state.dataZoneCtrls->ComfortTStatObjects(Item).Name = cAlphaArgs(1);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
+            state.dataZoneCtrls->ComfortTStatObjects(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
             if (Item1 > 0) {
                 state.dataZoneCtrls->ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
                 ++state.dataZoneCtrls->NumComfortControlledZones;
@@ -973,7 +972,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneListActive = true;
                 state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 errFlag = true;
                 ErrorsFound = true;
@@ -996,33 +995,33 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Item,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 for (Item1 = 1; Item1 <= state.dataZoneCtrls->ComfortTStatObjects(Item).NumOfZones; ++Item1) {
                     ++ComfortControlledZoneNum;
                     if (state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneListActive) {
-                        cAlphaArgs(2) = state.dataHeatBal->Zone(state.dataHeatBal->ZoneList(state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
+                        state.dataIPShortCut->cAlphaArgs(2) = state.dataHeatBal->Zone(state.dataHeatBal->ZoneList(state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                     }
                     ZoneAssigned = UtilityRoutines::FindItemInList(
-                        cAlphaArgs(2), state.dataZoneCtrls->ComfortControlledZone, &ZoneComfortControls::ZoneName, ComfortControlledZoneNum - 1);
+                        state.dataIPShortCut->cAlphaArgs(2), state.dataZoneCtrls->ComfortControlledZone, &ZoneComfortControls::ZoneName, ComfortControlledZoneNum - 1);
                     if (ZoneAssigned == 0) {
-                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ZoneName = cAlphaArgs(2);
-                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
+                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
                         if (state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" +
-                                            cAlphaArgs(2) + "\" not found.");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(2) + "\" not found.");
                             ErrorsFound = true;
                         }
                     } else {
-                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ZoneName = cAlphaArgs(2); // for continuity
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2); // for continuity
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                         "\" zone previously assigned.");
                         ShowContinueError(state, "...Zone was previously assigned to Thermostat=\"" + state.dataZoneCtrls->ComfortControlledZone(ZoneAssigned).Name + "\".");
                         ErrorsFound = true;
@@ -1030,7 +1029,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     }
 
                     if (!state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneListActive) {
-                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).Name = cAlphaArgs(1);
+                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                     } else {
                         state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).Name =
                             state.dataHeatBal->Zone(state.dataHeatBal->ZoneList(state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name + ' ' + state.dataZoneCtrls->ComfortTStatObjects(Item).Name;
@@ -1045,36 +1044,36 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     }
                     // Could not find a people object for this particular zone
                     if (IZoneCount == 0 && state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum > 0) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " no PEOPLE in " + cAlphaFieldNames(2) + "=\"" +
-                                        cAlphaArgs(2) + "\" - cannot use Comfort Control.");
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " no PEOPLE in " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(2) + "\" - cannot use Comfort Control.");
                         ErrorsFound = true;
                     }
                     state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum = static_cast<int>(AverageMethod::NO);
                     if (IZoneCount > 1) {
-                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).AverageMethodName = cAlphaArgs(3);
-                        if (UtilityRoutines::SameString(cAlphaArgs(3), "SpecificObject")) {
+                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).AverageMethodName = state.dataIPShortCut->cAlphaArgs(3);
+                        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "SpecificObject")) {
                             state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum = static_cast<int>(AverageMethod::SPE);
                         }
-                        if (UtilityRoutines::SameString(cAlphaArgs(3), "ObjectAverage")) {
+                        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "ObjectAverage")) {
                             state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum = static_cast<int>(AverageMethod::OBJ);
                         }
-                        if (UtilityRoutines::SameString(cAlphaArgs(3), "PeopleAverage")) {
+                        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PeopleAverage")) {
                             state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum = static_cast<int>(AverageMethod::PEO);
                         }
                         if (state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
                                             "\".");
                             ShowContinueError(state, "Allowed keys are SpecificObject, ObjectAverage, or PeopleAverage");
                             ErrorsFound = true;
                         }
                         if (state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum == static_cast<int>(AverageMethod::SPE)) {
-                            state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).AverageObjectName = cAlphaArgs(4);
-                            if (UtilityRoutines::FindItem(cAlphaArgs(4), state.dataHeatBal->People) == 0) {
-                                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" +
-                                                cAlphaArgs(4) + "\".");
+                            state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).AverageObjectName = state.dataIPShortCut->cAlphaArgs(4);
+                            if (UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->People) == 0) {
+                                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(4) + "\".");
                                 ErrorsFound = true;
                             } else {
-                                state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).SpecificObjectNum = UtilityRoutines::FindItem(cAlphaArgs(4), state.dataHeatBal->People);
+                                state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).SpecificObjectNum = UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->People);
                             }
                         }
                     } else {
@@ -1139,21 +1138,21 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
                     // Read Max and Min temperature setpoint
                     if (NumNums > 0) {
-                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).TdbMinSetPoint = rNumericArgs(1);
-                        if (rNumericArgs(1) > 50 || rNumericArgs(1) < 0) {
+                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).TdbMinSetPoint = state.dataIPShortCut->rNumericArgs(1);
+                        if (state.dataIPShortCut->rNumericArgs(1) > 50 || state.dataIPShortCut->rNumericArgs(1) < 0) {
                             ShowSevereError(
                                 state,
-                                format("{}=\"{} invalid {}=[{:.0T}].", cCurrentModuleObject, cAlphaArgs(1), cNumericFieldNames(1), rNumericArgs(1)));
+                                format("{}=\"{} invalid {}=[{:.0T}].", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
                             ShowContinueError(state, "..Allowable values must be between 0 C and 50 C");
                             ErrorsFound = true;
                         }
                     }
                     if (NumNums > 1) {
-                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).TdbMaxSetPoint = rNumericArgs(2);
-                        if (rNumericArgs(2) > 50 || rNumericArgs(2) < 0) {
+                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).TdbMaxSetPoint = state.dataIPShortCut->rNumericArgs(2);
+                        if (state.dataIPShortCut->rNumericArgs(2) > 50 || state.dataIPShortCut->rNumericArgs(2) < 0) {
                             ShowSevereError(
                                 state,
-                                format("{}=\"{} invalid {}=[{:.0T}].", cCurrentModuleObject, cAlphaArgs(1), cNumericFieldNames(2), rNumericArgs(2)));
+                                format("{}=\"{} invalid {}=[{:.0T}].", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
                             ShowContinueError(state, "..Allowable values must be between 0 C and 50 C");
                             ErrorsFound = true;
                         }
@@ -1161,23 +1160,23 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     // Ensure MaxTemp >= MinTemp
                     if (state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).TdbMinSetPoint >
                         state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).TdbMaxSetPoint) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                        ShowContinueError(state, ".." + cNumericFieldNames(1) + " > " + cNumericFieldNames(2));
-                        ShowContinueError(state, format("..[{:.0T}] > [{:.0T}].", rNumericArgs(1), rNumericArgs(2)));
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowContinueError(state, ".." + state.dataIPShortCut->cNumericFieldNames(1) + " > " + state.dataIPShortCut->cNumericFieldNames(2));
+                        ShowContinueError(state, format("..[{:.0T}] > [{:.0T}].", state.dataIPShortCut->rNumericArgs(1), state.dataIPShortCut->rNumericArgs(2)));
                         ErrorsFound = true;
                     }
                     // If MaxTemp = MinTemp, no thermal comfort control
                     if (state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).TdbMinSetPoint ==
                         state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).TdbMaxSetPoint) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                        ShowContinueError(state, ".." + cNumericFieldNames(1) + " = " + cNumericFieldNames(2));
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowContinueError(state, ".." + state.dataIPShortCut->cNumericFieldNames(1) + " = " + state.dataIPShortCut->cNumericFieldNames(2));
                         ShowContinueError(state, "The zone will be controlled using this dry-bulb temperature setpoint.");
                     }
                     // read Thermal comfort type schedule name
-                    state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName = cAlphaArgs(5);
-                    state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ComfortSchedIndex = GetScheduleIndex(state, cAlphaArgs(5));
+                    state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName = state.dataIPShortCut->cAlphaArgs(5);
+                    state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ComfortSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
                     if (state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ComfortSchedIndex == 0) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) +
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) +
                                         "\" not found.");
                         ErrorsFound = true;
                     } else {
@@ -1185,8 +1184,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                         ValidScheduleControlType =
                             CheckScheduleValueMinMax(state, state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ComfortSchedIndex, ">=", 0.0, "<=", 4.0);
                         if (!ValidScheduleControlType) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(5) + "=\"" +
-                                            cAlphaArgs(5) + "\"");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid range " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(5) + "\"");
                             ShowContinueError(state, "..contains values outside of range [0,4].");
                             ErrorsFound = true;
                         }
@@ -1200,27 +1199,27 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                         .ControlTypeSchIndx.allocate(state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
 
                     for (ControlTypeNum = 1; ControlTypeNum <= state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes; ++ControlTypeNum) {
-                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum) = cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 5));
-                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ControlTypeNum) = cAlphaArgs(nint(2.0 * ControlTypeNum + 5));
+                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum) = state.dataIPShortCut->cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 5));
+                        state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ControlTypeNum) = state.dataIPShortCut->cAlphaArgs(nint(2.0 * ControlTypeNum + 5));
                         if (state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum) != "") {
                             CTIndex = UtilityRoutines::FindItem(
                                 state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum), ValidComfortControlTypes, 12);
                             if (CTIndex == 0) {
-                                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
-                                                cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 5)) + "=\"" +
-                                                cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 5)) + "\"");
+                                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                                state.dataIPShortCut->cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 5)) + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 5)) + "\"");
                                 ErrorsFound = true;
                             }
                             if (CTIndex > 4) { // For Fanger control only for the time being
-                                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
-                                                cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 5)) + "=\"" +
-                                                cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 5)) + "\"");
+                                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                                state.dataIPShortCut->cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 5)) + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 5)) + "\"");
                                 ShowContinueError(state, "..Fanger is the only valid model.");
                                 ErrorsFound = true;
                             }
                         } else {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
-                                            cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 5)) + "=\"<blank>\"");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                            state.dataIPShortCut->cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 5)) + "=\"<blank>\"");
                             ErrorsFound = true;
                         }
                         state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ControlTypeNum) = 0;
@@ -1239,30 +1238,30 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleFangerHeatingControlNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 ValidScheduleControlType =
                     CheckScheduleValueMinMax(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
                 if (!ValidScheduleControlType) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
-                                    cAlphaArgs(2) + "\" entered.");
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid PMV values " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                    state.dataIPShortCut->cAlphaArgs(2) + "\" entered.");
                     ShowContinueError(state, "..Values outside of range [-3,+3].");
                     ErrorsFound = true;
                 }
@@ -1280,30 +1279,30 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleFangerCoolingControlNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+            state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 ValidScheduleControlType =
                     CheckScheduleValueMinMax(state, state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
                 if (!ValidScheduleControlType) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
-                                    cAlphaArgs(2) + "\" entered.");
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid PMV values " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                    state.dataIPShortCut->cAlphaArgs(2) + "\" entered.");
                     ShowContinueError(state, "..Values outside of range [-3,+3].");
                     ErrorsFound = true;
                 }
@@ -1321,30 +1320,30 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleFangerHeatCoolControlNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 ValidScheduleControlType =
                     CheckScheduleValueMinMax(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
                 if (!ValidScheduleControlType) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
-                                    cAlphaArgs(2) + "\" entered.");
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid PMV values " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                    state.dataIPShortCut->cAlphaArgs(2) + "\" entered.");
                     ShowContinueError(state, "..Values outside of range [-3,+3].");
                     ErrorsFound = true;
                 }
@@ -1361,45 +1360,45 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           DualFangerHeatCoolControlNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSetptSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSetptSchedName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
-            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSetptSchedName = cAlphaArgs(3);
-            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSetptSchedName = state.dataIPShortCut->cAlphaArgs(3);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
             if (state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 ValidScheduleControlType =
                     CheckScheduleValueMinMax(state, state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex, ">=", -3.0, "<=", 3.0);
                 if (!ValidScheduleControlType) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
-                                    cAlphaArgs(2) + "\" entered.");
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid PMV values " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                    state.dataIPShortCut->cAlphaArgs(2) + "\" entered.");
                     ShowContinueError(state, "..Values outside of range [-3,+3].");
                     ErrorsFound = true;
                 }
                 ValidScheduleControlType =
                     CheckScheduleValueMinMax(state, state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex, ">=", -3.0, "<=", 3.0);
                 if (!ValidScheduleControlType) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(3) + "=\"" +
-                                    cAlphaArgs(3) + "\" entered.");
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid PMV values " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
+                                    state.dataIPShortCut->cAlphaArgs(3) + "\" entered.");
                     ShowContinueError(state, "..Values outside of range [-3,+3].");
                     ErrorsFound = true;
                 }
@@ -1666,47 +1665,47 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               ZoneCapNum,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
-                if (lAlphaFieldBlanks(2)) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     // default multiplier values for all the zones not specified (zone or zonelist name field is empty)
-                    ZoneVolCapMultpSens = rNumericArgs(1);
-                    ZoneVolCapMultpMoist = rNumericArgs(2);
-                    ZoneVolCapMultpCO2 = rNumericArgs(3);
-                    ZoneVolCapMultpGenContam = rNumericArgs(4);
+                    ZoneVolCapMultpSens = state.dataIPShortCut->rNumericArgs(1);
+                    ZoneVolCapMultpMoist = state.dataIPShortCut->rNumericArgs(2);
+                    ZoneVolCapMultpCO2 = state.dataIPShortCut->rNumericArgs(3);
+                    ZoneVolCapMultpGenContam = state.dataIPShortCut->rNumericArgs(4);
                 } else {
                     // multiplier values for the specified zone(s)
                     int ZoneNum = 0;
                     ZLItem = 0;
-                    Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-                    if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
+                    Item1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+                    if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
                     if (Item1 > 0) {
                         ZoneNum = Item1;
                         state.dataHeatBal->Zone(ZoneNum).FlagCustomizedZoneCap = true;
-                        state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens = rNumericArgs(1);
-                        state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = rNumericArgs(2);
-                        state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpCO2 = rNumericArgs(3);
-                        state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpGenContam = rNumericArgs(4);
+                        state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens = state.dataIPShortCut->rNumericArgs(1);
+                        state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = state.dataIPShortCut->rNumericArgs(2);
+                        state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpCO2 = state.dataIPShortCut->rNumericArgs(3);
+                        state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpGenContam = state.dataIPShortCut->rNumericArgs(4);
                     } else if (ZLItem > 0) {
                         for (int ZonePtrNum = 1; ZonePtrNum < state.dataHeatBal->ZoneList(ZLItem).NumOfZones; ZonePtrNum++) {
                             ZoneNum = state.dataHeatBal->ZoneList(ZLItem).Zone(ZonePtrNum);
                             state.dataHeatBal->Zone(ZoneNum).FlagCustomizedZoneCap = true;
-                            state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens = rNumericArgs(1);
-                            state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = rNumericArgs(2);
-                            state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpCO2 = rNumericArgs(3);
-                            state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpGenContam = rNumericArgs(4);
+                            state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens = state.dataIPShortCut->rNumericArgs(1);
+                            state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = state.dataIPShortCut->rNumericArgs(2);
+                            state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpCO2 = state.dataIPShortCut->rNumericArgs(3);
+                            state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpGenContam = state.dataIPShortCut->rNumericArgs(4);
                         }
 
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                         "\" not found.");
                         ErrorsFound = true;
                     }
@@ -1759,42 +1758,42 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               OpTempContrlNum,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 // find matching name of  ZONECONTROL:THERMOSTAT object
-                found = UtilityRoutines::FindItem(cAlphaArgs(1), state.dataZoneCtrls->TStatObjects);
+                found = UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(1), state.dataZoneCtrls->TStatObjects);
                 if (found == 0) {
                     // It might be in the TempControlledZones
-                    found = UtilityRoutines::FindItem(cAlphaArgs(1), state.dataZoneCtrls->TempControlledZone);
+                    found = UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(1), state.dataZoneCtrls->TempControlledZone);
                     if (found == 0) { // throw error
-                        ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) +
+                        ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) +
                                         " reference not found.");
                         ErrorsFound = true;
                     } else {
                         TempControlledZoneNum = found;
                         state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OperativeTempControl = true;
-                        if (UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled")) {
+                        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Scheduled")) {
                             state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled = true;
                         }
-                        if ((!(UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled"))) &&
-                            (!(UtilityRoutines::SameString(cAlphaArgs(2), "Constant")))) {
-                            ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                        if ((!(UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Scheduled"))) &&
+                            (!(UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Constant")))) {
+                            ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                             "\".");
                             ErrorsFound = true;
                         }
 
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).FixedRadiativeFraction = rNumericArgs(1);
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched = GetScheduleIndex(state, cAlphaArgs(3));
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).FixedRadiativeFraction = state.dataIPShortCut->rNumericArgs(1);
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                         if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched == 0) &&
                             (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled)) { // throw error
-                            ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                            ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
                                             "\" not found.");
                             ErrorsFound = true;
                         }
@@ -1805,9 +1804,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             ShowSevereError(state,
                                             format("{}={} invalid {}=[{:.2T}\" cannot be negative.",
                                                    cCurrentModuleObject,
-                                                   cAlphaArgs(1),
-                                                   cNumericFieldNames(1),
-                                                   rNumericArgs(1)));
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cNumericFieldNames(1),
+                                                   state.dataIPShortCut->rNumericArgs(1)));
                             ErrorsFound = true;
                         }
                         if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).FixedRadiativeFraction >= 0.9) &&
@@ -1815,9 +1814,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             ShowSevereError(state,
                                             format("{}={} invalid {}=[{:.2T}\" cannot >= .9.",
                                                    cCurrentModuleObject,
-                                                   cAlphaArgs(1),
-                                                   cNumericFieldNames(1),
-                                                   rNumericArgs(1)));
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cNumericFieldNames(1),
+                                                   state.dataIPShortCut->rNumericArgs(1)));
                             ErrorsFound = true;
                         }
 
@@ -1826,8 +1825,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             ValidRadFractSched =
                                 CheckScheduleValueMinMax(state, state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9);
                             if (!ValidRadFractSched) {
-                                ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid values " + cAlphaFieldNames(3) + "=[" +
-                                                cAlphaArgs(3) + "\".");
+                                ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid values " + state.dataIPShortCut->cAlphaFieldNames(3) + "=[" +
+                                                state.dataIPShortCut->cAlphaArgs(3) + "\".");
                                 ShowContinueError(state, "..Values outside of range [0.0,0.9).");
                                 ErrorsFound = true;
                             }
@@ -1836,17 +1835,17 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                         // added Jan, 2017 - Xuan Luo
                         // read adaptive comfort model and calculate adaptive thermal comfort setpoint
                         if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OperativeTempControl) {
-                            if (NumAlphas >= 4 && !lAlphaFieldBlanks(4)) {
+                            if (NumAlphas >= 4 && !state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                                 int adaptiveComfortModelTypeIndex =
-                                    UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
+                                    UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
                                 if (!adaptiveComfortModelTypeIndex) {
-                                    ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" +
-                                                    cAlphaArgs(4) + "\" not found.");
+                                    ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" +
+                                                    state.dataIPShortCut->cAlphaArgs(4) + "\" not found.");
                                     ErrorsFound = true;
                                 } else if (adaptiveComfortModelTypeIndex != static_cast<int>(AdaptiveComfortModel::ADAP_NONE)) {
                                     state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).AdaptiveComfortTempControl = true;
                                     state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
-                                        UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
+                                        UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
                                     if (!state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.initialized) {
                                         Array1D<Real64> runningAverageASH(state.dataWeatherManager->NumDaysInYear, 0.0);
                                         Array1D<Real64> runningAverageCEN(state.dataWeatherManager->NumDaysInYear, 0.0);
@@ -1870,25 +1869,25 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                         TempControlledZoneNum = state.dataZoneCtrls->TStatObjects(found).TempControlledZoneStartPtr + Item - 1;
                         if (state.dataZoneCtrls->NumTempControlledZones == 0) continue;
                         state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OperativeTempControl = true;
-                        if (UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled")) {
+                        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Scheduled")) {
                             state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled = true;
                         }
                         if (Item == 1) {
-                            if ((!(UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled"))) &&
-                                (!(UtilityRoutines::SameString(cAlphaArgs(2), "Constant")))) {
-                                ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(2) + "=\"" +
-                                                cAlphaArgs(2) + "\".");
+                            if ((!(UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Scheduled"))) &&
+                                (!(UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Constant")))) {
+                                ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(2) + "\".");
                                 ErrorsFound = true;
                             }
                         }
 
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).FixedRadiativeFraction = rNumericArgs(1);
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched = GetScheduleIndex(state, cAlphaArgs(3));
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).FixedRadiativeFraction = state.dataIPShortCut->rNumericArgs(1);
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                         if (Item == 1) {
                             if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched == 0) &&
                                 (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled)) { // throw error
-                                ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(3) + "=\"" +
-                                                cAlphaArgs(3) + "\" not found.");
+                                ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(3) + "\" not found.");
                                 ErrorsFound = true;
                             }
                         }
@@ -1900,9 +1899,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                                 ShowSevereError(state,
                                                 format("{}={} invalid {}=[{:.2T}\" cannot be negative.",
                                                        cCurrentModuleObject,
-                                                       cAlphaArgs(1),
-                                                       cNumericFieldNames(1),
-                                                       rNumericArgs(1)));
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataIPShortCut->cNumericFieldNames(1),
+                                                       state.dataIPShortCut->rNumericArgs(1)));
                                 ErrorsFound = true;
                             }
                         }
@@ -1912,9 +1911,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                                 ShowSevereError(state,
                                                 format("{}={} invalid {}=[{:.2T}\" cannot >= .9.",
                                                        cCurrentModuleObject,
-                                                       cAlphaArgs(1),
-                                                       cNumericFieldNames(1),
-                                                       rNumericArgs(1)));
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataIPShortCut->cNumericFieldNames(1),
+                                                       state.dataIPShortCut->rNumericArgs(1)));
                                 ErrorsFound = true;
                             }
                         }
@@ -1925,8 +1924,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                                 ValidRadFractSched = CheckScheduleValueMinMax(state,
                                     state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9);
                                 if (!ValidRadFractSched) {
-                                    ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid values " + cAlphaFieldNames(3) + "=[" +
-                                                    cAlphaArgs(3) + "\".");
+                                    ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid values " + state.dataIPShortCut->cAlphaFieldNames(3) + "=[" +
+                                                    state.dataIPShortCut->cAlphaArgs(3) + "\".");
                                     ShowContinueError(state, "..Values outside of range [0.0,0.9).");
                                     ErrorsFound = true;
                                 }
@@ -1936,17 +1935,17 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                         // added Jan, 2017 - Xuan Luo
                         // read adaptive comfort model and calculate adaptive thermal comfort setpoint
                         if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OperativeTempControl) {
-                            if (NumAlphas >= 4 && !lAlphaFieldBlanks(4)) {
+                            if (NumAlphas >= 4 && !state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                                 int adaptiveComfortModelTypeIndex =
-                                    UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
+                                    UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
                                 if (!adaptiveComfortModelTypeIndex) {
-                                    ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" +
-                                                    cAlphaArgs(4) + "\" not found.");
+                                    ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" +
+                                                    state.dataIPShortCut->cAlphaArgs(4) + "\" not found.");
                                     ErrorsFound = true;
                                 } else if (adaptiveComfortModelTypeIndex != static_cast<int>(AdaptiveComfortModel::ADAP_NONE)) {
                                     state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).AdaptiveComfortTempControl = true;
                                     state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
-                                        UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
+                                        UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
                                     if (!state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.initialized) {
                                         Array1D<Real64> runningAverageASH(state.dataWeatherManager->NumDaysInYear, 0.0);
                                         Array1D<Real64> runningAverageCEN(state.dataWeatherManager->NumDaysInYear, 0.0);
@@ -1980,52 +1979,52 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               TempHumidityCntrlNum,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 // find matching name of  ZONECONTROL:THERMOSTAT object
-                found = UtilityRoutines::FindItem(cAlphaArgs(1), state.dataZoneCtrls->TStatObjects);
+                found = UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(1), state.dataZoneCtrls->TStatObjects);
                 if (found == 0) {
                     // It might be in the TempControlledZones
-                    found = UtilityRoutines::FindItem(cAlphaArgs(1), state.dataZoneCtrls->TempControlledZone);
+                    found = UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(1), state.dataZoneCtrls->TempControlledZone);
                     if (found == 0) { // throw error
-                        ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) +
+                        ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) +
                                         " reference not found.");
                         ErrorsFound = true;
                     } else {
                         TempControlledZoneNum = found;
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSched = cAlphaArgs(2);
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSched = state.dataIPShortCut->cAlphaArgs(2);
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                         if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSchedIndex == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                             "\" not found.");
                             ErrorsFound = true;
                         }
                         state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolControl = true;
-                        if ((UtilityRoutines::SameString(cAlphaArgs(3), "None"))) {
+                        if ((UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "None"))) {
                             state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolControl = false;
                         }
-                        if (UtilityRoutines::SameString(cAlphaArgs(4), "Scheduled")) {
+                        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Scheduled")) {
                             state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled = true;
                         }
-                        if ((!(UtilityRoutines::SameString(cAlphaArgs(4), "Scheduled"))) &&
-                            (!(UtilityRoutines::SameString(cAlphaArgs(4), "Constant")))) {
-                            ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
+                        if ((!(UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Scheduled"))) &&
+                            (!(UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Constant")))) {
+                            ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
                                             "\".");
                             ErrorsFound = true;
                         }
 
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange = rNumericArgs(1);
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex = GetScheduleIndex(state, cAlphaArgs(4));
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange = state.dataIPShortCut->rNumericArgs(1);
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
                         if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex == 0) &&
                             (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled)) { // throw error
-                            ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) +
+                            ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) +
                                             "\" not found.");
                             ErrorsFound = true;
                         }
@@ -2036,9 +2035,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             ShowSevereError(state,
                                             format("{}={} invalid {}=[{:.2T}\" cannot be negative.",
                                                    cCurrentModuleObject,
-                                                   cAlphaArgs(1),
-                                                   cNumericFieldNames(1),
-                                                   rNumericArgs(1)));
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cNumericFieldNames(1),
+                                                   state.dataIPShortCut->rNumericArgs(1)));
                             ErrorsFound = true;
                         }
                         if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange > 3.0) &&
@@ -2046,9 +2045,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             ShowSevereError(state,
                                             format("{}={} invalid {}=[{:.2T}\" cannot be > 3.0",
                                                    cCurrentModuleObject,
-                                                   cAlphaArgs(1),
-                                                   cNumericFieldNames(1),
-                                                   rNumericArgs(1)));
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cNumericFieldNames(1),
+                                                   state.dataIPShortCut->rNumericArgs(1)));
                             ErrorsFound = true;
                         }
 
@@ -2057,56 +2056,56 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             ValidZoneOvercoolRangeSched =
                                 CheckScheduleValueMinMax(state, state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0);
                             if (!ValidZoneOvercoolRangeSched) {
-                                ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid values " + cAlphaFieldNames(5) + "=[" +
-                                                cAlphaArgs(5) + "\".");
+                                ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid values " + state.dataIPShortCut->cAlphaFieldNames(5) + "=[" +
+                                                state.dataIPShortCut->cAlphaArgs(5) + "\".");
                                 ShowContinueError(state, "..Values outside of range [0.0,3.0].");
                                 ErrorsFound = true;
                             }
                         }
                         // check Overcool Control Ratio limits
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolControlRatio = rNumericArgs(2);
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolControlRatio = state.dataIPShortCut->rNumericArgs(2);
                         if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolControlRatio < 0.0) {
                             ShowSevereError(state,
                                             format("{}={} invalid {}=[{:.2T}\" cannot be negative.",
                                                    cCurrentModuleObject,
-                                                   cAlphaArgs(2),
-                                                   cNumericFieldNames(2),
-                                                   rNumericArgs(2)));
+                                                   state.dataIPShortCut->cAlphaArgs(2),
+                                                   state.dataIPShortCut->cNumericFieldNames(2),
+                                                   state.dataIPShortCut->rNumericArgs(2)));
                             ErrorsFound = true;
                         }
                     }
                 } else {
                     for (Item = 1; Item <= state.dataZoneCtrls->TStatObjects(found).NumOfZones; ++Item) {
                         TempControlledZoneNum = state.dataZoneCtrls->TStatObjects(found).TempControlledZoneStartPtr + Item - 1;
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSched = cAlphaArgs(2);
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSched = state.dataIPShortCut->cAlphaArgs(2);
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                         if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSchedIndex == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                             "\" not found.");
                             ErrorsFound = true;
                         }
                         state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolControl = true;
-                        if ((UtilityRoutines::SameString(cAlphaArgs(3), "None"))) {
+                        if ((UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "None"))) {
                             state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolControl = false;
                         }
-                        if (UtilityRoutines::SameString(cAlphaArgs(4), "Scheduled")) {
+                        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Scheduled")) {
                             state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled = false;
                         }
                         if (Item == 1) {
-                            if ((!(UtilityRoutines::SameString(cAlphaArgs(4), "Scheduled"))) &&
-                                (!(UtilityRoutines::SameString(cAlphaArgs(4), "Constant")))) {
-                                ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" +
-                                                cAlphaArgs(4) + "\".");
+                            if ((!(UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Scheduled"))) &&
+                                (!(UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Constant")))) {
+                                ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(4) + "\".");
                                 ErrorsFound = true;
                             }
                         }
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange = rNumericArgs(1);
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex = GetScheduleIndex(state, cAlphaArgs(6));
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange = state.dataIPShortCut->rNumericArgs(1);
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
                         if (Item == 1) {
                             if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex == 0) &&
                                 (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled)) { // throw error
-                                ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(5) + "=\"" +
-                                                cAlphaArgs(5) + "\" not found.");
+                                ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(5) + "\" not found.");
                                 ErrorsFound = true;
                             }
                         }
@@ -2117,9 +2116,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                                 ShowSevereError(state,
                                                 format("{}={} invalid {}=[{:.2T}\" cannot be negative.",
                                                        cCurrentModuleObject,
-                                                       cAlphaArgs(1),
-                                                       cNumericFieldNames(1),
-                                                       rNumericArgs(1)));
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataIPShortCut->cNumericFieldNames(1),
+                                                       state.dataIPShortCut->rNumericArgs(1)));
                                 ErrorsFound = true;
                             }
                         }
@@ -2129,9 +2128,9 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                                 ShowSevereError(state,
                                                 format("{}={} invalid {}=[{:.2T}\" cannot > 3.0",
                                                        cCurrentModuleObject,
-                                                       cAlphaArgs(1),
-                                                       cNumericFieldNames(1),
-                                                       rNumericArgs(1)));
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataIPShortCut->cNumericFieldNames(1),
+                                                       state.dataIPShortCut->rNumericArgs(1)));
                                 ErrorsFound = true;
                             }
                         }
@@ -2141,23 +2140,23 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                                 ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax(state,
                                     state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0);
                                 if (!ValidZoneOvercoolRangeSched) {
-                                    ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid values " + cAlphaFieldNames(5) + "=[" +
-                                                    cAlphaArgs(5) + "\".");
+                                    ShowSevereError(state, cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + " invalid values " + state.dataIPShortCut->cAlphaFieldNames(5) + "=[" +
+                                                    state.dataIPShortCut->cAlphaArgs(5) + "\".");
                                     ShowContinueError(state, "..Values outside of range [0.0,3.0].");
                                     ErrorsFound = true;
                                 }
                             }
                         }
-                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolControlRatio = rNumericArgs(2);
+                        state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolControlRatio = state.dataIPShortCut->rNumericArgs(2);
                         // check Overcool Control Ratio limits
                         if (Item == 1) {
                             if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ZoneOvercoolControlRatio < 0.0) {
                                 ShowSevereError(state,
                                                 format("{}={} invalid {}=[{:.2T}\" cannot be negative.",
                                                        cCurrentModuleObject,
-                                                       cAlphaArgs(2),
-                                                       cNumericFieldNames(2),
-                                                       rNumericArgs(2)));
+                                                       state.dataIPShortCut->cAlphaArgs(2),
+                                                       state.dataIPShortCut->cNumericFieldNames(2),
+                                                       state.dataIPShortCut->rNumericArgs(2)));
                                 ErrorsFound = true;
                             }
                         }
@@ -2178,21 +2177,21 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneCtrls->StagedTStatObjects(Item).Name = cAlphaArgs(1);
-            Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+            state.dataZoneCtrls->StagedTStatObjects(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
+            Item1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             ZLItem = 0;
-            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
             if (Item1 > 0) {
                 state.dataZoneCtrls->StagedTStatObjects(Item).StageControlledZoneStartPtr = state.dataZoneTempPredictorCorrector->NumStageCtrZone + 1;
                 ++state.dataZoneTempPredictorCorrector->NumStageCtrZone;
@@ -2206,7 +2205,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive = true;
                 state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
@@ -2227,28 +2226,28 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Item,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 for (Item1 = 1; Item1 <= state.dataZoneCtrls->StagedTStatObjects(Item).NumOfZones; ++Item1) {
                     ++StageControlledZoneNum;
                     if (state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive) {
-                        cAlphaArgs(2) = state.dataHeatBal->Zone(state.dataHeatBal->ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
+                        state.dataIPShortCut->cAlphaArgs(2) = state.dataHeatBal->Zone(state.dataHeatBal->ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                     }
                     ZoneAssigned = UtilityRoutines::FindItemInList(
-                        cAlphaArgs(2), state.dataZoneCtrls->StageControlledZone, &ZoneStagedControls::ZoneName, StageControlledZoneNum - 1);
+                        state.dataIPShortCut->cAlphaArgs(2), state.dataZoneCtrls->StageControlledZone, &ZoneStagedControls::ZoneName, StageControlledZoneNum - 1);
                     if (ZoneAssigned == 0) {
-                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ZoneName = cAlphaArgs(2);
-                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
+                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
                         if (state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ActualZoneNum == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" +
-                                            cAlphaArgs(2) + "\" not found.");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(2) + "\" not found.");
                             ErrorsFound = true;
                         } else {
                             //           Zone(StageControlledZone(StageControlledZoneNum)%ActualZoneNum)%StageControlledZoneIndex =
@@ -2256,8 +2255,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                         }
                         state.dataZoneCtrls->StageZoneLogic(state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ActualZoneNum) = true;
                     } else {
-                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ZoneName = cAlphaArgs(2); // for continuity
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2); // for continuity
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                         "\" zone previously assigned.");
                         ShowContinueError(state, "...Zone was previously assigned to Thermostat=\"" + state.dataZoneCtrls->StageControlledZone(ZoneAssigned).Name + "\".");
                         ErrorsFound = true;
@@ -2265,7 +2264,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     }
 
                     if (!state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive) {
-                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).Name = cAlphaArgs(1);
+                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                     } else {
                         CheckCreatedZoneItemName(state, RoutineName,
                                                  cCurrentModuleObject,
@@ -2279,35 +2278,35 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                         if (errFlag) ErrorsFound = true;
                     }
 
-                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfHeatStages = rNumericArgs(1);
-                    if (rNumericArgs(1) < 1 || rNumericArgs(1) > 4) {
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfHeatStages = state.dataIPShortCut->rNumericArgs(1);
+                    if (state.dataIPShortCut->rNumericArgs(1) < 1 || state.dataIPShortCut->rNumericArgs(1) > 4) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" invalid range {}=\"{:.0R}\"",
                                                cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               cNumericFieldNames(1),
-                                               rNumericArgs(1)));
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cNumericFieldNames(1),
+                                               state.dataIPShortCut->rNumericArgs(1)));
                         ShowContinueError(state, "..contains values outside of range [1,4].");
                         ErrorsFound = true;
                     }
 
-                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HeatSetBaseSchedName = cAlphaArgs(3);
-                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HSBchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HeatSetBaseSchedName = state.dataIPShortCut->cAlphaArgs(3);
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HSBchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (Item1 == 1) { // only show error on first of several if zone list
                         if (state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HSBchedIndex == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" +
-                                            cAlphaArgs(3) + "\" not found.");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(3) + "\" not found.");
                             ErrorsFound = true;
                         }
                     }
 
-                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HeatThroRange = rNumericArgs(2);
-                    if (rNumericArgs(1) < 0.0) {
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HeatThroRange = state.dataIPShortCut->rNumericArgs(2);
+                    if (state.dataIPShortCut->rNumericArgs(1) < 0.0) {
                         ShowSevereError(state,
-                                        format("{}=\"" + cAlphaArgs(1) + "\" negative value is found at {}=\"{:.1R}\"",
+                                        format("{}=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" negative value is found at {}=\"{:.1R}\"",
                                                cCurrentModuleObject,
-                                               cNumericFieldNames(2),
-                                               rNumericArgs(2)));
+                                               state.dataIPShortCut->cNumericFieldNames(2),
+                                               state.dataIPShortCut->rNumericArgs(2)));
                         ShowContinueError(state, ".. The minumum value is 0.");
                         ErrorsFound = true;
                     }
@@ -2315,64 +2314,64 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     if (state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfHeatStages > 0) {
                         state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HeatTOffset.allocate(state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfHeatStages);
                         for (i = 1; i <= state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfHeatStages; ++i) {
-                            state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HeatTOffset(i) = rNumericArgs(2 + i);
-                            if (rNumericArgs(2 + i) > 0.0) {
+                            state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HeatTOffset(i) = state.dataIPShortCut->rNumericArgs(2 + i);
+                            if (state.dataIPShortCut->rNumericArgs(2 + i) > 0.0) {
                                 ShowSevereError(state,
-                                                cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" positive value is found at " +
-                                                    format("{}=\"{:.1R}\"", cNumericFieldNames(2 + i), rNumericArgs(2 + i)));
+                                                cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" positive value is found at " +
+                                                    format("{}=\"{:.1R}\"", state.dataIPShortCut->cNumericFieldNames(2 + i), state.dataIPShortCut->rNumericArgs(2 + i)));
                                 ShowContinueError(state, ".. The maximum value is 0.");
                                 ErrorsFound = true;
                             }
-                            if (lNumericFieldBlanks(2 + i)) {
-                                ShowSevereError(state, cCurrentModuleObject + " object =" + cAlphaArgs(1) + ". The input of " + cNumericFieldNames(2 + i) +
+                            if (state.dataIPShortCut->lNumericFieldBlanks(2 + i)) {
+                                ShowSevereError(state, cCurrentModuleObject + " object =" + state.dataIPShortCut->cAlphaArgs(1) + ". The input of " + state.dataIPShortCut->cNumericFieldNames(2 + i) +
                                                 " is required, but a blank is found.");
                                 ErrorsFound = true;
                             }
                             if (i > 1) {
-                                if (rNumericArgs(2 + i) >= rNumericArgs(1 + i)) {
+                                if (state.dataIPShortCut->rNumericArgs(2 + i) >= state.dataIPShortCut->rNumericArgs(1 + i)) {
                                     ShowSevereError(state,
                                                     format("{}=\"{}\" The value at {}=\"{:.1R}\" has to be less than ",
                                                            cCurrentModuleObject,
-                                                           cAlphaArgs(1),
-                                                           cNumericFieldNames(2 + i),
-                                                           rNumericArgs(2 + i)));
-                                    ShowContinueError(state, format("{}=\"{:.1R}", cNumericFieldNames(1 + i), rNumericArgs(1 + i)));
+                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           state.dataIPShortCut->cNumericFieldNames(2 + i),
+                                                           state.dataIPShortCut->rNumericArgs(2 + i)));
+                                    ShowContinueError(state, format("{}=\"{:.1R}", state.dataIPShortCut->cNumericFieldNames(1 + i), state.dataIPShortCut->rNumericArgs(1 + i)));
                                     ErrorsFound = true;
                                 }
                             }
                         }
                     }
 
-                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfCoolStages = rNumericArgs(7);
-                    if (rNumericArgs(7) < 1 || rNumericArgs(7) > 4) {
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfCoolStages = state.dataIPShortCut->rNumericArgs(7);
+                    if (state.dataIPShortCut->rNumericArgs(7) < 1 || state.dataIPShortCut->rNumericArgs(7) > 4) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" invalid range {}=\"{:.0R}\"",
                                                cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               cNumericFieldNames(7),
-                                               rNumericArgs(7)));
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cNumericFieldNames(7),
+                                               state.dataIPShortCut->rNumericArgs(7)));
                         ShowContinueError(state, "..contains values outside of range [1,4].");
                         ErrorsFound = true;
                     }
 
-                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CoolSetBaseSchedName = cAlphaArgs(4);
-                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CSBchedIndex = GetScheduleIndex(state, cAlphaArgs(4));
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CoolSetBaseSchedName = state.dataIPShortCut->cAlphaArgs(4);
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CSBchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
                     if (Item1 == 1) { // only show error on first of several if zone list
                         if (state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CSBchedIndex == 0) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + "=\"" +
-                                            cAlphaArgs(4) + "\" not found.");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(4) + "\" not found.");
                             ErrorsFound = true;
                         }
                     }
 
-                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CoolThroRange = rNumericArgs(8);
-                    if (rNumericArgs(8) < 0.0) {
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CoolThroRange = state.dataIPShortCut->rNumericArgs(8);
+                    if (state.dataIPShortCut->rNumericArgs(8) < 0.0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" negative value is found at {}=\"{:.1R}\"",
                                                cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               cNumericFieldNames(8),
-                                               rNumericArgs(8)));
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cNumericFieldNames(8),
+                                               state.dataIPShortCut->rNumericArgs(8)));
                         ShowContinueError(state, ".. The minumum value is 0.");
                         ErrorsFound = true;
                     }
@@ -2380,31 +2379,31 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     if (state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfCoolStages > 0) {
                         state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CoolTOffset.allocate(state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfCoolStages);
                         for (i = 1; i <= state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfCoolStages; ++i) {
-                            state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CoolTOffset(i) = rNumericArgs(8 + i);
-                            if (rNumericArgs(8 + i) < 0.0) {
+                            state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CoolTOffset(i) = state.dataIPShortCut->rNumericArgs(8 + i);
+                            if (state.dataIPShortCut->rNumericArgs(8 + i) < 0.0) {
                                 ShowSevereError(state,
                                                 format("{}=\"{}\" negative value is found at {}=\"{:.1R}\"",
                                                        cCurrentModuleObject,
-                                                       cAlphaArgs(1),
-                                                       cNumericFieldNames(8 + i),
-                                                       rNumericArgs(8 + i)));
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataIPShortCut->cNumericFieldNames(8 + i),
+                                                       state.dataIPShortCut->rNumericArgs(8 + i)));
                                 ShowContinueError(state, ".. The minimum value is 0.");
                                 ErrorsFound = true;
                             }
-                            if (lNumericFieldBlanks(8 + i)) {
-                                ShowSevereError(state, cCurrentModuleObject + " object =" + cAlphaArgs(1) + ". The input of " + cNumericFieldNames(8 + i) +
+                            if (state.dataIPShortCut->lNumericFieldBlanks(8 + i)) {
+                                ShowSevereError(state, cCurrentModuleObject + " object =" + state.dataIPShortCut->cAlphaArgs(1) + ". The input of " + state.dataIPShortCut->cNumericFieldNames(8 + i) +
                                                 " is required, but a blank is found.");
                                 ErrorsFound = true;
                             }
                             if (i > 1) {
-                                if (rNumericArgs(8 + i) <= rNumericArgs(7 + i)) {
+                                if (state.dataIPShortCut->rNumericArgs(8 + i) <= state.dataIPShortCut->rNumericArgs(7 + i)) {
                                     ShowSevereError(state,
                                                     format("{}=\"{}\" The value at {}=\"{:.1R}\" has to be greater than ",
                                                            cCurrentModuleObject,
-                                                           cAlphaArgs(1),
-                                                           cNumericFieldNames(8 + i),
-                                                           rNumericArgs(8 + i)));
-                                    ShowContinueError(state, format("{}=\"{:.1R}", cNumericFieldNames(7 + i), rNumericArgs(7 + i)));
+                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           state.dataIPShortCut->cNumericFieldNames(8 + i),
+                                                           state.dataIPShortCut->rNumericArgs(8 + i)));
+                                    ShowContinueError(state, format("{}=\"{:.1R}", state.dataIPShortCut->cNumericFieldNames(7 + i), state.dataIPShortCut->rNumericArgs(7 + i)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -6606,8 +6605,8 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
             // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
             if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
-                state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyM += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyM;
-                state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyH += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyF;
+                state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyM += state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).EnthalpyM;
+                state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyH += state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).EnthalpyF;
             }
         } // SurfNum
 

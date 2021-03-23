@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -8477,17 +8478,17 @@ namespace WindowManager {
         rNumericArgs.dimension(NumNumbers, 0.0);
 
         if (NumSiteSpectrum == 1) {
-            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
 
             // use default spectrum data, done!
-            if (UtilityRoutines::SameString(cAlphaArgs(2), "Default")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Default")) {
                 state.dataWindowManager->RunMeOnceFlag = true;
                 return;
             }
 
             // now read custom solar and visible spectrum data
-            cSolarSpectrum = cAlphaArgs(3);
-            cVisibleSpectrum = cAlphaArgs(4);
+            cSolarSpectrum = state.dataIPShortCut->cAlphaArgs(3);
+            cVisibleSpectrum = state.dataIPShortCut->cAlphaArgs(4);
 
             cCurrentModuleObject = "Site:SpectrumData";
             NumSiteSpectrum = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -8507,19 +8508,19 @@ namespace WindowManager {
             iVisibleSpectrum = 0;
             for (Loop = 1; Loop <= NumSiteSpectrum; ++Loop) {
                 // Step 2 - read user-defined spectrum data
-                inputProcessor->getObjectItem(state, cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-                if (UtilityRoutines::SameString(cAlphaArgs(1), cSolarSpectrum)) {
+                inputProcessor->getObjectItem(state, cCurrentModuleObject, Loop, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), cSolarSpectrum)) {
                     iSolarSpectrum = Loop;
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->nume) {
-                        ShowSevereError(state, "Solar spectrum data pair is more than 107 - " + cCurrentModuleObject + " - " + cAlphaArgs(1));
+                        ShowSevereError(state, "Solar spectrum data pair is more than 107 - " + cCurrentModuleObject + " - " + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     } else {
                         // Step 3 - overwrite default solar spectrum data
                         for (iTmp = 1; iTmp <= state.dataWindowManager->nume; ++iTmp) {
                             if (iTmp <= NumNumbers / 2) {
-                                state.dataWindowManager->wle(iTmp) = rNumericArgs(2 * iTmp - 1);
-                                state.dataWindowManager->e(iTmp) = rNumericArgs(2 * iTmp);
+                                state.dataWindowManager->wle(iTmp) = state.dataIPShortCut->rNumericArgs(2 * iTmp - 1);
+                                state.dataWindowManager->e(iTmp) = state.dataIPShortCut->rNumericArgs(2 * iTmp);
                             } else {
                                 state.dataWindowManager->wle(iTmp) = 0.0;
                                 state.dataWindowManager->e(iTmp) = 0.0;
@@ -8527,18 +8528,18 @@ namespace WindowManager {
                         }
                     }
                 }
-                if (UtilityRoutines::SameString(cAlphaArgs(1), cVisibleSpectrum)) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), cVisibleSpectrum)) {
                     iVisibleSpectrum = Loop;
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->numt3) {
-                        ShowSevereError(state, "Visible spectrum data pair is more than 81 - " + cCurrentModuleObject + " - " + cAlphaArgs(1));
+                        ShowSevereError(state, "Visible spectrum data pair is more than 81 - " + cCurrentModuleObject + " - " + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     } else {
                         // Step 3 - overwrite default visible spectrum data
                         for (iTmp = 1; iTmp <= state.dataWindowManager->numt3; ++iTmp) {
                             if (iTmp <= NumNumbers / 2) {
-                                state.dataWindowManager->wlt3(iTmp) = rNumericArgs(2 * iTmp - 1);
-                                state.dataWindowManager->y30(iTmp) = rNumericArgs(2 * iTmp);
+                                state.dataWindowManager->wlt3(iTmp) = state.dataIPShortCut->rNumericArgs(2 * iTmp - 1);
+                                state.dataWindowManager->y30(iTmp) = state.dataIPShortCut->rNumericArgs(2 * iTmp);
                             } else {
                                 state.dataWindowManager->wlt3(iTmp) = 0.0;
                                 state.dataWindowManager->y30(iTmp) = 0.0;

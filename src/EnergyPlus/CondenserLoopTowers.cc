@@ -196,9 +196,6 @@ namespace CondenserLoopTowers {
         // METHODOLOGY EMPLOYED:
         // Uses "Get" routines to read in the data.
 
-        // Using/Aliasing
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr auto OutputFormat("{:5.2F}");
 
@@ -255,6 +252,7 @@ namespace CondenserLoopTowers {
             NumVSYorkCalcModelCoeffs = inputProcessor->getNumObjectsFound(state, "CoolingTowerPerformance:YorkCalc");
         }
 
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // Load data structures with cooling tower input data
         cCurrentModuleObject = cCoolingTower_SingleSpeed;
         for (SingleSpeedTowerNumber = 1; SingleSpeedTowerNumber <= NumSingleSpeedTowers; ++SingleSpeedTowerNumber) {
@@ -268,10 +266,10 @@ namespace CondenserLoopTowers {
                                           NumNums,
                                           IOStat,
                                           _,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
             state.dataCondenserLoopTowers->towers(TowerNum).Name = AlphArray(1);
             state.dataCondenserLoopTowers->towers(TowerNum).thisTowerNum = TowerNum;
             state.dataCondenserLoopTowers->towers(TowerNum).TowerType = cCurrentModuleObject;
@@ -337,7 +335,7 @@ namespace CondenserLoopTowers {
                     state.dataCondenserLoopTowers->towers(TowerNum).PerformanceInputMethod_Num = PIM::NominalCapacity;
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError(state, "Invalid, " + cAlphaFieldNames(4) + " = " + AlphArray(4));
+                    ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
                     ErrorsFound = true;
                 }
             } else {
@@ -383,7 +381,7 @@ namespace CondenserLoopTowers {
                     state.dataCondenserLoopTowers->towers(TowerNum).BasinHeaterSetPointTemp = 2.0;
                 }
                 if (state.dataCondenserLoopTowers->towers(TowerNum).BasinHeaterSetPointTemp < 2.0) {
-                    ShowWarningError(state, cCurrentModuleObject + ":\"" + state.dataCondenserLoopTowers->towers(TowerNum).Name + "\", " + cNumericFieldNames(18) +
+                    ShowWarningError(state, cCurrentModuleObject + ":\"" + state.dataCondenserLoopTowers->towers(TowerNum).Name + "\", " + state.dataIPShortCut->cNumericFieldNames(18) +
                                      " is less than 2 deg C. Freezing could occur.");
                 }
             }
@@ -405,7 +403,7 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).EvapLossMode = EvapLoss::MoistTheory;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid, " + cAlphaFieldNames(6) + " = " + AlphArray(6));
+                ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6));
                 ErrorsFound = true;
             }
 
@@ -433,13 +431,13 @@ namespace CondenserLoopTowers {
                 }
             } else {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid, " + cAlphaFieldNames(7) + " = " + AlphArray(7));
+                ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + AlphArray(7));
                 ErrorsFound = true;
             }
             state.dataCondenserLoopTowers->towers(TowerNum).SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((state.dataCondenserLoopTowers->towers(TowerNum).SchedIDBlowdown == 0) && (state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid, " + cAlphaFieldNames(8) + " = " + AlphArray(8));
+                ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8));
                 ErrorsFound = true;
             }
 
@@ -457,7 +455,7 @@ namespace CondenserLoopTowers {
 
             //   outdoor air inlet node
 
-            if (lAlphaFieldBlanks(10)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum = 0;
             } else {
                 state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(10),
@@ -477,7 +475,7 @@ namespace CondenserLoopTowers {
             }
 
             //   fluid bypass for single speed tower
-            if (lAlphaFieldBlanks(11) || AlphArray(11).empty()) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(11) || AlphArray(11).empty()) {
                 state.dataCondenserLoopTowers->towers(TowerNum).CapacityControl = CapacityCtrlEnum::FanCycling; // FanCycling
             } else {
                 {
@@ -512,7 +510,7 @@ namespace CondenserLoopTowers {
             }
 
             if (NumAlphas >= 12) {
-                if (lAlphaFieldBlanks(12) || AlphArray(12).empty()) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(12) || AlphArray(12).empty()) {
                     state.dataCondenserLoopTowers->towers(TowerNum).CellCtrl_Num = CellCtrl::MaxCell;
                 } else {
                     if (UtilityRoutines::SameString(AlphArray(12), "MinimalCell") || UtilityRoutines::SameString(AlphArray(12), "MaximalCell")) {
@@ -523,7 +521,7 @@ namespace CondenserLoopTowers {
                             state.dataCondenserLoopTowers->towers(TowerNum).CellCtrl_Num = CellCtrl::MaxCell;
                         }
                     } else {
-                        ShowSevereError(state, "Illegal " + cAlphaFieldNames(12) + " = " + AlphArray(12));
+                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(12) + " = " + AlphArray(12));
                         ShowContinueError(state, "Occurs in " + state.dataCondenserLoopTowers->towers(TowerNum).TowerType + '=' + state.dataCondenserLoopTowers->towers(TowerNum).Name);
                         ErrorsFound = true;
                     }
@@ -631,10 +629,10 @@ namespace CondenserLoopTowers {
                                           NumNums,
                                           IOStat,
                                           _,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
 
             state.dataCondenserLoopTowers->towers(TowerNum).Name = AlphArray(1);
             state.dataCondenserLoopTowers->towers(TowerNum).thisTowerNum = TowerNum;
@@ -666,7 +664,7 @@ namespace CondenserLoopTowers {
                     state.dataCondenserLoopTowers->towers(TowerNum).PerformanceInputMethod_Num = PIM::NominalCapacity;
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError(state, "Invalid, " + cAlphaFieldNames(4) + " = " + AlphArray(4));
+                    ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
                     ErrorsFound = true;
                 }
             } else {
@@ -766,7 +764,7 @@ namespace CondenserLoopTowers {
                     state.dataCondenserLoopTowers->towers(TowerNum).BasinHeaterSetPointTemp = 2.0;
                 }
                 if (state.dataCondenserLoopTowers->towers(TowerNum).BasinHeaterSetPointTemp < 2.0) {
-                    ShowWarningError(state, cCurrentModuleObject + ":\"" + state.dataCondenserLoopTowers->towers(TowerNum).Name + "\", " + cNumericFieldNames(26) +
+                    ShowWarningError(state, cCurrentModuleObject + ":\"" + state.dataCondenserLoopTowers->towers(TowerNum).Name + "\", " + state.dataIPShortCut->cNumericFieldNames(26) +
                                      " is less than 2 deg C. Freezing could occur.");
                 }
             }
@@ -784,11 +782,11 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).EvapLossMode = EvapLoss::UserFactor;
             } else if (UtilityRoutines::SameString(AlphArray(6), "SaturatedExit")) {
                 state.dataCondenserLoopTowers->towers(TowerNum).EvapLossMode = EvapLoss::MoistTheory;
-            } else if (lAlphaFieldBlanks(6)) {
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).EvapLossMode = EvapLoss::MoistTheory;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(6) + '=' + AlphArray(6));
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6));
                 ErrorsFound = true;
             }
 
@@ -807,7 +805,7 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode = Blowdown::Schedule;
             } else if (UtilityRoutines::SameString(AlphArray(7), "ConcentrationRatio")) {
                 state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode = Blowdown::Concentration;
-            } else if (lAlphaFieldBlanks(7)) {
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode = Blowdown::Concentration;
                 if ((NumNums < 29) && (state.dataCondenserLoopTowers->towers(TowerNum).ConcentrationRatio == 0.0)) {
                     // assume concentration ratio was omitted and should be defaulted
@@ -815,13 +813,13 @@ namespace CondenserLoopTowers {
                 }
             } else {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + '=' + AlphArray(7));
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7));
                 ErrorsFound = true;
             }
             state.dataCondenserLoopTowers->towers(TowerNum).SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((state.dataCondenserLoopTowers->towers(TowerNum).SchedIDBlowdown == 0) && (state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(8) + '=' + AlphArray(8));
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
                 ErrorsFound = true;
             }
 
@@ -843,7 +841,7 @@ namespace CondenserLoopTowers {
             }
 
             if (NumAlphas >= 11) {
-                if (lAlphaFieldBlanks(11) || AlphArray(11).empty()) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(11) || AlphArray(11).empty()) {
                     state.dataCondenserLoopTowers->towers(TowerNum).CellCtrl_Num = CellCtrl::MaxCell;
                 } else {
                     if (UtilityRoutines::SameString(AlphArray(11), "MinimalCell") || UtilityRoutines::SameString(AlphArray(11), "MaximalCell")) {
@@ -854,7 +852,7 @@ namespace CondenserLoopTowers {
                             state.dataCondenserLoopTowers->towers(TowerNum).CellCtrl_Num = CellCtrl::MaxCell;
                         }
                     } else {
-                        ShowSevereError(state, "Illegal " + cAlphaFieldNames(12) + " = " + AlphArray(12));
+                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(12) + " = " + AlphArray(12));
                         ShowContinueError(state, "Occurs in " + state.dataCondenserLoopTowers->towers(TowerNum).TowerType + '=' + state.dataCondenserLoopTowers->towers(TowerNum).Name);
                         ErrorsFound = true;
                     }
@@ -864,7 +862,7 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).CellCtrl_Num = CellCtrl::MaxCell;
             }
 
-            if (lAlphaFieldBlanks(9)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
                 WaterManager::SetupTankDemandComponent(state, AlphArray(1),
@@ -877,7 +875,7 @@ namespace CondenserLoopTowers {
             }
 
             //   outdoor air inlet node
-            if (lAlphaFieldBlanks(10)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum = 0;
             } else {
                 state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(10),
@@ -1030,10 +1028,10 @@ namespace CondenserLoopTowers {
                                           NumNums,
                                           IOStat,
                                           _,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
 
             state.dataCondenserLoopTowers->towers(TowerNum).VSTower = VariableSpeedTowerNumber;
             state.dataCondenserLoopTowers->towers(TowerNum).Name = AlphArray(1);
@@ -1060,12 +1058,12 @@ namespace CondenserLoopTowers {
 
             if ((UtilityRoutines::SameString(AlphArray(4), "CoolToolsUserDefined") ||
                  UtilityRoutines::SameString(AlphArray(4), "YorkCalcUserDefined")) &&
-                lAlphaFieldBlanks(5)) {
-                ShowSevereError(state, cCurrentModuleObject + ", \"" + state.dataCondenserLoopTowers->towers(TowerNum).Name + "\" a " + cAlphaFieldNames(5) + " must be specified when " +
-                                cAlphaFieldNames(4) + " is specified as CoolToolsUserDefined or YorkCalcUserDefined");
+                    state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                ShowSevereError(state, cCurrentModuleObject + ", \"" + state.dataCondenserLoopTowers->towers(TowerNum).Name + "\" a " + state.dataIPShortCut->cAlphaFieldNames(5) + " must be specified when " +
+                                state.dataIPShortCut->cAlphaFieldNames(4) + " is specified as CoolToolsUserDefined or YorkCalcUserDefined");
                 ErrorsFound = true;
             } else if ((UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow") || UtilityRoutines::SameString(AlphArray(4), "YorkCalc")) &&
-                       !lAlphaFieldBlanks(5)) {
+                       !state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 ShowWarningError(state, cCurrentModuleObject + ", \"" + state.dataCondenserLoopTowers->towers(TowerNum).Name +
                                  "\" a Tower Model Coefficient Name is specified and the Tower Model Type is not specified as CoolToolsUserDefined "
                                  "or YorkCalcUserDefined. The CoolingTowerPerformance:CoolTools (orCoolingTowerPerformance:YorkCalc) data object "
@@ -1074,7 +1072,7 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).ModelCoeffObjectName = AlphArray(5);
             }
 
-            if (!lAlphaFieldBlanks(6)) {
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).FanPowerfAirFlowCurve = CurveManager::GetCurveIndex(state, AlphArray(6));
                 if (state.dataCondenserLoopTowers->towers(TowerNum).FanPowerfAirFlowCurve == 0) {
                     ShowWarningError(state, cCurrentModuleObject + ", \"" + state.dataCondenserLoopTowers->towers(TowerNum).Name +
@@ -1396,7 +1394,7 @@ namespace CondenserLoopTowers {
                     state.dataCondenserLoopTowers->towers(TowerNum).BasinHeaterSetPointTemp = 2.0;
                 }
                 if (state.dataCondenserLoopTowers->towers(TowerNum).BasinHeaterSetPointTemp < 2.0) {
-                    ShowWarningError(state, cCurrentModuleObject + ":\"" + state.dataCondenserLoopTowers->towers(TowerNum).Name + "\", " + cNumericFieldNames(10) +
+                    ShowWarningError(state, cCurrentModuleObject + ":\"" + state.dataCondenserLoopTowers->towers(TowerNum).Name + "\", " + state.dataIPShortCut->cNumericFieldNames(10) +
                                      " is less than 2 deg C. Freezing could occur.");
                 }
             }
@@ -1418,10 +1416,10 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).EvapLossMode = EvapLoss::UserFactor;
             } else if (UtilityRoutines::SameString(AlphArray(8), "SaturatedExit")) {
                 state.dataCondenserLoopTowers->towers(TowerNum).EvapLossMode = EvapLoss::MoistTheory;
-            } else if (lAlphaFieldBlanks(8)) {
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).EvapLossMode = EvapLoss::MoistTheory;
             } else {
-                ShowSevereError(state, "Invalid " + cAlphaFieldNames(8) + '=' + AlphArray(8));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -1436,16 +1434,16 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode = Blowdown::Schedule;
             } else if (UtilityRoutines::SameString(AlphArray(9), "ConcentrationRatio")) {
                 state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode = Blowdown::Concentration;
-            } else if (lAlphaFieldBlanks(9)) {
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode = Blowdown::Concentration;
             } else {
-                ShowSevereError(state, "Invalid " + cAlphaFieldNames(9) + '=' + AlphArray(9));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphArray(9));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
             state.dataCondenserLoopTowers->towers(TowerNum).SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(10));
             if ((state.dataCondenserLoopTowers->towers(TowerNum).SchedIDBlowdown == 0) && (state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode == Blowdown::Schedule)) {
-                ShowSevereError(state, "Invalid " + cAlphaFieldNames(10) + '=' + AlphArray(10));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -1468,7 +1466,7 @@ namespace CondenserLoopTowers {
             }
 
             if (NumAlphas >= 13) {
-                if (lAlphaFieldBlanks(13) || AlphArray(13).empty()) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(13) || AlphArray(13).empty()) {
                     state.dataCondenserLoopTowers->towers(TowerNum).CellCtrl_Num = CellCtrl::MaxCell;
                 } else {
                     if (UtilityRoutines::SameString(AlphArray(13), "MinimalCell") || UtilityRoutines::SameString(AlphArray(13), "MaximalCell")) {
@@ -1479,7 +1477,7 @@ namespace CondenserLoopTowers {
                             state.dataCondenserLoopTowers->towers(TowerNum).CellCtrl_Num = CellCtrl::MaxCell;
                         }
                     } else {
-                        ShowSevereError(state, "Illegal " + cAlphaFieldNames(13) + " = " + AlphArray(13));
+                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(13) + " = " + AlphArray(13));
                         ShowContinueError(state, "Occurs in " + state.dataCondenserLoopTowers->towers(TowerNum).TowerType + '=' + state.dataCondenserLoopTowers->towers(TowerNum).Name);
                         ErrorsFound = true;
                     }
@@ -1489,7 +1487,7 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).CellCtrl_Num = CellCtrl::MaxCell;
             }
 
-            if (lAlphaFieldBlanks(11)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
                 WaterManager::SetupTankDemandComponent(state, AlphArray(1),
@@ -1502,7 +1500,7 @@ namespace CondenserLoopTowers {
             }
 
             //   outdoor air inlet node
-            if (lAlphaFieldBlanks(12)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum = 0;
             } else {
                 state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(12),
@@ -1539,11 +1537,11 @@ namespace CondenserLoopTowers {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
             state.dataCondenserLoopTowers->towers(TowerNum).Name = AlphArray(1);
             state.dataCondenserLoopTowers->towers(TowerNum).thisTowerNum = TowerNum;
             state.dataCondenserLoopTowers->towers(TowerNum).TowerType = cCurrentModuleObject;
@@ -1572,14 +1570,14 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).PerformanceInputMethod_Num = PIM::NominalCapacity;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid, " + cAlphaFieldNames(4) + " = " + AlphArray(4));
+                ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
                 ErrorsFound = true;
             }
 
             state.dataCondenserLoopTowers->towers(TowerNum).FanPowerfAirFlowCurve = CurveManager::GetCurveIndex(state, AlphArray(5));
             if (state.dataCondenserLoopTowers->towers(TowerNum).FanPowerfAirFlowCurve == 0) {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(5) + '=' + AlphArray(5));
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + AlphArray(5));
                 ShowContinueError(state, "Curve name not found.");
                 ErrorsFound = true;
             }
@@ -1603,7 +1601,7 @@ namespace CondenserLoopTowers {
             if (state.dataCondenserLoopTowers->towers(TowerNum).HighSpeedAirFlowRate == DataSizing::AutoSize) {
                 state.dataCondenserLoopTowers->towers(TowerNum).HighSpeedAirFlowRateWasAutoSized = true;
             }
-            state.dataCondenserLoopTowers->towers(TowerNum).DefaultedDesignAirFlowScalingFactor = lNumericFieldBlanks(8);
+            state.dataCondenserLoopTowers->towers(TowerNum).DefaultedDesignAirFlowScalingFactor = state.dataIPShortCut->lNumericFieldBlanks(8);
             state.dataCondenserLoopTowers->towers(TowerNum).DesignAirFlowPerUnitNomCap = NumArray(8);
             state.dataCondenserLoopTowers->towers(TowerNum).MinimumVSAirFlowFrac = NumArray(9);
             state.dataCondenserLoopTowers->towers(TowerNum).HighSpeedFanPower = NumArray(10);
@@ -1629,7 +1627,7 @@ namespace CondenserLoopTowers {
             state.dataCondenserLoopTowers->towers(TowerNum).UAModFuncAirFlowRatioCurvePtr = CurveManager::GetCurveIndex(state, AlphArray(6));
             if (state.dataCondenserLoopTowers->towers(TowerNum).UAModFuncAirFlowRatioCurvePtr == 0) {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(6) + '=' + AlphArray(6));
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6));
                 ShowContinueError(state, "Curve name not found.");
                 ErrorsFound = true;
             }
@@ -1637,7 +1635,7 @@ namespace CondenserLoopTowers {
             state.dataCondenserLoopTowers->towers(TowerNum).UAModFuncWetBulbDiffCurvePtr = CurveManager::GetCurveIndex(state, AlphArray(7));
             if (state.dataCondenserLoopTowers->towers(TowerNum).UAModFuncWetBulbDiffCurvePtr == 0) {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + '=' + AlphArray(7));
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7));
                 ShowContinueError(state, "Curve name not found.");
                 ErrorsFound = true;
             }
@@ -1645,7 +1643,7 @@ namespace CondenserLoopTowers {
             state.dataCondenserLoopTowers->towers(TowerNum).UAModFuncWaterFlowRatioCurvePtr = CurveManager::GetCurveIndex(state, AlphArray(8));
             if (state.dataCondenserLoopTowers->towers(TowerNum).UAModFuncWaterFlowRatioCurvePtr == 0) {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(8) + '=' + AlphArray(8));
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
                 ShowContinueError(state, "Curve name not found.");
                 ErrorsFound = true;
             }
@@ -1687,7 +1685,7 @@ namespace CondenserLoopTowers {
                     state.dataCondenserLoopTowers->towers(TowerNum).BasinHeaterSetPointTemp = 2.0;
                 }
                 if (state.dataCondenserLoopTowers->towers(TowerNum).BasinHeaterSetPointTemp < 2.0) {
-                    ShowWarningError(state, cCurrentModuleObject + ":\"" + state.dataCondenserLoopTowers->towers(TowerNum).Name + "\", " + cNumericFieldNames(22) +
+                    ShowWarningError(state, cCurrentModuleObject + ":\"" + state.dataCondenserLoopTowers->towers(TowerNum).Name + "\", " + state.dataIPShortCut->cNumericFieldNames(22) +
                                      " is less than 2 deg C. Freezing could occur.");
                 }
             }
@@ -1705,11 +1703,11 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).EvapLossMode = EvapLoss::UserFactor;
             } else if (UtilityRoutines::SameString(AlphArray(10), "SaturatedExit")) {
                 state.dataCondenserLoopTowers->towers(TowerNum).EvapLossMode = EvapLoss::MoistTheory;
-            } else if (lAlphaFieldBlanks(10)) {
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).EvapLossMode = EvapLoss::MoistTheory;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(10) + '=' + AlphArray(10));
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
                 ErrorsFound = true;
             }
 
@@ -1728,7 +1726,7 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode = Blowdown::Schedule;
             } else if (UtilityRoutines::SameString(AlphArray(11), "ConcentrationRatio")) {
                 state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode = Blowdown::Concentration;
-            } else if (lAlphaFieldBlanks(11)) {
+            } else if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode = Blowdown::Concentration;
                 if ((NumNums < 25) && (state.dataCondenserLoopTowers->towers(TowerNum).ConcentrationRatio == 0.0)) {
                     // assume concentration ratio was omitted and should be defaulted
@@ -1736,13 +1734,13 @@ namespace CondenserLoopTowers {
                 }
             } else {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(11) + '=' + AlphArray(11));
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphArray(11));
                 ErrorsFound = true;
             }
             state.dataCondenserLoopTowers->towers(TowerNum).SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(12));
             if ((state.dataCondenserLoopTowers->towers(TowerNum).SchedIDBlowdown == 0) && (state.dataCondenserLoopTowers->towers(TowerNum).BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(12) + '=' + AlphArray(12));
+                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + AlphArray(12));
                 ErrorsFound = true;
             }
 
@@ -1764,7 +1762,7 @@ namespace CondenserLoopTowers {
             }
             state.dataCondenserLoopTowers->towers(TowerNum).TowerMassFlowRateMultiplier = state.dataCondenserLoopTowers->towers(TowerNum).MaxFracFlowRate;
             if (NumAlphas >= 15) {
-                if (lAlphaFieldBlanks(15) || AlphArray(15).empty()) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(15) || AlphArray(15).empty()) {
                     state.dataCondenserLoopTowers->towers(TowerNum).CellCtrl_Num = CellCtrl::MaxCell;
                 } else {
                     if (UtilityRoutines::SameString(AlphArray(15), "MinimalCell") || UtilityRoutines::SameString(AlphArray(15), "MaximalCell")) {
@@ -1775,7 +1773,7 @@ namespace CondenserLoopTowers {
                             state.dataCondenserLoopTowers->towers(TowerNum).CellCtrl_Num = CellCtrl::MaxCell;
                         }
                     } else {
-                        ShowSevereError(state, "Illegal " + cAlphaFieldNames(15) + " = " + AlphArray(15));
+                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(15) + " = " + AlphArray(15));
                         ShowContinueError(state, "Occurs in " + state.dataCondenserLoopTowers->towers(TowerNum).TowerType + '=' + state.dataCondenserLoopTowers->towers(TowerNum).Name);
                         ErrorsFound = true;
                     }
@@ -1785,7 +1783,7 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).CellCtrl_Num = CellCtrl::MaxCell;
             }
 
-            if (lAlphaFieldBlanks(13)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
                 WaterManager::SetupTankDemandComponent(state, AlphArray(1),
@@ -1798,7 +1796,7 @@ namespace CondenserLoopTowers {
             }
 
             //   outdoor air inlet node
-            if (lAlphaFieldBlanks(14)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                 state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum = 0;
             } else {
                 state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(14),

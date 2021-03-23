@@ -180,96 +180,96 @@ namespace PhotovoltaicThermalCollectors {
         Array1D<SimplePVTModelStruct> tmpSimplePVTperf;
 
         // first load the performance object info into temporary structure
-        DataIPShortCuts::cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
-        int NumSimplePVTPerform = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+        state.dataIPShortCut->cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
+        int NumSimplePVTPerform = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
         if (NumSimplePVTPerform > 0) {
             tmpSimplePVTperf.allocate(NumSimplePVTPerform);
             for (Item = 1; Item <= NumSimplePVTPerform; ++Item) {
                 inputProcessor->getObjectItem(state,
-                                              DataIPShortCuts::cCurrentModuleObject,
+                                              state.dataIPShortCut->cCurrentModuleObject,
                                               Item,
-                                              DataIPShortCuts::cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
                                               _,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound)) continue;
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
+                if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound)) continue;
 
-                tmpSimplePVTperf(Item).Name = DataIPShortCuts::cAlphaArgs(1);
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "Fixed")) {
+                tmpSimplePVTperf(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Fixed")) {
                     tmpSimplePVTperf(Item).ThermEfficMode = ThermEfficEnum::FIXED;
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "Scheduled")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Scheduled")) {
                     tmpSimplePVTperf(Item).ThermEfficMode = ThermEfficEnum::SCHEDULED;
                 } else {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
-                tmpSimplePVTperf(Item).ThermalActiveFract = DataIPShortCuts::rNumericArgs(1);
-                tmpSimplePVTperf(Item).ThermEffic = DataIPShortCuts::rNumericArgs(2);
+                tmpSimplePVTperf(Item).ThermalActiveFract = state.dataIPShortCut->rNumericArgs(1);
+                tmpSimplePVTperf(Item).ThermEffic = state.dataIPShortCut->rNumericArgs(2);
 
-                tmpSimplePVTperf(Item).ThermEffSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(3));
+                tmpSimplePVTperf(Item).ThermEffSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if ((tmpSimplePVTperf(Item).ThermEffSchedNum == 0) && (tmpSimplePVTperf(Item).ThermEfficMode == ThermEfficEnum::SCHEDULED)) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
-                tmpSimplePVTperf(Item).SurfEmissivity = DataIPShortCuts::rNumericArgs(3);
+                tmpSimplePVTperf(Item).SurfEmissivity = state.dataIPShortCut->rNumericArgs(3);
             }
         } // NumSimplePVTPerform > 0
 
         // now get main PVT objects
-        DataIPShortCuts::cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
-        NumPVT = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+        state.dataIPShortCut->cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
+        NumPVT = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
         PVT.allocate(NumPVT);
 
         for (Item = 1; Item <= NumPVT; ++Item) {
             inputProcessor->getObjectItem(state,
-                                          DataIPShortCuts::cCurrentModuleObject,
+                                          state.dataIPShortCut->cCurrentModuleObject,
                                           Item,
-                                          DataIPShortCuts::cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          DataIPShortCuts::rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
                                           _,
-                                          DataIPShortCuts::lAlphaFieldBlanks,
-                                          DataIPShortCuts::cAlphaFieldNames,
-                                          DataIPShortCuts::cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound)) continue;
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound)) continue;
 
-            PVT(Item).Name = DataIPShortCuts::cAlphaArgs(1);
+            PVT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
             PVT(Item).TypeNum = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
 
-            PVT(Item).SurfNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(2), state.dataSurface->Surface);
+            PVT(Item).SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
             // check surface
             if (PVT(Item).SurfNum == 0) {
-                if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "Surface name cannot be blank.");
                 } else {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "Surface was not found.");
                 }
                 ErrorsFound = true;
             } else {
 
                 if (!state.dataSurface->Surface(PVT(Item).SurfNum).ExtSolar) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "Surface must be exposed to solar.");
                     ErrorsFound = true;
                 }
                 // check surface orientation, warn if upside down
                 if ((state.dataSurface->Surface(PVT(Item).SurfNum).Tilt < -95.0) || (state.dataSurface->Surface(PVT(Item).SurfNum).Tilt > 95.0)) {
-                    ShowWarningError(state, "Suspected input problem with " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                    ShowWarningError(state, "Suspected input problem with " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "Surface used for solar collector faces down");
                     ShowContinueError(
                         state,
@@ -278,13 +278,13 @@ namespace PhotovoltaicThermalCollectors {
 
             } // check surface
 
-            if (DataIPShortCuts::lAlphaFieldBlanks(3)) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(3) + ", name cannot be blank.");
+            if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(3) + ", name cannot be blank.");
                 ErrorsFound = true;
             } else {
-                PVT(Item).PVTModelName = DataIPShortCuts::cAlphaArgs(3);
+                PVT(Item).PVTModelName = state.dataIPShortCut->cAlphaArgs(3);
                 int ThisParamObj = UtilityRoutines::FindItemInList(PVT(Item).PVTModelName, tmpSimplePVTperf);
                 if (ThisParamObj > 0) {
                     PVT(Item).Simple = tmpSimplePVTperf(ThisParamObj); // entire structure assigned
@@ -292,97 +292,97 @@ namespace PhotovoltaicThermalCollectors {
                     PVT(Item).AreaCol = state.dataSurface->Surface(PVT(Item).SurfNum).Area * PVT(Item).Simple.ThermalActiveFract;
                     PVT(Item).PVTModelType = SimplePVTmodel;
                 } else {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(3) + ", was not found.");
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(3) + ", was not found.");
                     ErrorsFound = true;
                 }
             }
             if (allocated(state.dataPhotovoltaic->PVarray)) { // then PV input gotten... but don't expect this to be true.
-                PVT(Item).PVnum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), state.dataPhotovoltaic->PVarray);
+                PVT(Item).PVnum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataPhotovoltaic->PVarray);
                 // check PV
                 if (PVT(Item).PVnum == 0) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + DataIPShortCuts::cAlphaArgs(4));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 } else {
-                    PVT(Item).PVname = DataIPShortCuts::cAlphaArgs(4);
+                    PVT(Item).PVname = state.dataIPShortCut->cAlphaArgs(4);
                     PVT(Item).PVfound = true;
                 }
             } else { // no PV or not yet gotten.
-                PVT(Item).PVname = DataIPShortCuts::cAlphaArgs(4);
+                PVT(Item).PVname = state.dataIPShortCut->cAlphaArgs(4);
                 PVT(Item).PVfound = false;
             }
 
-            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "Water")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Water")) {
                 PVT(Item).WorkingFluidType = WorkingFluidEnum::LIQUID;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "Air")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Air")) {
                 PVT(Item).WorkingFluidType = WorkingFluidEnum::AIR;
             } else {
-                if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + DataIPShortCuts::cAlphaArgs(5));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(5) + " field cannot be blank.");
+                if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(5) + " field cannot be blank.");
                 } else {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + DataIPShortCuts::cAlphaArgs(5));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                 }
                 ErrorsFound = true;
             }
 
             if (PVT(Item).WorkingFluidType == WorkingFluidEnum::LIQUID) {
-                PVT(Item).PlantInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
+                PVT(Item).PlantInletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(6),
                                                                                   ErrorsFound,
-                                                                                  DataIPShortCuts::cCurrentModuleObject,
-                                                                                  DataIPShortCuts::cAlphaArgs(1),
+                                                                                  state.dataIPShortCut->cCurrentModuleObject,
+                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Water,
                                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                                   1,
                                                                                   DataLoopNode::ObjectIsNotParent);
-                PVT(Item).PlantOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
+                PVT(Item).PlantOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(7),
                                                                                    ErrorsFound,
-                                                                                   DataIPShortCuts::cCurrentModuleObject,
-                                                                                   DataIPShortCuts::cAlphaArgs(1),
+                                                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                                    1,
                                                                                    DataLoopNode::ObjectIsNotParent);
 
-                BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaArgs(6),
-                                                   DataIPShortCuts::cAlphaArgs(7),
+                BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaArgs(6),
+                                                   state.dataIPShortCut->cAlphaArgs(7),
                                                    "Water Nodes");
 
                 PVT(Item).WLoopSideNum = DataPlant::DemandSupply_No;
             }
 
             if (PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
-                PVT(Item).HVACInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(8),
+                PVT(Item).HVACInletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(8),
                                                                                  ErrorsFound,
-                                                                                 DataIPShortCuts::cCurrentModuleObject,
-                                                                                 DataIPShortCuts::cAlphaArgs(1),
+                                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                  DataLoopNode::NodeConnectionType::Inlet,
                                                                                  1,
                                                                                  DataLoopNode::ObjectIsNotParent);
-                PVT(Item).HVACOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(9),
+                PVT(Item).HVACOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(9),
                                                                                   ErrorsFound,
-                                                                                  DataIPShortCuts::cCurrentModuleObject,
-                                                                                  DataIPShortCuts::cAlphaArgs(1),
+                                                                                  state.dataIPShortCut->cCurrentModuleObject,
+                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
                                                                                   DataLoopNode::NodeConnectionType::Outlet,
                                                                                   1,
                                                                                   DataLoopNode::ObjectIsNotParent);
 
-                BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaArgs(8),
-                                                   DataIPShortCuts::cAlphaArgs(9),
+                BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaArgs(8),
+                                                   state.dataIPShortCut->cAlphaArgs(9),
                                                    "Air Nodes");
             }
 
-            PVT(Item).DesignVolFlowRate = DataIPShortCuts::rNumericArgs(1);
+            PVT(Item).DesignVolFlowRate = state.dataIPShortCut->rNumericArgs(1);
             PVT(Item).SizingInit = true;
             if (PVT(Item).DesignVolFlowRate == DataSizing::AutoSize) {
                 PVT(Item).DesignVolFlowRateWasAutoSized = true;
