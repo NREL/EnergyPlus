@@ -293,7 +293,7 @@ namespace CurveManager {
         int IOStatus;                    // Used in GetObjectItem
         int NumTableLookup;
         std::string CurrentModuleObject; // for ease in renaming.
-        static int MaxTableNums(0);      // Maximum number of numeric input fields in Tables
+        int MaxTableNums(0);      // Maximum number of numeric input fields in Tables
         //   certain object in the input file
 
         std::string FileName; // name of external table data file
