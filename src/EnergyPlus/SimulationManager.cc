@@ -1166,7 +1166,7 @@ namespace SimulationManager {
                     state.dataGlobal->DoCoilDirectSolutions = UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
-                    HeatBalanceIntRadExchange::CarrollMethod =
+                    state.dataHeatBalIntRadExchg->CarrollMethod =
                         UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm")) == "CARROLLMRT";
                 }
                 bool overrideTimestep(false);
@@ -1368,7 +1368,7 @@ namespace SimulationManager {
         } else {
             Alphas(1) = "No";
         }
-        if (HeatBalanceIntRadExchange::CarrollMethod) {
+        if (state.dataHeatBalIntRadExchg->CarrollMethod) {
             Alphas(2) = "CarrollMRT";
             ShowWarningError(state, "PerformancePrecisionTradeoffs: Carroll MRT radiant exchange method is selected.");
         } else {
@@ -1437,7 +1437,7 @@ namespace SimulationManager {
         UtilityRoutines::appendPerfLog(state, "Program, Version, TimeStamp",
                                        DataStringGlobals::VerString); // this string already includes three portions and has commas
         UtilityRoutines::appendPerfLog(state, "Use Coil Direct Solution", bool_to_string(state.dataGlobal->DoCoilDirectSolutions));
-        if (HeatBalanceIntRadExchange::CarrollMethod) {
+        if (state.dataHeatBalIntRadExchg->CarrollMethod) {
             UtilityRoutines::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "CarrollMRT");
         } else {
             UtilityRoutines::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "ScriptF");

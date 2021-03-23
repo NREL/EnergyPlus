@@ -109,29 +109,6 @@ namespace HeatBalanceIntRadExchange {
     using namespace DataSystemVariables;
     using namespace DataViewFactorInformation;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    int MaxNumOfRadEnclosureSurfs(0); // Max saved to get large enough space for SurfaceTempInKto4th
-
-    bool CarrollMethod(false);  // Use Carroll MRT method
-
-    namespace {
-        bool CalcInteriorRadExchangefirstTime(true); // Logical flag for one-time initializations
-    }
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
-
-    // Functions
-    void clear_state()
-    {
-        MaxNumOfRadEnclosureSurfs = 0;
-        CalcInteriorRadExchangefirstTime = true;
-    }
-
     void CalcInteriorRadExchange(EnergyPlusData &state,
                                  Array1S<Real64> const SurfaceTemp,   // Current surface temperatures
                                  int const SurfIterations,            // Number of iterations in calling subroutine
@@ -179,17 +156,14 @@ namespace HeatBalanceIntRadExchange {
         static Array1D<Real64> SurfaceTempInKto4th;
         static Array1D<Real64> SurfaceEmiss;
 
-
-
-
 #ifdef EP_Detailed_Timings
         epStartTime("CalcInteriorRadExchange=");
 #endif
-        if (CalcInteriorRadExchangefirstTime) {
-            SurfaceTempRad.allocate(MaxNumOfRadEnclosureSurfs);
-            SurfaceTempInKto4th.allocate(MaxNumOfRadEnclosureSurfs);
-            SurfaceEmiss.allocate(MaxNumOfRadEnclosureSurfs);
-            CalcInteriorRadExchangefirstTime = false;
+        if (state.dataHeatBalIntRadExchg->CalcInteriorRadExchangefirstTime) {
+            SurfaceTempRad.allocate(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs);
+            SurfaceTempInKto4th.allocate(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs);
+            SurfaceEmiss.allocate(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs);
+            state.dataHeatBalIntRadExchg->CalcInteriorRadExchangefirstTime = false;
             if (state.dataSysVars->DeveloperFlag) {
                 DisplayString(state, " OMP turned off, HBIRE loop executed in serial");
             }
@@ -304,7 +278,7 @@ namespace HeatBalanceIntRadExchange {
                         }
                     }
 
-                    if (CarrollMethod) {
+                    if (state.dataHeatBalIntRadExchg->CarrollMethod) {
                         CalcFp(n_zone_Surfaces, zone_info.Emissivity, zone_info.FMRT, zone_info.Fp);
                     } else {
                         CalcScriptF(state, n_zone_Surfaces, zone_info.Area, zone_info.F, zone_info.Emissivity, zone_ScriptF);
@@ -355,14 +329,14 @@ namespace HeatBalanceIntRadExchange {
                     SurfaceTempRad[ZoneSurfNum] = SurfaceTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
                 }
-                if (CarrollMethod) {
+                if (state.dataHeatBalIntRadExchg->CarrollMethod) {
                     CarrollMRTNumerator += SurfaceTempRad[ZoneSurfNum]*zone_info.Fp[ZoneSurfNum]*zone_info.Area[ZoneSurfNum];
                     CarrollMRTDenominator += zone_info.Fp[ZoneSurfNum]*zone_info.Area[ZoneSurfNum];
                 }
                 SurfaceTempInKto4th[ZoneSurfNum] = pow_4(SurfaceTempRad[ZoneSurfNum] + DataGlobalConstants::KelvinConv);
             }
 
-            if (CarrollMethod) {
+            if (state.dataHeatBalIntRadExchg->CarrollMethod) {
                 if (CarrollMRTDenominator > 0.0) {
                     CarrollMRTInKTo4th = pow_4(CarrollMRTNumerator/CarrollMRTDenominator + DataGlobalConstants::KelvinConv);
                 } else {
@@ -373,7 +347,7 @@ namespace HeatBalanceIntRadExchange {
 
             // These are the money loops
             size_type lSR(0u);
-            if (CarrollMethod) {
+            if (state.dataHeatBalIntRadExchg->CarrollMethod) {
                 for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
                     int const RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
                     int const ConstrNumRec = state.dataSurface->Surface(RecSurfNum).Construction;
@@ -532,7 +506,7 @@ namespace HeatBalanceIntRadExchange {
             print(state.files.eio, "{}\n", "! <View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface");
         }
 
-        MaxNumOfRadEnclosureSurfs = 0;
+        state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs = 0;
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
             auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
             if (enclosureNum == 1) {
@@ -550,7 +524,8 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
-            MaxNumOfRadEnclosureSurfs = max(MaxNumOfRadEnclosureSurfs, numEnclosureSurfaces);
+            state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs =
+                max(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs, numEnclosureSurfaces);
             if (numEnclosureSurfaces < 1) ShowFatalError(state, "No surfaces in an enclosure in InitInteriorRadExchange");
 
             // Allocate the parts of the derived type
@@ -603,7 +578,7 @@ namespace HeatBalanceIntRadExchange {
             }
 
 
-            if (CarrollMethod) {
+            if (state.dataHeatBalIntRadExchg->CarrollMethod) {
 
                 // User View Factors cannot be used with Carroll method.
                 if(inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName")) {
