@@ -119,59 +119,6 @@ namespace HVACDXSystem {
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    Real64 const MinAirMassFlow(0.001);
-
-    // Dehumidification control modes (DehumidControlMode)
-    int const DehumidControl_None(0);
-    int const DehumidControl_Multimode(1);
-    int const DehumidControl_CoolReheat(2);
-    bool GetInputFlag(true); // Flag to get input only once
-
-    // packaged TES modes
-    int const OffMode(0);
-    int const CoolingOnlyMode(1);
-    int const CoolingAndChargeMode(2);
-    int const CoolingAndDischargeMode(3);
-    int const ChargeOnlyMode(4);
-    int const DischargeOnlyMode(5);
-
-    Real64 const LatCapTimeConst(45.0);
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumDXSystem(0);         // The Number of DXCoolingSystems found in the Input
-    bool EconomizerFlag(false); // holds air loop economizer status
-
-    // Make this type allocatable
-    Array1D_bool CheckEquipName;
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Update routine to check convergence and update nodes
-
-    // Object Data
-    Array1D<DXCoolingConditions> DXCoolingSystem;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
-
-    void clear_state()
-    {
-        NumDXSystem = 0;
-        EconomizerFlag = false;
-        GetInputFlag = true;
-        CheckEquipName.deallocate();
-        DXCoolingSystem.deallocate();
-    }
-
     void SimDXCoolingSystem(EnergyPlusData &state, std::string const &DXCoolingSystemName, // Name of DXSystem:Airloop object
                             bool const FirstHVACIteration,          // True when first HVAC iteration
                             int const AirLoopNum,                   // Primary air loop number
@@ -218,6 +165,12 @@ namespace HVACDXSystem {
         static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
+
+        auto & GetInputFlag = state.dataHVACDXSys->GetInputFlag;
+        auto & DXCoolingSystem = state.dataHVACDXSys->DXCoolingSystem;
+        auto & NumDXSystem = state.dataHVACDXSys->NumDXSystem;
+        auto & CheckEquipName = state.dataHVACDXSys->CheckEquipName;
+        auto & EconomizerFlag = state.dataHVACDXSys->EconomizerFlag;
 
         // Obtains and Allocates DX Cooling System related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
@@ -412,6 +365,10 @@ namespace HVACDXSystem {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
+
+        auto & DXCoolingSystem = state.dataHVACDXSys->DXCoolingSystem;
+        auto & NumDXSystem = state.dataHVACDXSys->NumDXSystem;
+        auto & CheckEquipName = state.dataHVACDXSys->CheckEquipName;
 
         CurrentModuleObject = "CoilSystem:Cooling:DX";
         NumDXSystem = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -796,9 +753,11 @@ namespace HVACDXSystem {
         int OutdoorAirUnitNum;    // "ONLY" for ZoneHVAC:OutdoorAirUnit
         Real64 OAUCoilOutletTemp; // "ONLY" for zoneHVAC:OutdoorAirUnit
 
+        auto & DXCoolingSystem = state.dataHVACDXSys->DXCoolingSystem;
+        auto & NumDXSystem = state.dataHVACDXSys->NumDXSystem;
+        auto & EconomizerFlag = state.dataHVACDXSys->EconomizerFlag;
 
         if (MyOneTimeFlag) {
-
             MyOneTimeFlag = false;
         }
         if (AirLoopNum == -1) { // This Dx system is component of ZoneHVAC:OutdoorAirUnit
@@ -1078,6 +1037,8 @@ namespace HVACDXSystem {
         int VSCoilIndex;              // variable-speed coil index
         int I;                        // interation increment
 
+        auto & DXCoolingSystem = state.dataHVACDXSys->DXCoolingSystem;
+
         // Set local variables
         // Retrieve the load on the controlled zone
         OutletNode = DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
@@ -1107,6 +1068,7 @@ namespace HVACDXSystem {
         I = 1;
 
         auto &Node(state.dataLoopNodes->Node);
+        auto &EconomizerFlag = state.dataHVACDXSys->EconomizerFlag;
 
         // If there is a fault of coil SAT Sensor
         if (DXCoolingSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
@@ -3231,7 +3193,7 @@ namespace HVACDXSystem {
         FirstHVACIteration = (Par(3) == 1.0);
         HXUnitOn = (Par(4) == 1.0);
         FanOpMode = int(Par(5));
-        CalcHXAssistedCoolingCoil(state, CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode, _, EconomizerFlag);
+        CalcHXAssistedCoolingCoil(state, CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode, _, state.dataHVACDXSys->EconomizerFlag);
         OutletAirHumRat = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(CoilIndex);
         Residuum = Par(2) - OutletAirHumRat;
         return Residuum;
@@ -3436,7 +3398,7 @@ namespace HVACDXSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 HumRatioSat; // saturation humidity ratio at forst control temperature
         Real64 AirMassFlow; // air masss flow rate through the DX coil
-
+        auto &DXCoolingSystem = state.dataHVACDXSys->DXCoolingSystem;
         AirMassFlow = state.dataLoopNodes->Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).MassFlowRate;
         if (ControlMode == RunOnSensible && AirMassFlow > MinAirMassFlow &&
             TempSetPoint < state.dataLoopNodes->Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).Temp) {
@@ -3472,6 +3434,9 @@ namespace HVACDXSystem {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DXCoolSysNum;
+        auto &DXCoolingSystem = state.dataHVACDXSys->DXCoolingSystem;
+        auto &GetInputFlag = state.dataHVACDXSys->GetInputFlag;
+        auto &NumDXSystem = state.dataHVACDXSys->NumDXSystem;
 
         if (GetInputFlag) { // First time subroutine has been entered
             GetDXCoolingSystemInput(state);
@@ -3510,6 +3475,9 @@ namespace HVACDXSystem {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DXCoolSysNum;
+        auto &DXCoolingSystem = state.dataHVACDXSys->DXCoolingSystem;
+        auto &GetInputFlag = state.dataHVACDXSys->GetInputFlag;
+        auto &NumDXSystem = state.dataHVACDXSys->NumDXSystem;
 
         if (GetInputFlag) { // First time subroutine has been entered
             GetDXCoolingSystemInput(state);
@@ -3839,6 +3807,9 @@ namespace HVACDXSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;
         int DXCoolSysNum;
+        auto &DXCoolingSystem = state.dataHVACDXSys->DXCoolingSystem;
+        auto &GetInputFlag = state.dataHVACDXSys->GetInputFlag;
+        auto &NumDXSystem = state.dataHVACDXSys->NumDXSystem;
 
         if (GetInputFlag) { // First time subroutine has been entered
             GetDXCoolingSystemInput(state);
@@ -3868,6 +3839,9 @@ namespace HVACDXSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;
         int DXCoolSysNum;
+        auto &DXCoolingSystem = state.dataHVACDXSys->DXCoolingSystem;
+        auto &GetInputFlag = state.dataHVACDXSys->GetInputFlag;
+        auto &NumDXSystem = state.dataHVACDXSys->NumDXSystem;
 
         if (GetInputFlag) { // First time subroutine has been entered
             GetDXCoolingSystemInput(state);

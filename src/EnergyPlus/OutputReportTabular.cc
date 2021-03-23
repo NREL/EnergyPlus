@@ -2033,19 +2033,19 @@ namespace EnergyPlus::OutputReportTabular {
         ort->namedMonthly(62).title = "MechanicalVentilationLoadsMonthly";
         ort->namedMonthly(63).title = "HeatEmissionsReportMonthly";
 
-        if (numNamedMonthly != NumMonthlyReports) {
+        if (numNamedMonthly != state.dataOutput->NumMonthlyReports) {
             ShowFatalError(state,
                            format("InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[{}] does not match number in "
                                   "DataOutputs=[{}].",
                                   numNamedMonthly,
-                                  NumMonthlyReports));
+                                  state.dataOutput->NumMonthlyReports));
         } else {
             for (xcount = 1; xcount <= numNamedMonthly; ++xcount) {
-                if (!UtilityRoutines::SameString(MonthlyNamedReports(xcount), ort->namedMonthly(xcount).title)) {
+                if (!UtilityRoutines::SameString(state.dataOutput->MonthlyNamedReports(xcount), ort->namedMonthly(xcount).title)) {
                     ShowSevereError(state,
                         "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match titles in DataOutput.");
                     ShowContinueError(state, format("first mismatch at ORT [{}] =\"{}\".", numNamedMonthly, ort->namedMonthly(xcount).title));
-                    ShowContinueError(state, "same location in DO =\"" + MonthlyNamedReports(xcount) + "\".");
+                    ShowContinueError(state, "same location in DO =\"" + state.dataOutput->MonthlyNamedReports(xcount) + "\".");
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
             }
@@ -5824,13 +5824,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-        using DataOutputs::iNumberOfAutoCalcedFields;
-        using DataOutputs::iNumberOfAutoSizedFields;
-        using DataOutputs::iNumberOfDefaultedFields;
-        using DataOutputs::iNumberOfRecords;
-        using DataOutputs::iTotalAutoCalculatableFields;
-        using DataOutputs::iTotalAutoSizableFields;
-        using DataOutputs::iTotalFieldsWithDefaults;
 
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;
@@ -6353,13 +6346,13 @@ namespace EnergyPlus::OutputReportTabular {
         // Add footnote saying if it is a design day or other kind of environment
 
         // Field counts
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "IDF Objects", iNumberOfRecords);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Defaulted Fields", iNumberOfDefaultedFields);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Fields with Defaults", iTotalFieldsWithDefaults);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autosized Fields", iNumberOfAutoSizedFields);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autosizable Fields", iTotalAutoSizableFields);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autocalculated Fields", iNumberOfAutoCalcedFields);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autocalculatable Fields", iTotalAutoCalculatableFields);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "IDF Objects", state.dataOutput->iNumberOfRecords);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Defaulted Fields", state.dataOutput->iNumberOfDefaultedFields);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Fields with Defaults", state.dataOutput->iTotalFieldsWithDefaults);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autosized Fields", state.dataOutput->iNumberOfAutoSizedFields);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autosizable Fields", state.dataOutput->iTotalAutoSizableFields);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autocalculated Fields", state.dataOutput->iNumberOfAutoCalcedFields);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autocalculatable Fields", state.dataOutput->iTotalAutoCalculatableFields);
 
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             // annual

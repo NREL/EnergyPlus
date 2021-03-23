@@ -7186,7 +7186,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
 
     // InputProcessor::addVariablesForMonthlyReport should have requested 5 variables
     // for the SetpointsNotMetWithTemperatureMonthly report
-    EXPECT_EQ(DataOutputs::OutputVariablesForSimulation.size(), 5u);
+    EXPECT_EQ(state->dataOutput->OutputVariablesForSimulation.size(), 5u);
 
     // The Variables needed for the report are initialized (=SetupOutputVariable)
     // Inside ThermalComfort::InitThermalComfort();
