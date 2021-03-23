@@ -3433,56 +3433,12 @@ namespace EnergyPlus::ConvectionCoefficients {
         std::string YesNo1;
         std::string YesNo2;
 
-        struct FacadeGeoCharactisticsStruct
-        {
-            // Members
-            Real64 AzimuthRangeLow;
-            Real64 AzimuthRangeHi;
-            Real64 Zmax;
-            Real64 Zmin;
-            Real64 Ymax;
-            Real64 Ymin;
-            Real64 Xmax;
-            Real64 Xmin;
-            Real64 Area;
-            Real64 Perimeter;
-            Real64 Height;
-
-            // Default Constructor
-            FacadeGeoCharactisticsStruct() = default;
-
-            // Member Constructor
-            FacadeGeoCharactisticsStruct(Real64 const AzimuthRangeLow,
-                                         Real64 const AzimuthRangeHi,
-                                         Real64 const Zmax,
-                                         Real64 const Zmin,
-                                         Real64 const Ymax,
-                                         Real64 const Ymin,
-                                         Real64 const Xmax,
-                                         Real64 const Xmin,
-                                         Real64 const Area,
-                                         Real64 const Perimeter,
-                                         Real64 const Height)
-                : AzimuthRangeLow(AzimuthRangeLow), AzimuthRangeHi(AzimuthRangeHi), Zmax(Zmax), Zmin(Zmin), Ymax(Ymax), Ymin(Ymin), Xmax(Xmax),
-                  Xmin(Xmin), Area(Area), Perimeter(Perimeter), Height(Height)
-            {
-            }
-        };
-
         // Object Data
         Vector BoundNewellVec;
         Vector BoundNewellAreaVec;
         Vector dummy1;
         Vector dummy2;
         Vector dummy3;
-        static FacadeGeoCharactisticsStruct NorthFacade(332.5, 22.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-        static FacadeGeoCharactisticsStruct NorthEastFacade(22.5, 67.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-        static FacadeGeoCharactisticsStruct EastFacade(67.5, 112.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-        static FacadeGeoCharactisticsStruct SouthEastFacade(112.5, 157.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-        static FacadeGeoCharactisticsStruct SouthFacade(157.5, 202.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-        static FacadeGeoCharactisticsStruct SouthWestFacade(202.5, 247.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-        static FacadeGeoCharactisticsStruct WestFacade(247.5, 287.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-        static FacadeGeoCharactisticsStruct NorthWestFacade(287.5, 332.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
         auto &Zone(state.dataHeatBal->Zone);
         auto &Surface(state.dataSurface->Surface);
@@ -3569,6 +3525,15 @@ namespace EnergyPlus::ConvectionCoefficients {
         } // loop over zones for inside face parameters
 
         state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume = std::pow(BldgVolumeSum, OneThird);
+
+        auto & NorthFacade = state.dataConvectionCoefficient->NorthFacade;
+        auto & NorthEastFacade = state.dataConvectionCoefficient->NorthEastFacade;
+        auto & EastFacade = state.dataConvectionCoefficient->EastFacade;
+        auto & SouthEastFacade = state.dataConvectionCoefficient->SouthEastFacade;
+        auto & SouthFacade = state.dataConvectionCoefficient->SouthFacade;
+        auto & SouthWestFacade = state.dataConvectionCoefficient->SouthWestFacade;
+        auto & WestFacade = state.dataConvectionCoefficient->WestFacade;
+        auto & NorthWestFacade = state.dataConvectionCoefficient->NorthWestFacade;
 
         // first pass over surfaces for outside face params
         for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
