@@ -66,6 +66,8 @@ struct EnergyPlusData;
 
 namespace WaterCoils {
 
+    constexpr int MaxOrderedPairs = 60;
+
     enum class iCoilModel
     {
         Unassigned,
@@ -546,7 +548,6 @@ struct WaterCoilsData : BaseGlobalStruct
 {
 
     int const MaxPolynomOrder;
-    int const MaxOrderedPairs;
 
     Real64 const PolyConvgTol;
     Real64 const MinWaterMassFlowFrac;
@@ -589,6 +590,21 @@ struct WaterCoilsData : BaseGlobalStruct
     Array1D<WaterCoils::WaterCoilEquipConditions> WaterCoil;
     Array1D<WaterCoils::WaterCoilNumericFieldData> WaterCoilNumericFields;
 
+    Array1D<Real64> DesCpAir;        // CpAir at Design Inlet Air Temp
+    Array1D<Real64> DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyCoilReportFlag;
+    Array1D_bool PlantLoopScanFlag;
+    Array1D<Real64> CoefSeries = Array1D<Real64>(5);
+    Array1D<Real64> Par = Array1D<Real64>(4);
+    Array1D_bool RptCoilHeaderFlag = Array1D_bool(2, true);
+    Array2D<Real64> OrderedPair = Array2D<Real64>(WaterCoils::MaxOrderedPairs, 2);
+    Array2D<Real64> OrdPairSum = Array2D<Real64>(10, 2);
+    Array2D<Real64> OrdPairSumMatrix = Array2D<Real64>(10, 10);
+    Array1D<Real64> Par_TdbFnHRhPb = Array1D<Real64>(3);   // Par(1) = desired enthalpy H [J/kg]
+                                                             // Par(2) = desired relative humidity (0.0 - 1.0)
+                                                             // Par(3) = barometric pressure [N/m2 (Pascals)]
+
     void clear_state() override
     {
         this->NumWaterCoils = 0;
@@ -604,11 +620,22 @@ struct WaterCoilsData : BaseGlobalStruct
         this->WaterCoil.deallocate();
         this->WaterCoilNumericFields.deallocate();
         this->WaterCoilControllerCheckOneTimeFlag = true;
+        this->DesCpAir.deallocate();
+        this->DesUARangeCheck.deallocate();
+        this->MyEnvrnFlag.deallocate();
+        this->MyCoilReportFlag.deallocate();
+        this->PlantLoopScanFlag.deallocate();
+        this->CoefSeries = Array1D<Real64>(5);
+        this->Par = Array1D<Real64>(4);
+        this->RptCoilHeaderFlag = Array1D_bool(2, true);
+        this->OrderedPair = Array2D<Real64>(WaterCoils::MaxOrderedPairs, 2);
+        this->OrdPairSum = Array2D<Real64>(10, 2);
+        this->OrdPairSumMatrix = Array2D<Real64>(10, 10);
     }
 
     // Default Constructor
     WaterCoilsData()
-        : MaxPolynomOrder(4), MaxOrderedPairs(60), PolyConvgTol(1.E-05), MinWaterMassFlowFrac(0.000001), MinAirMassFlow(0.001), CounterFlow(1),
+        : MaxPolynomOrder(4), PolyConvgTol(1.E-05), MinWaterMassFlowFrac(0.000001), MinAirMassFlow(0.001), CounterFlow(1),
           CrossFlow(2), SimpleAnalysis(1), DetailedAnalysis(2), CondensateDiscarded(1001), CondensateToTank(1002), UAandFlow(1), NomCap(2),
           DesignCalc(1), SimCalc(2), NumWaterCoils(0), GetWaterCoilsInputFlag(true), WaterCoilControllerCheckOneTimeFlag(true),
           InitWaterCoilOneTimeFlag(true)
