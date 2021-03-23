@@ -125,11 +125,11 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
 
         bool ErrorsFound(false);
 
-        DataIPShortCuts::cCurrentModuleObject = "Generator:MicroTurbine";
-        state.dataMircoturbElectGen->NumMTGenerators = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+        state.dataIPShortCut->cCurrentModuleObject = "Generator:MicroTurbine";
+        state.dataMircoturbElectGen->NumMTGenerators = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataMircoturbElectGen->NumMTGenerators <= 0) {
-            ShowSevereError(state, "No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
@@ -144,25 +144,25 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             Array1D<Real64> NumArray(19);
             Array1D_string AlphArray(20);
             inputProcessor->getObjectItem(state,
-                                          DataIPShortCuts::cCurrentModuleObject,
+                                          state.dataIPShortCut->cCurrentModuleObject,
                                           GeneratorNum,
                                           AlphArray,
                                           NumAlphas,
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          DataIPShortCuts::lNumericFieldBlanks,
-                                          DataIPShortCuts::lAlphaFieldBlanks,
-                                          DataIPShortCuts::cAlphaFieldNames,
-                                          DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name = AlphArray(1);
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecPowerOutput = NumArray(1);
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecPowerOutput <= 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), NumArray(1)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(1) + " must be greater than 0.");
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), NumArray(1)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " must be greater than 0.");
                 ErrorsFound = true;
             }
 
@@ -170,30 +170,30 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MaxElecPowerOutput = NumArray(3);
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MinElecPowerOutput < 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(2), NumArray(2)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(2) + " must be greater than 0.");
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(2), NumArray(2)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(2) + " must be greater than 0.");
                 ErrorsFound = true;
             }
 
-            if (DataIPShortCuts::lNumericFieldBlanks(3)) {
+            if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MaxElecPowerOutput = state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecPowerOutput;
             } else {
                 if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MaxElecPowerOutput <= 0.0) {
-                    ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(3), NumArray(3)));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(3) + " must be greater than 0.");
+                    ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(3), NumArray(3)));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(3) + " must be greater than 0.");
                     ErrorsFound = true;
                 }
             }
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MinElecPowerOutput >= state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MaxElecPowerOutput) {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "= " + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name);
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "= " + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name);
                 ShowContinueError(state,
                                   format("{} [{:.2R}] > {} [{:.2R}]",
-                                         DataIPShortCuts::cNumericFieldNames(2),
+                                         state.dataIPShortCut->cNumericFieldNames(2),
                                          NumArray(2),
-                                         DataIPShortCuts::cNumericFieldNames(3),
+                                         state.dataIPShortCut->cNumericFieldNames(3),
                                          NumArray(3)));
                 ShowContinueError(state, "Minimum Full Load Electrical Power Output must be less than or equal");
                 ShowContinueError(state, "to Maximum Full Load Electrical Power Output.");
@@ -202,21 +202,21 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecPowerOutput > state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MaxElecPowerOutput ||
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecPowerOutput < state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MinElecPowerOutput) {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "= " + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name);
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(1) + " must be >= " + DataIPShortCuts::cNumericFieldNames(2));
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(1) + " must be <= " + DataIPShortCuts::cNumericFieldNames(3));
-                ShowContinueError(state, format("{} = {:.2R}", DataIPShortCuts::cNumericFieldNames(1), NumArray(1)));
-                ShowContinueError(state, format("{} = {:.2R}", DataIPShortCuts::cNumericFieldNames(2), NumArray(2)));
-                ShowContinueError(state, format("{} = {:.2R}", DataIPShortCuts::cNumericFieldNames(3), NumArray(3)));
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "= " + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name);
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " must be >= " + state.dataIPShortCut->cNumericFieldNames(2));
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " must be <= " + state.dataIPShortCut->cNumericFieldNames(3));
+                ShowContinueError(state, format("{} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(1), NumArray(1)));
+                ShowContinueError(state, format("{} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(2), NumArray(2)));
+                ShowContinueError(state, format("{} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(3), NumArray(3)));
                 ErrorsFound = true;
             }
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecEfficiencyLHV = NumArray(4);
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecEfficiencyLHV <= 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(4), NumArray(4)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(4) + " must be greater than 0.");
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(4), NumArray(4)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(4) + " must be greater than 0.");
                 ErrorsFound = true;
             }
 
@@ -225,9 +225,9 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElevation = NumArray(7);
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletHumRat <= 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(6), NumArray(6)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(6) + " must be greater than 0.");
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(6), NumArray(6)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(6) + " must be greater than 0.");
                 ErrorsFound = true;
             } else {
                 // Reference barometric pressure, adjusted for reference elevation (Pa)
@@ -238,8 +238,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum = CurveManager::GetCurveIndex(state, AlphArray(2)); // Convert curve name to number
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum == 0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + AlphArray(2));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + AlphArray(2));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal type is BiQuadratic
@@ -252,8 +252,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                               state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp,
                                                                               state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElevation);
                     if (std::abs(ElectOutFTempElevOutput - 1.0) > 0.1) {
-                        ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
+                        ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2));
                         ShowContinueError(state, "...Curve output at reference conditions should equal 1 (+-10%).");
                         ShowContinueError(
                             state,
@@ -267,8 +267,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFTempCurveNum = CurveManager::GetCurveIndex(state, AlphArray(3)); // Convert curve name to number
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFTempCurveNum == 0) {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                ShowSevereError(state, DataIPShortCuts::cAlphaFieldNames(3) + " not found = " + AlphArray(3));
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                ShowSevereError(state, state.dataIPShortCut->cAlphaFieldNames(3) + " not found = " + AlphArray(3));
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal types are Quadratic and Cubic
@@ -279,8 +279,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                     Real64 ElecEfficFTempOutput =
                         CurveManager::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFTempCurveNum, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp);
                     if (std::abs(ElecEfficFTempOutput - 1.0) > 0.1) {
-                        ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
+                        ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(3) + " = " + AlphArray(3));
                         ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                         ShowContinueError(
                             state,
@@ -292,8 +292,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFPLRCurveNum = CurveManager::GetCurveIndex(state, AlphArray(4)); // Convert curve name to number
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFPLRCurveNum == 0) {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                ShowSevereError(state, DataIPShortCuts::cAlphaFieldNames(4) + " not found = " + AlphArray(4));
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                ShowSevereError(state, state.dataIPShortCut->cAlphaFieldNames(4) + " not found = " + AlphArray(4));
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal types are Quadratic and Cubic
@@ -303,8 +303,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                     // Output of Electrical Efficiency Modifier Curve (function of PLR)
                     Real64 ElecEfficFPLROutput = CurveManager::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, 1.0);
                     if (std::abs(ElecEfficFPLROutput - 1.0) > 0.1) {
-                        ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(4) + " = " + AlphArray(4));
+                        ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
                         ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                         ShowContinueError(state, format("... Curve output = {:.4T}", ElecEfficFPLROutput));
                     }
@@ -321,8 +321,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             bool FuelTypeError(false);
             UtilityRoutines::ValidateFuelType(state, AlphArray(5), state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType, FuelTypeError);
             if (FuelTypeError) {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "  = " + AlphArray(5));
                 ErrorsFound = true;
                 FuelTypeError = false;
             }
@@ -331,50 +331,50 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelLowerHeatingValue = NumArray(9);
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelLowerHeatingValue <= 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(9), NumArray(9)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(9) + " must be greater than 0.");
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(9), NumArray(9)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(9) + " must be greater than 0.");
                 ErrorsFound = true;
             }
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelHigherHeatingValue <= 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(8), NumArray(8)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(8) + " must be greater than 0.");
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(8), NumArray(8)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(8) + " must be greater than 0.");
                 ErrorsFound = true;
             }
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelLowerHeatingValue > state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelHigherHeatingValue) {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(8) + " must be greater than the " + DataIPShortCuts::cNumericFieldNames(9));
-                ShowContinueError(state, format("{}={:.2R}", DataIPShortCuts::cNumericFieldNames(8), NumArray(8)));
-                ShowContinueError(state, format("{}={:.2R}", DataIPShortCuts::cNumericFieldNames(9), NumArray(9)));
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(8) + " must be greater than the " + state.dataIPShortCut->cNumericFieldNames(9));
+                ShowContinueError(state, format("{}={:.2R}", state.dataIPShortCut->cNumericFieldNames(8), NumArray(8)));
+                ShowContinueError(state, format("{}={:.2R}", state.dataIPShortCut->cNumericFieldNames(9), NumArray(9)));
                 ErrorsFound = true;
             }
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).StandbyPower = NumArray(10);
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).StandbyPower < 0.0) {
-                ShowWarningError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(10), NumArray(10)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(10) + " must be greater than 0.");
+                ShowWarningError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(10), NumArray(10)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(10) + " must be greater than 0.");
                 ShowContinueError(state, "Resetting to 0 and the simulation continues.");
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).StandbyPower = 0.0;
             }
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPower = NumArray(11);
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPower < 0.0) {
-                ShowWarningError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(11), NumArray(11)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(11) + " must be greater than 0.");
+                ShowWarningError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(11), NumArray(11)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(11) + " must be greater than 0.");
                 ShowContinueError(state, "Resetting to 0 and the simulation continues.");
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPower = 0.0;
             }
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum = CurveManager::GetCurveIndex(state, AlphArray(6)); // Convert curve name to number
             //   If blank, then the calc routine assumes modifier curve value = 1 for entire simulation
-            if (!DataIPShortCuts::lAlphaFieldBlanks(6) && state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum == 0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + AlphArray(6));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6) && state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             } else if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum > 0) {
                 // Verify curve object, only legal type is Quadratic
@@ -386,8 +386,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                     // Output of Ancillary Power Modifer Curve (function of temps and fuel flow)
                     Real64 AncillaryPowerOutput = CurveManager::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum, RefFuelUseMdot);
                     if (std::abs(AncillaryPowerOutput - 1.0) > 0.1) {
-                        ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
+                        ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6));
                         ShowContinueError(state, "... Curve output at reference conditions should equal 1 (+-10%).");
                         ShowContinueError(
                             state,
@@ -404,10 +404,10 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                 }
             }
 
-            if (!DataIPShortCuts::lAlphaFieldBlanks(7)) {
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(7),
                                                                                                     ErrorsFound,
-                                                                                                    DataIPShortCuts::cCurrentModuleObject,
+                                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                                     DataLoopNode::NodeConnectionType::Inlet,
@@ -415,10 +415,10 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                                     DataLoopNode::ObjectIsNotParent);
             }
 
-            if (!DataIPShortCuts::lAlphaFieldBlanks(8)) {
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(8),
                                                                                                      ErrorsFound,
-                                                                                                     DataIPShortCuts::cCurrentModuleObject,
+                                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                                      state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                                                                      DataLoopNode::NodeFluidType::Water,
                                                                                                      DataLoopNode::NodeConnectionType::Outlet,
@@ -428,12 +428,12 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum > 0 && state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecOutletNodeNum > 0) {
                 BranchNodeConnections::TestCompSet(state,
-                    DataIPShortCuts::cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name, AlphArray(7), AlphArray(8), "Heat Recovery Nodes");
+                    state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name, AlphArray(7), AlphArray(8), "Heat Recovery Nodes");
             }
 
             if ((state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecOutletNodeNum > 0 && state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum == 0) ||
                 (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecOutletNodeNum == 0 && state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum > 0)) {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
                 ShowContinueError(state, "... If one Heat Recovery Water Node Name is specified, then both the Inlet and Outlet Heat Recovery");
                 ShowContinueError(state, "... Water Node Names must be specified. Only one water node is being specified for this generator.");
                 ErrorsFound = true;
@@ -446,8 +446,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
 
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefThermalEffLHV = NumArray(12);
                 if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefThermalEffLHV < 0.0) {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                    ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(12) + " must be >= 0.");
+                    ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                    ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(12) + " must be >= 0.");
                     ShowContinueError(state, "Resetting to 0 and the simulation continues.");
                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefThermalEffLHV = 0.0;
                 }
@@ -471,8 +471,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                 }
                 if ((!(UtilityRoutines::SameString(AlphArray(9), "InternalControl"))) &&
                     (!(UtilityRoutines::SameString(AlphArray(9), "PlantControl")))) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + AlphArray(9));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphArray(9));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Operating Mode must be INTERNAL CONTROL or PLANT CONTROL.");
                     ErrorsFound = true;
                 }
@@ -480,9 +480,9 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate = NumArray(14);
 
                 if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate <= 0.0) {
-                    ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(14), NumArray(14)));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(14) + " must be greater than 0.");
+                    ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(14), NumArray(14)));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(14) + " must be greater than 0.");
                     ErrorsFound = true;
                 }
 
@@ -506,8 +506,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                    state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElevation);
 
                         if (std::abs(ThermalEffTempElevOutput - 1.0) > 0.1) {
-                            ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(11) + " = " + AlphArray(11));
+                            ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(11) + " = " + AlphArray(11));
                             ShowContinueError(state, "... Curve output at reference conditions should equal 1 (+-10%).");
                             ShowContinueError(state,
                                               format("... Reference combustion air inlet temperature      = {:.4T} C",
@@ -528,8 +528,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                         Real64 HeatRecRateFPLROutput = CurveManager::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum, 1.0);
 
                         if (std::abs(HeatRecRateFPLROutput - 1.0) > 0.1) {
-                            ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(12) + " = " + AlphArray(12));
+                            ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(12) + " = " + AlphArray(12));
                             ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                             ShowContinueError(state, format("... Curve output = {:.4T}", HeatRecRateFPLROutput));
                         }
@@ -546,8 +546,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                             CurveManager::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefInletWaterTemp);
 
                         if (std::abs(HeatRecRateFTempOutput - 1.0) > 0.1) {
-                            ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(13) + " = " + AlphArray(13));
+                            ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(13) + " = " + AlphArray(13));
                             ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                             ShowContinueError(state,
                                               format("... Reference inlet water temperature temperature      = {:.4T} C",
@@ -567,8 +567,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                  state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate);
 
                         if (std::abs(HeatRecRateFFlowOutput - 1.0) > 0.1) {
-                            ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(14) + " = " + AlphArray(14));
+                            ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(14) + " = " + AlphArray(14));
                             ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                             ShowContinueError(state,
                                               format("... Reference Heat Recovery Water Flow Rate      = {:.4T} m3/s",
@@ -580,42 +580,42 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
 
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate = NumArray(15);
                 if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate < 0.0) {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                    ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(15) + " must be >= 0.");
+                    ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                    ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(15) + " must be >= 0.");
                     ShowContinueError(state, "Resetting to 0 and the simulation continues.");
                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate = 0.0;
                 }
 
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate = NumArray(16);
                 if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate < 0.0) {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                    ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(16) + " must be >= 0.");
+                    ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                    ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(16) + " must be >= 0.");
                     ShowContinueError(state, "Resetting to 0 and the simulation continues.");
                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate = 0.0;
                 }
 
                 if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate < state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate) {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                    ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(16) + " must be >= " + DataIPShortCuts::cNumericFieldNames(15));
-                    ShowContinueError(state, "Resetting " + DataIPShortCuts::cNumericFieldNames(16) + " = " + DataIPShortCuts::cNumericFieldNames(15) +
+                    ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                    ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(16) + " must be >= " + state.dataIPShortCut->cNumericFieldNames(15));
+                    ShowContinueError(state, "Resetting " + state.dataIPShortCut->cNumericFieldNames(16) + " = " + state.dataIPShortCut->cNumericFieldNames(15) +
                                       " and the simulation continues.");
                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate = state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate;
                 }
 
                 //     Check if reference heat recovery water flow rate is below the minimum flow rate
                 if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate < state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate) {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                    ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(14) + " must be >= " + DataIPShortCuts::cNumericFieldNames(15));
-                    ShowContinueError(state, "Resetting " + DataIPShortCuts::cNumericFieldNames(14) + " = " + DataIPShortCuts::cNumericFieldNames(15) +
+                    ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                    ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(14) + " must be >= " + state.dataIPShortCut->cNumericFieldNames(15));
+                    ShowContinueError(state, "Resetting " + state.dataIPShortCut->cNumericFieldNames(14) + " = " + state.dataIPShortCut->cNumericFieldNames(15) +
                                       " and the simulation continues.");
                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate = state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate;
                 }
 
                 //     Check if reference heat recovery water flow rate is above the maximum flow rate
                 if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate > state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate) {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                    ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(14) + " must be <= " + DataIPShortCuts::cNumericFieldNames(16));
-                    ShowContinueError(state, "Resetting " + DataIPShortCuts::cNumericFieldNames(14) + " = " + DataIPShortCuts::cNumericFieldNames(16) +
+                    ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                    ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(14) + " must be <= " + state.dataIPShortCut->cNumericFieldNames(16));
+                    ShowContinueError(state, "Resetting " + state.dataIPShortCut->cNumericFieldNames(14) + " = " + state.dataIPShortCut->cNumericFieldNames(16) +
                                       " and the simulation continues.");
                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate = state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate;
                 }
@@ -628,10 +628,10 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             } // End of 'IF (MTGenerator(GeneratorNum)%HeatRecInletNodeNum .NE. 0 .AND. &
             //             MTGenerator(GeneratorNum)%HeatRecOutletNodeNum .NE. 0) THEN'
 
-            if (!DataIPShortCuts::lAlphaFieldBlanks(15)) {
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(15),
                                                                                                           ErrorsFound,
-                                                                                                          DataIPShortCuts::cCurrentModuleObject,
+                                                                                                          state.dataIPShortCut->cCurrentModuleObject,
                                                                                                           AlphArray(1),
                                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                                           DataLoopNode::NodeConnectionType::Inlet,
@@ -640,18 +640,18 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             }
 
             //    Combustion air inlet node must be an outside air node
-            if (!DataIPShortCuts::lAlphaFieldBlanks(15) &&
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15) &&
                 !OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInletNodeNum)) {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(15) + " is not a valid Outdoor Air Node = " + AlphArray(15));
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(15) + " is not a valid Outdoor Air Node = " + AlphArray(15));
                 ShowContinueError(state, "it does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                 ErrorsFound = true;
             }
 
-            if (!DataIPShortCuts::lAlphaFieldBlanks(16)) {
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(16),
                                                                                                            ErrorsFound,
-                                                                                                           DataIPShortCuts::cCurrentModuleObject,
+                                                                                                           state.dataIPShortCut->cCurrentModuleObject,
                                                                                                            AlphArray(1),
                                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                                            DataLoopNode::NodeConnectionType::Outlet,
@@ -660,9 +660,9 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             }
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirOutletNodeNum > 0 && state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInletNodeNum == 0) {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                ShowContinueError(state, "A " + DataIPShortCuts::cAlphaFieldNames(15) + " must be specified when a " +
-                                  DataIPShortCuts::cAlphaFieldNames(16) + " is specified.");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                ShowContinueError(state, "A " + state.dataIPShortCut->cAlphaFieldNames(15) + " must be specified when a " +
+                                  state.dataIPShortCut->cAlphaFieldNames(16) + " is specified.");
                 ErrorsFound = true;
             }
 
@@ -671,10 +671,10 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
 
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirCalcsActive = true;
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefExhaustAirMassFlowRate = NumArray(18);
-                if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefExhaustAirMassFlowRate <= 0.0 && !DataIPShortCuts::lNumericFieldBlanks(18)) {
-                    ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(18), NumArray(18)));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(18) + " must be greater than 0.");
+                if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefExhaustAirMassFlowRate <= 0.0 && !state.dataIPShortCut->lNumericFieldBlanks(18)) {
+                    ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(18), NumArray(18)));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(18) + " must be greater than 0.");
                     ErrorsFound = true;
                 }
 
@@ -688,8 +688,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                              state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp);
 
                         if (std::abs(ExhFlowFTempOutput - 1.0) > 0.1) {
-                            ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(17) + " = " + AlphArray(17));
+                            ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(17) + " = " + AlphArray(17));
                             ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                             ShowContinueError(state,
                                               format("... Reference combustion air inlet temperature      = {:.4T} C",
@@ -708,8 +708,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                         Real64 ExhFlowFPLROutput = CurveManager::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum, 1.0);
 
                         if (std::abs(ExhFlowFPLROutput - 1.0) > 0.1) {
-                            ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(18) + " = " + AlphArray(18));
+                            ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(18) + " = " + AlphArray(18));
                             ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                             ShowContinueError(state, format("... Curve output = {:.4T}", ExhFlowFPLROutput));
                         }
@@ -728,8 +728,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp);
 
                         if (std::abs(ExhAirTempFTempOutput - 1.0) > 0.1) {
-                            ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(19) + " = " + AlphArray(19));
+                            ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(19) + " = " + AlphArray(19));
                             ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                             ShowContinueError(state,
                                               format("... Reference combustion air inlet temperature      = {:.4T} C",
@@ -748,8 +748,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                         Real64 ExhOutAirTempFPLROutput = CurveManager::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum, 1.0);
 
                         if (std::abs(ExhOutAirTempFPLROutput - 1.0) > 0.1) {
-                            ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(20) + " = " + AlphArray(20));
+                            ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(20) + " = " + AlphArray(20));
                             ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                             ShowContinueError(state, format("... Curve output = {:.4T}", ExhOutAirTempFPLROutput));
                         }
@@ -761,7 +761,7 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
         }
     }
 
