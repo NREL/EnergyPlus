@@ -955,7 +955,6 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
     void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
     {
-        using namespace DataIPShortCuts;
 
         struct ClassType
         {
@@ -991,6 +990,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                            EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract}};
 
         bool errorsFound = false;
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         for (auto &classToInput : classesToInput) {
             cCurrentModuleObject = classToInput.thisType;
             int numPLHP = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);

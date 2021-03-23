@@ -817,8 +817,7 @@ namespace Furnaces {
 
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using SteamCoils::GetTypeOfCoil;
-        using namespace DataIPShortCuts;
-        using EMSManager::ManageEMS;
+                using EMSManager::ManageEMS;
         using HVACControllers::CheckCoilWaterInletNode;
         using IntegratedHeatPump::GetCoilIndexIHP;
 
@@ -899,6 +898,7 @@ namespace Furnaces {
         int DXCoilIndex;                // Index to DX coil in HXAssited object
         std::string IHPCoilName;        // IHP cooling coil name
         int IHPCoilIndex(0);            // IHP cooling coil id
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         state.dataFurnaces->GetFurnaceInputFlag = false;
         MaxNumbers = 0;

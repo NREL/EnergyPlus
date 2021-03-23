@@ -69,8 +69,6 @@ using namespace EnergyPlus;
 TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
 {
 
-    using namespace DataIPShortCuts;
-
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
     thisModel->objectType = GroundTemperatureManager::objectType_FiniteDiffGroundTemp;

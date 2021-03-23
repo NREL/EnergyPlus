@@ -1019,8 +1019,6 @@ namespace HVACDXSystem {
 
         using General::SolveRoot;
         using TempSolveRoot::SolveRoot;
-        using HVACHXAssistedCoolingCoil::HXAssistedCoilOutletHumRat;
-        using HVACHXAssistedCoolingCoil::HXAssistedCoilOutletTemp;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using PackagedThermalStorageCoil::ControlTESIceStorageTankCoil;
         using PackagedThermalStorageCoil::SimTESCoil;
@@ -1379,7 +1377,7 @@ namespace HVACDXSystem {
                             //           If this temp is greater than or very near the desired outlet temp, then run the compressor at PartLoadFrac
                             //           = 1. (i.e. HX iterates to find solution, don't allow the tolerance in solution to trip up RegulaFalsi. So if
                             //           solution is very near request, run compressor at PLR = 1)
-                            OutletTempDXCoil = HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                             if ((OutletTempDXCoil > DesOutTemp) || std::abs(OutletTempDXCoil - DesOutTemp) <= (Acc * 2.0)) {
                                 PartLoadFrac = 1.0;
                             } else {
@@ -1416,7 +1414,7 @@ namespace HVACDXSystem {
                                                                  HXUnitOn,
                                                                  _,
                                                                  EconomizerFlag);
-                                        TempOutletTempDXCoil = HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                        TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     TempMinPLR = TempMaxPLR;
                                     while ((TempOutletTempDXCoil - DesOutTemp) < 0.0 && TempMinPLR >= 0.0) {
@@ -1434,7 +1432,7 @@ namespace HVACDXSystem {
                                                                  HXUnitOn,
                                                                  _,
                                                                  EconomizerFlag);
-                                        TempOutletTempDXCoil = HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                        TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     //               Relax boundary slightly to assure a solution can be found using RegulaFalsi (i.e. one boundary
                                     //               may be very near the desired result)
@@ -1516,7 +1514,7 @@ namespace HVACDXSystem {
                         if (PartLoadFrac == 0.0) {
                             OutletHumRatDXCoil = NoLoadHumRatOut;
                         } else {
-                            OutletHumRatDXCoil = HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                         }
 
                         // If humidity setpoint is not satisfied and humidity control type is MultiMode,
@@ -1537,7 +1535,7 @@ namespace HVACDXSystem {
                                                      _,
                                                      EconomizerFlag);
 
-                            OutletTempDXCoil = HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                             //           FullOutput will be different than the FullOutput determined above during sensible PLR calculations
                             FullOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
@@ -1665,7 +1663,7 @@ namespace HVACDXSystem {
                                                                  HXUnitOn,
                                                                  _,
                                                                  EconomizerFlag);
-                                        OutletHumRatDXCoil = HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                        OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     TempMinPLR = TempMaxPLR;
                                     while ((OutletHumRatDXCoil - TempOutletHumRatDXCoil) <= 0.0 && TempMinPLR >= 0.0) {
@@ -1683,7 +1681,7 @@ namespace HVACDXSystem {
                                                                  HXUnitOn,
                                                                  _,
                                                                  EconomizerFlag);
-                                        OutletHumRatDXCoil = HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                        OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     //               tighter boundary of solution has been found, call RegulaFalsi a second time
                                     TempSolveRoot::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par);
@@ -3137,7 +3135,6 @@ namespace HVACDXSystem {
 
         // Using/Aliasing
         using HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil;
-        using HVACHXAssistedCoolingCoil::HXAssistedCoilOutletTemp;
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -3173,7 +3170,7 @@ namespace HVACDXSystem {
         HXUnitOn = (Par(4) == 1.0);
         FanOpMode = int(Par(5));
         CalcHXAssistedCoolingCoil(state, CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode);
-        OutletAirTemp = HXAssistedCoilOutletTemp(CoilIndex);
+        OutletAirTemp = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(CoilIndex);
         Residuum = Par(2) - OutletAirTemp;
         return Residuum;
     }
@@ -3200,7 +3197,6 @@ namespace HVACDXSystem {
 
         // Using/Aliasing
         using HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil;
-        using HVACHXAssistedCoolingCoil::HXAssistedCoilOutletHumRat;
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -3236,7 +3232,7 @@ namespace HVACDXSystem {
         HXUnitOn = (Par(4) == 1.0);
         FanOpMode = int(Par(5));
         CalcHXAssistedCoolingCoil(state, CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode, _, EconomizerFlag);
-        OutletAirHumRat = HXAssistedCoilOutletHumRat(CoilIndex);
+        OutletAirHumRat = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(CoilIndex);
         Residuum = Par(2) - OutletAirHumRat;
         return Residuum;
     }

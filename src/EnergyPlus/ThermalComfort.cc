@@ -1684,7 +1684,6 @@ namespace ThermalComfort {
 
         // Using/Aliasing
         using namespace DataHeatBalance;
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const AngleFacLimit(0.01); // To set the limit of sum of angle factors
@@ -1700,7 +1699,7 @@ namespace ThermalComfort {
         int NumOfAngleFactorLists; // Number of Angle Factor Lists found in IDF
         int SurfNum;               // Surface number DO loop counter
         int WhichAFList;           // Used in validating AngleFactorList
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ComfortViewFactorAngles";
         NumOfAngleFactorLists = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataThermalComforts->AngleFactorList.allocate(NumOfAngleFactorLists);
@@ -1718,28 +1717,28 @@ namespace ThermalComfort {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
-            thisAngFacList.Name = cAlphaArgs(1); // no need for verification/uniqueness.
-            thisAngFacList.ZoneName = cAlphaArgs(2);
-            thisAngFacList.ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+            thisAngFacList.Name = state.dataIPShortCut->cAlphaArgs(1); // no need for verification/uniqueness.
+            thisAngFacList.ZoneName = state.dataIPShortCut->cAlphaArgs(2);
+            thisAngFacList.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (thisAngFacList.ZonePtr == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - not found");
-                ShowContinueError(state, "...invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - not found");
+                ShowContinueError(state, "...invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             }
 
             thisAngFacList.TotAngleFacSurfaces = NumNumbers;
             if (thisAngFacList.TotAngleFacSurfaces > MaxSurfaces) {
-                ShowSevereError(state, cCurrentModuleObject + ": Too many surfaces specified in " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                ShowSevereError(state, cCurrentModuleObject + ": Too many surfaces specified in " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -1748,24 +1747,24 @@ namespace ThermalComfort {
             thisAngFacList.AngleFactor.allocate(thisAngFacList.TotAngleFacSurfaces);
 
             for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-                thisAngFacList.SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 2);
-                thisAngFacList.SurfacePtr(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + 2), state.dataSurface->Surface);
-                thisAngFacList.AngleFactor(SurfNum) = rNumericArgs(SurfNum);
+                thisAngFacList.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 2);
+                thisAngFacList.SurfacePtr(SurfNum) = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(SurfNum + 2), state.dataSurface->Surface);
+                thisAngFacList.AngleFactor(SurfNum) = state.dataIPShortCut->rNumericArgs(SurfNum);
                 // Error trap for surfaces that do not exist or surfaces not in the zone
                 if (thisAngFacList.SurfacePtr(SurfNum) == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(SurfNum + 2) +
-                                    ", entered value=" + cAlphaArgs(SurfNum + 2));
-                    ShowContinueError(state, "ref " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1) + " not found in " + cAlphaFieldNames(2) + '=' +
-                                      cAlphaArgs(2));
+                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(SurfNum + 2) +
+                                    ", entered value=" + state.dataIPShortCut->cAlphaArgs(SurfNum + 2));
+                    ShowContinueError(state, "ref " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) + " not found in " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' +
+                                      state.dataIPShortCut->cAlphaArgs(2));
                     ErrorsFound = true;
                 } else if (thisAngFacList.ZonePtr != 0) { // don't look at invalid zones
                     // Found Surface, is it in same zone tagged for Angle Factor List?
                     if (thisAngFacList.ZonePtr != state.dataSurface->Surface(thisAngFacList.SurfacePtr(SurfNum)).Zone) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - mismatch " + cAlphaFieldNames(2) + "=\"" +
-                                        cAlphaArgs(2) + "\"");
-                        ShowContinueError(state, "... does not match " + cAlphaFieldNames(2) + "=\"" +
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - mismatch " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(2) + "\"");
+                        ShowContinueError(state, "... does not match " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                           state.dataHeatBal->Zone(state.dataSurface->Surface(state.dataThermalComforts->AngleFactorList(Item).SurfacePtr(SurfNum)).Zone).Name + "\" for " +
-                                          cAlphaFieldNames(SurfNum + 2) + "=\"" + cAlphaArgs(SurfNum + 2) + "\".");
+                                          state.dataIPShortCut->cAlphaFieldNames(SurfNum + 2) + "=\"" + state.dataIPShortCut->cAlphaArgs(SurfNum + 2) + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -1774,7 +1773,7 @@ namespace ThermalComfort {
             }
 
             if (std::abs(AllAngleFacSummed - 1.0) > AngleFacLimit) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - Sum[AngleFactors]");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - Sum[AngleFactors]");
                 ShowContinueError(state,
                                   format("...Sum of Angle Factors [{:.3R}] exceed expected sum [1.0] by more than limit [{:.3R}].",
                                          AllAngleFacSummed,

@@ -670,7 +670,6 @@ namespace SimulationManager {
         auto &deviationFromSetPtThresholdClg = state.dataHVACGlobal->deviationFromSetPtThresholdClg;
         auto &deviationFromSetPtThresholdHtg = state.dataHVACGlobal->deviationFromSetPtThresholdHtg;
 
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
@@ -705,10 +704,10 @@ namespace SimulationManager {
                                           Number,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             std::string::size_type const lenVer(len(MatchVersion));
             if ((lenVer > 0) && (MatchVersion[lenVer - 1] == '0')) {
                 Which = static_cast<int>(index(Alphas(1).substr(0, lenVer - 2), MatchVersion.substr(0, lenVer - 2)));
@@ -739,10 +738,10 @@ namespace SimulationManager {
                                           Number,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             {
                 auto const SELECT_CASE_var(Alphas(1));
                 if ((SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") || (SELECT_CASE_var == "CONDFD") ||
@@ -764,10 +763,10 @@ namespace SimulationManager {
                                               Number,
                                               NumNumber,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(Alphas(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -790,10 +789,10 @@ namespace SimulationManager {
                                               Number,
                                               NumNumber,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(Alphas(3));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -810,17 +809,17 @@ namespace SimulationManager {
                 inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               1,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlpha,
                                               Number,
                                               NumNumber,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(2));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                         CondFDAlgo = true;
                     } else {
@@ -835,17 +834,17 @@ namespace SimulationManager {
                 inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               1,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlpha,
                                               Number,
                                               NumNumber,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(2));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                         CondFDAlgo = true;
                     } else {
@@ -865,10 +864,10 @@ namespace SimulationManager {
                                           Number,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             state.dataGlobal->NumOfTimeStepInHour = Number(1);
             if (state.dataGlobal->NumOfTimeStepInHour <= 0 || state.dataGlobal->NumOfTimeStepInHour > 60) {
                 Alphas(1) = fmt::to_string(state.dataGlobal->NumOfTimeStepInHour);
@@ -932,17 +931,17 @@ namespace SimulationManager {
                                           Number,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             MinInt = int(Number(1));
             if (MinInt > state.dataGlobal->MinutesPerTimeStep) {
                 MinInt = state.dataGlobal->MinutesPerTimeStep;
             }
             if (MinInt < 0 || MinInt > 60) {
                 ShowWarningError(state,
-                                 format("{}: Requested {} ({}) invalid. Set to 1 minute.", CurrentModuleObject, cNumericFieldNames(1), MinInt));
+                                 format("{}: Requested {} ({}) invalid. Set to 1 minute.", CurrentModuleObject, state.dataIPShortCut->cNumericFieldNames(1), MinInt));
                 state.dataConvergeParams->MinTimeStepSys = 1.0 / 60.0;
             } else if (MinInt == 0) { // Set to TimeStepZone
                 state.dataConvergeParams->MinTimeStepSys = state.dataGlobal->TimeStepZone;
@@ -953,8 +952,8 @@ namespace SimulationManager {
             if (state.dataConvergeParams->MaxIter <= 0) {
                 state.dataConvergeParams->MaxIter = 20;
             }
-            if (!lNumericFieldBlanks(3)) state.dataConvergeParams->MinPlantSubIterations = int(Number(3));
-            if (!lNumericFieldBlanks(4)) state.dataConvergeParams->MaxPlantSubIterations = int(Number(4));
+            if (!state.dataIPShortCut->lNumericFieldBlanks(3)) state.dataConvergeParams->MinPlantSubIterations = int(Number(3));
+            if (!state.dataIPShortCut->lNumericFieldBlanks(4)) state.dataConvergeParams->MaxPlantSubIterations = int(Number(4));
             // trap bad values
             if (state.dataConvergeParams->MinPlantSubIterations < 1) state.dataConvergeParams->MinPlantSubIterations = 1;
             if (state.dataConvergeParams->MaxPlantSubIterations < 3) state.dataConvergeParams->MaxPlantSubIterations = 3;
@@ -1090,16 +1089,16 @@ namespace SimulationManager {
                                           Number,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            if (!lNumericFieldBlanks(1)) {
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            if (!state.dataIPShortCut->lNumericFieldBlanks(1)) {
                 deviationFromSetPtThresholdHtg = -Number(1);
             } else {
                 deviationFromSetPtThresholdHtg = -0.2;
             }
-            if (!lNumericFieldBlanks(2)) {
+            if (!state.dataIPShortCut->lNumericFieldBlanks(2)) {
                 deviationFromSetPtThresholdClg = Number(2);
             } else {
                 deviationFromSetPtThresholdClg = 0.2;
@@ -1125,10 +1124,10 @@ namespace SimulationManager {
                                           Number,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             if (Alphas(1) == "YES") state.dataGlobal->DoZoneSizing = true;
             if (Alphas(2) == "YES") state.dataGlobal->DoSystemSizing = true;
             if (Alphas(3) == "YES") state.dataGlobal->DoPlantSizing = true;

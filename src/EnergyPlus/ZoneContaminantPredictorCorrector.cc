@@ -171,8 +171,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using DataSurfaces::ExternalEnvironment;
+                using DataSurfaces::ExternalEnvironment;
         using General::FindNumberInList;
 
         using ScheduleManager::CheckScheduleValue;
@@ -252,27 +251,27 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                                           IHGNumbers,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ZoneName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
             if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr = GetScheduleIndex(state, AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr == 0) {
-                if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
@@ -281,13 +280,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
@@ -300,10 +299,10 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
 
             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr = GetScheduleIndex(state, AlphaName(4));
             if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr == 0) {
-                if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) + " is required.");
+                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(4) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(4) +
                                     " entered=" + AlphaName(4));
                 }
                 ErrorsFound = true;
@@ -312,13 +311,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(4) +
                                         ", minimum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(4) +
                                         ", maximum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMax));
                         ErrorsFound = true;
@@ -375,10 +374,10 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                                           IHGNumbers,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name = AlphaName(1);
 
@@ -386,7 +385,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum =
                 UtilityRoutines::FindItemInList(AlphaName(2), state.dataAirflowNetwork->MultizoneSurfaceData, &AirflowNetwork::MultizoneSurfaceProp::SurfName);
             if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ShowContinueError(state, "which is not listed in AirflowNetwork:MultiZone:Surface.");
                 ErrorsFound = true;
@@ -401,10 +400,10 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
 
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr = GetScheduleIndex(state, AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr == 0) {
-                if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
@@ -413,13 +412,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
@@ -429,7 +428,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
 
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoef = IHGNumbers(1);
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
                 ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
@@ -437,13 +436,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
 
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCExpo = IHGNumbers(2);
             if (IHGNumbers(2) <= 0.0) {
-                ShowSevereError(state, RoutineName + "Negative or zero value is not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
+                ShowSevereError(state, RoutineName + "Negative or zero value is not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
                 ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) > 1.0) {
-                ShowSevereError(state, RoutineName + "The value greater than 1.0 is not allowed for " + cNumericFieldNames(2) + " in " +
+                ShowSevereError(state, RoutineName + "The value greater than 1.0 is not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " +
                                 CurrentModuleObject + " = " + AlphaName(1));
                 ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
@@ -501,27 +500,27 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                                           IHGNumbers,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ZoneName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
             if (state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr = GetScheduleIndex(state, AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr == 0) {
-                if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
@@ -530,13 +529,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
@@ -548,13 +547,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCCutoffValue = IHGNumbers(2);
 
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
                 ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) <= 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
+                ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
                 ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
@@ -607,27 +606,27 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                                           IHGNumbers,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ZoneName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
             if (state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr = GetScheduleIndex(state, AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr == 0) {
-                if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
@@ -636,13 +635,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
@@ -654,13 +653,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCDelayTime = IHGNumbers(2);
 
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
                 ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) <= 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
+                ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
                 ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
@@ -719,27 +718,27 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                                           IHGNumbers,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataSurface->Surface);
             if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr = GetScheduleIndex(state, AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr == 0) {
-                if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
@@ -748,13 +747,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
@@ -765,13 +764,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoef = IHGNumbers(1);
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCHenryCoef = IHGNumbers(2);
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
                 ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) <= 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
+                ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
                 ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
@@ -832,27 +831,27 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                                           IHGNumbers,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataSurface->Surface);
             if (state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr = GetScheduleIndex(state, AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr == 0) {
-                if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
@@ -861,13 +860,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
@@ -877,7 +876,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
 
             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVelo = IHGNumbers(1);
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
                 ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
@@ -930,27 +929,27 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                                           IHGNumbers,
                                           NumNumber,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ZoneName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
             if (state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr = GetScheduleIndex(state, AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr == 0) {
-                if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
@@ -959,13 +958,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
                         ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
@@ -976,7 +975,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRate = IHGNumbers(1);
 
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
                 ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
@@ -1039,7 +1038,6 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
@@ -1078,7 +1076,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             {
             }
         };
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ZoneControl:ContaminantController";
         state.dataContaminantBalance->NumContControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -1090,43 +1088,43 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ContControlledZoneNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).Name = cAlphaArgs(1);
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneName = cAlphaArgs(2);
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 //      Zone(ContaminantControlledZone(ContControlledZoneNum)%ActualZoneNum)%TempControlledZoneIndex = ContControlledZoneNum
             }
 
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedule = cAlphaArgs(3);
-            if (lAlphaFieldBlanks(3)) {
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedule = state.dataIPShortCut->cAlphaArgs(3);
+            if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn; // (Returns 1.0)
             } else {
-                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
                                     "\" not found.");
                     ErrorsFound = true;
                 } else {
                     // Check validity of control types.
                     ValidScheduleType = CheckScheduleValueMinMax(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr, ">=", 0.0, "<=", 1.0);
                     if (!ValidScheduleType) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(3) + "=\"" +
-                                        cAlphaArgs(3) + "\"");
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid range " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(3) + "\"");
                         ShowContinueError(state, "..contains values outside of range [0,1].");
                         ErrorsFound = true;
                     } else {
@@ -1136,31 +1134,31 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 }
             }
 
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SetPointSchedName = cAlphaArgs(4);
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SPSchedIndex = GetScheduleIndex(state, cAlphaArgs(4));
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SetPointSchedName = state.dataIPShortCut->cAlphaArgs(4);
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SPSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SPSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 // Check validity of control types.
                 ValidScheduleType = CheckScheduleValueMinMax(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SPSchedIndex, ">=", 0.0, "<=", 2000.0);
                 if (!ValidScheduleType) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid range " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
                                     "\"");
                     ShowContinueError(state, "..contains values outside of range [0,2000 ppm].");
                     ErrorsFound = true;
                 }
             }
 
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedName = cAlphaArgs(5);
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex = GetScheduleIndex(state, cAlphaArgs(5));
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedName = state.dataIPShortCut->cAlphaArgs(5);
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex > 0) {
                 // Check validity of control types.
                 ValidScheduleType =
                     CheckScheduleValueMinMax(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex, ">=", 0.0, "<=", 2000.0);
                 if (!ValidScheduleType) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) +
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid range " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) +
                                     "\"");
                     ShowContinueError(state, "..contains values outside of range [0,2000 ppm].");
                     ErrorsFound = true;
@@ -1170,14 +1168,14 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                 }
             }
 
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedName = cAlphaArgs(6);
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex = GetScheduleIndex(state, cAlphaArgs(6));
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedName = state.dataIPShortCut->cAlphaArgs(6);
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex > 0) {
                 // Check validity of control types.
                 ValidScheduleType =
                     CheckScheduleValueMinMax(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex, ">=", 0.0, "<=", 2000.0);
                 if (!ValidScheduleType) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) +
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid range " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + state.dataIPShortCut->cAlphaArgs(6) +
                                     "\"");
                     ShowContinueError(state, "..contains values outside of range [0,2000 ppm].");
                     ErrorsFound = true;
@@ -1188,13 +1186,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             }
 
             if (NumAlphas > 6) {
-                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedule = cAlphaArgs(7);
-                if (lAlphaFieldBlanks(7)) {
+                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedule = state.dataIPShortCut->cAlphaArgs(7);
+                if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                     state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
-                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
+                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7));
                     if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr == 0) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(7) +
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(7) +
                                         "\" not found.");
                         ErrorsFound = true;
                     } else {
@@ -1202,21 +1200,21 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
                         ValidScheduleType =
                             CheckScheduleValueMinMax(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr, ">=", 0.0, "<=", 1.0);
                         if (!ValidScheduleType) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(3) + "=\"" +
-                                            cAlphaArgs(7) + "\"");
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid range " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(7) + "\"");
                             ShowContinueError(state, "..contains values outside of range [0,1].");
                             ErrorsFound = true;
                         }
                     }
                 }
-                if (lAlphaFieldBlanks(8)) {
-                    ShowSevereError(state, cCurrentModuleObject + " \"" + cAlphaArgs(8) + "\" is required, but blank.");
+                if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                    ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataIPShortCut->cAlphaArgs(8) + "\" is required, but blank.");
                     ErrorsFound = true;
                 } else {
-                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCSetPointSchedName = cAlphaArgs(8);
-                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCSPSchedIndex = GetScheduleIndex(state, cAlphaArgs(8));
+                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCSetPointSchedName = state.dataIPShortCut->cAlphaArgs(8);
+                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCSPSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
                     if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCSPSchedIndex == 0) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) +
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + "=\"" + state.dataIPShortCut->cAlphaArgs(8) +
                                         "\" not found.");
                         ErrorsFound = true;
                     }

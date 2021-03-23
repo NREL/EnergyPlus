@@ -182,10 +182,10 @@ namespace ZoneAirLoopEquipmentManager {
         int NumAlphas;
         int NumNums;
         int IOStat;
+        bool ErrorsFound(false); // If errors detected in input
+        bool IsNotOK;            // Flag to verify name
         Array1D_string AlphArray(5);
         Array1D<Real64> NumArray(2);
-        bool ErrorsFound(false);          // If errors detected in input
-        bool IsNotOK;                     // Flag to verify name
         Array1D_string cAlphaFields(5);   // Alpha field names
         Array1D_string cNumericFields(2); // Numeric field names
         Array1D_bool lAlphaBlanks(5);     // Logical array, alpha field input BLANK = .TRUE.

@@ -153,7 +153,6 @@ namespace PlantValves {
         // usual method using InputProcessor
 
         // Using/Aliasing
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using NodeInputManager::GetOnlySingleNode;
 
