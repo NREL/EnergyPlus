@@ -205,7 +205,7 @@ namespace HeatBalFiniteDiffManager {
         int MaterialNumAlpha;               // Number of material alpha names being passed
         int MaterialNumProp;                // Number of material properties being passed
         Array1D<Real64> MaterialProps(40);  // Temporary array to transfer material properties
-        static bool ErrorsFound(false);     // If errors detected in input
+        bool ErrorsFound(false);     // If errors detected in input
         int Loop;
         int NumAlphas;
         int NumNumbers;

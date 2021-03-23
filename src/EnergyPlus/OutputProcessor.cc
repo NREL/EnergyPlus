@@ -6567,7 +6567,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
     int NumReqMeterFOs;
     ReportingFrequency ReportFreq;
 
-    static bool ErrorsFound(false); // If errors detected in input
+    bool ErrorsFound(false); // If errors detected in input
     auto &op(state.dataOutputProcessor);
 
     GetCustomMeterInput(state, ErrorsFound);

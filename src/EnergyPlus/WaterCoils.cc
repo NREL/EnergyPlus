@@ -291,7 +291,7 @@ namespace EnergyPlus::WaterCoils {
         static int MaxAlphas(0);         // Maximum number of alpha input fields
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
 
         NumSimpHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Water");
         NumFlatFin = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water:DetailedGeometry");

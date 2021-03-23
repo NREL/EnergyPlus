@@ -257,7 +257,7 @@ namespace UnitVentilator {
         static std::string const RoutineName("GetUnitVentilatorInput: "); // include trailing blank
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int IOStatus;                   // Used in GetObjectItem
         bool IsNotOK;                   // TRUE if there was a problem with a list name
         int NumFields;                  // Total number of fields in object

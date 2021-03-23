@@ -449,16 +449,15 @@ namespace DaylightingDevices {
         using General::SafeDivide;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        int IOStatus;                   // Used in GetObjectItem
-        int NumAlphas;         // Number of Alphas for each GetObjectItem call
-        int NumNumbers;        // Number of Numbers for each GetObjectItem call
-        int PipeNum;           // TDD pipe object number
-        int SurfNum;           // Dome or diffuser surface
-        int TZoneNum;          // Transition zone loop
-        std::string TZoneName; // Transition zone name
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        int IOStatus;            // Used in GetObjectItem
+        int NumAlphas;           // Number of Alphas for each GetObjectItem call
+        int NumNumbers;          // Number of Numbers for each GetObjectItem call
+        int PipeNum;             // TDD pipe object number
+        int SurfNum;             // Dome or diffuser surface
+        int TZoneNum;            // Transition zone loop
+        std::string TZoneName;   // Transition zone name
         Real64 PipeArea;
-
 
         cCurrentModuleObject = "DaylightingDevice:Tubular";
         state.dataDaylightingDevicesData->NumOfTDDPipes = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -719,14 +718,13 @@ namespace DaylightingDevices {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        int IOStatus;                   // Used in GetObjectItem
-        int NumAlphas;                  // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                 // Number of Numbers for each GetObjectItem call
-        int ShelfNum;                   // Daylighting shelf object number
-        int SurfNum;                    // Window, inside, or outside shelf surfaces
-        int ConstrNum;                  // Outside shelf construction object number
-
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        int IOStatus;            // Used in GetObjectItem
+        int NumAlphas;           // Number of Alphas for each GetObjectItem call
+        int NumNumbers;          // Number of Numbers for each GetObjectItem call
+        int ShelfNum;            // Daylighting shelf object number
+        int SurfNum;             // Window, inside, or outside shelf surfaces
+        int ConstrNum;           // Outside shelf construction object number
 
         cCurrentModuleObject = "DaylightingDevice:Shelf";
         state.dataDaylightingDevicesData->NumOfShelf = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);

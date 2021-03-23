@@ -288,7 +288,7 @@ namespace OutdoorAirUnit {
         int NumInList;
         int InListNum;
         int ListNum;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         static int MaxNums(0);           // Maximum number of numeric input fields
         static int MaxAlphas(0);         // Maximum number of alpha input fields
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a

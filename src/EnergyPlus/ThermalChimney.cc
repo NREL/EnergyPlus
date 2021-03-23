@@ -120,7 +120,7 @@ namespace ThermalChimney {
         // the other drivers and simulation algorithms.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         // Obtains and Allocates heat balance related parameters from input file
         if (state.dataThermalChimneys->ThermalChimneyGetInputFlag) {

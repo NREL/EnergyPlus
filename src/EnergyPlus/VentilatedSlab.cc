@@ -247,7 +247,7 @@ namespace VentilatedSlab {
         static std::string const CurrentModuleObject("ZoneHVAC:VentilatedSlab");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int IOStatus;                   // Used in GetObjectItem
         bool IsNotOK;                   // TRUE if there was a problem with a list name
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
@@ -2449,7 +2449,7 @@ namespace VentilatedSlab {
         std::string SlabName;
         int MSlabInletNode;
         int MSlabOutletNode;
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         static std::string const CurrentModuleObject("ZoneHVAC:VentilatedSlab");
 
         {
@@ -3429,7 +3429,7 @@ namespace VentilatedSlab {
         Real64 FlowFrac;
         // unused0309  REAL(r64)  :: SlabAirOutTemp
         Real64 MSlabAirInTemp;
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
         std::string MSlabIn;
         std::string MSlabOut;

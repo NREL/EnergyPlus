@@ -508,7 +508,7 @@ namespace HeatBalanceIntRadExchange {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool NoUserInputF;            // Logical flag signifying no input F's for zone
         static bool ViewFactorReport; // Flag to output view factor report in eio file
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         Real64 CheckValue1;
         Real64 CheckValue2;
         Real64 FinalCheckValue;

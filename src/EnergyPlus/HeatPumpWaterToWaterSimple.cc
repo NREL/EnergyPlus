@@ -243,7 +243,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         int NumNums;     // Number of elements in the numeric array
         int IOStat;      // IO Status when calling get input subroutine
 
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         NumCoolCoil = inputProcessor->getNumObjectsFound(state, HPEqFitCoolingUC);
         NumHeatCoil = inputProcessor->getNumObjectsFound(state, HPEqFitHeatingUC);

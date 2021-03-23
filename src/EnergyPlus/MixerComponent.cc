@@ -169,7 +169,7 @@ namespace EnergyPlus::MixerComponent {
         int NumNums;
         int NodeNum;
         int IOStat;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int NumParams;
         int InNodeNum1;
         int InNodeNum2;

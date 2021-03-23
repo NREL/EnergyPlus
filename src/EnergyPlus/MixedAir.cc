@@ -823,7 +823,7 @@ namespace EnergyPlus::MixedAir {
         int InListNum;
         int ListNum;
         int NumSimpControllers; // number of Controller:Simple objects in an OA System
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         std::string CurrentModuleObject; // Object type for getting and messages
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
@@ -1198,7 +1198,7 @@ namespace EnergyPlus::MixedAir {
         Array1D_string cNumericFields;   // Numeric field names
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static bool ErrorsFound(false);  // Flag identifying errors found during get input
+        bool ErrorsFound(false);  // Flag identifying errors found during get input
         int ZoneListNum;                 // Index to Zone List
         int MechVentZoneCount;           // Index counter for zones with mechanical ventilation
         int NumArg;                      // Number of arguments from GetObjectDefMaxArgs call
@@ -1938,7 +1938,7 @@ namespace EnergyPlus::MixedAir {
         Array1D_string cNumericFields;   // Numeric field names
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         if (!state.dataMixedAir->GetOAMixerInputFlag) return;
 
@@ -5024,7 +5024,7 @@ namespace EnergyPlus::MixedAir {
     // Beginning Utility Section of the Module
     //******************************************************************************
 
-    Real64 MixedAirControlTempResidual(EnergyPlusData &state, 
+    Real64 MixedAirControlTempResidual(EnergyPlusData &state,
                                        Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
                                        Array1D<Real64> const &Par // par(1) = mixed node number
     )

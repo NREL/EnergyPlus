@@ -297,7 +297,7 @@ namespace EnergyPlus::OutputReportTabular {
         Array1D_string AlphArray; // character string data
         Array1D<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         auto &ort(state.dataOutRptTab);
 
         if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {

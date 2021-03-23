@@ -512,7 +512,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         int MaxNumbers;                  // Maximum number of numeric fields in all objects
         int NumFields;                   // Total number of fields in object
         int IOStatus;                    // Used in GetObjectItem
-        static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
         bool IsNotOK;                    // Flag to verify name
         std::string CurrentModuleObject; // Object type for getting and error messages
         static bool errFlag(false);      // Error flag returned during CALL to mining functions
