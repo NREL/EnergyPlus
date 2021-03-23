@@ -168,11 +168,23 @@ struct HeatBalanceIntRadExchgData : BaseGlobalStruct {
     bool CarrollMethod = false; // Use Carroll MRT method
     bool CalcInteriorRadExchangefirstTime = true; // Logical flag for one-time initializations
 
+    // variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
+    Array1D<Real64> SurfaceTempRad;
+    Array1D<Real64> SurfaceTempInKto4th;
+    Array1D<Real64> SurfaceEmiss;
+    bool ViewFactorReport = false; // Flag to output view factor report in eio file
+    bool ErrorsFound = false;
+
     void clear_state() override
     {
         this->MaxNumOfRadEnclosureSurfs = 0;
         this->CarrollMethod = false;
         this->CalcInteriorRadExchangefirstTime = true;
+        this->SurfaceTempRad.deallocate();
+        this->SurfaceTempInKto4th.deallocate();
+        this->SurfaceEmiss.deallocate();
+        this->ViewFactorReport = false;
+        this->ErrorsFound = false;
 
     }
 };

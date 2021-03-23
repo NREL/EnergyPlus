@@ -151,10 +151,9 @@ namespace HeatBalanceIntRadExchange {
         WinShadingType ShadeFlag;     // Window shading status current time step
         WinShadingType ShadeFlagPrev; // Window shading status previous time step
 
-        // variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
-        static Array1D<Real64> SurfaceTempRad;
-        static Array1D<Real64> SurfaceTempInKto4th;
-        static Array1D<Real64> SurfaceEmiss;
+        auto &SurfaceTempRad(state.dataHeatBalIntRadExchg->SurfaceTempRad);
+        auto &SurfaceTempInKto4th(state.dataHeatBalIntRadExchg->SurfaceTempInKto4th);
+        auto &SurfaceEmiss(state.dataHeatBalIntRadExchg->SurfaceEmiss);
 
 #ifdef EP_Detailed_Timings
         epStartTime("CalcInteriorRadExchange=");
@@ -481,8 +480,6 @@ namespace HeatBalanceIntRadExchange {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool NoUserInputF;            // Logical flag signifying no input F's for zone
-        static bool ViewFactorReport; // Flag to output view factor report in eio file
-        static bool ErrorsFound(false);
         Real64 CheckValue1;
         Real64 CheckValue2;
         Real64 FinalCheckValue;
@@ -492,7 +489,8 @@ namespace HeatBalanceIntRadExchange {
         int NumIterations;
         std::string Option1; // view factor report option
 
-
+        auto &ViewFactorReport(state.dataHeatBalIntRadExchg->ViewFactorReport);
+        auto &ErrorsFound(state.dataHeatBalIntRadExchg->ErrorsFound);
 
         ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
 
