@@ -68,7 +68,6 @@
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -98,7 +97,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     FluidProperties::clear_state();
     HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
-    Humidifiers::clear_state();
     HVACDuct::clear_state();
     HVACDXSystem::clear_state();
     HVACFan::clearHVACFanObjects();

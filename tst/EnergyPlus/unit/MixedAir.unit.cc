@@ -1254,24 +1254,24 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
     // simulate OA system, common node properties are propagated
     ManageOutsideAirSystem(*state, state->dataAirLoop->OutsideAirSys(OASysNum).Name, true, AirloopNum, OASysNum);
     // humidifier water and electric use rate are zero (no Hum Rat setpoint applied)
-    EXPECT_EQ(0.0, Humidifiers::Humidifier(HumNum).WaterAdd);
-    EXPECT_EQ(0.0, Humidifiers::Humidifier(HumNum).ElecUseRate);
+    EXPECT_EQ(0.0, state->dataHumidifiers->Humidifier(HumNum).WaterAdd);
+    EXPECT_EQ(0.0, state->dataHumidifiers->Humidifier(HumNum).ElecUseRate);
 
     // Add humidity ratio setpoint to the humidifier air outlet node
     state->dataLoopNodes->Node(2).HumRatMin = 0.005; // humidity ratio setpoint value
     // simulate OA system
     ManageOutsideAirSystem(*state, state->dataAirLoop->OutsideAirSys(OASysNum).Name, true, AirloopNum, OASysNum);
     // get humidifier's air inlet and outlet node number
-    AirInNode = Humidifiers::Humidifier(HumNum).AirInNode;
-    AirOutNode = Humidifiers::Humidifier(HumNum).AirOutNode;
+    AirInNode = state->dataHumidifiers->Humidifier(HumNum).AirInNode;
+    AirOutNode = state->dataHumidifiers->Humidifier(HumNum).AirOutNode;
     // Calculate expected humidifier water consumption rate
     WaterConsumptionRate = state->dataAirLoop->AirLoopFlow(AirloopNum).DesSupply * (0.005 - 0.0005);
     // Calculate humidifier electric use rate (fan electric power and standby electric power are zero)
-    ElecPowerInput = (WaterConsumptionRate / Humidifiers::Humidifier(HumNum).NomCap) * Humidifiers::Humidifier(HumNum).NomPower;
+    ElecPowerInput = (WaterConsumptionRate / state->dataHumidifiers->Humidifier(HumNum).NomCap) * state->dataHumidifiers->Humidifier(HumNum).NomPower;
     // Confirm humidifier water consumption calculation
-    EXPECT_EQ(WaterConsumptionRate, Humidifiers::Humidifier(HumNum).WaterAdd);
+    EXPECT_EQ(WaterConsumptionRate, state->dataHumidifiers->Humidifier(HumNum).WaterAdd);
     // confirm that electric energy is used by the humidifier
-    EXPECT_EQ(ElecPowerInput, Humidifiers::Humidifier(HumNum).ElecUseRate);
+    EXPECT_EQ(ElecPowerInput, state->dataHumidifiers->Humidifier(HumNum).ElecUseRate);
 }
 
 TEST_F(EnergyPlusFixture, FreezingCheckTest)
