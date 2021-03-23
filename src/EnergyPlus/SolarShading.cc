@@ -6097,6 +6097,7 @@ namespace EnergyPlus::SolarShading {
                         FrontDiffDiffTrans = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffTrans(1);
 
                     }
+
                     if (SunLitFract > 0.0 || SunlitFracWithoutReveal) {
                         if (VarSlats) {
                             FrontBeamDiffTrans = General::InterpProfSlat(state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexLower),
@@ -6111,16 +6112,7 @@ namespace EnergyPlus::SolarShading {
                                                                    state.dataHeatBal->Blind(BlNum).SolFrontBeamAbs(SlatsAngIndexUpper, ProfAngIndexUpper),
                                                                    SlatsAngInterpFac,
                                                                    ProfAngInterpFac);
-                        } else {
-                            FrontBeamAbs = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).SolFrontBeamAbs(1, ProfAngIndexLower),
-                                                                  state.dataHeatBal->Blind(BlNum).SolFrontBeamAbs(1, ProfAngIndexUpper),
-                                                                  ProfAngInterpFac);
-                            FrontBeamDiffTrans = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffTrans(1, ProfAngIndexLower),
-                                                                        state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffTrans(1, ProfAngIndexUpper),
-                                                                        ProfAngInterpFac);
-                        }
-                        if (ShadeFlag != WinShadingType::ExtBlind) { // FRONT: interior or bg blinds
-                            if (VarSlats) {
+                            if (ShadeFlag != WinShadingType::ExtBlind) { // FRONT: interior or bg blinds
                                 FrontDiffDiffRefl = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffRefl(SlatsAngIndexLower),
                                                                            state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffRefl(SlatsAngIndexUpper),
                                                                            SlatsAngInterpFac);
@@ -6133,16 +6125,8 @@ namespace EnergyPlus::SolarShading {
                                                                             state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexUpper),
                                                                             SlatsAngInterpFac,
                                                                             ProfAngInterpFac);
-                            } else {
-                                FrontDiffDiffRefl = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffRefl(1);
-                                FrontDiffAbs = state.dataHeatBal->Blind(BlNum).SolFrontDiffAbs(1);
-                                FrontBeamDiffRefl = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffRefl(1, ProfAngIndexLower),
-                                                                           state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffRefl(1, ProfAngIndexUpper),
-                                                                           ProfAngInterpFac);
                             }
-                        }
-                        if (ShadeFlag != WinShadingType::IntBlind) { // BACK: exterior or bg blinds
-                            if (VarSlats) {
+                            if (ShadeFlag != WinShadingType::IntBlind) { // BACK: exterior or bg blinds
                                 BackDiffDiffTrans = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).SolBackDiffDiffTrans(SlatsAngIndexLower),
                                                                            state.dataHeatBal->Blind(BlNum).SolBackDiffDiffTrans(SlatsAngIndexUpper),
                                                                            SlatsAngInterpFac);
@@ -6170,8 +6154,22 @@ namespace EnergyPlus::SolarShading {
                                                                       state.dataHeatBal->Blind(BlNum).SolBackBeamAbs(SlatsAngIndexUpper, ProfAngIndexUpper),
                                                                       SlatsAngInterpFac,
                                                                       ProfAngInterpFac);
-
-                            } else {
+                            }
+                        } else {
+                            FrontBeamAbs = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).SolFrontBeamAbs(1, ProfAngIndexLower),
+                                                                  state.dataHeatBal->Blind(BlNum).SolFrontBeamAbs(1, ProfAngIndexUpper),
+                                                                  ProfAngInterpFac);
+                            FrontBeamDiffTrans = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffTrans(1, ProfAngIndexLower),
+                                                                        state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffTrans(1, ProfAngIndexUpper),
+                                                                        ProfAngInterpFac);
+                            if (ShadeFlag != WinShadingType::ExtBlind) { // FRONT: interior or bg blinds
+                                FrontDiffDiffRefl = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffRefl(1);
+                                FrontDiffAbs = state.dataHeatBal->Blind(BlNum).SolFrontDiffAbs(1);
+                                FrontBeamDiffRefl = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffRefl(1, ProfAngIndexLower),
+                                                                           state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffRefl(1, ProfAngIndexUpper),
+                                                                           ProfAngInterpFac);
+                            }
+                            if (ShadeFlag != WinShadingType::IntBlind) { // BACK: exterior or bg blinds{
                                 BackDiffDiffTrans = state.dataHeatBal->Blind(BlNum).SolBackDiffDiffTrans(1);
                                 BackDiffDiffRefl = state.dataHeatBal->Blind(BlNum).SolBackDiffDiffRefl(1);
                                 BackDiffAbs = state.dataHeatBal->Blind(BlNum).SolBackDiffAbs(1);
