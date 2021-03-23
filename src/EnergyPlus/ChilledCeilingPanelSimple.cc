@@ -714,7 +714,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         static std::string const RoutineName("ChilledCeilingPanelSimple:InitCoolingPanel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag;
         int Loop;
         int ZoneNode;
         int ZoneNum;
@@ -726,7 +725,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         if (state.dataChilledCeilingPanelSimple->MyOneTimeFlag) {
 
             // Initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+            state.dataChilledCeilingPanelSimple->MyEnvrnFlag.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
             state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf.allocate(state.dataGlobal->NumOfZones);
             state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf = 0.0;
             state.dataChilledCeilingPanelSimple->CoolingPanelSource.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
@@ -742,7 +741,7 @@ namespace EnergyPlus::CoolingPanelSimple {
             state.dataChilledCeilingPanelSimple->SetLoopIndexFlag.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
             state.dataChilledCeilingPanelSimple->MySizeFlagCoolPanel.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
             state.dataChilledCeilingPanelSimple->MySizeFlagCoolPanel = true;
-            MyEnvrnFlag = true;
+            state.dataChilledCeilingPanelSimple->MyEnvrnFlag = true;
             state.dataChilledCeilingPanelSimple->MyOneTimeFlag = false;
             state.dataChilledCeilingPanelSimple->SetLoopIndexFlag = true;
         }
@@ -799,7 +798,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoolingPanelNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataChilledCeilingPanelSimple->MyEnvrnFlag(CoolingPanelNum)) {
             // Initialize
 
             rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::InitConvTemp, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
@@ -832,11 +831,11 @@ namespace EnergyPlus::CoolingPanelSimple {
             state.dataChilledCeilingPanelSimple->LastSysTimeElapsed = 0.0;
             state.dataChilledCeilingPanelSimple->LastTimeStepSys = 0.0;
 
-            MyEnvrnFlag(CoolingPanelNum) = false;
+            state.dataChilledCeilingPanelSimple->MyEnvrnFlag(CoolingPanelNum) = false;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(CoolingPanelNum) = true;
+            state.dataChilledCeilingPanelSimple->MyEnvrnFlag(CoolingPanelNum) = true;
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
