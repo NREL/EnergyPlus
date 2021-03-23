@@ -53,6 +53,7 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <algorithm>
 #include <nlohmann/json.hpp>
 
 namespace EnergyPlus::PluginManagement {
@@ -114,6 +115,9 @@ namespace EnergyPlus::PluginManagement {
             return "Python Version not accessible during API calls";
         }
         std::string sVersion = Py_GetVersion();
+        // 3.8.3 (default, Jun  2 2020, 15:25:16) \n[GCC 7.5.0]
+        // Remove the '\n'
+        sVersion.erase(std::remove(sVersion.begin(), sVersion.end(), '\n'), sVersion.end());
         return "Linked to Python Version: \"" + sVersion + "\"";
     }
 #else

@@ -176,7 +176,6 @@ set(SRC
     DataGlobalConstants.cc
     DataGlobalConstants.hh
     DataGlobals.hh
-    DataHVACControllers.cc
     DataHVACControllers.hh
     DataHVACGlobals.cc
     DataHVACGlobals.hh
@@ -185,7 +184,6 @@ set(SRC
     DataHeatBalSurface.hh
     DataHeatBalance.cc
     DataHeatBalance.hh
-    DataIPShortCuts.cc
     DataIPShortCuts.hh
     DataLoopNode.hh
     DataMoistureBalance.hh

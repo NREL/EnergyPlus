@@ -1582,7 +1582,7 @@ namespace EnergyPlus::HVACControllers {
             } else if (SELECT_CASE_var == iStatus::ErrorBracket) {
                 ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
                 ShowContinueError(state, " Controller name=" + ControllerProps(ControlNum).ControllerName);
-                ShowContinueError(state, " Controller action=" + ActionTypes(ControllerProps(ControlNum).Action));
+                ShowContinueError(state, " Controller action=" + state.dataHVACCtrl->ActionTypes(ControllerProps(ControlNum).Action));
                 ShowContinueError(state,
                                   format(" Root candidate x={:.{}T} does not lie within the lower/upper brackets.",
                                          ControllerProps(ControlNum).ActuatedValue,
@@ -1612,7 +1612,7 @@ namespace EnergyPlus::HVACControllers {
                     ShowSevereError(state, "FindRootSimpleController: Controller error for controller = \"" + ControllerName + "\"");
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, "  Controller function is inconsistent with user specified controller action = " +
-                                      ActionTypes(ControllerProps(ControlNum).Action));
+                                      state.dataHVACCtrl->ActionTypes(ControllerProps(ControlNum).Action));
                     ShowContinueError(state, "  Actuator will be set to maximum action");
                     ShowContinueError(state, "Controller control type=" + ControlVariableTypes(ControllerProps(ControlNum).ControlVar));
                     if (ControllerProps(ControlNum).ControlVar == iCtrl::Temperature) {
@@ -2192,11 +2192,11 @@ namespace EnergyPlus::HVACControllers {
         // note that the AirLoopStats object does not seem to be initialized when this code
         // is executed and it causes a crash here
         for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            WriteAirLoopStatistics(statisticsFile, state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum), state.dataHVACControllers->AirLoopStats(AirLoopNum));
+            WriteAirLoopStatistics(state, statisticsFile, state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum), state.dataHVACControllers->AirLoopStats(AirLoopNum));
         }
     }
 
-    void WriteAirLoopStatistics(InputOutputFile &statisticsFile,
+    void WriteAirLoopStatistics(EnergyPlusData &state, InputOutputFile &statisticsFile,
                                 DefinePrimaryAirSystem const &ThisPrimaryAirSystem,
                                 AirLoopStatsType const &ThisAirLoopStats)
     {
@@ -2299,7 +2299,7 @@ namespace EnergyPlus::HVACControllers {
             // Dump iteration trackers for each operating mode
             for (iModeNum = iFirstMode; iModeNum <= iLastMode; ++iModeNum) {
 
-                print(statisticsFile, "{},\n", ControllerModeTypes(iModeNum));
+                print(statisticsFile, "{},\n", state.dataHVACCtrl->ControllerModeTypes(iModeNum));
 
                 // Number of times this controller operated in this mode
                 print(statisticsFile, "NumCalls,{}\n", ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum));

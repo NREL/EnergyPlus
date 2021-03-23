@@ -59,6 +59,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -236,46 +237,46 @@ namespace WindTurbine {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           WindTurbineNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStat,
                                           lNumericBlanks,
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name = cAlphaArgs(1); // Name of wind turbine
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name = state.dataIPShortCut->cAlphaArgs(1); // Name of wind turbine
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Schedule = cAlphaArgs(2); // Get schedule
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Schedule = state.dataIPShortCut->cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr == 0) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(2) + "=\"" + cAlphaArgs(2) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                     "\" not found.");
                     ErrorsFound = true;
                 }
             }
             // Select rotor type
             {
-                auto const SELECT_CASE_var(cAlphaArgs(3));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
                 if ((SELECT_CASE_var == "HORIZONTALAXISWINDTURBINE") || (SELECT_CASE_var == "")) {
                     state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType = RotorType::HAWT;
                 } else if (SELECT_CASE_var == "VERTICALAXISWINDTURBINE") {
                     state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType = RotorType::VAWT;
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) + "=\"" + cAlphaArgs(3) + "\".");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
             }
 
             // Select control type
             {
-                auto const SELECT_CASE_var(cAlphaArgs(4));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
                 if (SELECT_CASE_var == "FIXEDSPEEDFIXEDPITCH") {
                     state.dataWindTurbine->WindTurbineSys(WindTurbineNum).controlType = ControlType::FSFP;
                 } else if (SELECT_CASE_var == "FIXEDSPEEDVARIABLEPITCH") {
@@ -285,128 +286,128 @@ namespace WindTurbine {
                 } else if ((SELECT_CASE_var == "VARIABLESPEEDVARIABLEPITCH") || (SELECT_CASE_var == "")) {
                     state.dataWindTurbine->WindTurbineSys(WindTurbineNum).controlType = ControlType::VSVP;
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(4) + "=\"" + cAlphaArgs(4) + "\".");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
                     ErrorsFound = true;
                 }
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedRotorSpeed = rNumericArgs(1); // Maximum rotor speed in rpm
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedRotorSpeed = state.dataIPShortCut->rNumericArgs(1); // Maximum rotor speed in rpm
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedRotorSpeed <= 0.0) {
                 if (lNumericBlanks(1)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(1) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(1) +
                                     " is required but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(1),
                                            rNumericArgs(1)));
                 }
                 ErrorsFound = true;
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RotorDiameter = rNumericArgs(2); // Rotor diameter in m
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RotorDiameter = state.dataIPShortCut->rNumericArgs(2); // Rotor diameter in m
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RotorDiameter <= 0.0) {
                 if (lNumericBlanks(2)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(2) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(2) +
                                     " is required but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.1R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(2),
                                            rNumericArgs(2)));
                 }
                 ErrorsFound = true;
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RotorHeight = rNumericArgs(3); // Overall height of the rotor
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RotorHeight = state.dataIPShortCut->rNumericArgs(3); // Overall height of the rotor
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RotorHeight <= 0.0) {
                 if (lNumericBlanks(3)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(3) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(3) +
                                     " is required but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.1R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(3),
                                            rNumericArgs(3)));
                 }
                 ErrorsFound = true;
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NumOfBlade = rNumericArgs(4); // Total number of blade
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NumOfBlade = state.dataIPShortCut->rNumericArgs(4); // Total number of blade
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NumOfBlade == 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\" invalid {}=[{:.0R}] must be greater than zero.",
                                        CurrentModuleObject,
-                                       cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(1),
                                        cNumericFields(4),
                                        rNumericArgs(4)));
                 ErrorsFound = true;
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower = rNumericArgs(5); // Rated average power
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower = state.dataIPShortCut->rNumericArgs(5); // Rated average power
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower == 0.0) {
                 if (lNumericBlanks(5)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(5) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(5) +
                                     " is required but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(5),
                                            rNumericArgs(5)));
                 }
                 ErrorsFound = true;
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedWindSpeed = rNumericArgs(6); // Rated wind speed
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedWindSpeed = state.dataIPShortCut->rNumericArgs(6); // Rated wind speed
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedWindSpeed == 0.0) {
                 if (lNumericBlanks(6)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(6) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(6) +
                                     " is required but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(6),
                                            rNumericArgs(6)));
                 }
                 ErrorsFound = true;
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutInSpeed = rNumericArgs(7); // Minimum wind speed for system operation
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutInSpeed = state.dataIPShortCut->rNumericArgs(7); // Minimum wind speed for system operation
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutInSpeed == 0.0) {
                 if (lNumericBlanks(7)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(7) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(7) +
                                     " is required but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(7),
                                            rNumericArgs(7)));
                 }
                 ErrorsFound = true;
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutOutSpeed = rNumericArgs(8); // Minimum wind speed for system operation
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutOutSpeed = state.dataIPShortCut->rNumericArgs(8); // Minimum wind speed for system operation
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutOutSpeed == 0.0) {
                 if (lNumericBlanks(8)) {
                     ShowSevereError(
-                        state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(8) + " is required but input is blank.");
+                        state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(8) + " is required but input is blank.");
                 } else if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutOutSpeed <= state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedWindSpeed) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than {}=[{:.2R}].",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(8),
                                            rNumericArgs(8),
                                            cNumericFields(6),
@@ -415,31 +416,31 @@ namespace WindTurbine {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(8),
                                            rNumericArgs(8)));
                 }
                 ErrorsFound = true;
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency = rNumericArgs(9); // Overall wind turbine system efficiency
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency = state.dataIPShortCut->rNumericArgs(9); // Overall wind turbine system efficiency
             if (lNumericBlanks(9) || state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency == 0.0 || state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency > 1.0) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency = SysEffDefault;
                 ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(9), rNumericArgs(9)));
+                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), cNumericFields(9), state.dataIPShortCut->rNumericArgs(9)));
                 ShowContinueError(state, format("...The default value of {:.3R} was assumed. for {}", SysEffDefault, cNumericFields(9)));
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxTipSpeedRatio = rNumericArgs(10); // Maximum tip speed ratio
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxTipSpeedRatio = state.dataIPShortCut->rNumericArgs(10); // Maximum tip speed ratio
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxTipSpeedRatio == 0.0) {
                 if (lNumericBlanks(10)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(10) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(10) +
                                     " is required but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(10),
                                            rNumericArgs(10)));
                 }
@@ -448,20 +449,20 @@ namespace WindTurbine {
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency > MaxTSR) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency = MaxTSR;
                 ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(10), rNumericArgs(10)));
+                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), cNumericFields(10), state.dataIPShortCut->rNumericArgs(10)));
                 ShowContinueError(state, format("...The default value of {:.1R} was assumed. for {}", MaxTSR, cNumericFields(10)));
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxPowerCoeff = rNumericArgs(11); // Maximum power coefficient
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxPowerCoeff = state.dataIPShortCut->rNumericArgs(11); // Maximum power coefficient
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType == RotorType::HAWT && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxPowerCoeff == 0.0) {
                 if (lNumericBlanks(11)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(11) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(11) +
                                     " is required but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(11),
                                            rNumericArgs(11)));
                 }
@@ -470,41 +471,41 @@ namespace WindTurbine {
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxPowerCoeff > MaxPowerCoeff) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxPowerCoeff = DefaultPC;
                 ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(11), rNumericArgs(11)));
+                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), cNumericFields(11), state.dataIPShortCut->rNumericArgs(11)));
                 ShowContinueError(state, format("...The default value of {:.2R} will be used. for {}", DefaultPC, cNumericFields(11)));
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS = rNumericArgs(12); // Local wind speed annually averaged
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS = state.dataIPShortCut->rNumericArgs(12); // Local wind speed annually averaged
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS == 0.0) {
                 if (lNumericBlanks(12)) {
-                    ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(12) +
+                    ShowWarningError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(12) +
                                      " is necessary for accurate prediction but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(12),
                                            rNumericArgs(12)));
                     ErrorsFound = true;
                 }
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).HeightForLocalWS = rNumericArgs(13); // Height of local meteorological station
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).HeightForLocalWS = state.dataIPShortCut->rNumericArgs(13); // Height of local meteorological station
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).HeightForLocalWS == 0.0) {
                 if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS == 0.0) {
                     state.dataWindTurbine->WindTurbineSys(WindTurbineNum).HeightForLocalWS = 0.0;
                 } else {
                     state.dataWindTurbine->WindTurbineSys(WindTurbineNum).HeightForLocalWS = DefaultH;
                     if (lNumericBlanks(13)) {
-                        ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(13) +
+                        ShowWarningError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(13) +
                                          " is necessary for accurate prediction but input is blank.");
                         ShowContinueError(state, format("...The default value of {:.2R} will be used. for {}", DefaultH, cNumericFields(13)));
                     } else {
                         ShowSevereError(state,
                                         format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
                                                CurrentModuleObject,
-                                               cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(1),
                                                cNumericFields(13),
                                                rNumericArgs(13)));
                         ErrorsFound = true;
@@ -512,75 +513,75 @@ namespace WindTurbine {
                 }
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordArea = rNumericArgs(14); // Chord area of a single blade for VAWTs
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordArea = state.dataIPShortCut->rNumericArgs(14); // Chord area of a single blade for VAWTs
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType == RotorType::VAWT && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordArea == 0.0) {
                 if (lNumericBlanks(14)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(14) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(14) +
                                     " is required but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(14),
                                            rNumericArgs(14)));
                 }
                 ErrorsFound = true;
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).DragCoeff = rNumericArgs(15); // Blade drag coefficient
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).DragCoeff = state.dataIPShortCut->rNumericArgs(15); // Blade drag coefficient
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType == RotorType::VAWT && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).DragCoeff == 0.0) {
                 if (lNumericBlanks(15)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(15) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(15) +
                                     " is required but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(15),
                                            rNumericArgs(15)));
                 }
                 ErrorsFound = true;
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LiftCoeff = rNumericArgs(16); // Blade lift coefficient
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LiftCoeff = state.dataIPShortCut->rNumericArgs(16); // Blade lift coefficient
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType == RotorType::VAWT && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LiftCoeff == 0.0) {
                 if (lNumericBlanks(16)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(16) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(16) +
                                     " is required but input is blank.");
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
                                            CurrentModuleObject,
-                                           cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(1),
                                            cNumericFields(16),
                                            rNumericArgs(16)));
                 }
                 ErrorsFound = true;
             }
 
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC1 = rNumericArgs(17); // Empirical power coefficient C1
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC1 = state.dataIPShortCut->rNumericArgs(17); // Empirical power coefficient C1
             if (lNumericBlanks(17)) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC1 = 0.0;
             }
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC2 = rNumericArgs(18); // Empirical power coefficient C2
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC2 = state.dataIPShortCut->rNumericArgs(18); // Empirical power coefficient C2
             if (lNumericBlanks(18)) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC2 = 0.0;
             }
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC3 = rNumericArgs(19); // Empirical power coefficient C3
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC3 = state.dataIPShortCut->rNumericArgs(19); // Empirical power coefficient C3
             if (lNumericBlanks(19)) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC3 = 0.0;
             }
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC4 = rNumericArgs(20); // Empirical power coefficient C4
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC4 = state.dataIPShortCut->rNumericArgs(20); // Empirical power coefficient C4
             if (lNumericBlanks(20)) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC4 = 0.0;
             }
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC5 = rNumericArgs(21); // Empirical power coefficient C5
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC5 = state.dataIPShortCut->rNumericArgs(21); // Empirical power coefficient C5
             if (lNumericBlanks(21)) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC5 = 0.0;
             }
-            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC6 = rNumericArgs(22); // Empirical power coefficient C6
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC6 = state.dataIPShortCut->rNumericArgs(22); // Empirical power coefficient C6
             if (lNumericBlanks(22)) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC6 = 0.0;
             }
