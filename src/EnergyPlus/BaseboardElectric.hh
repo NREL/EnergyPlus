@@ -123,6 +123,7 @@ namespace BaseboardElectric {
         Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
         bool MyOneTimeFlag = true;
         bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+        Array1D_bool MyEnvrnFlag;
 
         void clear_state() override
         {
@@ -132,6 +133,7 @@ namespace BaseboardElectric {
             this->BaseboardNumericFields.deallocate();
             this->MyOneTimeFlag = true;
             this->ZoneEquipmentListChecked = false;
+            this->MyEnvrnFlag.clear();
         }
     };
 
