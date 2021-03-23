@@ -63,11 +63,9 @@
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -103,10 +101,8 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
     Humidifiers::clear_state();
-    HVACCooledBeam::clear_state();
     HVACDuct::clear_state();
     HVACDXSystem::clear_state();
-    HVACHXAssistedCoolingCoil::clear_state();
     HVACFan::clearHVACFanObjects();
     HVACSingleDuctInduc::clear_state();
     HybridModel::clear_state();

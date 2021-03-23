@@ -409,7 +409,6 @@ namespace EnergyPlus::MixedAir {
         using Humidifiers::SimHumidifier;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
-        using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using SimAirServingZones::SolveWaterCoilController;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -541,11 +540,11 @@ namespace EnergyPlus::MixedAir {
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
-                                             HXAssistedCoil(CompIndex).ControllerName,
-                                             HXAssistedCoil(CompIndex).ControllerIndex,
+                                             state.dataHVACAssistedCC->HXAssistedCoil(CompIndex).ControllerName,
+                                             state.dataHVACAssistedCC->HXAssistedCoil(CompIndex).ControllerIndex,
                                              true);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    state.dataHVACControllers->ControllerProps(HXAssistedCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    state.dataHVACControllers->ControllerProps(state.dataHVACAssistedCC->HXAssistedCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'

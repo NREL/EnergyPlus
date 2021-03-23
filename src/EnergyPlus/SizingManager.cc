@@ -1106,24 +1106,24 @@ namespace EnergyPlus::SizingManager {
                 }
 
                 // sum up heating and max flows for any two pipe constant volume cooled beam terminal units
-                if (allocated(HVACCooledBeam::CoolBeam) && (HVACCooledBeam::NumCB > 0)) {
-                    for (int coolBeamNum = 1; coolBeamNum <= HVACCooledBeam::NumCB; ++coolBeamNum) {
-                        if (AirLoopNum == HVACCooledBeam::CoolBeam(coolBeamNum).AirLoopNum) {
-                            int termUnitSizingIndex = AirDistUnit(HVACCooledBeam::CoolBeam(coolBeamNum).ADUNum).TermUnitSizingNum;
-                            airLoopHeatingMaximumFlowRateSum += HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            airLoopHeatingMinimumFlowRateSum += HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            airLoopMaxFlowRateSum += HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
+                if (allocated(state.dataHVACCooledBeam->CoolBeam) && (state.dataHVACCooledBeam->NumCB > 0)) {
+                    for (int coolBeamNum = 1; coolBeamNum <= state.dataHVACCooledBeam->NumCB; ++coolBeamNum) {
+                        if (AirLoopNum == state.dataHVACCooledBeam->CoolBeam(coolBeamNum).AirLoopNum) {
+                            int termUnitSizingIndex = AirDistUnit(state.dataHVACCooledBeam->CoolBeam(coolBeamNum).ADUNum).TermUnitSizingNum;
+                            airLoopHeatingMaximumFlowRateSum += state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            airLoopHeatingMinimumFlowRateSum += state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            airLoopMaxFlowRateSum += state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
 
                             // store std 62.1 values, beam will actually have secondary flow but that is not part of the model since it uses non air
                             // system term, we have no secondary flow rate information to work with
-                            state.dataSize->VpzClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            state.dataSize->VpzMinClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            state.dataSize->VpzHtgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            state.dataSize->VpzMinHtgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            state.dataSize->VdzClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            state.dataSize->VdzHtgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VpzClgByZone(termUnitSizingIndex) = state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VpzMinClgByZone(termUnitSizingIndex) = state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VpzHtgByZone(termUnitSizingIndex) = state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VpzMinHtgByZone(termUnitSizingIndex) = state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VdzClgByZone(termUnitSizingIndex) = state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VdzHtgByZone(termUnitSizingIndex) = state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
                         }
                     }
                 }
