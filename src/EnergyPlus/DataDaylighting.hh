@@ -344,7 +344,6 @@ struct DaylightingData : BaseGlobalStruct {
         this->IllumMapCalc.deallocate();
         this->DaylRefPt.deallocate();
         this->DElightComplexFene.deallocate();
-
     }
 };
 

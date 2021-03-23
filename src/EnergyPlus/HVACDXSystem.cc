@@ -121,7 +121,8 @@ namespace HVACDXSystem {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    Real64 const MinAirMassFlow(0.001);
+
+    Real64 const MinAirMassFlow = 0.001;
 
     Real64 const LatCapTimeConst(45.0);
 
