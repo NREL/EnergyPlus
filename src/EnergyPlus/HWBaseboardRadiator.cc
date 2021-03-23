@@ -832,7 +832,7 @@ namespace HWBaseboardRadiator {
         if (MyOneTimeFlag) {
 
             // Initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(NumHWBaseboardDesignObjs);
+            MyEnvrnFlag.allocate(NumHWBaseboards);
             MySizeFlag.allocate(NumHWBaseboards);
             ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             QBBRadSource.dimension(NumHWBaseboards, 0.0);
