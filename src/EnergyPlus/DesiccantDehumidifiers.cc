@@ -289,9 +289,6 @@ namespace DesiccantDehumidifiers {
         int NumAlphas;                         // Number of Alphas for each GetObjectItem call
         int NumNumbers;                        // Number of Numbers for each GetObjectItem call
         int IOStatus;                          // Used in GetObjectItem
-        static bool ErrorsFound(false);        // Set to true if errors in input, fatal at end of routine
-        static bool ErrorsFound2(false);       // Set to true if errors in input, fatal at end of routine
-        static bool ErrorsFoundGeneric(false); // Set to true if errors in input, fatal at end of routine
         bool IsNotOK;                          // Flag to verify name
         bool OANodeError;                      // Flag for check on outside air node
         std::string RegenFanInlet;             // Desiccant system regeneration air fan inlet node
@@ -312,20 +309,22 @@ namespace DesiccantDehumidifiers {
         Array1D<Real64> Numbers;               // Numeric input items for object
         Array1D_bool lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
-        static int MaxNums(0);                 // Maximum number of numeric input fields
-        static int MaxAlphas(0);               // Maximum number of alpha input fields
-        static int TotalArgs(0);               // Total number of alpha and numeric arguments (max) for a
-        //  certain object in the input file
         int RegenCoilAirInletNode;         // regen heating coil air inlet node number
         int RegenCoilAirOutletNode;        // regen heating coil air outlet node number
         bool errFlag;                      // local error flag
         std::string RegenCoilType;         // Regen heating coil type
         std::string RegenCoilName;         // Regen heating coil name
-        static Real64 SteamDensity(0.0);   // density of steam at 100C
         int SteamIndex;                    // steam coil Index
         bool RegairHeatingCoilFlag(false); // local error flag
 
         auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
+        auto &ErrorsFound(state.dataDesiccantDehumidifiers->ErrorsFound);
+        auto &ErrorsFound2(state.dataDesiccantDehumidifiers->ErrorsFound2);
+        auto &ErrorsFoundGeneric(state.dataDesiccantDehumidifiers->ErrorsFoundGeneric);
+        auto &MaxNums(state.dataDesiccantDehumidifiers->MaxNums);
+        auto &MaxAlphas(state.dataDesiccantDehumidifiers->MaxAlphas);
+        auto &TotalArgs(state.dataDesiccantDehumidifiers->TotalArgs);
+        auto &SteamDensity(state.dataDesiccantDehumidifiers->SteamDensity);
 
         state.dataDesiccantDehumidifiers->NumSolidDesicDehums = inputProcessor->getNumObjectsFound(state, dehumidifierDesiccantNoFans);
         state.dataDesiccantDehumidifiers->NumGenericDesicDehums = inputProcessor->getNumObjectsFound(state, "Dehumidifier:Desiccant:System");
@@ -1713,10 +1712,6 @@ namespace DesiccantDehumidifiers {
         int ProcInNode;  // inlet node number
         int RegenInNode; // inlet node number
         int ControlNode; // control node number
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
-
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int SteamIndex;                 // steam coil index
         Real64 FluidDensity;            // steam or water coil fluid density
         Real64 CoilMaxVolFlowRate;      // water or steam max volumetric water flow rate
@@ -1724,6 +1719,9 @@ namespace DesiccantDehumidifiers {
         bool ErrorFlag;                 // local error flag returned from data mining
 
         auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
+        auto &MyEnvrnFlag(state.dataDesiccantDehumidifiers->MyEnvrnFlag);
+        auto &MyPlantScanFlag(state.dataDesiccantDehumidifiers->MyPlantScanFlag);
+        auto &ErrorsFound3(state.dataDesiccantDehumidifiers->ErrorsFound3);
 
         if (state.dataDesiccantDehumidifiers->InitDesiccantDehumidifierOneTimeFlag) {
 
@@ -1885,7 +1883,7 @@ namespace DesiccantDehumidifiers {
                                 CoilMaxVolFlowRate =
                                     GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
                                 if (ErrorFlag) {
-                                    ErrorsFound = true;
+                                    ErrorsFound3 = true;
                                 }
                                 if (CoilMaxVolFlowRate != AutoSize) {
                                     FluidDensity = GetDensityGlycol(state,
@@ -1905,7 +1903,7 @@ namespace DesiccantDehumidifiers {
                                 ErrorFlag = false;
                                 CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(state, DesicDehum(DesicDehumNum).RegenCoilIndex, ErrorFlag);
                                 if (ErrorFlag) {
-                                    ErrorsFound = true;
+                                    ErrorsFound3 = true;
                                 }
                                 if (CoilMaxVolFlowRate != AutoSize) {
                                     SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
@@ -2016,6 +2014,7 @@ namespace DesiccantDehumidifiers {
         Real64 RegenAirMassFlowRate; // regen air mass flow rate [kg/s]
 
         auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
+
         ProcAirMassFlowRate = 0.0;
         RegenAirMassFlowRate = 0.0;
         UnitOn = true;
@@ -2180,8 +2179,6 @@ namespace DesiccantDehumidifiers {
         Real64 PartLoad;             // fraction of dehumidification capacity required to meet setpoint
         bool UnitOn;                 // unit on flag
 
-        static Real64 RhoAirStdInit;
-
         // Variables for hardwired coefficients for default performance model
 
         Real64 TC0;
@@ -2253,6 +2250,7 @@ namespace DesiccantDehumidifiers {
         Real64 RC15;
 
         auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
+        auto &RhoAirStdInit(state.dataDesiccantDehumidifiers->RhoAirStdInit);
 
         // Setup internal variables for calculations
 
@@ -2582,7 +2580,6 @@ namespace DesiccantDehumidifiers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DDPartLoadRatio;          // fraction of dehumidification capacity required to meet setpoint
-        static Real64 QRegen(0.0);       // required coil load passed to sim heating coil routine (W)
         Real64 MassFlowRateNew;          // new required mass flow rate calculated to keep regen setpoint temperature (kg/s)
         Real64 CondenserWasteHeat;       // Condenser waste heat (W)
         Real64 CpAir;                    // Specific heat of air (J/kg-K)
@@ -2603,6 +2600,7 @@ namespace DesiccantDehumidifiers {
         Real64 QRegen_OASysFanAdjust; // temporary variable used to adjust regen heater load during iteration
 
         auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
+        auto &QRegen(state.dataDesiccantDehumidifiers->QRegen);
 
         UnitOn = false;
         DDPartLoadRatio = 0.0;

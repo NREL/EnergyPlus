@@ -337,6 +337,19 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct {
     Array1D<DesiccantDehumidifiers::DesiccantDehumidifierData> DesicDehum;
     std::unordered_map<std::string, std::string> UniqueDesicDehumNames;
 
+    bool ErrorsFound = false;        // Set to true if errors in input, fatal at end of routine
+    bool ErrorsFound2 = false;       // Set to true if errors in input, fatal at end of routine
+    bool ErrorsFoundGeneric = false; // Set to true if errors in input, fatal at end of routine
+    int MaxNums = 0;           // Maximum number of numeric input fields
+    int MaxAlphas = 0;         // Maximum number of alpha input fields
+    int TotalArgs = 0;         // Total number of alpha and numeric arguments (max) for a certain object in the input file
+    Real64 SteamDensity = 0.0;  // density of steam at 100C
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
+    bool ErrorsFound3 = false; // Set to true if errors in input, fatal at end of routine
+    Real64 RhoAirStdInit = 0.0;
+    Real64 QRegen = 0.0; // required coil load passed to sim heating coil routine (W)
+
     void clear_state() override
     {
         this->NumDesicDehums = 0;
@@ -350,6 +363,18 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct {
         this->MySetPointCheckFlag = true;
         this->CalcSolidDesiccantDehumidifierMyOneTimeFlag = true;
         this->CalcGenericDesiccantDehumidifierMyOneTimeFlag = true;
+        this->ErrorsFound = false;
+        this->ErrorsFound2 = false;
+        this->ErrorsFoundGeneric = false;
+        this->MaxNums = 0;
+        this->MaxAlphas = 0;
+        this->TotalArgs = 0;
+        this->SteamDensity = 0.0;
+        this->MyEnvrnFlag.deallocate();
+        this->MyPlantScanFlag.deallocate();
+        this->ErrorsFound3 = false;
+        this->RhoAirStdInit = 0.0;
+        this->QRegen = 0.0;
     }
 };
 
