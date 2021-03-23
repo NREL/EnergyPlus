@@ -80,7 +80,6 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
-#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
@@ -118,7 +117,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
     Photovoltaics::clear_state();
-    PhotovoltaicThermalCollectors::clear_state();
     Psychrometrics::clear_state();
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelUserTempPattern::clear_state();

@@ -1078,6 +1078,13 @@ struct SetPointManagerData : BaseGlobalStruct {
     bool RunSubOptCondEntTemp = false;
     bool RunFinalOptCondEntTemp = false;
 
+    // Previous Statics
+    int MaxNumAlphasGSPID = 0;  // argument for call to GetObjectDefMaxArgs
+    int MaxNumNumbersGSPID = 0; // argument for call to GetObjectDefMaxArgs
+    int TypeNumISPM = 0;
+    int NumChillerISPM = 0;
+    int TypeOf_NumISPM = 0;
+
     // Object Data
     Array1D<SetPointManager::DataSetPointManager> AllSetPtMgr;                                    // Array for all Setpoint Manager data(warnings)
     Array1D<SetPointManager::DefineScheduledSetPointManager> SchSetPtMgr;                         // Array for Scheduled Setpoint Manager data
