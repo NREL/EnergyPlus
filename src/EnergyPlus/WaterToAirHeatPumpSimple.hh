@@ -152,10 +152,10 @@ namespace WaterToAirHeatPumpSimple {
               OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), Energy(0.0), EnergyLoadTotal(0.0),
               EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0), RatedWaterVolFlowRate(0.0),
               RatedAirVolFlowRate(0.0), RatedCapHeat(0.0), RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolTotal(0.0), RatedCapCoolSens(0.0),
-              RatedPowerCool(0.0), RatedCOPCool(0.0), HeatCapCurveIndex(0), HeatPowCurveIndex(0), TotalCoolCapCurveIndex(0), 
-              SensCoolCapCurveIndex(0),CoolPowCurveIndex(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), 
-              LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), WaterCyclingMode(0), LastOperatingMode(WaterCycling), WaterFlowMode(false), 
-              CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), Twet_Rated(0.0), Gamma_Rated(0.0), MaxONOFFCyclesperHour(0.0), 
+              RatedPowerCool(0.0), RatedCOPCool(0.0), HeatCapCurveIndex(0), HeatPowCurveIndex(0), TotalCoolCapCurveIndex(0),
+              SensCoolCapCurveIndex(0),CoolPowCurveIndex(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
+              LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), WaterCyclingMode(0), LastOperatingMode(WaterCycling), WaterFlowMode(false),
+              CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), Twet_Rated(0.0), Gamma_Rated(0.0), MaxONOFFCyclesperHour(0.0),
               HPTimeConstant(0.0), FanDelayTime(0.0), reportCoilFinalSizes(true)
         {
         }
@@ -299,6 +299,9 @@ namespace WaterToAirHeatPumpSimple {
 
         Array1D<WaterToAirHeatPumpSimple::SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
 
+        Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
+        Array1D_bool MyPlantScanFlag;
+
         void clear_state() override
         {
             this->NumWatertoAirHPs = 0;
@@ -308,6 +311,8 @@ namespace WaterToAirHeatPumpSimple {
             this->SimpleHPTimeStepFlag.clear();
             this->SimpleWatertoAirHP.deallocate();
             this->firstTime = true;
+            this->MyEnvrnFlag.deallocate();
+            this->MyPlantScanFlag.deallocate();
         }
 
         // Default Constructor
