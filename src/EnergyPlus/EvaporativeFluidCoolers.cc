@@ -1054,7 +1054,7 @@ namespace EvaporativeFluidCoolers {
             this->setupOutputVars(state);
 
             this->FluidIndex = state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).FluidIndex;
-            std::string FluidName = FluidProperties::GetGlycolNameByIndex(this->FluidIndex);
+            std::string FluidName = FluidProperties::GetGlycolNameByIndex(state, this->FluidIndex);
 
             if (UtilityRoutines::SameString(this->PerformanceInputMethod, "STANDARDDESIGNCAPACITY")) {
                 this->PerformanceInputMethod_Num = PIM::StandardDesignCapacity;

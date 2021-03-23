@@ -380,7 +380,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
     state->dataSize->DataWaterLoopNum = 1;
-    FluidProperties::NumOfGlycols = 1;
+    state->dataFluidProps->NumOfGlycols = 1;
 
     createCoilSelectionReportObj(*state);
     WaterCoils::SizeWaterCoil(*state, CoilNum);

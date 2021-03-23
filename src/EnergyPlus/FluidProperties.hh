@@ -97,6 +97,11 @@ namespace FluidProperties {
 
     // MODULE VARIABLE DECLARATIONS
 
+#ifdef EP_cache_GlycolSpecificHeat
+int const t_sh_cache_size = 1024 * 1024;
+int const t_sh_precision_bits = 24;
+Int64 const t_sh_cache_mask = (t_sh_cache_size - 1);
+#endif
     // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTONS:
 
     // Types
@@ -346,11 +351,16 @@ namespace FluidProperties {
         }
     };
 
-    // Object Data
+#ifdef EP_cache_GlycolSpecificHeat
+    extern Array1D<FluidProperties::cached_tsh> cached_t_sh; // DIMENSION(t_sh_cache_size)
+#endif
+        // Object Data
 
     // Functions
 
-    void InitializeGlycRoutines(EnergyPlusData &state);
+    void clear_state();
+
+    void InitializeGlycRoutines();
 
     void GetFluidPropertiesData(EnergyPlusData &state);
 
@@ -743,21 +753,11 @@ struct FluidPropertiesData : BaseGlobalStruct {
     int FluidIndex_EthyleneGlycol = 0;
     int FluidIndex_PropoleneGlycol = 0;
 
-#ifdef EP_cache_GlycolSpecificHeat
-    int const t_sh_cache_size = 1024 * 1024;
-    int const t_sh_precision_bits = 24;
-    Int64 const t_sh_cache_mask = (t_sh_cache_size - 1);
-#endif
-
     Array1D<FluidProperties::FluidPropsRefrigerantData> RefrigData;
     Array1D<FluidProperties::FluidPropsRefrigErrors> RefrigErrorTracking;
     Array1D<FluidProperties::FluidPropsGlycolRawData> GlyRawData;
     Array1D<FluidProperties::FluidPropsGlycolData> GlycolData;
     Array1D<FluidProperties::FluidPropsGlycolErrors> GlycolErrorTracking;
-
-#ifdef EP_cache_GlycolSpecificHeat
-    Array1D<FluidProperties::cached_tsh> cached_t_sh; // DIMENSION(t_sh_cache_size)
-#endif
 
     void clear_state() override
     {
@@ -779,9 +779,6 @@ struct FluidPropertiesData : BaseGlobalStruct {
         this->GlyRawData.deallocate();
         this->GlycolData.deallocate();
         this->GlycolErrorTracking.deallocate();
-#ifdef EP_cache_GlycolSpecificHeat
-        cached_t_sh.deallocate();
-#endif
 
     }
 };

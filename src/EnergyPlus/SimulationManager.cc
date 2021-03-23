@@ -2941,9 +2941,6 @@ namespace SimulationManager {
         // Using/Aliasing
         // using SQLiteProcedures::CreateSQLiteDatabase;
         using FluidProperties::FindGlycol;
-        using FluidProperties::FluidIndex_EthyleneGlycol;
-        using FluidProperties::FluidIndex_PropoleneGlycol;
-        using FluidProperties::FluidIndex_Water;
 
         state.dataGlobal->DoingInputProcessing = false;
 
@@ -2954,9 +2951,9 @@ namespace SimulationManager {
         }
 
         // Set up more globals - process fluid input.
-        FluidIndex_Water = FindGlycol(state, "Water");
-        FluidIndex_EthyleneGlycol = FindGlycol(state, "EthyleneGlycol");
-        FluidIndex_PropoleneGlycol = FindGlycol(state, "PropoleneGlycol");
+        state.dataFluidProps->FluidIndex_Water = FindGlycol(state, "Water");
+        state.dataFluidProps->FluidIndex_EthyleneGlycol = FindGlycol(state, "EthyleneGlycol");
+        state.dataFluidProps->FluidIndex_PropoleneGlycol = FindGlycol(state, "PropoleneGlycol");
 
         inputProcessor->preScanReportingVariables(state);
     }

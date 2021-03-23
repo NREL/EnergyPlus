@@ -8723,9 +8723,6 @@ namespace EnergyPlus::RefrigeratedCase {
         // this most recent addition/subtraction is reversed before the rest of the refrigeration simulation begins.
 
         // Used to adjust accumulative variables when time step is repeated
-        static Real64 MyCurrentTimeSaved(0.0);   // Used to determine whether the zone time step is a repetition
-        static Real64 MyStepStartTimeSaved(0.0); // Used to determine whether the system time step is a repetition
-        static Real64 TimeStepFraction(0.0);     // Used to calculate my current time
 
         auto &RefrigCase(state.dataRefrigCase->RefrigCase);
         auto &RefrigRack(state.dataRefrigCase->RefrigRack);
@@ -8907,7 +8904,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 System(systemId).LSHXTransEnergy = 0.0;
             }
 
-            if (state.dataGlobal->NumOfTimeStepInHour > 0.0) TimeStepFraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
+            if (state.dataGlobal->NumOfTimeStepInHour > 0.0) state.dataRefrigCase->TimeStepFraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
             state.dataRefrigCase->InitRefrigerationMyBeginEnvrnFlag = false;
 
         } // ( DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag )
@@ -8919,8 +8916,8 @@ namespace EnergyPlus::RefrigeratedCase {
             // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
             if ((!state.dataRefrigCase->UseSysTimeStep) && ((state.dataRefrigCase->NumSimulationCases > 0) || (state.dataRefrigCase->NumSimulationWalkIns > 0))) {
                 // Used to determine whether the zone time step is a repetition
-                Real64 MyCurrentTime = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * TimeStepFraction;
-                if (std::abs(MyCurrentTime - MyCurrentTimeSaved) < MySmallNumber) {
+                Real64 MyCurrentTime = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataRefrigCase->TimeStepFraction;
+                if (std::abs(MyCurrentTime - state.dataRefrigCase->MyCurrentTimeSaved) < MySmallNumber) {
                     // If the time step is repeated, need to return to correct values at start of time step
                     if (state.dataRefrigCase->NumSimulationCases > 0) {
                         for (int caseID = 1; caseID <= state.dataRefrigCase->NumSimulationCases; ++caseID) {
@@ -8959,7 +8956,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 } else {
                     // First time through this Zone time step, so set saved values to those in place at start of this time step
-                    MyCurrentTimeSaved = MyCurrentTime;
+                    state.dataRefrigCase->MyCurrentTimeSaved = MyCurrentTime;
                     if (state.dataRefrigCase->NumSimulationCases > 0) {
                         for (int caseID = 1; caseID <= state.dataRefrigCase->NumSimulationCases; ++caseID) {
                             RefrigCase(caseID).DefrostEnergySaved = RefrigCase(caseID).DefrostEnergy;
@@ -9013,7 +9010,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 // Used to determine whether the system time step is a repetition
                 Real64 MyStepStartTime = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
-                if (std::abs(MyStepStartTime - MyStepStartTimeSaved) < MySmallNumber) {
+                if (std::abs(MyStepStartTime - state.dataRefrigCase->MyStepStartTimeSaved) < MySmallNumber) {
                     // If the time step is repeated, need to return to correct values at start of time step
                     if (state.dataRefrigCase->NumSimulationRefrigAirChillers > 0) {
                         for (int coilID = 1; coilID <= state.dataRefrigCase->NumSimulationRefrigAirChillers; ++coilID) {
@@ -9023,7 +9020,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     }
                 } else { // First time through this system time step or hvac loop,
                     // so set saved values to those in place at start of this time step
-                    MyStepStartTimeSaved = MyStepStartTime;
+                    state.dataRefrigCase->MyStepStartTimeSaved = MyStepStartTime;
                     if (state.dataRefrigCase->NumSimulationRefrigAirChillers > 0) {
                         for (int coilID = 1; coilID <= state.dataRefrigCase->NumSimulationRefrigAirChillers; ++coilID) {
                             WarehouseCoil(coilID).KgFrostSaved = WarehouseCoil(coilID).KgFrost;

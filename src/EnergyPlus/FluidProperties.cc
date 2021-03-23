@@ -131,9 +131,18 @@ namespace FluidProperties {
 
     // Object Data
 
-
-    // Data Initializer Forward Declarations
+#ifdef EP_cache_GlycolSpecificHeat
+    Array1D<cached_tsh> cached_t_sh; // DIMENSION(t_sh_cache_size)
+#endif
+        // Data Initializer Forward Declarations
     // See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
+
+void clear_state()
+{
+#ifdef EP_cache_GlycolSpecificHeat
+    cached_t_sh.deallocate();
+#endif
+}
 
     void DefaultEthGlyCpData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
 
@@ -159,10 +168,10 @@ namespace FluidProperties {
 
     // Functions
 
-    void InitializeGlycRoutines(EnergyPlusData &state)
+    void InitializeGlycRoutines()
     {
 #ifdef EP_cache_GlycolSpecificHeat
-        state.dataFluidProps->cached_t_sh.allocate({0, state.dataFluidProps->t_sh_cache_size});
+        cached_t_sh.allocate({0, t_sh_cache_size});
 #endif
     }
 
@@ -532,7 +541,7 @@ namespace FluidProperties {
         cNumericFieldNames = "";
         lNumericFieldBlanks = false;
 
-        InitializeGlycRoutines(state);
+        InitializeGlycRoutines();
 
         // Check to see if there is any FluidName input.  If not, this is okay as
         // long as the user only desires to simulate loops with water.  More than

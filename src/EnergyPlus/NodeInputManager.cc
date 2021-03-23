@@ -910,11 +910,9 @@ namespace EnergyPlus::NodeInputManager {
 
         // Using/Aliasing
         using FluidProperties::GetDensityGlycol;
-        using FluidProperties::GetGlycolNameByIndex;
         using FluidProperties::GetSatDensityRefrig;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSpecificHeatGlycol;
-        using FluidProperties::NumOfGlycols;
         using OutputProcessor::ReqReportVariables;
         using Psychrometrics::CPCW;
         using Psychrometrics::PsyCpAirFnW;
@@ -980,7 +978,7 @@ namespace EnergyPlus::NodeInputManager {
 
             for (iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) {
                 nodeReportingStrings.push_back(std::string(NodeReportingCalc + state.dataLoopNodes->NodeID(iNode)));
-                nodeFluidNames.push_back(GetGlycolNameByIndex(state.dataLoopNodes->Node(iNode).FluidIndex));
+                nodeFluidNames.push_back(FluidProperties::GetGlycolNameByIndex(state, state.dataLoopNodes->Node(iNode).FluidIndex));
                 for (iReq = 1; iReq <= state.dataOutputProcessor->NumOfReqVariables; ++iReq) {
                     if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).Key, state.dataLoopNodes->NodeID(iNode)) ||
                         state.dataOutputProcessor->ReqRepVars(iReq).Key.empty()) {
@@ -1082,7 +1080,7 @@ namespace EnergyPlus::NodeInputManager {
                 }
             } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Water) {
 
-                if (!((state.dataLoopNodes->Node(iNode).FluidIndex > 0) && (state.dataLoopNodes->Node(iNode).FluidIndex <= NumOfGlycols))) {
+                if (!((state.dataLoopNodes->Node(iNode).FluidIndex > 0) && (state.dataLoopNodes->Node(iNode).FluidIndex <= state.dataFluidProps->NumOfGlycols))) {
                     rho = RhoWaterStdInit;
                     rhoStd = RhoWaterStdInit;
                     Cp = CPCW(state.dataLoopNodes->Node(iNode).Temp);
