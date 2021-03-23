@@ -5710,12 +5710,6 @@ namespace AirflowNetworkBalanceManager {
         Real64 const ErrorToler(0.00001);
         int const MaxIte(20);
         int SolFla;
-        static int ErrCountVar(0);
-        static int ErrCountHighPre(0);
-        static int ErrCountLowPre(0);
-        static int ErrIndexHighPre(0);
-        static int ErrIndexVar(0);
-        static int ErrIndexLowPre(0);
         Real64 MinExhaustMassFlowrate;
         Real64 MaxExhaustMassFlowrate;
         Real64 MinReliefMassFlowrate;
@@ -5913,17 +5907,17 @@ namespace AirflowNetworkBalanceManager {
             if (ZonePressure1 <= PressureSet) {
                 // The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
                 if (!state.dataGlobal->WarmupFlag) {
-                    if (ErrCountLowPre == 0) {
-                        ++ErrCountLowPre;
+                    if ( state.dataAirflowNetworkBalanceManager->ErrCountLowPre == 0) {
+                        ++state.dataAirflowNetworkBalanceManager->ErrCountLowPre;
                         ShowWarningError(state, "The calculated pressure with minimum exhaust fan rate is lower than the pressure setpoint. The pressure "
                                          "control is unable to perform.");
                         ShowContinueErrorTimeStamp(state,
                                                    format("Calculated pressure = {:.2R}[Pa], Pressure setpoint ={:.2R}", ZonePressure1, PressureSet));
                     } else {
-                        ++ErrCountLowPre;
+                        ++state.dataAirflowNetworkBalanceManager->ErrCountLowPre;
                         ShowRecurringWarningErrorAtEnd(state, state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).Name +
                                                            ": The AFN model continues not to perform pressure control due to lower zone pressure...",
-                                                       ErrIndexLowPre,
+                                                       state.dataAirflowNetworkBalanceManager->ErrIndexLowPre,
                                                        ZonePressure1,
                                                        ZonePressure1);
                     }
@@ -5935,18 +5929,18 @@ namespace AirflowNetworkBalanceManager {
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
                     if (!state.dataGlobal->WarmupFlag) {
-                        if (ErrCountHighPre == 0) {
-                            ++ErrCountHighPre;
+                        if (state.dataAirflowNetworkBalanceManager->ErrCountHighPre == 0) {
+                            ++state.dataAirflowNetworkBalanceManager->ErrCountHighPre;
                             ShowWarningError(state, "The calculated pressure with maximum exhaust fan rate is higher than the pressure setpoint. The "
                                              "pressure control is unable to perform.");
                             ShowContinueErrorTimeStamp(
                                 state, format("Calculated pressure = {:.2R}[Pa], Pressure setpoint = {:.2R}", ZonePressure2, PressureSet));
                         } else {
-                            ++ErrCountHighPre;
+                            ++state.dataAirflowNetworkBalanceManager->ErrCountHighPre;
                             ShowRecurringWarningErrorAtEnd(state,
                                 state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).Name +
                                     ": The AFN model continues not to perform pressure control due to higher zone pressure...",
-                                ErrIndexHighPre,
+                                state.dataAirflowNetworkBalanceManager->ErrIndexHighPre,
                                 ZonePressure2,
                                 ZonePressure2);
                         }
@@ -5958,15 +5952,15 @@ namespace AirflowNetworkBalanceManager {
                         ErrorToler, MaxIte, SolFla, state.dataAirflowNetwork->ExhaustFanMassFlowRate, AFNPressureResidual, MinExhaustMassFlowrate, MaxExhaustMassFlowrate, Par);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
-                            if (ErrCountVar == 0) {
-                                ++ErrCountVar;
+                            if (state.dataAirflowNetworkBalanceManager->ErrCountVar == 0) {
+                                ++state.dataAirflowNetworkBalanceManager->ErrCountVar;
                                 ShowWarningError(state, "Iteration limit exceeded pressure setpoint using an exhaust fan. Simulation continues.");
                                 ShowContinueErrorTimeStamp(state, format("Exhaust fan flow rate = {:.4R}", state.dataAirflowNetwork->ExhaustFanMassFlowRate));
                             } else {
-                                ++ErrCountVar;
+                                ++state.dataAirflowNetworkBalanceManager->ErrCountVar;
                                 ShowRecurringWarningErrorAtEnd(state, state.dataAirflowNetwork->PressureControllerData(1).Name +
                                                                    "\": Iteration limit warning exceeding pressure setpoint continues...",
-                                                               ErrIndexVar,
+                                                               state.dataAirflowNetworkBalanceManager->ErrIndexVar,
                                                                state.dataAirflowNetwork->ExhaustFanMassFlowRate,
                                                                state.dataAirflowNetwork->ExhaustFanMassFlowRate);
                             }
@@ -5992,17 +5986,17 @@ namespace AirflowNetworkBalanceManager {
             if (ZonePressure1 <= PressureSet) {
                 // The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
                 if (!state.dataGlobal->WarmupFlag) {
-                    if (ErrCountLowPre == 0) {
-                        ++ErrCountLowPre;
+                    if (state.dataAirflowNetworkBalanceManager->ErrCountLowPre == 0) {
+                        ++state.dataAirflowNetworkBalanceManager->ErrCountLowPre;
                         ShowWarningError(state, "The calculated pressure with minimum relief air rate is lower than the pressure setpoint. The pressure "
                                          "control is unable to perform.");
                         ShowContinueErrorTimeStamp(state,
                                                    format("Calculated pressure = {:.2R}[Pa], Pressure setpoint ={:.2R}", ZonePressure1, PressureSet));
                     } else {
-                        ++ErrCountLowPre;
+                        ++state.dataAirflowNetworkBalanceManager->ErrCountLowPre;
                         ShowRecurringWarningErrorAtEnd(state, state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).Name +
                                                            ": The AFN model continues not to perform pressure control due to lower zone pressure...",
-                                                       ErrIndexLowPre,
+                                                       state.dataAirflowNetworkBalanceManager->ErrIndexLowPre,
                                                        ZonePressure1,
                                                        ZonePressure1);
                     }
@@ -6015,18 +6009,18 @@ namespace AirflowNetworkBalanceManager {
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
                     if (!state.dataGlobal->WarmupFlag) {
-                        if (ErrCountHighPre == 0) {
-                            ++ErrCountHighPre;
+                        if (state.dataAirflowNetworkBalanceManager->ErrCountHighPre == 0) {
+                            ++state.dataAirflowNetworkBalanceManager->ErrCountHighPre;
                             ShowWarningError(state, "The calculated pressure with maximum relief air rate is higher than the pressure setpoint. The "
                                              "pressure control is unable to perform.");
                             ShowContinueErrorTimeStamp(
                                 state, format("Calculated pressure = {:.2R}[Pa], Pressure setpoint = {:.2R}", ZonePressure2, PressureSet));
                         } else {
-                            ++ErrCountHighPre;
+                            ++state.dataAirflowNetworkBalanceManager->ErrCountHighPre;
                             ShowRecurringWarningErrorAtEnd(state,
                                 state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).Name +
                                     ": The AFN model continues not to perform pressure control due to higher zone pressure...",
-                                ErrIndexHighPre,
+                                state.dataAirflowNetworkBalanceManager->ErrIndexHighPre,
                                 ZonePressure2,
                                 ZonePressure2);
                         }
@@ -6037,15 +6031,15 @@ namespace AirflowNetworkBalanceManager {
                     TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, state.dataAirflowNetwork->ReliefMassFlowRate, AFNPressureResidual, MinReliefMassFlowrate, MaxReliefMassFlowrate, Par);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
-                            if (ErrCountVar == 0) {
-                                ++ErrCountVar;
+                            if (state.dataAirflowNetworkBalanceManager->ErrCountVar == 0) {
+                                ++state.dataAirflowNetworkBalanceManager->ErrCountVar;
                                 ShowWarningError(state, "Iteration limit exceeded pressure setpoint using relief air. Simulation continues.");
                                 ShowContinueErrorTimeStamp(state, format("Relief air flow rate = {:.4R}", state.dataAirflowNetwork->ReliefMassFlowRate));
                             } else {
-                                ++ErrCountVar;
+                                ++state.dataAirflowNetworkBalanceManager->ErrCountVar;
                                 ShowRecurringWarningErrorAtEnd(state, state.dataAirflowNetwork->PressureControllerData(1).Name +
                                                                    "\": Iteration limit warning exceeding pressure setpoint continues...",
-                                                               ErrIndexVar,
+                                                               state.dataAirflowNetworkBalanceManager->ErrIndexVar,
                                                                state.dataAirflowNetwork->ReliefMassFlowRate,
                                                                state.dataAirflowNetwork->ReliefMassFlowRate);
                             }

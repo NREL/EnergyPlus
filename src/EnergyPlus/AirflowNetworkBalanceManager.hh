@@ -287,6 +287,14 @@ namespace AirflowNetworkBalanceManager {
         bool UpdateAirflowNetworkMyOneTimeFlag = true;
         bool UpdateAirflowNetworkMyOneTimeFlag1 = true;
 
+        // CalcAirflowNetworkAirBalance variables
+        int ErrCountVar = 0;
+        int ErrCountHighPre = 0;
+        int ErrCountLowPre = 0;
+        int ErrIndexHighPre = 0;
+        int ErrIndexVar = 0;
+        int ErrIndexLowPre = 0;
+
         // Object Data
         Array1D<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
         std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
