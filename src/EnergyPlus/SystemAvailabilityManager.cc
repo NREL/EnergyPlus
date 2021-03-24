@@ -145,7 +145,7 @@ namespace SystemAvailabilityManager {
         int ZoneEquipType;           // Type of ZoneHVAC:* component
         int CompNum;                 // Index of ZoneHVAC:* component
         int ZoneCompAvailMgrNum;     // Index of availability manager associated with the ZoneHVAC:* component
-        static int DummyArgument(1); // This variable is used when SimSysAvailManager is called for a ZoneHVAC:* component
+        int const DummyArgument(1); // This variable is used when SimSysAvailManager is called for a ZoneHVAC:* component
 
         if (state.dataSystemAvailabilityManager->GetAvailMgrInputFlag) {
             GetSysAvailManagerInputs(state);
@@ -1945,7 +1945,7 @@ namespace SystemAvailabilityManager {
         int CtrldZoneNum;
         int ZoneNum;
         Real64 TempTol;
-        static Array1D_bool ZoneCompNCControlType;
+        auto & ZoneCompNCControlType = state.dataSystemAvailabilityManager->ZoneCompNCControlType;
         int CyclingRunTimeControlType;
 
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
@@ -4238,8 +4238,8 @@ namespace SystemAvailabilityManager {
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true); // One time flag
-        static bool MyEnvrnFlag(true);
+        auto & MyOneTimeFlag = state.dataSystemAvailabilityManager->MyOneTimeFlag;
+        auto & MyEnvrnFlag = state.dataSystemAvailabilityManager->MyEnvrnFlag;
         int SysAvailNum;                // DO loop index for Sys Avail Manager objects
         int ControlledZoneNum;          // Index into the ZoneEquipConfig array
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
