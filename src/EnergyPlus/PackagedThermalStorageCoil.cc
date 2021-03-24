@@ -1758,10 +1758,10 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyFlag;       // One time environment flag
-        static Array1D_bool MySizeFlag;   // One time sizing flag
-        static Array1D_bool MyEnvrnFlag;  // flag for init once at start of environment
-        static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
+        auto & MyFlag = state.dataPackagedThermalStorageCoil->MyFlag;
+        auto & MySizeFlag = state.dataPackagedThermalStorageCoil->MySizeFlag;
+        auto & MyEnvrnFlag = state.dataPackagedThermalStorageCoil->MyEnvrnFlag;
+        auto & MyWarmupFlag = state.dataPackagedThermalStorageCoil->MyWarmupFlag;
         bool errFlag;
         int plloopnum;
         int lsnum;

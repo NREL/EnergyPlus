@@ -509,6 +509,10 @@ struct PackagedThermalStorageCoilData : BaseGlobalStruct
     bool GetTESInputFlag = true;
     bool MyOneTimeFlag = true;
     Array1D<PackagedThermalStorageCoil::PackagedTESCoolingCoilStruct> TESCoil;
+    Array1D_bool MyFlag;       // One time environment flag
+    Array1D_bool MySizeFlag;   // One time sizing flag
+    Array1D_bool MyEnvrnFlag;  // flag for init once at start of environment
+    Array1D_bool MyWarmupFlag; // flag for init after warmup complete
 
     void clear_state() override
     {
@@ -517,6 +521,10 @@ struct PackagedThermalStorageCoilData : BaseGlobalStruct
         this->GetTESInputFlag = true;
         this->MyOneTimeFlag = true;
         this->TESCoil.deallocate();
+        this->MyFlag.clear();
+        this->MySizeFlag.clear();
+        this->MyEnvrnFlag.clear();
+        this->MyWarmupFlag.clear();
     }
 };
 
