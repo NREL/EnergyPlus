@@ -185,10 +185,15 @@ struct HeatBalHAMTMgrData : BaseGlobalStruct {
     bool latswitch = false;  // latent heat switch,
     bool rainswitch = false; // rain switch,
     Array1D<HeatBalanceHAMTManager::subcell> cells;
+    bool OneTimeFlag = true;
+    int qvpErrCount = 0;
+    int qvpErrReport = 0;
 
     void clear_state() override
     {
-
+        this->OneTimeFlag = true;
+        this->qvpErrCount = 0;
+        this->qvpErrReport = 0;
     }
 };
 
