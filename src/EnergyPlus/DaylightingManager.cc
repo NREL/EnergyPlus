@@ -7120,7 +7120,6 @@ namespace EnergyPlus::DaylightingManager {
         auto & DayltgInterReflectedIllumNearestHitPt = state.dataDaylightingManager->DayltgInterReflectedIllumNearestHitPt;
         auto & DayltgInterReflectedIllumObsHitPt = state.dataDaylightingManager->DayltgInterReflectedIllumObsHitPt;
         auto & DayltgInterReflectedIllumGroundHitPt = state.dataDaylightingManager->DayltgInterReflectedIllumGroundHitPt;
-        auto & DayltgInterReflectedIllumURay = state.dataDaylightingManager->DayltgInterReflectedIllumURay;
         auto & SkyObstructionMult = state.dataDaylightingManager->SkyObstructionMult;
         auto & FLFWSK = state.dataDaylightingManager->FLFWSK;
         auto & FLFWSU = state.dataDaylightingManager->FLFWSU;
