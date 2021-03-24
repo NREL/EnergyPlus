@@ -692,8 +692,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         int LoadSideOutletNode;            // Load Side Outlet Node
         int SourceSideInletNode;           // Source Side Inlet Node
         int SourceSideOutletNode;          // Source Side Outlet Node
-        static Real64 CurrentSimTime(0.0); // Current Simulation Time
-        static Real64 PrevSimTime(0.0);    // Previous Simulation Time
+        auto & CurrentSimTime = state.dataHPWaterToWaterSimple->CurrentSimTime;
+        auto & PrevSimTime = state.dataHPWaterToWaterSimple->PrevSimTime;
 
         int LoopNum;
         int LoopSideNum;
