@@ -67,22 +67,6 @@ struct EnergyPlusData;
 
 namespace HeatBalanceIntRadExchange {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int MaxNumOfRadEnclosureSurfs; // Max saved to get large enough space for SurfaceTempInKto4th
-
-    extern bool CarrollMethod;  // Use Carroll MRT method
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
-
-    // Functions
-    void clear_state();
-
     void CalcInteriorRadExchange(EnergyPlusData &state,
                                  Array1S<Real64> const SurfaceTemp,       // Current surface temperatures
                                  int const SurfIterations,                // Number of iterations in calling subroutine
@@ -180,8 +164,25 @@ namespace HeatBalanceIntRadExchange {
 
 struct HeatBalanceIntRadExchgData : BaseGlobalStruct {
 
+    int MaxNumOfRadEnclosureSurfs = 0; // Max saved to get large enough space for SurfaceTempInKto4th
+    bool CarrollMethod = false; // Use Carroll MRT method
+    bool CalcInteriorRadExchangefirstTime = true; // Logical flag for one-time initializations
+
+    // variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
+    Array1D<Real64> SurfaceTempRad;
+    Array1D<Real64> SurfaceTempInKto4th;
+    Array1D<Real64> SurfaceEmiss;
+    bool ViewFactorReport = false; // Flag to output view factor report in eio file
+
     void clear_state() override
     {
+        this->MaxNumOfRadEnclosureSurfs = 0;
+        this->CarrollMethod = false;
+        this->CalcInteriorRadExchangefirstTime = true;
+        this->SurfaceTempRad.deallocate();
+        this->SurfaceTempInKto4th.deallocate();
+        this->SurfaceEmiss.deallocate();
+        this->ViewFactorReport = false;
 
     }
 };

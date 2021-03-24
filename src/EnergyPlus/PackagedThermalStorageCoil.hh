@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/HVACDXSystem.hh>
 
 namespace EnergyPlus {
 
@@ -458,7 +459,7 @@ namespace PackagedThermalStorageCoil {
                                       Real64 const DesiredOutletHumRat,
                                       Real64 &PartLoadFrac,
                                       int &TESOpMode,
-                                      int &ControlType,
+                                      HVACDXSystem::DehumidControl &ControlType,
                                       int &SensPLRIter,
                                       int &SensPLRIterIndex,
                                       int &SensPLRFail,
