@@ -68,7 +68,6 @@
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataHVACControllers.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -1421,7 +1420,6 @@ namespace EnergyPlus::SimAirServingZones {
         int PlenumOutNum;                  // DO loop index of supply plenum outlets
         Real64 MassFlowSaved;              // mass flow rate for a node saved from previous call
         Real64 MassFlowSet;                // desired mass flow rate for a node
-        static Real64 SumZoneDesFlow(0.0); // sum of the zone design air mass flow rates for zones served by a system
         int SupAirPath;                    // supply air path do loop index
         int SupAirPathNum;                 // specific supply air path index
         int SplitterNum;                   // Zone equip splitter index
@@ -1436,16 +1434,12 @@ namespace EnergyPlus::SimAirServingZones {
         int SupFanIndex;
         int RetFanIndex;
         bool FoundOASys;
-        static int TUInNode(0); // inlet node number of a terminal unit
 
         // Dimension the local subcomponent arrays
 
         auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         bool ErrorsFound;
-        static Real64 OAReliefDiff(0.0); // local for massflow change across OA system, kg/s
-        static Real64 MassFlowSetToler;
-
         Array1D_int tmpNodeARR;
         int nodeLoop;
         int ZoneNum;
@@ -1473,7 +1467,7 @@ namespace EnergyPlus::SimAirServingZones {
             state.dataSimAirServingZones->TermUnitSizingNumsCool.allocate(state.dataGlobal->NumOfZones);
             state.dataSimAirServingZones->TermUnitSizingNumsHeat.allocate(state.dataGlobal->NumOfZones);
 
-            MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
+            state.dataSimAirServingZones->MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
 
             for (SupAirPath = 1; SupAirPath <= state.dataZoneEquip->NumSupplyAirPaths; ++SupAirPath) {
 
@@ -2081,15 +2075,15 @@ namespace EnergyPlus::SimAirServingZones {
 
             // calculate the ratio of air loop design flow to the sum of the zone design flows
             for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-                SumZoneDesFlow = 0.0;
+                state.dataSimAirServingZones->SumZoneDesFlow = 0.0;
                 state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply = PrimaryAirSystems(AirLoopNum).DesignVolFlowRate * state.dataEnvrn->StdRhoAir;
                 state.dataAirLoop->AirLoopFlow(AirLoopNum).DesReturnFrac = PrimaryAirSystems(AirLoopNum).DesignReturnFlowFraction;
                 for (ZoneInSysIndex = 1; ZoneInSysIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZoneInSysIndex) {
-                    TUInNode = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
-                    SumZoneDesFlow += state.dataLoopNodes->Node(TUInNode).MassFlowRateMax;
+                    state.dataSimAirServingZones->TUInNode = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
+                    state.dataSimAirServingZones->SumZoneDesFlow += state.dataLoopNodes->Node(state.dataSimAirServingZones->TUInNode).MassFlowRateMax;
                 }
-                if (SumZoneDesFlow > VerySmallMassFlow) {
-                    state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / SumZoneDesFlow;
+                if (state.dataSimAirServingZones->SumZoneDesFlow > VerySmallMassFlow) {
+                    state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / state.dataSimAirServingZones->SumZoneDesFlow;
                 } else {
                     state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio = 1.0;
                 }
@@ -2202,7 +2196,7 @@ namespace EnergyPlus::SimAirServingZones {
                     state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint = 0.0;
                 }
 
-                if (state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint < MassFlowSetToler) {
+                if (state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint < state.dataSimAirServingZones->MassFlowSetToler) {
                     state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint = 0.0;
                 }
 
@@ -2211,9 +2205,9 @@ namespace EnergyPlus::SimAirServingZones {
                     NodeNum = PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).NodeNum(BranchNodeIndex);
                     if (PrimaryAirSystems(AirLoopNum).OASysExists && (NodeNum == PrimaryAirSystems(AirLoopNum).OASysInletNodeNum)) {
                         // need to modify if OA relief and supply not balanced because of exhaust fans
-                        OAReliefDiff = state.dataLoopNodes->Node(PrimaryAirSystems(AirLoopNum).OASysOutletNodeNum).MassFlowRate - state.dataLoopNodes->Node(NodeNum).MassFlowRate;
-                        if (OAReliefDiff > 0.0) {
-                            state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint - OAReliefDiff;
+                        state.dataSimAirServingZones->OAReliefDiff = state.dataLoopNodes->Node(PrimaryAirSystems(AirLoopNum).OASysOutletNodeNum).MassFlowRate - state.dataLoopNodes->Node(NodeNum).MassFlowRate;
+                        if (state.dataSimAirServingZones->OAReliefDiff > 0.0) {
+                            state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint - state.dataSimAirServingZones->OAReliefDiff;
                         } else {
                             state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = state.dataLoopNodes->Node(NodeNumOut).MassFlowRateSetPoint;
                         }
@@ -2414,12 +2408,6 @@ namespace EnergyPlus::SimAirServingZones {
         // Used to control when to reset the statistic counters for each new HVAC step.
         static Real64 SavedPreviousHVACTime(0.0);
         Real64 rxTime;
-        // Maximum of iteration counters across all air loops
-        static int IterMax(0);
-        // Aggregated number of iterations across all air loops
-        static int IterTot(0);
-        // Aggregated number fo times SimAirLoopComponents() has been invoked across all air loops
-        static int NumCallsTot(0);
         // Primary Air Sys DO loop index
         int AirLoopNum;
         // Max number of iterations performed by controllers on each air loop
@@ -2441,16 +2429,16 @@ namespace EnergyPlus::SimAirServingZones {
 
         // Set up output variables
         if (!state.dataSimAirServingZones->OutputSetupFlag) {
-            SetupOutputVariable(state, "Air System Simulation Maximum Iteration Count", OutputProcessor::Unit::None, IterMax, "HVAC", "Sum", "SimAir");
-            SetupOutputVariable(state, "Air System Simulation Iteration Count", OutputProcessor::Unit::None, IterTot, "HVAC", "Sum", "SimAir");
-            SetupOutputVariable(state, "Air System Component Model Simulation Calls", OutputProcessor::Unit::None, NumCallsTot, "HVAC", "Sum", "SimAir");
+            SetupOutputVariable(state, "Air System Simulation Maximum Iteration Count", OutputProcessor::Unit::None, state.dataSimAirServingZones->salIterMax, "HVAC", "Sum", "SimAir");
+            SetupOutputVariable(state, "Air System Simulation Iteration Count", OutputProcessor::Unit::None, state.dataSimAirServingZones->salIterTot, "HVAC", "Sum", "SimAir");
+            SetupOutputVariable(state, "Air System Component Model Simulation Calls", OutputProcessor::Unit::None, state.dataSimAirServingZones->NumCallsTot, "HVAC", "Sum", "SimAir");
             state.dataSimAirServingZones->OutputSetupFlag = true;
         }
 
         // BUG: IterMax should not be aggregated as a Sum output variable
         //      We need a new aggregation scheme to track the max value across HVAC steps
         //      instead of summing it up.
-        IterMax = 0;
+        state.dataSimAirServingZones->salIterMax = 0;
 
         // Reset counters to capture statistics for the current zone time step
         // Aggregate statistics over all HVAC time steps, even the rejected ones, to properly
@@ -2460,8 +2448,8 @@ namespace EnergyPlus::SimAirServingZones {
             rxTime = GetPreviousHVACTime(state);
             if (SavedPreviousHVACTime != rxTime) {
                 SavedPreviousHVACTime = rxTime;
-                IterTot = 0;
-                NumCallsTot = 0;
+                state.dataSimAirServingZones->salIterTot = 0;
+                state.dataSimAirServingZones->NumCallsTot = 0;
             }
         }
 
@@ -2497,11 +2485,11 @@ namespace EnergyPlus::SimAirServingZones {
                 SimAirLoop(state, FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls);
 
                 // Update tracker for maximum number of iterations needed by any controller on all air loops
-                IterMax = max(IterMax, AirLoopIterMax);
+                state.dataSimAirServingZones->salIterMax = max(state.dataSimAirServingZones->salIterMax, AirLoopIterMax);
                 // Update tracker for aggregated number of iterations needed by all controllers on all air loops
-                IterTot += AirLoopIterTot;
+                state.dataSimAirServingZones->salIterTot += AirLoopIterTot;
                 // Update tracker for total number of times SimAirLoopComponents() has been invoked across all air loops
-                NumCallsTot += AirLoopNumCalls;
+                state.dataSimAirServingZones->NumCallsTot += AirLoopNumCalls;
 
                 // At the end of the first pass, check whether a second pass is needed or not
                 if (AirLoopPass == 1) {
@@ -2571,11 +2559,11 @@ namespace EnergyPlus::SimAirServingZones {
                         SimAirLoop(state, FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls);
 
                         // Update tracker for maximum number of iterations needed by any controller on all air loops
-                        IterMax = max(IterMax, AirLoopIterMax);
+                        state.dataSimAirServingZones->salIterMax = max(state.dataSimAirServingZones->salIterMax, AirLoopIterMax);
                         // Update tracker for aggregated number of iterations needed by all controllers on all air loops
-                        IterTot += AirLoopIterTot;
+                        state.dataSimAirServingZones->salIterTot += AirLoopIterTot;
                         // Update tracker for total number of times SimAirLoopComponents() has been invoked across all air loops
-                        NumCallsTot += AirLoopNumCalls;
+                        state.dataSimAirServingZones->NumCallsTot += AirLoopNumCalls;
 
                         // At the end of the first pass, check whether a second pass is needed or not
                         if (AirLoopPass == 1) {
@@ -2659,20 +2647,6 @@ namespace EnergyPlus::SimAirServingZones {
         // Total number of times SimAirLoopComponents() has been invoked to simulate this air loop
 
         // SUBROUTINE LOCAL VARIABLE DEFINITIONS
-        // Maximum number of iterations performed by each controller on this air loop
-        static int IterMax(0);
-        // Aggregated number of iterations performed by each controller on this air loop
-        static int IterTot(0);
-        // Number of times SimAirLoopComponents() has been invoked per air loop for either Solve or ReSolve operations
-        static int NumCalls(0);
-        // TRUE when primary air system & controllers simulation has converged;
-        static bool AirLoopConvergedFlag(false);
-        // TRUE when speculative warm restart is allowed; FALSE otherwise.
-        static bool DoWarmRestartFlag(false);
-        // If Status<0, no speculative warm restart attempted.
-        // If Status==0, warm restart failed.
-        // If Status>0, warm restart succeeded.
-        static int WarmRestartStatus(iControllerWarmRestartNone);
 
         auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
         auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
@@ -2695,38 +2669,38 @@ namespace EnergyPlus::SimAirServingZones {
         // Next condition is true whenever the final check for the air loop was converged
         // at the previous SimAirLoop call
         // Next conditions should detect when air mass flow rates have changed
-        DoWarmRestartFlag = PrimaryAirSystems(AirLoopNum).NumControllers > 0 && AirLoopControlInfo(AirLoopNum).AllowWarmRestartFlag &&
+        state.dataSimAirServingZones->DoWarmRestartFlagSAL = PrimaryAirSystems(AirLoopNum).NumControllers > 0 && AirLoopControlInfo(AirLoopNum).AllowWarmRestartFlag &&
                             !FirstHVACIteration && !state.dataGlobal->SysSizingCalc && AirLoopControlInfo(AirLoopNum).ConvergedFlag &&
                             !AirLoopControlInfo(AirLoopNum).LoopFlowRateSet && !AirLoopControlInfo(AirLoopNum).NewFlowRateFlag;
 
-        if (!DoWarmRestartFlag) {
+        if (!state.dataSimAirServingZones->DoWarmRestartFlagSAL) {
             // Solve controllers with cold start using default initial values
-            SolveAirLoopControllers(state, FirstHVACIteration, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls);
+            SolveAirLoopControllers(state, FirstHVACIteration, AirLoopNum, state.dataSimAirServingZones->AirLoopConvergedFlagSAL, state.dataSimAirServingZones->IterMaxSAL2, state.dataSimAirServingZones->IterTotSAL2, state.dataSimAirServingZones->NumCallsSAL2);
 
             // Update air loop trackers
-            WarmRestartStatus = iControllerWarmRestartNone;
-            AirLoopNumCalls += NumCalls;
-            AirLoopIterMax = max(AirLoopIterMax, IterMax);
-            AirLoopIterTot += IterTot;
+            state.dataSimAirServingZones->WarmRestartStatusSAL = iControllerWarmRestartNone;
+            AirLoopNumCalls += state.dataSimAirServingZones->NumCallsSAL2;
+            AirLoopIterMax = max(AirLoopIterMax, state.dataSimAirServingZones->IterMaxSAL2);
+            AirLoopIterTot += state.dataSimAirServingZones->IterTotSAL2;
         } else {
             // First try with speculative warm restart using previous solution
-            ReSolveAirLoopControllers(state, FirstHVACIteration, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls);
+            ReSolveAirLoopControllers(state, FirstHVACIteration, AirLoopNum, state.dataSimAirServingZones->AirLoopConvergedFlagSAL, state.dataSimAirServingZones->IterMaxSAL2, state.dataSimAirServingZones->IterTotSAL2, state.dataSimAirServingZones->NumCallsSAL2);
 
             // Update air loop trackers
-            WarmRestartStatus = iControllerWarmRestartSuccess;
-            AirLoopNumCalls += NumCalls;
-            AirLoopIterMax = max(AirLoopIterMax, IterMax);
-            AirLoopIterTot += IterTot;
+            state.dataSimAirServingZones->WarmRestartStatusSAL = iControllerWarmRestartSuccess;
+            AirLoopNumCalls += state.dataSimAirServingZones->NumCallsSAL2;
+            AirLoopIterMax = max(AirLoopIterMax, state.dataSimAirServingZones->IterMaxSAL2);
+            AirLoopIterTot += state.dataSimAirServingZones->IterTotSAL2;
 
             // Retry with cold start using default initial values if speculative warm restart did not work
-            if (!AirLoopConvergedFlag) {
-                SolveAirLoopControllers(state, FirstHVACIteration, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls);
+            if (!state.dataSimAirServingZones->AirLoopConvergedFlagSAL) {
+                SolveAirLoopControllers(state, FirstHVACIteration, AirLoopNum, state.dataSimAirServingZones->AirLoopConvergedFlagSAL, state.dataSimAirServingZones->IterMaxSAL2, state.dataSimAirServingZones->IterTotSAL2, state.dataSimAirServingZones->NumCallsSAL2);
 
                 // Update air loop trackers
-                WarmRestartStatus = iControllerWarmRestartFail;
-                AirLoopNumCalls += NumCalls;
-                AirLoopIterMax = max(AirLoopIterMax, IterMax);
-                AirLoopIterTot += IterTot;
+                state.dataSimAirServingZones->WarmRestartStatusSAL = iControllerWarmRestartFail;
+                AirLoopNumCalls += state.dataSimAirServingZones->NumCallsSAL2;
+                AirLoopIterMax = max(AirLoopIterMax, state.dataSimAirServingZones->IterMaxSAL2);
+                AirLoopIterTot += state.dataSimAirServingZones->IterTotSAL2;
             }
         }
 
@@ -2734,14 +2708,14 @@ namespace EnergyPlus::SimAirServingZones {
         // To enable runtime statistics tracking for each air loop, define the environment variable
         // TRACK_AIRLOOP=YES or TRACK_AIRLOOP=Y
         if (state.dataSysVars->TrackAirLoopEnvFlag) {
-            TrackAirLoopControllers(state, AirLoopNum, WarmRestartStatus, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls);
+            TrackAirLoopControllers(state, AirLoopNum, state.dataSimAirServingZones->WarmRestartStatusSAL, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls);
         }
 
         // Generate trace for all controllers on this air loop
         // To enable generating a trace file with the converged solution for all controllers on each air loop,
         // define the environment variable TRACE_AIRLOOP=YES or TRACE_AIRLOOP=Y.
         if (state.dataSysVars->TraceAirLoopEnvFlag) {
-            TraceAirLoopControllers(state, FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopConvergedFlag, AirLoopNumCalls);
+            TraceAirLoopControllers(state, FirstHVACIteration, AirLoopNum, AirLoopPass, state.dataSimAirServingZones->AirLoopConvergedFlagSAL, AirLoopNumCalls);
         }
 
         // When there is more than 1 controller on an air loop, each controller sensing
@@ -2751,7 +2725,7 @@ namespace EnergyPlus::SimAirServingZones {
         // happen if
         // If this is the case then we do not want to try a warm restart as it is very
         // unlikely to succeed.
-        AirLoopControlInfo(AirLoopNum).ConvergedFlag = AirLoopConvergedFlag;
+        AirLoopControlInfo(AirLoopNum).ConvergedFlag = state.dataSimAirServingZones->AirLoopConvergedFlagSAL;
     }
 
     void SolveAirLoopControllers(EnergyPlusData &state,
@@ -2812,17 +2786,8 @@ namespace EnergyPlus::SimAirServingZones {
         bool ControllerConvergedFlag;
         // TRUE when air loop has been evaluated with latest actuated variables
         bool IsUpToDateFlag;
-        // Iteration counter
-        static int Iter(0);
-        // Number of times that the maximum iterations was exceeded
-        static int ErrCount(0);
-        // Number of times that the maximum iterations was exceeded
-        static int MaxErrCount(0);
         // Placeholder for environment name used in error reporting
         static std::string ErrEnvironmentName;
-        // A character string equivalent of ErrCount
-        static bool BypassOAController; // logical to tell ManageControllers to sim or not sim controller in OA System (don't sim here)
-
         auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
         auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
 
@@ -2834,7 +2799,7 @@ namespace EnergyPlus::SimAirServingZones {
         IterTot = 0;
 
         AirLoopConvergedFlag = true;
-        BypassOAController = true; // don't simulate OA contollers at this time (see SolveWaterCoilController)
+        state.dataSimAirServingZones->BypassOAControllerSALC = true; // don't simulate OA contollers at this time (see SolveWaterCoilController)
         IsUpToDateFlag = false;
         PrimaryAirSystems(AirLoopNum).ControlConverged = false;
 
@@ -2869,7 +2834,7 @@ namespace EnergyPlus::SimAirServingZones {
                               iControllerOpColdStart,
                               ControllerConvergedFlag,
                               IsUpToDateFlag,
-                              BypassOAController,
+                              state.dataSimAirServingZones->BypassOAControllerSALC,
                               AllowWarmRestartFlag);
             // Detect whether the speculative warm restart feature is supported by each controller
             // on this air loop.
@@ -2884,7 +2849,7 @@ namespace EnergyPlus::SimAirServingZones {
         // Loop over the air sys controllers until convergence or MaxIter iterations
         for (int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystems(AirLoopNum).NumControllers; ++AirLoopControlNum) {
 
-            Iter = 0;
+            state.dataSimAirServingZones->IterSALC = 0;
             ControllerConvergedFlag = false;
             // if the controller can be locked out by the economizer operation and the economizer is active, leave the controller inactive
             if (AirLoopControlInfo(AirLoopNum).EconoActive) {
@@ -2898,7 +2863,7 @@ namespace EnergyPlus::SimAirServingZones {
             // For each controller in sequence, iterate until convergence
             while (!ControllerConvergedFlag) {
 
-                ++Iter;
+                ++state.dataSimAirServingZones->IterSALC;
 
                 ManageControllers(state,
                                   PrimaryAirSystems(AirLoopNum).ControllerName(AirLoopControlNum),
@@ -2908,21 +2873,21 @@ namespace EnergyPlus::SimAirServingZones {
                                   iControllerOpIterate,
                                   ControllerConvergedFlag,
                                   IsUpToDateFlag,
-                                  BypassOAController);
+                                  state.dataSimAirServingZones->BypassOAControllerSALC);
 
                 PrimaryAirSystems(AirLoopNum).ControlConverged(AirLoopControlNum) = ControllerConvergedFlag;
 
                 if (!ControllerConvergedFlag) {
                     // Only check abnormal termination if not yet converged
                     // The iteration counter has been exceeded.
-                    if (Iter > MaxIter) {
+                    if (state.dataSimAirServingZones->IterSALC > MaxIter) {
                         // Indicate that this air loop is not converged
                         AirLoopConvergedFlag = false;
 
                         // The warning message will be suppressed during the warm up days.
                         if (!state.dataGlobal->WarmupFlag) {
-                            ++ErrCount;
-                            if (ErrCount < 15) {
+                            ++state.dataSimAirServingZones->ErrCountSALC;
+                            if (state.dataSimAirServingZones->ErrCountSALC < 15) {
                                 ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                                 const auto CharErrOut = fmt::to_string(MaxIter);
                                 ShowWarningError(state, "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
@@ -2931,12 +2896,12 @@ namespace EnergyPlus::SimAirServingZones {
                                                  state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state));
                             } else {
                                 if (state.dataEnvrn->EnvironmentName != ErrEnvironmentName) {
-                                    MaxErrCount = 0;
+                                    state.dataSimAirServingZones->MaxErrCountSALC = 0;
                                     ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                                 }
                                 ShowRecurringWarningErrorAtEnd(state, "SolveAirLoopControllers: Exceeding Maximum iterations for " +
                                                                    PrimaryAirSystems(AirLoopNum).Name + " during " + state.dataEnvrn->EnvironmentName + " continues",
-                                                               MaxErrCount);
+                                                               state.dataSimAirServingZones->MaxErrCountSALC);
                             }
                         }
 
@@ -2962,10 +2927,10 @@ namespace EnergyPlus::SimAirServingZones {
             } // End of the Convergence Iteration
 
             // Update tracker for max iteration counter across all controllers on this air loops
-            IterMax = max(IterMax, Iter);
+            IterMax = max(IterMax, state.dataSimAirServingZones->IterSALC);
             // Update tracker for aggregated counter of air loop inner iterations across controllers
             // on this air loop
-            IterTot += Iter;
+            IterTot += state.dataSimAirServingZones->IterSALC;
 
         } // End of controller loop
 
@@ -2990,7 +2955,7 @@ namespace EnergyPlus::SimAirServingZones {
                               iControllerOpEnd,
                               ControllerConvergedFlag,
                               IsUpToDateFlag,
-                              BypassOAController);
+                              state.dataSimAirServingZones->BypassOAControllerSALC);
 
             PrimaryAirSystems(AirLoopNum).ControlConverged(AirLoopControlNum) = ControllerConvergedFlag;
 
@@ -3052,17 +3017,9 @@ namespace EnergyPlus::SimAirServingZones {
         bool ControllerConvergedFlag;
         // TRUE when air loop has been evaluated with latest actuated variables
         bool IsUpToDateFlag;
-        // Iteration counter
-        static int Iter(0);
-        // Number of times that the maximum iterations was exceeded
-        static int ErrCount(0);
-        // Number of times that the maximum iterations was exceeded
-        static int MaxErrCount(0);
         // Placeholder for environment name used in error reporting
         static std::string ErrEnvironmentName;
         // A character string equivalent of ErrCount
-        int static AirLoopPass;
-        static bool BypassOAController;
 
         auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
         auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
@@ -3071,9 +3028,9 @@ namespace EnergyPlus::SimAirServingZones {
         if (AirLoopNum > 0) {
             AirLoopCheck = true;
         }
-        BypassOAController = false; // simulate OA water coil controllers
+        state.dataSimAirServingZones->BypassOAControllerSWCC = false; // simulate OA water coil controllers
         if (AirLoopCheck) {
-            AirLoopPass = AirLoopControlInfo(AirLoopNum).AirLoopPass;
+            state.dataSimAirServingZones->AirLoopPassSWCC = AirLoopControlInfo(AirLoopNum).AirLoopPass;
         }
         IsUpToDateFlag = false;
         if (AirLoopCheck) {
@@ -3096,7 +3053,7 @@ namespace EnergyPlus::SimAirServingZones {
                           iControllerOpColdStart,
                           ControllerConvergedFlag,
                           IsUpToDateFlag,
-                          BypassOAController,
+                          state.dataSimAirServingZones->BypassOAControllerSWCC,
                           AllowWarmRestartFlag);
 
         // Detect whether the speculative warm restart feature is supported by each controller on this air loop.
@@ -3113,7 +3070,7 @@ namespace EnergyPlus::SimAirServingZones {
         IsUpToDateFlag = true;
 
         // Loop over the air sys controllers until convergence or MaxIter iterations
-        Iter = 0;
+        state.dataSimAirServingZones->IterSWCC = 0;
         ControllerConvergedFlag = false;
         // if the controller can be locked out by the economizer operation and the economizer is active, leave the controller inactive
         if (AirLoopCheck) {
@@ -3127,7 +3084,7 @@ namespace EnergyPlus::SimAirServingZones {
         // For this controller, iterate until convergence
         while (!ControllerConvergedFlag) {
 
-            ++Iter;
+            ++state.dataSimAirServingZones->IterSWCC;
 
             ManageControllers(state,
                               ControllerName,
@@ -3137,7 +3094,7 @@ namespace EnergyPlus::SimAirServingZones {
                               iControllerOpIterate,
                               ControllerConvergedFlag,
                               IsUpToDateFlag,
-                              BypassOAController);
+                              state.dataSimAirServingZones->BypassOAControllerSWCC);
 
             if (AirLoopCheck) {
                 PrimaryAirSystems(AirLoopNum).ControlConverged(state.dataHVACControllers->ControllerProps(ControllerIndex).AirLoopControllerIndex) =
@@ -3147,12 +3104,12 @@ namespace EnergyPlus::SimAirServingZones {
             if (!ControllerConvergedFlag) {
                 // Only check abnormal termination if not yet converged
                 // The iteration counter has been exceeded.
-                if (Iter > MaxIter) {
+                if (state.dataSimAirServingZones->IterSWCC > MaxIter) {
 
                     // The warning message will be suppressed during the warm up days.
                     if (!state.dataGlobal->WarmupFlag) {
-                        ++ErrCount;
-                        if (ErrCount < 15) {
+                        ++state.dataSimAirServingZones->ErrCountSWCC;
+                        if (state.dataSimAirServingZones->ErrCountSWCC < 15) {
                             ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                             const auto CharErrOut = fmt::to_string(MaxIter);
                             ShowWarningError(state, "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
@@ -3160,12 +3117,12 @@ namespace EnergyPlus::SimAirServingZones {
                                              ' ' + CreateSysTimeIntervalString(state));
                         } else {
                             if (state.dataEnvrn->EnvironmentName != ErrEnvironmentName) {
-                                MaxErrCount = 0;
+                                state.dataSimAirServingZones->MaxErrCountSWCC = 0;
                                 ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                             }
                             ShowRecurringWarningErrorAtEnd(state, "SolveAirLoopControllers: Exceeding Maximum iterations for " +
                                                                PrimaryAirSystems(AirLoopNum).Name + " during " + state.dataEnvrn->EnvironmentName + " continues",
-                                                           MaxErrCount);
+                                                           state.dataSimAirServingZones->MaxErrCountSWCC);
                         }
                     }
 
@@ -3199,7 +3156,7 @@ namespace EnergyPlus::SimAirServingZones {
                           iControllerOpEnd,
                           ControllerConvergedFlag,
                           IsUpToDateFlag,
-                          BypassOAController);
+                          state.dataSimAirServingZones->BypassOAControllerSWCC);
 
         // pass convergence of OA system water coils back to SolveAirLoopControllers via PrimaryAirSystem().ControlConverged flag
         if (AirLoopCheck) {
@@ -3260,7 +3217,6 @@ namespace EnergyPlus::SimAirServingZones {
         // TRUE when air loop needs to be refreshed.
         // Note that it is not used by ManageControllers() in the WARM_RESTART mode.
         bool IsUpToDateFlag;
-        static bool BypassOAController; // logical to bypass HVAC controller calcs
 
         auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
 
@@ -3272,7 +3228,7 @@ namespace EnergyPlus::SimAirServingZones {
         IterTot = 0;
 
         AirLoopConvergedFlag = true;
-        BypassOAController = false; // not exactly sure of this but it seems all controllers need to be simulated -- don't bypass
+        state.dataSimAirServingZones->BypassOAControllerRSALC = false; // not exactly sure of this but it seems all controllers need to be simulated -- don't bypass
         IsUpToDateFlag = false;
         PrimaryAirSystems(AirLoopNum).ControlConverged = false;
 
@@ -3289,7 +3245,7 @@ namespace EnergyPlus::SimAirServingZones {
                               iControllerOpWarmRestart,
                               ControllerConvergedFlag,
                               IsUpToDateFlag,
-                              BypassOAController);
+                              state.dataSimAirServingZones->BypassOAControllerRSALC);
         }
 
         // Evaluate air loop components with new actuated variables
@@ -3311,7 +3267,7 @@ namespace EnergyPlus::SimAirServingZones {
                               iControllerOpEnd,
                               ControllerConvergedFlag,
                               IsUpToDateFlag,
-                              BypassOAController);
+                              state.dataSimAirServingZones->BypassOAControllerRSALC);
 
             PrimaryAirSystems(AirLoopNum).ControlConverged(AirLoopControlNum) = ControllerConvergedFlag;
 
@@ -4634,7 +4590,6 @@ namespace EnergyPlus::SimAirServingZones {
         Real64 MinOAFlow;                // design minimum outside air flow for a system
         Real64 ZoneOAFracCooling;        // zone OA fraction for cooling design air flow
         Real64 ZoneOAFracHeating;        // zone OA fraction for heating design air flow
-        static Real64 Ep(1.0);           // zone primary air fraction
         Real64 ZoneSA;                   // Zone supply air flow rate
         Real64 ZonePA;                   // Zone primary air flow rate
         Real64 ClgSupplyAirAdjustFactor; // temporary variable
@@ -4777,7 +4732,7 @@ namespace EnergyPlus::SimAirServingZones {
 
                     ZoneSA = 0.0;
                     ZonePA = 0.0;
-                    Ep = 1.0;
+                    state.dataSimAirServingZones->EpSSOA = 1.0;
                     if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0) { // multi-path system
                         // Vpz: "Primary" supply air from main air handler served by an oa mixer
                         ZonePA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow;
@@ -4822,9 +4777,9 @@ namespace EnergyPlus::SimAirServingZones {
                     }
 
                     // calc zone primary air fraction
-                    if (ZoneSA > 0.0) Ep = ZonePA / ZoneSA;
-                    if (Ep > 1.0) Ep = 1.0;
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFraction = Ep;
+                    if (ZoneSA > 0.0) state.dataSimAirServingZones->EpSSOA = ZonePA / ZoneSA;
+                    if (state.dataSimAirServingZones->EpSSOA > 1.0) state.dataSimAirServingZones->EpSSOA = 1.0;
+                    TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFraction = state.dataSimAirServingZones->EpSSOA;
                     TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneOAFracCooling = ZoneOAFracCooling;
 
                     // determined cooled zone floor area in an airloop
@@ -4942,7 +4897,7 @@ namespace EnergyPlus::SimAirServingZones {
 
                         ZoneSA = 0.0;
                         ZonePA = 0.0;
-                        Ep = 1.0;
+                        state.dataSimAirServingZones->EpSSOA = 1.0;
                         if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0) { // multi-path system
                             // Vpz: "Primary" supply air from main air handler served by an oa mixer
                             ZonePA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
@@ -4978,9 +4933,9 @@ namespace EnergyPlus::SimAirServingZones {
                         }
 
                         // calc zone primary air fraction
-                        if (ZoneSA > 0.0) Ep = ZonePA / ZoneSA;
-                        if (Ep > 1.0) Ep = 1.0;
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg = Ep;
+                        if (ZoneSA > 0.0) state.dataSimAirServingZones->EpSSOA = ZonePA / ZoneSA;
+                        if (state.dataSimAirServingZones->EpSSOA > 1.0) state.dataSimAirServingZones->EpSSOA = 1.0;
+                        TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg = state.dataSimAirServingZones->EpSSOA;
                         TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneOAFracHeating = ZoneOAFracHeating;
 
                         // determined heated zone floor area in an airloop
@@ -5062,10 +5017,10 @@ namespace EnergyPlus::SimAirServingZones {
                         }
 
                         // calc zone primary air fraction
-                        Ep = 1.0;
-                        if (ZoneSA > 0.0) Ep = ZonePA / ZoneSA;
-                        if (Ep > 1.0) Ep = 1.0;
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg = Ep;
+                        state.dataSimAirServingZones->EpSSOA = 1.0;
+                        if (ZoneSA > 0.0) state.dataSimAirServingZones->EpSSOA = ZonePA / ZoneSA;
+                        if (state.dataSimAirServingZones->EpSSOA > 1.0) state.dataSimAirServingZones->EpSSOA = 1.0;
+                        TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg = state.dataSimAirServingZones->EpSSOA;
                         TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneOAFracHeating = ZoneOAFracHeating;
                         TermUnitFinalZoneSizing(TermUnitSizingIndex).SupplyAirAdjustFactor = max(ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor);
 

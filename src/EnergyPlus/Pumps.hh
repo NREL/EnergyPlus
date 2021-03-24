@@ -285,6 +285,16 @@ struct PumpsData : BaseGlobalStruct {
     Array1D<Pumps::ReportVars> PumpEquipReport;
     std::unordered_map<std::string, std::string> PumpUniqueNames;
 
+    int iDummyWaterIndex = 1;
+    int ipDummyWaterIndex = 1;
+    int spDummyWaterIndex = 1;
+    Real64 PumpMassFlowRateMaxPress = 0.0; // Maximum mass flow rate associated with maximum pressure limit
+    Real64 PumpMassFlowRateMinPress = 0.0; // Minimum mass flow rate associated with minimum pressure limit
+    Real64 GRMFRRotSpeed_Max = 0.0;             // Maximum rotational speed in rps
+    Real64 GRMFRRotSpeed_Min = 0.0;             // Minimum rotational speed in rps
+    Real64 GRMFRMinPress = 0.0;                 // Minimum pressure
+    Real64 GRMFRMaxPress = 0.0;                 // Maximum pressure
+
     void clear_state() override
     {
         this->NumPumps = 0;
@@ -298,6 +308,16 @@ struct PumpsData : BaseGlobalStruct {
         this->PumpEquip.deallocate();
         this->PumpEquipReport.deallocate();
         this->PumpUniqueNames.clear();
+
+        this->iDummyWaterIndex = 1;
+        this->ipDummyWaterIndex = 1;
+        this->spDummyWaterIndex = 1;
+        this->PumpMassFlowRateMaxPress = 0.0; // Maximum mass flow rate associated with maximum pressure limit
+        this->PumpMassFlowRateMinPress = 0.0; // Minimum mass flow rate associated with minimum pressure limit
+        this->GRMFRRotSpeed_Max = 0.0;             // Maximum rotational speed in rps
+        this->GRMFRRotSpeed_Min = 0.0;             // Minimum rotational speed in rps
+        this->GRMFRMinPress = 0.0;                 // Minimum pressure
+        this->GRMFRMaxPress = 0.0;                 // Maximum pressure
     }
 };
 
