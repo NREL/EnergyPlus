@@ -637,10 +637,10 @@ struct MixedAirData : BaseGlobalStruct {
         this->VentilationMechanical.deallocate();
         this->ControllerListUniqueNames.clear();
         this->OAControllerUniqueNames.clear();
-        this->OAControllerMyOneTimeFlag;
-        this->OAControllerMyEnvrnFlag;
-        this->OAControllerMySizeFlag;
-        this->MechVentCheckFlag;
+        this->OAControllerMyOneTimeFlag.clear();
+        this->OAControllerMyEnvrnFlag.clear();
+        this->OAControllerMySizeFlag.clear();
+        this->MechVentCheckFlag.clear();
     }
 };
 
