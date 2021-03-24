@@ -1085,20 +1085,8 @@ namespace EnergyPlus::SystemReports {
         int DemandSideLoopType;
         bool found;
 
-        struct IdentifyLoop
-        {
-            // Members
-            int LoopNum;
-            int LoopType;
-
-            // Default Constructor
-            IdentifyLoop() : LoopNum(0), LoopType(0)
-            {
-            }
-        };
-
         // Object Data
-        static Array1D<IdentifyLoop> LoopStack;
+        auto & LoopStack = state.dataSysRpts->LoopStack;
 
         return; // Autodesk:? Is this routine now an intentional NOOP?
 
