@@ -342,20 +342,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
         Real64 sc_NOSD;
         Real64 hflux_NOSD;
         Real64 shgc_NOSD;
-//        Real64 hout_NOSD;
-//        static Array1D<Real64> gap_NOSD(maxlay);
-//        static Array1D<Real64> thick_NOSD(maxlay);
-//        static Array1D<Real64> scon_NOSD(maxlay);
-//        static Array1D<Real64> emis_NOSD(maxlay2);
-//        static Array1D<Real64> rir_NOSD(maxlay2);
-//        static Array1D<Real64> tir_NOSD(maxlay2);
-//        static Array1D<Real64> theta_NOSD(maxlay2);
-//        static Array2D<Real64> frct_NOSD(maxgas, maxlay1);
-//        static Array2D_int iprop_NOSD(maxgas, maxlay1);
-//        static Array1D_int nmix_NOSD(maxlay1);
-//        static Array1D<Real64> presure_NOSD(maxlay1);
-//        static Array1D<Real64> hcgas_NOSD(maxlay1);
-//        static Array1D<Real64> hrgas_NOSD(maxlay1);
+        Real64 hout_NOSD;
         // REAL(r64) ::  rs_NOSD(maxlay3)!,sol(maxlay)
         static Array1D<Real64> LaminateA_NOSD(maxlay);
         static Array1D<Real64> LaminateB_NOSD(maxlay);
@@ -810,11 +797,11 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 state.dataThermalISO15099Calc->nmix_NOSD(nlayer_NOSD + 1) = nmix(nlayer + 1);
                 state.dataThermalISO15099Calc->presure_NOSD(nlayer_NOSD + 1) = presure(nlayer + 1);
                 for (j = 1; j <= nmix(1); ++j) {
-                    state.dataThermalISO15099Calc->frct_NOSD(j, 1) = iprop(j, 1);
+                    state.dataThermalISO15099Calc->iprop_NOSD(j, 1) = iprop(j, 1);
                     state.dataThermalISO15099Calc->frct_NOSD(j, 1) = frct(j, 1);
                 }
                 for (j = 1; j <= nmix(nlayer_NOSD + 1); ++j) {
-                    state.dataThermalISO15099Calc->frct_NOSD(j, nlayer_NOSD + 1) = iprop(j, nlayer + 1);
+                    state.dataThermalISO15099Calc->iprop_NOSD(j, nlayer_NOSD + 1) = iprop(j, nlayer + 1);
                     state.dataThermalISO15099Calc->frct_NOSD(j, nlayer_NOSD + 1) = frct(j, nlayer + 1);
                 }
                 for (i = 1; i <= nlayer_NOSD; ++i) {
@@ -852,7 +839,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                         state.dataThermalISO15099Calc->nmix_NOSD(i + 1) = nmix(OriginalIndex + 1);
                         state.dataThermalISO15099Calc->presure_NOSD(i + 1) = presure(OriginalIndex + 1);
                         for (j = 1; j <= state.dataThermalISO15099Calc->nmix_NOSD(i + 1); ++j) {
-                            state.dataThermalISO15099Calc->frct_NOSD(j, i + 1) = iprop(j, OriginalIndex + 1);
+                            state.dataThermalISO15099Calc->iprop_NOSD(j, i + 1) = iprop(j, OriginalIndex + 1);
                             state.dataThermalISO15099Calc->frct_NOSD(j, i + 1) = frct(j, OriginalIndex + 1);
                         }
                     }
@@ -875,7 +862,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                     print(files.DebugOutputFile, "UNSHADED RUN:\n");
                     print(files.DebugOutputFile, "\n");
 
-                    WriteInputArguments(state, files.DebugOutputFile,
+                    WriteInputArguments(state,
+                                        files.DebugOutputFile,
                                         files.DBGD,
                                         tout,
                                         tind,
@@ -929,7 +917,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                                         state.dataThermalISO15099Calc->tvent_NOSD,
                                         state.dataThermalISO15099Calc->presure_NOSD,
                                         state.dataThermalISO15099Calc->nmix_NOSD,
-                                        state.dataThermalISO15099Calc->frct_NOSD,
+                                        state.dataThermalISO15099Calc->iprop_NOSD,
                                         state.dataThermalISO15099Calc->frct_NOSD,
                                         xgcon,
                                         xgvis,
@@ -970,7 +958,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                         height,
                         heightt,
                         width,
-                        state.dataThermalISO15099Calc->frct_NOSD,
+                        state.dataThermalISO15099Calc->iprop_NOSD,
                         state.dataThermalISO15099Calc->frct_NOSD,
                         state.dataThermalISO15099Calc->presure_NOSD,
                         state.dataThermalISO15099Calc->nmix_NOSD,
