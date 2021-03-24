@@ -812,6 +812,54 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->sin_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2); // sin( Phi ) table
         this->cos_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // cos( Theta ) table
         this->sin_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // sin( Theta ) table
+
+        this->IConstShaded = 0;
+        this->VTDark = 0.0;
+        this->VTMULT = 1.0;
+
+        this->DayltgInteriorMapIllumDFSKHR.clear();
+        this->DayltgInteriorMapIllumBFSKHR.clear();
+        this->DayltgInteriorMapIllumSFSKHR.clear();
+        this->BACLUM.clear();
+        this->DayltgInteriorMapIllumGLRNDX.clear();
+        this->daylight_illum.clear();
+        this->FLFWSU.clear();
+        this->FLFWSUdisk.clear();
+        this->FLCWSU.clear();
+        this->TransMult.clear();
+        this->DayltgInterReflectedIllumTransBmBmMult.clear();
+        this->TransBmBmMult.clear();
+        this->TransBmBmMultRefl.clear();
+        this->PH.clear();
+        this->TH.clear();
+        this->SPHCPH.clear();
+        this->SetPnt.clear();
+        this->GLRNDX.clear();
+        this->GLRNEW.clear();
+        this->FLCWSK.clear();
+        this->SkyObstructionMult.clear();
+        this->FLFWSK.clear();
+        this->ObTransM.clear();
+        this->SFSKHR.clear();
+        this->DFSKHR.clear();
+        this->BFSKHR.clear();
+        this->tmpIllumFromWinAtRefPt.clear();
+        this->tmpBackLumFromWinAtRefPt.clear();
+        this->tmpSourceLumFromWinAtRefPt.clear();
+        this->FirstTimeMaps.clear();
+        this->EnvrnPrint.clear();
+        this->SavedMnDy.clear();
+        this->RefPts.clear();
+        this->XValue.clear();
+        this->YValue.clear();
+        this->IllumValue.clear();
+
+        this->tmpSWSL1 = 0.0;
+        this->tmpSWSL2 = 0.0;
+        this->tmpSWFactor = 0.0;
+        this->tmpMult = 0.0;
+        this->GlareOK = false;
+        this->blnCycle = false;
     }
 };
 
