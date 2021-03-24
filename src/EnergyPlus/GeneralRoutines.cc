@@ -189,7 +189,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
     // Interval Half Type used for Controller
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static int Iter(0); // Iteration limit for the interval halving process
+    int Iter(0); // Iteration limit for the interval halving process
     Real64 CpAir;       // specific heat of air (J/kg-C)
     bool Converged;
     Real64 Denom;   // the denominator of the control signal
@@ -198,70 +198,12 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
     // INTEGER, SAVE    :: ErrCount1=0 ! for recurring error
     bool WaterCoilAirFlowControl;   // True if controlling air flow through water coil, water flow fixed
     int SimCompNum;                 // internal number for case statement
-    static Real64 HalvingPrec(0.0); // precision of halving algorithm
+    Real64 HalvingPrec(0.0); // precision of halving algorithm
     bool BBConvergeCheckFlag;       // additional check on convergence specifically for radiant/convective baseboard units
 
-    struct IntervalHalf
-    {
-        // Members
-        Real64 MaxFlow;
-        Real64 MinFlow;
-        Real64 MaxResult;
-        Real64 MinResult;
-        Real64 MidFlow;
-        Real64 MidResult;
-        bool MaxFlowCalc;
-        bool MinFlowCalc;
-        bool MinFlowResult;
-        bool NormFlowCalc;
-
-        // Default Constructor
-        IntervalHalf() = default;
-
-        // Member Constructor
-        IntervalHalf(Real64 const MaxFlow,
-                     Real64 const MinFlow,
-                     Real64 const MaxResult,
-                     Real64 const MinResult,
-                     Real64 const MidFlow,
-                     Real64 const MidResult,
-                     bool const MaxFlowCalc,
-                     bool const MinFlowCalc,
-                     bool const MinFlowResult,
-                     bool const NormFlowCalc)
-            : MaxFlow(MaxFlow), MinFlow(MinFlow), MaxResult(MaxResult), MinResult(MinResult), MidFlow(MidFlow), MidResult(MidResult),
-              MaxFlowCalc(MaxFlowCalc), MinFlowCalc(MinFlowCalc), MinFlowResult(MinFlowResult), NormFlowCalc(NormFlowCalc)
-        {
-        }
-    };
-
-    struct ZoneEquipControllerProps
-    {
-        // Members
-        Real64 SetPoint;           // Desired setpoint;
-        Real64 MaxSetPoint;        // The maximum setpoint; either user input or reset per time step by simulation
-        Real64 MinSetPoint;        // The minimum setpoint; either user input or reset per time step by simulation
-        Real64 SensedValue;        // The sensed control variable of any type
-        Real64 CalculatedSetPoint; // The Calculated SetPoint or new control actuated value
-
-        // Default Constructor
-        ZoneEquipControllerProps() = default;
-
-        // Member Constructor
-        ZoneEquipControllerProps(Real64 const SetPoint,          // Desired setpoint;
-                                 Real64 const MaxSetPoint,       // The maximum setpoint; either user input or reset per time step by simulation
-                                 Real64 const MinSetPoint,       // The minimum setpoint; either user input or reset per time step by simulation
-                                 Real64 const SensedValue,       // The sensed control variable of any type
-                                 Real64 const CalculatedSetPoint // The Calculated SetPoint or new control actuated value
-                                 )
-            : SetPoint(SetPoint), MaxSetPoint(MaxSetPoint), MinSetPoint(MinSetPoint), SensedValue(SensedValue), CalculatedSetPoint(CalculatedSetPoint)
-        {
-        }
-    };
-
     // Object Data
-    static IntervalHalf ZoneInterHalf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false, false);
-    static ZoneEquipControllerProps ZoneController(0.0, 0.0, 0.0, 0.0, 0.0);
+    auto & ZoneInterHalf = state.dataGeneralRoutines->ZoneInterHalf;
+    auto & ZoneController = state.dataGeneralRoutines->ZoneController;
 
     if (ControlCompTypeNum != 0) {
         SimCompNum = ControlCompTypeNum;

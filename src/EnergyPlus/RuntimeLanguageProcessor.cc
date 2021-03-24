@@ -104,10 +104,10 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
-        static Real64 tmpCurrentTime(0.0);
-        static Real64 tmpMinutes(0.0);
-        static Real64 tmpHours(0.0);
-        static Real64 tmpCurEnvirNum(0.0);
+        Real64 tmpCurrentTime(0.0);
+        Real64 tmpMinutes(0.0);
+        Real64 tmpHours(0.0);
+        Real64 tmpCurEnvirNum(0.0);
         Array1D_int datevalues(8);
         // value(1)   Current year
         // value(2)   Current month
@@ -767,7 +767,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         int InstructionNum;
         int InstructionNum2;
         int ExpressionNum;
-        static int VariableNum;
+        int VariableNum;
         int WhileLoopExitCounter;      // to avoid infinite loop in While loop
         bool seriousErrorFound(false); // once it gets set true (inside EvaluateExpresssion) it will trigger a fatal (in WriteTrace)
 
@@ -1021,8 +1021,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         bool LastED; // last character in a numeric was an E or D
 
         // Object Data
-        static Array1D<TokenType> Token;
-
+        auto & Token = state.dataRuntimeLangProcessor->Token;
 
         CountDoLooping = 0;
         NumErrors = 0;
@@ -2495,21 +2494,21 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         int VariableNum(0); // temporary
         int RuntimeReportVarNum;
         bool Found;
-        static std::string FreqString;    // temporary
-        static std::string VarTypeString; // temporary
-        static std::string ResourceTypeString;
-        static std::string GroupTypeString;
-        static std::string EndUseTypeString;
-        static std::string EndUseSubCatString;
+        std::string FreqString;    // temporary
+        std::string VarTypeString; // temporary
+        std::string ResourceTypeString;
+        std::string GroupTypeString;
+        std::string EndUseTypeString;
+        std::string EndUseSubCatString;
 
         int TrendNum;
         int NumTrendSteps;
         int loop;
         int ErlVarLoop;
         int CurveIndexNum;
-        static int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
-        static int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
-        static int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
+        int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
+        int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
+        int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;

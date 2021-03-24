@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/RootFinder.hh>
@@ -1419,7 +1420,7 @@ namespace EnergyPlus::RootFinder {
         // False position, Secant and Brent) to compute the next candidate.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 XNext(0.0);
+        auto & XNext = state.dataGeneral->XNext;
 
         //----------------------------------------------------------------------------
         // First attempt to bracket root between a lower point and an upper point.

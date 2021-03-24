@@ -6196,7 +6196,7 @@ namespace EnergyPlus::RefrigeratedCase {
         auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
         auto &CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
 
-        static std::string Walkin_and_zone_name; // concat name for walk-in/zone credit reporting
+        std::string Walkin_and_zone_name; // concat name for walk-in/zone credit reporting
 
         if (state.dataRefrigCase->NumSimulationCases > 0) {
             // Setup Report Variables for simulated Refrigerated Case (do not report unused cases)
@@ -8724,9 +8724,9 @@ namespace EnergyPlus::RefrigeratedCase {
         // this most recent addition/subtraction is reversed before the rest of the refrigeration simulation begins.
 
         // Used to adjust accumulative variables when time step is repeated
-        static Real64 MyCurrentTimeSaved(0.0);   // Used to determine whether the zone time step is a repetition
-        static Real64 MyStepStartTimeSaved(0.0); // Used to determine whether the system time step is a repetition
-        static Real64 TimeStepFraction(0.0);     // Used to calculate my current time
+        auto & MyCurrentTimeSaved = state.dataRefrigCase->MyCurrentTimeSaved;   // Used to determine whether the zone time step is a repetition
+        auto & MyStepStartTimeSaved = state.dataRefrigCase->MyStepStartTimeSaved; // Used to determine whether the system time step is a repetition
+        auto & TimeStepFraction = state.dataRefrigCase->TimeStepFraction;     // Used to calculate my current time
 
         auto &RefrigCase(state.dataRefrigCase->RefrigCase);
         auto &RefrigRack(state.dataRefrigCase->RefrigRack);

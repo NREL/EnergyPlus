@@ -1134,7 +1134,7 @@ namespace Photovoltaics {
         auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag;
+        auto & MyEnvrnFlag = state.dataPhotovoltaicState->MyEnvrnFlag;
         Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 
         // perform the one time initializations
@@ -1198,8 +1198,7 @@ namespace Photovoltaics {
         Real64 const MinInsolation(30.0);
         int const KMAX(100);
         Real64 const EtaIni(0.10); // initial value of eta
-
-        static Real64 PVTimeStep; // internal timestep (in seconds) for cell temperature mode 3
+        auto & PVTimeStep = state.dataPhotovoltaicState->PVTimeStep;
         Real64 DummyErr;
         Real64 ETA;
         Real64 Tambient;
@@ -1229,7 +1228,6 @@ namespace Photovoltaics {
         int K;
         Real64 CellTemp(0.0); // cell temperature in Kelvin
         Real64 CellTempC;     // cell temperature in degrees C
-        // unused1208  INTEGER :: thisZone
 
         // if the cell temperature mode is 2, convert the timestep to seconds
         if (firstTime && state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode == CellIntegration::DecoupledUllebergDynamic) {

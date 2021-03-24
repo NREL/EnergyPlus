@@ -320,6 +320,12 @@ struct GeneratorsData : BaseGlobalStruct {
     Array1D<DataGenerators::GeneratorFuelSupplyDataStruct> FuelSupply; // fuel supply (reused across various)
     Array1D<DataGenerators::GeneratorDynamicsManagerStruct> GeneratorDynamics;
 
+    int InletCWnode = 0; // cooling water inlet node ID
+    bool InternalFlowControl = false;
+    Real64 TcwIn = 0.0;          // inlet cooling water temperature (C)
+    Real64 TrialMdotcw = 0.0;    // test or estimate of what the plant flows are going to be (kg/s)
+    Real64 LimitMinMdotcw = 0.0; // lower limit for cooling water flow for generatior operation (kg/s)
+
     void clear_state() override
     {
         NumFuelConstit = 0;
@@ -328,6 +334,11 @@ struct GeneratorsData : BaseGlobalStruct {
         GasPhaseThermoChemistryData.deallocate();
         FuelSupply.deallocate();
         GeneratorDynamics.deallocate();
+        this->InletCWnode = 0;
+        this->InternalFlowControl = false;
+        this->TcwIn = 0.0;
+        this->TrialMdotcw = 0.0;
+        this->LimitMinMdotcw = 0.0;
     }
 };
 
