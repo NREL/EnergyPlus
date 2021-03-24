@@ -651,7 +651,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calHeater_Fix_Test)
     thisChillerHeater.HWLoopSideNum = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint; 
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
     state->dataLoopNodes->Node(3).Temp = 60.0;
@@ -669,7 +669,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calHeater_Fix_Test)
     EXPECT_NEAR(thisChillerHeater.HotWaterFlowRate, 0.5, 1e-6);
     EXPECT_NEAR(thisChillerHeater.FractionOfPeriodRunning, 1.0, 1e-6);
 
-    EXPECT_NEAR(thisChillerHeater.ElectricPower, 400, 1e-6);
+    EXPECT_NEAR(thisChillerHeater.ElectricPower, 400.0, 1e-6);
     EXPECT_NEAR(thisChillerHeater.ExhaustInTemp, 350.0, 1e-6);
     EXPECT_NEAR(thisChillerHeater.ExhaustInFlow, 0.5, 1e-6);
     EXPECT_NEAR(thisChillerHeater.ExhHeatRecPotentialHeat, 87087.5769469, 1e-6);
