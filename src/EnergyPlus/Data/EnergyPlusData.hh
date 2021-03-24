@@ -191,7 +191,6 @@ struct InternalHeatGainsData;
 struct LoopNodeData;
 struct LowTempRadiantSystemData;
 struct MaterialData;
-struct MatrixDataManagerData;
 struct MicroCHPElectricGeneratorData;
 struct MicroturbineElectricGeneratorData;
 struct MixedAirData;
@@ -441,7 +440,6 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<LoopNodeData> dataLoopNodes;
     std::unique_ptr<LowTempRadiantSystemData> dataLowTempRadSys;
     std::unique_ptr<MaterialData> dataMaterial;
-    std::unique_ptr<MatrixDataManagerData> dataMatrixDataMgr;
     std::unique_ptr<MicroCHPElectricGeneratorData> dataCHPElectGen;
     std::unique_ptr<MicroturbineElectricGeneratorData> dataMircoturbElectGen;
     std::unique_ptr<MixedAirData> dataMixedAir;

@@ -564,8 +564,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterHEATING {
         std::string ErrString;
         Real64 DutyFactor;
 
-        static Real64 CurrentSimTime(0.0);
-        static Real64 PrevSimTime(0.0);
+        auto & CurrentSimTime = state.dataHPWaterToWaterHtg->CurrentSimTime;
+        auto & PrevSimTime = state.dataHPWaterToWaterHtg->PrevSimTime;
 
         // Init Module level Variables
         if (PrevSimTime != CurrentSimTime) {

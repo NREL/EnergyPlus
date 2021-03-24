@@ -63,7 +63,6 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
@@ -94,7 +93,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HeatBalanceManager::clear_state();
     HVACDuct::clear_state();
     HVACFan::clearHVACFanObjects();
-    HVACSingleDuctInduc::clear_state();
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
     Photovoltaics::clear_state();

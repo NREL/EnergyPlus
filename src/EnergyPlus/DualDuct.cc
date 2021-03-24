@@ -237,7 +237,7 @@ namespace DualDuct {
         int CtrlZone;                                // controlled zone do loop index
         int SupAirIn;                                // controlled zone supply air inlet index
         int ADUNum;                                  // loop control to search Air Distribution Units
-        static Real64 DummyOAFlow(0.0);
+        Real64 DummyOAFlow(0.0);
 
         state.dataDualDuct->NumDualDuctConstVolDampers = inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDConstantVolume);
         state.dataDualDuct->NumDualDuctVarVolDampers = inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVariableVolume);

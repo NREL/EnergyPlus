@@ -418,7 +418,7 @@ namespace HeatBalFiniteDiffManager {
         // This subroutine sets the initial values for the FD moisture calculation
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyEnvrnFlag(true);
+        auto & MyEnvrnFlag = state.dataHeatBalFiniteDiffMgr->MyEnvrnFlag;
         int SurfNum;
         int ConstrNum; // Loop counter
         bool ErrorsFound;
@@ -1034,7 +1034,7 @@ namespace HeatBalFiniteDiffManager {
         //      finite difference procedures for
         //      all building surface constructs.
 
-        static Real64 MaxDelTemp(0.0);
+        Real64 MaxDelTemp(0.0);
 
         auto & ConstructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD;
         auto & SurfaceFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD;

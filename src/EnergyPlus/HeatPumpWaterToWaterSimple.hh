@@ -213,6 +213,8 @@ struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct
     bool GetInputFlag = true;
     Array1D<HeatPumpWaterToWaterSimple::GshpSpecs> GSHP;
     std::unordered_map<std::string, std::string> HeatPumpWaterUniqueNames;
+    Real64 CurrentSimTime = 0.0;
+    Real64 PrevSimTime = 0.0;
 
     void clear_state() override
     {
@@ -220,6 +222,8 @@ struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct
         this->GetInputFlag = true;
         this->GSHP.deallocate();
         this->HeatPumpWaterUniqueNames.clear();
+        this->CurrentSimTime = 0.0;
+        this->PrevSimTime = 0.0;
     }
 };
 
