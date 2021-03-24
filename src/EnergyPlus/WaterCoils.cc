@@ -270,9 +270,9 @@ namespace EnergyPlus::WaterCoils {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum; // The WaterCoil that you are currently loading input into
-        int NumSimpHeat(0);
-        int NumFlatFin(0);
-        int NumCooling(0);
+        static int NumSimpHeat(0);
+        static int NumFlatFin(0);
+        static int NumCooling(0);
         int SimpHeatNum;
         int FlatFinNum;
         int CoolingNum;
@@ -286,9 +286,9 @@ namespace EnergyPlus::WaterCoils {
         Array1D<Real64> NumArray;        // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        int MaxNums(0);                  // Maximum number of numeric input fields
-        int MaxAlphas(0);                // Maximum number of alpha input fields
-        int TotalArgs(0);                // Total number of alpha and numeric arguments (max) for a
+        static int MaxNums(0);           // Maximum number of numeric input fields
+        static int MaxAlphas(0);         // Maximum number of alpha input fields
+        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
         bool ErrorsFound(false); // If errors detected in input
 
@@ -888,9 +888,9 @@ namespace EnergyPlus::WaterCoils {
         using SimAirServingZones::CheckWaterCoilIsOnAirLoop;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr Real64 SmallNo(1.e-9); // SmallNo number in place of zero
-        constexpr int itmax(10);
-        constexpr int MaxIte(500); // Maximum number of iterations
+        Real64 const SmallNo(1.e-9); // SmallNo number in place of zero
+        int const itmax(10);
+        int const MaxIte(500); // Maximum number of iterations
         static std::string const RoutineName("InitWaterCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -914,13 +914,23 @@ namespace EnergyPlus::WaterCoils {
         int icvg;                          // Iteration convergence flag
         Real64 ResultX;                    // Output variable from ITERATE function.
         int Ipass;                         // loop index for App_Dewpoint_Loop
-        Real64 TOutNew(0.0);               // reset outlet air temperature for Coil:Cooling:Water
-        Real64 WOutNew(0.0);               // reset outlet air humidity ratio for Coil:Cooling:Water
+        static Real64 TOutNew(0.0);        // reset outlet air temperature for Coil:Cooling:Water
+        static Real64 WOutNew(0.0);        // reset outlet air humidity ratio for Coil:Cooling:Water
 
         int AirInletNode;
         int WaterInletNode;
         int WaterOutletNode;
 
+        static Array1D<Real64> DesCpAir;        // CpAir at Design Inlet Air Temp
+        static Array1D<Real64> DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
+        /////////// hoisted into namespace InitWaterCoilOneTimeFlag
+        // static bool MyOneTimeFlag( true );
+        /////////////////////////
+        static Array1D_bool MyEnvrnFlag;
+        static Array1D_bool MyCoilReportFlag;
+        static Array1D_bool PlantLoopScanFlag;
+
+        static Array1D<Real64> CoefSeries(5); // Tuned Changed to static: High call count: Set before use
         Real64 FinDiamVar;
         Real64 TubeToFinDiamRatio;
 
@@ -929,19 +939,21 @@ namespace EnergyPlus::WaterCoils {
         Real64 UA0;      // lower bound for UA
         Real64 UA1;      // upper bound for UA
         Real64 UA;
+        static Array1D<Real64> Par(4); // Tuned Changed to static: High call count: Set before use
 
-        bool NoSatCurveIntersect(false); // TRUE if failed to find apparatus dew-point
-        bool BelowInletWaterTemp(false); // TRUE if apparatus dew-point below design inlet water temperature
-        bool CBFTooLarge(false);         // TRUE if the coil bypass factor is unrealistically large
-        bool NoExitCondReset(false);     // TRUE if exit condition reset is not to be done
+        static bool NoSatCurveIntersect(false); // TRUE if failed to find appatatus dew-point
+        static bool BelowInletWaterTemp(false); // TRUE if apparatus dew-point below design inlet water temperature
+        static bool CBFTooLarge(false);         // TRUE if the coil bypass factor is unrealistically large
+        static bool NoExitCondReset(false);     // TRUE if exit condition reset is not to be done
 
-        Real64 RatedLatentCapacity(0.0); // latent cooling capacity at the rating point [W]
-        Real64 RatedSHR(0.0);            // sensible heat ratio at the rating point
-        Real64 CapacitanceWater(0.0);    // capacitance of the water stream [W/K]
-        Real64 CMin(0.0);                // minimum capacitance of 2 streams [W/K]
-        Real64 CoilEffectiveness(0.0);   // effectiveness of the coil (rated)
-        Real64 SurfaceArea(0.0);         // heat exchanger surface area, [m2]
-        Real64 UATotal(0.0);             // heat exchanger UA total, [W/C]
+        static Real64 RatedLatentCapacity(0.0); // latent cooling capacity at the rating point [W]
+        static Real64 RatedSHR(0.0);            // sensible heat ratio at the rating point
+        static Real64 CapacitanceWater(0.0);    // capacitance of the water stream [W/K]
+        static Real64 CMin(0.0);                // minimum capacitance of 2 streams [W/K]
+        static Real64 CoilEffectiveness(0.0);   // effectiveness of the coil (rated)
+        static Real64 SurfaceArea(0.0);         // heat exchanger surface area, [m2]
+        static Real64 UATotal(0.0);             // heat exchanger UA total, [W/C]
+        static Array1D_bool RptCoilHeaderFlag(2, true);
 
         Real64 DesUACoilExternalEnth; // enthalpy based UAExternal for wet coil surface {kg/s}
         Real64 LogMeanEnthDiff;       // long mean enthalpy difference {J/kg}
@@ -954,33 +966,33 @@ namespace EnergyPlus::WaterCoils {
         Real64 Cp;  // local fluid specific heat
         Real64 rho; // local fluid density
         bool errFlag;
-        Real64 EnthCorrFrac(0.0); // enthalpy correction factor
-        Real64 TempCorrFrac(0.0); // temperature correction factor
+        static Real64 EnthCorrFrac(0.0); // enthalpy correction factor
+        static Real64 TempCorrFrac(0.0); // temperature correction factor
 
         auto &Node(state.dataLoopNodes->Node);
 
         if (state.dataWaterCoils->InitWaterCoilOneTimeFlag) {
             // initialize the environment and sizing flags
-            state.dataWaterCoils->MyEnvrnFlag.allocate(state.dataWaterCoils->NumWaterCoils);
+            MyEnvrnFlag.allocate(state.dataWaterCoils->NumWaterCoils);
             state.dataWaterCoils->MySizeFlag.allocate(state.dataWaterCoils->NumWaterCoils);
             state.dataWaterCoils->CoilWarningOnceFlag.allocate(state.dataWaterCoils->NumWaterCoils);
-            state.dataWaterCoils->DesCpAir.allocate(state.dataWaterCoils->NumWaterCoils);
+            DesCpAir.allocate(state.dataWaterCoils->NumWaterCoils);
             state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(state.dataWaterCoils->NumWaterCoils);
             state.dataWaterCoils->MyCoilDesignFlag.allocate(state.dataWaterCoils->NumWaterCoils);
-            state.dataWaterCoils->MyCoilReportFlag.allocate(state.dataWaterCoils->NumWaterCoils);
-            state.dataWaterCoils->DesUARangeCheck.allocate(state.dataWaterCoils->NumWaterCoils);
-            state.dataWaterCoils->PlantLoopScanFlag.allocate(state.dataWaterCoils->NumWaterCoils);
+            MyCoilReportFlag.allocate(state.dataWaterCoils->NumWaterCoils);
+            DesUARangeCheck.allocate(state.dataWaterCoils->NumWaterCoils);
+            PlantLoopScanFlag.allocate(state.dataWaterCoils->NumWaterCoils);
 
-            state.dataWaterCoils->DesCpAir = 0.0;
-            state.dataWaterCoils->DesUARangeCheck = 0.0;
-            state.dataWaterCoils->MyEnvrnFlag = true;
+            DesCpAir = 0.0;
+            DesUARangeCheck = 0.0;
+            MyEnvrnFlag = true;
             state.dataWaterCoils->MySizeFlag = true;
             state.dataWaterCoils->CoilWarningOnceFlag = true;
             state.dataWaterCoils->MyUAAndFlowCalcFlag = true;
             state.dataWaterCoils->MyCoilDesignFlag = true;
-            state.dataWaterCoils->MyCoilReportFlag = true;
+            MyCoilReportFlag = true;
             state.dataWaterCoils->InitWaterCoilOneTimeFlag = false;
-            state.dataWaterCoils->PlantLoopScanFlag = true;
+            PlantLoopScanFlag = true;
 
             for (tempCoilNum = 1; tempCoilNum <= state.dataWaterCoils->NumWaterCoils; ++tempCoilNum) {
                 GetControllerNameAndIndex(state,
@@ -1023,7 +1035,7 @@ namespace EnergyPlus::WaterCoils {
             }
         }
 
-        if (state.dataWaterCoils->PlantLoopScanFlag(CoilNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (PlantLoopScanFlag(CoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataWaterCoils->WaterCoil(CoilNum).Name,
@@ -1041,7 +1053,7 @@ namespace EnergyPlus::WaterCoils {
             if (errFlag) {
                 ShowFatalError(state, "InitWaterCoil: Program terminated for previous conditions.");
             }
-            state.dataWaterCoils->PlantLoopScanFlag(CoilNum) = false;
+            PlantLoopScanFlag(CoilNum) = false;
         }
         if (!state.dataGlobal->SysSizingCalc && state.dataWaterCoils->MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
@@ -1051,7 +1063,7 @@ namespace EnergyPlus::WaterCoils {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && state.dataWaterCoils->MyEnvrnFlag(CoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoilNum)) {
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                    DataGlobalConstants::InitConvTemp,
@@ -1070,8 +1082,8 @@ namespace EnergyPlus::WaterCoils {
             WaterInletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
             WaterOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;
 
-            state.dataWaterCoils->DesCpAir(CoilNum) = PsyCpAirFnW(0.0);
-            state.dataWaterCoils->DesUARangeCheck(CoilNum) = (-1568.6 * state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat + 20.157);
+            DesCpAir(CoilNum) = PsyCpAirFnW(0.0);
+            DesUARangeCheck(CoilNum) = (-1568.6 * state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat + 20.157);
 
             if ((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) ||
                 (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterDetailedFlatCooling)) { // 'Cooling'
@@ -1156,9 +1168,9 @@ namespace EnergyPlus::WaterCoils {
                     ShowContinueError(state, format("  Resetting coil depth to {:.4R} meters", state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth));
                 }
 
-                CalcDryFinEffCoef(state, TubeToFinDiamRatio, state.dataWaterCoils->CoefSeries);
+                CalcDryFinEffCoef(state, TubeToFinDiamRatio, CoefSeries);
 
-                state.dataWaterCoils->WaterCoil(CoilNum).DryFinEfficncyCoef = state.dataWaterCoils->CoefSeries;
+                state.dataWaterCoils->WaterCoil(CoilNum).DryFinEfficncyCoef = CoefSeries;
 
                 FinDiamVar = 0.5 * (state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam - state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideDiam);
 
@@ -1470,11 +1482,11 @@ namespace EnergyPlus::WaterCoils {
 
                 // Now use SolveRoot to "invert" the cooling coil model to obtain the UA given the specified design inlet and outlet conditions
                 // Note that the UAs we have obtained so far are rough estimates that are the starting points for the the following iterative
-                //   calculation of the actual UAs.
-                state.dataWaterCoils->Par(1) = state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad;
-                state.dataWaterCoils->Par(2) = double(CoilNum);
-                state.dataWaterCoils->Par(3) = double(ContFanCycCoil); // fan operating mode
-                state.dataWaterCoils->Par(4) = 1.0;                    // part-load ratio
+                //   calulation of the actual UAs.
+                Par(1) = state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad;
+                Par(2) = double(CoilNum);
+                Par(3) = double(ContFanCycCoil); // fan operating mode
+                Par(4) = 1.0;                    // part-load ratio
                 state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp;
                 state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat;
                 state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp;
@@ -1484,7 +1496,7 @@ namespace EnergyPlus::WaterCoils {
                 UA0 = 0.1 * state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal;
                 UA1 = 10.0 * state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal;
                 // Invert the simple cooling coil model: given the design inlet conditions and the design load, find the design UA
-                TempSolveRoot::SolveRoot(state, 0.001, MaxIte, SolFla, UA, SimpleCoolingCoilUAResidual, UA0, UA1, state.dataWaterCoils->Par);
+                TempSolveRoot::SolveRoot(state, 0.001, MaxIte, SolFla, UA, SimpleCoolingCoilUAResidual, UA0, UA1, Par);
                 // if the numerical inversion failed, issue error messages.
                 if (SolFla == -1) {
                     ShowSevereError(state, "Calculation of cooling coil design UA failed for coil " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
@@ -1572,26 +1584,26 @@ namespace EnergyPlus::WaterCoils {
                 RatedLatentCapacity = 0.0;
                 RatedSHR = 0.0;
             }
-            state.dataWaterCoils->MyEnvrnFlag(CoilNum) = false;
+            MyEnvrnFlag(CoilNum) = false;
 
         } // End If for the Begin Environment initializations
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            state.dataWaterCoils->MyEnvrnFlag(CoilNum) = true;
+            MyEnvrnFlag(CoilNum) = true;
         }
 
         if (!state.dataGlobal->DoingSizing) {
-            if (state.dataWaterCoils->MyCoilReportFlag(CoilNum)) {
+            if (MyCoilReportFlag(CoilNum)) {
                 // create predefined report entries
-                state.dataWaterCoils->MyCoilReportFlag(CoilNum) = false;
+                MyCoilReportFlag(CoilNum) = false;
                 {
                     auto const SELECT_CASE_var(state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
                     if (SELECT_CASE_var == DataPlant::TypeOf_CoilWaterSimpleHeating) {
-                        if (state.dataWaterCoils->RptCoilHeaderFlag(1)) {
+                        if (RptCoilHeaderFlag(1)) {
                             print(state.files.eio,
                                   "{}",
                                   "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}\n");
-                            state.dataWaterCoils->RptCoilHeaderFlag(1) = false;
+                            RptCoilHeaderFlag(1) = false;
                         }
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Heating:Water");
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate);
@@ -1617,13 +1629,13 @@ namespace EnergyPlus::WaterCoils {
                                                                                    state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum,
                                                                                    state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum); // coil report
                     } else if (SELECT_CASE_var == DataPlant::TypeOf_CoilWaterDetailedFlatCooling) {
-                        if (state.dataWaterCoils->RptCoilHeaderFlag(2)) {
+                        if (RptCoilHeaderFlag(2)) {
                             print(state.files.eio,
                                   "{}\n",
                                   "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
                                   "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
                                   "Sensible Heat Ratio");
-                            state.dataWaterCoils->RptCoilHeaderFlag(2) = false;
+                            RptCoilHeaderFlag(2) = false;
                         }
                         RatedLatentCapacity = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate - state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate;
                         RatedSHR = SafeDivide(state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
@@ -1657,13 +1669,13 @@ namespace EnergyPlus::WaterCoils {
                                                                             state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum,
                                                                             state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum); // Coil Report
                     } else if (SELECT_CASE_var == DataPlant::TypeOf_CoilWaterCooling) {
-                        if (state.dataWaterCoils->RptCoilHeaderFlag(2)) {
+                        if (RptCoilHeaderFlag(2)) {
                             print(state.files.eio,
                                   "{}\n",
                                   "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
                                   "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
                                   "Sensible Heat Ratio, Nominal Coil UA Value {W/C}, Nominal Coil Surface Area {m2}");
-                            state.dataWaterCoils->RptCoilHeaderFlag(2) = false;
+                            RptCoilHeaderFlag(2) = false;
                         }
                         RatedLatentCapacity = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate - state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate;
                         RatedSHR = SafeDivide(state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
@@ -2931,11 +2943,11 @@ namespace EnergyPlus::WaterCoils {
         static Real64 const exp_35(std::exp(-0.3574));
         static std::string const RoutineName("CalcDetailFlatFinCoolingCoil");
 
-        constexpr Real64 AirViscosity(1.846e-5); // Dynamic Viscosity of Air in kg/(m.s)
-        constexpr Real64 ConvK(1.0e-3);          // Unit conversion factor
-        constexpr Real64 unity(1.0);
-        constexpr Real64 zero(0.0);
-        constexpr Real64 TubeFoulFactor(5.0e-2); // Inside tube fouling factor for water, in m2K/kW
+        Real64 const AirViscosity(1.846e-5); // Dynamic Viscosity of Air in kg/(m.s)
+        Real64 const ConvK(1.0e-3);          // Unit conversion factor
+        Real64 const unity(1.0);
+        Real64 const zero(0.0);
+        Real64 const TubeFoulFactor(5.0e-2); // Inside tube fouling factor for water, in m2K/kW
         // Changed from m2K/W to m2K/kW for consistency with the
         // other parameters in "TubeFoulThermResis" calculation
 
@@ -2947,8 +2959,10 @@ namespace EnergyPlus::WaterCoils {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoefPointer;
+        //    INTEGER :: CoolCoilErrs = 0
         int PartWetIterations;
         int WaterTempConvgLoop;
+
         bool CoilPartWetConvg;
         bool WaterTempConvg;
 
@@ -4436,9 +4450,9 @@ namespace EnergyPlus::WaterCoils {
         Real64 MaximumCapacityStream;     // Maximum capacity rate of the streams(W/C)
         Real64 RatioStreamCapacity;       // Ratio of minimum to maximum capacity rate
         Real64 NTU;                       // Number of transfer units
-        Real64 effectiveness(0.0);        // Heat exchanger effectiveness
+        static Real64 effectiveness(0.0); // Heat exchanger effectiveness
         Real64 MaxHeatTransfer;           // Maximum heat transfer possible(W)
-        Real64 e;                         // Intermediate variables in effectiveness equation
+        Real64 e;                         // Intermediate variables in effectivness equation
         Real64 eta;
         Real64 b;
         Real64 d;
@@ -4837,6 +4851,7 @@ namespace EnergyPlus::WaterCoils {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        static Array2D<Real64> OrderedPair(state.dataWaterCoils->MaxOrderedPairs, 2); // Tuned Changed to static: Set before use
         Real64 FAI;
         Real64 FED;
         Real64 FEDnumerator;
@@ -4858,7 +4873,7 @@ namespace EnergyPlus::WaterCoils {
         Real64 RO;
 
         FAI = 0.02;
-        for (I = 1; I <= WaterCoils::MaxOrderedPairs; ++I) {
+        for (I = 1; I <= state.dataWaterCoils->MaxOrderedPairs; ++I) {
             FAI += 0.035;
             R1 = FAI / (1.0 - OutTubeEffFinDiamRatio);
             R2 = R1 * OutTubeEffFinDiamRatio;
@@ -4876,10 +4891,10 @@ namespace EnergyPlus::WaterCoils {
                 FED = 0.0;
             }
             //      FED = RO * (R1I1 * R2K1 - R2I1 * R1K1) / (R2I0 * R1K1 + R1I1 * R2K0)
-            state.dataWaterCoils->OrderedPair(I, 1) = FAI;
-            state.dataWaterCoils->OrderedPair(I, 2) = FED;
+            OrderedPair(I, 1) = FAI;
+            OrderedPair(I, 2) = FED;
         }
-        CalcPolynomCoef(state, state.dataWaterCoils->OrderedPair, PolynomCoef);
+        CalcPolynomCoef(state, OrderedPair, PolynomCoef);
     }
 
     void CalcIBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &IBessFunc, int &ErrorCode)
@@ -5178,6 +5193,8 @@ namespace EnergyPlus::WaterCoils {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool Converged;
+        static Array2D<Real64> OrdPairSum(10, 2);        // Tuned Changed to static and whole array zero-initialized
+        static Array2D<Real64> OrdPairSumMatrix(10, 10); // Tuned Changed to static
         Real64 B;
         int I;
         int II;
@@ -5188,13 +5205,10 @@ namespace EnergyPlus::WaterCoils {
         Real64 S1;
         Real64 S2;
 
-        auto & OrdPairSum(state.dataWaterCoils->OrdPairSum);
-        auto & OrdPairSumMatrix(state.dataWaterCoils->OrdPairSumMatrix);
-
         OrdPairSum = 0.0;
-        OrdPairSum(1, 1) = WaterCoils::MaxOrderedPairs;
+        OrdPairSum(1, 1) = state.dataWaterCoils->MaxOrderedPairs;
         PolynomCoef = 0.0;
-        for (CurrentOrdPair = 1; CurrentOrdPair <= WaterCoils::MaxOrderedPairs; ++CurrentOrdPair) {
+        for (CurrentOrdPair = 1; CurrentOrdPair <= state.dataWaterCoils->MaxOrderedPairs; ++CurrentOrdPair) {
             OrdPairSum(2, 1) += OrderedPair(CurrentOrdPair, 1);
             OrdPairSum(3, 1) += OrderedPair(CurrentOrdPair, 1) * OrderedPair(CurrentOrdPair, 1);
             OrdPairSum(1, 2) += OrderedPair(CurrentOrdPair, 2);
@@ -5229,7 +5243,7 @@ namespace EnergyPlus::WaterCoils {
             }         // End of CurrentOrder loop
 
             S2 = 0.0;
-            for (CurrentOrdPair = 1; CurrentOrdPair <= WaterCoils::MaxOrderedPairs; ++CurrentOrdPair) {
+            for (CurrentOrdPair = 1; CurrentOrdPair <= state.dataWaterCoils->MaxOrderedPairs; ++CurrentOrdPair) {
                 S1 = OrdPairSumMatrix(PolynomOrder + 2, 1);
                 auto const OrderedPair1C(OrderedPair(CurrentOrdPair, 1));
                 auto OrderedPair1C_pow(1.0);
@@ -5239,7 +5253,7 @@ namespace EnergyPlus::WaterCoils {
                 } // End of CurrentOrder loop
                 S2 += (S1 - OrderedPair(CurrentOrdPair, 2)) * (S1 - OrderedPair(CurrentOrdPair, 2));
             } // End of CurrentOrdPair loop
-            B = WaterCoils::MaxOrderedPairs - (PolynomOrder + 1);
+            B = state.dataWaterCoils->MaxOrderedPairs - (PolynomOrder + 1);
             if (S2 > 0.0001) S2 = std::sqrt(S2 / B);
             for (CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder) {
                 PolynomCoef(CurrentOrder) = OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder);
@@ -5250,7 +5264,7 @@ namespace EnergyPlus::WaterCoils {
                 J = 2 * PolynomOrder;
                 OrdPairSum(J, 1) = OrdPairSum(J + 1, 1) = 0.0;
                 auto OrdPairSum2P = OrdPairSum(PolynomOrder + 1, 2) = 0.0;
-                for (I = 1; I <= WaterCoils::MaxOrderedPairs; ++I) {
+                for (I = 1; I <= state.dataWaterCoils->MaxOrderedPairs; ++I) {
                     auto const OrderedPair1I(OrderedPair(I, 1));
                     auto OrderedPair_pow(std::pow(OrderedPair1I, J - 1));
                     OrdPairSum(J, 1) += OrderedPair_pow;
@@ -6163,14 +6177,17 @@ namespace EnergyPlus::WaterCoils {
         int SolFla;               // Flag of solver
         Real64 T0;                // lower bound for Tprov [C]
         Real64 T1;                // upper bound for Tprov [C]
-        Real64 Tprov(0.0); // provisional value of drybulb temperature [C]
+        static Real64 Tprov(0.0); // provisional value of drybulb temperature [C]
+        Array1D<Real64> Par(3);   // Par(1) = desired enthaply H [J/kg]
+        // Par(2) = desired relative humidity (0.0 - 1.0)
+        // Par(3) = barometric pressure [N/m2 (Pascals)]
 
         T0 = 1.0;
         T1 = 50.0;
-        state.dataWaterCoils->Par_TdbFnHRhPb(1) = H;
-        state.dataWaterCoils->Par_TdbFnHRhPb(2) = RH;
-        state.dataWaterCoils->Par_TdbFnHRhPb(3) = PB;
-        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, Tprov, EnthalpyResidual, T0, T1, state.dataWaterCoils->Par_TdbFnHRhPb);
+        Par(1) = H;
+        Par(2) = RH;
+        Par(3) = PB;
+        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, Tprov, EnthalpyResidual, T0, T1, Par);
         // if the numerical inversion failed, issue error messages.
         if (SolFla == -1) {
             ShowSevereError(state, "Calculation of drybulb temperature failed in TdbFnHRhPb(H,RH,PB)");
@@ -6274,15 +6291,15 @@ namespace EnergyPlus::WaterCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        constexpr Real64 OverallFinEfficiency(0.92); // Assumes aluminum fins, 12 fins per inch, fins
+        static Real64 const OverallFinEfficiency(0.92); // Assumes aluminum fins, 12 fins per inch, fins
         // area of about 90% of external surface area Ao.
 
-        constexpr Real64 AreaRatio(0.07); // Heat exchanger Inside to Outside surface area ratio
+        static Real64 const AreaRatio(0.07); // Heat exchanger Inside to Outside surface area ratio
         // design values range from (Ai/Ao) = 0.06 to 0.08
 
         // Constant value air side heat transfer coefficient is assumed. This coefficient has sensible
         // (58.d0 [W/m2C]) and latent (82.d0 [W/m2C]) heat transfer coefficient components.
-        constexpr Real64 hAirTubeOutside(58.0 + 82.0); // Air side heat transfer coefficient [W/m2C]
+        static Real64 const hAirTubeOutside(58.0 + 82.0); // Air side heat transfer coefficient [W/m2C]
 
         // Tube side water convection heat transfer coefficient of the cooling coil is calculated for
         // inside tube diameter of 0.0122m (~0.5 inch nominal diameter) and water velocity 2.0 m/s:
@@ -6435,7 +6452,7 @@ namespace EnergyPlus::WaterCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int CoilNum;
-        bool DidAnythingChange(false); // set to true if conditions changed
+        static bool DidAnythingChange(false); // set to true if conditions changed
         int InletNodeNum;
         int OutletNodeNum;
 
@@ -6627,7 +6644,7 @@ namespace EnergyPlus::WaterCoils {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("EstimateCoilInletWaterTemp");
-        constexpr Real64 EffectivnessMaxAssumed(0.80);
+        Real64 const EffectivnessMaxAssumed(0.80);
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
