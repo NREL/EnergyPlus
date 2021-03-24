@@ -1950,9 +1950,9 @@ struct RefrigeratedCaseData : BaseGlobalStruct
         this->InitRefrigerationMyBeginEnvrnFlag = true;
         this->InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
         this->FigureRefrigerationZoneGainsMyEnvrnFlag = true;
-        this->MyCurrentTimeSaved = 0.0
-        this->MyStepStartTimeSaved = 0.0
-        this->TimeStepFraction = 0.0
+        this->MyCurrentTimeSaved = 0.0;
+        this->MyStepStartTimeSaved = 0.0;
+        this->TimeStepFraction = 0.0;
     }
 };
 
