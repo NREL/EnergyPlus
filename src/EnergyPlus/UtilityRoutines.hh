@@ -599,12 +599,14 @@ struct UtilityRoutinesData : BaseGlobalStruct {
     bool outputErrorHeader = true;
     std::string appendPerfLog_headerRow;
     std::string appendPerfLog_valuesRow;
+    bool GetMatrixInputFlag = true;
 
     void clear_state() override
     {
         outputErrorHeader = true;
         appendPerfLog_headerRow.clear();
         appendPerfLog_valuesRow.clear();
+        GetMatrixInputFlag = true;
     }
 
     // Default Constructor
