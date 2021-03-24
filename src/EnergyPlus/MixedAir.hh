@@ -336,6 +336,13 @@ namespace MixedAir {
         Array1D_int ZoneOAFlowMethod;               // OA flow method for each zone
         Array1D_int ZoneOASchPtr;               // Index to the outdoor air schedule for each zone (from DesignSpecification:OutdoorAir or default)
         Array1D<Real64> OAPropCtlMinRateSchPtr; // Outdoor design OA flow rate schedule from DesignSpecification:OutdoorAir
+        Real64 Ep = 1.0; // zone primary air fraction
+        Real64 Er = 0.0; // zone secondary recirculation fraction
+        Real64 Fa = 1.0; // temporary variable used in multi-path VRP calc
+        Real64 Fb = 1.0;
+        Real64 Fc = 1.0;
+        Real64 Xs = 1.0;  // uncorrected system outdoor air fraction
+        Real64 Evz = 1.0; // zone ventilation efficiency
 
         // Default Constructor
         VentilationMechanicalProps()
@@ -593,6 +600,14 @@ struct MixedAirData : BaseGlobalStruct {
     Array1D<MixedAir::VentilationMechanicalProps> VentilationMechanical;
     std::unordered_set<std::string> ControllerListUniqueNames;
     std::unordered_map<std::string, std::string> OAControllerUniqueNames;
+    std::string CompType;
+    std::string CompName;
+    std::string CtrlName;
+    Array1D_bool OAControllerMyOneTimeFlag;
+    Array1D_bool OAControllerMyEnvrnFlag;
+    Array1D_bool OAControllerMySizeFlag;
+    Array1D_bool MechVentCheckFlag;
+    Array1D<Real64> Par = Array1D<Real64>(6);
 
     void clear_state() override
     {
@@ -622,6 +637,10 @@ struct MixedAirData : BaseGlobalStruct {
         this->VentilationMechanical.deallocate();
         this->ControllerListUniqueNames.clear();
         this->OAControllerUniqueNames.clear();
+        this->OAControllerMyOneTimeFlag;
+        this->OAControllerMyEnvrnFlag;
+        this->OAControllerMySizeFlag;
+        this->MechVentCheckFlag;
     }
 };
 
