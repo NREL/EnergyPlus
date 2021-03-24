@@ -345,6 +345,50 @@ struct HVACDXSystemData : BaseGlobalStruct {
     Array1D_bool CheckEquipName;
     Array1D<HVACDXSystem::DXCoolingConditions> DXCoolingSystem;
 
+    Real64 QZnReq = 0.001;                   // Zone load (W), input to variable-speed DX coil
+    Real64 QLatReq = 0.0;                    // Zone latent load, input to variable-speed DX coil
+    Real64 MaxONOFFCyclesperHour = 4.0;      // Maximum cycling rate of heat pump [cycles/hr]
+    Real64 HPTimeConstant = 45.0;            // Heat pump time constant [s]
+    Real64 FanDelayTime = 0.0;               // Fan delay time, time delay for the HP's fan to
+    Real64 OnOffAirFlowRatio = 1.0;          // ratio of compressor on flow to average flow over time step
+    bool ErrorsFound = false;          // If errors detected in input
+    bool ErrFound = false;             // used for mining functions
+    int TotalArgs = 0;                 // Total number of alpha and numeric arguments (max) for a certain object in the input file
+    bool MyOneTimeFlag = true;
+    bool MySetPointCheckFlag = true;
+    int SpeedNum = 1;                               // speed number of variable speed DX cooling coil
+    Real64 QZnReqCycling = 0.001;                   // Zone load (W), input to variable-speed DX coil
+    Real64 QLatReqCycling = 0.0;                    // Zone latent load, input to variable-speed DX coil
+    Real64 MaxONOFFCyclesperHourCycling = 4.0;      // Maximum cycling rate of heat pump [cycles/hr]
+    Real64 HPTimeConstantCycling = 45.0;            // Heat pump time constant [s]
+    Real64 FanDelayTimeCycling = 0.0;               // Fan delay time, time delay for the HP's fan to
+    Real64 OnOffAirFlowRatioCycling = 1.0;          // ratio of compressor on flow to average flow over time step
+    Real64 SpeedRatio = 0.0;                        // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+    int mySpeedNum = 1;                       // speed number of variable speed DX cooling coil
+    Real64 myQZnReq = 0.001;                  // Zone load (W), input to variable-speed DX coil
+    Real64 myQLatReq = 0.0;                   // Zone latent load, input to variable-speed DX coil
+    Real64 myMaxONOFFCyclesperHour = 4.0;     // Maximum cycling rate of heat pump [cycles/hr]
+    Real64 myHPTimeConstant = 45.0;           // Heat pump time constant [s]
+    Real64 myFanDelayTime = 0.0;               // Fan delay time, time delay for the HP's fan to
+    Real64 myOnOffAirFlowRatio = 1.0;          // ratio of compressor on flow to average flow over time step
+    Real64 PartLoadRatio = 1.0;                // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+    int SpeedNumCyclingHum = 1;                // speed number of variable speed DX cooling coil
+    Real64 QZnReqCyclingHum = 0.001;              // Zone load (W), input to variable-speed DX coil
+    Real64 QLatReqCyclingHum = 0.0;               // Zone latent load, input to variable-speed DX coil
+    Real64 MaxONOFFCyclesperHourCyclingHum = 4.0; // Maximum cycling rate of heat pump [cycles/hr]
+    Real64 HPTimeConstantCyclingHum = 45.0;       // Heat pump time constant [s]
+    Real64 FanDelayTimeCyclingHum = 0.0;          // Fan delay time, time delay for the HP's fan to
+    Real64 OnOffAirFlowRatioCyclingHum = 1.0;     // ratio of compressor on flow to average flow over time step
+    Real64 SpeedRatioCyclingHum = 0.0;            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+    int SpeedNumSpeedHum = 1;                     // speed number of variable speed DX cooling coil
+    Real64 QZnReqSpeedHum = 0.001;                // Zone load (W), input to variable-speed DX coil
+    Real64 QLatReqSpeedHum = 0.0;                 // Zone latent load, input to variable-speed DX coil
+    Real64 MaxONOFFCyclesperHourSpeedHum = 4.0;      // Maximum cycling rate of heat pump [cycles/hr]
+    Real64 HPTimeConstantSpeedHum = 45.0;            // Heat pump time constant [s]
+    Real64 FanDelayTimeSpeedHum = 0.0;               // Fan delay time, time delay for the HP's fan to
+    Real64 OnOffAirFlowRatioSpeedHum = 1.0;          // ratio of compressor on flow to average flow over time step
+    Real64 PartLoadRatioSpeedHum = 1.0;              // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+
     void clear_state() override
     {
         this->GetInputFlag = true;
@@ -352,6 +396,50 @@ struct HVACDXSystemData : BaseGlobalStruct {
         this->EconomizerFlag = false;
         this->CheckEquipName.deallocate();
         this->DXCoolingSystem.deallocate();
+        this->QZnReq = 0.001;
+        this->QLatReq = 0.0;
+        this->MaxONOFFCyclesperHour = 4.0;
+        this->HPTimeConstant = 45.0;
+        this->FanDelayTime = 0.0;
+        this->OnOffAirFlowRatio = 1.0;    
+        this->ErrorsFound = false;
+        this->ErrFound = false;
+        this->TotalArgs = 0;   
+        this->MyOneTimeFlag = true;
+        this->MySetPointCheckFlag = true;
+        this->SpeedNum = 1;
+        this->QZnReqCycling = 0.001;
+        this->QLatReqCycling = 0.0;
+        this->MaxONOFFCyclesperHourCycling = 4.0;
+        this->HPTimeConstantCycling = 45.0;
+        this->FanDelayTimeCycling = 0.0;
+        this->OnOffAirFlowRatioCycling = 1.0;
+        this->SpeedRatio = 0.0;    
+        this->mySpeedNum = 1;
+        this->myQZnReq = 0.001;
+        this->myQLatReq = 0.0;
+        this->myMaxONOFFCyclesperHour = 4.0;
+        this->myHPTimeConstant = 45.0;
+        this->myFanDelayTime = 0.0;
+        this->myOnOffAirFlowRatio = 1.0;
+        this->PartLoadRatio = 1.0;          
+        this->SpeedNumCyclingHum = 1;
+        this->QZnReqCyclingHum = 0.001;
+        this->QLatReqCyclingHum = 0.0;
+        this->MaxONOFFCyclesperHourCyclingHum = 4.0;
+        this->HPTimeConstantCyclingHum = 45.0;
+        this->FanDelayTimeCyclingHum = 0.0;
+        this->OnOffAirFlowRatioCyclingHum = 1.0;
+        this->SpeedRatioCyclingHum = 0.0;  
+        this->SpeedNumSpeedHum = 1;
+        this->QZnReqSpeedHum = 0.001;
+        this->QLatReqSpeedHum = 0.0;
+        this->MaxONOFFCyclesperHourSpeedHum = 4.0;
+        this->HPTimeConstantSpeedHum = 45.0;
+        this->FanDelayTimeSpeedHum = 0.0;
+        this->OnOffAirFlowRatioSpeedHum = 1.0;
+        this->PartLoadRatioSpeedHum = 1.0;        
+
     }
 };
 

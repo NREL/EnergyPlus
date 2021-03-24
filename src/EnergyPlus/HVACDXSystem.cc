@@ -154,13 +154,6 @@ namespace HVACDXSystem {
         Real64 AirMassFlow;   // DX System air mass flow rate
         int InletNodeNum;     // DX System inlet node number
         int OutletNodeNum;    // DX System outlet node number
-        // local variables for calling variable speed coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
 
         auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
 
@@ -257,16 +250,16 @@ namespace HVACDXSystem {
                 SimVariableSpeedCoils(state, CompName,
                                       DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                       DXCoolingSystem(DXSystemNum).FanOpMode,
-                                      MaxONOFFCyclesperHour,
-                                      HPTimeConstant,
-                                      FanDelayTime,
+                                      state.dataHVACDXSys->MaxONOFFCyclesperHour,
+                                      state.dataHVACDXSys->HPTimeConstant,
+                                      state.dataHVACDXSys->FanDelayTime,
                                       On,
                                       DXCoolingSystem(DXSystemNum).PartLoadFrac,
                                       DXCoolingSystem(DXSystemNum).SpeedNum,
                                       DXCoolingSystem(DXSystemNum).SpeedRatio,
-                                      QZnReq,
-                                      QLatReq,
-                                      OnOffAirFlowRatio);
+                                      state.dataHVACDXSys->QZnReq,
+                                      state.dataHVACDXSys->QLatReq,
+                                      state.dataHVACDXSys->OnOffAirFlowRatio);
 
             } else if (SELECT_CASE_var == CoilDX_PackagedThermalStorageCooling) {
 
@@ -341,8 +334,6 @@ namespace HVACDXSystem {
         int NumNums;
         int IOStat;
         static std::string const RoutineName("GetDXCoolingSystemInput: "); // include trailing blank space
-        static bool ErrorsFound(false);                                    // If errors detected in input
-        static bool ErrFound(false);                                       // used for mining functions
         bool IsNotOK;                                                      // Flag to verify name
         int DXCoolSysNum;
         bool FanErrorsFound;             // flag returned on fan operating mode check
@@ -355,10 +346,11 @@ namespace HVACDXSystem {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
-        //  certain object in the input file
 
         auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
+        auto &ErrorsFound(state.dataHVACDXSys->ErrorsFound);
+        auto &ErrFound(state.dataHVACDXSys->ErrFound);
+        auto &TotalArgs(state.dataHVACDXSys->TotalArgs);
 
         CurrentModuleObject = "CoilSystem:Cooling:DX";
         state.dataHVACDXSys->NumDXSystem = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -738,23 +730,21 @@ namespace HVACDXSystem {
         int OutNode;     // outlet node number
         int ControlNode; // control node number
         int DXSysIndex;
-        static bool MyOneTimeFlag(true);
-        static bool MySetPointCheckFlag(true);
         int OutdoorAirUnitNum;    // "ONLY" for ZoneHVAC:OutdoorAirUnit
         Real64 OAUCoilOutletTemp; // "ONLY" for zoneHVAC:OutdoorAirUnit
 
         auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
 
-        if (MyOneTimeFlag) {
+        if (state.dataHVACDXSys->MyOneTimeFlag) {
 
-            MyOneTimeFlag = false;
+            state.dataHVACDXSys->MyOneTimeFlag = false;
         }
         if (AirLoopNum == -1) { // This Dx system is component of ZoneHVAC:OutdoorAirUnit
             OutdoorAirUnitNum = OAUnitNum;
             OAUCoilOutletTemp = OAUCoilOutTemp;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataHVACDXSys->MySetPointCheckFlag && DoSetPointTest) {
             for (DXSysIndex = 1; DXSysIndex <= state.dataHVACDXSys->NumDXSystem; ++DXSysIndex) {
                 ControlNode = DXCoolingSystem(DXSysIndex).DXSystemControlNodeNum;
                 if (ControlNode > 0) {
@@ -807,7 +797,7 @@ namespace HVACDXSystem {
                     }
                 }
             }
-            MySetPointCheckFlag = false;
+            state.dataHVACDXSys->MySetPointCheckFlag = false;
         }
 
         if (!DXCoolingSystem(DXSystemNum).VSCoilFanInfoSet && AirLoopNum > 0) {
@@ -3513,14 +3503,6 @@ namespace HVACDXSystem {
         int CoilIndex;                            // index of this coil
         Real64 OutletAirTemp;                     // outlet air temperature [C]
         int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 SpeedRatio(0.0);            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
@@ -3528,16 +3510,16 @@ namespace HVACDXSystem {
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->MaxONOFFCyclesperHourCycling,
+                              state.dataHVACDXSys->HPTimeConstantCycling,
+                              state.dataHVACDXSys->FanDelayTimeCycling,
                               On,
                               PartLoadRatio,
-                              SpeedNum,
-                              SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->SpeedNum,
+                              state.dataHVACDXSys->SpeedRatio,
+                              state.dataHVACDXSys->QZnReqCycling,
+                              state.dataHVACDXSys->QLatReqCycling,
+                              state.dataHVACDXSys->OnOffAirFlowRatioCycling);
 
         OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
@@ -3590,32 +3572,24 @@ namespace HVACDXSystem {
         int CoilIndex;                            // index of this coil
         Real64 OutletAirTemp;                     // outlet air temperature [C]
         int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 PartLoadRatio(1.0);         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
-        SpeedNum = int(Par(3));
+        state.dataHVACDXSys->mySpeedNum = int(Par(3));
 
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->myMaxONOFFCyclesperHour,
+                              state.dataHVACDXSys->myHPTimeConstant,
+                              state.dataHVACDXSys->myFanDelayTime,
                               On,
-                              PartLoadRatio,
-                              SpeedNum,
+                              state.dataHVACDXSys->PartLoadRatio,
+                              state.dataHVACDXSys->mySpeedNum,
                               SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->myQZnReq,
+                              state.dataHVACDXSys->myQLatReq,
+                              state.dataHVACDXSys->myOnOffAirFlowRatio);
 
         OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
@@ -3666,14 +3640,6 @@ namespace HVACDXSystem {
         int CoilIndex;                            // index of this coil
         Real64 OutletAirHumRat;                   // outlet air humidity ratio [kg/kg]
         int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 SpeedRatio(0.0);            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
@@ -3681,16 +3647,16 @@ namespace HVACDXSystem {
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->MaxONOFFCyclesperHourCyclingHum,
+                              state.dataHVACDXSys->HPTimeConstantCyclingHum,
+                              state.dataHVACDXSys->FanDelayTimeCyclingHum,
                               On,
                               PartLoadRatio,
-                              SpeedNum,
-                              SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->SpeedNumCyclingHum,
+                              state.dataHVACDXSys->SpeedRatioCyclingHum,
+                              state.dataHVACDXSys->QZnReqCyclingHum,
+                              state.dataHVACDXSys->QLatReqCyclingHum,
+                              state.dataHVACDXSys->OnOffAirFlowRatioCyclingHum);
 
         OutletAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirHumRat;
         Residuum = Par(2) - OutletAirHumRat;
@@ -3744,32 +3710,24 @@ namespace HVACDXSystem {
         int CoilIndex;                            // index of this coil
         Real64 OutletAirHumRat;                   // outlet air humidity ratio [kg/kg]
         int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 PartLoadRatio(1.0);         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
-        SpeedNum = int(Par(3));
+        state.dataHVACDXSys->SpeedNumSpeedHum = int(Par(3));
 
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->MaxONOFFCyclesperHourSpeedHum,
+                              state.dataHVACDXSys->HPTimeConstantSpeedHum,
+                              state.dataHVACDXSys->FanDelayTimeSpeedHum,
                               On,
-                              PartLoadRatio,
-                              SpeedNum,
+                              state.dataHVACDXSys->PartLoadRatioSpeedHum,
+                              state.dataHVACDXSys->SpeedNumSpeedHum,
                               SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->QZnReqSpeedHum,
+                              state.dataHVACDXSys->QLatReqSpeedHum,
+                              state.dataHVACDXSys->OnOffAirFlowRatioSpeedHum);
 
         OutletAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirHumRat;
         Residuum = Par(2) - OutletAirHumRat;
