@@ -3084,12 +3084,12 @@ namespace EnergyPlus::DaylightingManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Vector3<Real64> const RREF(0.0); // Location of a reference point in absolute coordinate system //Autodesk Was used uninitialized:
                                                 // Never set here // Made static for performance and const for now until issue addressed
-        static Vector4<Real64> XEDIRSK;         // Illuminance contribution from luminance element, sky-related
-        static Vector4<Real64> XAVWLSK;                        // Luminance of window element, sky-related
-        static Vector3<Real64> RAYCOS;                         // Unit vector from reference point to sun
-        static Array1D<Real64> TransBmBmMult(MaxSlatAngs);     // Beam-beam transmittance of isolated blind
-        static Array1D<Real64> TransBmBmMultRefl(MaxSlatAngs); // As above but for beam reflected from exterior obstruction
-        static Vector3<Real64> HP; // Hit coordinates, if ray hits
+        auto & XEDIRSK = state.dataDaylightingManager->XEDIRSK;
+        auto & XAVWLSK = state.dataDaylightingManager->XAVWLSK;
+        auto & RAYCOS = state.dataDaylightingManager->RAYCOS;
+        auto & TransBmBmMult = state.dataDaylightingManager->TransBmBmMult;
+        auto & TransBmBmMultRefl = state.dataDaylightingManager->TransBmBmMultRefl;
+        auto & HP = state.dataDaylightingManager->HP;
         int JB;                                                // Slat angle counter
         Real64 ProfAng;                                        // Solar profile angle on a window (radians)
         Real64 POSFAC;                                         // Position factor for a window element / ref point / view vector combination
@@ -4321,8 +4321,8 @@ namespace EnergyPlus::DaylightingManager {
         Real64 SinBldgRelNorth;                // Sine of Building rotation
         Real64 CosZoneRelNorth;                // Cosine of Zone rotation
         Real64 SinZoneRelNorth;                // Sine of Zone rotation
-        static Real64 CosBldgRotAppGonly(0.0); // Cosine of the building rotation for appendix G only ( relative north )
-        static Real64 SinBldgRotAppGonly(0.0); // Sine of the building rotation for appendix G only ( relative north )
+        Real64 CosBldgRotAppGonly(0.0); // Cosine of the building rotation for appendix G only ( relative north )
+        Real64 SinBldgRotAppGonly(0.0); // Sine of the building rotation for appendix G only ( relative north )
         Real64 Xb;                             // temp var for transformation calc
         Real64 Yb;                             // temp var for transformation calc
         Real64 Xo;
@@ -5476,18 +5476,16 @@ namespace EnergyPlus::DaylightingManager {
         HISK.dim(4);
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const NTH(18);                          // Number of azimuth steps for sky integration
-        int const NPH(8);                           // Number of altitude steps for sky integration
         Real64 const DTH((2.0 * DataGlobalConstants::Pi) / double(NTH)); // Sky integration azimuth stepsize (radians)
         Real64 const DPH(DataGlobalConstants::PiOvr2 / double(NPH));     // Sky integration altitude stepsize (radians)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IPH;                            // Altitude index for sky integration
         int ITH;                            // Azimuth index for sky integration
-        static Array1D<Real64> PH(NPH);     // Altitude of sky element (radians)
-        static Array1D<Real64> TH(NTH);     // Azimuth of sky element (radians)
+        auto & PH = state.dataDaylightingManager->PH;
+        auto & TH = state.dataDaylightingManager->TH;
+        auto & SPHCPH = state.dataDaylightingManager->SPHCPH;
         int ISky;                           // Sky type index
-        static Array1D<Real64> SPHCPH(NPH); // Sine times cosine of altitude of sky element
 
         // Integrate to obtain illuminance from sky.
         // The contribution in lumens/m2 from a patch of sky at altitude PH and azimuth TH
@@ -5562,7 +5560,7 @@ namespace EnergyPlus::DaylightingManager {
 
         // Local declarations
         SurfaceClass IType;                 // Surface type/class:  mirror surfaces of shading surfaces
-        static Vector3<Real64> HP; // Hit coordinates, if ray hits an obstruction
+        auto & DayltgHitObstructionHP = state.dataDaylightingManager->DayltgHitObstructionHP;
         bool hit;                  // True iff a particular obstruction is hit
 
         ObTrans = 1.0;
@@ -5580,13 +5578,13 @@ namespace EnergyPlus::DaylightingManager {
                 if (!surface.ShadowSurfPossibleObstruction) continue;
                 IType = surface.Class;
                 if ((IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && (ISurf != window_iBaseSurf)) {
-                    PierceSurface(state, ISurf, R1, RN, HP, hit);
+                    PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP, hit);
                     if (hit) { // Building element is hit (assumed opaque)
                         ObTrans = 0.0;
                         break;
                     }
                 } else if (surface.ShadowingSurf) {
-                    PierceSurface(state, ISurf, R1, RN, HP, hit);
+                    PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP, hit);
                     if (hit) { // Shading surface is hit
                         // Get solar transmittance of the shading surface
                         Real64 const Trans(surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue(state, surface.SchedShadowSurfIndex, IHOUR, 1) : 0.0);
@@ -5610,13 +5608,13 @@ namespace EnergyPlus::DaylightingManager {
                 if (!surface.ShadowSurfPossibleObstruction) return false; // Do Consider separate octree without filtered surfaces
                 auto const sClass(surface.Class);
                 if ((sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && (&surface != window_base_p)) {
-                    PierceSurface(surface, R1, RN, HP, hit);
+                    PierceSurface(surface, R1, RN, state.dataDaylightingManager->DayltgHitObstructionHP, hit);
                     if (hit) { // Building element is hit (assumed opaque)
                         ObTrans = 0.0;
                         return true;
                     }
                 } else if (surface.ShadowingSurf) {
-                    PierceSurface(surface, R1, RN, HP, hit);
+                    PierceSurface(surface, R1, RN, state.dataDaylightingManager->DayltgHitObstructionHP, hit);
                     if (hit) { // Shading surface is hit
                         // Get solar transmittance of the shading surface
                         Real64 const Trans(surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue(state, surface.SchedShadowSurfIndex, IHOUR, 1) : 0.0);
@@ -5660,8 +5658,8 @@ namespace EnergyPlus::DaylightingManager {
 
         // Local declarations
         SurfaceClass IType;                 // Surface type/class
-        static Vector3<Real64> HP; // Hit coordinates, if ray hits an obstruction
-        static Vector3<Real64> RN; // Unit vector along ray
+        auto & DayltgHitInteriorObstructionHP = state.dataDaylightingManager->DayltgHitInteriorObstructionHP; // Hit coordinates, if ray hits an obstruction
+        auto & RN = state.dataDaylightingManager->RN; // Unit vector along ray
 
         hit = false;
         RN = (R2 - R1).normalize();         // Make unit vector
@@ -5684,7 +5682,7 @@ namespace EnergyPlus::DaylightingManager {
                      (IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && (ISurf != window_iBaseSurf) &&
                      (ISurf != window_base_iExtBoundCond))) // Exclude window's base or base-adjacent surfaces
                 {
-                    PierceSurface(state, ISurf, R1, RN, d12, HP, hit); // Check if R2-R1 segment pierces surface
+                    PierceSurface(state, ISurf, R1, RN, d12, DayltgHitInteriorObstructionHP, hit); // Check if R2-R1 segment pierces surface
                     if (hit) break;                             // Segment pierces surface: Don't check the rest
                 }
             }
@@ -5696,14 +5694,14 @@ namespace EnergyPlus::DaylightingManager {
             auto const window_base_adjacent_p(&window_base_adjacent);
 
             // Lambda function for the octree to test for surface hit
-            auto surfaceHit = [=, &R1, &hit](SurfaceData const &surface) -> bool {
+            auto surfaceHit = [=, &R1, &hit, &state](SurfaceData const &surface) -> bool {
                 auto const sClass(surface.Class);
                 if ((surface.ShadowingSurf) ||        // Shadowing surface
                     ((surface.SolarEnclIndex == window_Enclosure) && // Surface is in same zone as window
                      (sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor
                      (&surface != window_base_p) && (&surface != window_base_adjacent_p))) // Exclude window's base or base-adjacent surfaces
                 {
-                    PierceSurface(surface, R1, RN, d12, HP, hit); // Check if R2-R1 segment pierces surface
+                    PierceSurface(surface, R1, RN, d12, state.dataDaylightingManager->DayltgHitInteriorObstructionHP, hit); // Check if R2-R1 segment pierces surface
                     return hit;
                 } else {
                     return false;
@@ -5739,11 +5737,11 @@ namespace EnergyPlus::DaylightingManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         SurfaceClass IType;                 // Surface type/class
-        static Vector3<Real64> HP; // Hit coordinates, if ray hits an obstruction surface (m)
-        static Vector3<Real64> RN; // Unit vector along ray from R1 to R2
+        auto & DayltgHitBetWinObstructionHP = state.dataDaylightingManager->DayltgHitBetWinObstructionHP;
+        auto & DayltgHitBetWinObstructionRN = state.dataDaylightingManager->DayltgHitBetWinObstructionRN;
 
         hit = false;
-        RN = (R2 - R1).normalize();         // Unit vector
+        DayltgHitBetWinObstructionRN = (R2 - R1).normalize();         // Unit vector
         Real64 const d12(distance(R1, R2)); // Distance between R1 and R2 (m)
 
         auto const &window1(state.dataSurface->Surface(IWin1));
@@ -5773,7 +5771,7 @@ namespace EnergyPlus::DaylightingManager {
                      (ISurf != window1_iBaseSurf) && (ISurf != window2_iBaseSurf) &&                              // Exclude windows' base surfaces
                      (ISurf != window1_base_iExtBoundCond) && (ISurf != window2_base_iExtBoundCond))) // Exclude windows' base-adjacent surfaces
                 {
-                    PierceSurface(state, ISurf, R1, RN, d12, HP, hit); // Check if R2-R1 segment pierces surface
+                    PierceSurface(state, ISurf, R1, DayltgHitBetWinObstructionRN, d12, DayltgHitBetWinObstructionHP, hit); // Check if R2-R1 segment pierces surface
                     if (hit) break;                             // Segment pierces surface: Don't check the rest
                 }
             }
@@ -5789,7 +5787,7 @@ namespace EnergyPlus::DaylightingManager {
             auto const window2_base_adjacent_p(&window2_base_adjacent);
 
             // Lambda function for the octree to test for surface hit
-            auto surfaceHit = [=, &R1, &hit](SurfaceData const &surface) -> bool {
+            auto surfaceHit = [=, &R1, &hit, &state](SurfaceData const &surface) -> bool {
                 auto const sClass(surface.Class);
                 if ((surface.ShadowingSurf) ||         // Shadowing surface
                     ((surface.SolarEnclIndex == window2_Enclosure) && // Surface is in same zone as window
@@ -5797,7 +5795,7 @@ namespace EnergyPlus::DaylightingManager {
                      (&surface != window1_base_p) && (&surface != window2_base_p) &&                                 // Exclude windows' base surfaces
                      (&surface != window1_base_adjacent_p) && (&surface != window2_base_adjacent_p))) // Exclude windows' base-adjacent surfaces
                 {
-                    PierceSurface(surface, R1, RN, d12, HP, hit); // Check if R2-R1 segment pierces surface
+                    PierceSurface(surface, R1, state.dataDaylightingManager->DayltgHitBetWinObstructionRN, d12, state.dataDaylightingManager->DayltgHitBetWinObstructionHP, hit); // Check if R2-R1 segment pierces surface
                     return hit;
                 } else {
                     return false;
@@ -5858,18 +5856,17 @@ namespace EnergyPlus::DaylightingManager {
         int ISky;   // Sky type index
         int ISky1;  // Sky type index values for averaging two sky types
         int ISky2;
-        static Array1D<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
-        static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (second index),
-        //   bare/shaded window (first index)
-        static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
-        static Array2D<Real64> BFSKHR(2, 4); // Sky background luminance factor for sky type (second index),
-        //   bare/shaded window (first index)
-        static Vector2<Real64> BFSUHR;       // Sun background luminance factor for bare/shaded window
-        static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (second index),
-        //   bare/shaded window (first index)
-        static Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
-        static Array1D<Real64> GLRNDX; // Glare index at reference point
-        static Array1D<Real64> GLRNEW; // New glare index at reference point
+        auto & DFSUHR = state.dataDaylightingManager->DFSUHR;       // Sun daylight factor for bare/shaded window
+        auto & BFSUHR = state.dataDaylightingManager->BFSUHR;       // Sun background luminance factor for bare/shaded window
+        auto & SFSUHR = state.dataDaylightingManager->SFSUHR; // Sun source luminance factor for bare/shaded window
+        auto & HorIllSky = state.dataDaylightingManager->HorIllSky;                          // Horizontal illuminance for different sky types
+        auto & SetPnt = state.dataDaylightingManager->SetPnt;       // Illuminance setpoint at reference points (lux)
+        auto & GLRNDX = state.dataDaylightingManager->GLRNDX; // Glare index at reference point
+        auto & GLRNEW = state.dataDaylightingManager->GLRNEW; // New glare index at reference point
+        auto & SFSKHR = state.dataDaylightingManager->SFSKHR; // Sky source luminance factor for sky type (second index), bare/shaded window (first index)
+        auto & DFSKHR = state.dataDaylightingManager->DFSKHR; // Sky daylight factor for sky type (second index), bare/shaded window (first index)
+        auto & BFSKHR = state.dataDaylightingManager->BFSKHR; // Sky background luminance factor for sky type (second index), bare/shaded window (first index)
+
         int ISWFLG;                    // Switchable glazing flag: =1 if one or more windows in a zone
         //  has switchable glazing that adjusts visible transmittance to just meet
         //  daylighting setpoint; =0 otherwise.
@@ -5883,7 +5880,6 @@ namespace EnergyPlus::DaylightingManager {
         Real64 VTRAT;                                              // Ratio between switched and unswitched visible transmittance at normal incidence
         Real64 BACL;                                               // Window background (surround) luminance for glare calc (cd/m2)
         Real64 SkyWeight;                                          // Weighting factor used to average two different sky types
-        static Vector4<Real64> HorIllSky;                          // Horizontal illuminance for different sky types
         Real64 HorIllSkyFac;                                       // Ratio between horizontal illuminance from sky horizontal irradiance and
         //   luminous efficacy and horizontal illuminance from averaged sky
         Real64 SlatAng; // Blind slat angle (rad)
