@@ -137,7 +137,6 @@ namespace SteamBaseboardRadiator {
         Real64 QZnReq;    // zone load not yet satisfied
         Real64 MaxSteamFlow;
         Real64 MinSteamFlow;
-        static Real64 mdot(0.0);
 
         if (state.dataSteamBaseboardRadiator->GetInputFlag) {
             GetSteamBaseboardInput(state);
@@ -233,7 +232,7 @@ namespace SteamBaseboardRadiator {
                 PowerMet = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower;
             } else {
                 // baseboard is off, don't bother going into ControlCompOutput
-                mdot = 0.0;
+                Real64 mdot = 0.0;
                 SetComponentFlowRate(state, mdot,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode,
@@ -767,7 +766,7 @@ namespace SteamBaseboardRadiator {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag;
+        auto & MyEnvrnFlag = state.dataSteamBaseboardRadiator->MyEnvrnFlag;
         int Loop;
         int SteamInletNode;
         int ZoneNode;
