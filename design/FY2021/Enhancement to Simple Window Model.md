@@ -15,15 +15,22 @@ An IBPSA paper published in 2017 [1] presents a simple method for correcting sur
 
 ## Overview ##
 
-Window-frame film coefficients, both exterior and interior, are typically larger than the film coefficients applying to the same window’s parent wall. This is because window frames and other complex 2-D shapes exhibit increased convective and radiative heat transfer, similar to a finned heat sink or on the cooling fins of an air-cooled engine. This "fin effect" can result in very large film coefficients, both outdoors and indoors. At present it is not computationally feasible to perform 2-D, heat transfer modeling on every framing element in a building, for all 8760 hours of the year. The paper [1] presents a simplified method to estimate the real-world, frame film coefficients based on knowledge of the frame geometry, and use these "fin-inflated" coefficients to calculate the true frame heat flow, rather than using standard 1-D coefficients applied to the parent wall.
+Window-frame film coefficients, both exterior and interior, are typically larger than the film coefficients applying toWindow-frame film coefficients, both exterior and interior, are typically larger than the film coefficients applying to the same window’s parent wall. This is because window frames and other complex 2-D shapes exhibit increased convective and radiative heat transfer, similar to a finned heat sink or on the cooling fins of an air-cooled engine. This “fin effect” can result in very large film coefficients, both outdoors and indoors. At present it is not computationally feasible to perform 2-D, heat transfer modeling on every framing element in a building, for all 8760 hours of the year. A paper by Lyons and Curcija (2017) presents a simplified method to estimate the real-world, frame film coefficients based on knowledge of the frame geometry, and use these “fin-inflated” coefficients to calculate the true frame heat flow, rather than using standard 1-D coefficients applied to the parent wall.
+
+To calculate the “fin-inflated” film coefficients, the total length of the outside face and the total length of the inside face are used as the outside and inside wetted lengths. These dimensions are complemented by the “projected frame dimension”, PFD. The PFD is projected onto the plane parallel to the glass and is currently used in EnergyPlus as the frame width.
+ 
+With derivation detailed in the feature proposal, adding an adjustment factor to the frame coefficients would allow considering the fin-inflated film coefficient for both indoor and outdoor sides. For simple window models considering the glazing and frame together in heat transfer calculations, this is equivalent to adding an adjustment factor to the inside and outside convective coefficients of the whole glazing system. We propose to add film coefficient adjustment ratios for fenestration objects in EnergyPlus.
+ the same window’s parent wall. This is because window frames and other complex 2-D shapes exhibit increased convective and radiative heat transfer, similar to a finned heat sink or on the cooling fins of an air-cooled engine. This "fin effect" can result in very large film coefficients, both outdoors and indoors. At present it is not computationally feasible to perform 2-D, heat transfer modeling on every framing element in a building, for all 8760 hours of the year. The paper [1] presents a simplified method to estimate the real-world, frame film coefficients based on knowledge of the frame geometry, and use these "fin-inflated" coefficients to calculate the true frame heat flow, rather than using standard 1-D coefficients applied to the parent wall.
 
 Figure 1 shows the front view and cross section of a window frame.
 
 ![FrontViewCrossSecWindowFrame](FrontViewCrossSecWindowFrame.png)
+<p style="text-align: center;"> Figure 1. Front view and cross section of a window frame.</p>
 
 The methods and its derivation are as follows.  Figure 2 shows the thermal circuit for a window frame (light blue area in the figure). The arbitrary, asymmetric frame in Figure 2 is depicted notionally as a window sill, but could be any framing element in a fenestration system. The upper and lower surfaces, shown by dotted lines, are assumed to be adiabatic. The exterior, cold left face of the frame is shown in dark blue, while the interior, right, warm face is shown in red.
 
 ![ThermalCircuitWindowFrame](ThermalCircuitWindowFrame.png)
+<p style="text-align: center;"> Figure 2. Thermal circuit for window frame. </p>
 
 The frame U-factor, U<sub>f</sub>, including air films in Figure 1 is calculated as by
 
@@ -33,6 +40,7 @@ where R<sub>ss</sub> is the surface-to-surface thermal resistance of the frame, 
 To calculate the "fin-inflated" film coefficients, the total length of the outside blue face (denoted WL<sub>o</sub>), and the total length of the inside red face (denoted WL<sub>i</sub>) are used as the outside and inside wetted lengths. These dimensions are complemented by the "projected frame dimension", PFD. The PFD is projected onto the plane parallel to the glass and is currently used in EnergyPlus as the frame width. The length-weighted, average frame outside and inside surface temperatures are noted as T<sub>fo</sub> and T<sub>fi</sub> respectively, and the outdoor and indoor air temperatures are noted as T<sub>o</sub> and T<sub>i</sub>. Figure 3 shows an example of the WL<sub>o</sub> and WL<sub>i</sub> of a frame.
 
 ![CrossSecWettedLengthFrame](CrossSecWettedLengthFrame.png)
+<p style="text-align: center;"> Figure 3. Cross section wetted lengths of a frame. </p>
 
 If the constant heat transfer coefficient is applied to frame surfaces, the heat flux from the outside frame surface to the exterior environment is
 
