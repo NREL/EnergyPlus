@@ -297,6 +297,26 @@ struct SimAirServingZonesData : BaseGlobalStruct {
         this->TermUnitSizingNumsHeat.clear();
         this->SupNode.clear();
         this->SupNodeType.clear();
+
+        this->TUInNode = 0;         // inlet node number of a terminal unit
+        this->SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system
+        this->OAReliefDiff = 0.0;   // local for massflow change across OA system, kg/s
+        this->salIterMax = 0;       // Maximum of iteration counters across all air loops
+        this->salIterTot = 0;       // Aggregated number of iterations across all air loops
+        this->NumCallsTot = 0;      // Aggregated number fo times SimAirLoopComponents() has been invoked across all air loops
+        this->IterMaxSAL2 = 0;      // Maximum number of iterations performed by each controller on this air loop
+        this->IterTotSAL2 = 0;      // Aggregated number of iterations performed by each controller on this air loop
+        this->NumCallsSAL2 = 0;     // Number of times SimAirLoopComponents() has been invoked per air loop for either Solve or ReSolve operations
+        this->AirLoopConvergedFlagSAL = false;
+        this->DoWarmRestartFlagSAL = false;
+        this->WarmRestartStatusSAL = DataHVACControllers::iControllerWarmRestartNone;
+        this->IterSALC = 0;        // Iteration counter
+        this->ErrCountSALC = 0;    // Number of times that the maximum iterations was exceeded
+        this->MaxErrCountSALC = 0; // Number of times that the maximum iterations was exceeded
+        this->IterSWCC = 0;
+        this->ErrCountSWCC = 0;
+        this->MaxErrCountSWCC = 0;
+        this->EpSSOA = 1.0; // zone primary air fraction
     }
 };
 
