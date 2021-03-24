@@ -9311,16 +9311,16 @@ namespace EnergyPlus::DaylightingManager {
         int R;
         int IllumOut;
 
-        static Array1D_bool FirstTimeMaps;
-        static Array1D_bool EnvrnPrint;
-        static Array1D_string SavedMnDy;
-        static Array2D_string RefPts;
+        auto & FirstTimeMaps = state.dataDaylightingManager->FirstTimeMaps;
+        auto & EnvrnPrint = state.dataDaylightingManager->EnvrnPrint;
+        auto & SavedMnDy = state.dataDaylightingManager->SavedMnDy;
+        auto & RefPts = state.dataDaylightingManager->RefPts;
+        auto & XValue = state.dataDaylightingManager->XValue;
+        auto & YValue = state.dataDaylightingManager->YValue;
+        auto & IllumValue = state.dataDaylightingManager->IllumValue;
         std::string MapNoString;
         int linelen;
         // BSLLC Start
-        static Array1D<Real64> XValue;
-        static Array1D<Real64> YValue;
-        static Array2D<Real64> IllumValue;
         int SQYear;
         int SQMonth;
         int SQDayOfMonth;
@@ -10047,18 +10047,18 @@ namespace EnergyPlus::DaylightingManager {
         // one or more exterior windows
         Real64 IntWinSolidAng; // Approximation to solid angle subtended by an interior window
         // from a point a distance SQRT(zone floor area) away.
-        static Vector3<Real64> W1; // Window vertices
-        static Vector3<Real64> W2;
-        static Vector3<Real64> W3;
-        static Vector3<Real64> WC;  // Center point of window
-        static Vector3<Real64> W21; // Unit vectors from window vertex 2 to 1 and 2 to 3
-        static Vector3<Real64> W23;
+        auto & W1 = state.dataDaylightingManager->CalcMinIntWinSolidAngsW1; // Window vertices
+        auto & W2 = state.dataDaylightingManager->CalcMinIntWinSolidAngsW2;
+        auto & W3 = state.dataDaylightingManager->CalcMinIntWinSolidAngsW3;
+        auto & WC = state.dataDaylightingManager->CalcMinIntWinSolidAngsWC;  // Center point of window
+        auto & W21 = state.dataDaylightingManager->CalcMinIntWinSolidAngsW21; // Unit vectors from window vertex 2 to 1 and 2 to 3
+        auto & W23 = state.dataDaylightingManager->CalcMinIntWinSolidAngsW23;
+        auto & RREF = state.dataDaylightingManager->CalcMinIntWinSolidAngsRREF;  // Location of a reference point in absolute coordinate system
+        auto & Ray = state.dataDaylightingManager->CalcMinIntWinSolidAngsRay;   // Unit vector along ray from reference point to window center
+        auto & REFWC = state.dataDaylightingManager->CalcMinIntWinSolidAngsREFWC; // Vector from reference point to center of window
+        auto & WNORM = state.dataDaylightingManager->CalcMinIntWinSolidAngsWNORM; // Unit vector normal to window (pointing away from room)
         Real64 HW; // Window height and width (m)
         Real64 WW;
-        static Vector3<Real64> RREF;  // Location of a reference point in absolute coordinate system
-        static Vector3<Real64> Ray;   // Unit vector along ray from reference point to window center
-        static Vector3<Real64> REFWC; // Vector from reference point to center of window
-        static Vector3<Real64> WNORM; // Unit vector normal to window (pointing away from room)
         Real64 DIS;                   // Distance from ref point to window center (m)
         Real64 COSB;                  // Cosine of angle between ray from ref pt to center of window
         //  and window outward normal
@@ -10167,8 +10167,8 @@ namespace EnergyPlus::DaylightingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_string cAlphas(1);
-        static Array1D<Real64> rNumerics;
+        Array1D_string cAlphas(1);
+        Array1D<Real64> rNumerics;
         int NAlphas;
         int NNum;
         int IOStat;

@@ -644,17 +644,26 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Vector4<Real64> EDirSky; // Sky related direct illuminance
     Vector3<Real64> DayltgDirectSunDiskComplexFenestrationV;    // temporary vector
     Vector3<Real64> DayltgDirectSunDiskComplexFenestrationRWin; // Window center
-
     Vector2<Real64> DayltgInteriorMapIllumDFSUHR;       // Sun daylight factor for bare/shaded window
     Vector2<Real64> DayltgInteriorMapIllumSFSUHR; // Sun source luminance factor for bare/shaded window
     Vector2<Real64> DayltgInteriorMapIllumBFSUHR;       // Sun background luminance factor for bare/shaded window
     Vector4<Real64> DayltgInteriorMapIllumHorIllSky; // Horizontal illuminance for different sky types
+    Vector3<Real64> CalcMinIntWinSolidAngsW1; // Window vertices
+    Vector3<Real64> CalcMinIntWinSolidAngsW2;
+    Vector3<Real64> CalcMinIntWinSolidAngsW3;
+    Vector3<Real64> CalcMinIntWinSolidAngsWC;  // Center point of window
+    Vector3<Real64> CalcMinIntWinSolidAngsW21; // Unit vectors from window vertex 2 to 1 and 2 to 3
+    Vector3<Real64> CalcMinIntWinSolidAngsW23;
+    Vector3<Real64> CalcMinIntWinSolidAngsRREF;  // Location of a reference point in absolute coordinate system
+    Vector3<Real64> CalcMinIntWinSolidAngsRay;   // Unit vector along ray from reference point to window center
+    Vector3<Real64> CalcMinIntWinSolidAngsREFWC; // Vector from reference point to center of window
+    Vector3<Real64> CalcMinIntWinSolidAngsWNORM; // Unit vector normal to window (pointing away from room)
+
     Array2D<Real64> DayltgInteriorMapIllumDFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (first index), bare/shaded window (second index)
     Array2D<Real64> DayltgInteriorMapIllumBFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
     Array2D<Real64> DayltgInteriorMapIllumSFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
     Array1D<Real64> BACLUM;
     Array1D<Real64> DayltgInteriorMapIllumGLRNDX;
-
     Array1D<Real64> daylight_illum;
     Array1D<Real64> FLFWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
     Array1D<Real64> FLFWSUdisk = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
@@ -679,6 +688,13 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Array3D<Real64> tmpIllumFromWinAtRefPt;
     Array3D<Real64> tmpBackLumFromWinAtRefPt;
     Array3D<Real64> tmpSourceLumFromWinAtRefPt;
+    Array1D_bool FirstTimeMaps;
+    Array1D_bool EnvrnPrint;
+    Array1D_string SavedMnDy;
+    Array2D_string RefPts;
+    Array1D<Real64> XValue;
+    Array1D<Real64> YValue;
+    Array2D<Real64> IllumValue;
 
     Real64 tmpSWSL1 = 0.0;
     Real64 tmpSWSL2 = 0.0;
