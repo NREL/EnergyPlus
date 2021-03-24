@@ -479,6 +479,7 @@ namespace HeatBalanceIntRadExchange {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool NoUserInputF;            // Logical flag signifying no input F's for zone
+        bool ErrorsFound(false);
         Real64 CheckValue1;
         Real64 CheckValue2;
         Real64 FinalCheckValue;
@@ -489,7 +490,6 @@ namespace HeatBalanceIntRadExchange {
         std::string Option1; // view factor report option
 
         auto &ViewFactorReport(state.dataHeatBalIntRadExchg->ViewFactorReport);
-        auto &ErrorsFound(state.dataHeatBalIntRadExchg->ErrorsFound);
 
         ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
 

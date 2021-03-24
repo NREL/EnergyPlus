@@ -173,7 +173,6 @@ struct HeatBalanceIntRadExchgData : BaseGlobalStruct {
     Array1D<Real64> SurfaceTempInKto4th;
     Array1D<Real64> SurfaceEmiss;
     bool ViewFactorReport = false; // Flag to output view factor report in eio file
-    bool ErrorsFound = false;
 
     void clear_state() override
     {
@@ -184,7 +183,6 @@ struct HeatBalanceIntRadExchgData : BaseGlobalStruct {
         this->SurfaceTempInKto4th.deallocate();
         this->SurfaceEmiss.deallocate();
         this->ViewFactorReport = false;
-        this->ErrorsFound = false;
 
     }
 };

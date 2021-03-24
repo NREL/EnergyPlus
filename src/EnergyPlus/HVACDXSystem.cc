@@ -334,6 +334,7 @@ namespace HVACDXSystem {
         int NumNums;
         int IOStat;
         static std::string const RoutineName("GetDXCoolingSystemInput: "); // include trailing blank space
+        bool ErrorsFound(false);                                    // If errors detected in input
         bool IsNotOK;                                                      // Flag to verify name
         int DXCoolSysNum;
         bool FanErrorsFound;             // flag returned on fan operating mode check
@@ -348,7 +349,6 @@ namespace HVACDXSystem {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
-        auto &ErrorsFound(state.dataHVACDXSys->ErrorsFound);
         auto &ErrFound(state.dataHVACDXSys->ErrFound);
         auto &TotalArgs(state.dataHVACDXSys->TotalArgs);
 

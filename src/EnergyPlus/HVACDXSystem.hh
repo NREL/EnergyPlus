@@ -351,7 +351,6 @@ struct HVACDXSystemData : BaseGlobalStruct {
     Real64 HPTimeConstant = 45.0;            // Heat pump time constant [s]
     Real64 FanDelayTime = 0.0;               // Fan delay time, time delay for the HP's fan to
     Real64 OnOffAirFlowRatio = 1.0;          // ratio of compressor on flow to average flow over time step
-    bool ErrorsFound = false;          // If errors detected in input
     bool ErrFound = false;             // used for mining functions
     int TotalArgs = 0;                 // Total number of alpha and numeric arguments (max) for a certain object in the input file
     bool MyOneTimeFlag = true;
@@ -402,7 +401,6 @@ struct HVACDXSystemData : BaseGlobalStruct {
         this->HPTimeConstant = 45.0;
         this->FanDelayTime = 0.0;
         this->OnOffAirFlowRatio = 1.0;    
-        this->ErrorsFound = false;
         this->ErrFound = false;
         this->TotalArgs = 0;   
         this->MyOneTimeFlag = true;

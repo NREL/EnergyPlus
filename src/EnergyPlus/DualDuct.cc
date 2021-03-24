@@ -226,14 +226,14 @@ namespace DualDuct {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static Array1D<Real64> NumArray(2, 0.0);
-        static Array1D_string AlphArray(7);
-        static Array1D_string cAlphaFields(7);       // Alpha field names
-        static Array1D_string cNumericFields(2);     // Numeric field names
-        static Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
-        static Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
+        Array1D<Real64> NumArray(2, 0.0);
+        Array1D_string AlphArray(7);
+        Array1D_string cAlphaFields(7);       // Alpha field names
+        Array1D_string cNumericFields(2);     // Numeric field names
+        Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
+        Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
         std::string CurrentModuleObject;             // for ease in getting objects
-        static bool ErrorsFound(false);              // If errors detected in input
+        bool ErrorsFound(false);              // If errors detected in input
         int CtrlZone;                                // controlled zone do loop index
         int SupAirIn;                                // controlled zone supply air inlet index
         int ADUNum;                                  // loop control to search Air Distribution Units
@@ -2275,16 +2275,9 @@ namespace DualDuct {
         // get routine to learn if a dual duct outdoor air unit is using its recirc deck
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool RecircIsUsedARR;
-        static Array1D_string DamperNamesARR;
         int DamperIndex;                 // Loop index to Damper that you are currently loading input into
         std::string CurrentModuleObject; // for ease in getting objects
-        static Array1D<Real64> NumArray(2, 0.0);
-        static Array1D_string AlphArray(7);
-        static Array1D_string cAlphaFields(7);       // Alpha field names
-        static Array1D_string cNumericFields(2);     // Numeric field names
-        static Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
-        static Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
+
         int NumAlphas;
         int NumNums;
         int IOStat;
@@ -2299,9 +2292,15 @@ namespace DualDuct {
 
         if (state.dataDualDuct->GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
             state.dataDualDuct->NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
-            RecircIsUsedARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
-            DamperNamesARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
+            state.dataDualDuct->RecircIsUsedARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
+            state.dataDualDuct->DamperNamesARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
             if (state.dataDualDuct->NumDualDuctVarVolOA > 0) {
+                Array1D<Real64> NumArray(2, 0.0);
+                Array1D_string AlphArray(7);
+                Array1D_string cAlphaFields(7);       // Alpha field names
+                Array1D_string cNumericFields(2);     // Numeric field names
+                Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
+                Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
                 for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolOA; ++DamperIndex) {
 
                     CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
@@ -2318,20 +2317,20 @@ namespace DualDuct {
                                                   lAlphaBlanks,
                                                   cAlphaFields,
                                                   cNumericFields);
-                    DamperNamesARR(DamperIndex) = AlphArray(1);
+                    state.dataDualDuct->DamperNamesARR(DamperIndex) = AlphArray(1);
                     if (!lAlphaBlanks(5)) {
-                        RecircIsUsedARR(DamperIndex) = true;
+                        state.dataDualDuct->RecircIsUsedARR(DamperIndex) = true;
                     } else {
-                        RecircIsUsedARR(DamperIndex) = false;
+                        state.dataDualDuct->RecircIsUsedARR(DamperIndex) = false;
                     }
                 }
             }
             state.dataDualDuct->GetDualDuctOutdoorAirRecircUseFirstTimeOnly = false;
         }
 
-        DamperIndex = UtilityRoutines::FindItemInList(CompName, DamperNamesARR, state.dataDualDuct->NumDualDuctVarVolOA);
+        DamperIndex = UtilityRoutines::FindItemInList(CompName, state.dataDualDuct->DamperNamesARR, state.dataDualDuct->NumDualDuctVarVolOA);
         if (DamperIndex > 0) {
-            RecircIsUsed = RecircIsUsedARR(DamperIndex);
+            RecircIsUsed = state.dataDualDuct->RecircIsUsedARR(DamperIndex);
         }
     }
 

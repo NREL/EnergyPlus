@@ -238,7 +238,7 @@ namespace DataSystemVariables {
 
     void processEnvironmentVariables(EnergyPlusData &state) {
 
-        static std::string cEnvValue;
+        std::string cEnvValue;
 
         get_environment_variable(DDOnlyEnvVar, cEnvValue);
         state.dataSysVars->DDOnly = env_var_on(cEnvValue); // Yes or True

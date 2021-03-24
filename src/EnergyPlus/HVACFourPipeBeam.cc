@@ -109,7 +109,7 @@ namespace FourPipeBeam {
         //  certain object in the input file
         int IOStatus; // Used in GetObjectItem
         bool errFlag = false;
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         bool found = false;
         int ctrlZone; // controlled zome do loop index
         int supAirIn; // controlled zone supply air inlet index

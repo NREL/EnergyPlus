@@ -289,6 +289,9 @@ namespace DesiccantDehumidifiers {
         int NumAlphas;                         // Number of Alphas for each GetObjectItem call
         int NumNumbers;                        // Number of Numbers for each GetObjectItem call
         int IOStatus;                          // Used in GetObjectItem
+        bool ErrorsFound(false);               // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound2(false);              // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFoundGeneric(false);        // Set to true if errors in input, fatal at end of routine
         bool IsNotOK;                          // Flag to verify name
         bool OANodeError;                      // Flag for check on outside air node
         std::string RegenFanInlet;             // Desiccant system regeneration air fan inlet node
@@ -318,9 +321,6 @@ namespace DesiccantDehumidifiers {
         bool RegairHeatingCoilFlag(false); // local error flag
 
         auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
-        auto &ErrorsFound(state.dataDesiccantDehumidifiers->ErrorsFound);
-        auto &ErrorsFound2(state.dataDesiccantDehumidifiers->ErrorsFound2);
-        auto &ErrorsFoundGeneric(state.dataDesiccantDehumidifiers->ErrorsFoundGeneric);
         auto &MaxNums(state.dataDesiccantDehumidifiers->MaxNums);
         auto &MaxAlphas(state.dataDesiccantDehumidifiers->MaxAlphas);
         auto &TotalArgs(state.dataDesiccantDehumidifiers->TotalArgs);
@@ -1712,6 +1712,7 @@ namespace DesiccantDehumidifiers {
         int ProcInNode;  // inlet node number
         int RegenInNode; // inlet node number
         int ControlNode; // control node number
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int SteamIndex;                 // steam coil index
         Real64 FluidDensity;            // steam or water coil fluid density
         Real64 CoilMaxVolFlowRate;      // water or steam max volumetric water flow rate
@@ -1721,7 +1722,6 @@ namespace DesiccantDehumidifiers {
         auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
         auto &MyEnvrnFlag(state.dataDesiccantDehumidifiers->MyEnvrnFlag);
         auto &MyPlantScanFlag(state.dataDesiccantDehumidifiers->MyPlantScanFlag);
-        auto &ErrorsFound3(state.dataDesiccantDehumidifiers->ErrorsFound3);
 
         if (state.dataDesiccantDehumidifiers->InitDesiccantDehumidifierOneTimeFlag) {
 
@@ -1883,7 +1883,7 @@ namespace DesiccantDehumidifiers {
                                 CoilMaxVolFlowRate =
                                     GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
                                 if (ErrorFlag) {
-                                    ErrorsFound3 = true;
+                                    ErrorsFound = true;
                                 }
                                 if (CoilMaxVolFlowRate != AutoSize) {
                                     FluidDensity = GetDensityGlycol(state,
@@ -1903,7 +1903,7 @@ namespace DesiccantDehumidifiers {
                                 ErrorFlag = false;
                                 CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(state, DesicDehum(DesicDehumNum).RegenCoilIndex, ErrorFlag);
                                 if (ErrorFlag) {
-                                    ErrorsFound3 = true;
+                                    ErrorsFound = true;
                                 }
                                 if (CoilMaxVolFlowRate != AutoSize) {
                                     SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
