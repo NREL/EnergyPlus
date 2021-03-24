@@ -1008,6 +1008,10 @@ struct HVACVarRefFlowData : BaseGlobalStruct {
     Array1D<Real64> MinDeltaT;              // minimum zone temperature difference from setpoint
     Array1D<Real64> SumCoolingLoads;        // sum of cooling loads
     Array1D<Real64> SumHeatingLoads;        // sum of heating loads
+    Array1D_bool CheckVRFCombinationRatio;
+    bool MyOneTimeEIOFlag = true; // eio header flag reporting
+    int ATMixOutNode = 0; // terminal unit mixer outlet node
+    int ATMixOutNode2 = 0; // terminal unit mixer outlet node
 
     // Object Data
     Array1D<HVACVariableRefrigerantFlow::VRFCondenserEquipment> VRF; // AirConditioner:VariableRefrigerantFlow object
@@ -1065,6 +1069,10 @@ struct HVACVarRefFlowData : BaseGlobalStruct {
         this->VRFTU.deallocate();
         this->TerminalUnitList.deallocate();
         this->VRFTUNumericFields.deallocate();
+        this->CheckVRFCombinationRatio.clear();
+        this->MyOneTimeEIOFlag = true;
+        this->ATMixOutNode = 0;
+        this->ATMixOutNode2 = 0;
     }
 };
 

@@ -134,11 +134,11 @@ namespace HVACSingleDuctInduc {
         // These are purposefully not in the header file as an extern variable. No one outside of this should
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MySizeFlag;
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyAirDistInitFlag;
+        bool MyOneTimeFlag(true);
+        Array1D_bool MyEnvrnFlag;
+        Array1D_bool MySizeFlag;
+        Array1D_bool MyPlantScanFlag;
+        Array1D_bool MyAirDistInitFlag;
     } // namespace
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
