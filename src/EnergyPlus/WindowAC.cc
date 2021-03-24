@@ -263,11 +263,10 @@ namespace WindowAC {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
-        //  INTEGER                              :: FanType           ! Integer index for Fan type
-        int CtrlZone;          // index to loop counter
-        int NodeNum;           // index to loop counter
-        bool ZoneNodeNotFound; // used in error checking
+        int TotalArgs(0);                // Total number of alpha and numeric arguments (max) for a
+        int CtrlZone;                    // index to loop counter
+        int NodeNum;                     // index to loop counter
+        bool ZoneNodeNotFound;           // used in error checking
 
         // find the number of each type of window AC unit
         CurrentModuleObject = "ZoneHVAC:WindowAirConditioner";
@@ -763,28 +762,26 @@ namespace WindowAC {
         int AirRelNode;     // relief air node number in window AC loop
         Real64 RhoAir;      // air density at InNode
         int Loop;                         // loop counter
-        static Array1D_bool MyEnvrnFlag;  // one time initialization flag
-        static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
         Real64 QToCoolSetPt;              // sensible load to cooling setpoint (W)
         Real64 NoCompOutput;              // sensible load delivered with compressor off (W)
 
         // Do the one time initializations
         if (state.dataWindowAC->MyOneTimeFlag) {
 
-            MyEnvrnFlag.allocate(state.dataWindowAC->NumWindAC);
+            state.dataWindowAC->MyEnvrnFlag.allocate(state.dataWindowAC->NumWindAC);
             state.dataWindowAC->MySizeFlag.allocate(state.dataWindowAC->NumWindAC);
-            MyZoneEqFlag.allocate(state.dataWindowAC->NumWindAC);
-            MyEnvrnFlag = true;
+            state.dataWindowAC->MyZoneEqFlag.allocate(state.dataWindowAC->NumWindAC);
+            state.dataWindowAC->MyEnvrnFlag = true;
             state.dataWindowAC->MySizeFlag = true;
-            MyZoneEqFlag = true;
+            state.dataWindowAC->MyZoneEqFlag = true;
             state.dataWindowAC->MyOneTimeFlag = false;
         }
 
         if (allocated(ZoneComp)) {
-            if (MyZoneEqFlag(WindACNum)) { // initialize the name of each availability manager list and zone number
+            if (state.dataWindowAC->MyZoneEqFlag(WindACNum)) { // initialize the name of each availability manager list and zone number
                 ZoneComp(WindowAC_Num).ZoneCompAvailMgrs(WindACNum).AvailManagerListName = state.dataWindowAC->WindAC(WindACNum).AvailManagerListName;
                 ZoneComp(WindowAC_Num).ZoneCompAvailMgrs(WindACNum).ZoneNum = ZoneNum;
-                MyZoneEqFlag(WindACNum) = false;
+                state.dataWindowAC->MyZoneEqFlag(WindACNum) = false;
             }
             state.dataWindowAC->WindAC(WindACNum).AvailStatus = ZoneComp(WindowAC_Num).ZoneCompAvailMgrs(WindACNum).AvailStatus;
         }
@@ -809,7 +806,7 @@ namespace WindowAC {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(WindACNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataWindowAC->MyEnvrnFlag(WindACNum)) {
             InNode = state.dataWindowAC->WindAC(WindACNum).AirInNode;
             OutNode = state.dataWindowAC->WindAC(WindACNum).AirOutNode;
             OutsideAirNode = state.dataWindowAC->WindAC(WindACNum).OutsideAirNode;
@@ -824,11 +821,11 @@ namespace WindowAC {
             state.dataLoopNodes->Node(OutNode).MassFlowRateMin = 0.0;
             state.dataLoopNodes->Node(InNode).MassFlowRateMax = state.dataWindowAC->WindAC(WindACNum).MaxAirMassFlow;
             state.dataLoopNodes->Node(InNode).MassFlowRateMin = 0.0;
-            MyEnvrnFlag(WindACNum) = false;
+            state.dataWindowAC->MyEnvrnFlag(WindACNum) = false;
         } // end one time inits
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(WindACNum) = true;
+            state.dataWindowAC->MyEnvrnFlag(WindACNum) = true;
         }
 
         if (state.dataWindowAC->WindAC(WindACNum).FanSchedPtr > 0) {
