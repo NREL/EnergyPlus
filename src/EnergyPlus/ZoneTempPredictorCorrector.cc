@@ -4707,23 +4707,23 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         constexpr auto RoutineName("CorrectZoneAirTemp");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 CpAir;                              // specific heat of air
-        static Real64 SumIntGain(0.0);             // Zone sum of convective internal gains
-        static Real64 SumIntGainExceptPeople(0.0); // Zone sum of convective internal gains except for convective heat from people, HybridModel
-        static Real64 SumHA(0.0);                  // Zone sum of Hc*Area
-        static Real64 SumHATsurf(0.0);             // Zone sum of Hc*Area*Tsurf
-        static Real64 SumHATref(0.0);              // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
-        static Real64 SumMCp(0.0);                 // Zone sum of MassFlowRate*Cp
-        static Real64 SumMCpT(0.0);                // Zone sum of MassFlowRate*Cp*T
-        static Real64 SumSysMCp(0.0);              // Zone sum of air system MassFlowRate*Cp
-        static Real64 SumSysMCpT(0.0);             // Zone sum of air system MassFlowRate*Cp*T
-        static Real64 ZoneEnthalpyIn(0.0);         // Zone inlet air enthalpy
-        static Real64 TempDepCoef(0.0);            // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
-        static Real64 TempIndCoef(0.0);            // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-        static Real64 AirCap(0.0);                 // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"
-        static Real64 SNLoad(0.0);                 // Sensible load calculated for zone in watts and then loaded in report variables
-        static int ZoneNum(0);
-        static int ZoneNodeNum(0); // System node number for air flow through zone either by system or as a plenum
+        Real64 CpAir;                       // specific heat of air
+        Real64 SumIntGain(0.0);             // Zone sum of convective internal gains
+        Real64 SumIntGainExceptPeople(0.0); // Zone sum of convective internal gains except for convective heat from people, HybridModel
+        Real64 SumHA(0.0);                  // Zone sum of Hc*Area
+        Real64 SumHATsurf(0.0);             // Zone sum of Hc*Area*Tsurf
+        Real64 SumHATref(0.0);              // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
+        Real64 SumMCp(0.0);                 // Zone sum of MassFlowRate*Cp
+        Real64 SumMCpT(0.0);                // Zone sum of MassFlowRate*Cp*T
+        Real64 SumSysMCp(0.0);              // Zone sum of air system MassFlowRate*Cp
+        Real64 SumSysMCpT(0.0);             // Zone sum of air system MassFlowRate*Cp*T
+        Real64 ZoneEnthalpyIn(0.0);         // Zone inlet air enthalpy
+        Real64 TempDepCoef(0.0);            // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
+        Real64 TempIndCoef(0.0);            // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
+        Real64 AirCap(0.0);                 // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"
+        Real64 SNLoad(0.0);                 // Sensible load calculated for zone in watts and then loaded in report variables
+        int ZoneNum(0);
+        int ZoneNodeNum(0); // System node number for air flow through zone either by system or as a plenum
 
         Real64 TempSupplyAir;
         Real64 ZoneMult;
@@ -5662,10 +5662,10 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // This subroutine inversely solve infiltration airflow rate or people count with zone air temperatures measurements.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 CpAir;                   // specific heat of air
-        static Real64 TempDepCoef(0.0); // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
-        static Real64 TempIndCoef(0.0); // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-        static Real64 AirCapHM(0.0);    // Air power capacity for hybrid modeling
+        Real64 CpAir;            // specific heat of air
+        Real64 TempDepCoef(0.0); // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
+        Real64 TempIndCoef(0.0); // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
+        Real64 AirCapHM(0.0);    // Air power capacity for hybrid modeling
 
         Real64 AA(0.0);
         Real64 BB(0.0);
@@ -7340,17 +7340,13 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         int const MaxIter(500);  // iteration control for SolveRoot
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Tmin;            // Minimun drybulb setpoint temperature
-        Real64 Tmax;            // Maximun drybulb setpoint temperature
+        Real64 Tmin;            // Minimum drybulb setpoint temperature
+        Real64 Tmax;            // Minimum drybulb setpoint temperature
         Real64 PMVResult;       // Calculated PMV value
         Real64 PMVMin;          // Minimum allowed PMV value
         Real64 PMVMax;          // Calculated PMV value
         Array1D<Real64> Par(2); // Passed parameter for RegularFalsi function
         int SolFla;             // feed back flag from SolveRoot
-        static int IterLimitExceededNum1(0);
-        static int IterLimitErrIndex1(0);
-        static int IterLimitExceededNum2(0);
-        static int IterLimitErrIndex2(0);
 
         Tmin = state.dataZoneCtrls->ComfortControlledZone(ComfortControlNum).TdbMinSetPoint;
         Tmax = state.dataZoneCtrls->ComfortControlledZone(ComfortControlNum).TdbMaxSetPoint;
@@ -7365,28 +7361,28 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             TempSolveRoot::SolveRoot(state, Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
-                    ++IterLimitExceededNum1;
-                    if (IterLimitExceededNum1 == 1) {
+                    ++state.dataZoneTempPredictorCorrector->IterLimitExceededNum1;
+                    if (state.dataZoneTempPredictorCorrector->IterLimitExceededNum1 == 1) {
                         ShowWarningError(state, state.dataZoneCtrls->ComfortControlledZone(ComfortControlNum).Name +
                                          ": Iteration limit exceeded calculating thermal comfort Fanger setpoint and non-converged setpoint is used");
                     } else {
                         ShowRecurringWarningErrorAtEnd(state, state.dataZoneCtrls->ComfortControlledZone(ComfortControlNum).Name +
                                                            ":  Iteration limit exceeded calculating thermal comfort setpoint.",
-                                                       IterLimitErrIndex1,
+                                                       state.dataZoneTempPredictorCorrector->IterLimitErrIndex1,
                                                        Tset,
                                                        Tset);
                     }
                 }
             } else if (SolFla == -2) {
                 if (!state.dataGlobal->WarmupFlag) {
-                    ++IterLimitExceededNum2;
-                    if (IterLimitExceededNum2 == 1) {
+                    ++state.dataZoneTempPredictorCorrector->IterLimitExceededNum2;
+                    if (state.dataZoneTempPredictorCorrector->IterLimitExceededNum2 == 1) {
                         ShowWarningError(state, state.dataZoneCtrls->ComfortControlledZone(ComfortControlNum).Name +
                                          ": Solution is not found in calculating thermal comfort Fanger setpoint and the minimum setpoint is used");
                     } else {
                         ShowRecurringWarningErrorAtEnd(state, state.dataZoneCtrls->ComfortControlledZone(ComfortControlNum).Name +
                                                            ":  Solution is not found in  calculating thermal comfort Fanger setpoint.",
-                                                       IterLimitErrIndex2,
+                                                       state.dataZoneTempPredictorCorrector->IterLimitErrIndex2,
                                                        Tset,
                                                        Tset);
                     }

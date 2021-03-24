@@ -209,19 +209,19 @@ namespace ZoneDehumidifier {
         Real64 const RatedInletAirRH(60.0);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneDehumidIndex;           // Loop index
-        static int NumAlphas(0);        // Number of Alphas to allocate arrays, then used for each GetObjectItem call
-        static int NumNumbers(0);       // Number of Numbers to allocate arrays, then used for each GetObjectItem call
-        int IOStatus;                   // Used in GetObjectItem
-        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        Array1D_string Alphas;          // Alpha input items for object
-        Array1D_string cAlphaFields;    // Alpha field names
-        Array1D_string cNumericFields;  // Numeric field names
-        Array1D<Real64> Numbers;        // Numeric input items for object
-        Array1D_bool lAlphaBlanks;      // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;    // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);        // Total number of alpha and numeric arguments (max)
-        Real64 CurveVal;                // Output from curve object (water removal or energy factor curves)
+        int ZoneDehumidIndex;          // Loop index
+        int NumAlphas(0);              // Number of Alphas to allocate arrays, then used for each GetObjectItem call
+        int NumNumbers(0);             // Number of Numbers to allocate arrays, then used for each GetObjectItem call
+        int IOStatus;                  // Used in GetObjectItem
+        bool ErrorsFound(false);       // Set to true if errors in input, fatal at end of routine
+        Array1D_string Alphas;         // Alpha input items for object
+        Array1D_string cAlphaFields;   // Alpha field names
+        Array1D_string cNumericFields; // Numeric field names
+        Array1D<Real64> Numbers;       // Numeric input items for object
+        Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
+        Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
+        int TotalArgs(0);              // Total number of alpha and numeric arguments (max)
+        Real64 CurveVal;               // Output from curve object (water removal or energy factor curves)
 
         state.dataZoneDehumidifier->NumDehumidifiers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
@@ -568,20 +568,16 @@ namespace ZoneDehumidifier {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-        //  LOGICAL, ALLOCATABLE, SAVE, DIMENSION(:) :: MySizeFlag  ! Used for sizing zone dehumidifier inputs one time
-        int LoopIndex;                               // DO loop index
-        int AirInletNode;                            // Inlet air node number
-        Real64 RatedAirHumrat;                       // Humidity ratio (kg/kg) at rated inlet air conditions of 26.6667C, 60% RH
-        Real64 RatedAirDBTemp;                       // Dry-bulb air temperature at rated conditions 26.6667C
-        Real64 RatedAirRH;                           // Relative humidity of air (0.6 --> 60%) at rated conditions
+        int LoopIndex;         // DO loop index
+        int AirInletNode;      // Inlet air node number
+        Real64 RatedAirHumrat; // Humidity ratio (kg/kg) at rated inlet air conditions of 26.6667C, 60% RH
+        Real64 RatedAirDBTemp; // Dry-bulb air temperature at rated conditions 26.6667C
+        Real64 RatedAirRH;     // Relative humidity of air (0.6 --> 60%) at rated conditions
 
         // Do the one time initializations
         if (state.dataZoneDehumidifier->MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(state.dataZoneDehumidifier->NumDehumidifiers);
-            //    ALLOCATE(MySizeFlag(NumDehumidifiers))
-            MyEnvrnFlag = true;
-            //    MySizeFlag = .TRUE.
+            state.dataZoneDehumidifier->MyEnvrnFlag.allocate(state.dataZoneDehumidifier->NumDehumidifiers);
+            state.dataZoneDehumidifier->MyEnvrnFlag = true;
             state.dataZoneDehumidifier->MyOneTimeFlag = false;
         }
 
@@ -597,7 +593,7 @@ namespace ZoneDehumidifier {
 
         AirInletNode = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).AirInletNodeNum;
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneDehumNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataZoneDehumidifier->MyEnvrnFlag(ZoneDehumNum)) {
 
             // Set the mass flow rates from the input volume flow rates, at rated conditions of 26.6667C, 60% RH
             // Might default back to STP later after discussion with M. Witte, use StdRhoAir instead of calc'd RhoAir at rated conditions
@@ -613,11 +609,11 @@ namespace ZoneDehumidifier {
             state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail = 0.0;
             state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin = 0.0;
 
-            MyEnvrnFlag(ZoneDehumNum) = false;
+            state.dataZoneDehumidifier->MyEnvrnFlag(ZoneDehumNum) = false;
         } // End one time inits
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(ZoneDehumNum) = true;
+            state.dataZoneDehumidifier->MyEnvrnFlag(ZoneDehumNum) = true;
         }
 
         // These initializations are done every iteration
@@ -741,8 +737,8 @@ namespace ZoneDehumidifier {
         Real64 hfg;                     // Enthalpy of evaporation of inlet air (J/kg)
         Real64 AirMassFlowRate;         // Air mass flow rate through this dehumidifier (kg/s)
         Real64 Cp;                      // Heat capacity of inlet air (J/kg-C)
-        static int AirInletNodeNum(0);  // Node number for the inlet air to the dehumidifier
-        static int AirOutletNodeNum(0); // Node number for the outlet air from the dehumidifier
+        int AirInletNodeNum(0);         // Node number for the inlet air to the dehumidifier
+        int AirOutletNodeNum(0);        // Node number for the outlet air from the dehumidifier
 
         SensibleOutput = 0.0;
         LatentOutput = 0.0;

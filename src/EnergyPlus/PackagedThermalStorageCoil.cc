@@ -71,6 +71,7 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -1758,10 +1759,10 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyFlag;       // One time environment flag
-        static Array1D_bool MySizeFlag;   // One time sizing flag
-        static Array1D_bool MyEnvrnFlag;  // flag for init once at start of environment
-        static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
+        auto & MyFlag = state.dataPackagedThermalStorageCoil->MyFlag;
+        auto & MySizeFlag = state.dataPackagedThermalStorageCoil->MySizeFlag;
+        auto & MyEnvrnFlag = state.dataPackagedThermalStorageCoil->MyEnvrnFlag;
+        auto & MyWarmupFlag = state.dataPackagedThermalStorageCoil->MyWarmupFlag;
         bool errFlag;
         int plloopnum;
         int lsnum;
@@ -3875,7 +3876,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
                                       Real64 const DesiredOutletHumRat, // desired outlet humidity ratio [kg/kg]
                                       Real64 &PartLoadFrac, // value based on coil operation, if possible, as PLR required to meet T or w set point
                                       int &TESOpMode,       // value determined in InitTESCoil and passed back to parent for use in iteration routines
-                                      int &ControlType,     // parent object dehumidification control type (e.g., None, Multimode, CoolReheat)
+                                      HVACDXSystem::DehumidControl &ControlType, // parent object dehumidification control type (e.g., None, Multimode, CoolReheat)
                                       int &SensPLRIter,     // iteration number of Sensible PLR Iteration warning message
                                       int &SensPLRIterIndex, // index to Sensible PLR Iteration warning message
                                       int &SensPLRFail,      // iteration number of Sensible PLR Iteration fail warning message
@@ -4008,7 +4009,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
                 // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
                 // then overcool to meet moisture load
 
-                if ((OutletHumRatDXCoil > DesiredOutletHumRat) && (PartLoadFrac < 1.0) && (ControlType == DehumidControl_CoolReheat)) {
+                if ((OutletHumRatDXCoil > DesiredOutletHumRat) && (PartLoadFrac < 1.0) && (ControlType == HVACDXSystem::DehumidControl::CoolReheat)) {
                     //           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
                     //           do not run the compressor
                     if ((NoLoadHumRatOut - DesiredOutletHumRat) < HumRatAcc) {

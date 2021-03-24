@@ -184,8 +184,6 @@ void ManageHVAC(EnergyPlusData &state)
     bool ReportDebug;
     int ZoneNum;
 
-    static int ZTempTrendsNumSysSteps(0);
-    static int SysTimestepLoop(0);
     bool DummyLogical;
 
     auto & AirLoopsSimOnce = state.dataHVACGlobal->AirLoopsSimOnce;
@@ -299,7 +297,7 @@ void ManageHVAC(EnergyPlusData &state)
     if (ZoneTempChange > state.dataConvergeParams->MaxZoneTempDiff && !state.dataGlobal->KickOffSimulation) {
         // determine value of adaptive system time step
         // model how many system timesteps we want in zone timestep
-        ZTempTrendsNumSysSteps = int(ZoneTempChange / state.dataConvergeParams->MaxZoneTempDiff + 1.0); // add 1 for truncation
+        int ZTempTrendsNumSysSteps = int(ZoneTempChange / state.dataConvergeParams->MaxZoneTempDiff + 1.0); // add 1 for truncation
         NumOfSysTimeSteps = min(ZTempTrendsNumSysSteps, LimitNumSysSteps);
         // then determine timestep length for even distribution, protect div by zero
         if (NumOfSysTimeSteps > 0) TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
@@ -312,7 +310,7 @@ void ManageHVAC(EnergyPlusData &state)
     }
 
     if (UseZoneTimeStepHistory) state.dataHVACGlobal->PreviousTimeStep = state.dataGlobal->TimeStepZone;
-    for (SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
+    for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
         if (state.dataGlobal->stopSimulation) break;
 
         if (TimeStepSys < state.dataGlobal->TimeStepZone) {
@@ -614,9 +612,9 @@ void SimHVAC(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool FirstHVACIteration; // True when solution technique on first iteration
-    static int ErrCount(0);  // Number of times that the maximum iterations was exceeded
-    static int MaxErrCount(0);
-    static std::string ErrEnvironmentName;
+    auto & ErrCount = state.dataHVACMgr->ErrCount;
+    auto & MaxErrCount = state.dataHVACMgr->MaxErrCount;
+    auto & ErrEnvironmentName = state.dataHVACMgr->ErrEnvironmentName;
     int LoopNum;
     int LoopSide;
     int ThisLoopSide;
@@ -2318,8 +2316,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     Real64 H2OHtOfVap;                 // Heat of vaporization of air
     Real64 TotalLoad;                  // Total loss or gain
     int MixNum;                        // Counter for MIXING and Cross Mixing statements
-    static Array1D<Real64> MixSenLoad; // Mixing sensible loss or gain
-    static Array1D<Real64> MixLatLoad; // Mixing latent loss or gain
+    auto & MixSenLoad = state.dataHVACMgr->MixSenLoad; // Mixing sensible loss or gain
+    auto & MixLatLoad = state.dataHVACMgr->MixLatLoad; // Mixing latent loss or gain
     int j;                             // Index in a do-loop
     int VentZoneNum;                   // Number of ventilation object per zone
     Real64 VentZoneMassflow;           // Total mass flow rate per zone
@@ -2875,13 +2873,12 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     using ScheduleManager::GetScheduleMaxValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static int AirLoopNum(0);        // the air loop index
+    int AirLoopNum(0);        // the air loop index
+    int ZoneNum(0);           // zone index
     int ControlledZoneNum;           // controlled zone index
     bool CyclingFan(false);          // TRUE means air loop operates in cycling fan mode at some point
-    static int ZoneNum(0);           // zone index
     int LightNum;                    // Lights object index
     int SurfNum;                     // Surface index
-    static Real64 CycFanMaxVal(0.0); // max value of cycling fan schedule
 
     auto &Zone(state.dataHeatBal->Zone);
     auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
@@ -2894,7 +2891,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             if (AirLoopControlInfo(AirLoopNum).UnitarySys) { // for unitary systems check the cycling fan schedule
                 if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                    CycFanMaxVal = GetScheduleMaxValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr);
+                    Real64 CycFanMaxVal = GetScheduleMaxValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr);
                     if (CycFanMaxVal > 0.0) {
                         AirLoopControlInfo(AirLoopNum).AnyContFan = true;
                     } else {

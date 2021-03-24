@@ -175,8 +175,10 @@ struct ElectricBaseboardRadiatorData : BaseGlobalStruct {
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
+    Array1D_bool MyEnvrnFlag;
     void clear_state() override
     {
+        this->MyEnvrnFlag.clear();
         this->NumElecBaseboards = 0;
         this->GetInputFlag = true;
         this->MyOneTimeFlag = true;

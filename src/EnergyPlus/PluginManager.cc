@@ -1341,13 +1341,8 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     bool PluginManager::anyUnexpectedPluginObjects(EnergyPlusData &state)
     {
-        static std::vector<std::string> objectsToFind = {"PythonPlugin:OutputVariable",
-                                                         "PythonPlugin:SearchPaths",
-                                                         "PythonPlugin:Instance",
-                                                         "PythonPlugin:Variables",
-                                                         "PythonPlugin:TrendVariable"};
         int numTotalThings = 0;
-        for (auto const &objToFind : objectsToFind) {
+        for (auto const &objToFind : state.dataPluginManager->objectsToFind) {
             int instances = inputProcessor->getNumObjectsFound(state, objToFind);
             numTotalThings += instances;
             if (numTotalThings == 1) {

@@ -1691,7 +1691,7 @@ namespace ThermalComfort {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AllAngleFacSummed;       // Sum of angle factors in each zone
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int IOStatus;
         int Item;                  // Item to be "gotten"
         int NumAlphas;             // Number of Alphas from InputProcessor

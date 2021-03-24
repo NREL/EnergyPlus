@@ -1557,7 +1557,7 @@ namespace EnergyPlus::General {
         int JulianDay;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_int EndDayofMonth(12, {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
+        static Array1D_int const EndDayofMonth(12, {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
         // End day numbers of each month (without Leap Year)
 
         if (Month == 1) {
@@ -2098,7 +2098,7 @@ namespace EnergyPlus::General {
         // string but in this case the output string is a fixed size so this is more
         // clear for formatting and faster. If formatted string changes, make sure to
         // add more to buffer.
-        static char buffer[11];
+        char buffer[11];
         int cx = snprintf(buffer, 11, "%02d:%02d:%04.1f", Hours, Minutes, Seconds);
 
         // Make sure output string is only between 0 and 10 characters so string is
@@ -2202,16 +2202,16 @@ namespace EnergyPlus::General {
         int NumNames;
         int NumNumbers;
         int IOStat;
-        static std::string DXFOption1;
-        static std::string DXFOption2;
-        static std::string DXFWFOption1;
-        static std::string DXFWFOption2;
-        static std::string VRMLOption1;
-        static std::string VRMLOption2;
-        static std::string ViewRptOption1;
-        static std::string LineRptOption1;
-        static std::string VarDictOption1;
-        static std::string VarDictOption2;
+        auto & DXFOption1 = state.dataGeneral->DXFOption1;
+        auto & DXFOption2 = state.dataGeneral->DXFOption2;
+        auto & DXFWFOption1 = state.dataGeneral->DXFWFOption1;
+        auto & DXFWFOption2 = state.dataGeneral->DXFWFOption2;
+        auto & VRMLOption1 = state.dataGeneral->VRMLOption1;
+        auto & VRMLOption2 = state.dataGeneral->VRMLOption2;
+        auto & ViewRptOption1 = state.dataGeneral->ViewRptOption1;
+        auto & LineRptOption1 = state.dataGeneral->LineRptOption1;
+        auto & VarDictOption1 = state.dataGeneral->VarDictOption1;
+        auto & VarDictOption2 = state.dataGeneral->VarDictOption2;
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         if (state.dataGeneral->GetReportInput) {

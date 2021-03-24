@@ -1131,19 +1131,15 @@ void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(Optional<int const> cell, Opt
     // Evaluates the soil properties
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static Real64 Theta_ice;
-    static Real64 Theta_liq;
-    static Real64 Theta_sat;
-    static Real64 rho_ice;
-    static Real64 rho_liq;
-    static Real64 rhoCp_soil_liq_1;
-    static Real64 CP_liq;
-    static Real64 CP_ice;
-    static Real64 Lat_fus;
-    static Real64 Cp_transient;
-    static Real64 rhoCP_soil_liq;
-    static Real64 rhoCP_soil_transient;
-    static Real64 rhoCP_soil_ice;
+    Real64 Theta_ice;
+    Real64 Theta_liq;
+    Real64 Theta_sat;
+    Real64 rho_ice;
+    Real64 rho_liq;
+    Real64 CP_liq;
+    Real64 CP_ice;
+    Real64 Lat_fus;
+    Real64 Cp_transient;
     // other variables
     Real64 frzAllIce;
     Real64 frzIceTrans;

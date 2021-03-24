@@ -318,19 +318,38 @@ struct UnitVentilatorsData : BaseGlobalStruct {
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyPlantScanFlag;
+    Array1D_bool MyZoneEqFlag;
+
+    int RefrigIndex = 0;
+    int DummyWaterIndex = 1;
+
+    int ATMixOutNode = 0;   // outlet node of ATM Mixer
+    int ATMixerPriNode = 0; // primary air node of ATM Mixer
+    int ZoneNode = 0;       // zone node
+
     void clear_state() override
     {
-        HCoilOn = false;
-        NumOfUnitVents = 0;
-        OAMassFlowRate = 0.0;
-        QZnReq = 0.0;
-        GetUnitVentilatorInputFlag = true;
-        MySizeFlag.deallocate();
-        CheckEquipName.deallocate();
-        UnitVent.deallocate();
-        UnitVentNumericFields.deallocate();
-        MyOneTimeFlag = true;
-        ZoneEquipmentListChecked = false;
+        this->HCoilOn = false;
+        this->NumOfUnitVents = 0;
+        this->OAMassFlowRate = 0.0;
+        this->QZnReq = 0.0;
+        this->GetUnitVentilatorInputFlag = true;
+        this->MySizeFlag.deallocate();
+        this->CheckEquipName.deallocate();
+        this->UnitVent.deallocate();
+        this->UnitVentNumericFields.deallocate();
+        this->MyOneTimeFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->MyEnvrnFlag.deallocate();
+        this->MyPlantScanFlag.deallocate();
+        this->MyZoneEqFlag.deallocate();
+        this->RefrigIndex = 0;
+        this->DummyWaterIndex = 1;
+        this->ATMixOutNode = 0;
+        this->ATMixerPriNode = 0;
+        this->ZoneNode = 0;
     }
 
     // Default Constructor

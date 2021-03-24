@@ -108,6 +108,10 @@ struct HybridUnitaryAirConditionersData : BaseGlobalStruct {
     bool HybridCoolOneTimeFlag = true;
     Array1D_bool CheckZoneHybridEvapName;
     Array1D<HybridUnitaryAirConditioners::Model> ZoneHybridUnitaryAirConditioner;
+    Array1D_bool MySizeFlag;
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyFanFlag;
+    Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 
     void clear_state() override
     {
@@ -117,6 +121,10 @@ struct HybridUnitaryAirConditionersData : BaseGlobalStruct {
         this->HybridCoolOneTimeFlag = true;
         this->CheckZoneHybridEvapName.deallocate();
         this->ZoneHybridUnitaryAirConditioner.deallocate();
+        this->MySizeFlag.clear();
+        this->MyEnvrnFlag.clear();
+        this->MyFanFlag.clear();
+        this->MyZoneEqFlag.clear();
     }
 };
 

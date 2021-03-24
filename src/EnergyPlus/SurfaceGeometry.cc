@@ -7002,10 +7002,10 @@ namespace SurfaceGeometry {
         int CountHTAlgoObjectsMultiSurf;
         int CountHTAlgoObjectsSurfList;
         int IOStatus; // Used in GetObjectItem
-        static bool ErrorsFoundSingleSurf(false);
-        static bool ErrorsFoundMultiSurf(false);
-        static bool ErrorsFoundSurfList(false);
-        static bool ErrorsFoundByConstruct(false);
+        bool ErrorsFoundSingleSurf(false);
+        bool ErrorsFoundMultiSurf(false);
+        bool ErrorsFoundSurfList(false);
+        bool ErrorsFoundByConstruct(false);
         DataSurfaces::iHeatTransferModel tmpAlgoInput;
         int Item;
         int Item1;
@@ -10370,7 +10370,7 @@ namespace SurfaceGeometry {
             zoneVolumeCalculationMethod volCalcMethod;
 
             if (isZoneEnclosed) {
-                CalcVolume = CalcPolyhedronVolume(ZoneStruct);
+                CalcVolume = CalcPolyhedronVolume(state, ZoneStruct);
                 volCalcMethod = zoneVolumeCalculationMethod::enclosed;
             } else if (state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0 && state.dataHeatBal->Zone(ZoneNum).CeilingHeight > 0.0 && areFloorAndCeilingSame(state, ZoneStruct)) {
                 CalcVolume = state.dataHeatBal->Zone(ZoneNum).FloorArea * state.dataHeatBal->Zone(ZoneNum).CeilingHeight;

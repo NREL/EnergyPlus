@@ -253,14 +253,11 @@ namespace BranchInputManager {
         int Count; // Loop Counter
         int MinCompsAllowed;
 
-        // Object Data
-        static Array1D<ComponentData> BComponents; // Component data to be returned
-
         // NumComps now defined on input
 
-        BComponents.allocate(NumComps);
+        state.dataBranchInputManager->BComponents.allocate(NumComps);
 
-        GetInternalBranchData(state, LoopName, BranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound);
+        GetInternalBranchData(state, LoopName, BranchName, PressCurveType, PressCurveIndex, NumComps, state.dataBranchInputManager->BComponents, ErrorsFound);
 
         MinCompsAllowed = min(
             size(CompType), size(CompName), size(CompInletNodeNames), size(CompInletNodeNums), size(CompOutletNodeNames), size(CompOutletNodeNums));
@@ -272,14 +269,14 @@ namespace BranchInputManager {
         }
 
         for (Count = 1; Count <= NumComps; ++Count) {
-            CompType(Count) = BComponents(Count).CType;
-            CompName(Count) = BComponents(Count).Name;
-            CompInletNodeNames(Count) = BComponents(Count).InletNodeName;
-            CompInletNodeNums(Count) = BComponents(Count).InletNode;
-            CompOutletNodeNames(Count) = BComponents(Count).OutletNodeName;
-            CompOutletNodeNums(Count) = BComponents(Count).OutletNode;
+            CompType(Count) = state.dataBranchInputManager->BComponents(Count).CType;
+            CompName(Count) = state.dataBranchInputManager->BComponents(Count).Name;
+            CompInletNodeNames(Count) = state.dataBranchInputManager->BComponents(Count).InletNodeName;
+            CompInletNodeNums(Count) = state.dataBranchInputManager->BComponents(Count).InletNode;
+            CompOutletNodeNames(Count) = state.dataBranchInputManager->BComponents(Count).OutletNodeName;
+            CompOutletNodeNums(Count) = state.dataBranchInputManager->BComponents(Count).OutletNode;
         }
-        BComponents.deallocate();
+        state.dataBranchInputManager->BComponents.deallocate();
     }
 
     int NumCompsInBranch(EnergyPlusData &state, std::string const &BranchName)

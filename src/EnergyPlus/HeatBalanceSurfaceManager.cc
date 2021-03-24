@@ -2235,9 +2235,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         using SolarShading::SurfaceScheduledSolarInc;
         using SolarShading::WindowScheduledSolarAbs;
 
-        static Array1D<Real64> AbsDiffWin(CFSMAXNL);    // Diffuse solar absorptance of glass layers //Tuned Made static
-        static Array1D<Real64> AbsDiffWinGnd(CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
-        static Array1D<Real64> AbsDiffWinSky(CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
+        auto & AbsDiffWin = state.dataHeatBalSurfMgr->AbsDiffWin;
+        auto & AbsDiffWinGnd = state.dataHeatBalSurfMgr->AbsDiffWinGnd;
+        auto & AbsDiffWinSky = state.dataHeatBalSurfMgr->AbsDiffWinSky;
 
         Array1D<Real64> currCosInc(state.dataSurface->TotSurfaces); // Cosine of incidence angle of beam solar on glass
         Array1D<Real64> currBeamSolar(state.dataSurface->TotSurfaces); // Local variable for BeamSolarRad
