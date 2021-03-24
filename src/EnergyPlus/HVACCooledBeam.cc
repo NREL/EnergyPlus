@@ -216,12 +216,12 @@ namespace HVACCooledBeam {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int NumAlphas(0);         // Number of Alphas for each GetObjectItem call
-        static int NumNumbers(0);        // Number of Numbers for each GetObjectItem call
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
+        int NumAlphas(0);         // Number of Alphas for each GetObjectItem call
+        int NumNumbers(0);        // Number of Numbers for each GetObjectItem call
+        int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int CtrlZone;                   // controlled zome do loop index
         int SupAirIn;                   // controlled zone supply air inlet index
         bool AirNodeFound;
@@ -672,23 +672,23 @@ namespace HVACCooledBeam {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("SizeCoolBeam");
-        static int PltSizCoolNum(0);          // index of plant sizing object for the cooling loop
-        static int NumBeams(0);               // number of beams in the zone
-        static int Iter(0);                   // beam length iteration index
-        static Real64 DesCoilLoad(0.0);       // total cooling capacity of the beams in the zone [W]
-        static Real64 DesLoadPerBeam(0.0);    // cooling capacity per individual beam [W]
-        static Real64 DesAirVolFlow(0.0);     // design total supply air flow rate [m3/s]
-        static Real64 DesAirFlowPerBeam(0.0); // design supply air volumetric flow per beam [m3/s]
-        static Real64 RhoAir(0.0);
-        static Real64 CpAir(0.0);
-        static Real64 WaterVel(0.0);            // design water velocity in beam
-        static Real64 IndAirFlowPerBeamL(0.0);  // induced volumetric air flow rate per beam length [m3/s-m]
-        static Real64 DT(0.0);                  // air - water delta T [C]
-        static Real64 LengthX(0.0);             // test value for beam length [m]
-        static Real64 Length(0.0);              // beam length [m]
-        static Real64 ConvFlow(0.0);            // convective and induced air mass flow rate across beam per beam plan area [kg/s-m2]
-        static Real64 K(0.0);                   // coil (beam) heat transfer coefficient [W/m2-K]
-        static Real64 WaterVolFlowPerBeam(0.0); // Cooling water volumetric flow per beam [m3]
+        int PltSizCoolNum(0);          // index of plant sizing object for the cooling loop
+        int NumBeams(0);               // number of beams in the zone
+        int Iter(0);                   // beam length iteration index
+        Real64 DesCoilLoad(0.0);       // total cooling capacity of the beams in the zone [W]
+        Real64 DesLoadPerBeam(0.0);    // cooling capacity per individual beam [W]
+        Real64 DesAirVolFlow(0.0);     // design total supply air flow rate [m3/s]
+        Real64 DesAirFlowPerBeam(0.0); // design supply air volumetric flow per beam [m3/s]
+        Real64 RhoAir(0.0);
+        Real64 CpAir(0.0);
+        Real64 WaterVel(0.0);            // design water velocity in beam
+        Real64 IndAirFlowPerBeamL(0.0);  // induced volumetric air flow rate per beam length [m3/s-m]
+        Real64 DT(0.0);                  // air - water delta T [C]
+        Real64 LengthX(0.0);             // test value for beam length [m]
+        Real64 Length(0.0);              // beam length [m]
+        Real64 ConvFlow(0.0);            // convective and induced air mass flow rate across beam per beam plan area [kg/s-m2]
+        Real64 K(0.0);                   // coil (beam) heat transfer coefficient [W/m2-K]
+        Real64 WaterVolFlowPerBeam(0.0); // Cooling water volumetric flow per beam [m3]
         bool ErrorsFound;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
@@ -925,17 +925,17 @@ namespace HVACCooledBeam {
         Real64 QZnReq;                       // heating or cooling needed by zone [Watts]
         Real64 QToHeatSetPt;                 // [W]  remaining load to heating setpoint
         Real64 QToCoolSetPt;                 // [W]  remaining load to cooling setpoint
-        static Real64 QMin(0.0);             // cooled beam output at minimum water flow [W]
-        static Real64 QMax(0.0);             // cooled beam output at maximum water flow [W]
-        static Real64 QSup(0.0);             // heating or cooling by supply air [W]
-        static Real64 PowerMet(0.0);         // power supplied
-        static Real64 CWFlow(0.0);           // cold water flow [kg/s]
-        static Real64 AirMassFlow(0.0);      // air mass flow rate for the cooled beam system [kg/s]
-        static Real64 MaxColdWaterFlow(0.0); // max water mass flow rate for the cooled beam system [kg/s]
-        static Real64 MinColdWaterFlow(0.0); // min water mass flow rate for the cooled beam system [kg/s]
-        static Real64 CpAirZn(0.0);          // specific heat of air at zone conditions [J/kg-C]
-        static Real64 CpAirSys(0.0);         // specific heat of air at supply air conditions [J/kg-C]
-        static Real64 TWOut(0.0);            // outlet water tamperature [C]
+        Real64 QMin(0.0);             // cooled beam output at minimum water flow [W]
+        Real64 QMax(0.0);             // cooled beam output at maximum water flow [W]
+        Real64 QSup(0.0);             // heating or cooling by supply air [W]
+        Real64 PowerMet(0.0);         // power supplied
+        Real64 CWFlow(0.0);           // cold water flow [kg/s]
+        Real64 AirMassFlow(0.0);      // air mass flow rate for the cooled beam system [kg/s]
+        Real64 MaxColdWaterFlow(0.0); // max water mass flow rate for the cooled beam system [kg/s]
+        Real64 MinColdWaterFlow(0.0); // min water mass flow rate for the cooled beam system [kg/s]
+        Real64 CpAirZn(0.0);          // specific heat of air at zone conditions [J/kg-C]
+        Real64 CpAirSys(0.0);         // specific heat of air at supply air conditions [J/kg-C]
+        Real64 TWOut(0.0);            // outlet water tamperature [C]
         int ControlNode;                     // the water inlet node
         int InAirNode;                       // the air inlet node
         bool UnitOn;                         // TRUE if unit is on
@@ -1075,21 +1075,21 @@ namespace HVACCooledBeam {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int Iter(0);                // TWOut iteration index
-        static Real64 TWIn(0.0);           // Inlet water temperature [C]
-        static Real64 ZTemp(0.0);          // zone air temperature [C]
-        static Real64 WaterCoolPower(0.0); // cooling power from water side [W]
-        static Real64 DT(0.0);             // approximate air - water delta T [C]
-        static Real64 IndFlow(0.0);        // induced air flow rate per beam length [m3/s-m]
-        static Real64 CoilFlow(0.0);       // mass air flow rate of air passing through "coil" [kg/m2-s]
-        static Real64 WaterVel(0.0);       // water velocity [m/s]
-        static Real64 K(0.0);              // coil heat transfer coefficient [W/m2-K]
-        static Real64 AirCoolPower(0.0);   // cooling power from the air side [W]
+        int Iter(0);                // TWOut iteration index
+        Real64 TWIn(0.0);           // Inlet water temperature [C]
+        Real64 ZTemp(0.0);          // zone air temperature [C]
+        Real64 WaterCoolPower(0.0); // cooling power from water side [W]
+        Real64 DT(0.0);             // approximate air - water delta T [C]
+        Real64 IndFlow(0.0);        // induced air flow rate per beam length [m3/s-m]
+        Real64 CoilFlow(0.0);       // mass air flow rate of air passing through "coil" [kg/m2-s]
+        Real64 WaterVel(0.0);       // water velocity [m/s]
+        Real64 K(0.0);              // coil heat transfer coefficient [W/m2-K]
+        Real64 AirCoolPower(0.0);   // cooling power from the air side [W]
         Real64 Diff;                       // difference between water side cooling power and air side cooling power [W]
-        static Real64 CWFlowPerBeam(0.0);  // water mass flow rate per beam
-        static Real64 Coeff(0.0);          // iteration parameter
-        static Real64 Delta(0.0);
-        static Real64 mdot(0.0);
+        Real64 CWFlowPerBeam(0.0);  // water mass flow rate per beam
+        Real64 Coeff(0.0);          // iteration parameter
+        Real64 Delta(0.0);
+        Real64 mdot(0.0);
         Real64 Cp;  // local fluid specific heat
         Real64 rho; // local fluid density
 
@@ -1210,8 +1210,8 @@ namespace HVACCooledBeam {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int CBIndex;
         int ZoneNodeIndex;
-        static Real64 UnitOutput(0.0);
-        static Real64 TWOut(0.0);
+        Real64 UnitOutput(0.0);
+        Real64 TWOut(0.0);
 
         CBIndex = int(Par(1));
         ZoneNodeIndex = int(Par(2));

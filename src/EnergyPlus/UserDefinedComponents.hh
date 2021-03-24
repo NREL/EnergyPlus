@@ -345,25 +345,27 @@ struct UserDefinedComponentsData : BaseGlobalStruct {
     Array1D<UserDefinedComponents::UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
     Array1D<UserDefinedComponents::UserAirTerminalComponentStruct> UserAirTerminal;
 
+    bool lDummy_EMSActuatedPlantComp = false;
+    bool lDummy_GetUserDefComp = false;
+
     void clear_state() override
     {
-        GetInput = true;
-        GetPlantCompInput = true;
-
-        NumUserPlantComps = 0;
-        NumUserCoils = 0;
-        NumUserZoneAir = 0;
-        NumUserAirTerminals = 0;
-
-        CheckUserPlantCompName.deallocate();
-        CheckUserCoilName.deallocate();
-        CheckUserZoneAirName.deallocate();
-        CheckUserAirTerminal.deallocate();
-
-        UserPlantComp.deallocate();
-        UserCoil.deallocate();
-        UserZoneAirHVAC.deallocate();
-        UserAirTerminal.deallocate();
+        this->GetInput = true;
+        this->GetPlantCompInput = true;
+        this->NumUserPlantComps = 0;
+        this->NumUserCoils = 0;
+        this->NumUserZoneAir = 0;
+        this->NumUserAirTerminals = 0;
+        this->CheckUserPlantCompName.deallocate();
+        this->CheckUserCoilName.deallocate();
+        this->CheckUserZoneAirName.deallocate();
+        this->CheckUserAirTerminal.deallocate();
+        this->UserPlantComp.deallocate();
+        this->UserCoil.deallocate();
+        this->UserZoneAirHVAC.deallocate();
+        this->UserAirTerminal.deallocate();
+        this->lDummy_EMSActuatedPlantComp = false;
+        this->lDummy_GetUserDefComp = false;
     }
 
     // Default Constructor

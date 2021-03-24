@@ -140,7 +140,7 @@ namespace HeatRecovery {
     // External function calls
 
     // Functions
-    
+
     void SimHeatRecovery(EnergyPlusData &state,
                          std::string const &CompName,             // name of the heat exchanger unit
                          bool const FirstHVACIteration,           // TRUE if 1st HVAC simulation of system timestep
@@ -307,7 +307,7 @@ namespace HeatRecovery {
         int NumAlphas;                                                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                                                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                                                   // Used in GetObjectItem
-        static bool ErrorsFound(false);                                 // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);                                 // Set to true if errors in input, fatal at end of routine
         static std::string HeatExchPerfType;                            // Desiccant balanced heat exchanger performance data type
         constexpr const char * RoutineName("GetHeatRecoveryInput: "); // include trailing blank space
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;

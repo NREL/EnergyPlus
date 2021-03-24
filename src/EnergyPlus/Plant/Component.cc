@@ -112,8 +112,6 @@ namespace DataPlant {
         // If you add a module or new equipment type, you must set up this structure.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::vector<int> compsToSimAfterInitLoopEquip = {
-            DataPlant::TypeOf_Pipe, DataPlant::TypeOf_PipeSteam, DataPlant::TypeOf_SolarCollectorICS, DataPlant::TypeOf_SolarCollectorFlatPlate};
         if (this->compPtr != nullptr) {
             if (InitLoopEquip) {
                 this->compPtr->onInitLoopEquip(state, this->location);
@@ -133,8 +131,8 @@ namespace DataPlant {
                 // I anticipate the list of components that fall through to be very small, so that is the check I will do.
                 // If std::find returns the .end() iterator, that means it didn't find it in the list, which means it's not one of the ones to fall
                 // through, so RETURN
-                if (std::find(compsToSimAfterInitLoopEquip.begin(), compsToSimAfterInitLoopEquip.end(), this->TypeOf_Num) ==
-                    compsToSimAfterInitLoopEquip.end()) {
+                if (std::find(state.dataPlnt->compsToSimAfterInitLoopEquip.begin(), state.dataPlnt->compsToSimAfterInitLoopEquip.end(), this->TypeOf_Num) ==
+                    state.dataPlnt->compsToSimAfterInitLoopEquip.end()) {
                     return;
                 }
             }

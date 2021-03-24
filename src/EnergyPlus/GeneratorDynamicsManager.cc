@@ -243,7 +243,6 @@ namespace GeneratorDynamicsManager {
         Real64 Pel;
         DataGenerators::OperatingMode newOpMode(DataGenerators::OperatingMode::Unassigned);
         Real64 SchedVal;
-        //  REAL(r64)    :: PelDiff
         Real64 ElectLoadForThermalRequest;
         bool ConstrainedMaxP;           // true if request was altered because of max power limit
         bool ConstrainedMinP;           // true if request was altered because of min power limit
@@ -252,12 +251,11 @@ namespace GeneratorDynamicsManager {
         bool ConstrainedByPlant;        // true if request was altered because of cooling water problem
         bool PLRStartUp;                // true if subtimestep issue involving startup
         bool PLRShutDown;
-        //  INTEGER :: OutletCWnode        = 0 ! cooling water outlet node ID
-        static int InletCWnode(0); // cooling water inlet node ID
-        static bool InternalFlowControl(false);
-        static Real64 TcwIn(0.0);          // inlet cooling water temperature (C)
-        static Real64 TrialMdotcw(0.0);    // test or estimate of what the plant flows are going to be (kg/s)
-        static Real64 LimitMinMdotcw(0.0); // lower limit for cooling water flow for generatior operation (kg/s)
+        auto & InletCWnode = state.dataGenerator->InletCWnode;
+        auto & InternalFlowControl = state.dataGenerator->InternalFlowControl;
+        auto & TcwIn = state.dataGenerator->TcwIn;
+        auto & TrialMdotcw = state.dataGenerator->TrialMdotcw;
+        auto & LimitMinMdotcw = state.dataGenerator->LimitMinMdotcw;
 
         // inits
         PLRforSubtimestepStartUp = 1.0;

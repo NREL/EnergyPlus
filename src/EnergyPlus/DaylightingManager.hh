@@ -81,6 +81,10 @@ namespace DaylightingManager {
     // A reasonable, conservative crossover is selected but may be refined as more
     //  experience is gained.
     constexpr int octreeCrossover(100); // Octree surface count crossover
+    constexpr int NTH(18);                          // Number of azimuth steps for sky integration
+    constexpr int NPH(8);                           // Number of altitude steps for sky integration
+    constexpr int NPHMAX(10); // Number of sky/ground integration steps in altitude
+    constexpr int NTHMAX(16); // Number of sky/ground integration steps in azimuth
 
     void DayltgAveInteriorReflectance(EnergyPlusData &state, int &ZoneNum); // Zone number
 
@@ -603,6 +607,103 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Array1D<Real64> cos_Theta; // cos( Theta ) table
     Array1D<Real64> sin_Theta; // sin( Theta ) table
 
+    int IConstShaded = 0; // The shaded window construction for switchable windows
+    Real64 VTDark = 0.0;  // Visible transmittance (VT) of electrochromic (EC) windows in fully dark state
+    Real64 VTMULT = 1.0;  // VT multiplier for EC windows
+
+    Vector3<Real64> WinNorm;  // Window outward normal unit vector
+    Vector3<Real64> SunPrime; // Projection of sun vector onto plane (perpendicular to window plane) determined by WinNorm and vector along baseline of window
+    Vector3<Real64> WinNormCrossBase; // Cross product of WinNorm and vector along window baseline
+    Vector4<Real64> XEDIRSK;         // Illuminance contribution from luminance element, sky-related
+    Vector4<Real64> XAVWLSK;                        // Luminance of window element, sky-related
+    Vector3<Real64> RAYCOS;                         // Unit vector from reference point to sun
+    Vector3<Real64> HP; // Hit coordinates, if ray hits
+    Vector3<Real64> DayltgHitObstructionHP; // Hit coordinates, if ray hits an obstruction
+    Vector3<Real64> DayltgHitInteriorObstructionHP; // Hit coordinates, if ray hits an obstruction
+    Vector3<Real64> RN; // Unit vector along ray
+    Vector3<Real64> DayltgHitBetWinObstructionHP; // Hit coordinates, if ray hits an obstruction surface (m)
+    Vector3<Real64> DayltgHitBetWinObstructionRN; // Unit vector along ray from R1 to R2
+    Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
+    Vector2<Real64> BFSUHR;       // Sun background luminance factor for bare/shaded window
+    Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
+    Vector4<Real64> HorIllSky;                          // Horizontal illuminance for different sky types
+    Vector4<Real64> TDDTransVisDiff; // Weighted diffuse visible transmittance for each sky type
+    Vector3<Real64> HitPt; // Hit point on an obstruction (m)
+    Vector3<Real64> DayltgSurfaceLumFromSunReflNorm; // Unit normal to reflecting surface (m)
+    Vector3<Real64> DayltgSurfaceLumFromSunObsHitPt; // Hit point on obstruction (m)
+    Vector3<Real64> U;                        // Unit vector in (PH,TH) direction
+    Vector3<Real64> DayltgInterReflectedIllumNearestHitPt; // Hit point of ray on nearest obstruction (m)
+    Vector3<Real64> DayltgInterReflectedIllumObsHitPt;    // Coordinates of hit point on an obstruction (m)
+    Vector3<Real64> DayltgInterReflectedIllumGroundHitPt; // Coordinates of point that ray from window center hits the ground (m)
+    Vector3<Real64> DayltgInterReflectedIllumURay; // Unit vector in (Phi,Theta) direction
+    Vector3<Real64> ComplexFenestrationLuminancesObsHitPt;    // Coordinates of hit point on an obstruction (m)
+    Vector3<Real64> ComplexFenestrationLuminancesGroundHitPt; // Coordinates of point that ray from window center hits the ground (m)
+    Vector4<Real64> ZSK; // Sky-related and sun-related illuminance on window from sky/ground
+    Vector4<Real64> FFSKTot;
+    Vector4<Real64> WinLumSK; // Sky related window luminance
+    Vector4<Real64> EDirSky; // Sky related direct illuminance
+    Vector3<Real64> DayltgDirectSunDiskComplexFenestrationV;    // temporary vector
+    Vector3<Real64> DayltgDirectSunDiskComplexFenestrationRWin; // Window center
+    Vector2<Real64> DayltgInteriorMapIllumDFSUHR;       // Sun daylight factor for bare/shaded window
+    Vector2<Real64> DayltgInteriorMapIllumSFSUHR; // Sun source luminance factor for bare/shaded window
+    Vector2<Real64> DayltgInteriorMapIllumBFSUHR;       // Sun background luminance factor for bare/shaded window
+    Vector4<Real64> DayltgInteriorMapIllumHorIllSky; // Horizontal illuminance for different sky types
+    Vector3<Real64> CalcMinIntWinSolidAngsW1; // Window vertices
+    Vector3<Real64> CalcMinIntWinSolidAngsW2;
+    Vector3<Real64> CalcMinIntWinSolidAngsW3;
+    Vector3<Real64> CalcMinIntWinSolidAngsWC;  // Center point of window
+    Vector3<Real64> CalcMinIntWinSolidAngsW21; // Unit vectors from window vertex 2 to 1 and 2 to 3
+    Vector3<Real64> CalcMinIntWinSolidAngsW23;
+    Vector3<Real64> CalcMinIntWinSolidAngsRREF;  // Location of a reference point in absolute coordinate system
+    Vector3<Real64> CalcMinIntWinSolidAngsRay;   // Unit vector along ray from reference point to window center
+    Vector3<Real64> CalcMinIntWinSolidAngsREFWC; // Vector from reference point to center of window
+    Vector3<Real64> CalcMinIntWinSolidAngsWNORM; // Unit vector normal to window (pointing away from room)
+
+    Array2D<Real64> DayltgInteriorMapIllumDFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (first index), bare/shaded window (second index)
+    Array2D<Real64> DayltgInteriorMapIllumBFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
+    Array2D<Real64> DayltgInteriorMapIllumSFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
+    Array1D<Real64> BACLUM;
+    Array1D<Real64> DayltgInteriorMapIllumGLRNDX;
+    Array1D<Real64> daylight_illum;
+    Array1D<Real64> FLFWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
+    Array1D<Real64> FLFWSUdisk = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
+    Array1D<Real64> FLCWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
+    Array1D<Real64> TransMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);     // Transmittance multiplier
+    Array1D<Real64> DayltgInterReflectedIllumTransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs); // Isolated blind beam-beam transmittance
+    Array1D<Real64> TransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);     // Beam-beam transmittance of isolated blind
+    Array1D<Real64> TransBmBmMultRefl = Array1D<Real64>(DataSurfaces::MaxSlatAngs); // As above but for beam reflected from exterior obstruction
+    Array1D<Real64> PH = Array1D<Real64>(DaylightingManager::NPH);     // Altitude of sky element (radians)
+    Array1D<Real64> TH = Array1D<Real64>(DaylightingManager::NTH);     // Azimuth of sky element (radians)
+    Array1D<Real64> SPHCPH = Array1D<Real64>(DaylightingManager::NPH); // Sine times cosine of altitude of sky element
+    Array1D<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
+    Array1D<Real64> GLRNDX; // Glare index at reference point
+    Array1D<Real64> GLRNEW; // New glare index at reference point
+    Array2D<Real64> FLCWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related upgoing luminous flux
+    Array2D<Real64> SkyObstructionMult = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
+    Array2D<Real64> FLFWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related downgoing luminous flux
+    Array2D<Real64> ObTransM = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // ObTrans value for each (TH,PH) direction
+    Array2D<Real64> SFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (second index), bare/shaded window (first index)
+    Array2D<Real64> DFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (second index), bare/shaded window (first index)
+    Array2D<Real64> BFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (second index), bare/shaded window (first index)
+    Array3D<Real64> tmpIllumFromWinAtRefPt;
+    Array3D<Real64> tmpBackLumFromWinAtRefPt;
+    Array3D<Real64> tmpSourceLumFromWinAtRefPt;
+    Array1D_bool FirstTimeMaps;
+    Array1D_bool EnvrnPrint;
+    Array1D_string SavedMnDy;
+    Array2D_string RefPts;
+    Array1D<Real64> XValue;
+    Array1D<Real64> YValue;
+    Array2D<Real64> IllumValue;
+
+    Real64 tmpSWSL1 = 0.0;
+    Real64 tmpSWSL2 = 0.0;
+    Real64 tmpSWFactor = 0.0; // new switching factor to meet glare criteria
+    Real64 tmpMult = 0.0;
+
+    bool GlareOK = false;
+    bool blnCycle = false;
+
     DaylightingManagerData()
     {
         this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
@@ -711,6 +812,54 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->sin_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2); // sin( Phi ) table
         this->cos_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // cos( Theta ) table
         this->sin_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // sin( Theta ) table
+
+        this->IConstShaded = 0;
+        this->VTDark = 0.0;
+        this->VTMULT = 1.0;
+
+        this->DayltgInteriorMapIllumDFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (first index), bare/shaded window (second index)
+        this->DayltgInteriorMapIllumBFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
+        this->DayltgInteriorMapIllumSFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
+        this->BACLUM.clear();
+        this->DayltgInteriorMapIllumGLRNDX.clear();
+        this->daylight_illum.clear();
+        this->FLFWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
+        this->FLFWSUdisk = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
+        this->FLCWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
+        this->TransMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);     // Transmittance multiplier
+        this->DayltgInterReflectedIllumTransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs); // Isolated blind beam-beam transmittance
+        this->TransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);     // Beam-beam transmittance of isolated blind
+        this->TransBmBmMultRefl = Array1D<Real64>(DataSurfaces::MaxSlatAngs); // As above but for beam reflected from exterior obstruction
+        this->PH = Array1D<Real64>(DaylightingManager::NPH);     // Altitude of sky element (radians)
+        this->TH = Array1D<Real64>(DaylightingManager::NTH);     // Azimuth of sky element (radians)
+        this->SPHCPH = Array1D<Real64>(DaylightingManager::NPH); // Sine times cosine of altitude of sky element
+        this->SetPnt.clear();
+        this->GLRNDX.clear();
+        this->GLRNEW.clear();
+        this->FLCWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related upgoing luminous flux
+        this->SkyObstructionMult = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
+        this->FLFWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related downgoing luminous flux
+        this->ObTransM = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // ObTrans value for each (TH,PH) direction
+        this->SFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (second index), bare/shaded window (first index)
+        this->DFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (second index), bare/shaded window (first index)
+        this->BFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (second index), bare/shaded window (first index)
+        this->tmpIllumFromWinAtRefPt.clear();
+        this->tmpBackLumFromWinAtRefPt.clear();
+        this->tmpSourceLumFromWinAtRefPt.clear();
+        this->FirstTimeMaps.clear();
+        this->EnvrnPrint.clear();
+        this->SavedMnDy.clear();
+        this->RefPts.clear();
+        this->XValue.clear();
+        this->YValue.clear();
+        this->IllumValue.clear();
+
+        this->tmpSWSL1 = 0.0;
+        this->tmpSWSL2 = 0.0;
+        this->tmpSWFactor = 0.0;
+        this->tmpMult = 0.0;
+        this->GlareOK = false;
+        this->blnCycle = false;
     }
 };
 

@@ -587,33 +587,90 @@ struct VariableSpeedCoilsData : BaseGlobalStruct {
     Array1D<VariableSpeedCoils::VariableSpeedCoilData> VarSpeedCoil;
     bool firstTime = true;
 
+    Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
+    Array1D_bool MySizeFlag;  // used for sizing PTHP inputs one time
+    Array1D_bool MyPlantScanFlag;
+
+    Real64 LoadSideInletDBTemp_Init = 0.0;
+    Real64 LoadSideInletWBTemp_Init = 0.0;
+    Real64 LoadSideInletHumRat_Init = 0.0;
+    Real64 LoadSideInletEnth_Init = 0.0;
+    Real64 CpAir_Init = 0.0;
+
+    Real64 OutdoorCoilT = 0.0;              // Outdoor coil temperature (C)
+    Real64 OutdoorCoildw = 0.0;             // Outdoor coil delta w assuming coil temp of OutdoorCoilT (kg/kg)
+    Real64 OutdoorDryBulb = 0.0;            // Outdoor dry-bulb temperature at condenser (C)
+    Real64 OutdoorWetBulb = 0.0;            // Outdoor wet-bulb temperature at condenser (C)
+    Real64 OutdoorHumRat = 0.0;             // Outdoor humidity ratio at condenser (kg/kg)
+    Real64 OutdoorPressure = 0.0;           // Outdoor barometric pressure at condenser (Pa)
+    Real64 FractionalDefrostTime = 0.0;     // Fraction of time step system is in defrost
+    Real64 HeatingCapacityMultiplier = 0.0; // Multiplier for heating capacity when system is in defrost
+    Real64 InputPowerMultiplier = 0.0;      // Multiplier for power when system is in defrost
+    Real64 LoadDueToDefrost = 0.0;          // Additional load due to defrost
+    Real64 CrankcaseHeatingPower = 0.0;     // power due to crankcase heater
+    Real64 DefrostEIRTempModFac = 0.0;      // EIR modifier for defrost (function of entering wetbulb, outside drybulb)
+    Real64 TotRatedCapacity = 0.0;          // total rated capacity at the given speed and speed ratio for defrosting
+    Real64 OutdoorDryBulb_CalcVarSpeedCoilCooling = 0.0;        // Outdoor dry-bulb temperature at condenser (C)
+    Real64 OutdoorWetBulb_CalcVarSpeedCoilCooling = 0.0;        // Outdoor wet-bulb temperature at condenser (C)
+    Real64 OutdoorHumRat_CalcVarSpeedCoilCooling = 0.0;         // Outdoor humidity ratio at condenser (kg/kg)
+    Real64 OutdoorPressure_CalcVarSpeedCoilCooling = 0.0;       // Outdoor barometric pressure at condenser (Pa)
+    Real64 CrankcaseHeatingPower_CalcVarSpeedCoilCooling = 0.0; // power due to crankcase heater
+    Real64 CompAmbTemp_CalcVarSpeedCoilCooling = 0.0;           // Ambient temperature at compressor
+
     void clear_state() override
     {
-        NumVarSpeedCoils = 0;
-        MyOneTimeFlag = true;
-        GetCoilsInputFlag = true;
-        SourceSideMassFlowRate = 0.0;
-        SourceSideInletTemp = 0.0;
-        SourceSideInletEnth = 0.0;
-        LoadSideMassFlowRate = 0.0;
-        LoadSideInletDBTemp = 0.0;
-        LoadSideInletWBTemp = 0.0;
-        LoadSideInletHumRat = 0.0;
-        LoadSideInletEnth = 0.0;
-        LoadSideOutletDBTemp = 0.0;
-        LoadSideOutletHumRat = 0.0;
-        LoadSideOutletEnth = 0.0;
-        QSensible = 0.0;
-        QLoadTotal = 0.0;
-        QLatRated = 0.0;
-        QLatActual = 0.0;
-        QSource = 0.0;
-        Winput = 0.0;
-        PLRCorrLoadSideMdot = 0.0;
-        VSHPWHHeatingCapacity = 0.0;
-        VSHPWHHeatingCOP = 0.0;
-        VarSpeedCoil.deallocate();
-        firstTime = true;
+        this->NumVarSpeedCoils = 0;
+        this->MyOneTimeFlag = true;
+        this->GetCoilsInputFlag = true;
+        this->SourceSideMassFlowRate = 0.0;
+        this->SourceSideInletTemp = 0.0;
+        this->SourceSideInletEnth = 0.0;
+        this->LoadSideMassFlowRate = 0.0;
+        this->LoadSideInletDBTemp = 0.0;
+        this->LoadSideInletWBTemp = 0.0;
+        this->LoadSideInletHumRat = 0.0;
+        this->LoadSideInletEnth = 0.0;
+        this->LoadSideOutletDBTemp = 0.0;
+        this->LoadSideOutletHumRat = 0.0;
+        this->LoadSideOutletEnth = 0.0;
+        this->QSensible = 0.0;
+        this->QLoadTotal = 0.0;
+        this->QLatRated = 0.0;
+        this->QLatActual = 0.0;
+        this->QSource = 0.0;
+        this->Winput = 0.0;
+        this->PLRCorrLoadSideMdot = 0.0;
+        this->VSHPWHHeatingCapacity = 0.0;
+        this->VSHPWHHeatingCOP = 0.0;
+        this->VarSpeedCoil.deallocate();
+        this->firstTime = true;
+        this->MyEnvrnFlag.deallocate();
+        this->MySizeFlag.deallocate();
+        this->MyPlantScanFlag.deallocate();
+        this->LoadSideInletDBTemp_Init = 0.0;
+        this->LoadSideInletWBTemp_Init = 0.0;
+        this->LoadSideInletHumRat_Init = 0.0;
+        this->LoadSideInletEnth_Init = 0.0;
+        this->CpAir_Init = 0.0;
+        this->OutdoorCoilT = 0.0;
+        this->OutdoorCoildw = 0.0;
+        this->OutdoorDryBulb = 0.0;
+        this->OutdoorWetBulb = 0.0;
+        this->OutdoorHumRat = 0.0;
+        this->OutdoorPressure = 0.0;
+        this->FractionalDefrostTime = 0.0;
+        this->HeatingCapacityMultiplier = 0.0;
+        this->InputPowerMultiplier = 0.0;
+        this->LoadDueToDefrost = 0.0;
+        this->CrankcaseHeatingPower = 0.0;
+        this->DefrostEIRTempModFac = 0.0;
+        this->TotRatedCapacity = 0.0;
+        this->OutdoorDryBulb_CalcVarSpeedCoilCooling = 0.0;
+        this->OutdoorWetBulb_CalcVarSpeedCoilCooling = 0.0;
+        this->OutdoorHumRat_CalcVarSpeedCoilCooling = 0.0;
+        this->OutdoorPressure_CalcVarSpeedCoilCooling = 0.0;
+        this->CrankcaseHeatingPower_CalcVarSpeedCoilCooling = 0.0;
+        this->CompAmbTemp_CalcVarSpeedCoilCooling = 0.0;
     }
 
     // Default Constructor

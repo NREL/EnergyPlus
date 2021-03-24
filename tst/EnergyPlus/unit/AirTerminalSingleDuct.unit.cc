@@ -316,10 +316,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
     GetZoneAirLoopEquipment(*state);
     GetIndUnits(*state);
 
-    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction", IndUnit(1).UnitType); // AT SD VAV Reheat Type
-    EXPECT_EQ("SPACE1-1 FPIU", IndUnit(1).Name);                                               // AT SD VAV Reheat Name
-    EXPECT_GT(IndUnit(1).HWControlNode, 0);                                                    // none zero integer node index is expected
-    EXPECT_GT(IndUnit(1).CWControlNode, 0);                                                    // none zero integer node index is expected
+    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction", state->dataHVACSingleDuctInduc->IndUnit(1).UnitType); // AT SD VAV Reheat Type
+    EXPECT_EQ("SPACE1-1 FPIU", state->dataHVACSingleDuctInduc->IndUnit(1).Name);                                               // AT SD VAV Reheat Name
+    EXPECT_GT(state->dataHVACSingleDuctInduc->IndUnit(1).HWControlNode, 0);                                                    // none zero integer node index is expected
+    EXPECT_GT(state->dataHVACSingleDuctInduc->IndUnit(1).CWControlNode, 0);                                                    // none zero integer node index is expected
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVHeatCool_GetInputTest)

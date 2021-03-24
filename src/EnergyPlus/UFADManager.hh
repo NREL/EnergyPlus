@@ -98,10 +98,12 @@ struct UFADManagerData : BaseGlobalStruct {
     Real64 HeightIntMassDefault = 2.0;    // Default height of internal mass surfaces
 
     bool MyOneTimeFlag = true;
+    Array1D_bool MySizeFlag;
 
     void clear_state() override
     {
-        MyOneTimeFlag = true;
+        this->MyOneTimeFlag = true;
+        this->MySizeFlag.deallocate();
     }
 
     // Default Constructor

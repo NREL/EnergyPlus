@@ -180,7 +180,6 @@ namespace EnergyPlus {
         this->dataLoopNodes = std::make_unique<LoopNodeData>();
         this->dataLowTempRadSys = std::make_unique<LowTempRadiantSystemData>();
         this->dataMaterial = std::make_unique<MaterialData>();
-        this->dataMatrixDataMgr = std::make_unique<MatrixDataManagerData>();
         this->dataMircoturbElectGen = std::make_unique<MicroturbineElectricGeneratorData>();
         this->dataMixedAir = std::make_unique<MixedAirData>();
         this->dataMixerComponent = std::make_unique<MixerComponentData>();
@@ -275,6 +274,7 @@ namespace EnergyPlus {
         this->dataUserDefinedComponents = std::make_unique<UserDefinedComponentsData>();
         this->dataUtilityRoutines = std::make_unique<UtilityRoutinesData>();
         this->dataVariableSpeedCoils = std::make_unique<VariableSpeedCoilsData>();
+        this->dataVectors = std::make_unique<VectorsData>();
         this->dataVentilatedSlab = std::make_unique<VentilatedSlabData>();
         this->dataViewFactor = std::make_unique<ViewFactorInfoData>();
         this->dataWaterCoils = std::make_unique<WaterCoilsData>();
@@ -427,7 +427,6 @@ namespace EnergyPlus {
         this->dataLoopNodes->clear_state();
         this->dataLowTempRadSys->clear_state();
         this->dataMaterial->clear_state();
-        this->dataMatrixDataMgr->clear_state();
         this->dataMircoturbElectGen->clear_state();
         this->dataMixedAir->clear_state();
         this->dataMixerComponent->clear_state();
@@ -521,6 +520,7 @@ namespace EnergyPlus {
         this->dataUserDefinedComponents->clear_state();
         this->dataUtilityRoutines->clear_state();
         this->dataVariableSpeedCoils->clear_state();
+        this->dataVectors->clear_state();
         this->dataVentilatedSlab->clear_state();
         this->dataViewFactor->clear_state();
         this->dataWaterCoils->clear_state();

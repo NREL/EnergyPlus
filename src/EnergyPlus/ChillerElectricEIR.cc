@@ -1580,7 +1580,6 @@ namespace EnergyPlus::ChillerElectricEIR {
         // should be the actual load. Instead the minimum PLR * RefCap is
         // passed in. [W]
         Real64 CurrentEndTime = 0.0;         // end time of time step for current simulation time step
-        static std::string OutputChar; // character string for warning messages
 
         // Set module level inlet and outlet nodes and initialize other local variables
         this->CondMassFlowRate = 0.0;

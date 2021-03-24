@@ -139,7 +139,7 @@ namespace TranspiredCollector {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        static int UTSCNum(0); // local number index for UTSC
+        int UTSCNum(0); // local number index for UTSC
 
         if (state.dataTranspiredCollector->GetInputFlag) {
             GetTranspiredCollectorInput(state);
@@ -712,9 +712,7 @@ namespace TranspiredCollector {
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
         int UTSCUnitNum;
-        static Array1D_bool MyEnvrnFlag;
         int ControlNode;
-        // unused  INTEGER             :: InletNode
         int SplitBranch;
         int thisUTSC;
         Real64 Tamb;
@@ -744,7 +742,7 @@ namespace TranspiredCollector {
                 }
             }
 
-            MyEnvrnFlag.dimension(state.dataTranspiredCollector->NumUTSC, true);
+            state.dataTranspiredCollector->MyEnvrnFlag.dimension(state.dataTranspiredCollector->NumUTSC, true);
             state.dataTranspiredCollector->MyOneTimeFlag = false;
         } // first time
 
@@ -776,14 +774,14 @@ namespace TranspiredCollector {
             state.dataTranspiredCollector->MySetPointCheckFlag = false;
         }
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(UTSCNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataTranspiredCollector->MyEnvrnFlag(UTSCNum)) {
             state.dataTranspiredCollector->UTSC(UTSCNum).TplenLast = 22.5;
             state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast = 22.0;
 
-            MyEnvrnFlag(UTSCNum) = false;
+            state.dataTranspiredCollector->MyEnvrnFlag(UTSCNum) = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(UTSCNum) = true;
+            state.dataTranspiredCollector->MyEnvrnFlag(UTSCNum) = true;
         }
 
         // determine average ambient temperature

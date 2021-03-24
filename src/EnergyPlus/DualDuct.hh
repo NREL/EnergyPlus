@@ -267,6 +267,9 @@ struct DualDuctData : BaseGlobalStruct {
     std::string const cCMO_DDVariableVolume = "AirTerminal:DualDuct:VAV";
     std::string const cCMO_DDVarVolOA = "AirTerminal:DualDuct:VAV:OutdoorAir";
 
+    Array1D_bool RecircIsUsedARR;
+    Array1D_string DamperNamesARR;
+
     void clear_state() override
     {
         this->CheckEquipName.clear();
@@ -281,6 +284,8 @@ struct DualDuctData : BaseGlobalStruct {
         this->InitDualDuctMyOneTimeFlag = true;
         this->ZoneEquipmentListChecked = false;
         this->GetDualDuctOutdoorAirRecircUseFirstTimeOnly = true;
+        this->RecircIsUsedARR.clear();
+        this->DamperNamesARR.clear();
     }
 };
 

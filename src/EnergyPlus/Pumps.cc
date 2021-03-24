@@ -265,6 +265,7 @@ namespace EnergyPlus::Pumps {
         int NumConstPumpBankSimple;
         Real64 SteamDensity;
         Real64 TempWaterDensity;
+        int DummyWaterIndex(1);
 
         ErrorsFound = false;
 
@@ -709,7 +710,7 @@ namespace EnergyPlus::Pumps {
             } else {
                 // Calc Condensate Pump Water Volume Flow Rate
                 SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, state.dataPumps->PumpEquip(PumpNum).FluidIndex, RoutineNameNoColon);
-                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, state.dataPumps->iDummyWaterIndex, RoutineName);
+                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
                 state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = (state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
             }
 
@@ -1207,6 +1208,7 @@ namespace EnergyPlus::Pumps {
         int OutletNode; // pump outlet node number
         Real64 TotalEffic;
         Real64 SteamDensity; // Density of working fluid
+        int DummyWaterIndex(1);
         Real64 TempWaterDensity;
         bool errFlag;
         Real64 mdotMax; // local fluid mass flow rate maximum
@@ -1352,7 +1354,7 @@ namespace EnergyPlus::Pumps {
         if (state.dataPumps->PumpEquip(PumpNum).PumpInitFlag && state.dataGlobal->BeginEnvrnFlag) {
             if (state.dataPumps->PumpEquip(PumpNum).PumpType == Pump_Cond) {
 
-                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, state.dataPumps->ipDummyWaterIndex, RoutineName);
+                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
                 SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, state.dataPumps->PumpEquip(PumpNum).FluidIndex, RoutineName);
                 state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = (state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
 
@@ -1910,6 +1912,7 @@ namespace EnergyPlus::Pumps {
         Real64 PumpSizFac; // pump sizing factor
         Real64 SteamDensity;
         Real64 TempWaterDensity;
+        int DummyWaterIndex(1);
         Real64 DesVolFlowRatePerBranch; // local temporary for split of branch pumps
 
         // Calculate density at InitConvTemp once here, to remove RhoH2O calls littered throughout
@@ -1920,7 +1923,7 @@ namespace EnergyPlus::Pumps {
                                                 state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).FluidIndex,
                                                 RoutineName);
         } else {
-            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, state.dataPumps->spDummyWaterIndex, RoutineName);
+            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
         }
 
         PlantSizNum = 0;
@@ -1965,7 +1968,7 @@ namespace EnergyPlus::Pumps {
                     if (!state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum).BranchPumpsExist) {
                         // size pump to full flow of plant loop
                         if (state.dataPumps->PumpEquip(PumpNum).PumpType == Pump_Cond) {
-                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, state.dataPumps->spDummyWaterIndex, RoutineName);
+                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, state.dataPumps->PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
                             state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate = state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * PumpSizFac;
                             state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
@@ -1977,7 +1980,7 @@ namespace EnergyPlus::Pumps {
                         DesVolFlowRatePerBranch = state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate /
                                                   state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum).TotalPumps;
                         if (state.dataPumps->PumpEquip(PumpNum).PumpType == Pump_Cond) {
-                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, state.dataPumps->spDummyWaterIndex, RoutineName);
+                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, state.dataPumps->PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
                             state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate = DesVolFlowRatePerBranch * PumpSizFac;
                             state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
@@ -2184,10 +2187,17 @@ namespace EnergyPlus::Pumps {
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        state.dataPumps->GRMFRRotSpeed_Min = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.MinRPMSchedIndex);
-        state.dataPumps->GRMFRRotSpeed_Max = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.MaxRPMSchedIndex);
-        state.dataPumps->GRMFRMinPress = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.LowerPsetSchedIndex);
-        state.dataPumps->GRMFRMaxPress = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.UpperPsetSchedIndex);
+        Real64 PumpMassFlowRateMaxPress(0.0); // Maximum mass flow rate associated with maximum pressure limit
+        Real64 PumpMassFlowRateMinPress(0.0); // Minimum mass flow rate associated with minimum pressure limit
+        Real64 RotSpeed_Max(0.0);             // Maximum rotational speed in rps
+        Real64 RotSpeed_Min(0.0);             // Minimum rotational speed in rps
+        Real64 MinPress(0.0);                 // Minimum pressure
+        Real64 MaxPress(0.0);                 // Maximum pressure
+
+        RotSpeed_Min = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.MinRPMSchedIndex);
+        RotSpeed_Max = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.MaxRPMSchedIndex);
+        MinPress = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.LowerPsetSchedIndex);
+        MaxPress = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.UpperPsetSchedIndex);
 
         // Calculate maximum and minimum mass flow rate associated with maximun and minimum RPM
         if (state.dataPumps->PumpEquip(PumpNum).LoopNum > 0) {
@@ -2197,14 +2207,14 @@ namespace EnergyPlus::Pumps {
                 state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM = ResolveLoopFlowVsPressure(state, state.dataPumps->PumpEquip(PumpNum).LoopNum,
                                                                                       InletNodeMassFlowRate,
                                                                                       state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index,
-                                              state.dataPumps->GRMFRRotSpeed_Max,
+                                              RotSpeed_Max,
                                                                                       state.dataPumps->PumpEquip(PumpNum).ImpellerDiameter,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MinPhiValue,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MaxPhiValue);
                 state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMinRPM = ResolveLoopFlowVsPressure(state, state.dataPumps->PumpEquip(PumpNum).LoopNum,
                                                                                       InletNodeMassFlowRate,
                                                                                       state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index,
-                                              state.dataPumps->GRMFRRotSpeed_Min,
+                                              RotSpeed_Min,
                                                                                       state.dataPumps->PumpEquip(PumpNum).ImpellerDiameter,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MinPhiValue,
                                                                                       state.dataPumps->PumpEquip(PumpNum).MaxPhiValue);
@@ -2219,28 +2229,28 @@ namespace EnergyPlus::Pumps {
         // Calculate maximum and minimum mass flow rate associated with operating pressure range
         if (state.dataPumps->PumpEquip(PumpNum).LoopNum > 0) {
             if (state.dataPlnt->PlantLoop(LoopNum).PressureEffectiveK > 0.0) {
-                state.dataPumps->PumpMassFlowRateMaxPress = std::sqrt(state.dataPumps->GRMFRMaxPress / state.dataPlnt->PlantLoop(LoopNum).PressureEffectiveK);
-                state.dataPumps->PumpMassFlowRateMinPress = std::sqrt(state.dataPumps->GRMFRMinPress / state.dataPlnt->PlantLoop(LoopNum).PressureEffectiveK);
+                PumpMassFlowRateMaxPress = std::sqrt(MaxPress / state.dataPlnt->PlantLoop(LoopNum).PressureEffectiveK);
+                PumpMassFlowRateMinPress = std::sqrt(MinPress / state.dataPlnt->PlantLoop(LoopNum).PressureEffectiveK);
             }
         }
 
         // Decide operating range for mass flow rate
         // Maximum mass flow rate value of the range
-        if (state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM > state.dataPumps->PumpMassFlowRateMaxPress) {
+        if (state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM > PumpMassFlowRateMaxPress) {
             // Maximum pressure value governs maximum VFD range value
-            PumpMaxMassFlowRateVFDRange = state.dataPumps->PumpMassFlowRateMaxPress;
+            PumpMaxMassFlowRateVFDRange = PumpMassFlowRateMaxPress;
         } else {
             // Maximum RPM value governs maximum VFD range value
             PumpMaxMassFlowRateVFDRange = state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM;
         }
 
         // Minimum mass flow rate value of the range
-        if (state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMinRPM > state.dataPumps->PumpMassFlowRateMinPress) {
+        if (state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMinRPM > PumpMassFlowRateMinPress) {
             // Minimum pressure value governs minimum VFD range value
             PumpMinMassFlowRateVFDRange = state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMinRPM;
         } else {
             // Minimum pressure range value governs minimum VFD range value
-            PumpMinMassFlowRateVFDRange = state.dataPumps->PumpMassFlowRateMinPress;
+            PumpMinMassFlowRateVFDRange = PumpMassFlowRateMinPress;
         }
 
         // Set the mass flow rate within VFD operating range

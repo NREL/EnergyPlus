@@ -3995,7 +3995,7 @@ namespace EnergyPlus::SimAirServingZones {
         // Uses data from System Sizing input and the system to zone connection data
         // calculated in InitAirLoops and stored in AirToZoneNodeInfo in DataLoopNode..
 
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
         auto &CalcSysSizing(state.dataSize->CalcSysSizing);
         auto &SysSizing(state.dataSize->SysSizing);

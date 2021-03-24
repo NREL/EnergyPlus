@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
 
 namespace EnergyPlus {
 
@@ -230,6 +231,9 @@ struct HeatBalSurfMgr : BaseGlobalStruct {
     int calcHeatBalInsideSurfWarmupErrCount = 0;
     bool calcHeatBalInsideSurEnvrnFlag = true;
     Array1D<Real64> RefAirTemp; // inside surface convection reference air temperatures
+    Array1D<Real64> AbsDiffWin = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);    // Diffuse solar absorptance of glass layers //Tuned Made static
+    Array1D<Real64> AbsDiffWinGnd = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
+    Array1D<Real64> AbsDiffWinSky = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
 
     void clear_state() override
     {
@@ -272,6 +276,9 @@ struct HeatBalSurfMgr : BaseGlobalStruct {
         calcHeatBalInsideSurfWarmupErrCount = 0;
         calcHeatBalInsideSurEnvrnFlag = true;
         RefAirTemp.clear();
+        AbsDiffWin = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
+        AbsDiffWinGnd = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
+        AbsDiffWinSky = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
     }
 };
 
