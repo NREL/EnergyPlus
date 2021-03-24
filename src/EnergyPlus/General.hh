@@ -372,6 +372,7 @@ struct GeneralData : BaseGlobalStruct {
     bool LineRpt = false;
     bool VarDict = false;
     bool EMSoutput = false;
+    Real64 XNext = 0.0; // used in root finder
 
     void clear_state() override
     {
@@ -389,6 +390,7 @@ struct GeneralData : BaseGlobalStruct {
         this->LineRpt = false;
         this->VarDict = false;
         this->EMSoutput = false;
+        this->XNext = 0.0;
     }
 };
 
