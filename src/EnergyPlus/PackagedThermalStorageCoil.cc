@@ -71,6 +71,7 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -3875,7 +3876,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
                                       Real64 const DesiredOutletHumRat, // desired outlet humidity ratio [kg/kg]
                                       Real64 &PartLoadFrac, // value based on coil operation, if possible, as PLR required to meet T or w set point
                                       int &TESOpMode,       // value determined in InitTESCoil and passed back to parent for use in iteration routines
-                                      int &ControlType,     // parent object dehumidification control type (e.g., None, Multimode, CoolReheat)
+                                      HVACDXSystem::DehumidControl &ControlType, // parent object dehumidification control type (e.g., None, Multimode, CoolReheat)
                                       int &SensPLRIter,     // iteration number of Sensible PLR Iteration warning message
                                       int &SensPLRIterIndex, // index to Sensible PLR Iteration warning message
                                       int &SensPLRFail,      // iteration number of Sensible PLR Iteration fail warning message

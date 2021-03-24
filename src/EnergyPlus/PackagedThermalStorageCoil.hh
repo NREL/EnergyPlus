@@ -458,7 +458,7 @@ namespace PackagedThermalStorageCoil {
                                       Real64 const DesiredOutletHumRat,
                                       Real64 &PartLoadFrac,
                                       int &TESOpMode,
-                                      int &ControlType,
+                                      HVACDXSystem::DehumidControl &ControlType,
                                       int &SensPLRIter,
                                       int &SensPLRIterIndex,
                                       int &SensPLRFail,

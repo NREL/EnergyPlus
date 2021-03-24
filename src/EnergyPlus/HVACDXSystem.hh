@@ -70,46 +70,29 @@ struct EnergyPlusData;
 
 namespace HVACDXSystem {
 
-    // Using/Aliasing
+    Real64 constexpr MinAirMassFlow(0.001);
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern Real64 const MinAirMassFlow;
     // Compressor operation
     constexpr int On(1);  // normal compressor operation
     constexpr int Off(0); // signal DXCoil that compressor shouldn't run
-    // Dehumidification control modes (DehumidControlMode)
-    extern int const DehumidControl_None;
-    extern int const DehumidControl_Multimode;
-    extern int const DehumidControl_CoolReheat;
-    extern bool GetInputFlag; // Flag to get input only once
-
-    // packaged TES modes
-    extern int const OffMode;
-    extern int const CoolingOnlyMode;
-    extern int const CoolingAndChargeMode;
-    extern int const CoolingAndDischargeMode;
-    extern int const ChargeOnlyMode;
-    extern int const DischargeOnlyMode;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumDXSystem;     // The Number of DXCoolingSystems found in the Input
-    extern bool EconomizerFlag; // holds air loop economizer status
-
-    // Make this type allocatable
-    extern Array1D_bool CheckEquipName;
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Update routine to check convergence and update nodes
-
-    // Types
-
+    
+    enum class DehumidControl // Dehumidification control modes (DehumidControlMode)
+    {
+        None,
+        Multimode,
+        CoolReheat
+    };
+                          
+    enum class TESMode // packaged TES modes
+    {
+        OffMode,
+        CoolingOnlyMode,
+        CoolingAndChargeMode,
+        CoolingAndDischargeMode,
+        ChargeOnlyMode,
+        DischargeOnlyMode
+    };
+    
     struct DXCoolingConditions
     {
         // Members
@@ -134,7 +117,7 @@ namespace HVACDXSystem {
         // meet a sensible load - for future use
         bool RunOnLatentLoad; // logical determines if this system will run to
         // meet a latent-only load - for future use
-        int DehumidControlType;   // Dehumidification control type (currently only for multimode coil)
+        DehumidControl DehumidControlType; // Dehumidification control type (currently only for multimode coil)
         int DehumidificationMode; // Dehumidification mode for multimode coil,
         // 0=normal, 1+=enhanced dehumidification mode
         int FanOpMode; // Fan operating mode (see parameter above)
@@ -199,7 +182,8 @@ namespace HVACDXSystem {
         DXCoolingConditions()
             : SchedPtr(0), CoolingCoilType_Num(0), CoolingCoilIndex(0), DXCoolingCoilInletNodeNum(0), DXCoolingCoilOutletNodeNum(0),
               DXSystemControlNodeNum(0), DesiredOutletTemp(0.0), DesiredOutletHumRat(1.0), PartLoadFrac(0.0), SpeedRatio(0.0), CycRatio(0.0),
-              RunOnSensibleLoad(true), RunOnLatentLoad(false), DehumidControlType(0), DehumidificationMode(0), FanOpMode(0), HXAssistedSensPLRIter(0),
+              RunOnSensibleLoad(true), RunOnLatentLoad(false), DehumidControlType(DehumidControl::None), DehumidificationMode(0), FanOpMode(0),
+              HXAssistedSensPLRIter(0),
               HXAssistedSensPLRIterIndex(0), HXAssistedSensPLRFail(0), HXAssistedSensPLRFailIndex(0), HXAssistedSensPLRFail2(0),
               HXAssistedSensPLRFailIndex2(0), HXAssistedLatPLRIter(0), HXAssistedLatPLRIterIndex(0), HXAssistedLatPLRFail(0),
               HXAssistedLatPLRFailIndex(0), HXAssistedCRLatPLRIter(0), HXAssistedCRLatPLRIterIndex(0), HXAssistedCRLatPLRFail(0),
@@ -214,13 +198,6 @@ namespace HVACDXSystem {
         {
         }
     };
-
-    // Object Data
-    extern Array1D<DXCoolingConditions> DXCoolingSystem;
-
-    // Functions
-
-    void clear_state();
 
     void SimDXCoolingSystem(EnergyPlusData &state, std::string const &DXCoolingSystemName,    // Name of DXSystem:Airloop object
                             bool const FirstHVACIteration,             // True when first HVAC iteration
@@ -362,9 +339,19 @@ namespace HVACDXSystem {
 
 struct HVACDXSystemData : BaseGlobalStruct {
 
+    bool GetInputFlag = true; // Flag to get input only once
+    int NumDXSystem = 0;         // The Number of DXCoolingSystems found in the Input
+    bool EconomizerFlag = false; // holds air loop economizer status
+    Array1D_bool CheckEquipName;
+    Array1D<HVACDXSystem::DXCoolingConditions> DXCoolingSystem;
+
     void clear_state() override
     {
-
+        this->GetInputFlag = true;
+        this->NumDXSystem = 0; 
+        this->EconomizerFlag = false;
+        this->CheckEquipName.deallocate();
+        this->DXCoolingSystem.deallocate();
     }
 };
 
