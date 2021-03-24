@@ -2090,9 +2090,9 @@ namespace WaterToAirHeatPumpSimple {
 
         bool LatDegradModelSimFlag;      // Latent degradation model simulation flag
         int NumIteration;                // Iteration Counter
-        Real64 LoadSideInletDBTemp_Init; // rated conditions
-        Real64 LoadSideInletWBTemp_Init; // rated conditions
-        Real64 LoadSideInletHumRat_Init; // rated conditions
+        Real64 LoadSideInletDBTemp_Init(0); // rated conditions
+        Real64 LoadSideInletWBTemp_Init(0); // rated conditions
+        Real64 LoadSideInletHumRat_Init(0); // rated conditions
         Real64 LoadSideInletEnth_Init;   // rated conditions
         Real64 CpAir_Init;               // rated conditions
         Real64 LoadSideInletDBTemp_Unit; // calc conditions for unit

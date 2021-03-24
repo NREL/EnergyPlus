@@ -52,10 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Fwd decl
+struct EnergyPlusData;
 
 namespace Vectors {
 
@@ -120,9 +124,19 @@ namespace Vectors {
 
     std::vector<int> PointsInPlane(Array1D<Vector> &BaseSurf, int const BaseSides, Array1D<Vector> &QuerySurf, int const QuerySides, bool &ErrorFound);
 
-    Real64 CalcPolyhedronVolume(Polyhedron const &Poly);
+    Real64 CalcPolyhedronVolume(EnergyPlusData &state, Polyhedron const &Poly);
 
 } // namespace Vectors
+
+struct VectorsData : BaseGlobalStruct
+{
+    Vectors::Vector p0 = Vectors::Vector(0.0, 0.0, 0.0);
+
+    void clear_state() override
+    {
+        this->p0 = Vectors::Vector(0.0, 0.0, 0.0);
+    }
+};
 
 } // namespace EnergyPlus
 

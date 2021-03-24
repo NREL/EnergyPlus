@@ -294,8 +294,8 @@ namespace WaterToAirHeatPumpSimple {
         Real64 QSource;                // Source side heat transfer rate [W]
         Real64 Winput;                 // Power Consumption [W]
         Real64 PLRCorrLoadSideMdot;    // Load Side Mdot corrected for Part Load Ratio of the unit
-        bool MyOneTimeFlag;           // one time allocation flag
-        bool firstTime;
+        bool MyOneTimeFlag = true;     // one time allocation flag
+        bool firstTime = true;
 
         Array1D<WaterToAirHeatPumpSimple::SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
 
