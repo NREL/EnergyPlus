@@ -737,8 +737,8 @@ namespace ZoneDehumidifier {
         Real64 hfg;                     // Enthalpy of evaporation of inlet air (J/kg)
         Real64 AirMassFlowRate;         // Air mass flow rate through this dehumidifier (kg/s)
         Real64 Cp;                      // Heat capacity of inlet air (J/kg-C)
-        static int AirInletNodeNum(0);  // Node number for the inlet air to the dehumidifier
-        static int AirOutletNodeNum(0); // Node number for the outlet air from the dehumidifier
+        int AirInletNodeNum(0);         // Node number for the inlet air to the dehumidifier
+        int AirOutletNodeNum(0);        // Node number for the outlet air from the dehumidifier
 
         SensibleOutput = 0.0;
         LatentOutput = 0.0;
