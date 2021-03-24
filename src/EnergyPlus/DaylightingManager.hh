@@ -607,6 +607,13 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Array1D<Real64> cos_Theta; // cos( Theta ) table
     Array1D<Real64> sin_Theta; // sin( Theta ) table
 
+    int IConstShaded = 0; // The shaded window construction for switchable windows
+    Real64 VTDark = 0.0;  // Visible transmittance (VT) of electrochromic (EC) windows in fully dark state
+    Real64 VTMULT = 1.0;  // VT multiplier for EC windows
+
+    Vector3<Real64> WinNorm;  // Window outward normal unit vector
+    Vector3<Real64> SunPrime; // Projection of sun vector onto plane (perpendicular to window plane) determined by WinNorm and vector along baseline of window
+    Vector3<Real64> WinNormCrossBase; // Cross product of WinNorm and vector along window baseline
     Vector4<Real64> XEDIRSK;         // Illuminance contribution from luminance element, sky-related
     Vector4<Real64> XAVWLSK;                        // Luminance of window element, sky-related
     Vector3<Real64> RAYCOS;                         // Unit vector from reference point to sun
@@ -621,7 +628,9 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
     Vector4<Real64> HorIllSky;                          // Horizontal illuminance for different sky types
     Vector4<Real64> TDDTransVisDiff; // Weighted diffuse visible transmittance for each sky type
-
+    Vector3<Real64> HitPt; // Hit point on an obstruction (m)
+    Vector3<Real64> DayltgSurfaceLumFromSunReflNorm; // Unit normal to reflecting surface (m)
+    Vector3<Real64> DayltgSurfaceLumFromSunObsHitPt; // Hit point on obstruction (m)
     Vector3<Real64> U;                        // Unit vector in (PH,TH) direction
     Vector3<Real64> DayltgInterReflectedIllumNearestHitPt; // Hit point of ray on nearest obstruction (m)
     Vector3<Real64> DayltgInterReflectedIllumObsHitPt;    // Coordinates of hit point on an obstruction (m)
@@ -636,6 +645,17 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Vector3<Real64> DayltgDirectSunDiskComplexFenestrationV;    // temporary vector
     Vector3<Real64> DayltgDirectSunDiskComplexFenestrationRWin; // Window center
 
+    Vector2<Real64> DayltgInteriorMapIllumDFSUHR;       // Sun daylight factor for bare/shaded window
+    Vector2<Real64> DayltgInteriorMapIllumSFSUHR; // Sun source luminance factor for bare/shaded window
+    Vector2<Real64> DayltgInteriorMapIllumBFSUHR;       // Sun background luminance factor for bare/shaded window
+    Vector4<Real64> DayltgInteriorMapIllumHorIllSky; // Horizontal illuminance for different sky types
+    Array2D<Real64> DayltgInteriorMapIllumDFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (first index), bare/shaded window (second index)
+    Array2D<Real64> DayltgInteriorMapIllumBFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
+    Array2D<Real64> DayltgInteriorMapIllumSFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
+    Array1D<Real64> BACLUM;
+    Array1D<Real64> DayltgInteriorMapIllumGLRNDX;
+
+    Array1D<Real64> daylight_illum;
     Array1D<Real64> FLFWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
     Array1D<Real64> FLFWSUdisk = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
     Array1D<Real64> FLCWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
