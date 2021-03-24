@@ -285,15 +285,15 @@ namespace WaterToAirHeatPumpSimple {
         static std::string const RoutineName("GetSimpleWatertoAirHPInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int HPNum;               // The Water to Air HP that you are currently loading input into
-        int NumCool;             // Counter for cooling coil
-        int NumHeat;             // Counter for heating coil
-        int WatertoAirHPNum;     // Counter
-        int NumAlphas;           // Number of variables in String format
-        int NumNums;             // Number of variables in Numeric format
-        int NumParams;           // Total number of input fields
-        static int MaxNums(0);   // Maximum number of numeric input fields
-        static int MaxAlphas(0); // Maximum number of alpha input fields
+        int HPNum;           // The Water to Air HP that you are currently loading input into
+        int NumCool;         // Counter for cooling coil
+        int NumHeat;         // Counter for heating coil
+        int WatertoAirHPNum; // Counter
+        int NumAlphas;       // Number of variables in String format
+        int NumNums;         // Number of variables in Numeric format
+        int NumParams;       // Total number of input fields
+        int MaxNums(0);      // Maximum number of numeric input fields
+        int MaxAlphas(0);    // Maximum number of alpha input fields
         int IOStat;
         bool ErrorsFound(false);  // If errors detected in input
         std::string CurrentModuleObject; // for ease in getting objects
@@ -806,8 +806,6 @@ namespace WaterToAirHeatPumpSimple {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // REFERENCES:
-
         // Using/Aliasing
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -816,43 +814,28 @@ namespace WaterToAirHeatPumpSimple {
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        // Locals
-        static Array1D_bool MySizeFlag; // used for sizing PTHP inputs one time
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // shut off after compressor cycle off  [s]
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitSimpleWatertoAirHP");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirInletNode;                // Node Number of the air inlet
         int WaterInletNode;              // Node Number of the Water inlet
-        static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
-        static Array1D_bool MyPlantScanFlag;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
         bool errFlag;
 
         if (state.dataWaterToAirHeatPumpSimple->MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            MySizeFlag.allocate(state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs);
-            MyEnvrnFlag.allocate(state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs);
-            MyPlantScanFlag.allocate(state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs);
-            MySizeFlag = true;
-            MyEnvrnFlag = true;
-            MyPlantScanFlag = true;
+            state.dataWaterToAirHeatPumpSimple->MySizeFlag.allocate(state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs);
+            state.dataWaterToAirHeatPumpSimple->MyEnvrnFlag.allocate(state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs);
+            state.dataWaterToAirHeatPumpSimple->MyPlantScanFlag.allocate(state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs);
+            state.dataWaterToAirHeatPumpSimple->MySizeFlag = true;
+            state.dataWaterToAirHeatPumpSimple->MyEnvrnFlag = true;
+            state.dataWaterToAirHeatPumpSimple->MyPlantScanFlag = true;
             state.dataWaterToAirHeatPumpSimple->MyOneTimeFlag = false;
         }
 
-        if (MyPlantScanFlag(HPNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (state.dataWaterToAirHeatPumpSimple->MyPlantScanFlag(HPNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
@@ -870,14 +853,14 @@ namespace WaterToAirHeatPumpSimple {
             if (errFlag) {
                 ShowFatalError(state, "InitSimpleWatertoAirHP: Program terminated for previous conditions.");
             }
-            MyPlantScanFlag(HPNum) = false;
+            state.dataWaterToAirHeatPumpSimple->MyPlantScanFlag(HPNum) = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataWaterToAirHeatPumpSimple->MySizeFlag(HPNum) && !state.dataWaterToAirHeatPumpSimple->MyPlantScanFlag(HPNum)) {
             // for each furnace, do the sizing once.
             SizeHVACWaterToAir(state, HPNum);
 
-            MySizeFlag(HPNum) = false;
+            state.dataWaterToAirHeatPumpSimple->MySizeFlag(HPNum) = false;
         }
 
         if (FirstHVACIteration) {
@@ -929,7 +912,7 @@ namespace WaterToAirHeatPumpSimple {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataWaterToAirHeatPumpSimple->MyEnvrnFlag(HPNum) && !state.dataWaterToAirHeatPumpSimple->MyPlantScanFlag(HPNum)) {
             // Do the initializations to start simulation
 
             AirInletNode = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum;
@@ -987,12 +970,12 @@ namespace WaterToAirHeatPumpSimple {
 
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SimFlag = true;
 
-            MyEnvrnFlag(HPNum) = false;
+            state.dataWaterToAirHeatPumpSimple->MyEnvrnFlag(HPNum) = false;
 
         } // End If for the Begin Environment initializations
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(HPNum) = true;
+            state.dataWaterToAirHeatPumpSimple->MyEnvrnFlag(HPNum) = true;
         }
 
         // Do the following initializations (every time step): This should be the info from
@@ -2082,21 +2065,10 @@ namespace WaterToAirHeatPumpSimple {
         using Psychrometrics::PsyWFnTdbTwbPb;
         using CurveManager::CurveValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Tref(283.15); // Reference Temperature for performance curves,10C [K]
+        constexpr Real64 Tref(283.15); // Reference Temperature for performance curves,10C [K]
         static std::string const RoutineName("CalcHPCoolingSimple");
         static std::string const RoutineNameSourceSideInletTemp("CalcHPCoolingSimple:SourceSideInletTemp");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 TotalCapRated;         // Rated Total Cooling Capacity [W]
         Real64 SensCapRated;          // Rated Sensible Cooling Capacity [W]
@@ -2105,11 +2077,8 @@ namespace WaterToAirHeatPumpSimple {
         Real64 WaterVolFlowRateRated; // Rated Water Volumetric Flow Rate [m3/s]
         Real64 Twet_Rated;            // Twet at rated conditions (coil air flow rate and air temperatures), sec
         Real64 Gamma_Rated;           // Gamma at rated conditions (coil air flow rate and air temperatures)
-
         Real64 SHRss;  // Sensible heat ratio at steady state
         Real64 SHReff; // Effective sensible heat ratio at part-load condition
-        //  REAL(r64) :: PartLoadRatio          ! Part load ratio
-
         Real64 ratioTDB; // Ratio of the inlet air dry bulb temperature to the rated conditions
         Real64 ratioTWB; // Ratio of the inlet air wet bulb temperature to the rated conditions
         Real64 ratioTS;  // Ratio of the source side(water) inlet temperature to the rated conditions
@@ -2119,19 +2088,18 @@ namespace WaterToAirHeatPumpSimple {
         Real64 CpAir;    // Specific heat of air [J/kg_C]
         Real64 ReportingConstant;
 
-        bool LatDegradModelSimFlag;             // Latent degradation model simulation flag
-        int NumIteration;                       // Iteration Counter
-        static int Count(0);                    // No idea what this is for.
-        static Real64 LoadSideInletDBTemp_Init; // rated conditions
-        static Real64 LoadSideInletWBTemp_Init; // rated conditions
-        static Real64 LoadSideInletHumRat_Init; // rated conditions
-        static Real64 LoadSideInletEnth_Init;   // rated conditions
-        static Real64 CpAir_Init;               // rated conditions
-        Real64 LoadSideInletDBTemp_Unit;        // calc conditions for unit
-        Real64 LoadSideInletWBTemp_Unit;        // calc conditions for unit
-        Real64 LoadSideInletHumRat_Unit;        // calc conditions for unit
-        Real64 LoadSideInletEnth_Unit;          // calc conditions for unit
-        Real64 CpAir_Unit;                      // calc conditions for unit
+        bool LatDegradModelSimFlag;      // Latent degradation model simulation flag
+        int NumIteration;                // Iteration Counter
+        Real64 LoadSideInletDBTemp_Init(0); // rated conditions
+        Real64 LoadSideInletWBTemp_Init(0); // rated conditions
+        Real64 LoadSideInletHumRat_Init(0); // rated conditions
+        Real64 LoadSideInletEnth_Init;   // rated conditions
+        Real64 CpAir_Init;               // rated conditions
+        Real64 LoadSideInletDBTemp_Unit; // calc conditions for unit
+        Real64 LoadSideInletWBTemp_Unit; // calc conditions for unit
+        Real64 LoadSideInletHumRat_Unit; // calc conditions for unit
+        Real64 LoadSideInletEnth_Unit;   // calc conditions for unit
+        Real64 CpAir_Unit;               // calc conditions for unit
 
         if (state.dataWaterToAirHeatPumpSimple->firstTime) {
             // Set indoor air conditions to the rated condition
@@ -2259,7 +2227,6 @@ namespace WaterToAirHeatPumpSimple {
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletEnth = state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth - state.dataWaterToAirHeatPumpSimple->QLoadTotal / state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate;
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp = state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp - state.dataWaterToAirHeatPumpSimple->QSensible / (state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate * CpAir);
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletHumRat = PsyWFnTdbH(state, state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp, state.dataWaterToAirHeatPumpSimple->LoadSideOutletEnth, RoutineName);
-        ++Count;
         // Actual outlet conditions are "average" for time step
         if (CyclingScheme == ContFanCycCoil) {
             // continuous fan, cycling compressor
@@ -2397,28 +2364,15 @@ namespace WaterToAirHeatPumpSimple {
         using Psychrometrics::PsyWFnTdbTwbPb;
         using CurveManager::CurveValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Tref(283.15); // Reference Temperature for performance curves,10C [K]
         static std::string const RoutineName("CalcHPHeatingSimple");
         static std::string const RoutineNameSourceSideInletTemp("CalcHPHeatingSimple:SourceSideInletTemp");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Real64 HeatCapRated;          // Rated Heating Capacity [W]
         Real64 HeatPowerRated;        // Rated Heating Power Input[W]
         Real64 AirVolFlowRateRated;   // Rated Air Volumetric Flow Rate [m3/s]
         Real64 WaterVolFlowRateRated; // Rated Water Volumetric Flow Rate [m3/s]
-
-        //  REAL(r64) :: PartLoadRatio          ! Part load ratio
         Real64 ratioTDB; // Ratio of the inlet air dry bulb temperature to the rated conditions
         Real64 ratioTS;  // Ratio of the source side (water) inlet temperature to the rated conditions
         Real64 ratioVL;  // Ratio of the load side flow rate to the rated conditions

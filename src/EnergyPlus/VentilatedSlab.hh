@@ -394,24 +394,43 @@ struct VentilatedSlabData : BaseGlobalStruct {
     Array1D<VentilatedSlab::VentilatedSlabData> VentSlab;
     Array1D<VentilatedSlab::VentSlabNumericFieldData> VentSlabNumericFields;
 
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyPlantScanFlag;
+    Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+
+    Array1D<Real64> AirTempOut; // Array of outlet air temperatures for each surface in the radiant system
+
+    int CondensationErrorCount = 0;    // Counts for # times the radiant systems are shutdown due to condensation
+    int EnergyImbalanceErrorCount = 0; // Counts for # times a temperature mismatch is found in the energy balance check
+    bool FirstTimeFlag = true;         // for setting size of AirTempOut array
+
     void clear_state() override
     {
-        MyOneTimeFlag = true;
-        GetInputFlag = true;
-        HCoilOn = false;
-        NumOfVentSlabs = 0;
-        OAMassFlowRate = 0.0;
-        MaxCloNumOfSurfaces = 0;
-        QZnReq = 0.0;
-        QRadSysSrcAvg.deallocate();
-        ZeroSourceSumHATsurf.deallocate();
-        LastQRadSysSrc.deallocate();
-        LastSysTimeElapsed.deallocate();
-        LastTimeStepSys.deallocate();
-        CheckEquipName.deallocate();
-        MySizeFlag.deallocate();
-        VentSlab.deallocate();
-        VentSlabNumericFields.deallocate();
+        this->MyOneTimeFlag = true;
+        this->GetInputFlag = true;
+        this->HCoilOn = false;
+        this->NumOfVentSlabs = 0;
+        this->OAMassFlowRate = 0.0;
+        this->MaxCloNumOfSurfaces = 0;
+        this->QZnReq = 0.0;
+        this->QRadSysSrcAvg.deallocate();
+        this->ZeroSourceSumHATsurf.deallocate();
+        this->LastQRadSysSrc.deallocate();
+        this->LastSysTimeElapsed.deallocate();
+        this->LastTimeStepSys.deallocate();
+        this->CheckEquipName.deallocate();
+        this->MySizeFlag.deallocate();
+        this->VentSlab.deallocate();
+        this->VentSlabNumericFields.deallocate();
+        this->ZoneEquipmentListChecked = false;
+        this->MyEnvrnFlag.deallocate();
+        this->MyPlantScanFlag.deallocate();
+        this->MyZoneEqFlag.deallocate();
+        this->AirTempOut.deallocate();
+        this->CondensationErrorCount = 0;
+        this->EnergyImbalanceErrorCount = 0;
+        this->FirstTimeFlag = true;
     }
 
     // Default Constructor

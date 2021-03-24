@@ -52,12 +52,11 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Vectors.hh>
 
-namespace EnergyPlus {
-
-namespace Vectors {
+namespace EnergyPlus::Vectors {
     // Module containing the routines dealing with Vector operations
 
     // MODULE INFORMATION:
@@ -786,7 +785,7 @@ namespace Vectors {
         return pointIndices;
     }
 
-    Real64 CalcPolyhedronVolume(Polyhedron const &Poly)
+    Real64 CalcPolyhedronVolume(EnergyPlusData &state, Polyhedron const &Poly)
     {
 
         // SUBROUTINE INFORMATION:
@@ -805,38 +804,20 @@ namespace Vectors {
         // REFERENCES:
         // Conversations with Bill Carroll, LBNL.
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 PyramidVolume;
 
         // Object Data
-        static Vector p0(0.0, 0.0, 0.0);
         Vector p3FaceOrigin;
 
         Real64 Volume = 0.0;
 
         for (int NFace = 1; NFace <= Poly.NumSurfaceFaces; ++NFace) {
             p3FaceOrigin = Poly.SurfaceFace(NFace).FacePoints(2);
-            PyramidVolume = dot(Poly.SurfaceFace(NFace).NewellAreaVector, (p3FaceOrigin - p0));
+            PyramidVolume = dot(Poly.SurfaceFace(NFace).NewellAreaVector, (p3FaceOrigin - state.dataVectors->p0));
             Volume += PyramidVolume / 3.0;
         }
         return Volume;
     }
-
-} // namespace Vectors
 
 } // namespace EnergyPlus
