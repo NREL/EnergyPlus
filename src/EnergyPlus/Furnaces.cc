@@ -9627,7 +9627,6 @@ namespace Furnaces {
         Array1D<Real64> Par(4);
         int SolFlag;
         auto & HeatingCoilName = state.dataFurnaces->HeatingCoilName; // name of heating coil
-        auto & HeatingCoilType = state.dataFurnaces->HeatingCoilType; // type of heating coil
         int CoilTypeNum(0);          // heating coil type number
         int HeatingCoilIndex(0);     // heating coil index
         int CoilControlNode(0);      // control node for hot water and steam heating coils

@@ -817,32 +817,32 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->VTDark = 0.0;
         this->VTMULT = 1.0;
 
-        this->DayltgInteriorMapIllumDFSKHR.clear();
-        this->DayltgInteriorMapIllumBFSKHR.clear();
-        this->DayltgInteriorMapIllumSFSKHR.clear();
+        this->DayltgInteriorMapIllumDFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (first index), bare/shaded window (second index)
+        this->DayltgInteriorMapIllumBFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
+        this->DayltgInteriorMapIllumSFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
         this->BACLUM.clear();
         this->DayltgInteriorMapIllumGLRNDX.clear();
         this->daylight_illum.clear();
-        this->FLFWSU.clear();
-        this->FLFWSUdisk.clear();
-        this->FLCWSU.clear();
-        this->TransMult.clear();
-        this->DayltgInterReflectedIllumTransBmBmMult.clear();
-        this->TransBmBmMult.clear();
-        this->TransBmBmMultRefl.clear();
-        this->PH.clear();
-        this->TH.clear();
-        this->SPHCPH.clear();
+        this->FLFWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
+        this->FLFWSUdisk = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
+        this->FLCWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
+        this->TransMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);     // Transmittance multiplier
+        this->DayltgInterReflectedIllumTransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs); // Isolated blind beam-beam transmittance
+        this->TransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);     // Beam-beam transmittance of isolated blind
+        this->TransBmBmMultRefl = Array1D<Real64>(DataSurfaces::MaxSlatAngs); // As above but for beam reflected from exterior obstruction
+        this->PH = Array1D<Real64>(DaylightingManager::NPH);     // Altitude of sky element (radians)
+        this->TH = Array1D<Real64>(DaylightingManager::NTH);     // Azimuth of sky element (radians)
+        this->SPHCPH = Array1D<Real64>(DaylightingManager::NPH); // Sine times cosine of altitude of sky element
         this->SetPnt.clear();
         this->GLRNDX.clear();
         this->GLRNEW.clear();
-        this->FLCWSK.clear();
-        this->SkyObstructionMult.clear();
-        this->FLFWSK.clear();
-        this->ObTransM.clear();
-        this->SFSKHR.clear();
-        this->DFSKHR.clear();
-        this->BFSKHR.clear();
+        this->FLCWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related upgoing luminous flux
+        this->SkyObstructionMult = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
+        this->FLFWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related downgoing luminous flux
+        this->ObTransM = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // ObTrans value for each (TH,PH) direction
+        this->SFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (second index), bare/shaded window (first index)
+        this->DFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (second index), bare/shaded window (first index)
+        this->BFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (second index), bare/shaded window (first index)
         this->tmpIllumFromWinAtRefPt.clear();
         this->tmpBackLumFromWinAtRefPt.clear();
         this->tmpSourceLumFromWinAtRefPt.clear();

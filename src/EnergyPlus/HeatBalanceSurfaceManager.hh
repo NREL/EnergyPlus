@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
 
 namespace EnergyPlus {
 
@@ -275,9 +276,9 @@ struct HeatBalSurfMgr : BaseGlobalStruct {
         calcHeatBalInsideSurfWarmupErrCount = 0;
         calcHeatBalInsideSurEnvrnFlag = true;
         RefAirTemp.clear();
-        this->AbsDiffWin.clear();
-        this->AbsDiffWinGnd.clear();
-        this->AbsDiffWinSky.clear();
+        AbsDiffWin = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
+        AbsDiffWinGnd = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
+        AbsDiffWinSky = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
     }
 };
 
