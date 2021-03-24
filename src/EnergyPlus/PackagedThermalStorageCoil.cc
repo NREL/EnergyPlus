@@ -4009,7 +4009,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
                 // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
                 // then overcool to meet moisture load
 
-                if ((OutletHumRatDXCoil > DesiredOutletHumRat) && (PartLoadFrac < 1.0) && (ControlType == DehumidControl_CoolReheat)) {
+                if ((OutletHumRatDXCoil > DesiredOutletHumRat) && (PartLoadFrac < 1.0) && (ControlType == HVACDXSystem::DehumidControl::CoolReheat)) {
                     //           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
                     //           do not run the compressor
                     if ((NoLoadHumRatOut - DesiredOutletHumRat) < HumRatAcc) {
