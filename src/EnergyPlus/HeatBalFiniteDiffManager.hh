@@ -312,6 +312,7 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct {
     Array1D<HeatBalFiniteDiffManager::ConstructionDataFD> ConstructFD;
     Array1D<HeatBalFiniteDiffManager::SurfaceDataFD> SurfaceFD;
     Array1D<HeatBalFiniteDiffManager::MaterialDataFD> MaterialFD;
+    bool MyEnvrnFlag = true;
 
     void clear_state() override
     {
@@ -330,6 +331,7 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct {
         this->ConstructFD.deallocate();
         this->SurfaceFD.deallocate();
         this->MaterialFD.deallocate();
+        this->MyEnvrnFlag = true;
     }
 };
 
