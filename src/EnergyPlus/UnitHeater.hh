@@ -217,19 +217,29 @@ struct UnitHeatersData : BaseGlobalStruct {
     Array1D<UnitHeater::UnitHeaterData> UnitHeat;
     Array1D<UnitHeater::UnitHeatNumericFieldData> UnitHeatNumericFields;
 
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyPlantScanFlag;
+    Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+
+    int RefrigIndex = 0;
+
     void clear_state() override
     {
-        HCoilOn = false;
-        NumOfUnitHeats = 0;
-        QZnReq = 0.0;
-        MySizeFlag.deallocate();
-        CheckEquipName.deallocate();
-        UnitHeat.deallocate();
-        UnitHeatNumericFields.deallocate();
-        InitUnitHeaterOneTimeFlag = true;
-        GetUnitHeaterInputFlag = true;
-        ZoneEquipmentListChecked = false;
-        SetMassFlowRateToZero = false;
+        this->HCoilOn = false;
+        this->NumOfUnitHeats = 0;
+        this->QZnReq = 0.0;
+        this->MySizeFlag.deallocate();
+        this->CheckEquipName.deallocate();
+        this->UnitHeat.deallocate();
+        this->UnitHeatNumericFields.deallocate();
+        this->InitUnitHeaterOneTimeFlag = true;
+        this->GetUnitHeaterInputFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->SetMassFlowRateToZero = false;
+        this->MyEnvrnFlag.deallocate();
+        this->MyPlantScanFlag.deallocate();
+        this->MyZoneEqFlag.deallocate();
+        this->RefrigIndex = 0;
     }
 
     // Default Constructor
