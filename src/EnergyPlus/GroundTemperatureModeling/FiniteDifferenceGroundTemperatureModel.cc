@@ -1136,14 +1136,10 @@ void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(Optional<int const> cell, Opt
     Real64 Theta_sat;
     Real64 rho_ice;
     Real64 rho_liq;
-    Real64 rhoCp_soil_liq_1;
     Real64 CP_liq;
     Real64 CP_ice;
     Real64 Lat_fus;
     Real64 Cp_transient;
-    Real64 rhoCP_soil_liq;
-    Real64 rhoCP_soil_transient;
-    Real64 rhoCP_soil_ice;
     // other variables
     Real64 frzAllIce;
     Real64 frzIceTrans;

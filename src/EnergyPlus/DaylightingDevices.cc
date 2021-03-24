@@ -1535,7 +1535,7 @@ namespace DaylightingDevices {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyEnvrnFlag(true);
+        auto & MyEnvrnFlag = state.dataDaylightingDevices->MyEnvrnFlag;
         int Loop;
 
         if (state.dataDaylightingDevicesData->NumOfTDDPipes == 0) return;

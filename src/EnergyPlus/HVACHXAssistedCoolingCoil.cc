@@ -266,9 +266,9 @@ namespace HVACHXAssistedCoolingCoil {
         Array1D<Real64> NumArray;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
-        static int MaxNums(0);            // Maximum number of numeric input fields
-        static int MaxAlphas(0);          // Maximum number of alpha input fields
-        static int TotalArgs(0);          // Total number of alpha and numeric arguments (max) for a
+        int MaxNums(0);            // Maximum number of numeric input fields
+        int MaxAlphas(0);          // Maximum number of alpha input fields
+        int TotalArgs(0);          // Total number of alpha and numeric arguments (max) for a
 
         auto & TotalNumHXAssistedCoils = state.dataHVACAssistedCC->TotalNumHXAssistedCoils;
         auto & HXAssistedCoil = state.dataHVACAssistedCC->HXAssistedCoil;
@@ -824,7 +824,7 @@ namespace HVACHXAssistedCoolingCoil {
         //  na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 CoilOutputTempLast; // Exiting cooling coil temperature from last iteration
+        auto & CoilOutputTempLast = state.dataHVACAssistedCC->CoilOutputTempLast; // Exiting cooling coil temperature from last iteration
         Real64 AirMassFlow;               // Inlet air mass flow rate
         Real64 Error;                     // Error (exiting coil temp from last iteration minus current coil exiting temp)
         Real64 ErrorLast;                 // check for oscillations
@@ -1072,7 +1072,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
-        static int ErrCount(0);
+        auto & ErrCount = state.dataHVACAssistedCC->ErrCount;
         bool errFlag;
 
         auto & HXAssistedCoil = state.dataHVACAssistedCC->HXAssistedCoil;
@@ -1660,7 +1660,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
-        static int ErrCount(0);
+        auto & ErrCount = state.dataHVACAssistedCC->ErrCount2;
 
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data

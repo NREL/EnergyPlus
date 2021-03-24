@@ -104,11 +104,13 @@ struct DaylightingDevicesData : BaseGlobalStruct {
 
     Array1D<Real64> COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles); // List of cosines of incident angle
     bool ShelfReported = false;
+    bool MyEnvrnFlag = true;
 
     void clear_state() override
     {
         this->COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles);
         this->ShelfReported = false;
+        this->MyEnvrnFlag = true;
     }
 };
 

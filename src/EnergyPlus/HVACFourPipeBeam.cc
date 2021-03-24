@@ -103,8 +103,8 @@ namespace FourPipeBeam {
 
         int beamIndex; // loop index
 
-        static int NumAlphas(0);  // Number of Alphas for each GetObjectItem call
-        static int NumNumbers(0); // Number of Numbers for each GetObjectItem call
+        int NumAlphas(0);  // Number of Alphas for each GetObjectItem call
+        int NumNumbers(0); // Number of Numbers for each GetObjectItem call
 
         //  certain object in the input file
         int IOStatus; // Used in GetObjectItem
@@ -727,8 +727,6 @@ namespace FourPipeBeam {
         using namespace std::placeholders;
 
         static std::string const routineName("HVACFourPipeBeam::set_size ");
-        static int pltSizCoolNum(0); // index of plant sizing object for the cooling loop
-        static int pltSizHeatNum(0);
 
         bool ErrorsFound = false;
         Real64 rho;                     // local fluid density
@@ -832,7 +830,7 @@ namespace FourPipeBeam {
                     minFlow = maxFlowCool / 3.0; // make sure min is significantly lower than max.
                 }
 
-                pltSizCoolNum = MyPlantSizingIndex(state, "four pipe beam unit", this->name, this->cWInNodeNum, this->cWOutNodeNum, ErrorsFound);
+                int pltSizCoolNum = MyPlantSizingIndex(state, "four pipe beam unit", this->name, this->cWInNodeNum, this->cWOutNodeNum, ErrorsFound);
                 if (pltSizCoolNum == 0) {
                     ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
                     ShowContinueError(state, "Occurs in " + this->unitType + " Object=" + this->name);
@@ -873,7 +871,7 @@ namespace FourPipeBeam {
                     maxFlowHeat = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatLoad / (cpAir * 2.0);
                 }
 
-                pltSizHeatNum = MyPlantSizingIndex(state, "four pipe beam unit", this->name, this->hWInNodeNum, this->hWOutNodeNum, ErrorsFound);
+                int pltSizHeatNum = MyPlantSizingIndex(state, "four pipe beam unit", this->name, this->hWInNodeNum, this->hWOutNodeNum, ErrorsFound);
                 if (pltSizHeatNum == 0) {
                     ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object");
                     ShowContinueError(state, "Occurs in " + this->unitType + " Object=" + this->name);

@@ -611,8 +611,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
         Real64 DutyFactor;
         int IterationCount;
 
-        static Real64 CurrentSimTime(0.0);
-        static Real64 PrevSimTime(0.0);
+        auto & CurrentSimTime = state.dataHPWaterToWaterClg->CurrentSimTime;
+        auto & PrevSimTime = state.dataHPWaterToWaterClg->PrevSimTime;
 
         Real64 CpSourceSide; // local temporary for fluid specific heat
         Real64 CpLoadSide;   // local temporary for fluid specific heat
