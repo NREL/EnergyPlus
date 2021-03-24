@@ -1335,14 +1335,13 @@ namespace EnergyPlus::DataZoneEquipment {
         Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
         Real64 CO2PeopleGeneration;       // CO2 generation from people at design level
         int PeopleNum;
-        static Array1D_bool MyEnvrnFlag;
 
         OAVolumeFlowRate = 0.0;
         if (DSOAPtr == 0) return OAVolumeFlowRate;
 
         if (state.dataZoneEquip->CalcDesignSpecificationOutdoorAirOneTimeFlag) {
-            MyEnvrnFlag.allocate(state.dataSize->NumOARequirements);
-            MyEnvrnFlag = true;
+            state.dataZoneEquip->MyEnvrnFlag.allocate(state.dataSize->NumOARequirements);
+            state.dataZoneEquip->MyEnvrnFlag = true;
             state.dataZoneEquip->CalcDesignSpecificationOutdoorAirOneTimeFlag = false;
         }
 
@@ -1358,32 +1357,32 @@ namespace EnergyPlus::DataZoneEquipment {
             MaxOAFlag = false;
         }
 
-        if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_IAQP && MyEnvrnFlag(DSOAPtr)) {
+        if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_IAQP && state.dataZoneEquip->MyEnvrnFlag(DSOAPtr)) {
             if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
                                 R"(" valid Outdoor Air Method =" IndoorAirQualityProcedure" requires CO2 simulation.)");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
                 ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
             }
-            MyEnvrnFlag(DSOAPtr) = false;
+            state.dataZoneEquip->MyEnvrnFlag(DSOAPtr) = false;
         }
-        if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlSchOcc && MyEnvrnFlag(DSOAPtr)) {
+        if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlSchOcc && state.dataZoneEquip->MyEnvrnFlag(DSOAPtr)) {
             if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
                                 R"(" valid Outdoor Air Method =" ProportionalControlBasedOnDesignOccupancy" requires CO2 simulation.)");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
                 ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
             }
-            MyEnvrnFlag(DSOAPtr) = false;
+            state.dataZoneEquip->MyEnvrnFlag(DSOAPtr) = false;
         }
-        if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc && MyEnvrnFlag(DSOAPtr)) {
+        if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc && state.dataZoneEquip->MyEnvrnFlag(DSOAPtr)) {
             if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
                                 R"(" valid Outdoor Air Method =" ProportionalControlBasedOnOccupancySchedule" requires CO2 simulation.)");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
                 ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
             }
-            MyEnvrnFlag(DSOAPtr) = false;
+            state.dataZoneEquip->MyEnvrnFlag(DSOAPtr) = false;
         }
 
         // Calculate people outdoor air flow rate as needed

@@ -571,6 +571,16 @@ struct FurnacesData : BaseGlobalStruct {
     Array1D_bool MyPlantScanFlag;         // used to initializa plant comp for water and steam heating coils
     Array1D_bool MySuppCoilPlantScanFlag; // used to initialize plant comp for water and steam heating coils
 
+    // used to be statics
+    Real64 CoolCoilLoad;       // Negative value means cooling required
+    Real64 SystemSensibleLoad; // Positive value means heating required
+    bool HumControl = false; // Logical flag signaling when dehumidification is required
+    Real64 TotalZoneLatentLoad; // Total ZONE latent load (not including outside air) to be removed by furnace/unitary system
+    Real64 TotalZoneSensLoad; // Total ZONE heating load (not including outside air) to be removed by furnace/unitary system
+    Real64 CoolPartLoadRatio; // Part load ratio (greater of sensible or latent part load ratio for cooling)
+    Real64 HeatPartLoadRatio; // Part load ratio (greater of sensible or latent part load ratio for cooling)
+    Real64 Dummy2 = 0.0;        // Dummy var. for generic calc. furnace output arg. (n/a for heat pump)
+
     void clear_state() override
     {
         NumFurnaces = 0;
@@ -609,6 +619,9 @@ struct FurnacesData : BaseGlobalStruct {
         MyFlowFracFlag.clear();
         MyPlantScanFlag.clear();
         MySuppCoilPlantScanFlag.clear();
+
+        HumControl = false;
+        Dummy2 = 0.0;
     }
 };
 
