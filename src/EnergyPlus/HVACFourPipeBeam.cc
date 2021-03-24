@@ -98,8 +98,7 @@ namespace FourPipeBeam {
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
         using CurveManager::GetCurveIndex;
-        using namespace DataIPShortCuts;
-        using ScheduleManager::GetScheduleIndex;
+                using ScheduleManager::GetScheduleIndex;
         static std::string const routineName("FourPipeBeamFactory "); // include trailing blank space
 
         int beamIndex; // loop index
@@ -110,7 +109,7 @@ namespace FourPipeBeam {
         //  certain object in the input file
         int IOStatus; // Used in GetObjectItem
         bool errFlag = false;
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         bool found = false;
         int ctrlZone; // controlled zome do loop index
         int supAirIn; // controlled zone supply air inlet index
@@ -119,7 +118,7 @@ namespace FourPipeBeam {
 
         ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
         std::shared_ptr<HVACFourPipeBeam> thisBeam(new HVACFourPipeBeam());
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // find the number of cooled beam units
         cCurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam";
 
@@ -132,197 +131,197 @@ namespace FourPipeBeam {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           beamIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             found = true;
         } else {
             ErrorsFound = true;
         }
 
         errFlag = false;
-        GlobalNames::VerifyUniqueADUName(state, cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
+        GlobalNames::VerifyUniqueADUName(state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
         if (errFlag) {
             ErrorsFound = true;
         }
-        thisBeam->name = cAlphaArgs(1);
+        thisBeam->name = state.dataIPShortCut->cAlphaArgs(1);
         thisBeam->unitType = cCurrentModuleObject;
 
-        if (lAlphaFieldBlanks(2)) {
+        if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             thisBeam->airAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
         } else {
-            thisBeam->airAvailSchedNum = GetScheduleIndex(state, cAlphaArgs(2)); // convert schedule name to pointer
+            thisBeam->airAvailSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (thisBeam->airAvailSchedNum == 0) {
-                ShowSevereError(state, routineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
-                                cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                ShowSevereError(state, routineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " +
+                                state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
         }
-        if (lAlphaFieldBlanks(3)) {
+        if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
             thisBeam->coolingAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
         } else {
-            thisBeam->coolingAvailSchedNum = GetScheduleIndex(state, cAlphaArgs(3)); // convert schedule name to index
+            thisBeam->coolingAvailSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3)); // convert schedule name to index
             if (thisBeam->coolingAvailSchedNum == 0) {
-                ShowSevereError(state, routineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " entered =" + cAlphaArgs(3) + " for " +
-                                cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                ShowSevereError(state, routineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " entered =" + state.dataIPShortCut->cAlphaArgs(3) + " for " +
+                                state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
         }
-        if (lAlphaFieldBlanks(4)) {
+        if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
             thisBeam->heatingAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
         } else {
-            thisBeam->heatingAvailSchedNum = GetScheduleIndex(state, cAlphaArgs(4)); // convert schedule name to index
+            thisBeam->heatingAvailSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // convert schedule name to index
             if (thisBeam->heatingAvailSchedNum == 0) {
-                ShowSevereError(state, routineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(4) + " entered =" + cAlphaArgs(4) + " for " +
-                                cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                ShowSevereError(state, routineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " entered =" + state.dataIPShortCut->cAlphaArgs(4) + " for " +
+                                state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
         }
 
-        thisBeam->airInNodeNum = GetOnlySingleNode(state, cAlphaArgs(5),
+        thisBeam->airInNodeNum = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(5),
                                                    ErrorsFound,
                                                    cCurrentModuleObject,
-                                                   cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                    DataLoopNode::NodeFluidType::Air,
                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                    1,
                                                    ObjectIsNotParent,
-                                                   cAlphaFieldNames(5));
-        thisBeam->airOutNodeNum = GetOnlySingleNode(state, cAlphaArgs(6),
+                                                   state.dataIPShortCut->cAlphaFieldNames(5));
+        thisBeam->airOutNodeNum = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(6),
                                                     ErrorsFound,
                                                     cCurrentModuleObject,
-                                                    cAlphaArgs(1),
+                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                     1,
                                                     ObjectIsNotParent,
-                                                    cAlphaFieldNames(6));
-        if (lAlphaFieldBlanks(7) && lAlphaFieldBlanks(8)) { // no chilled water nodes, no beam cooling
+                                                    state.dataIPShortCut->cAlphaFieldNames(6));
+        if (state.dataIPShortCut->lAlphaFieldBlanks(7) && state.dataIPShortCut->lAlphaFieldBlanks(8)) { // no chilled water nodes, no beam cooling
             thisBeam->beamCoolingPresent = false;
-        } else if (lAlphaFieldBlanks(7) && !lAlphaFieldBlanks(8)) { // outlet node but no inlet node for chilled water
+        } else if (state.dataIPShortCut->lAlphaFieldBlanks(7) && !state.dataIPShortCut->lAlphaFieldBlanks(8)) { // outlet node but no inlet node for chilled water
             thisBeam->beamCoolingPresent = false;
-            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(7) + " for " + cAlphaFieldNames(1) + '=' +
-                             cAlphaArgs(1) + ", simulation continues with no beam cooling");
-        } else if (!lAlphaFieldBlanks(7) && lAlphaFieldBlanks(8)) { // inlet node but no outlet node for chilled water
+            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(7) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
+                             state.dataIPShortCut->cAlphaArgs(1) + ", simulation continues with no beam cooling");
+        } else if (!state.dataIPShortCut->lAlphaFieldBlanks(7) && state.dataIPShortCut->lAlphaFieldBlanks(8)) { // inlet node but no outlet node for chilled water
             thisBeam->beamCoolingPresent = false;
-            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(8) + " for " + cAlphaFieldNames(1) + '=' +
-                             cAlphaArgs(1) + ", simulation continues with no beam cooling");
+            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(8) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
+                             state.dataIPShortCut->cAlphaArgs(1) + ", simulation continues with no beam cooling");
         } else {
             thisBeam->beamCoolingPresent = true;
-            thisBeam->cWInNodeNum = GetOnlySingleNode(state, cAlphaArgs(7),
+            thisBeam->cWInNodeNum = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(7),
                                                       ErrorsFound,
                                                       cCurrentModuleObject,
-                                                      cAlphaArgs(1),
+                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Water,
                                                       DataLoopNode::NodeConnectionType::Inlet,
                                                       2,
                                                       ObjectIsParent,
-                                                      cAlphaFieldNames(7));
-            thisBeam->cWOutNodeNum = GetOnlySingleNode(state, cAlphaArgs(8),
+                                                      state.dataIPShortCut->cAlphaFieldNames(7));
+            thisBeam->cWOutNodeNum = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(8),
                                                        ErrorsFound,
                                                        cCurrentModuleObject,
-                                                       cAlphaArgs(1),
+                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Water,
                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                        2,
                                                        ObjectIsParent,
-                                                       cAlphaFieldNames(8));
+                                                       state.dataIPShortCut->cAlphaFieldNames(8));
         }
-        if (lAlphaFieldBlanks(9) && lAlphaFieldBlanks(10)) { // no hot water nodes, no beam heating
+        if (state.dataIPShortCut->lAlphaFieldBlanks(9) && state.dataIPShortCut->lAlphaFieldBlanks(10)) { // no hot water nodes, no beam heating
             thisBeam->beamHeatingPresent = false;
-        } else if (lAlphaFieldBlanks(9) && !lAlphaFieldBlanks(10)) { // outlet node but no inlet node for hot water
+        } else if (state.dataIPShortCut->lAlphaFieldBlanks(9) && !state.dataIPShortCut->lAlphaFieldBlanks(10)) { // outlet node but no inlet node for hot water
             thisBeam->beamHeatingPresent = false;
-            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(9) + " for " + cAlphaFieldNames(1) + '=' +
-                             cAlphaArgs(1) + ", simulation continues with no beam heating");
-        } else if (!lAlphaFieldBlanks(9) && lAlphaFieldBlanks(10)) { // inlet node but no outlet node for hot water
+            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(9) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
+                             state.dataIPShortCut->cAlphaArgs(1) + ", simulation continues with no beam heating");
+        } else if (!state.dataIPShortCut->lAlphaFieldBlanks(9) && state.dataIPShortCut->lAlphaFieldBlanks(10)) { // inlet node but no outlet node for hot water
             thisBeam->beamHeatingPresent = false;
-            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(10) + " for " + cAlphaFieldNames(1) + '=' +
-                             cAlphaArgs(1) + ", simulation continues with no beam heating");
+            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(10) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
+                             state.dataIPShortCut->cAlphaArgs(1) + ", simulation continues with no beam heating");
         } else {
             thisBeam->beamHeatingPresent = true;
-            thisBeam->hWInNodeNum = GetOnlySingleNode(state, cAlphaArgs(9),
+            thisBeam->hWInNodeNum = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(9),
                                                       ErrorsFound,
                                                       cCurrentModuleObject,
-                                                      cAlphaArgs(1),
+                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Water,
                                                       DataLoopNode::NodeConnectionType::Inlet,
                                                       2,
                                                       ObjectIsParent,
-                                                      cAlphaFieldNames(9));
-            thisBeam->hWOutNodeNum = GetOnlySingleNode(state, cAlphaArgs(10),
+                                                      state.dataIPShortCut->cAlphaFieldNames(9));
+            thisBeam->hWOutNodeNum = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(10),
                                                        ErrorsFound,
                                                        cCurrentModuleObject,
-                                                       cAlphaArgs(1),
+                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Water,
                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                        2,
                                                        ObjectIsParent,
-                                                       cAlphaFieldNames(10));
+                                                       state.dataIPShortCut->cAlphaFieldNames(10));
         }
-        thisBeam->vDotDesignPrimAir = rNumericArgs(1);
+        thisBeam->vDotDesignPrimAir = state.dataIPShortCut->rNumericArgs(1);
         if (thisBeam->vDotDesignPrimAir == AutoSize) {
             thisBeam->vDotDesignPrimAirWasAutosized = true;
         }
-        thisBeam->vDotDesignCW = rNumericArgs(2);
+        thisBeam->vDotDesignCW = state.dataIPShortCut->rNumericArgs(2);
         if (thisBeam->vDotDesignCW == AutoSize && thisBeam->beamCoolingPresent) {
             thisBeam->vDotDesignCWWasAutosized = true;
         }
-        thisBeam->vDotDesignHW = rNumericArgs(3);
+        thisBeam->vDotDesignHW = state.dataIPShortCut->rNumericArgs(3);
         if (thisBeam->vDotDesignHW == AutoSize && thisBeam->beamHeatingPresent) {
             thisBeam->vDotDesignHWWasAutosized = true;
         }
-        thisBeam->totBeamLength = rNumericArgs(4);
+        thisBeam->totBeamLength = state.dataIPShortCut->rNumericArgs(4);
         if (thisBeam->totBeamLength == AutoSize) {
             thisBeam->totBeamLengthWasAutosized = true;
         }
-        thisBeam->vDotNormRatedPrimAir = rNumericArgs(5);
-        thisBeam->qDotNormRatedCooling = rNumericArgs(6);
-        thisBeam->deltaTempRatedCooling = rNumericArgs(7);
-        thisBeam->vDotNormRatedCW = rNumericArgs(8);
+        thisBeam->vDotNormRatedPrimAir = state.dataIPShortCut->rNumericArgs(5);
+        thisBeam->qDotNormRatedCooling = state.dataIPShortCut->rNumericArgs(6);
+        thisBeam->deltaTempRatedCooling = state.dataIPShortCut->rNumericArgs(7);
+        thisBeam->vDotNormRatedCW = state.dataIPShortCut->rNumericArgs(8);
 
-        thisBeam->modCoolingQdotDeltaTFuncNum = GetCurveIndex(state, cAlphaArgs(11));
+        thisBeam->modCoolingQdotDeltaTFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));
         if (thisBeam->modCoolingQdotDeltaTFuncNum == 0 && thisBeam->beamCoolingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + cAlphaFieldNames(11) + '=' + cAlphaArgs(11));
+            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
             ErrorsFound = true;
         }
-        thisBeam->modCoolingQdotAirFlowFuncNum = GetCurveIndex(state, cAlphaArgs(12));
+        thisBeam->modCoolingQdotAirFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(12));
         if (thisBeam->modCoolingQdotAirFlowFuncNum == 0 && thisBeam->beamCoolingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + cAlphaFieldNames(12) + '=' + cAlphaArgs(12));
+            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + state.dataIPShortCut->cAlphaArgs(12));
             ErrorsFound = true;
         }
-        thisBeam->modCoolingQdotCWFlowFuncNum = GetCurveIndex(state, cAlphaArgs(13));
+        thisBeam->modCoolingQdotCWFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(13));
         if (thisBeam->modCoolingQdotCWFlowFuncNum == 0 && thisBeam->beamCoolingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + cAlphaFieldNames(13) + '=' + cAlphaArgs(13));
+            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + '=' + state.dataIPShortCut->cAlphaArgs(13));
             ErrorsFound = true;
         }
-        thisBeam->qDotNormRatedHeating = rNumericArgs(9);
-        thisBeam->deltaTempRatedHeating = rNumericArgs(10);
-        thisBeam->vDotNormRatedHW = rNumericArgs(11);
-        thisBeam->modHeatingQdotDeltaTFuncNum = GetCurveIndex(state, cAlphaArgs(14));
+        thisBeam->qDotNormRatedHeating = state.dataIPShortCut->rNumericArgs(9);
+        thisBeam->deltaTempRatedHeating = state.dataIPShortCut->rNumericArgs(10);
+        thisBeam->vDotNormRatedHW = state.dataIPShortCut->rNumericArgs(11);
+        thisBeam->modHeatingQdotDeltaTFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14));
         if (thisBeam->modHeatingQdotDeltaTFuncNum == 0 && thisBeam->beamHeatingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + cAlphaFieldNames(14) + '=' + cAlphaArgs(14));
+            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + '=' + state.dataIPShortCut->cAlphaArgs(14));
             ErrorsFound = true;
         }
-        thisBeam->modHeatingQdotAirFlowFuncNum = GetCurveIndex(state, cAlphaArgs(15));
+        thisBeam->modHeatingQdotAirFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(15));
         if (thisBeam->modHeatingQdotAirFlowFuncNum == 0 && thisBeam->beamHeatingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + cAlphaFieldNames(15) + '=' + cAlphaArgs(15));
+            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + state.dataIPShortCut->cAlphaArgs(15));
             ErrorsFound = true;
         }
-        thisBeam->modHeatingQdotHWFlowFuncNum = GetCurveIndex(state, cAlphaArgs(16));
+        thisBeam->modHeatingQdotHWFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(16));
         if (thisBeam->modHeatingQdotHWFlowFuncNum == 0 && thisBeam->beamHeatingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + cAlphaFieldNames(16) + '=' + cAlphaArgs(16));
+            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(16) + '=' + state.dataIPShortCut->cAlphaArgs(16));
             ErrorsFound = true;
         }
         // Register component set data
@@ -458,7 +457,7 @@ namespace FourPipeBeam {
         }
         if (!airNodeFound) {
             ShowSevereError(state, "The outlet air node from the " + cCurrentModuleObject + " = " + thisBeam->name);
-            ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node =" + cAlphaArgs(5));
+            ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node =" + state.dataIPShortCut->cAlphaArgs(5));
             ErrorsFound = true;
         }
 

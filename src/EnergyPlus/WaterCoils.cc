@@ -261,8 +261,7 @@ namespace EnergyPlus::WaterCoils {
         using DataSizing::AutoSize;
         using NodeInputManager::GetOnlySingleNode;
         using WaterManager::SetupTankSupplyComponent;
-        using namespace DataIPShortCuts;
-        using GlobalNames::VerifyUniqueCoilName;
+                using GlobalNames::VerifyUniqueCoilName;
         using SetPointManager::NodeHasSPMCtrlVarType;
         using namespace FaultsManager;
 
@@ -291,7 +290,7 @@ namespace EnergyPlus::WaterCoils {
         static int MaxAlphas(0);         // Maximum number of alpha input fields
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
 
         NumSimpHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Water");
         NumFlatFin = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water:DetailedGeometry");
@@ -322,7 +321,7 @@ namespace EnergyPlus::WaterCoils {
         NumArray.dimension(MaxNums, 0.0);
         lAlphaBlanks.dimension(MaxAlphas, true);
         lNumericBlanks.dimension(MaxNums, true);
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         CurrentModuleObject = "Coil:Heating:Water";
         // Get the data for simple heating coils
         for (SimpHeatNum = 1; SimpHeatNum <= NumSimpHeat; ++SimpHeatNum) {

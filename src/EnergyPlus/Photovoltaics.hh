@@ -318,10 +318,11 @@ namespace Photovoltaics {
 } // namespace Photovoltaics
 
 struct PhotovoltaicStateData : BaseGlobalStruct {
-
+    Array1D_bool MyEnvrnFlag;
+    Real64 PVTimeStep; // internal timestep (in seconds) for cell temperature mode 3
     void clear_state() override
     {
-
+        this->MyEnvrnFlag.clear();
     }
 };
 

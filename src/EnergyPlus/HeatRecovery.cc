@@ -140,7 +140,7 @@ namespace HeatRecovery {
     // External function calls
 
     // Functions
-    
+
     void SimHeatRecovery(EnergyPlusData &state,
                          std::string const &CompName,             // name of the heat exchanger unit
                          bool const FirstHVACIteration,           // TRUE if 1st HVAC simulation of system timestep
@@ -298,7 +298,6 @@ namespace HeatRecovery {
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using NodeInputManager::GetOnlySingleNode;
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ExchIndex;                                                  // loop index
@@ -308,9 +307,10 @@ namespace HeatRecovery {
         int NumAlphas;                                                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                                                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                                                   // Used in GetObjectItem
-        static bool ErrorsFound(false);                                 // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);                                 // Set to true if errors in input, fatal at end of routine
         static std::string HeatExchPerfType;                            // Desiccant balanced heat exchanger performance data type
         constexpr const char * RoutineName("GetHeatRecoveryInput: "); // include trailing blank space
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         state.dataHeatRecovery->NumAirToAirPlateExchs = inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:FlatPlate");
         state.dataHeatRecovery->NumAirToAirGenericExchs = inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:SensibleAndLatent");
@@ -335,37 +335,37 @@ namespace HeatRecovery {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ExchIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             ExchNum = ExchIndex;
 
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(NumNumbers);
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
-            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = cNumericFieldNames;
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataHeatRecovery->HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataHeatRecovery->HeatExchangerUniqueNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
 
-            state.dataHeatRecovery->ExchCond(ExchNum).Name = cAlphaArgs(1);
+            state.dataHeatRecovery->ExchCond(ExchNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_FLATPLATE;
-            if (lAlphaFieldBlanks(2)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
+                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
-                                    cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " +
+                                    state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
             }
             {
-                auto const SELECT_CASE_var(cAlphaArgs(3));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
                 if (SELECT_CASE_var == "COUNTERFLOW") {
                     state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = Counter_Flow;
                 } else if (SELECT_CASE_var == "PARALLELFLOW") {
@@ -373,42 +373,42 @@ namespace HeatRecovery {
                 } else if (SELECT_CASE_var == "CROSSFLOWBOTHUNMIXED") {
                     state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = Cross_Flow_Both_Unmixed;
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + ": incorrect flow arrangement: " + cAlphaArgs(3));
+                    ShowSevereError(state, cCurrentModuleObject + ": incorrect flow arrangement: " + state.dataIPShortCut->cAlphaArgs(3));
                     ErrorsFound = true;
                 }
             }
             {
-                auto const SELECT_CASE_var(cAlphaArgs(4));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
                 if (SELECT_CASE_var == "YES") {
                     state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
                 } else if (SELECT_CASE_var == "NO") {
                     state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
                 } else {
-                    if (lAlphaFieldBlanks(4)) {
+                    if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                         state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + cAlphaArgs(4));
+                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(4));
                         ErrorsFound = true;
                     }
                 }
             }
-            state.dataHeatRecovery->ExchCond(ExchNum).hARatio = rNumericArgs(1);
-            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = rNumericArgs(2);
-            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirInTemp = rNumericArgs(3);
-            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirOutTemp = rNumericArgs(4);
-            state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirVolFlow = rNumericArgs(5);
-            state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirInTemp = rNumericArgs(6);
-            state.dataHeatRecovery->ExchCond(ExchNum).NomElecPower = rNumericArgs(7);
+            state.dataHeatRecovery->ExchCond(ExchNum).hARatio = state.dataIPShortCut->rNumericArgs(1);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirInTemp = state.dataIPShortCut->rNumericArgs(3);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirOutTemp = state.dataIPShortCut->rNumericArgs(4);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirVolFlow = state.dataIPShortCut->rNumericArgs(5);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirInTemp = state.dataIPShortCut->rNumericArgs(6);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomElecPower = state.dataIPShortCut->rNumericArgs(7);
             state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
 
-            TestCompSet(state, cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum), state.dataHeatRecovery->ExchCond(ExchNum).Name, cAlphaArgs(5), cAlphaArgs(6), "Process Air Nodes");
+            TestCompSet(state, cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum), state.dataHeatRecovery->ExchCond(ExchNum).Name, state.dataIPShortCut->cAlphaArgs(5), state.dataIPShortCut->cAlphaArgs(6), "Process Air Nodes");
 
         } // end of input loop over air to air plate heat exchangers
 
@@ -418,40 +418,40 @@ namespace HeatRecovery {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ExchIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             ExchNum = ExchIndex + state.dataHeatRecovery->NumAirToAirPlateExchs;
 
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(NumNumbers);
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
-            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = cNumericFieldNames;
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataHeatRecovery->HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataHeatRecovery->HeatExchangerUniqueNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
 
-            state.dataHeatRecovery->ExchCond(ExchNum).Name = cAlphaArgs(1);
+            state.dataHeatRecovery->ExchCond(ExchNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
-            if (lAlphaFieldBlanks(2)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
+                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
-                                    cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " +
+                                    state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
             }
-            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = rNumericArgs(1);
-            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible100 = rNumericArgs(2);
-            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent100 = rNumericArgs(3);
-            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible75 = rNumericArgs(4);
-            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent75 = rNumericArgs(5);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
+            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible100 = state.dataIPShortCut->rNumericArgs(2);
+            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent100 = state.dataIPShortCut->rNumericArgs(3);
+            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible75 = state.dataIPShortCut->rNumericArgs(4);
+            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent75 = state.dataIPShortCut->rNumericArgs(5);
             if (state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible75 < state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible100) {
                 ShowWarningError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->ExchCond(ExchNum).Name +
                                  "\" sensible heating effectiveness at 75% rated flow is less than at 100% rated flow.");
@@ -462,10 +462,10 @@ namespace HeatRecovery {
                                  "\" latent heating effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError(state, "Latent heating effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
-            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 = rNumericArgs(6);
-            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent100 = rNumericArgs(7);
-            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 = rNumericArgs(8);
-            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent75 = rNumericArgs(9);
+            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 = state.dataIPShortCut->rNumericArgs(6);
+            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent100 = state.dataIPShortCut->rNumericArgs(7);
+            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 = state.dataIPShortCut->rNumericArgs(8);
+            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent75 = state.dataIPShortCut->rNumericArgs(9);
             if (state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 < state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100) {
                 ShowWarningError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->ExchCond(ExchNum).Name +
                                  "\" sensible cooling effectiveness at 75% rated flow is less than at 100% rated flow.");
@@ -477,72 +477,72 @@ namespace HeatRecovery {
                 ShowContinueError(state, "Latent cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
             state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
 
-            state.dataHeatRecovery->ExchCond(ExchNum).NomElecPower = rNumericArgs(10);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomElecPower = state.dataIPShortCut->rNumericArgs(10);
 
-            if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Yes")) {
                 state.dataHeatRecovery->ExchCond(ExchNum).ControlToTemperatureSetPoint = true;
             } else {
-                if (!UtilityRoutines::SameString(cAlphaArgs(7), "No")) {
+                if (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
                     ShowSevereError(state, "Rotary HX Speed Modulation or Plate Bypass for Temperature Control for ");
                     ShowContinueError(state, state.dataHeatRecovery->ExchCond(ExchNum).Name + " must be set to Yes or No");
                     ErrorsFound = true;
                 }
             }
 
-            if (UtilityRoutines::SameString(cAlphaArgs(8), "Plate")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Plate")) {
                 state.dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "Rotary")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Rotary")) {
                 state.dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " configuration not found= " + cAlphaArgs(8));
+                ShowSevereError(state, cCurrentModuleObject + " configuration not found= " + state.dataIPShortCut->cAlphaArgs(8));
                 ShowContinueError(state, "HX configuration must be either Plate or Rotary");
                 ErrorsFound = true;
             }
 
             // Added additional inputs for frost control
-            state.dataHeatRecovery->ExchCond(ExchNum).FrostControlType = cAlphaArgs(9);
+            state.dataHeatRecovery->ExchCond(ExchNum).FrostControlType = state.dataIPShortCut->cAlphaArgs(9);
             if (!UtilityRoutines::SameString(state.dataHeatRecovery->ExchCond(ExchNum).FrostControlType, "None")) {
                 if (!UtilityRoutines::SameString(state.dataHeatRecovery->ExchCond(ExchNum).FrostControlType, "ExhaustOnly")) {
                     if (!UtilityRoutines::SameString(state.dataHeatRecovery->ExchCond(ExchNum).FrostControlType, "ExhaustAirRecirculation")) {
                         if (!UtilityRoutines::SameString(state.dataHeatRecovery->ExchCond(ExchNum).FrostControlType, "MinimumExhaustTemperature")) {
-                            ShowSevereError(state, "Invalid Frost Control method for " + state.dataHeatRecovery->ExchCond(ExchNum).Name + " =  " + cAlphaArgs(9));
+                            ShowSevereError(state, "Invalid Frost Control method for " + state.dataHeatRecovery->ExchCond(ExchNum).Name + " =  " + state.dataIPShortCut->cAlphaArgs(9));
                             ErrorsFound = true;
                         }
                     }
                 }
             }
 
-            if (!UtilityRoutines::SameString(cAlphaArgs(9), "None")) {
-                state.dataHeatRecovery->ExchCond(ExchNum).ThresholdTemperature = rNumericArgs(11);
-                state.dataHeatRecovery->ExchCond(ExchNum).InitialDefrostTime = rNumericArgs(12);
-                state.dataHeatRecovery->ExchCond(ExchNum).RateofDefrostTimeIncrease = rNumericArgs(13);
+            if (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "None")) {
+                state.dataHeatRecovery->ExchCond(ExchNum).ThresholdTemperature = state.dataIPShortCut->rNumericArgs(11);
+                state.dataHeatRecovery->ExchCond(ExchNum).InitialDefrostTime = state.dataIPShortCut->rNumericArgs(12);
+                state.dataHeatRecovery->ExchCond(ExchNum).RateofDefrostTimeIncrease = state.dataIPShortCut->rNumericArgs(13);
             }
 
             {
-                auto const SELECT_CASE_var(cAlphaArgs(10));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(10));
                 if (SELECT_CASE_var == "YES") {
                     state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
                 } else if (SELECT_CASE_var == "NO") {
                     state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
                 } else {
-                    if (lAlphaFieldBlanks(10)) {
+                    if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                         state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + cAlphaArgs(10));
+                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(10));
                         ErrorsFound = true;
                     }
                 }
             }
 
-            TestCompSet(state, cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum), state.dataHeatRecovery->ExchCond(ExchNum).Name, cAlphaArgs(3), cAlphaArgs(4), "Process Air Nodes");
+            TestCompSet(state, cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum), state.dataHeatRecovery->ExchCond(ExchNum).Name, state.dataIPShortCut->cAlphaArgs(3), state.dataIPShortCut->cAlphaArgs(4), "Process Air Nodes");
         } // end of input loop over air to air generic heat exchangers
 
         // loop over the desiccant balanced heat exchangers and load their input data
@@ -551,32 +551,32 @@ namespace HeatRecovery {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ExchIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             ExchNum = ExchIndex + state.dataHeatRecovery->NumAirToAirPlateExchs + state.dataHeatRecovery->NumAirToAirGenericExchs;
 
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(NumNumbers);
             state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
-            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = cNumericFieldNames;
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataHeatRecovery->HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataHeatRecovery->HeatExchangerUniqueNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
 
-            state.dataHeatRecovery->ExchCond(ExchNum).Name = cAlphaArgs(1);
+            state.dataHeatRecovery->ExchCond(ExchNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_DESICCANT_BALANCED;
-            if (lAlphaFieldBlanks(2)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
+                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
-                                    cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " +
+                                    state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
             }
@@ -584,14 +584,14 @@ namespace HeatRecovery {
             // In this module, Sup = Regeneration nodes and Sec = Process nodes
             // regeneration air inlet and outlet nodes
             state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
             // process air inlet and outlet nodes
             state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
 
             // Set up the component set for the process side of the HX (Sec = Process)
             TestCompSet(state, cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum),
@@ -600,7 +600,7 @@ namespace HeatRecovery {
                         state.dataLoopNodes->NodeID(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode),
                         "Process Air Nodes");
 
-            HeatExchPerfType = cAlphaArgs(7);
+            HeatExchPerfType = state.dataIPShortCut->cAlphaArgs(7);
             if (UtilityRoutines::SameString(HeatExchPerfType, "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1")) {
                 state.dataHeatRecovery->ExchCond(ExchNum).HeatExchPerfTypeNum = BALANCEDHX_PERFDATATYPE1;
             } else {
@@ -610,19 +610,19 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->ExchCond(ExchNum).HeatExchPerfName = cAlphaArgs(8);
+            state.dataHeatRecovery->ExchCond(ExchNum).HeatExchPerfName = state.dataIPShortCut->cAlphaArgs(8);
 
             {
-                auto const SELECT_CASE_var(cAlphaArgs(9));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(9));
                 if (SELECT_CASE_var == "YES") {
                     state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
                 } else if (SELECT_CASE_var == "NO") {
                     state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
                 } else {
-                    if (lAlphaFieldBlanks(9)) {
+                    if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                         state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + cAlphaArgs(9));
+                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(9));
                         ErrorsFound = true;
                     }
                 }
@@ -637,26 +637,26 @@ namespace HeatRecovery {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           PerfDataIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             PerfDataNum = PerfDataIndex;
 
             state.dataHeatRecovery->BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames.allocate(NumNumbers);
             state.dataHeatRecovery->BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames = "";
-            state.dataHeatRecovery->BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames = cNumericFieldNames;
+            state.dataHeatRecovery->BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name = cAlphaArgs(1);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).PerfType = cCurrentModuleObject;
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow = rNumericArgs(1);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
             // check validity
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow <= 0.0 &&
                 state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow != DataSizing::AutoSize) {
@@ -666,7 +666,7 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel = rNumericArgs(2);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel = state.dataIPShortCut->rNumericArgs(2);
             // check validity
             if ((state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel <= 0.0 &&
                  state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel != DataSizing::AutoSize) ||
@@ -676,7 +676,7 @@ namespace HeatRecovery {
                 ShowContinueError(state, format("... value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel));
                 ErrorsFound = true;
             }
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomElecPower = rNumericArgs(3);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomElecPower = state.dataIPShortCut->rNumericArgs(3);
             // check validity
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomElecPower < 0.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
@@ -686,18 +686,18 @@ namespace HeatRecovery {
             }
 
             // regen outlet temp variables
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B1 = rNumericArgs(4);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B2 = rNumericArgs(5);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B3 = rNumericArgs(6);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B4 = rNumericArgs(7);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B5 = rNumericArgs(8);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B6 = rNumericArgs(9);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B7 = rNumericArgs(10);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B8 = rNumericArgs(11);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B1 = state.dataIPShortCut->rNumericArgs(4);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B2 = state.dataIPShortCut->rNumericArgs(5);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B3 = state.dataIPShortCut->rNumericArgs(6);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B4 = state.dataIPShortCut->rNumericArgs(7);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B5 = state.dataIPShortCut->rNumericArgs(8);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B6 = state.dataIPShortCut->rNumericArgs(9);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B7 = state.dataIPShortCut->rNumericArgs(10);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B8 = state.dataIPShortCut->rNumericArgs(11);
 
             //     Check that the minimum is not greater than or equal to the maximum for each of the following model boundaries
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat = rNumericArgs(12);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat = rNumericArgs(13);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(12);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(13);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
@@ -725,8 +725,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInTemp = rNumericArgs(14);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInTemp = rNumericArgs(15);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInTemp = state.dataIPShortCut->rNumericArgs(14);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInTemp = state.dataIPShortCut->rNumericArgs(15);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInTemp >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInTemp) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
@@ -736,8 +736,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat = rNumericArgs(16);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat = rNumericArgs(17);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat = state.dataIPShortCut->rNumericArgs(16);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat = state.dataIPShortCut->rNumericArgs(17);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
@@ -761,8 +761,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInTemp = rNumericArgs(18);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInTemp = rNumericArgs(19);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInTemp = state.dataIPShortCut->rNumericArgs(18);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInTemp = state.dataIPShortCut->rNumericArgs(19);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInTemp >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInTemp) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
@@ -772,8 +772,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinFaceVel = rNumericArgs(20);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxFaceVel = rNumericArgs(21);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinFaceVel = state.dataIPShortCut->rNumericArgs(20);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxFaceVel = state.dataIPShortCut->rNumericArgs(21);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinFaceVel >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxFaceVel) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
@@ -783,8 +783,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutTemp = rNumericArgs(22);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutTemp = rNumericArgs(23);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutTemp = state.dataIPShortCut->rNumericArgs(22);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutTemp = state.dataIPShortCut->rNumericArgs(23);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutTemp >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutTemp) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
@@ -794,8 +794,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum = rNumericArgs(24) / 100.0;
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum = rNumericArgs(25) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(24) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(25) / 100.0;
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
@@ -823,8 +823,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum = rNumericArgs(26) / 100.0;
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum = rNumericArgs(27) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum = state.dataIPShortCut->rNumericArgs(26) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum = state.dataIPShortCut->rNumericArgs(27) / 100.0;
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
@@ -849,18 +849,18 @@ namespace HeatRecovery {
             }
 
             // regen outlet humidity ratio variables
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C1 = rNumericArgs(28);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C2 = rNumericArgs(29);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C3 = rNumericArgs(30);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C4 = rNumericArgs(31);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C5 = rNumericArgs(32);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C6 = rNumericArgs(33);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C7 = rNumericArgs(34);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C8 = rNumericArgs(35);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C1 = state.dataIPShortCut->rNumericArgs(28);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C2 = state.dataIPShortCut->rNumericArgs(29);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C3 = state.dataIPShortCut->rNumericArgs(30);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C4 = state.dataIPShortCut->rNumericArgs(31);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C5 = state.dataIPShortCut->rNumericArgs(32);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C6 = state.dataIPShortCut->rNumericArgs(33);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C7 = state.dataIPShortCut->rNumericArgs(34);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C8 = state.dataIPShortCut->rNumericArgs(35);
 
             //     Check that the minimum is not greater than or equal to the maximum for each of the following model boundaries
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat = rNumericArgs(36);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat = rNumericArgs(37);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(36);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(37);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
@@ -888,8 +888,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInTemp = rNumericArgs(38);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInTemp = rNumericArgs(39);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInTemp = state.dataIPShortCut->rNumericArgs(38);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInTemp = state.dataIPShortCut->rNumericArgs(39);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInTemp >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInTemp) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
@@ -899,8 +899,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat = rNumericArgs(40);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat = rNumericArgs(41);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat = state.dataIPShortCut->rNumericArgs(40);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat = state.dataIPShortCut->rNumericArgs(41);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
@@ -924,8 +924,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInTemp = rNumericArgs(42);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInTemp = rNumericArgs(43);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInTemp = state.dataIPShortCut->rNumericArgs(42);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInTemp = state.dataIPShortCut->rNumericArgs(43);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInTemp >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInTemp) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
@@ -935,8 +935,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinFaceVel = rNumericArgs(44);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxFaceVel = rNumericArgs(45);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinFaceVel = state.dataIPShortCut->rNumericArgs(44);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxFaceVel = state.dataIPShortCut->rNumericArgs(45);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinFaceVel >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxFaceVel) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
@@ -946,8 +946,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat = rNumericArgs(46);
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat = rNumericArgs(47);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat = state.dataIPShortCut->rNumericArgs(46);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat = state.dataIPShortCut->rNumericArgs(47);
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
@@ -971,8 +971,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum = rNumericArgs(48) / 100.0;
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum = rNumericArgs(49) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(48) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(49) / 100.0;
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
@@ -1000,8 +1000,8 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum = rNumericArgs(50) / 100.0;
-            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum = rNumericArgs(51) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum = state.dataIPShortCut->rNumericArgs(50) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum = state.dataIPShortCut->rNumericArgs(51) / 100.0;
             if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum >= state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");

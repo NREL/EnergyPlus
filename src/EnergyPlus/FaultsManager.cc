@@ -53,6 +53,7 @@
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
@@ -899,21 +900,22 @@ namespace FaultsManager {
                     }
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Cooling:DX")) {
                     // Read in DXCoolingSystem input if not done yet
-                    if (HVACDXSystem::GetInputFlag) {
+                    if (state.dataHVACDXSys->GetInputFlag) {
                         HVACDXSystem::GetDXCoolingSystemInput(state);
-                        HVACDXSystem::GetInputFlag = false;
+                        state.dataHVACDXSys->GetInputFlag = false;
                     }
 
                     // Check the coil name and coil type
-                    int CoilSysNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName, HVACDXSystem::DXCoolingSystem);
+                    int CoilSysNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
+                                                                     state.dataHVACDXSys->DXCoolingSystem);
                     if (CoilSysNum <= 0) {
                         ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
                         // Link the coil system with the fault model
-                        HVACDXSystem::DXCoolingSystem(CoilSysNum).FaultyCoilSATFlag = true;
-                        HVACDXSystem::DXCoolingSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
+                        state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATFlag = true;
+                        state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
                     }
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Heating:DX")) {
                     // Read in DXCoolingSystem input if not done yet
@@ -1521,7 +1523,7 @@ namespace FaultsManager {
                 }
 
                 // Reference offset value is required for Humidistat Offset Type: ThermostatOffsetIndependent
-                if (lNumericFieldBlanks(1)) {
+                if (lAlphaFieldBlanks(1)) {
                     ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\": " + cNumericFieldNames(1) +
                                     " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetIndependent\".");
                     state.dataFaultsMgr->ErrorsFound = true;
@@ -1580,7 +1582,7 @@ namespace FaultsManager {
             }
 
             // Reference offset value is required
-            if (lNumericFieldBlanks(1)) {
+            if (lAlphaFieldBlanks(1)) {
                 ShowSevereError(state, cFaultCurrentObject + " = \"" + cNumericFieldNames(1) + "\" cannot be blank.");
                 state.dataFaultsMgr->ErrorsFound = true;
             } else {

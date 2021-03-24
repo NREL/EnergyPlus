@@ -227,7 +227,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterHEATING {
         Array1D_string AlphArray(5);  // character string data
         Array1D<Real64> NumArray(23); // numeric data
 
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         state.dataHPWaterToWaterHtg->NumGSHPs = inputProcessor->getNumObjectsFound(state, ModuleCompName);
 

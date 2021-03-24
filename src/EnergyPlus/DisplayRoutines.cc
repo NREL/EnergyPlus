@@ -146,7 +146,7 @@ void DisplaySimDaysProgress(EnergyPlusData &state,
     // Progress is percent of current days vs total days.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static int percent(0); // Current percent progress
+    int percent(0); // Current percent progress
 
     if (state.dataGlobal->KickOffSimulation && !state.dataSysVars->DeveloperFlag) return;
     if (TotalSimDays > 0) {

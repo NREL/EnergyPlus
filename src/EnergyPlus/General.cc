@@ -1784,7 +1784,7 @@ namespace EnergyPlus::General {
         int JulianDay;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_int EndDayofMonth(12, {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
+        static Array1D_int const EndDayofMonth(12, {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
         // End day numbers of each month (without Leap Year)
 
         if (Month == 1) {
@@ -2325,7 +2325,7 @@ namespace EnergyPlus::General {
         // string but in this case the output string is a fixed size so this is more
         // clear for formatting and faster. If formatted string changes, make sure to
         // add more to buffer.
-        static char buffer[11];
+        char buffer[11];
         int cx = snprintf(buffer, 11, "%02d:%02d:%04.1f", Hours, Minutes, Seconds);
 
         // Make sure output string is only between 0 and 10 characters so string is
@@ -2422,7 +2422,6 @@ namespace EnergyPlus::General {
         // stored in SAVEd variables.  Later callings will retrieve those.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumReports;
@@ -2430,16 +2429,17 @@ namespace EnergyPlus::General {
         int NumNames;
         int NumNumbers;
         int IOStat;
-        static std::string DXFOption1;
-        static std::string DXFOption2;
-        static std::string DXFWFOption1;
-        static std::string DXFWFOption2;
-        static std::string VRMLOption1;
-        static std::string VRMLOption2;
-        static std::string ViewRptOption1;
-        static std::string LineRptOption1;
-        static std::string VarDictOption1;
-        static std::string VarDictOption2;
+        auto & DXFOption1 = state.dataGeneral->DXFOption1;
+        auto & DXFOption2 = state.dataGeneral->DXFOption2;
+        auto & DXFWFOption1 = state.dataGeneral->DXFWFOption1;
+        auto & DXFWFOption2 = state.dataGeneral->DXFWFOption2;
+        auto & VRMLOption1 = state.dataGeneral->VRMLOption1;
+        auto & VRMLOption2 = state.dataGeneral->VRMLOption2;
+        auto & ViewRptOption1 = state.dataGeneral->ViewRptOption1;
+        auto & LineRptOption1 = state.dataGeneral->LineRptOption1;
+        auto & VarDictOption1 = state.dataGeneral->VarDictOption1;
+        auto & VarDictOption2 = state.dataGeneral->VarDictOption2;
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         if (state.dataGeneral->GetReportInput) {
 
@@ -2450,22 +2450,22 @@ namespace EnergyPlus::General {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               RepNum,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumNames,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(1));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
 
                     if (SELECT_CASE_var == "LINES") {
                         state.dataGeneral->LineRpt = true;
-                        LineRptOption1 = cAlphaArgs(2);
+                        LineRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
 
                     } else if (SELECT_CASE_var == "VERTICES") {
                         state.dataGeneral->SurfVert = true;
@@ -2482,19 +2482,19 @@ namespace EnergyPlus::General {
 
                     } else if (SELECT_CASE_var == "VIEWFACTORINFO") { // actual reporting is in HeatBalanceIntRadExchange
                         state.dataGeneral->ViewFactorInfo = true;
-                        ViewRptOption1 = cAlphaArgs(2);
+                        ViewRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
 
                     } else if (SELECT_CASE_var == "DECAYCURVESFROMCOMPONENTLOADSSUMMARY") { // Should the Radiant to Convective Decay Curves from the
                                                                                             // load component report appear in the EIO file
                         state.dataGlobal->ShowDecayCurvesInEIO = true;
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
+                        ShowWarningError(state, cCurrentModuleObject + ": No " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
                         ShowContinueError(state,
                             R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
 
                     } else {
-                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state,
                             R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
                     }
@@ -2508,40 +2508,40 @@ namespace EnergyPlus::General {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               RepNum,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumNames,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(1));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
 
                     if (SELECT_CASE_var == "DXF") {
                         state.dataGeneral->DXFReport = true;
-                        DXFOption1 = cAlphaArgs(2);
-                        DXFOption2 = cAlphaArgs(3);
+                        DXFOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                        DXFOption2 = state.dataIPShortCut->cAlphaArgs(3);
 
                     } else if (SELECT_CASE_var == "DXF:WIREFRAME") {
                         state.dataGeneral->DXFWFReport = true;
-                        DXFWFOption1 = cAlphaArgs(2);
-                        DXFWFOption2 = cAlphaArgs(3);
+                        DXFWFOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                        DXFWFOption2 = state.dataIPShortCut->cAlphaArgs(3);
 
                     } else if (SELECT_CASE_var == "VRML") {
                         state.dataGeneral->VRMLReport = true;
-                        VRMLOption1 = cAlphaArgs(2);
-                        VRMLOption2 = cAlphaArgs(3);
+                        VRMLOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                        VRMLOption2 = state.dataIPShortCut->cAlphaArgs(3);
 
                     } else if (SELECT_CASE_var.empty()) {
-                        ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
+                        ShowWarningError(state, cCurrentModuleObject + ": No " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
                         ShowContinueError(state, R"( Legal values are: "DXF", "DXF:WireFrame", "VRML".)");
 
                     } else {
-                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state, R"( Legal values are: "DXF", "DXF:WireFrame", "VRML".)");
                     }
                 }
@@ -2561,18 +2561,18 @@ namespace EnergyPlus::General {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               RepNum,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumNames,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 state.dataGeneral->VarDict = true;
-                VarDictOption1 = cAlphaArgs(1);
-                VarDictOption2 = cAlphaArgs(2);
+                VarDictOption1 = state.dataIPShortCut->cAlphaArgs(1);
+                VarDictOption2 = state.dataIPShortCut->cAlphaArgs(2);
             }
 
             cCurrentModuleObject = "Output:Constructions";
@@ -2581,24 +2581,24 @@ namespace EnergyPlus::General {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               RepNum,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumNames,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
-                if (UtilityRoutines::SameString(cAlphaArgs(1), "CONSTRUCTIONS")) {
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "CONSTRUCTIONS")) {
                     state.dataGeneral->Constructions = true;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(1), "MATERIALS")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "MATERIALS")) {
                     state.dataGeneral->Materials = true;
                 }
                 if (NumNames > 1) {
-                    if (UtilityRoutines::SameString(cAlphaArgs(2), "CONSTRUCTIONS")) {
+                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "CONSTRUCTIONS")) {
                         state.dataGeneral->Constructions = true;
-                    } else if (UtilityRoutines::SameString(cAlphaArgs(2), "MATERIALS")) {
+                    } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "MATERIALS")) {
                         state.dataGeneral->Materials = true;
                     }
                 }
@@ -2610,20 +2610,20 @@ namespace EnergyPlus::General {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               RepNum,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumNames,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStat,
-                                              lNumericFieldBlanks,
-                                              lAlphaFieldBlanks,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->lNumericFieldBlanks,
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
 
                 state.dataGeneral->EMSoutput = true;
 
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(1));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
 
                     if (SELECT_CASE_var == "NONE") {
                         state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
@@ -2636,12 +2636,12 @@ namespace EnergyPlus::General {
                         state.dataRuntimeLang->OutputEMSActuatorAvailFull = true;
 
                     } else if (SELECT_CASE_var.empty()) {
-                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
                         ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
                         state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     } else {
-                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
                         state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
@@ -2649,7 +2649,7 @@ namespace EnergyPlus::General {
                 }
 
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(2));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
 
                     if (SELECT_CASE_var == "NONE") {
                         state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
@@ -2661,12 +2661,12 @@ namespace EnergyPlus::General {
                         state.dataRuntimeLang->OutputEMSInternalVarsFull = true;
                         state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     } else if (SELECT_CASE_var.empty()) {
-                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + state.dataIPShortCut->cAlphaFieldNames(2) + " supplied.");
                         ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
                         state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     } else {
-                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
                         state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
@@ -2674,7 +2674,7 @@ namespace EnergyPlus::General {
                 }
 
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(3));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
 
                     if (SELECT_CASE_var == "NONE") {
                         state.dataRuntimeLang->OutputEMSErrors = false;
@@ -2686,12 +2686,12 @@ namespace EnergyPlus::General {
                         state.dataRuntimeLang->OutputFullEMSTrace = true;
                         state.dataRuntimeLang->OutputEMSErrors = true;
                     } else if (SELECT_CASE_var.empty()) {
-                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + state.dataIPShortCut->cAlphaFieldNames(3) + " supplied.");
                         ShowContinueError(state, R"( Legal values are: "None", "ErrorsOnly", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSErrors = false;
                         state.dataRuntimeLang->OutputFullEMSTrace = false;
                     } else {
-                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state, R"( Legal values are: "None", "ErrorsOnly", "Verbose". "None" will be used.)");
                         state.dataRuntimeLang->OutputEMSErrors = false;
                         state.dataRuntimeLang->OutputFullEMSTrace = false;

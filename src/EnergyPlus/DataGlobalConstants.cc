@@ -52,73 +52,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DataGlobalConstants {
-
-    std::map<EndUse, int> iEndUse = {{EndUse::Heating, 1},
-                                     {EndUse::Cooling, 2},
-                                     {EndUse::InteriorLights, 3},
-                                     {EndUse::ExteriorLights, 4},
-                                     {EndUse::InteriorEquipment, 5},
-                                     {EndUse::ExteriorEquipment, 6},
-                                     {EndUse::Fans, 7},
-                                     {EndUse::Pumps, 8},
-                                     {EndUse::HeatRejection, 9},
-                                     {EndUse::Humidification, 10},
-                                     {EndUse::HeatRecovery, 11},
-                                     {EndUse::WaterSystem, 12},
-                                     {EndUse::Refrigeration, 13},
-                                     {EndUse::Cogeneration, 14},
-                                    };
-
-    std::vector<ResourceType> AllResourceTypes({ResourceType::None,
-                                                ResourceType::Electricity,
-                                                ResourceType::Natural_Gas,
-                                                ResourceType::Gasoline,
-                                                ResourceType::Diesel,
-                                                ResourceType::Coal,
-                                                ResourceType::FuelOil_1,
-                                                ResourceType::FuelOil_2,
-                                                ResourceType::Propane,
-                                                ResourceType::Water,
-                                                ResourceType::EnergyTransfer,
-                                                ResourceType::Steam,
-                                                ResourceType::DistrictCooling,
-                                                ResourceType::DistrictHeating,
-                                                ResourceType::ElectricityProduced,
-                                                ResourceType::ElectricityPurchased,
-                                                ResourceType::ElectricitySurplusSold,
-                                                ResourceType::ElectricityNet,
-                                                ResourceType::SolarWater,
-                                                ResourceType::SolarAir,
-                                                ResourceType::SO2,
-                                                ResourceType::NOx,
-                                                ResourceType::N2O,
-                                                ResourceType::PM,
-                                                ResourceType::PM2_5,
-                                                ResourceType::PM10,
-                                                ResourceType::CO,
-                                                ResourceType::CO2,
-                                                ResourceType::CH4,
-                                                ResourceType::NH3,
-                                                ResourceType::NMVOC,
-                                                ResourceType::Hg,
-                                                ResourceType::Pb,
-                                                ResourceType::NuclearHigh,
-                                                ResourceType::NuclearLow,
-                                                ResourceType::WaterEnvironmentalFactors,
-                                                ResourceType::CarbonEquivalent,
-                                                ResourceType::Source,
-                                                ResourceType::PlantLoopHeatingDemand,
-                                                ResourceType::PlantLoopCoolingDemand,
-                                                ResourceType::OnSiteWater,
-                                                ResourceType::MainsWater,
-                                                ResourceType::RainWater,
-                                                ResourceType::WellWater,
-                                                ResourceType::Condensate,
-                                                ResourceType::OtherFuel1,
-                                                ResourceType::OtherFuel2});
+namespace EnergyPlus::DataGlobalConstants {
 
     ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
     {
@@ -437,7 +371,5 @@ namespace DataGlobalConstants {
             }
         }
     }
-
-} // namespace DataGlobalConstants
 
 } // namespace EnergyPlus

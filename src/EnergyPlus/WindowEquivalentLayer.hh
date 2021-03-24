@@ -785,9 +785,14 @@ namespace WindowEquivalentLayer {
         Array3D<Real64> CFSDiffAbsTrans;
         Array1D_bool EQLDiffPropFlag;
 
+        Real64 X1MRDiff = -1.0;
+        Real64 XTAUDiff = -1.0;
+
         void clear_state() {
             this->CFSDiffAbsTrans.deallocate();
             this->EQLDiffPropFlag.deallocate();
+            this->X1MRDiff = -1.0;
+            this->XTAUDiff = -1.0;
         }
         // Default Constructor
         WindowEquivalentLayerData() : RadiansToDeg(180.0 / 3.141592653589793),

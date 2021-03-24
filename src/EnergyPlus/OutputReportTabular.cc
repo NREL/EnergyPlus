@@ -297,7 +297,7 @@ namespace EnergyPlus::OutputReportTabular {
         Array1D_string AlphArray; // character string data
         Array1D<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         auto &ort(state.dataOutRptTab);
 
         if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
@@ -994,8 +994,7 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using ScheduleManager::GetScheduleIndex;
+                using ScheduleManager::GetScheduleIndex;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1062,10 +1061,10 @@ namespace EnergyPlus::OutputReportTabular {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             ort->OutputTableBinned(iInObj).keyValue = AlphArray(1);
             ort->OutputTableBinned(iInObj).varOrMeter = AlphArray(2);
             // if a schedule has been specified assign
@@ -1073,7 +1072,7 @@ namespace EnergyPlus::OutputReportTabular {
                 ort->OutputTableBinned(iInObj).ScheduleName = AlphArray(3);
                 ort->OutputTableBinned(iInObj).scheduleIndex = GetScheduleIndex(state, AlphArray(3));
                 if (ort->OutputTableBinned(iInObj).scheduleIndex == 0) {
-                    ShowWarningError(state, CurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" - not found.");
+                    ShowWarningError(state, CurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" - not found.");
                 }
             } else {
                 ort->OutputTableBinned(iInObj).scheduleIndex = 0; // flag value for no schedule used
@@ -1218,8 +1217,7 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using DataStringGlobals::CharComma;
+                using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
 
@@ -1267,10 +1265,10 @@ namespace EnergyPlus::OutputReportTabular {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             // ColumnSeparator
             if (UtilityRoutines::SameString(AlphArray(1), "Comma")) {
                 ort->numStyles = 1;
@@ -1329,7 +1327,7 @@ namespace EnergyPlus::OutputReportTabular {
                 ort->TableStyle(5) = iTableStyle::XML;
                 ort->del(5) = CharSpace; // space - this is not used much for XML output
             } else {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + AlphArray(1) + "\". Commas will be used.");
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + AlphArray(1) + "\". Commas will be used.");
                 ort->numStyles = 1;
                 ort->TableStyle(1) = iTableStyle::Comma;
                 ort->del(1) = CharComma; // comma
@@ -1339,7 +1337,7 @@ namespace EnergyPlus::OutputReportTabular {
             if (NumAlphas >= 2) {
                 ort->unitsStyle = SetUnitsStyleFromString(AlphArray(2));
                 if (ort->unitsStyle == iUnitsStyle::NotFound) {
-                    ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
+                    ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
                                      "\". No unit conversion will be performed. Normal SI units will be shown.");
                 }
             } else {
@@ -1404,8 +1402,7 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using DataStringGlobals::CharComma;
+                using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
 
@@ -1729,23 +1726,23 @@ namespace EnergyPlus::OutputReportTabular {
             ort->sourceTypeNames(12) = "OtherFuel2";
 
             // initialize the end use names
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) = "Heating";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)) = "Cooling";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) = "InteriorLights";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)) = "ExteriorLights";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) = "InteriorEquipment";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) = "ExteriorEquipment";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)) = "Fans";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)) = "Pumps";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) = "HeatRejection";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)) = "Humidifier";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) = "HeatRecovery";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)) = "WaterSystems";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)) = "Refrigeration";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) = "Cogeneration";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) = "Heating";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling)) = "Cooling";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) = "InteriorLights";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)) = "ExteriorLights";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) = "InteriorEquipment";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) = "ExteriorEquipment";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans)) = "Fans";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps)) = "Pumps";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) = "HeatRejection";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification)) = "Humidifier";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) = "HeatRecovery";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)) = "WaterSystems";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)) = "Refrigeration";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) = "Cogeneration";
 
             // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
-            ort->meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            ort->meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
             ort->meterNumEndUseSubBEPS = 0;
 
             // loop through all of the resources and end uses and sub end uses for the entire facility
@@ -1754,7 +1751,7 @@ namespace EnergyPlus::OutputReportTabular {
                 meterNumber = GetMeterIndex(state, meterName);
                 ort->meterNumTotalsBEPS(iResource) = meterNumber;
 
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     meterName = ort->endUseNames(jEndUse) + ':' + ort->resourceTypeNames(iResource); //// ':FACILITY'
                     meterNumber = GetMeterIndex(state, meterName);
                     ort->meterNumEndUseBEPS(iResource, jEndUse) = meterNumber;
@@ -1781,11 +1778,11 @@ namespace EnergyPlus::OutputReportTabular {
             ort->gatherEndUseBEPS = 0.0;
             ort->gatherEndUseBySourceBEPS = 0.0;
             // End use subs must be dynamically allocated to accommodate the end use with the most subcategories
-            ort->gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            ort->gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
             ort->gatherEndUseSubBEPS = 0.0;
-            ort->gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            ort->gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
             ort->gatherDemandEndUseSub = 0.0;
-            ort->gatherDemandIndEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            ort->gatherDemandIndEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
             ort->gatherDemandIndEndUseSub = 0.0;
 
             // get meter numbers for other meters relating to electric load components
@@ -3908,7 +3905,7 @@ namespace EnergyPlus::OutputReportTabular {
                     ort->gatherTotalsBEPS(iResource) += curMeterValue;
                 }
 
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                     if (curMeterNumber > 0) {
                         curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
@@ -4066,7 +4063,7 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 }
 
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (ort->ffSchedUsed(iResource)) {
                         curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                         if (curMeterNumber > 0) {
@@ -4185,7 +4182,7 @@ namespace EnergyPlus::OutputReportTabular {
                         ort->gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                         // if new peak demand is set, then gather all of the end use values at this particular
                         // time to find the components of the peak demand
-                        for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                        for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                             curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                             if (curMeterNumber > 0) {
                                 curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
@@ -4208,7 +4205,7 @@ namespace EnergyPlus::OutputReportTabular {
         if ((ort->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                     if (curMeterNumber > 0) {
                         curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
@@ -7301,9 +7298,9 @@ namespace EnergyPlus::OutputReportTabular {
         Array2D<Real64> useVal(13, 15);
         Array2D<Real64> normalVal(13, 4);
         Array1D<Real64> collapsedTotal(13);
-        Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
-        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
-        Array2D<Real64> endUseSubOther(13, DataGlobalConstants::iEndUse.size());
+        Array2D<Real64> collapsedEndUse(13, state.dataGlobalConst->iEndUse.size());
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
+        Array2D<Real64> endUseSubOther(13, state.dataGlobalConst->iEndUse.size());
         Real64 totalOnsiteHeat;
         Real64 totalOnsiteWater;
         Real64 totalWater;
@@ -7389,7 +7386,7 @@ namespace EnergyPlus::OutputReportTabular {
                 // determine building floor areas
                 DetermineBuildingFloorArea(state);
                 // collapse the gatherEndUseBEPS array to the resource groups displayed
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(1, jEndUse) = ort->gatherEndUseBEPS(1, jEndUse);   // electricity
                     collapsedEndUse(2, jEndUse) = ort->gatherEndUseBEPS(2, jEndUse);   // natural gas
                     collapsedEndUse(3, jEndUse) = ort->gatherEndUseBEPS(6, jEndUse);   // gasoline
@@ -7448,7 +7445,7 @@ namespace EnergyPlus::OutputReportTabular {
                                                        format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
                     }
                 }
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1);   // electricity
                         collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2);   // natural gas
@@ -7496,7 +7493,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // convert units into GJ (divide by 1,000,000,000) if J otherwise kWh
                 for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= largeConversionFactor;
@@ -7505,7 +7502,7 @@ namespace EnergyPlus::OutputReportTabular {
                     collapsedTotal(iResource) /= largeConversionFactor;
                 }
                 // do water
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(13, jEndUse) /= waterConversionFactor;
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedEndUseSub(kEndUseSub, jEndUse, 13) /= waterConversionFactor;
@@ -7557,8 +7554,8 @@ namespace EnergyPlus::OutputReportTabular {
                 resourcePrimaryHeating = 0;
                 heatingMaximum = 0.0;
                 for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                    if (collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) > heatingMaximum) {
-                        heatingMaximum = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    if (collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) > heatingMaximum) {
+                        heatingMaximum = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
                         resourcePrimaryHeating = iResource;
                     }
                 }
@@ -8037,22 +8034,22 @@ namespace EnergyPlus::OutputReportTabular {
                 columnWidth = 10; // array assignment - same for all columns
                 tableBody.allocate(13, 16);
                 for (iResource = 1; iResource <= 13; ++iResource) {
-                    useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                    useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                    useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                    useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
+                    useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling));
+                    useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
+                    useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
                     useVal(iResource, 5) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
                     useVal(iResource, 6) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                    useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                    useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                    useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                    useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                    useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                    useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                    useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                    useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
+                    useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans));
+                    useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps));
+                    useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
+                    useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification));
+                    useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
+                    useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
+                    useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
+                    useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
 
                     useVal(iResource, 15) = collapsedTotal(iResource); // totals
                 }
@@ -8405,7 +8402,7 @@ namespace EnergyPlus::OutputReportTabular {
                 // if not, determine the difference for the 'other' row
                 ort->needOtherRowLEED45 = false; // set array to all false assuming no other rows are needed
                 for (iResource = 1; iResource <= 13; ++iResource) {
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                             // set the value to the total for the end use
                             endUseSubOther(iResource, jEndUse) = collapsedEndUse(iResource, jEndUse);
@@ -8427,7 +8424,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // determine the number of rows needed for sub-table
                 numRows = 0;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             ++numRows;
@@ -8451,7 +8448,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // Build row head and subcategories columns
                 i = 1;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
@@ -8520,7 +8517,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 for (iResource = 1; iResource <= 13; ++iResource) {
                     i = 1;
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                             for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                                 tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
@@ -8601,7 +8598,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 for (iResource = 1; iResource <= 12; ++iResource) {
                     i = 1;
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                             for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                                 if (produceTabular) {
@@ -8644,31 +8641,31 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody.allocate(13, 4);
                 for (iResource = 1; iResource <= 13; ++iResource) {
                     normalVal(iResource, 1) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) +
                         collapsedEndUse(iResource,
-                                        DataGlobalConstants::iEndUse.at(
+                                        state.dataGlobalConst->iEndUse.at(
                                             DataGlobalConstants::EndUse::ExteriorLights)); // Lights     <- InteriorLights | <- ExteriorLights
 
                     normalVal(iResource, 2) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification)) +
                         collapsedEndUse(iResource,
-                                        DataGlobalConstants::iEndUse.at(
+                                        state.dataGlobalConst->iEndUse.at(
                                             DataGlobalConstants::EndUse::WaterSystem)); // HVAC       <- fans | <- pumps | <- heating | <- cooling |
                                                                                         // <- heat rejection | <- humidification | <- water system
                                                                                         // domestic hot water
 
                     normalVal(iResource, 3) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) +
                         collapsedEndUse(iResource,
-                                        DataGlobalConstants::iEndUse.at(
+                                        state.dataGlobalConst->iEndUse.at(
                                             DataGlobalConstants::EndUse::Refrigeration)); // Other      <- InteriorEquipment | <- ExteriorEquipment |
                                                                                           // <- generator fuel | <- Heat Recovery (parasitics) | <-
                                                                                           // Refrigeration
@@ -9285,8 +9282,8 @@ namespace EnergyPlus::OutputReportTabular {
         // all arrays are in the format: (row, columnm)
         Array2D<Real64> useVal(13, 15);
         Array1D<Real64> collapsedTotal(13);
-        Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
-        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
+        Array2D<Real64> collapsedEndUse(13, state.dataGlobalConst->iEndUse.size());
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
         int iResource;
         Real64 largeConversionFactor;
         Real64 areaConversionFactor;
@@ -9313,7 +9310,7 @@ namespace EnergyPlus::OutputReportTabular {
                 if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
                 // collapse the gatherEndUseBEPS array to the resource groups displayed
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(1, jEndUse) = ort->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
                     collapsedEndUse(2, jEndUse) = ort->gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
                     collapsedEndUse(3, jEndUse) = ort->gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
@@ -9363,7 +9360,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // convert units into MJ (divide by 1,000,000) if J otherwise kWh
                 for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
                     }
                     collapsedTotal(iResource) /= largeConversionFactor;
@@ -9375,22 +9372,22 @@ namespace EnergyPlus::OutputReportTabular {
                 columnWidth = 10; // array assignment - same for all columns
                 tableBody.allocate(12, 16);
                 for (iResource = 1; iResource <= 13; ++iResource) {
-                    useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                    useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                    useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                    useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
+                    useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling));
+                    useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
+                    useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
                     useVal(iResource, 5) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
                     useVal(iResource, 6) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                    useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                    useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                    useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                    useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                    useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                    useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                    useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                    useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
+                    useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans));
+                    useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps));
+                    useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
+                    useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification));
+                    useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
+                    useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
+                    useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
+                    useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
 
                     useVal(iResource, 15) = collapsedTotal(iResource); // totals
                 }
@@ -9659,12 +9656,12 @@ namespace EnergyPlus::OutputReportTabular {
         // all arrays are in the format: (row, column)
         Array2D<Real64> useVal(13, 15);
         Array1D<Real64> collapsedTotal(13);
-        Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
-        Array2D<Real64> collapsedIndEndUse(13, DataGlobalConstants::iEndUse.size());
+        Array2D<Real64> collapsedEndUse(13, state.dataGlobalConst->iEndUse.size());
+        Array2D<Real64> collapsedIndEndUse(13, state.dataGlobalConst->iEndUse.size());
         Array1D_int collapsedTimeStep(13);
-        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
-        Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
-        Array2D<Real64> endUseSubOther(13, DataGlobalConstants::iEndUse.size());
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
+        Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
+        Array2D<Real64> endUseSubOther(13, state.dataGlobalConst->iEndUse.size());
         int iResource;
         int kEndUseSub;
         int i;
@@ -9745,7 +9742,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // collapse the gatherEndUseBEPS array to the resource groups displayed
                 collapsedEndUse = 0.0;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(1, jEndUse) = ort->gatherDemandEndUse(1, jEndUse) * powerConversion;                  // electricity
                     collapsedEndUse(2, jEndUse) = ort->gatherDemandEndUse(2, jEndUse) * powerConversion;                  // natural gas
                     collapsedEndUse(3, jEndUse) = ort->gatherDemandEndUse(6, jEndUse) * powerConversion;                  // gasoline
@@ -9760,7 +9757,7 @@ namespace EnergyPlus::OutputReportTabular {
                     collapsedEndUse(12, jEndUse) = ort->gatherDemandEndUse(distrHeatSelected, jEndUse) * powerConversion; // district heating
                     collapsedEndUse(13, jEndUse) = ort->gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
                 }
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedEndUseSub(kEndUseSub, jEndUse, 1) =
                             ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion; // electricity
@@ -9789,7 +9786,7 @@ namespace EnergyPlus::OutputReportTabular {
                 // collapse the gatherEndUseBEPS array to the resource groups displayed
                 // no unit conversion, it is done at the reporting stage if necessary
                 collapsedIndEndUse = 0.0;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedIndEndUse(1, jEndUse) = ort->gatherDemandIndEndUse(1, jEndUse);                  // electricity
                     collapsedIndEndUse(2, jEndUse) = ort->gatherDemandIndEndUse(2, jEndUse);                  // natural gas
                     collapsedIndEndUse(3, jEndUse) = ort->gatherDemandIndEndUse(6, jEndUse);                  // gasoline
@@ -9804,7 +9801,7 @@ namespace EnergyPlus::OutputReportTabular {
                     collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(distrHeatSelected, jEndUse); // district heating
                     collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);                 // water
                 }
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
                         collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
@@ -9844,22 +9841,22 @@ namespace EnergyPlus::OutputReportTabular {
                 columnWidth = 10; // array assignment - same for all columns
                 tableBody.allocate(13, 17);
                 for (iResource = 1; iResource <= 13; ++iResource) {
-                    useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                    useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                    useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                    useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
+                    useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling));
+                    useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
+                    useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
                     useVal(iResource, 5) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
                     useVal(iResource, 6) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                    useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                    useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                    useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                    useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                    useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                    useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                    useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                    useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
+                    useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans));
+                    useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps));
+                    useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
+                    useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification));
+                    useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
+                    useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
+                    useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
+                    useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
                     useVal(iResource, 15) = collapsedTotal(iResource); // totals
                 }
 
@@ -9956,7 +9953,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 //---- End Uses By Subcategory Sub-Table
                 numRows = 0;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             ++numRows;
@@ -9977,7 +9974,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // Build row head and subcategories columns
                 i = 1;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
@@ -10038,7 +10035,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 for (iResource = 1; iResource <= 13; ++iResource) {
                     i = 1;
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                             for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                                 tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
@@ -10098,7 +10095,7 @@ namespace EnergyPlus::OutputReportTabular {
 
             // EAp2-4/5. Performance Rating Method Compliance
             for (iResource = 1; iResource <= 13; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (ort->needOtherRowLEED45(jEndUse)) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories == 0) {
                             endUseSubOther(iResource, jEndUse) =
@@ -10134,7 +10131,7 @@ namespace EnergyPlus::OutputReportTabular {
 
             for (iResource = 1; iResource <= 12; ++iResource) {
                 i = 1;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             PreDefTableEntry(state,

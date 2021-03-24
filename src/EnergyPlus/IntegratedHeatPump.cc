@@ -1916,7 +1916,7 @@ namespace EnergyPlus::IntegratedHeatPump {
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using VariableSpeedCoils::SizeVarSpeedCoil;
 
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         Real64 RatedCapacity(0.0);      // rated building cooling load
 
         // Obtains and Allocates AS-IHP related parameters from input file

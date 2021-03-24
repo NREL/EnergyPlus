@@ -63,7 +63,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
-using namespace DataIPShortCuts;
 
 void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
 {
@@ -142,34 +141,34 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         inputProcessor->getObjectItem(
-            state, CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks);
-        if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
+            state, CoilCoolingDXCurveFitPerformance::object_name, perfNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus, _, state.dataIPShortCut->lAlphaFieldBlanks);
+        if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }
         found_it = true;
 
         CoilCoolingDXCurveFitPerformanceInputSpecification input_specs;
 
-        input_specs.name = cAlphaArgs(1);
-        input_specs.crankcase_heater_capacity = rNumericArgs(1);
-        input_specs.minimum_outdoor_dry_bulb_temperature_for_compressor_operation = rNumericArgs(2);
-        input_specs.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation = rNumericArgs(3);
-        if (lNumericFieldBlanks(4)) {
+        input_specs.name = state.dataIPShortCut->cAlphaArgs(1);
+        input_specs.crankcase_heater_capacity = state.dataIPShortCut->rNumericArgs(1);
+        input_specs.minimum_outdoor_dry_bulb_temperature_for_compressor_operation = state.dataIPShortCut->rNumericArgs(2);
+        input_specs.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation = state.dataIPShortCut->rNumericArgs(3);
+        if (state.dataIPShortCut->lNumericFieldBlanks(4)) {
             input_specs.unit_internal_static_air_pressure = 0.0;
         } else {
-            input_specs.unit_internal_static_air_pressure = rNumericArgs(4);
+            input_specs.unit_internal_static_air_pressure = state.dataIPShortCut->rNumericArgs(4);
         }
-        input_specs.capacity_control = cAlphaArgs(2);
-        input_specs.basin_heater_capacity = rNumericArgs(5);
-        input_specs.basin_heater_setpoint_temperature = rNumericArgs(6);
-        input_specs.basin_heater_operating_schedule_name = cAlphaArgs(3);
-        input_specs.compressor_fuel_type = cAlphaArgs(4);
-        input_specs.base_operating_mode_name = cAlphaArgs(5);
-        if (!lAlphaFieldBlanks(6)) {
-            input_specs.alternate_operating_mode_name = cAlphaArgs(6);
+        input_specs.capacity_control = state.dataIPShortCut->cAlphaArgs(2);
+        input_specs.basin_heater_capacity = state.dataIPShortCut->rNumericArgs(5);
+        input_specs.basin_heater_setpoint_temperature = state.dataIPShortCut->rNumericArgs(6);
+        input_specs.basin_heater_operating_schedule_name = state.dataIPShortCut->cAlphaArgs(3);
+        input_specs.compressor_fuel_type = state.dataIPShortCut->cAlphaArgs(4);
+        input_specs.base_operating_mode_name = state.dataIPShortCut->cAlphaArgs(5);
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+            input_specs.alternate_operating_mode_name = state.dataIPShortCut->cAlphaArgs(6);
         }
-        if (!lAlphaFieldBlanks(7)) {
-            input_specs.alternate_operating_mode2_name = cAlphaArgs(7);
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+            input_specs.alternate_operating_mode2_name = state.dataIPShortCut->cAlphaArgs(7);
         }
 
         this->instantiateFromInputSpec(state, input_specs);
