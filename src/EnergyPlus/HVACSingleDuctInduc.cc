@@ -236,9 +236,9 @@ namespace HVACSingleDuctInduc {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int NumAlphas(0);         // Number of Alphas for each GetObjectItem call
-        static int NumNumbers(0);        // Number of Numbers for each GetObjectItem call
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
+        int NumAlphas(0);         // Number of Alphas for each GetObjectItem call
+        int NumNumbers(0);        // Number of Numbers for each GetObjectItem call
+        int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
         int IOStatus;                   // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
@@ -484,13 +484,13 @@ namespace HVACSingleDuctInduc {
         Real64 IndRat;   // unit induction ratio
         Real64 RhoAir;   // air density at outside pressure and standard temperature and humidity
 
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;                                    // Loop checking control variable
         Real64 rho;                                  // local fluid density
         int HWOutletNode;                            // local node index for hot water coil's outlet node
         int CWOutletNode;                            // local node index for cold water coil's outlet node
         bool errFlag(false);
 
+        auto & ZoneEquipmentListChecked = state.dataHVACSingleDuctInduc->ZoneEquipmentListChecked;
         auto & IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
         auto & MyOneTimeFlag = state.dataHVACSingleDuctInduc->MyOneTimeFlag;
         auto & NumIndUnits = state.dataHVACSingleDuctInduc->NumIndUnits;
@@ -740,8 +740,8 @@ namespace HVACSingleDuctInduc {
         Real64 DesPriVolFlow;
         Real64 RhoAir;
         Real64 CpAir;
-        static int CoilWaterInletNode(0);
-        static int CoilWaterOutletNode(0);
+        int CoilWaterInletNode(0);
+        int CoilWaterOutletNode(0);
         bool ErrorsFound;
         Real64 Cp;  // local fluid specific heat
         Real64 rho; // local fluid density

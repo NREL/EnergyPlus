@@ -195,6 +195,7 @@ struct HVACSingleDuctInducData : BaseGlobalStruct {
     Array1D_bool MyPlantScanFlag;
     Array1D_bool MyAirDistInitFlag;
     Array1D<HVACSingleDuctInduc::IndUnitData> IndUnit;
+    bool ZoneEquipmentListChecked = false;
 
     void clear_state() override
     {
@@ -208,6 +209,7 @@ struct HVACSingleDuctInducData : BaseGlobalStruct {
         this->MyPlantScanFlag.deallocate();
         this->MyAirDistInitFlag.deallocate();
         this->IndUnit.deallocate();
+        this->ZoneEquipmentListChecked = false;
     }
 };
 
