@@ -9626,16 +9626,16 @@ namespace Furnaces {
         Real64 HotWaterMdot;    // actual hot water mass flow rate
         Array1D<Real64> Par(4);
         int SolFlag;
-        static std::string HeatingCoilName; // name of heating coil
-        static std::string HeatingCoilType; // type of heating coil
-        static int CoilTypeNum(0);          // heating coil type number
-        static int HeatingCoilIndex(0);     // heating coil index
-        static int CoilControlNode(0);      // control node for hot water and steam heating coils
-        static int CoilOutletNode(0);       // air outlet node of the heatiing coils
-        static int LoopNum(0);              // plant loop number
-        static int LoopSideNum(0);          // plant loop side number
-        static int BranchNum(0);            // plant branch number
-        static int CompNum(0);              // Numeric Equivalent for Supplemental Heat Coil Type
+        auto & HeatingCoilName = state.dataFurnaces->HeatingCoilName; // name of heating coil
+        auto & HeatingCoilType = state.dataFurnaces->HeatingCoilType; // type of heating coil
+        int CoilTypeNum(0);          // heating coil type number
+        int HeatingCoilIndex(0);     // heating coil index
+        int CoilControlNode(0);      // control node for hot water and steam heating coils
+        int CoilOutletNode(0);       // air outlet node of the heatiing coils
+        int LoopNum(0);              // plant loop number
+        int LoopSideNum(0);          // plant loop side number
+        int BranchNum(0);            // plant branch number
+        int CompNum(0);              // Numeric Equivalent for Supplemental Heat Coil Type
 
         QActual = 0.0;
 
@@ -9867,17 +9867,17 @@ namespace Furnaces {
         int OpMode;                          // operating mode (fan cycling or continious; DX coil always cycles)
         int ZoneNum;                         // Controlled zone number
         Real64 QTotUnitOut;                  // capacity output
-        static int SpeedNum(1);              // Speed number
-        static Real64 SupHeaterLoad(0.0);    // supplement heater load
+        auto & SpeedNum = state.dataFurnaces->SpeedNum;
+        auto & SupHeaterLoad = state.dataFurnaces->SupHeaterLoad;
+        Real64 TotalZoneLatentLoad;   // Total ZONE latent load
+        Real64 TotalZoneSensibleLoad; // Total ZONE sensible load
+        Real64 SystemSensibleLoad;    // Positive value means heating required
         int CompOp;                          // compressor operation; 1=on, 0=off
         Real64 SaveMassFlowRate;             // saved inlet air mass flow rate [kg/s]
         Real64 QSensUnitOut;                 // sensible capacity output
         Real64 QLatUnitOut;                  // latent capacity output
-        static Real64 TotalZoneLatentLoad;   // Total ZONE latent load
-        static Real64 TotalZoneSensibleLoad; // Total ZONE sensible load
         Real64 ActualSensibleOutput;         // Actual furnace sensible capacity
         Real64 ReheatCoilLoad;               // reheat coil load due to dehumidification
-        static Real64 SystemSensibleLoad;    // Positive value means heating required
         Real64 QToHeatSetPt;                 // Load required to meet heating setpoint temp (>0 is a heating load)
         Real64 NoCompOutput;                 // output when no active compressor [W]
         int TotBranchNum;                    // total exit branch number
