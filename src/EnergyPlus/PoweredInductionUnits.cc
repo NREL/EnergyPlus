@@ -728,9 +728,9 @@ namespace EnergyPlus::PoweredInductionUnits {
         int HotConNode; // hot water control node number in PIU
         int OutletNode; // unit air outlet node number
         Real64 RhoAir;  // air density at outside pressure and standard temperature and humidity
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MySizeFlag;
-        static Array1D_bool MyPlantScanFlag;
+        auto & MyEnvrnFlag = state.dataPowerInductionUnits->MyEnvrnFlag;
+        auto & MySizeFlag = state.dataPowerInductionUnits->MySizeFlag;
+        auto & MyPlantScanFlag = state.dataPowerInductionUnits->MyPlantScanFlag;
         int Loop;   // Loop checking control variable
         Real64 rho; // local plant fluid density
         bool errFlag;
@@ -961,14 +961,14 @@ namespace EnergyPlus::PoweredInductionUnits {
         Real64 EnthSteamOutWet;
         Real64 LatentHeatSteam;
         Real64 SteamDensity;
-        static int CoilWaterInletNode(0);
-        static int CoilWaterOutletNode(0);
-        static int CoilSteamInletNode(0);
-        static int CoilSteamOutletNode(0);
+        int CoilWaterInletNode(0);
+        int CoilWaterOutletNode(0);
+        int CoilSteamInletNode(0);
+        int CoilSteamOutletNode(0);
         bool ErrorsFound;
         Real64 rho;
         Real64 Cp;
-        static int DummyWaterIndex(1);
+        int constexpr DummyWaterIndex(1);
         bool IsAutoSize;               // Indicator to autosize
         Real64 MaxPriAirVolFlowDes;    // Autosized maximum primary air flow for reporting
         Real64 MaxPriAirVolFlowUser;   // Hardsized maximum primary air flow for reporting

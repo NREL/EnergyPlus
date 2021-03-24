@@ -1342,7 +1342,7 @@ namespace EnergyPlus::PluginManagement {
     bool PluginManager::anyUnexpectedPluginObjects(EnergyPlusData &state)
     {
         int numTotalThings = 0;
-        for (auto const &objToFind : state.dataPluginManager->objectsToFind) {
+        for (auto const &objToFind : state.dataPlu      ginManager->objectsToFind) {
             int instances = inputProcessor->getNumObjectsFound(state, objToFind);
             numTotalThings += instances;
             if (numTotalThings == 1) {
