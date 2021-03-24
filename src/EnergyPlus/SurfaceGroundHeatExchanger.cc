@@ -598,10 +598,10 @@ namespace SurfaceGroundHeatExchanger {
         Real64 OldPastFluxTop; // top surface flux - past value used during iteration
         Real64 OldPastFluxBtm; // bottom surface flux - past value used during iteration
         // variables used with current environmental conditions
-        static Real64 FluxTop; // top surface flux
-        static Real64 FluxBtm; // bottom surface flux
-        static Real64 TempBtm; // bottom surface temp
-        static Real64 TempTop; // top surface temp
+        auto & FluxTop = state.dataSurfaceGroundHeatExchangers->FluxTop; // top surface flux
+        auto & FluxBtm = state.dataSurfaceGroundHeatExchangers->FluxBtm; // bottom surface flux
+        auto & TempBtm = state.dataSurfaceGroundHeatExchangers->TempBtm; // bottom surface temp
+        auto & TempTop = state.dataSurfaceGroundHeatExchangers->TempTop; // top surface temp
         Real64 TempT;          // top surface temp - used in underrelaxation
         Real64 TempB;          // bottom surface temp - used in underrelaxation
         Real64 OldFluxTop;     // top surface flux - value used during iteration
