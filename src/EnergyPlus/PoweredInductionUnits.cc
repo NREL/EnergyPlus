@@ -968,7 +968,7 @@ namespace EnergyPlus::PoweredInductionUnits {
         bool ErrorsFound;
         Real64 rho;
         Real64 Cp;
-        int constexpr DummyWaterIndex(1);
+        int DummyWaterIndex(1);
         bool IsAutoSize;               // Indicator to autosize
         Real64 MaxPriAirVolFlowDes;    // Autosized maximum primary air flow for reporting
         Real64 MaxPriAirVolFlowUser;   // Hardsized maximum primary air flow for reporting
