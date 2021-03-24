@@ -269,6 +269,7 @@
 #include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/ThermalISO15099Calc.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
 #include <EnergyPlus/UFADManager.hh>
 #include <EnergyPlus/UnitHeater.hh>

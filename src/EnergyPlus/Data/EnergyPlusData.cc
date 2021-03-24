@@ -264,6 +264,7 @@ namespace EnergyPlus {
         this->dataTARCOGOutputs = std::make_unique<TARCOGOutputData>();
         this->dataThermalChimneys = std::make_unique<ThermalChimneysData>();
         this->dataThermalComforts = std::make_unique<ThermalComfortsData>();
+        this->dataThermalISO15099Calc = std::make_unique<ThermalISO15099CalcData>();
         this->dataTimingsData = std::make_unique<DataTimingsData>();
         this->dataTranspiredCollector = std::make_unique<TranspiredCollectorData>();
         this->dataUCSDShared = std::make_unique<UCSDSharedData>();

@@ -274,6 +274,7 @@ struct SystemVarsData;
 struct TARCOGOutputData;
 struct ThermalChimneysData;
 struct ThermalComfortsData;
+struct ThermalISO15099CalcData;
 struct TranspiredCollectorData;
 struct UCSDSharedData;
 struct UFADManagerData;
@@ -523,6 +524,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<TARCOGOutputData> dataTARCOGOutputs;
     std::unique_ptr<ThermalChimneysData> dataThermalChimneys;
     std::unique_ptr<ThermalComfortsData> dataThermalComforts;
+    std::unique_ptr<ThermalISO15099CalcData> dataThermalISO15099Calc;
     std::unique_ptr<TranspiredCollectorData> dataTranspiredCollector;
     std::unique_ptr<UCSDSharedData> dataUCSDShared;
     std::unique_ptr<UFADManagerData> dataUFADManager;
