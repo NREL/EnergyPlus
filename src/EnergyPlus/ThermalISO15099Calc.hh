@@ -267,11 +267,9 @@ namespace ThermalISO15099Calc {
                Array1D<Real64> &Ebf,
                Array1D<Real64> &Tgap);
 
-    void solarISO15099(EnergyPlusData &state,
-                       Real64 totsol, Real64 rtot, const Array1D<Real64> &rs, int nlayer, const Array1D<Real64> &absol, Real64 &sf);
+    void solarISO15099(Real64 totsol, Real64 rtot, const Array1D<Real64> &rs, int nlayer, const Array1D<Real64> &absol, Real64 &sf);
 
-    void resist(EnergyPlusData &state,
-                int nlayer,
+    void resist(int nlayer,
                 Real64 trmout,
                 Real64 Tout,
                 Real64 trmin,
@@ -415,9 +413,9 @@ namespace ThermalISO15099Calc {
                     int &nperr,
                     std::string &ErrorMessage);
 
-    void nusselt(EnergyPlusData &state,Real64 tilt, Real64 ra, Real64 asp, Real64 &gnu, int &nperr, std::string &ErrorMessage);
+    void nusselt(Real64 tilt, Real64 ra, Real64 asp, Real64 &gnu, int &nperr, std::string &ErrorMessage);
 
-    void storeIterationResults(EnergyPlusData &state, TARCOGOutput::Files &files,
+    void storeIterationResults(TARCOGOutput::Files &files,
                                int nlayer,
                                int index,
                                const Array1D<Real64> &theta,
@@ -439,7 +437,7 @@ namespace ThermalISO15099Calc {
                                const Array1D<Real64> &Rf,
                                int &);
 
-    void CalculateFuncResults(EnergyPlusData &state, int nlayer, Array2<Real64> const &a, const Array1D<Real64> &b, const Array1D<Real64> &x, Array1D<Real64> &FRes);
+    void CalculateFuncResults(int nlayer, Array2<Real64> const &a, const Array1D<Real64> &b, const Array1D<Real64> &x, Array1D<Real64> &FRes);
 }
     struct ThermalISO15099CalcData : BaseGlobalStruct
     {
