@@ -385,15 +385,14 @@ namespace BaseboardElectric {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNode;
         int Loop;
-        static Array1D_bool MyEnvrnFlag;
 
         auto & baseboard = state.dataBaseboardElectric;
 
         // Do the one time initializations
         if (baseboard->MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(baseboard->NumBaseboards);
-            MyEnvrnFlag = true;
+            state.dataBaseboardElectric->MyEnvrnFlag.allocate(baseboard->NumBaseboards);
+            state.dataBaseboardElectric->MyEnvrnFlag = true;
 
             baseboard->MyOneTimeFlag = false;
         }

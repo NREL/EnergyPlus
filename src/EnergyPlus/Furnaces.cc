@@ -253,7 +253,7 @@ namespace Furnaces {
         Real64 H2OHtOfVap;        // Heat of vaporization of air
         int FurnaceInletNode;     // Inlet node to furnace or unitary system
         Real64 FurnaceSavMdot;    // saved furnace inlet air mass flow rate [m3/s]
-        static Real64 Dummy(0.0);
+        Real64 Dummy(0.0);
         int CompOp;               // compressor operation; 1=on, 0=off
         Real64 OnOffAirFlowRatio; // Ratio of compressor ON air flow to AVERAGE air flow over time step
         int FanOpMode;            // Fan operating mode (1=CycFanCycCoil, 2=ContFanCycCoil)
@@ -6684,8 +6684,6 @@ namespace Furnaces {
         int FurnaceInletNode;             // Inlet node to furnace or unitary system
         int FurnaceOutletNode;            // Outlet node of furnace or unitary system
         int OpMode;                       // Mode of Operation (fan cycling = 1 or fan continuous = 2)
-        static Real64 CoolCoilLoad;       // Negative value means cooling required
-        static Real64 SystemSensibleLoad; // Positive value means heating required
         Real64 CoolErrorToler;            // Error tolerance in cooling mode
         Real64 HeatErrorToler;            // Error tolerance in heating mode
         Real64 ActualSensibleOutput;      // Actual furnace sensible capacity
@@ -6697,7 +6695,6 @@ namespace Furnaces {
         Real64 TempHeatOutput;      // Temporary Sensible output of heating coil while iterating on PLR (W)
         Real64 TempLatentOutput;    // Temporary Latent output of AC at increasing PLR (W)
         //                                           ! (Temp variables are used to find min PLR for positive latent removal)
-        static bool HumControl(false); // Logical flag signaling when dehumidification is required
         Array1D<Real64> Par(10);       // parameters passed to RegulaFalsi function
         int SolFlag;                   // return flag from RegulaFalsi
         Real64 TempMinPLR;             // Temporary min latent PLR when hum control is required and iter is exceeded
@@ -6708,6 +6705,10 @@ namespace Furnaces {
         Real64 HeatingSensibleOutput;
         Real64 HeatingLatentOutput;
         Real64 OutdoorDryBulbTemp; // secondary coil (condenser) entering dry bulb temperature
+
+        auto & CoolCoilLoad = state.dataFurnaces->CoolCoilLoad;
+        auto & SystemSensibleLoad = state.dataFurnaces->SystemSensibleLoad;
+        auto & HumControl = state.dataFurnaces->HumControl;
 
         // Set local variables
         FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
@@ -7993,10 +7994,6 @@ namespace Furnaces {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 OnOffAirFlowRatio;          // Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
-        static Real64 TotalZoneLatentLoad; // Total ZONE latent load (not including outside air)
-        // to be removed by furnace/unitary system
-        static Real64 TotalZoneSensLoad; // Total ZONE heating load (not including outside air)
-        // to be removed by furnace/unitary system
         Real64 ZoneSensLoadMet;             // Actual zone sensible load met by heat pump (W)
         Real64 ZoneLatLoadMet;              // Actual zone latent load met by heat pump (W)
         Real64 ZoneSensLoadMetFanONCompON;  // Max Zone sensible load heat pump can meet (W)
@@ -8013,9 +8010,6 @@ namespace Furnaces {
         int OASysInletNode;              // node number of return air inlet to OA sys
         int OASysOutletNode;             // node number of mixed air outlet of OA sys
         int OpMode;                      // Mode of Operation (fan cycling = 1 or fan continuous = 2)
-        static Real64 CoolPartLoadRatio; // Part load ratio (greater of sensible or latent part load ratio for cooling)
-        static Real64 HeatPartLoadRatio; // Part load ratio (greater of sensible or latent part load ratio for cooling)
-        static Real64 Dummy(0.0);        // Dummy var. for generic calc. furnace output arg. (n/a for heat pump)
         bool HumControl;                 // Logical flag signaling when dehumidification is required
         Real64 SuppHeatCoilLoad;         // Load passed to supplemental heater (W)
         Real64 CoolErrorToler;           // convergence tolerance used in cooling mode
@@ -8023,8 +8017,14 @@ namespace Furnaces {
         int SolFlag;                     // flag returned from iteration routine to denote problems
         Array1D<Real64> Par(9);          // parameters passed to iteration routine
 
+        auto & TotalZoneLatentLoad = state.dataFurnaces->TotalZoneLatentLoad;
+        auto & TotalZoneSensLoad = state.dataFurnaces->TotalZoneSensLoad;
+        auto & CoolPartLoadRatio = state.dataFurnaces->CoolPartLoadRatio;
+        auto & HeatPartLoadRatio = state.dataFurnaces->HeatPartLoadRatio;
+        auto & Dummy2 = state.dataFurnaces->Dummy2;
+
         // Set local variables
-        Dummy = 0.0;
+        Dummy2 = 0.0;
         OnOffAirFlowRatio = 1.0;
         FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
         FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
@@ -8092,8 +8092,8 @@ namespace Furnaces {
                               CompOp,
                               CoolPartLoadRatio,
                               HeatPartLoadRatio,
-                              Dummy,
-                              Dummy,
+                              Dummy2,
+                              Dummy2,
                               ZoneSensLoadMetFanONCompOFF,
                               ZoneLatLoadMetFanONCompOFF,
                               OnOffAirFlowRatio,
@@ -8113,8 +8113,8 @@ namespace Furnaces {
                               CompOp,
                               CoolPartLoadRatio,
                               HeatPartLoadRatio,
-                              Dummy,
-                              Dummy,
+                              Dummy2,
+                              Dummy2,
                               ZoneSensLoadMetFanONCompON,
                               ZoneLatLoadMetFanONCompON,
                               OnOffAirFlowRatio,
@@ -8158,8 +8158,8 @@ namespace Furnaces {
                                   CompOp,
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
-                                  Dummy,
-                                  Dummy,
+                                  Dummy2,
+                                  Dummy2,
                                   ZoneSensLoadMetFanONCompOFF,
                                   ZoneLatLoadMetFanONCompOFF,
                                   OnOffAirFlowRatio,
@@ -8284,8 +8284,8 @@ namespace Furnaces {
                               CompOp,
                               CoolPartLoadRatio,
                               HeatPartLoadRatio,
-                              Dummy,
-                              Dummy,
+                              Dummy2,
+                              Dummy2,
                               ZoneSensLoadMetFanONCompOFF,
                               ZoneLatLoadMetFanONCompOFF,
                               OnOffAirFlowRatio,
@@ -8306,8 +8306,8 @@ namespace Furnaces {
                               CompOp,
                               CoolPartLoadRatio,
                               HeatPartLoadRatio,
-                              Dummy,
-                              Dummy,
+                              Dummy2,
+                              Dummy2,
                               ZoneSensLoadMetFanONCompON,
                               ZoneLatLoadMetFanONCompON,
                               OnOffAirFlowRatio,
@@ -8352,8 +8352,8 @@ namespace Furnaces {
                                   CompOp,
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
-                                  Dummy,
-                                  Dummy,
+                                  Dummy2,
+                                  Dummy2,
                                   ZoneSensLoadMet,
                                   ZoneLatLoadMet,
                                   OnOffAirFlowRatio,
@@ -8382,8 +8382,8 @@ namespace Furnaces {
                                   CompOp,
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
-                                  Dummy,
-                                  Dummy,
+                                  Dummy2,
+                                  Dummy2,
                                   ZoneSensLoadMet,
                                   ZoneLatLoadMet,
                                   OnOffAirFlowRatio,
@@ -8454,7 +8454,7 @@ namespace Furnaces {
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
                                   SuppHeatCoilLoad,
-                                  Dummy,
+                                  Dummy2,
                                   ZoneSensLoadMet,
                                   ZoneLatLoadMet,
                                   OnOffAirFlowRatio,
@@ -8486,8 +8486,8 @@ namespace Furnaces {
                                   CompOp,
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
-                                  Dummy,
-                                  Dummy,
+                                  Dummy2,
+                                  Dummy2,
                                   ZoneSensLoadMet,
                                   ZoneLatLoadMet,
                                   OnOffAirFlowRatio,
@@ -8501,8 +8501,8 @@ namespace Furnaces {
                                   CompOp,
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
-                                  Dummy,
-                                  Dummy,
+                                  Dummy2,
+                                  Dummy2,
                                   ZoneSensLoadMet,
                                   ZoneLatLoadMet,
                                   OnOffAirFlowRatio,
@@ -8526,8 +8526,8 @@ namespace Furnaces {
                               CompOp,
                               CoolPartLoadRatio,
                               HeatPartLoadRatio,
-                              Dummy,
-                              Dummy,
+                              Dummy2,
+                              Dummy2,
                               ZoneSensLoadMet,
                               ZoneLatLoadMet,
                               OnOffAirFlowRatio,

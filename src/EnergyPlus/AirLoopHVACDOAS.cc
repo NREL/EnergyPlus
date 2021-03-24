@@ -961,12 +961,10 @@ namespace AirLoopHVACDOAS {
 
         int const summerDesignDayTypeIndex(9);
         int const winterDesignDayTypeIndex(10);
-        bool static SummerDesignDayFlag = true;
-        bool static WinterDesignDayFlag = true;
 
         for (size_t i = 1; i <= state.dataWeatherManager->DesDayInput.size(); i++) {
             // Summer design day
-            if (state.dataWeatherManager->DesDayInput(i).DayType == summerDesignDayTypeIndex && SummerDesignDayFlag) {
+            if (state.dataWeatherManager->DesDayInput(i).DayType == summerDesignDayTypeIndex && state.dataAirLoopHVACDOAS->SummerDesignDayFlag) {
                 this->SizingCoolOATemp = state.dataWeatherManager->DesDayInput(i).MaxDryBulb;
                 if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
                     this->SizingCoolOAHumRat =
@@ -976,10 +974,10 @@ namespace AirLoopHVACDOAS {
                 } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
                     this->SizingCoolOAHumRat = state.dataWeatherManager->DesDayInput(i).HumIndValue;
                 } // else { // What about other cases?
-                SummerDesignDayFlag = false;
+                state.dataAirLoopHVACDOAS->SummerDesignDayFlag = false;
             }
             // Winter design day
-            if (state.dataWeatherManager->DesDayInput(i).DayType == winterDesignDayTypeIndex && WinterDesignDayFlag) {
+            if (state.dataWeatherManager->DesDayInput(i).DayType == winterDesignDayTypeIndex && state.dataAirLoopHVACDOAS->WinterDesignDayFlag) {
                 this->HeatOutTemp = state.dataWeatherManager->DesDayInput(i).MaxDryBulb;
                 if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
                     this->HeatOutHumRat =
@@ -989,7 +987,7 @@ namespace AirLoopHVACDOAS {
                 } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
                     this->HeatOutHumRat = state.dataWeatherManager->DesDayInput(i).HumIndValue;
                 } // else { // What about other cases?
-                WinterDesignDayFlag = false;
+                state.dataAirLoopHVACDOAS->WinterDesignDayFlag = false;
             }
         }
     }
