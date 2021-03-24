@@ -119,7 +119,7 @@ struct HVACManagerData : BaseGlobalStruct
     bool FlowResolutionNeeded = false;
     int ErrCount = 0;  // Number of times that the maximum iterations was exceeded
     int MaxErrCount = 0;
-    static std::string ErrEnvironmentName;
+    std::string ErrEnvironmentName;
     Array1D<Real64> MixSenLoad; // Mixing sensible loss or gain
     Array1D<Real64> MixLatLoad; // Mixing latent loss or gain
 
@@ -140,7 +140,6 @@ struct HVACManagerData : BaseGlobalStruct
         FlowResolutionNeeded = false;
         this->ErrCount = 0;
         this->MaxErrCount = 0;
-        this->ErrEnvironmentName.clear();
         this->MixSenLoad.clear();
         this->MixLatLoad.clear();
     }
