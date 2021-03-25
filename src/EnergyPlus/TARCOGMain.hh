@@ -177,14 +177,14 @@ namespace TARCOGMain {
 struct TARCOGMainData : BaseGlobalStruct
 {
 
-    Array1D<Real64> sconTemp = Array1D<Real64>(maxlay);
-    Array1D<Real64> thickTemp = Array1D<Real64>(maxlay);
+    Array1D<Real64> sconTemp = Array1D<Real64>(TARCOGParams::maxlay);
+    Array1D<Real64> thickTemp = Array1D<Real64>(TARCOGParams::maxlay);
 
     // Internaly used
     bool converged = false; // used for convergence check in case of deflection calculations
-    Array1D<Real64> told = Array1D<Real64>(maxlay2);
-    Array1D<Real64> CurGap = Array1D<Real64>(MaxGap);
-    Array1D<Real64> GapDefMean = Array1D<Real64>(MaxGap);
+    Array1D<Real64> told = Array1D<Real64>(TARCOGParams::maxlay2);
+    Array1D<Real64> CurGap = Array1D<Real64>(TARCOGParams::MaxGap);
+    Array1D<Real64> GapDefMean = Array1D<Real64>(TARCOGParams::MaxGap);
 
     void clear_state() override
     {
