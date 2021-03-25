@@ -85,7 +85,7 @@ namespace AirLoopHVACDOAS {
         ~AirLoopMixer() = default; // destructor
 
         static void getAirLoopMixer(EnergyPlusData &state);
-        void CalcAirLoopMixer();
+        void CalcAirLoopMixer(EnergyPlusData &state);
     };
 
     struct AirLoopSplitter
@@ -107,7 +107,7 @@ namespace AirLoopHVACDOAS {
         ~AirLoopSplitter() = default; // destructor
 
         static void getAirLoopSplitter(EnergyPlusData &state);
-        void CalcAirLoopSplitter(Real64 Temp, Real64 Humrat);
+        void CalcAirLoopSplitter(EnergyPlusData &state, Real64 Temp, Real64 Humrat);
     };
 
     struct AirLoopDOAS
@@ -216,7 +216,8 @@ namespace AirLoopHVACDOAS {
         std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
         std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
         std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
-
+        bool SummerDesignDayFlag = true;
+        bool WinterDesignDayFlag = true;
         void clear_state() override
         {
             this->GetInputOnceFlag = true;
@@ -226,6 +227,8 @@ namespace AirLoopHVACDOAS {
             this->airloopDOAS.clear();
             this->airloopMixer.clear();
             this->airloopSplitter.clear();
+            this->SummerDesignDayFlag = true;
+            this->WinterDesignDayFlag = true;
         }
     };
 

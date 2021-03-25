@@ -68,6 +68,7 @@ namespace FuelCellElectricGenerator {
         int EffCurveID;             // pointer to curve for efficiency
         Real64 NomEff;              // nominal efficiency
         Real64 NomPel;              // nominal power rate at rating point
+        int NumCyclesAtStart;       // number of start stop cycles at beggining of simulation (user input)
         int NumCycles;              // number of start stop cycles
         Real64 CyclingDegradRat;    // rate of degradation from cycles
         Real64 NumRunHours;         // number of hours of operation
@@ -437,6 +438,8 @@ namespace FuelCellElectricGenerator {
         Real64 ThermalEfficiency;
         Real64 OverallEfficiency;
         Real64 ExergyEfficiency;
+        int NumCycles;               // Number of start-stop cycles
+        Real64 FCPMSkinLoss;         // Power module skin losses [W]
 
         // Default Constructor
         FCReportDataStruct()
@@ -450,7 +453,8 @@ namespace FuelCellElectricGenerator {
               WaterVaporFractExh(0.0), CondensateRate(0.0), SeqSubstIterations(0), RegulaFalsiIterations(0), ACancillariesPower(0.0),
               ACancillariesEnergy(0.0), PCUlosses(0.0), DCPowerGen(0.0), DCPowerEff(0.0), ElectEnergyinStorage(0.0), StoredPower(0.0),
               StoredEnergy(0.0), DrawnPower(0.0), DrawnEnergy(0.0), SkinLossPower(0.0), SkinLossEnergy(0.0), SkinLossConvect(0.0),
-              SkinLossRadiat(0.0), ElectEfficiency(0.0), ThermalEfficiency(0.0), OverallEfficiency(0.0), ExergyEfficiency(0.0)
+              SkinLossRadiat(0.0), ElectEfficiency(0.0), ThermalEfficiency(0.0), OverallEfficiency(0.0), ExergyEfficiency(0.0), NumCycles(0),
+              FCPMSkinLoss(0.0)
         {
         }
     };
@@ -533,10 +537,16 @@ namespace FuelCellElectricGenerator {
         bool MyWarmupFlag_Init;
         bool MyPlantScanFlag_Init;
 
+        int SolverErr_Type1_Iter;      // Iteration counter for Fuel Cell solver root finding Type 1 error warning messages
+        int SolverErr_Type1_IterIndex; // Index for Fuel Cell solver root finding Type 1 error warning messages
+        int SolverErr_Type2_Iter;      // Iteration counter for Fuel Cell solver root finding Type 2 error warning messages
+        int SolverErr_Type2_IterIndex; // Index for Fuel Cell solver root finding Type 2 error warning messages
+
         // Default Constructor
         FCDataStruct()
             : TypeOf(0), FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0),
-              DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true)
+              DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true),
+              SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0), SolverErr_Type2_Iter(0), SolverErr_Type2_IterIndex(0)
         {
         }
 

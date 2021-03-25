@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -158,10 +159,6 @@ namespace WaterManager {
         //       DATE WRITTEN   August 2006
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataSurfaces::Surface;
 
         using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
@@ -359,7 +356,7 @@ namespace WaterManager {
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
-                        state.dataWaterData->WaterStorage(Item).ZoneID = UtilityRoutines::FindItemInList(cAlphaArgs(10), Zone);
+                        state.dataWaterData->WaterStorage(Item).ZoneID = UtilityRoutines::FindItemInList(cAlphaArgs(10), state.dataHeatBal->Zone);
                         if ((state.dataWaterData->WaterStorage(Item).ZoneID == 0) && (state.dataWaterData->WaterStorage(Item).AmbientTempIndicator == DataWater::AmbientTempType::Zone)) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(10) + '=' + cAlphaArgs(10));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -457,7 +454,7 @@ namespace WaterManager {
                     state.dataWaterData->RainCollector(Item).SurfID.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
                     for (int SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
                         state.dataWaterData->RainCollector(Item).SurfName(SurfNum) = cAlphaArgs(SurfNum + alphaOffset);
-                        state.dataWaterData->RainCollector(Item).SurfID(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + alphaOffset), Surface);
+                        state.dataWaterData->RainCollector(Item).SurfID(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + alphaOffset), state.dataSurface->Surface);
                         if (state.dataWaterData->RainCollector(Item).SurfID(SurfNum) == 0) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(SurfNum + alphaOffset) + '=' + cAlphaArgs(SurfNum + alphaOffset));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -471,9 +468,9 @@ namespace WaterManager {
                     Real64 tmpDenominator = 0.0;
                     for (int SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
                         int ThisSurf = state.dataWaterData->RainCollector(Item).SurfID(SurfNum);
-                        tmpArea += Surface(ThisSurf).GrossArea * Surface(ThisSurf).CosTilt;
-                        tmpNumerator += Surface(ThisSurf).Centroid.z * Surface(ThisSurf).GrossArea;
-                        tmpDenominator += Surface(ThisSurf).GrossArea;
+                        tmpArea += state.dataSurface->Surface(ThisSurf).GrossArea * state.dataSurface->Surface(ThisSurf).CosTilt;
+                        tmpNumerator += state.dataSurface->Surface(ThisSurf).Centroid.z * state.dataSurface->Surface(ThisSurf).GrossArea;
+                        tmpDenominator += state.dataSurface->Surface(ThisSurf).GrossArea;
                     }
                     state.dataWaterData->RainCollector(Item).HorizArea = tmpArea;
                     // now setup vertical hieght above ground for height dependent outdoor temps
@@ -877,7 +874,7 @@ namespace WaterManager {
         // PURPOSE OF THIS SUBROUTINE:
         // update the current rate of precipitation
 
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
         Real64 schedRate;
@@ -907,7 +904,7 @@ namespace WaterManager {
         // PURPOSE OF THIS SUBROUTINE:
         // update the current rate of irrigation
 
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
         Real64 schedRate;
@@ -938,7 +935,7 @@ namespace WaterManager {
         // for the storage tanks at each system timestep
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1338,7 +1335,7 @@ namespace WaterManager {
         // for the rain collector at each system timestep
 
         using DataEnvironment::OutWetBulbTempAt;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1403,7 +1400,7 @@ namespace WaterManager {
         // starting simple and ignoring well storage and complex rate restrictions.
         // just uses nominal pump rate and power (assuming well designed well).
 
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 VdotDelivered;

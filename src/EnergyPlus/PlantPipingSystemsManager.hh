@@ -846,13 +846,13 @@ namespace PlantPipingSystemsManager {
                                     Real64 ThisWallToNeighborCentroid,
                                     Real64 ThisAdiabaticMultiplier);
 
-        Real64 GetBasementWallHeatFlux();
+        Real64 GetBasementWallHeatFlux(EnergyPlusData &state);
 
-        Real64 GetBasementFloorHeatFlux();
+        Real64 GetBasementFloorHeatFlux(EnergyPlusData &state);
 
         void UpdateBasementSurfaceTemperatures(EnergyPlusData &state);
 
-        Real64 GetZoneInterfaceHeatFlux();
+        Real64 GetZoneInterfaceHeatFlux(EnergyPlusData &state);
 
         void UpdateZoneSurfaceTemperatures(EnergyPlusData &state);
 
@@ -903,7 +903,7 @@ namespace PlantPipingSystemsManager {
 
         Real64 EvaluateGroundSurfaceTemperature(EnergyPlusData &state, CartesianCell &cell);
 
-        Real64 EvaluateBasementCellTemperature(CartesianCell &cell);
+        Real64 EvaluateBasementCellTemperature(EnergyPlusData &state, CartesianCell &cell);
 
         Real64 EvaluateZoneInterfaceTemperature(CartesianCell &cell);
 
@@ -918,7 +918,7 @@ namespace PlantPipingSystemsManager {
 
         void InitPipingSystems(EnergyPlusData &state, Circuit * thisCircuit);
 
-        void UpdatePipingSystems(Circuit * thisCircuit);
+        void UpdatePipingSystems(EnergyPlusData &state, Circuit * thisCircuit);
 
         void SetupZoneCoupledOutputVariables(EnergyPlusData &state);
 
@@ -972,11 +972,11 @@ namespace PlantPipingSystemsManager {
                                     std::string const &Condition,
                                     bool &ErrorsFound);
 
-    int GetSurfaceCountForOSCM(int OSCMIndex);
+    int GetSurfaceCountForOSCM(EnergyPlusData &state, int OSCMIndex);
 
-    std::vector<int> GetSurfaceIndecesForOSCM(int OSCMIndex);
+    std::vector<int> GetSurfaceIndecesForOSCM(EnergyPlusData &state, int OSCMIndex);
 
-    std::vector<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(int OSCMIndex);
+    std::vector<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(EnergyPlusData &state, int OSCMIndex);
 
     bool inline IsInRangeReal(Real64 const r, Real64 const lower, Real64 const upper) {
         return ((r >= lower) && (r <= upper));

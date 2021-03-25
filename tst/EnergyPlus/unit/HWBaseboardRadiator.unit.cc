@@ -78,7 +78,11 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
     Real64 LoadMet;
     int BBNum;
 
-    Node.allocate(1);
+    auto & HWBaseboard = state->dataHWBaseboardRad->HWBaseboard;
+    auto & QBBRadSource = state->dataHWBaseboardRad->QBBRadSource;
+    auto & HWBaseboardDesignObject = state->dataHWBaseboardRad->HWBaseboardDesignObject;
+
+    state->dataLoopNodes->Node.allocate(1);
     HWBaseboard.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
@@ -86,7 +90,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
     QBBRadSource.allocate(1);
     HWBaseboardDesignObject.allocate(1);
 
-    Node(1).MassFlowRate = 0.40;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.40;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 12000.;
     BBNum = 1;
@@ -103,7 +107,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
     HWBaseboard(1).UA = 370;
     state->dataPlnt->PlantLoop(1).FluidName = "Water";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-    state->dataPlnt->PlantLoop(1).FluidType = 2;
+    state->dataPlnt->PlantLoop(1).FluidType = DataLoopNode::NodeFluidType::Water;
     QBBRadSource(1) = 0.0;
 
     CalcHWBaseboard(*state, BBNum, LoadMet);
@@ -113,7 +117,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
     EXPECT_NEAR(73.224991258180438, HWBaseboard(1).WaterOutletTemp, 0.000001);
     EXPECT_NEAR(0.5, HWBaseboard(1).AirMassFlowRate, 0.000001);
 
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     HWBaseboard.deallocate();
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
@@ -128,8 +132,11 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
 
     BBNum = 1;
     LoadMet = 0.0;
+    auto & HWBaseboard = state->dataHWBaseboardRad->HWBaseboard;
+    auto & QBBRadSource = state->dataHWBaseboardRad->QBBRadSource;
+    auto & HWBaseboardDesignObject = state->dataHWBaseboardRad->HWBaseboardDesignObject;
 
-    Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     HWBaseboard.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
@@ -158,13 +165,13 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     HWBaseboard(1).UA = 400.0;
     state->dataPlnt->PlantLoop(1).FluidName = "Water";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-    state->dataPlnt->PlantLoop(1).FluidType = 2;
+    state->dataPlnt->PlantLoop(1).FluidType = DataLoopNode::NodeFluidType::Water;
     QBBRadSource(1) = 0.0;
 
-    Node(HWBaseboard(1).WaterInletNode).MassFlowRate = 0.2;
-    Node(HWBaseboard(1).WaterInletNode).MassFlowRateMax = 0.4;
-    Node(HWBaseboard(1).WaterOutletNode).MassFlowRate = 0.2;
-    Node(HWBaseboard(1).WaterOutletNode).MassFlowRateMax = 0.4;
+    state->dataLoopNodes->Node(HWBaseboard(1).WaterInletNode).MassFlowRate = 0.2;
+    state->dataLoopNodes->Node(HWBaseboard(1).WaterInletNode).MassFlowRateMax = 0.4;
+    state->dataLoopNodes->Node(HWBaseboard(1).WaterOutletNode).MassFlowRate = 0.2;
+    state->dataLoopNodes->Node(HWBaseboard(1).WaterOutletNode).MassFlowRateMax = 0.4;
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -192,13 +199,13 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
 
     EXPECT_EQ(0.0, LoadMet);
     EXPECT_EQ(0.0, HWBaseboard(1).TotPower);
-    EXPECT_EQ(0.0, Node(HWBaseboard(1).WaterInletNode).MassFlowRate);
+    EXPECT_EQ(0.0, state->dataLoopNodes->Node(HWBaseboard(1).WaterInletNode).MassFlowRate);
     EXPECT_EQ(HWBaseboard(1).AirInletTemp, HWBaseboard(1).AirOutletTemp);
     EXPECT_EQ(HWBaseboard(1).WaterInletTemp, HWBaseboard(1).WaterOutletTemp);
     EXPECT_EQ(0.0, HWBaseboard(1).AirMassFlowRate);
 
     // clear
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     HWBaseboard.deallocate();
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();

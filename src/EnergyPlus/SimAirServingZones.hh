@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataHVACControllers.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -200,6 +201,66 @@ struct SimAirServingZonesData : BaseGlobalStruct {
     bool OutputSetupFlag = false;
     bool MyEnvrnFlag = true;
 
+    Array1D<Real64> EvBySysCool; // saved value of SysCoolingEv used in 62.1 tabular report
+    Array1D<Real64> EvBySysHeat; // saved value of SysHeatingEv used in 62.1 tabular report
+    Real64 Ep = 1.0;             // zone primary air fraction
+    Real64 Er = 0.0;             // zone secondary recirculation fraction
+    Real64 Fa = 1.0;             // temporary variable used in multi-path VRP calc
+    Real64 Fb = 1.0;             // temporary variable used in multi-path VRP calc
+    Real64 Fc = 1.0;             // temporary variable used in multi-path VRP calc
+    Real64 Xs = 1.0;             // uncorrected system outdoor air fraction
+    Real64 MinHeatingEvz = 1.0;  // minimum zone ventilation efficiency for heating (to be used as system efficiency)
+    Real64 MinCoolingEvz = 1.0;  // minimum zone ventilation efficiency for cooling (to be used as system efficiency)
+    Real64 ZoneOAFrac = 0.0;     // zone OA fraction
+    Real64 ZoneEz = 1.0;         // zone air distribution effectiveness
+    Real64 Vou = 0.0;            // Uncorrected outdoor air intake for all zones per ASHRAE std 62.1
+    Real64 Vot = 0.0;            // Required outdoor air intake at primary AHU per ASHRAE std 62.1
+
+    Array1D_int CtrlZoneNumsCool;
+    Array1D_int CtrlZoneNumsHeat;
+    Array1D_int ZoneInletNodesCool;
+    Array1D_int ZoneInletNodesHeat;
+    Array1D_int TermInletNodesCool;
+    Array1D_int TermInletNodesHeat;
+    Array1D_int TermUnitSizingNumsCool;
+    Array1D_int TermUnitSizingNumsHeat;
+    Array1D_int SupNode;
+    Array1D_int SupNodeType;
+
+    int TUInNode = 0;            // inlet node number of a terminal unit
+    Real64 SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system
+    Real64 OAReliefDiff = 0.0;   // local for massflow change across OA system, kg/s
+    Real64 MassFlowSetToler;
+    int salIterMax = 0;   // Maximum of iteration counters across all air loops
+    int salIterTot = 0;   // Aggregated number of iterations across all air loops
+    int NumCallsTot = 0;  // Aggregated number fo times SimAirLoopComponents() has been invoked across all air loops
+    int IterMaxSAL2 = 0;  // Maximum number of iterations performed by each controller on this air loop
+    int IterTotSAL2 = 0;  // Aggregated number of iterations performed by each controller on this air loop
+    int NumCallsSAL2 = 0; // Number of times SimAirLoopComponents() has been invoked per air loop for either Solve or ReSolve operations
+    // TRUE when primary air system & controllers simulation has converged;
+    bool AirLoopConvergedFlagSAL = false;
+    // TRUE when speculative warm restart is allowed; FALSE otherwise.
+    bool DoWarmRestartFlagSAL = false;
+    // If Status<0, no speculative warm restart attempted.
+    // If Status==0, warm restart failed.
+    // If Status>0, warm restart succeeded.
+    int WarmRestartStatusSAL = DataHVACControllers::iControllerWarmRestartNone;
+    int IterSALC = 0;        // Iteration counter
+    int ErrCountSALC = 0;    // Number of times that the maximum iterations was exceeded
+    int MaxErrCountSALC = 0; // Number of times that the maximum iterations was exceeded
+    // A character string equivalent of ErrCount
+    bool BypassOAControllerSALC; // logical to tell ManageControllers to sim or not sim controller in OA System (don't sim here)
+    // Iteration counter
+    int IterSWCC = 0;
+    // Number of times that the maximum iterations was exceeded
+    int ErrCountSWCC = 0;
+    // Number of times that the maximum iterations was exceeded
+    int MaxErrCountSWCC = 0;
+    int AirLoopPassSWCC;
+    bool BypassOAControllerSWCC;
+    bool BypassOAControllerRSALC; // logical to bypass HVAC controller calcs
+    Real64 EpSSOA = 1.0;           // zone primary air fraction
+
     void clear_state() override
     {
         this->GetAirLoopInputFlag = true;
@@ -210,6 +271,52 @@ struct SimAirServingZonesData : BaseGlobalStruct {
         this->InitAirLoopsBranchSizingFlag = true;
         this->OutputSetupFlag = false;
         this->MyEnvrnFlag = true;
+
+        this->EvBySysCool.clear();
+        this->EvBySysHeat.clear();
+        this->Ep = 1.0;
+        this->Er = 0.0;
+        this->Fa = 1.0;
+        this->Fb = 1.0;
+        this->Fc = 1.0;
+        this->Xs = 1.0;
+        this->MinHeatingEvz = 1.0;
+        this->MinCoolingEvz = 1.0;
+        this->ZoneOAFrac = 0.0;
+        this->ZoneEz = 1.0;
+        this->Vou = 0.0;
+        this->Vot = 0.0;
+
+        this->CtrlZoneNumsCool.clear();
+        this->CtrlZoneNumsHeat.clear();
+        this->ZoneInletNodesCool.clear();
+        this->ZoneInletNodesHeat.clear();
+        this->TermInletNodesCool.clear();
+        this->TermInletNodesHeat.clear();
+        this->TermUnitSizingNumsCool.clear();
+        this->TermUnitSizingNumsHeat.clear();
+        this->SupNode.clear();
+        this->SupNodeType.clear();
+
+        this->TUInNode = 0;         // inlet node number of a terminal unit
+        this->SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system
+        this->OAReliefDiff = 0.0;   // local for massflow change across OA system, kg/s
+        this->salIterMax = 0;       // Maximum of iteration counters across all air loops
+        this->salIterTot = 0;       // Aggregated number of iterations across all air loops
+        this->NumCallsTot = 0;      // Aggregated number fo times SimAirLoopComponents() has been invoked across all air loops
+        this->IterMaxSAL2 = 0;      // Maximum number of iterations performed by each controller on this air loop
+        this->IterTotSAL2 = 0;      // Aggregated number of iterations performed by each controller on this air loop
+        this->NumCallsSAL2 = 0;     // Number of times SimAirLoopComponents() has been invoked per air loop for either Solve or ReSolve operations
+        this->AirLoopConvergedFlagSAL = false;
+        this->DoWarmRestartFlagSAL = false;
+        this->WarmRestartStatusSAL = DataHVACControllers::iControllerWarmRestartNone;
+        this->IterSALC = 0;        // Iteration counter
+        this->ErrCountSALC = 0;    // Number of times that the maximum iterations was exceeded
+        this->MaxErrCountSALC = 0; // Number of times that the maximum iterations was exceeded
+        this->IterSWCC = 0;
+        this->ErrCountSWCC = 0;
+        this->MaxErrCountSWCC = 0;
+        this->EpSSOA = 1.0; // zone primary air fraction
     }
 };
 

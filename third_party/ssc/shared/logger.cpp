@@ -108,8 +108,11 @@ std::ostream &operator<<(std::ostream &os, const calendar_state &p) {
 std::ostream& operator<<(std::ostream& os, const lifetime_nmc_state& p) {
     char buf[1024];
     sprintf(buf, "\"lifetime_nmc_state\": { \"q_relative_li\": %.3f, "
-        "\"q_relative_neg\": %.3f } ",
-        p.q_relative_li, p.q_relative_neg);
+        "\"q_relative_neg\": %.3f, \"dq_relative_li_old\": %.3f, \"dq_relative_neg_old\": %.3f, "
+        "\"DOD_max\": %f, \"n_cycles_prev_day\": %d, \"cum_dt\": %.3f, \"b1_dt\": %.3f, "
+        "\"b2_dt\": %.3f, \"b3_dt\": %.3f, \"c0_dt\": %.3f, \"c2_dt\": %.3f }",
+        p.q_relative_li, p.q_relative_neg, p.dq_relative_li_old, p.dq_relative_neg_old, p.DOD_max, p.n_cycles_prev_day,
+        p.cum_dt, p.b1_dt, p.b2_dt, p.b3_dt, p.c0_dt, p.c2_dt);
     os << buf ;
     return os;
 }
@@ -117,9 +120,10 @@ std::ostream& operator<<(std::ostream& os, const lifetime_nmc_state& p) {
 std::ostream &operator<<(std::ostream &os, const lifetime_state &p) {
     os.precision(3);
     char buf[1024];
-    sprintf(buf, R"("lifetime_state": { "q_relative": %f, "n_cycles": %d, "range": %.3f, "average_range": %.3f, )",
-            p.q_relative, p.n_cycles, p.range, p.average_range);
-    os << buf << *p.cycle << ", " << *p.calendar << ", " << *p.nmc_state << " }";
+    sprintf(buf, R"("lifetime_state": { "q_relative": %f, "n_cycles": %d, "range": %.3f, "average_range": %.3f,
+                 "day_age_of_battery": %.3f, )",
+            p.q_relative, p.n_cycles, p.range, p.average_range, p.day_age_of_battery);
+    os << buf << *p.cycle << ", " << *p.calendar << ", " << *p.nmc_li_neg << " }";
     return os;
 }
 
@@ -140,6 +144,7 @@ std::ostream &operator<<(std::ostream &os, const lifetime_params &p) {
     os.precision(3);
     char buf[1024];
     sprintf(buf, R"("lifetime_params": { "dt_hr": %.3f, "model_choice": %d, )", p.dt_hr, p.model_choice);
+    os << buf;
     os << *p.cal_cyc << " }";
     return os;
 }
@@ -171,9 +176,9 @@ std::ostream &operator<<(std::ostream &os, const thermal_state &p) {
 std::ostream &operator<<(std::ostream &os, const thermal_params &p) {
     char buf[1024];
     sprintf(buf, "\"thermal_params\": { \"dt_hr\": %.3f, \"mass\": %.3f, \"surface_area\": %.3f, "
-                 "\"Cp\": %.3f, \"h\": %.3f, \"resistance\": %.3e, \"cap_vs_temp\": ",
+                 "\"Cp\": %.3f, \"h\": %.3f, \"resistance\": %.3e, \"en_cap_vs_temp\": %d, \"cap_vs_temp\": ",
             p.dt_hr, p.mass, p.surface_area,
-            p.Cp, p.h, p.resistance);
+            p.Cp, p.h, p.resistance, p.en_cap_vs_temp);
     os << buf << p.cap_vs_temp;
     os.precision(3);
     os << R"(, "option": )" << p.option;

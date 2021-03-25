@@ -159,7 +159,7 @@ namespace CoolingPanelSimple {
 
         bool SizeCoolingPanelUA(EnergyPlusData &state);
 
-        void ReportCoolingPanel();
+        void ReportCoolingPanel(EnergyPlusData &state);
     };
 
     struct CoolingPanelSysNumericFieldData
@@ -194,7 +194,7 @@ namespace CoolingPanelSimple {
 
     void DistributeCoolingPanelRadGains(EnergyPlusData &state);
 
-    Real64 SumHATsurf(int ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
 
 } // namespace CoolingPanelSimple
 
@@ -221,7 +221,7 @@ namespace CoolingPanelSimple {
         Array1D<CoolingPanelSimple::CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
 
         bool ZoneEquipmentListChecked = false;
-
+        Array1D_bool MyEnvrnFlag;
         void clear_state() override
         {
             this->GetInputFlag = true;
@@ -239,6 +239,7 @@ namespace CoolingPanelSimple {
             this->CoolingPanel.deallocate();
             this->CoolingPanelSysNumericFields.deallocate();
             this->ZoneEquipmentListChecked = false;
+            this->MyEnvrnFlag.clear();
         }
     };
 

@@ -53,13 +53,11 @@
 namespace EnergyPlus {
 
     EnergyPlusData::EnergyPlusData() {
-        // todo, try to eliminate the need for the singleton
-        IOFiles::setSingleton(&files);
-
         this->dataAirLoop = std::make_unique<DataAirLoopData>();
         this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
         this->dataAirSystemsData = std::make_unique<AirSystemsData>();
         this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
+        this->dataAirflowNetwork = std::make_unique<AirflowNetworkData>();
         this->dataAutoSizingBase = std::make_unique<AutoSizingBaseData>();
         this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
         this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
@@ -179,14 +177,12 @@ namespace EnergyPlus {
         this->dataLoopNodes = std::make_unique<LoopNodeData>();
         this->dataLowTempRadSys = std::make_unique<LowTempRadiantSystemData>();
         this->dataMaterial = std::make_unique<MaterialData>();
-        this->dataMatrixDataMgr = std::make_unique<MatrixDataManagerData>();
         this->dataMircoturbElectGen = std::make_unique<MicroturbineElectricGeneratorData>();
         this->dataMixedAir = std::make_unique<MixedAirData>();
         this->dataMixerComponent = std::make_unique<MixerComponentData>();
         this->dataMoistureBalEMPD = std::make_unique<MoistureBalanceEMPDManagerData>();
         this->dataMstBal = std::make_unique<MoistureBalanceData>();
         this->dataMstBalEMPD = std::make_unique<MoistureBalanceEMPDData>();
-        this->dataMundtSimMgr = std::make_unique<MundtSimMgrData>();
         this->dataNodeInputMgr = std::make_unique<NodeInputManagerData>();
         this->dataOutAirNodeMgr = std::make_unique<OutAirNodeManagerData>();
         this->dataOutRptPredefined = std::make_unique<OutputReportPredefinedData>();
@@ -263,6 +259,10 @@ namespace EnergyPlus {
         this->dataTARCOGOutputs = std::make_unique<TARCOGOutputData>();
         this->dataThermalChimneys = std::make_unique<ThermalChimneysData>();
         this->dataThermalComforts = std::make_unique<ThermalComfortsData>();
+        this->dataThermalISO15099Calc = std::make_unique<ThermalISO15099CalcData>();
+        this->dataTARCOGGasses90 = std::make_unique<TARCOGGasses90Data>();
+        this->dataTARCOGMain = std::make_unique<TARCOGMainData>();
+        this->dataTarcogShading = std::make_unique<TarcogShadingData>();
         this->dataTimingsData = std::make_unique<DataTimingsData>();
         this->dataTranspiredCollector = std::make_unique<TranspiredCollectorData>();
         this->dataUCSDShared = std::make_unique<UCSDSharedData>();
@@ -273,6 +273,7 @@ namespace EnergyPlus {
         this->dataUserDefinedComponents = std::make_unique<UserDefinedComponentsData>();
         this->dataUtilityRoutines = std::make_unique<UtilityRoutinesData>();
         this->dataVariableSpeedCoils = std::make_unique<VariableSpeedCoilsData>();
+        this->dataVectors = std::make_unique<VectorsData>();
         this->dataVentilatedSlab = std::make_unique<VentilatedSlabData>();
         this->dataViewFactor = std::make_unique<ViewFactorInfoData>();
         this->dataWaterCoils = std::make_unique<WaterCoilsData>();
@@ -305,6 +306,7 @@ namespace EnergyPlus {
         this->dataAirLoopHVACDOAS->clear_state();
         this->dataAirSystemsData->clear_state();
         this->dataAirflowNetworkBalanceManager->clear_state();
+        this->dataAirflowNetwork->clear_state();
         this->dataAutoSizingBase->clear_state();
         this->dataBSDFWindow->clear_state();
         this->dataBaseSizerFanHeatInputs->clear_state();
@@ -424,14 +426,12 @@ namespace EnergyPlus {
         this->dataLoopNodes->clear_state();
         this->dataLowTempRadSys->clear_state();
         this->dataMaterial->clear_state();
-        this->dataMatrixDataMgr->clear_state();
         this->dataMircoturbElectGen->clear_state();
         this->dataMixedAir->clear_state();
         this->dataMixerComponent->clear_state();
         this->dataMoistureBalEMPD->clear_state();
         this->dataMstBal->clear_state();
         this->dataMstBalEMPD->clear_state();
-        this->dataMundtSimMgr->clear_state();
         this->dataNodeInputMgr->clear_state();
         this->dataOutAirNodeMgr->clear_state();
         this->dataOutRptPredefined->clear_state();
@@ -508,6 +508,10 @@ namespace EnergyPlus {
         this->dataTARCOGOutputs->clear_state();
         this->dataThermalChimneys->clear_state();
         this->dataThermalComforts->clear_state();
+        this->dataThermalISO15099Calc->clear_state();
+        this->dataTARCOGGasses90->clear_state();
+        this->dataTARCOGMain->clear_state();
+        this->dataTarcogShading->clear_state();
         this->dataTimingsData->clear_state();
         this->dataTranspiredCollector->clear_state();
         this->dataUCSDShared->clear_state();
@@ -518,6 +522,7 @@ namespace EnergyPlus {
         this->dataUserDefinedComponents->clear_state();
         this->dataUtilityRoutines->clear_state();
         this->dataVariableSpeedCoils->clear_state();
+        this->dataVectors->clear_state();
         this->dataVentilatedSlab->clear_state();
         this->dataViewFactor->clear_state();
         this->dataWaterCoils->clear_state();

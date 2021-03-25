@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/Vectors.hh>
 
 // C++ Headers
 #include <map>
@@ -83,7 +84,7 @@ namespace SurfaceGeometry {
 
     void AllocateModuleArrays(EnergyPlusData &state);
 
-    void AllocateSurfaceWindows(int NumSurfaces);
+    void AllocateSurfaceWindows(EnergyPlusData &state, int NumSurfaces);
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -193,7 +194,8 @@ namespace SurfaceGeometry {
                                          Real64 const Length,
                                          Real64 const Height);
 
-    void MakeEquivalentRectangle(int const SurfNum, // Surface number
+    void MakeEquivalentRectangle(EnergyPlusData &state,
+                                 int const SurfNum, // Surface number
                                  bool &ErrorsFound  // Error flag indicator (true if errors found)
     );
 
@@ -265,7 +267,7 @@ namespace SurfaceGeometry {
 
     void CheckWindowShadingControlSimilarForWindow(EnergyPlusData &state, bool& ErrorsFound);
 
-    bool isWindowShadingControlSimilar(int a, int b);
+    bool isWindowShadingControlSimilar(EnergyPlusData &state, int a, int b);
 
     void GetStormWindowData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -306,17 +308,17 @@ namespace SurfaceGeometry {
 
     void insertVertexOnFace(DataVectorTypes::Face &face, int const &indexBefore, DataVectorTypes::Vector const &vertexToInsert);
 
-    bool areFloorAndCeilingSame(DataVectorTypes::Polyhedron const &zonePoly);
+    bool areFloorAndCeilingSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
-    bool areWallHeightSame(DataVectorTypes::Polyhedron const &zonePoly);
+    bool areWallHeightSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
-    std::tuple<bool, bool, bool> areSurfaceHorizAndVert(DataVectorTypes::Polyhedron const &zonePoly);
+    std::tuple<bool, bool, bool> areSurfaceHorizAndVert(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
-    bool areOppositeWallsSame(DataVectorTypes::Polyhedron const &zonePoly, Real64 &oppositeWallArea, Real64 &distanceBetweenOppositeWalls);
+    bool areOppositeWallsSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 &oppositeWallArea, Real64 &distanceBetweenOppositeWalls);
 
-    std::vector<int> listOfFacesFacingAzimuth(DataVectorTypes::Polyhedron const &zonePoly, Real64 const &azimuth);
+    std::vector<int> listOfFacesFacingAzimuth(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 const &azimuth);
 
-    int findPossibleOppositeFace(DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex);
+    int findPossibleOppositeFace(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex);
 
     bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex, int const &opFaceIndex, Real64 &distanceBetween);
 
@@ -378,11 +380,12 @@ namespace SurfaceGeometry {
                                          SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
                                          bool &ErrorsFound);                                                        // Set to true if errors found
 
-    void CheckConvexity(EnergyPlusData &state, int const SurfNum, // Current surface number
+    void CheckConvexity(EnergyPlusData &state,
+                        int const SurfNum, // Current surface number
                         int const NSides   // Number of sides to figure
     );
 
-    bool isRectangle(int const ThisSurf // Current surface number
+    bool isRectangle(EnergyPlusData &state, int const ThisSurf // Current surface number
     );
 
     void CheckForReversedLayers(EnergyPlusData &state,
@@ -436,6 +439,27 @@ struct SurfaceGeometryData : BaseGlobalStruct {
     HeatBalanceKivaManager::KivaManager kivaManager;
     SurfaceGeometry::ExposedFoundationPerimeter exposedFoundationPerimeter;
 
+    int ErrCount = 0;
+    bool WarningDisplayed = false;
+    int ErrCount2 = 0;
+    int ErrCount3 = 0;
+    int ErrCount4 = 0; // counts of interzone area mismatches.
+    bool ShowZoneSurfaceHeaders = true;
+    int ErrCount5 = 0;
+    Real64 OldAspectRatio;
+    Real64 NewAspectRatio;
+    std::string transformPlane;
+    Array1D<Vectors::Vector> Triangle1 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
+    Array1D<Vectors::Vector> Triangle2 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
+    Array1D<Real64> X; // containers for x,y,z vertices of the surface
+    Array1D<Real64> Y;
+    Array1D<Real64> Z;
+    Array1D<Real64> A; // containers for convexity test
+    Array1D<Real64> B;
+    Array1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
+    int VertSize;                   // size of X,Y,Z,A,B arrays
+    Real64 ACosZero; // set on firstTime
+
     void clear_state() override
     {
         ProcessSurfaceVerticesOneTimeFlag = true;
@@ -463,6 +487,13 @@ struct SurfaceGeometryData : BaseGlobalStruct {
         firstTime = true;
         noTransform = true;
         CheckConvexityFirstTime = true;
+        ErrCount = 0;
+        WarningDisplayed = false;
+        ErrCount2 = 0;
+        ErrCount3 = 0;
+        ErrCount4 = 0;
+        ErrCount5 = 0;
+        ShowZoneSurfaceHeaders = true;
     }
 
     // Default Constructor

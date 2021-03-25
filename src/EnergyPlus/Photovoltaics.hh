@@ -85,7 +85,8 @@ namespace Photovoltaics {
                         Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on"
     );
 
-    void GetPVGeneratorResults(GeneratorType const GeneratorType, // type of Generator
+    void GetPVGeneratorResults(EnergyPlusData &state,
+                               GeneratorType const GeneratorType, // type of Generator
                                int const GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy
@@ -293,13 +294,14 @@ namespace Photovoltaics {
                      Real64 const mBVoc        // change in BVoc with irradiance
     );
 
-    void SetVentedModuleQdotSource(int const VentModNum,
+    void SetVentedModuleQdotSource(EnergyPlusData &state,
+                                   int const VentModNum,
                                    Real64 const QSource // source term in Watts
     );
 
     void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex);
 
-    void GetExtVentedCavityTsColl(int const VentModNum, Real64 &TsColl);
+    void GetExtVentedCavityTsColl(EnergyPlusData &state, int const VentModNum, Real64 &TsColl);
 
     // -------------------------------------------------------------------------------
 
@@ -316,10 +318,11 @@ namespace Photovoltaics {
 } // namespace Photovoltaics
 
 struct PhotovoltaicStateData : BaseGlobalStruct {
-
+    Array1D_bool MyEnvrnFlag;
+    Real64 PVTimeStep; // internal timestep (in seconds) for cell temperature mode 3
     void clear_state() override
     {
-
+        this->MyEnvrnFlag.clear();
     }
 };
 

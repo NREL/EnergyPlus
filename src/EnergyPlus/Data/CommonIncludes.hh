@@ -266,9 +266,13 @@
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/SystemReports.hh>
+#include <EnergyPlus/TARCOGGasses90.hh>
+#include <EnergyPlus/TARCOGMain.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
+#include <EnergyPlus/TarcogShading.hh>
 #include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/ThermalISO15099Calc.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
 #include <EnergyPlus/UFADManager.hh>
 #include <EnergyPlus/UnitHeater.hh>
@@ -277,6 +281,7 @@
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterManager.hh>

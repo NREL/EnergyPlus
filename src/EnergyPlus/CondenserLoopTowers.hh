@@ -448,7 +448,7 @@ namespace CondenserLoopTowers {
 
         void update(EnergyPlusData &state);
 
-        void report(bool RunFlag);
+        void report(EnergyPlusData &state, bool RunFlag);
 
         Real64 residualUA(EnergyPlusData &state,
                           Real64 UA,                 // UA of cooling tower

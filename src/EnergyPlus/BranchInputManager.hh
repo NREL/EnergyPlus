@@ -132,12 +132,14 @@ namespace BranchInputManager {
         std::string AssignedLoopName;     // Loop Name for this branch
         DataBranchAirLoopPlant::PressureCurveType PressureCurveType;            // Integer index of pressure curve type
         int PressureCurveIndex;           // Integer index of pressure curve
-        int FluidType;                    // Fluid type (see DataLoopNode)
+        DataLoopNode::NodeFluidType FluidType;                                  // Fluid type (see DataLoopNode)
         int NumOfComponents;              // Number of Components on this Branch
         Array1D<ComponentData> Component; // Component definitions for each component
 
         // Default Constructor
-        BranchData() : PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Unassigned), PressureCurveIndex(0), FluidType(DataLoopNode::NodeType_Unknown), NumOfComponents(0)
+        BranchData()
+            : PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Unassigned), PressureCurveIndex(0),
+              FluidType(DataLoopNode::NodeFluidType::blank), NumOfComponents(0)
         {
         }
 
@@ -364,6 +366,7 @@ namespace BranchInputManager {
         Array1D<BranchInputManager::ConnectorData> ConnectorLists;  // Connector List data for each Connector List
         Array1D<BranchInputManager::SplitterData> Splitters;        // Splitter Data for each Splitter
         Array1D<BranchInputManager::MixerData> Mixers;              // Mixer Data for each Mixer
+        Array1D<BranchInputManager::ComponentData> BComponents; // Component data to be returned
 
         void clear_state() override
         {
@@ -384,6 +387,7 @@ namespace BranchInputManager {
             this->ConnectorLists.deallocate();
             this->Splitters.deallocate();
             this->Mixers.deallocate();
+            this->BComponents.deallocate();
         }
     };
 

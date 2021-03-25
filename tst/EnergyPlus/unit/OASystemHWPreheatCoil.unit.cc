@@ -2033,18 +2033,20 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
 
     EXPECT_DOUBLE_EQ(state->dataWaterCoils->WaterCoil(1).InletAirTemp, -17.3); // preheat Hot Water coil air inlet temp is the heating design day outdoor air temp
 
-    EXPECT_DOUBLE_EQ(11.6, Node(state->dataWaterCoils->WaterCoil(1).AirOutletNodeNum).TempSetPoint); // check the setpoint at the preheat Hot Water coil air outlet node
+    EXPECT_DOUBLE_EQ(11.6,
+                     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirOutletNodeNum)
+                         .TempSetPoint);                                        // check the setpoint at the preheat Hot Water coil air outlet node
     EXPECT_NEAR(11.6, state->dataWaterCoils->WaterCoil(1).OutletAirTemp, 0.01);                      // preheat hot water coil is on and is heating the OA air stream
 
     AirInletNodeNum = state->dataWaterCoils->WaterCoil(1).AirInletNodeNum;
-    CpAir = PsyCpAirFnW(Node(AirInletNodeNum).HumRat);
+    CpAir = PsyCpAirFnW(state->dataLoopNodes->Node(AirInletNodeNum).HumRat);
     EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).TotWaterHeatingCoilRate,
                 state->dataWaterCoils->WaterCoil(1).InletAirMassFlowRate * CpAir * (state->dataWaterCoils->WaterCoil(1).OutletAirTemp - state->dataWaterCoils->WaterCoil(1).InletAirTemp),
                 1.0);
 
     // test that OA sys water coil bypasses normal controller calls before air loop simulation
-    EXPECT_EQ("PREHEAT COIL CONTROLLER", HVACControllers::ControllerProps(1).ControllerName);
-    EXPECT_TRUE(HVACControllers::ControllerProps(1).BypassControllerCalc);
+    EXPECT_EQ("PREHEAT COIL CONTROLLER", state->dataHVACControllers->ControllerProps(1).ControllerName);
+    EXPECT_TRUE(state->dataHVACControllers->ControllerProps(1).BypassControllerCalc);
     // test that water coil knows which controller controls the HW coil
     EXPECT_EQ(state->dataWaterCoils->WaterCoil(1).ControllerIndex, 1);
 }

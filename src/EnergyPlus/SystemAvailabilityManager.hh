@@ -416,12 +416,12 @@ namespace SystemAvailabilityManager {
                              Optional_int_const CompNum = _        // Index of ZoneHVAC equipment component
     );
 
-    bool CoolingZoneOutOfTolerance(Array1D_int const ZonePtrList, // list of controlled zone pointers
+    bool CoolingZoneOutOfTolerance(EnergyPlusData &state, Array1D_int const ZonePtrList, // list of controlled zone pointers
                                    int const NumZones,            // number of zones in list
                                    Real64 const TempTolerance     // temperature tolerance
     );
 
-    bool HeatingZoneOutOfTolerance(Array1D_int const ZonePtrList, // list of controlled zone pointers
+    bool HeatingZoneOutOfTolerance(EnergyPlusData &state, Array1D_int const ZonePtrList, // list of controlled zone pointers
                                    int const NumZones,            // number of zones in list
                                    Real64 const TempTolerance     // temperature tolerance
     );
@@ -577,6 +577,10 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct {
     Array1D_string const cValidSysAvailManagerTypes;
     Array1D_int const ValidSysAvailManagerTypes;
 
+    Array1D_bool ZoneCompNCControlType;
+    bool MyOneTimeFlag = true; // One time flag
+    bool MyEnvrnFlag = true;
+
     void clear_state() override
     {
         NumSchedSysAvailMgrs = 0;
@@ -614,6 +618,8 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct {
         BeginOfDayResetFlag = true;
         OptStart_AdaTempGradTrdHeat.deallocate();
         OptStart_AdaTempGradTrdCool.deallocate();
+        MyOneTimeFlag = true;
+        MyEnvrnFlag = true;
     }
 
     // Default Constructor

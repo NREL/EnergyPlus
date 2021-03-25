@@ -197,7 +197,6 @@ namespace HVACDuct {
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using NodeInputManager::GetOnlySingleNode;
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DuctNum; // duct index
@@ -205,8 +204,8 @@ namespace HVACDuct {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        auto& cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Duct";
         NumDucts = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         Duct.allocate(NumDucts);
@@ -216,23 +215,23 @@ namespace HVACDuct {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           DuctNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            Duct(DuctNum).Name = cAlphaArgs(1);
+            Duct(DuctNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             Duct(DuctNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                state.dataIPShortCut->cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
+                state.dataIPShortCut->cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
+            TestCompSet(state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(3), "Air Nodes");
         }
 
         // No output variables
@@ -354,23 +353,23 @@ namespace HVACDuct {
         InNode = Duct(DuctNum).InletNodeNum;
         OutNode = Duct(DuctNum).OutletNodeNum;
         // Set the outlet air node conditions of the duct
-        Node(OutNode).MassFlowRate = Node(InNode).MassFlowRate;
-        Node(OutNode).Temp = Node(InNode).Temp;
-        Node(OutNode).HumRat = Node(InNode).HumRat;
-        Node(OutNode).Enthalpy = Node(InNode).Enthalpy;
-        Node(OutNode).Quality = Node(InNode).Quality;
-        Node(OutNode).Press = Node(InNode).Press;
-        Node(OutNode).MassFlowRateMin = Node(InNode).MassFlowRateMin;
-        Node(OutNode).MassFlowRateMax = Node(InNode).MassFlowRateMax;
-        Node(OutNode).MassFlowRateMinAvail = Node(InNode).MassFlowRateMinAvail;
-        Node(OutNode).MassFlowRateMaxAvail = Node(InNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(OutNode).MassFlowRate = state.dataLoopNodes->Node(InNode).MassFlowRate;
+        state.dataLoopNodes->Node(OutNode).Temp = state.dataLoopNodes->Node(InNode).Temp;
+        state.dataLoopNodes->Node(OutNode).HumRat = state.dataLoopNodes->Node(InNode).HumRat;
+        state.dataLoopNodes->Node(OutNode).Enthalpy = state.dataLoopNodes->Node(InNode).Enthalpy;
+        state.dataLoopNodes->Node(OutNode).Quality = state.dataLoopNodes->Node(InNode).Quality;
+        state.dataLoopNodes->Node(OutNode).Press = state.dataLoopNodes->Node(InNode).Press;
+        state.dataLoopNodes->Node(OutNode).MassFlowRateMin = state.dataLoopNodes->Node(InNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(OutNode).MassFlowRateMax = state.dataLoopNodes->Node(InNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(OutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(InNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(OutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InNode).MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(OutNode).CO2 = Node(InNode).CO2;
+            state.dataLoopNodes->Node(OutNode).CO2 = state.dataLoopNodes->Node(InNode).CO2;
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(OutNode).GenContam = Node(InNode).GenContam;
+            state.dataLoopNodes->Node(OutNode).GenContam = state.dataLoopNodes->Node(InNode).GenContam;
         }
     }
 

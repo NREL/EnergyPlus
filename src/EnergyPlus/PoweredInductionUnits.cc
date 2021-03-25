@@ -108,7 +108,6 @@ namespace EnergyPlus::PoweredInductionUnits {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHVACGlobals::PlenumInducedMassFlow;
     using DataHVACGlobals::SingleCoolingSetPoint;
     using DataHVACGlobals::SingleHeatingSetPoint;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -121,7 +120,6 @@ namespace EnergyPlus::PoweredInductionUnits {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using SteamCoils::SimulateSteamCoilComponents;
     using namespace FluidProperties;
-    using DataHeatBalFanSys::TempControlType;
 
     constexpr const char *fluidNameSteam("STEAM");
     constexpr const char *fluidNameWater("WATER");
@@ -145,13 +143,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         // Manages the simulation of a fan powered induction terminal unit.
         // Called from SimZoneAirLoopEquipmentin module ZoneAirLoopEquipmentManager.
 
-        // Using/Aliasing
-        using DataSizing::TermUnitPIU;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PIUNum; // index of powered induction unit being simulated
-
-
 
         // First time SimPIU is called, get the input for all the fan coil units
         if (state.dataPowerInductionUnits->GetPIUInputFlag) {
@@ -184,11 +177,11 @@ namespace EnergyPlus::PoweredInductionUnits {
             }
         }
 
-        DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).TermUnitSizingNum;
+        state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
         InitPIU(state, PIUNum, FirstHVACIteration);
 
-        TermUnitPIU = true;
+        state.dataSize->TermUnitPIU = true;
 
         // Select the correct unit type
         {
@@ -209,7 +202,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             }
         }
 
-        TermUnitPIU = false;
+        state.dataSize->TermUnitPIU = false;
 
         // Update the current unit's outlet nodes
         // no update needed: reheat coil updates outlet node; inlet nodes' mass flow rate set by Calc routine
@@ -239,8 +232,7 @@ namespace EnergyPlus::PoweredInductionUnits {
         using BranchNodeConnections::TestCompSet;
         using FluidProperties::FindRefrigerant;
         using NodeInputManager::GetOnlySingleNode;
-        using namespace DataIPShortCuts;
-        using DataPlant::TypeOf_CoilSteamAirHeating;
+                using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using SteamCoils::GetCoilSteamInletNode;
         using WaterCoils::GetCoilWaterInletNode;
@@ -270,7 +262,7 @@ namespace EnergyPlus::PoweredInductionUnits {
         state.dataPowerInductionUnits->PIU.allocate(state.dataPowerInductionUnits->NumPIUs);
         state.dataPowerInductionUnits->PiuUniqueNames.reserve(static_cast<unsigned>(state.dataPowerInductionUnits->NumPIUs));
         state.dataPowerInductionUnits->CheckEquipName.dimension(state.dataPowerInductionUnits->NumPIUs, true);
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // loop over Series PIUs; get and load the input data
         for (PIUIndex = 1; PIUIndex <= state.dataPowerInductionUnits->NumSeriesPIUs; ++PIUIndex) {
 
@@ -279,110 +271,110 @@ namespace EnergyPlus::PoweredInductionUnits {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           PIUIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             PIUNum = PIUIndex;
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataPowerInductionUnits->PiuUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
-            state.dataPowerInductionUnits->PIU(PIUNum).Name = cAlphaArgs(1);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataPowerInductionUnits->PiuUniqueNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+            state.dataPowerInductionUnits->PIU(PIUNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataPowerInductionUnits->PIU(PIUNum).UnitType = cCurrentModuleObject;
             state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
-            state.dataPowerInductionUnits->PIU(PIUNum).Sched = cAlphaArgs(2);
-            if (lAlphaFieldBlanks(2)) {
+            state.dataPowerInductionUnits->PIU(PIUNum).Sched = state.dataIPShortCut->cAlphaArgs(2);
+            if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2)); // convert schedule name to pointer
+                state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
                 if (state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
-                                    cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " +
+                                    state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
             }
 
-            state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow = rNumericArgs(1);
-            state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow = rNumericArgs(2);
-            state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac = rNumericArgs(3);
+            state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
+            state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
+            state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac = state.dataIPShortCut->rNumericArgs(3);
 
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = cAlphaArgs(9); // type (key) of heating coil
-            if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:WATER")) {
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = state.dataIPShortCut->cAlphaArgs(9); // type (key) of heating coil
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SimpleHeating;
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:FUEL")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::Gas;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:STEAM")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SteamAirHeating;
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
                 if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
-                    ShowSevereError(state, RoutineName + "Steam Properties for " + cAlphaArgs(1) + " not found.");
+                    ShowSevereError(state, RoutineName + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
                     if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
                     ErrorsFound = true;
                     SteamMessageNeeded = false;
                 }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::Electric;
             } else {
-                ShowSevereError(state, "Illegal " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
+                ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9));
                 ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 ErrorsFound = true;
             }
 
-            state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode = GetOnlySingleNode(state, cAlphaArgs(3),
+            state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(3),
                                                          ErrorsFound,
                                                          state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
-                                                         cAlphaArgs(1),
-                                                         NodeType_Air,
-                                                         NodeConnectionType_Inlet,
+                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                         DataLoopNode::NodeFluidType::Air,
+                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                          1,
                                                          ObjectIsParent,
-                                                         cAlphaFieldNames(3));
+                                                         state.dataIPShortCut->cAlphaFieldNames(3));
 
-            state.dataPowerInductionUnits->PIU(PIUNum).SecAirInNode = GetOnlySingleNode(state, cAlphaArgs(4),
+            state.dataPowerInductionUnits->PIU(PIUNum).SecAirInNode = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(4),
                                                          ErrorsFound,
                                                          state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
-                                                         cAlphaArgs(1),
-                                                         NodeType_Air,
-                                                         NodeConnectionType_Inlet,
+                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                         DataLoopNode::NodeFluidType::Air,
+                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                          1,
                                                          ObjectIsParent,
-                                                         cAlphaFieldNames(4));
+                                                         state.dataIPShortCut->cAlphaFieldNames(4));
 
-            state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode = GetOnlySingleNode(state, cAlphaArgs(5),
+            state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(5),
                                                        ErrorsFound,
                                                        state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
-                                                       cAlphaArgs(1),
-                                                       NodeType_Air,
-                                                       NodeConnectionType_Outlet,
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       DataLoopNode::NodeFluidType::Air,
+                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                        1,
                                                        ObjectIsParent,
-                                                       cAlphaFieldNames(5));
+                                                       state.dataIPShortCut->cAlphaFieldNames(5));
 
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoilInAirNode = GetOnlySingleNode(state, cAlphaArgs(6),
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoilInAirNode = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(6),
                                                            ErrorsFound,
                                                            state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
-                                                           cAlphaArgs(1),
-                                                           NodeType_Air,
-                                                           NodeConnectionType_Internal,
+                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::NodeConnectionType::Internal,
                                                            1,
                                                            ObjectIsParent,
-                                                           cAlphaFieldNames(6));
+                                                           state.dataIPShortCut->cAlphaFieldNames(6));
             // The reheat coil control node is necessary for hot water reheat, but not necessary for
             // electric or gas reheat.
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num == iHCoilType::SimpleHeating) {
-                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode = GetCoilWaterInletNode(state, cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
+                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode = GetCoilWaterInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
             }
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num == iHCoilType::SteamAirHeating) {
-                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode = GetCoilSteamInletNode(state, cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
+                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode = GetCoilSteamInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
             }
-            state.dataPowerInductionUnits->PIU(PIUNum).MixerName = cAlphaArgs(7); // name of zone mixer object
-            state.dataPowerInductionUnits->PIU(PIUNum).FanName = cAlphaArgs(8);   // name of fan object
+            state.dataPowerInductionUnits->PIU(PIUNum).MixerName = state.dataIPShortCut->cAlphaArgs(7); // name of zone mixer object
+            state.dataPowerInductionUnits->PIU(PIUNum).FanName = state.dataIPShortCut->cAlphaArgs(8);   // name of fan object
 
             // find fan type
             // test if Fan:SystemModel fan of this name exists
@@ -404,28 +396,28 @@ namespace EnergyPlus::PoweredInductionUnits {
                     Fans::GetFanAvailSchPtr(state, DataHVACGlobals::cFanTypes(FanType_Num), state.dataPowerInductionUnits->PIU(PIUNum).FanName, ErrorsFound);
             }
 
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoil = cAlphaArgs(10); // name of heating coil object
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoil = state.dataIPShortCut->cAlphaArgs(10); // name of heating coil object
             ValidateComponent(state, state.dataPowerInductionUnits->PIU(PIUNum).HCoilType, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil");
             if (IsNotOK) {
                 ShowContinueError(state, "In " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 ErrorsFound = true;
             }
-            state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow = rNumericArgs(4);
-            state.dataPowerInductionUnits->PIU(PIUNum).MinVolHotWaterFlow = rNumericArgs(5);
-            state.dataPowerInductionUnits->PIU(PIUNum).HotControlOffset = rNumericArgs(6);
+            state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow = state.dataIPShortCut->rNumericArgs(4);
+            state.dataPowerInductionUnits->PIU(PIUNum).MinVolHotWaterFlow = state.dataIPShortCut->rNumericArgs(5);
+            state.dataPowerInductionUnits->PIU(PIUNum).HotControlOffset = state.dataIPShortCut->rNumericArgs(6);
             // Set default convergence tolerance
             if (state.dataPowerInductionUnits->PIU(PIUNum).HotControlOffset <= 0.0) {
                 state.dataPowerInductionUnits->PIU(PIUNum).HotControlOffset = 0.001;
             }
 
             // Add fan to component sets array
-            SetUpCompSets(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "UNDEFINED", cAlphaArgs(8), "UNDEFINED", cAlphaArgs(6));
+            SetUpCompSets(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "UNDEFINED", state.dataIPShortCut->cAlphaArgs(8), "UNDEFINED", state.dataIPShortCut->cAlphaArgs(6));
 
             // Add reheat coil to component sets array
-            SetUpCompSets(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, cAlphaArgs(9), cAlphaArgs(10), cAlphaArgs(6), cAlphaArgs(5));
+            SetUpCompSets(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), state.dataIPShortCut->cAlphaArgs(6), state.dataIPShortCut->cAlphaArgs(5));
 
             // Register component set data
-            TestCompSet(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, NodeID(state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode), NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode), "Air Nodes");
+            TestCompSet(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode), state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode), "Air Nodes");
 
             AirNodeFound = false;
             for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
@@ -438,7 +430,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             if (state.dataPowerInductionUnits->PIU(PIUNum).ADUNum == 0) {
                 ShowSevereError(state, RoutineName + "No matching Air Distribution Unit, for PIU = [" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name +
                                 "].");
-                ShowContinueError(state, "...should have outlet node = " + NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
+                ShowContinueError(state, "...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
                 ErrorsFound = true;
             } else {
 
@@ -461,7 +453,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                 }
                 if (!AirNodeFound) {
                     ShowSevereError(state, "The outlet air node from the " + cCurrentModuleObject + " Unit = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
-                    ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node = " + cAlphaArgs(5));
+                    ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node = " + state.dataIPShortCut->cAlphaArgs(5));
                     ErrorsFound = true;
                 }
             }
@@ -474,125 +466,125 @@ namespace EnergyPlus::PoweredInductionUnits {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           PIUIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             PIUNum = PIUIndex + state.dataPowerInductionUnits->NumSeriesPIUs;
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataPowerInductionUnits->PiuUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
-            state.dataPowerInductionUnits->PIU(PIUNum).Name = cAlphaArgs(1);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataPowerInductionUnits->PiuUniqueNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
+            state.dataPowerInductionUnits->PIU(PIUNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataPowerInductionUnits->PIU(PIUNum).UnitType = cCurrentModuleObject;
             state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
-            state.dataPowerInductionUnits->PIU(PIUNum).Sched = cAlphaArgs(2);
-            if (lAlphaFieldBlanks(2)) {
+            state.dataPowerInductionUnits->PIU(PIUNum).Sched = state.dataIPShortCut->cAlphaArgs(2);
+            if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2)); // convert schedule name to pointer
+                state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
                 if (state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
-                                    cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " +
+                                    state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
             }
-            state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow = rNumericArgs(1);
-            state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow = rNumericArgs(2);
-            state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac = rNumericArgs(3);
-            state.dataPowerInductionUnits->PIU(PIUNum).FanOnFlowFrac = rNumericArgs(4);
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = cAlphaArgs(9); // type (key) of heating coil
-            if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:WATER")) {
+            state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
+            state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
+            state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac = state.dataIPShortCut->rNumericArgs(3);
+            state.dataPowerInductionUnits->PIU(PIUNum).FanOnFlowFrac = state.dataIPShortCut->rNumericArgs(4);
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = state.dataIPShortCut->cAlphaArgs(9); // type (key) of heating coil
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SimpleHeating;
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:FUEL")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::Gas;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:STEAM")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SteamAirHeating;
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
                 if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
-                    ShowSevereError(state, RoutineName + "Steam Properties for " + cAlphaArgs(1) + " not found.");
+                    ShowSevereError(state, RoutineName + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
                     if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
                     ErrorsFound = true;
                     SteamMessageNeeded = false;
                 }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
                 state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::Electric;
             } else {
-                ShowSevereError(state, "Illegal " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
+                ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9));
                 ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 ErrorsFound = true;
             }
 
-            state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode = GetOnlySingleNode(state, cAlphaArgs(3),
+            state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(3),
                                                          ErrorsFound,
                                                          cCurrentModuleObject,
-                                                         cAlphaArgs(1),
-                                                         NodeType_Air,
-                                                         NodeConnectionType_Inlet,
+                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                         DataLoopNode::NodeFluidType::Air,
+                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                          1,
                                                          ObjectIsParent,
-                                                         cAlphaFieldNames(3));
+                                                         state.dataIPShortCut->cAlphaFieldNames(3));
 
-            state.dataPowerInductionUnits->PIU(PIUNum).SecAirInNode = GetOnlySingleNode(state, cAlphaArgs(4),
+            state.dataPowerInductionUnits->PIU(PIUNum).SecAirInNode = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(4),
                                                          ErrorsFound,
                                                          cCurrentModuleObject,
-                                                         cAlphaArgs(1),
-                                                         NodeType_Air,
-                                                         NodeConnectionType_Inlet,
+                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                         DataLoopNode::NodeFluidType::Air,
+                                                         DataLoopNode::NodeConnectionType::Inlet,
                                                          1,
                                                          ObjectIsParent,
-                                                         cAlphaFieldNames(4));
+                                                         state.dataIPShortCut->cAlphaFieldNames(4));
 
-            state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode = GetOnlySingleNode(state, cAlphaArgs(5),
+            state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(5),
                                                        ErrorsFound,
                                                        cCurrentModuleObject,
-                                                       cAlphaArgs(1),
-                                                       NodeType_Air,
-                                                       NodeConnectionType_Outlet,
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       DataLoopNode::NodeFluidType::Air,
+                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                        1,
                                                        ObjectIsParent,
-                                                       cAlphaFieldNames(5));
+                                                       state.dataIPShortCut->cAlphaFieldNames(5));
 
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoilInAirNode = GetOnlySingleNode(state, cAlphaArgs(6),
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoilInAirNode = GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(6),
                                                            ErrorsFound,
                                                            cCurrentModuleObject,
-                                                           cAlphaArgs(1),
-                                                           NodeType_Air,
-                                                           NodeConnectionType_Internal,
+                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::NodeConnectionType::Internal,
                                                            1,
                                                            ObjectIsParent,
-                                                           cAlphaFieldNames(6));
+                                                           state.dataIPShortCut->cAlphaFieldNames(6));
             // The reheat coil control node is necessary for hot water reheat, but not necessary for
             // electric or gas reheat.
             //  IF (PIU(PIUNum)%HCoilType_Num .EQ. HCoilType_Gas .OR. PIU(PIUNum)%HCoilType_Num .EQ. HCoilType_Electric) THEN
-            //    IF(cAlphaArgs(11) /= '') THEN
+            //    IF(state.dataIPShortCut->cAlphaArgs(11) /= '') THEN
             //      CALL ShowWarningError(state, 'In '//TRIM(cCurrentModuleObject)//' = ' // TRIM(PIU(PIUNum)%Name) &
             //                             // ' the '//TRIM(cAlphaFieldNames(11))//' is not needed and will be ignored.')
             //      CALL ShowContinueError(state, '  It is used for hot water reheat coils only.')
             //    END IF
             //  ELSE
-            //    IF(cAlphaArgs(11) == '') THEN
+            //    IF(state.dataIPShortCut->cAlphaArgs(11) == '') THEN
             //      CALL ShowSevereError(state, 'In '//TRIM(cCurrentModuleObject)//' = ' // TRIM(PIU(PIUNum)%Name) &
             //                           // ' the '//TRIM(cAlphaFieldNames(11))//' is undefined.')
             //      ErrorsFound=.TRUE.
             //    END IF
             //    PIU(PIUNum)%HotControlNode  = &
-            //      GetOnlySingleNode(state, cAlphaArgs(11),ErrorsFound,TRIM(cCurrentModuleObject),cAlphaArgs(1), &
-            //                        NodeType_Water,NodeConnectionType_Actuator,1,ObjectIsParent)
+            //      GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(11),ErrorsFound,TRIM(cCurrentModuleObject),cAlphaArgs(1), &
+            //                        DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             //  END IF
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num == iHCoilType::SimpleHeating) {
-                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode = GetCoilWaterInletNode(state, cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
+                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode = GetCoilWaterInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
             }
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num == iHCoilType::SteamAirHeating) {
-                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode = GetCoilSteamInletNode(state, cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
+                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode = GetCoilSteamInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
             }
-            state.dataPowerInductionUnits->PIU(PIUNum).MixerName = cAlphaArgs(7); // name of zone mixer object
-            state.dataPowerInductionUnits->PIU(PIUNum).FanName = cAlphaArgs(8);   // name of fan object
+            state.dataPowerInductionUnits->PIU(PIUNum).MixerName = state.dataIPShortCut->cAlphaArgs(7); // name of zone mixer object
+            state.dataPowerInductionUnits->PIU(PIUNum).FanName = state.dataIPShortCut->cAlphaArgs(8);   // name of fan object
             // find fan type
             // test if Fan:SystemModel fan of this name exists
             if (HVACFan::checkIfFanNameIsAFanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)) {
@@ -612,28 +604,28 @@ namespace EnergyPlus::PoweredInductionUnits {
                 state.dataPowerInductionUnits->PIU(PIUNum).FanAvailSchedPtr =
                     Fans::GetFanAvailSchPtr(state, DataHVACGlobals::cFanTypes(FanType_Num), state.dataPowerInductionUnits->PIU(PIUNum).FanName, ErrorsFound);
             }
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoil = cAlphaArgs(10); // name of heating coil object
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoil = state.dataIPShortCut->cAlphaArgs(10); // name of heating coil object
             ValidateComponent(state, state.dataPowerInductionUnits->PIU(PIUNum).HCoilType, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil");
             if (IsNotOK) {
                 ShowContinueError(state, "In " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 ErrorsFound = true;
             }
-            state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow = rNumericArgs(5);
-            state.dataPowerInductionUnits->PIU(PIUNum).MinVolHotWaterFlow = rNumericArgs(6);
-            state.dataPowerInductionUnits->PIU(PIUNum).HotControlOffset = rNumericArgs(7);
+            state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow = state.dataIPShortCut->rNumericArgs(5);
+            state.dataPowerInductionUnits->PIU(PIUNum).MinVolHotWaterFlow = state.dataIPShortCut->rNumericArgs(6);
+            state.dataPowerInductionUnits->PIU(PIUNum).HotControlOffset = state.dataIPShortCut->rNumericArgs(7);
             // Set default convergence tolerance
             if (state.dataPowerInductionUnits->PIU(PIUNum).HotControlOffset <= 0.0) {
                 state.dataPowerInductionUnits->PIU(PIUNum).HotControlOffset = 0.001;
             }
 
             // Add fan to component sets array
-            SetUpCompSets(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "UNDEFINED", cAlphaArgs(8), cAlphaArgs(4), "UNDEFINED");
+            SetUpCompSets(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "UNDEFINED", state.dataIPShortCut->cAlphaArgs(8), state.dataIPShortCut->cAlphaArgs(4), "UNDEFINED");
 
             // Add reheat coil to component sets array
-            SetUpCompSets(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, cAlphaArgs(9), cAlphaArgs(10), cAlphaArgs(6), cAlphaArgs(5));
+            SetUpCompSets(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), state.dataIPShortCut->cAlphaArgs(6), state.dataIPShortCut->cAlphaArgs(5));
 
             // Register component set data
-            TestCompSet(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, NodeID(state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode), NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode), "Air Nodes");
+            TestCompSet(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode), state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode), "Air Nodes");
 
             AirNodeFound = false;
             for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
@@ -647,7 +639,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             if (state.dataPowerInductionUnits->PIU(PIUNum).ADUNum == 0) {
                 ShowSevereError(state, RoutineName + "No matching Air Distribution Unit, for PIU = [" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name +
                                 "].");
-                ShowContinueError(state, "...should have outlet node = " + NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
+                ShowContinueError(state, "...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
                 ErrorsFound = true;
             } else {
 
@@ -670,7 +662,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                 }
                 if (!AirNodeFound) {
                     ShowSevereError(state, "The outlet air node from the " + cCurrentModuleObject + " Unit = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
-                    ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node = " + cAlphaArgs(5));
+                    ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node = " + state.dataIPShortCut->cAlphaArgs(5));
                     ErrorsFound = true;
                 }
             }
@@ -736,9 +728,9 @@ namespace EnergyPlus::PoweredInductionUnits {
         int HotConNode; // hot water control node number in PIU
         int OutletNode; // unit air outlet node number
         Real64 RhoAir;  // air density at outside pressure and standard temperature and humidity
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MySizeFlag;
-        static Array1D_bool MyPlantScanFlag;
+        auto & MyEnvrnFlag = state.dataPowerInductionUnits->MyEnvrnFlag;
+        auto & MySizeFlag = state.dataPowerInductionUnits->MySizeFlag;
+        auto & MyPlantScanFlag = state.dataPowerInductionUnits->MyPlantScanFlag;
         int Loop;   // Loop checking control variable
         Real64 rho; // local plant fluid density
         bool errFlag;
@@ -813,7 +805,8 @@ namespace EnergyPlus::PoweredInductionUnits {
 
                 state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow = rho * state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow;
                 state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow = rho * state.dataPowerInductionUnits->PIU(PIUNum).MinVolHotWaterFlow;
-                InitComponentNodes(state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
+                InitComponentNodes(state,
+                                   state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
                                    state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow,
                                    state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
                                    state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
@@ -838,23 +831,24 @@ namespace EnergyPlus::PoweredInductionUnits {
                 state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow = RhoAir * state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow;
                 state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow = RhoAir * state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
                 state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow = RhoAir * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
-                Node(PriNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
-                Node(PriNode).MassFlowRateMin = state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow;
-                Node(OutletNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow;
+                state.dataLoopNodes->Node(PriNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
+                state.dataLoopNodes->Node(PriNode).MassFlowRateMin = state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow;
             } else {
                 // parallel
                 state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow = RhoAir * state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
                 state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow = RhoAir * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
                 state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow = RhoAir * state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow;
                 state.dataPowerInductionUnits->PIU(PIUNum).FanOnAirMassFlow = RhoAir * state.dataPowerInductionUnits->PIU(PIUNum).FanOnFlowFrac * state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
-                Node(PriNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
-                Node(PriNode).MassFlowRateMin = state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow;
-                Node(OutletNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
+                state.dataLoopNodes->Node(PriNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
+                state.dataLoopNodes->Node(PriNode).MassFlowRateMin = state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
             }
 
             if (((state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num == iHCoilType::SimpleHeating) || (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num == iHCoilType::SteamAirHeating)) &&
                 !MyPlantScanFlag(PIUNum)) {
-                InitComponentNodes(state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
+                InitComponentNodes(state,
+                                   state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
                                    state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow,
                                    state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
                                    state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
@@ -885,36 +879,36 @@ namespace EnergyPlus::PoweredInductionUnits {
         // Do the start of HVAC time step initializations
         if (FirstHVACIteration) {
             // check for upstream zero flow. If nonzero and schedule ON, set primary flow to max
-            if (GetCurrentScheduleValue(state, state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRate > 0.0) {
+            if (GetCurrentScheduleValue(state, state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr) > 0.0 && state.dataLoopNodes->Node(PriNode).MassFlowRate > 0.0) {
                 if (state.dataPowerInductionUnits->PIU(PIUNum).UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
-                    Node(PriNode).MassFlowRate = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
-                    Node(SecNode).MassFlowRate = max(0.0, state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow - state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow);
+                    state.dataLoopNodes->Node(PriNode).MassFlowRate = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
+                    state.dataLoopNodes->Node(SecNode).MassFlowRate = max(0.0, state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow - state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow);
                 } else {
-                    Node(PriNode).MassFlowRate = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
-                    Node(SecNode).MassFlowRate = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
+                    state.dataLoopNodes->Node(PriNode).MassFlowRate = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
+                    state.dataLoopNodes->Node(SecNode).MassFlowRate = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
                 }
             } else {
-                Node(PriNode).MassFlowRate = 0.0;
-                Node(SecNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(PriNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(SecNode).MassFlowRate = 0.0;
             }
             // reset the max and min avail flows
-            if (GetCurrentScheduleValue(state, state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRateMaxAvail > 0.0) {
+            if (GetCurrentScheduleValue(state, state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr) > 0.0 && state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail > 0.0) {
                 if (state.dataPowerInductionUnits->PIU(PIUNum).UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
-                    Node(PriNode).MassFlowRateMaxAvail = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
-                    Node(PriNode).MassFlowRateMinAvail = state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow;
-                    Node(SecNode).MassFlowRateMaxAvail = max(0.0, state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow);
-                    Node(SecNode).MassFlowRateMinAvail = max(0.0, state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow - state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow);
+                    state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
+                    state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail = state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow;
+                    state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = max(0.0, state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow);
+                    state.dataLoopNodes->Node(SecNode).MassFlowRateMinAvail = max(0.0, state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow - state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow);
                 } else {
-                    Node(PriNode).MassFlowRateMaxAvail = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
-                    Node(PriNode).MassFlowRateMinAvail = state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow;
-                    Node(SecNode).MassFlowRateMaxAvail = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
-                    Node(SecNode).MassFlowRateMinAvail = 0.0;
+                    state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
+                    state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail = state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirMassFlow;
+                    state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
+                    state.dataLoopNodes->Node(SecNode).MassFlowRateMinAvail = 0.0;
                 }
             } else {
-                Node(PriNode).MassFlowRateMaxAvail = 0.0;
-                Node(PriNode).MassFlowRateMinAvail = 0.0;
-                Node(SecNode).MassFlowRateMaxAvail = 0.0;
-                Node(SecNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail = 0.0;
+                state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = 0.0;
+                state.dataLoopNodes->Node(SecNode).MassFlowRateMinAvail = 0.0;
             }
         }
 
@@ -967,14 +961,14 @@ namespace EnergyPlus::PoweredInductionUnits {
         Real64 EnthSteamOutWet;
         Real64 LatentHeatSteam;
         Real64 SteamDensity;
-        static int CoilWaterInletNode(0);
-        static int CoilWaterOutletNode(0);
-        static int CoilSteamInletNode(0);
-        static int CoilSteamOutletNode(0);
+        int CoilWaterInletNode(0);
+        int CoilWaterOutletNode(0);
+        int CoilSteamInletNode(0);
+        int CoilSteamOutletNode(0);
         bool ErrorsFound;
         Real64 rho;
         Real64 Cp;
-        static int DummyWaterIndex(1);
+        int DummyWaterIndex(1);
         bool IsAutoSize;               // Indicator to autosize
         Real64 MaxPriAirVolFlowDes;    // Autosized maximum primary air flow for reporting
         Real64 MaxPriAirVolFlowUser;   // Hardsized maximum primary air flow for reporting
@@ -1011,11 +1005,14 @@ namespace EnergyPlus::PoweredInductionUnits {
         MaxVolHotSteamFlowDes = 0.0;
         MaxVolHotSteamFlowUser = 0.0;
 
+        auto &TermUnitSizing(state.dataSize->TermUnitSizing);
+        auto &CurTermUnitSizingNum(state.dataSize->CurTermUnitSizingNum);
+
         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state,
                         state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "User-Specified Maximum Primary Air Flow Rate [m3/s]", state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow);
@@ -1023,7 +1020,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 MaxPriAirVolFlowDes =
-                    max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxPriAirVolFlowDes < SmallAirVolFlow) {
                     MaxPriAirVolFlowDes = 0.0;
                 }
@@ -1042,7 +1039,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                      "User-Specified Maximum Primary Air Flow Rate [m3/s]",
                                                      MaxPriAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(MaxPriAirVolFlowDes - MaxPriAirVolFlowUser) / MaxPriAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(MaxPriAirVolFlowDes - MaxPriAirVolFlowUser) / MaxPriAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state, format("User-Specified Primary Air Flow Rate of {:.5R} [m3/s]", MaxPriAirVolFlowUser));
                                 ShowContinueError(state,
@@ -1060,8 +1057,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state,
                         state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "User-Specified Maximum Air Flow Rate [m3/s]", state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow);
@@ -1069,7 +1066,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 MaxTotAirVolFlowDes =
-                    max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxTotAirVolFlowDes < SmallAirVolFlow) {
                     MaxTotAirVolFlowDes = 0.0;
                 }
@@ -1087,7 +1084,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                      "User-Specified Maximum Air Flow Rate [m3/s]",
                                                      MaxTotAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(MaxTotAirVolFlowDes - MaxTotAirVolFlowUser) / MaxTotAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(MaxTotAirVolFlowDes - MaxTotAirVolFlowUser) / MaxTotAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowUser));
                                 ShowContinueError(state,
@@ -1105,8 +1102,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
@@ -1116,7 +1113,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 MaxSecAirVolFlowDes =
-                    max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxSecAirVolFlowDes < SmallAirVolFlow) {
                     MaxSecAirVolFlowDes = 0.0;
                 }
@@ -1134,7 +1131,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                      "User-Specified Maximum Secondary Air Flow Rate [m3/s]",
                                                      MaxSecAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(MaxSecAirVolFlowDes - MaxSecAirVolFlowUser) / MaxSecAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(MaxSecAirVolFlowDes - MaxSecAirVolFlowUser) / MaxSecAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state,
                                                   format("User-Specified Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowUser));
@@ -1153,16 +1150,16 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac == AutoSize) {
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac > 0.0) {
                     BaseSizer::reportSizerOutput(state,
                         state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "User-Specified Minimum Primary Air Flow Fraction", state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
                 }
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
-                if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow >= SmallAirVolFlow && TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA >= SmallAirVolFlow) {
-                    MinPriAirFlowFracDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA / state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
+                if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow >= SmallAirVolFlow && state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA >= SmallAirVolFlow) {
+                    MinPriAirFlowFracDes = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA / state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
                 } else {
                     MinPriAirFlowFracDes = 0.0;
                 }
@@ -1180,7 +1177,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                      "User-Specified Minimum Primary Air Flow Fraction",
                                                      MinPriAirFlowFracUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(MinPriAirFlowFracDes - MinPriAirFlowFracUser) / MinPriAirFlowFracUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(MinPriAirFlowFracDes - MinPriAirFlowFracUser) / MinPriAirFlowFracUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state, format("User-Specified Minimum Primary Air Flow Fraction of {:.1R}", MinPriAirFlowFracUser));
                                 ShowContinueError(
@@ -1210,8 +1207,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).FanOnFlowFrac == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if (state.dataSize->CurZoneEqNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).FanOnFlowFrac > 0.0) {
                     BaseSizer::reportSizerOutput(state,
                         state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "User-Specified Fan On Flow Fraction", state.dataPowerInductionUnits->PIU(PIUNum).FanOnFlowFrac);
@@ -1232,7 +1229,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                      "User-Specified Fan On Flow Fraction",
                                                      FanOnFlowFracUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(FanOnFlowFracDes - FanOnFlowFracUser) / FanOnFlowFracUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(FanOnFlowFracDes - FanOnFlowFracUser) / FanOnFlowFracUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state, format("User-Specified Fan On Flow Fraction of {:.1R}", FanOnFlowFracUser));
                                 ShowContinueError(state, format("differs from Design Size Fan On Flow Fraction of {:.1R}", FanOnFlowFracDes));
@@ -1249,8 +1246,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow == AutoSize) { //.or.()) THEN
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
@@ -1268,11 +1265,11 @@ namespace EnergyPlus::PoweredInductionUnits {
                             MyPlantSizingIndex(state, "Coil:Heating:Water", state.dataPowerInductionUnits->PIU(PIUNum).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
 
-                            if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
-                                CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
-                                             TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
-                                CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
-                                CoilOutHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
+                            if (state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
+                                CoilInTemp = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
+                                             state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
+                                CoilOutTemp = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
+                                CoilOutHumRat = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
                                 DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                                 DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
 
@@ -1287,7 +1284,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                            state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
 
-                                MaxVolHotWaterFlowDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
+                                MaxVolHotWaterFlowDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
                             } else {
                                 MaxVolHotWaterFlowDes = 0.0;
                             }
@@ -1304,11 +1301,11 @@ namespace EnergyPlus::PoweredInductionUnits {
                         BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                      state.dataPowerInductionUnits->PIU(PIUNum).Name,
                                                      "Design Size Reheat Coil Inlet Air Temperature [C]",
-                                                     TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
+                                                     state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
                         BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                      state.dataPowerInductionUnits->PIU(PIUNum).Name,
                                                      "Design Size Reheat Coil Inlet Air Humidity Ratio [kgWater/kgDryAir]",
-                                                     TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
+                                                     state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                     } else { // Hardsize with sizing data
                         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
                             MaxVolHotWaterFlowUser = state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow;
@@ -1319,7 +1316,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                          "User-Specified Maximum Reheat Water Flow Rate [m3/s]",
                                                          MaxVolHotWaterFlowUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
+                                if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' +
                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                     ShowContinueError(
@@ -1343,8 +1340,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotSteamFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
@@ -1361,11 +1358,11 @@ namespace EnergyPlus::PoweredInductionUnits {
                             MyPlantSizingIndex(state, "Coil:Heating:Steam", state.dataPowerInductionUnits->PIU(PIUNum).HCoil, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
 
-                            if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
-                                CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
-                                             TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
-                                CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
-                                CoilOutHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
+                            if (state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
+                                CoilInTemp = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
+                                             state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
+                                CoilOutTemp = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
+                                CoilOutHumRat = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
                                 DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                                 DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                                 TempSteamIn = 100.00;
@@ -1373,8 +1370,8 @@ namespace EnergyPlus::PoweredInductionUnits {
                                 EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex, RoutineName);
                                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
                                 SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex, RoutineName);
-                                Cp = GetSpecificHeatGlycol(state, fluidNameWater, PlantSizData(PltSizHeatNum).ExitTemp, DummyWaterIndex, RoutineName);
-                                MaxVolHotSteamFlowDes = DesCoilLoad / (SteamDensity * (LatentHeatSteam + PlantSizData(PltSizHeatNum).DeltaT * Cp));
+                                Cp = GetSpecificHeatGlycol(state, fluidNameWater, state.dataSize->PlantSizData(PltSizHeatNum).ExitTemp, DummyWaterIndex, RoutineName);
+                                MaxVolHotSteamFlowDes = DesCoilLoad / (SteamDensity * (LatentHeatSteam + state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp));
                             } else {
                                 MaxVolHotSteamFlowDes = 0.0;
                             }
@@ -1398,7 +1395,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                          "User-Specified Maximum Reheat Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > AutoVsHardSizingThreshold) {
+                                if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' +
                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                     ShowContinueError(state,
@@ -1518,8 +1515,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         Real64 mdot; // local plant fluid flow rate kg/s
         // Initialize local fan flags to global system flags
         bool PIUTurnFansOn =
-            (DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn); // If True, overrides fan schedule and cycles PIU fan on
-        bool PIUTurnFansOff = DataHVACGlobals::TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
+            (state.dataHVACGlobal->TurnFansOn || state.dataHVACGlobal->TurnZoneFansOnlyOn); // If True, overrides fan schedule and cycles PIU fan on
+        bool PIUTurnFansOff = state.dataHVACGlobal->TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
 
 
 
@@ -1530,13 +1527,13 @@ namespace EnergyPlus::PoweredInductionUnits {
         SecNode = state.dataPowerInductionUnits->PIU(PIUNum).SecAirInNode;
         HCoilInAirNode = state.dataPowerInductionUnits->PIU(PIUNum).HCoilInAirNode;
         ControlNode = state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode;
-        PriAirMassFlow = Node(PriNode).MassFlowRate;
-        PriAirMassFlowMax = Node(PriNode).MassFlowRateMaxAvail;
-        PriAirMassFlowMin = Node(PriNode).MassFlowRateMinAvail;
-        SecAirMassFlow = Node(SecNode).MassFlowRate;
+        PriAirMassFlow = state.dataLoopNodes->Node(PriNode).MassFlowRate;
+        PriAirMassFlowMax = state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail;
+        PriAirMassFlowMin = state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail;
+        SecAirMassFlow = state.dataLoopNodes->Node(SecNode).MassFlowRate;
         QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        CpAirZn = PsyCpAirFnW(Node(ZoneNode).HumRat);
+        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
 
         // On the first HVAC iteration the system values are given to the controller, but after that
         // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -1547,10 +1544,10 @@ namespace EnergyPlus::PoweredInductionUnits {
                 MaxSteamFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow; // Need TO change THESE******************************
                 MinSteamFlow = state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow;
             } else {
-                MaxWaterFlow = Node(ControlNode).MassFlowRateMaxAvail;
-                MinWaterFlow = Node(ControlNode).MassFlowRateMinAvail;
-                MaxSteamFlow = Node(ControlNode).MassFlowRateMaxAvail;
-                MinSteamFlow = Node(ControlNode).MassFlowRateMinAvail;
+                MaxWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
+                MinWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
+                MaxSteamFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
+                MinSteamFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
             }
         }
         if (GetCurrentScheduleValue(state, state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr) <= 0.0) UnitOn = false;
@@ -1581,8 +1578,8 @@ namespace EnergyPlus::PoweredInductionUnits {
                 // cooling: set the primary air flow rate to meet the load.
                 // First calculate the fan temperature rise
                 // use only secondary air for this calculation
-                Node(PriNode).MassFlowRate = 0.0;
-                Node(SecNode).MassFlowRate = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow;
+                state.dataLoopNodes->Node(PriNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(SecNode).MassFlowRate = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow;
                 SimAirMixer(state, state.dataPowerInductionUnits->PIU(PIUNum).MixerName, state.dataPowerInductionUnits->PIU(PIUNum).Mixer_Num); // fire the mixer
                 if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     HVACFan::fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
@@ -1596,18 +1593,18 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                 PIUTurnFansOff); // fire the fan
                 }
 
-                FanDeltaTemp = Node(HCoilInAirNode).Temp - Node(SecNode).Temp;
+                FanDeltaTemp = state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(SecNode).Temp;
                 // using the required zone load, calculate the air temperature needed to meet the load
-                // PIU(PIUNum)%MaxTotAirMassFlow * CpAirZn * (OutletTempNeeded - Node(ZoneNodeNum)%Temp) = QZnReq
-                OutletTempNeeded = Node(ZoneNode).Temp + QZnReq / (state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow * CpAirZn);
+                // PIU(PIUNum)%MaxTotAirMassFlow * CpAirZn * (OutletTempNeeded - state.dataLoopNodes->Node(ZoneNodeNum)%Temp) = QZnReq
+                OutletTempNeeded = state.dataLoopNodes->Node(ZoneNode).Temp + QZnReq / (state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow * CpAirZn);
                 MixTempNeeded = OutletTempNeeded - FanDeltaTemp;
-                if (MixTempNeeded <= Node(PriNode).Temp) {
+                if (MixTempNeeded <= state.dataLoopNodes->Node(PriNode).Temp) {
                     PriAirMassFlow = PriAirMassFlowMax;
-                } else if (MixTempNeeded >= Node(PriNode).Temp && MixTempNeeded >= Node(SecNode).Temp) {
+                } else if (MixTempNeeded >= state.dataLoopNodes->Node(PriNode).Temp && MixTempNeeded >= state.dataLoopNodes->Node(SecNode).Temp) {
                     PriAirMassFlow = PriAirMassFlowMin;
                 } else {
-                    PriAirMassFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow * (Node(SecNode).Temp - MixTempNeeded) /
-                                     max(SmallTempDiff, Node(SecNode).Temp - Node(PriNode).Temp);
+                    PriAirMassFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow * (state.dataLoopNodes->Node(SecNode).Temp - MixTempNeeded) /
+                                     max(SmallTempDiff, state.dataLoopNodes->Node(SecNode).Temp - state.dataLoopNodes->Node(PriNode).Temp);
                     PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
                 }
                 SecAirMassFlow = max(0.0, state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow - PriAirMassFlow);
@@ -1618,8 +1615,8 @@ namespace EnergyPlus::PoweredInductionUnits {
             SecAirMassFlow = 0.0;
         }
         // Set inlet node flowrates
-        Node(PriNode).MassFlowRate = PriAirMassFlow;
-        Node(SecNode).MassFlowRate = SecAirMassFlow;
+        state.dataLoopNodes->Node(PriNode).MassFlowRate = PriAirMassFlow;
+        state.dataLoopNodes->Node(SecNode).MassFlowRate = SecAirMassFlow;
         if (PriAirMassFlowMax == 0) {
             state.dataPowerInductionUnits->PIU(PIUNum).PriDamperPosition = 0;
         } else {
@@ -1642,8 +1639,8 @@ namespace EnergyPlus::PoweredInductionUnits {
                                         PIUTurnFansOff); // fire the fan
         }
         // check if heating coil is off
-        QActualHeating = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
-        if ((!UnitOn) || (QActualHeating < SmallLoad) || (TempControlType(ZoneNum) == SingleCoolingSetPoint) ||
+        QActualHeating = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn * (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+        if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleCoolingSetPoint) ||
             (PriAirMassFlow > PriAirMassFlowMin)) {
             HCoilOn = false;
         }
@@ -1693,7 +1690,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
-                    QCoilReq = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
+                    QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn * (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
                 }
                 SimulateSteamCoilComponents(state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index, QCoilReq);
 
@@ -1701,7 +1698,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
-                    QCoilReq = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
+                    QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn * (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
                 }
                 SimulateHeatingCoilComponents(state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index);
 
@@ -1709,27 +1706,27 @@ namespace EnergyPlus::PoweredInductionUnits {
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
-                    QCoilReq = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
+                    QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn * (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
                 }
                 SimulateHeatingCoilComponents(state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index);
             }
         }
 
-        PowerMet = Node(OutletNode).MassFlowRate *
-                   (PsyHFnTdbW(Node(OutletNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
+        PowerMet = state.dataLoopNodes->Node(OutletNode).MassFlowRate *
+                   (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat) - PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat));
         state.dataPowerInductionUnits->PIU(PIUNum).HeatingRate = max(0.0, PowerMet);
         state.dataPowerInductionUnits->PIU(PIUNum).SensCoolRate = std::abs(min(DataPrecisionGlobals::constant_zero, PowerMet));
-        if (Node(OutletNode).MassFlowRate == 0.0) {
-            Node(PriNode).MassFlowRate = 0.0;
-            Node(SecNode).MassFlowRate = 0.0;
+        if (state.dataLoopNodes->Node(OutletNode).MassFlowRate == 0.0) {
+            state.dataLoopNodes->Node(PriNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(SecNode).MassFlowRate = 0.0;
         }
         if (state.dataPowerInductionUnits->PIU(PIUNum).InducesPlenumAir) {
-            PlenumInducedMassFlow = Node(SecNode).MassFlowRate;
+            state.dataHVACGlobal->PlenumInducedMassFlow = state.dataLoopNodes->Node(SecNode).MassFlowRate;
         } else {
-            PlenumInducedMassFlow = 0.0;
+            state.dataHVACGlobal->PlenumInducedMassFlow = 0.0;
         }
-        state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
-        Node(OutletNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow;
+        state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).MassFlowRatePlenInd = state.dataHVACGlobal->PlenumInducedMassFlow;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow;
     }
 
     void CalcParallelPIU(EnergyPlusData &state,
@@ -1808,17 +1805,17 @@ namespace EnergyPlus::PoweredInductionUnits {
         SecNode = state.dataPowerInductionUnits->PIU(PIUNum).SecAirInNode;
         HCoilInAirNode = state.dataPowerInductionUnits->PIU(PIUNum).HCoilInAirNode;
         ControlNode = state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode;
-        PriAirMassFlow = Node(PriNode).MassFlowRate;
-        PriAirMassFlowMax = Node(PriNode).MassFlowRateMaxAvail;
-        PriAirMassFlowMin = Node(PriNode).MassFlowRateMinAvail;
-        SecAirMassFlow = Node(SecNode).MassFlowRate;
+        PriAirMassFlow = state.dataLoopNodes->Node(PriNode).MassFlowRate;
+        PriAirMassFlowMax = state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail;
+        PriAirMassFlowMin = state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail;
+        SecAirMassFlow = state.dataLoopNodes->Node(SecNode).MassFlowRate;
         QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        CpAirZn = PsyCpAirFnW(Node(ZoneNode).HumRat);
+        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
         // Initialize local fan flags to global system flags
         bool PIUTurnFansOn =
-            (DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn); // If True, overrides fan schedule and cycles PIU fan on
-        bool PIUTurnFansOff = DataHVACGlobals::TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
+            (state.dataHVACGlobal->TurnFansOn || state.dataHVACGlobal->TurnZoneFansOnlyOn); // If True, overrides fan schedule and cycles PIU fan on
+        bool PIUTurnFansOff = state.dataHVACGlobal->TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
 
         // On the first HVAC iteration the system values are given to the controller, but after that
         // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -1827,8 +1824,8 @@ namespace EnergyPlus::PoweredInductionUnits {
                 MaxWaterFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow;
                 MinWaterFlow = state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow;
             } else {
-                MaxWaterFlow = Node(ControlNode).MassFlowRateMaxAvail;
-                MinWaterFlow = Node(ControlNode).MassFlowRateMinAvail;
+                MaxWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
+                MinWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
             }
         }
         if (GetCurrentScheduleValue(state, state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr) <= 0.0) UnitOn = false;
@@ -1838,7 +1835,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             // unit is on
             // Calculate if reheat is needed
             bool ReheatRequired = false;
-            Real64 qMinPrimary = PriAirMassFlowMin * (CpAirZn * min(-SmallTempDiff, (Node(PriNode).Temp - Node(ZoneNode).Temp)));
+            Real64 qMinPrimary = PriAirMassFlowMin * (CpAirZn * min(-SmallTempDiff, (state.dataLoopNodes->Node(PriNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp)));
             if (qMinPrimary < QToHeatSetPt) ReheatRequired = true;
 
             if (!PriOn) {
@@ -1850,7 +1847,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                     PIUTurnFansOn = false;
                 } else {
                     SecAirMassFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
-                    PIUTurnFansOn = (DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn);
+                    PIUTurnFansOn = (state.dataHVACGlobal->TurnFansOn || state.dataHVACGlobal->TurnZoneFansOnlyOn);
                 }
             } else if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
                 // in deadband or very small load: set primary air flow to the minimum
@@ -1870,9 +1867,9 @@ namespace EnergyPlus::PoweredInductionUnits {
             } else {
                 // cooling: set the primary air flow rate to meet the load.
                 // First calculate the fan temperature rise
-                Node(SecNode).MassFlowRate = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
-                Node(SecNode).MassFlowRateMaxAvail = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
-                Node(PriNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(SecNode).MassFlowRate = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
+                state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
+                state.dataLoopNodes->Node(PriNode).MassFlowRate = 0.0;
 
                 if (state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     HVACFan::fanObjs[state.dataPowerInductionUnits->PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
@@ -1886,10 +1883,10 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                 PIUTurnFansOff); // fire the fan
                 }
                 SimAirMixer(state, state.dataPowerInductionUnits->PIU(PIUNum).MixerName, state.dataPowerInductionUnits->PIU(PIUNum).Mixer_Num); // fire the mixer
-                FanDeltaTemp = Node(HCoilInAirNode).Temp - Node(SecNode).Temp;
+                FanDeltaTemp = state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(SecNode).Temp;
                 // Assuming the fan is off, calculate the primary air flow needed to meet the zone cooling demand.
                 // CpAir*PriAirMassFlow*(Node(PriNode)%Temp - Node(ZoneNodeNum)%Temp) = QZnReq
-                PriAirMassFlow = QZnReq / (CpAirZn * min(-SmallTempDiff, (Node(PriNode).Temp - Node(ZoneNode).Temp)));
+                PriAirMassFlow = QZnReq / (CpAirZn * min(-SmallTempDiff, (state.dataLoopNodes->Node(PriNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp)));
                 PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
                 // check for fan on or off
                 if ((PriAirMassFlow > state.dataPowerInductionUnits->PIU(PIUNum).FanOnAirMassFlow) && !ReheatRequired) {
@@ -1899,8 +1896,8 @@ namespace EnergyPlus::PoweredInductionUnits {
                     // fan is on; recalc primary air flow
                     // CpAir*PriAirMassFlow*(Node(PriNode)%Temp - Node(ZoneNodeNum)%Temp) +
                     //   CpAir*SecAirMassFlow*(Node(SecNode)%Temp + FanDeltaTemp - Node(ZoneNodeNum)%Temp) = QZnReq
-                    PriAirMassFlow = (QZnReq - CpAirZn * SecAirMassFlow * (Node(SecNode).Temp + FanDeltaTemp - Node(ZoneNode).Temp)) /
-                                     (CpAirZn * min(-SmallTempDiff, (Node(PriNode).Temp - Node(ZoneNode).Temp)));
+                    PriAirMassFlow = (QZnReq - CpAirZn * SecAirMassFlow * (state.dataLoopNodes->Node(SecNode).Temp + FanDeltaTemp - state.dataLoopNodes->Node(ZoneNode).Temp)) /
+                                     (CpAirZn * min(-SmallTempDiff, (state.dataLoopNodes->Node(PriNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp)));
                     PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
                     SecAirMassFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
                 }
@@ -1911,9 +1908,9 @@ namespace EnergyPlus::PoweredInductionUnits {
             SecAirMassFlow = 0.0;
         }
         // Set inlet node flowrates
-        Node(PriNode).MassFlowRate = PriAirMassFlow;
-        Node(SecNode).MassFlowRate = SecAirMassFlow;
-        Node(SecNode).MassFlowRateMaxAvail = SecAirMassFlow;
+        state.dataLoopNodes->Node(PriNode).MassFlowRate = PriAirMassFlow;
+        state.dataLoopNodes->Node(SecNode).MassFlowRate = SecAirMassFlow;
+        state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = SecAirMassFlow;
         if (PriAirMassFlowMax == 0) {
             state.dataPowerInductionUnits->PIU(PIUNum).PriDamperPosition = 0;
         } else {
@@ -1936,8 +1933,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         // fire the mixer
         SimAirMixer(state, state.dataPowerInductionUnits->PIU(PIUNum).MixerName, state.dataPowerInductionUnits->PIU(PIUNum).Mixer_Num);
         // check if heating coil is off
-        QActualHeating = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
-        if ((!UnitOn) || (QActualHeating < SmallLoad) || (TempControlType(ZoneNum) == SingleCoolingSetPoint) ||
+        QActualHeating = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn * (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+        if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleCoolingSetPoint) ||
             (PriAirMassFlow > PriAirMassFlowMin)) {
             HCoilOn = false;
         }
@@ -1984,14 +1981,14 @@ namespace EnergyPlus::PoweredInductionUnits {
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
-                    QCoilReq = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
+                    QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn * (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
                 }
                 SimulateSteamCoilComponents(state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index, QCoilReq);
             } else if (SELECT_CASE_var == iHCoilType::Electric) { // COIL:ELECTRIC:HEATING
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
-                    QCoilReq = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
+                    QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn * (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
                 }
                 SimulateHeatingCoilComponents(state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index);
 
@@ -1999,26 +1996,26 @@ namespace EnergyPlus::PoweredInductionUnits {
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
-                    QCoilReq = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
+                    QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn * (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
                 }
                 SimulateHeatingCoilComponents(state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index);
             }
         }
-        PowerMet = Node(OutletNode).MassFlowRate *
-                   (PsyHFnTdbW(Node(OutletNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
+        PowerMet = state.dataLoopNodes->Node(OutletNode).MassFlowRate *
+                   (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat) - PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat));
         state.dataPowerInductionUnits->PIU(PIUNum).HeatingRate = max(0.0, PowerMet);
         state.dataPowerInductionUnits->PIU(PIUNum).SensCoolRate = std::abs(min(DataPrecisionGlobals::constant_zero, PowerMet));
-        if (Node(OutletNode).MassFlowRate == 0.0) {
-            Node(PriNode).MassFlowRate = 0.0;
-            Node(SecNode).MassFlowRate = 0.0;
+        if (state.dataLoopNodes->Node(OutletNode).MassFlowRate == 0.0) {
+            state.dataLoopNodes->Node(PriNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(SecNode).MassFlowRate = 0.0;
         }
         if (state.dataPowerInductionUnits->PIU(PIUNum).InducesPlenumAir) {
-            PlenumInducedMassFlow = Node(SecNode).MassFlowRate;
+            state.dataHVACGlobal->PlenumInducedMassFlow = state.dataLoopNodes->Node(SecNode).MassFlowRate;
         } else {
-            PlenumInducedMassFlow = 0.0;
+            state.dataHVACGlobal->PlenumInducedMassFlow = 0.0;
         }
-        state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
-        Node(OutletNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
+        state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).MassFlowRatePlenInd = state.dataHVACGlobal->PlenumInducedMassFlow;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
     }
 
     void ReportPIU(EnergyPlusData &state, int const PIUNum) // number of the current fan coil unit being simulated
@@ -2040,7 +2037,7 @@ namespace EnergyPlus::PoweredInductionUnits {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2133,7 +2130,7 @@ namespace EnergyPlus::PoweredInductionUnits {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (state.dataLoopNodes->Node(this->PriAirInNode).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

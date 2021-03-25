@@ -79,12 +79,12 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
     state->dataPlantChillers->GTChiller(1).engineCapacityScalar = 1.0;
 
     state->dataPlnt->PlantLoop.allocate(2);
-    DataSizing::PlantSizData.allocate(1);
+    state->dataSize->PlantSizData.allocate(1);
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1.0;
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
@@ -93,7 +93,7 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
     EXPECT_NEAR(state->dataPlantChillers->GTChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
     state->dataPlantChillers->GTChiller.deallocate();
-    DataSizing::PlantSizData.deallocate();
+    state->dataSize->PlantSizData.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
 }
 
@@ -115,12 +115,12 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
     state->dataPlantChillers->EngineDrivenChiller(1).COP = 3.0;
 
     state->dataPlnt->PlantLoop.allocate(2);
-    DataSizing::PlantSizData.allocate(1);
+    state->dataSize->PlantSizData.allocate(1);
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1.0;
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
@@ -129,7 +129,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
     EXPECT_NEAR(state->dataPlantChillers->EngineDrivenChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
     state->dataPlantChillers->EngineDrivenChiller.deallocate();
-    DataSizing::PlantSizData.deallocate();
+    state->dataSize->PlantSizData.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
 }
 

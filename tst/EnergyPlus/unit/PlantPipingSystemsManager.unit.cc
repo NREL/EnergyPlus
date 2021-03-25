@@ -65,7 +65,6 @@
 
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;
-using DataSurfaces::Surface;
 using HeatBalanceManager::GetMaterialData;
 using SurfaceGeometry::GetOSCMData;
 
@@ -122,9 +121,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_CorrectInputs) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -191,9 +190,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadOSCMName) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -260,9 +259,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabLocation) {
     EXPECT_FALSE(process_idf(idf_objects, false));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -329,9 +328,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabMaterialName) 
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -398,9 +397,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsSelection)
     EXPECT_FALSE(process_idf(idf_objects, false));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -467,9 +466,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsMaterialNa
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -536,9 +535,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsExtentsSel
     EXPECT_FALSE(process_idf(idf_objects, false));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -605,9 +604,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_PerimeterInsulationWi
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -674,9 +673,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsSelection) 
     EXPECT_FALSE(process_idf(idf_objects, false));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -743,9 +742,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsMaterialNam
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -812,9 +811,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsDepth) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -881,9 +880,9 @@ TEST_F(EnergyPlusFixture, DISABLED_SiteGroundDomainSlab_CheckInputs_BadTimeStepS
     EXPECT_FALSE(process_idf(idf_objects, false));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -950,9 +949,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_CorrectInputs) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -1019,9 +1018,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadOSCMName) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -1088,9 +1087,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsSelect
     EXPECT_FALSE(process_idf(idf_objects, false));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -1157,9 +1156,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsMateri
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -1226,9 +1225,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsExtent
     EXPECT_FALSE(process_idf(idf_objects, false));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -1295,9 +1294,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadBasementDepth)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -1364,9 +1363,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadFloorOSCMName)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -1433,9 +1432,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsSelecti
     EXPECT_FALSE(process_idf(idf_objects, false));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -1502,9 +1501,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsName) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -1571,9 +1570,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelect
     EXPECT_FALSE(process_idf(idf_objects, false));
 
     // Dummy surface
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
 
     bool errorsFound = false;
 
@@ -1718,10 +1717,10 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 
     // Dummy surface
-    DataSurfaces::TotSurfaces = 1;
-    Surface.allocate(1);
-    Surface(1).OSCMPtr = 1;
-    Surface(1).Area = 100;
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
     // Other necessary inputs

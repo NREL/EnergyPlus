@@ -52,6 +52,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -156,8 +157,8 @@ namespace HybridModel {
                                               cNumericFieldNames);
 
                 ZoneListPtr = 0;
-                ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone); // "Zone" is a 1D array, cAlphaArgs(2) is the zone name
-                if (ZonePtr == 0 && NumOfZoneLists > 0) ZoneListPtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
+                ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone); // "Zone" is a 1D array, cAlphaArgs(2) is the zone name
+                if (ZonePtr == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZoneListPtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
                 if (ZonePtr > 0) {
                     HybridModelZone(ZonePtr).Name = cAlphaArgs(1);                          // Zone HybridModel name
                     FlagHybridModel_TM = UtilityRoutines::SameString(cAlphaArgs(3), "Yes"); // Calculate thermal mass option
@@ -413,25 +414,25 @@ namespace HybridModel {
                         HybridModelZone(ZonePtr).InfiltrationCalc_C) {
                         SetupOutputVariable(state, "Zone Infiltration Hybrid Model Air Change Rate",
                                             OutputProcessor::Unit::ach,
-                                            Zone(ZonePtr).InfilOAAirChangeRateHM,
+                                            state.dataHeatBal->Zone(ZonePtr).InfilOAAirChangeRateHM,
                                             "Zone",
                                             "Average",
-                                            Zone(ZonePtr).Name);
+                                            state.dataHeatBal->Zone(ZonePtr).Name);
                         SetupOutputVariable(state, "Zone Infiltration Hybrid Model Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
-                                            Zone(ZonePtr).MCPIHM,
+                                            state.dataHeatBal->Zone(ZonePtr).MCPIHM,
                                             "Zone",
                                             "Average",
-                                            Zone(ZonePtr).Name);
+                                            state.dataHeatBal->Zone(ZonePtr).Name);
                     }
                     if (HybridModelZone(ZonePtr).PeopleCountCalc_T || HybridModelZone(ZonePtr).PeopleCountCalc_H ||
                         HybridModelZone(ZonePtr).PeopleCountCalc_C) {
                         SetupOutputVariable(state, "Zone Hybrid Model People Count",
                                             OutputProcessor::Unit::None,
-                                            Zone(ZonePtr).NumOccHM,
+                                            state.dataHeatBal->Zone(ZonePtr).NumOccHM,
                                             "Zone",
                                             "Average",
-                                            Zone(ZonePtr).Name);
+                                            state.dataHeatBal->Zone(ZonePtr).Name);
                     }
 
                 } else {
@@ -442,8 +443,8 @@ namespace HybridModel {
             }
 
             // ZoneAirMassFlowConservation should not be activated during the Hybrid Modeling infiltration calculations
-            if (HybridModelZone(ZonePtr).InfiltrationCalc_T && ZoneAirMassFlow.EnforceZoneMassBalance) {
-                ZoneAirMassFlow.EnforceZoneMassBalance = false;
+            if (HybridModelZone(ZonePtr).InfiltrationCalc_T && state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
+                state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
                 ShowWarningError(state, "ZoneAirMassFlowConservation is deactivated when Hybrid Modeling is performed.");
             }
 

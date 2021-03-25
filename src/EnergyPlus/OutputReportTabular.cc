@@ -91,7 +91,6 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -170,12 +169,6 @@ namespace EnergyPlus::OutputReportTabular {
     using namespace OutputReportPredefined;
     using namespace DataHeatBalance;
     using namespace HybridModel;
-
-    // Functions
-    void clear_state(EnergyPlusData &state)
-    {
-        OutputReportTabular::ResetTabularReports(state);
-    }
 
     std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file)
     {
@@ -304,7 +297,7 @@ namespace EnergyPlus::OutputReportTabular {
         Array1D_string AlphArray; // character string data
         Array1D<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         auto &ort(state.dataOutRptTab);
 
         if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
@@ -560,10 +553,7 @@ namespace EnergyPlus::OutputReportTabular {
         int mColumn;
         int ColumnsRecount;
         int TablesRecount;
-        static Real64 BigNum(0.0);
         bool environmentKeyFound;
-        static bool VarWarning(true);
-        static int ErrCount1(0);
         auto &ort(state.dataOutRptTab);
 
         // if not a running a weather simulation do not create reports
@@ -735,8 +725,8 @@ namespace EnergyPlus::OutputReportTabular {
                 //#endif
 
                 if (KeyCount == 0) {
-                    ++ErrCount1;
-                    if (ErrCount1 == 1 && !state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                    ++state.dataOutRptTab->ErrCount1;
+                    if (state.dataOutRptTab->ErrCount1 == 1 && !state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         ShowWarningError(state, "Processing Monthly Tabular Reports: Variable names not valid for this simulation");
                         ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.");
                     }
@@ -744,10 +734,10 @@ namespace EnergyPlus::OutputReportTabular {
                     if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         ShowWarningError(state, "Processing Monthly Tabular Reports: " + ort->MonthlyInput(TabNum).name);
                         ShowContinueError(state, "..Variable name=" + curVariMeter + " not valid for this simulation.");
-                        if (VarWarning) {
+                        if (state.dataOutRptTab->VarWarning) {
                             ShowContinueError(state, "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of "
                                               "the Table Report.");
-                            VarWarning = false;
+                            state.dataOutRptTab->VarWarning = false;
                         }
                     }
                 }
@@ -862,10 +852,10 @@ namespace EnergyPlus::OutputReportTabular {
                                 ort->MonthlyColumns(mColumn).reslt = 0.0;
                                 ort->MonthlyColumns(mColumn).duration = 0.0;
                             } else if (SELECT_CASE_var == iAggType::Maximum) {
-                                ort->MonthlyColumns(mColumn).reslt = -HUGE_(BigNum);
+                                ort->MonthlyColumns(mColumn).reslt = -HUGE_(state.dataOutRptTab->BigNum);
                                 ort->MonthlyColumns(mColumn).timeStamp = 0;
                             } else if (SELECT_CASE_var == iAggType::Minimum) {
-                                ort->MonthlyColumns(mColumn).reslt = HUGE_(BigNum);
+                                ort->MonthlyColumns(mColumn).reslt = HUGE_(state.dataOutRptTab->BigNum);
                                 ort->MonthlyColumns(mColumn).timeStamp = 0;
                             } else if (SELECT_CASE_var == iAggType::ValueWhenMaxMin) {
                                 ort->MonthlyColumns(mColumn).reslt = 0.0;
@@ -885,10 +875,10 @@ namespace EnergyPlus::OutputReportTabular {
                                 ort->MonthlyColumns(mColumn).reslt = 0.0;
                                 ort->MonthlyColumns(mColumn).duration = 0.0;
                             } else if (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) {
-                                ort->MonthlyColumns(mColumn).reslt = -HUGE_(BigNum);
+                                ort->MonthlyColumns(mColumn).reslt = -HUGE_(state.dataOutRptTab->BigNum);
                                 ort->MonthlyColumns(mColumn).timeStamp = 0;
                             } else if (SELECT_CASE_var == iAggType::MinimumDuringHoursShown) {
-                                ort->MonthlyColumns(mColumn).reslt = HUGE_(BigNum);
+                                ort->MonthlyColumns(mColumn).reslt = HUGE_(state.dataOutRptTab->BigNum);
                                 ort->MonthlyColumns(mColumn).timeStamp = 0;
                             }
                         }
@@ -899,10 +889,10 @@ namespace EnergyPlus::OutputReportTabular {
                             ShowContinueError(state, "..Variable name=" + curVariMeter + " not valid for this simulation.");
                             ShowContinueError(state, "..i.e., Variable name=" + UniqueKeyNames(kUniqueKey) + ':' + curVariMeter +
                                               " not valid for this simulation.");
-                            if (VarWarning) {
+                            if (state.dataOutRptTab->VarWarning) {
                                 ShowContinueError(state, "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column "
                                                   "of the Table Report.");
-                                VarWarning = false;
+                                state.dataOutRptTab->VarWarning = false;
                             }
                         }
                         ort->MonthlyColumns(mColumn).varName = curVariMeter;
@@ -1001,8 +991,7 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using ScheduleManager::GetScheduleIndex;
+                using ScheduleManager::GetScheduleIndex;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1069,10 +1058,10 @@ namespace EnergyPlus::OutputReportTabular {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             ort->OutputTableBinned(iInObj).keyValue = AlphArray(1);
             ort->OutputTableBinned(iInObj).varOrMeter = AlphArray(2);
             // if a schedule has been specified assign
@@ -1080,7 +1069,7 @@ namespace EnergyPlus::OutputReportTabular {
                 ort->OutputTableBinned(iInObj).ScheduleName = AlphArray(3);
                 ort->OutputTableBinned(iInObj).scheduleIndex = GetScheduleIndex(state, AlphArray(3));
                 if (ort->OutputTableBinned(iInObj).scheduleIndex == 0) {
-                    ShowWarningError(state, CurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" - not found.");
+                    ShowWarningError(state, CurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" - not found.");
                 }
             } else {
                 ort->OutputTableBinned(iInObj).scheduleIndex = 0; // flag value for no schedule used
@@ -1225,8 +1214,7 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using DataStringGlobals::CharComma;
+                using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
 
@@ -1274,10 +1262,10 @@ namespace EnergyPlus::OutputReportTabular {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             // ColumnSeparator
             if (UtilityRoutines::SameString(AlphArray(1), "Comma")) {
                 ort->numStyles = 1;
@@ -1336,7 +1324,7 @@ namespace EnergyPlus::OutputReportTabular {
                 ort->TableStyle(5) = iTableStyle::XML;
                 ort->del(5) = CharSpace; // space - this is not used much for XML output
             } else {
-                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + AlphArray(1) + "\". Commas will be used.");
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + AlphArray(1) + "\". Commas will be used.");
                 ort->numStyles = 1;
                 ort->TableStyle(1) = iTableStyle::Comma;
                 ort->del(1) = CharComma; // comma
@@ -1346,7 +1334,7 @@ namespace EnergyPlus::OutputReportTabular {
             if (NumAlphas >= 2) {
                 ort->unitsStyle = SetUnitsStyleFromString(AlphArray(2));
                 if (ort->unitsStyle == iUnitsStyle::NotFound) {
-                    ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
+                    ShowWarningError(state, CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
                                      "\". No unit conversion will be performed. Normal SI units will be shown.");
                 }
             } else {
@@ -1411,8 +1399,7 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using DataStringGlobals::CharComma;
+                using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
 
@@ -1736,23 +1723,23 @@ namespace EnergyPlus::OutputReportTabular {
             ort->sourceTypeNames(12) = "OtherFuel2";
 
             // initialize the end use names
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) = "Heating";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)) = "Cooling";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) = "InteriorLights";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)) = "ExteriorLights";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) = "InteriorEquipment";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) = "ExteriorEquipment";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)) = "Fans";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)) = "Pumps";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) = "HeatRejection";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)) = "Humidifier";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) = "HeatRecovery";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)) = "WaterSystems";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)) = "Refrigeration";
-            ort->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) = "Cogeneration";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) = "Heating";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling)) = "Cooling";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) = "InteriorLights";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)) = "ExteriorLights";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) = "InteriorEquipment";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) = "ExteriorEquipment";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans)) = "Fans";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps)) = "Pumps";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) = "HeatRejection";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification)) = "Humidifier";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) = "HeatRecovery";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)) = "WaterSystems";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)) = "Refrigeration";
+            ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) = "Cogeneration";
 
             // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
-            ort->meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            ort->meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
             ort->meterNumEndUseSubBEPS = 0;
 
             // loop through all of the resources and end uses and sub end uses for the entire facility
@@ -1761,7 +1748,7 @@ namespace EnergyPlus::OutputReportTabular {
                 meterNumber = GetMeterIndex(state, meterName);
                 ort->meterNumTotalsBEPS(iResource) = meterNumber;
 
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     meterName = ort->endUseNames(jEndUse) + ':' + ort->resourceTypeNames(iResource); //// ':FACILITY'
                     meterNumber = GetMeterIndex(state, meterName);
                     ort->meterNumEndUseBEPS(iResource, jEndUse) = meterNumber;
@@ -1788,11 +1775,11 @@ namespace EnergyPlus::OutputReportTabular {
             ort->gatherEndUseBEPS = 0.0;
             ort->gatherEndUseBySourceBEPS = 0.0;
             // End use subs must be dynamically allocated to accommodate the end use with the most subcategories
-            ort->gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            ort->gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
             ort->gatherEndUseSubBEPS = 0.0;
-            ort->gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            ort->gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
             ort->gatherDemandEndUseSub = 0.0;
-            ort->gatherDemandIndEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            ort->gatherDemandIndEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
             ort->gatherDemandIndEndUseSub = 0.0;
 
             // get meter numbers for other meters relating to electric load components
@@ -2992,27 +2979,8 @@ namespace EnergyPlus::OutputReportTabular {
         //   the output is in a CSV file if it is comma delimited otherwise
         //   it is in a TXT file.
 
-        // METHODOLOGY EMPLOYED:
-        //   Uses get input structure similar to other objects
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHeatBalance::BuildingName;
         using DataStringGlobals::VerString;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iStyle;
@@ -3028,11 +2996,11 @@ namespace EnergyPlus::OutputReportTabular {
                 curDel = ort->del(iStyle);
                 if (ort->TableStyle(iStyle) == iTableStyle::Comma) {
                     DisplayString(state, "Writing tabular output file results using comma format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblCsvFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblCsvFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version:" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                     tbl_stream << '\n';
-                    tbl_stream << "Building:" << curDel << BuildingName << '\n';
+                    tbl_stream << "Building:" << curDel << state.dataHeatBal->BuildingName << '\n';
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
                         tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
@@ -3041,11 +3009,11 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (ort->TableStyle(iStyle) == iTableStyle::Tab) {
                     DisplayString(state, "Writing tabular output file results using tab format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTabFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTabFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                     tbl_stream << '\n';
-                    tbl_stream << "Building:" << curDel << BuildingName << '\n';
+                    tbl_stream << "Building:" << curDel << state.dataHeatBal->BuildingName << '\n';
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
                         tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
@@ -3054,14 +3022,14 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (ort->TableStyle(iStyle) == iTableStyle::HTML) {
                     DisplayString(state, "Writing tabular output file results using HTML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblHtmFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblHtmFileName, state.files.outputControl.tabular);
                     tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                     tbl_stream << "<html>\n";
                     tbl_stream << "<head>\n";
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
-                        tbl_stream << "<title> " << BuildingName << ' ' << state.dataEnvrn->EnvironmentName << '\n';
+                        tbl_stream << "<title> " << state.dataHeatBal->BuildingName << ' ' << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
-                        tbl_stream << "<title> " << BuildingName << ' ' << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
+                        tbl_stream << "<title> " << state.dataHeatBal->BuildingName << ' ' << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << "  " << std::setw(4) << ort->td(1) << '-' << std::setfill('0') << std::setw(2) << ort->td(2) << '-' << std::setw(2) << ort->td(3)
                                << '\n';
@@ -3075,11 +3043,11 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "<a name=top></a>\n";
                     tbl_stream << "<p>Program Version:<b>" << VerString << "</b></p>\n";
                     tbl_stream << "<p>Tabular Output Report in Format: <b>HTML</b></p>\n";
-                    tbl_stream << "<p>Building: <b>" << BuildingName << "</b></p>\n";
+                    tbl_stream << "<p>Building: <b>" << state.dataHeatBal->BuildingName << "</b></p>\n";
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
-                        tbl_stream << "<p>Environment: <b>" << state.dataEnvrn->EnvironmentName << "</b></p>\n";
+                        tbl_stream << "<p>Environment: <b>" << ConvertToEscaped(state.dataEnvrn->EnvironmentName, false) << "</b></p>\n";
                     } else {
-                        tbl_stream << "<p>Environment: <b>" << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << "</b></p>\n";
+                        tbl_stream << "<p>Environment: <b>" << ConvertToEscaped(state.dataEnvrn->EnvironmentName, false) << " ** " << ConvertToEscaped(state.dataEnvrn->WeatherFileLocationTitle, false) << "</b></p>\n";
                     }
                     tbl_stream << "<p>Simulation Timestamp: <b>" << std::setw(4) << ort->td(1) << '-' << std::setfill('0') << std::setw(2) << ort->td(2) << '-'
                                << std::setw(2) << ort->td(3) << '\n';
@@ -3087,10 +3055,10 @@ namespace EnergyPlus::OutputReportTabular {
                                << "</b></p>\n";
                 } else if (ort->TableStyle(iStyle) == iTableStyle::XML) {
                     DisplayString(state, "Writing tabular output file results using XML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblXmlFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFileName, state.files.outputControl.tabular);
                     tbl_stream << "<?xml version=\"1.0\"?>\n";
                     tbl_stream << "<EnergyPlusTabularReports>\n";
-                    tbl_stream << "  <BuildingName>" << BuildingName << "</BuildingName>\n";
+                    tbl_stream << "  <state.dataHeatBal->BuildingName>" << state.dataHeatBal->BuildingName << "</state.dataHeatBal->BuildingName>\n";
                     tbl_stream << "  <EnvironmentName>" << state.dataEnvrn->EnvironmentName << "</EnvironmentName>\n";
                     tbl_stream << "  <WeatherFileLocationTitle>" << state.dataEnvrn->WeatherFileLocationTitle << "</WeatherFileLocationTitle>\n";
                     tbl_stream << "  <ProgramVersion>" << VerString << "</ProgramVersion>\n";
@@ -3107,11 +3075,11 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else {
                     DisplayString(state, "Writing tabular output file results using text format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTxtFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTxtFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version: " << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                     tbl_stream << '\n';
-                    tbl_stream << "Building:        " << BuildingName << '\n';
+                    tbl_stream << "Building:        " << state.dataHeatBal->BuildingName << '\n';
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
                         tbl_stream << "Environment:     " << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
@@ -3336,7 +3304,7 @@ namespace EnergyPlus::OutputReportTabular {
                             }
                         }
                     }
-                    OutputReportTabularAnnual::AddAnnualTableOfContents(tbl_stream);
+                    OutputReportTabularAnnual::AddAnnualTableOfContents(state, tbl_stream);
                 }
                 // add entries specifically added using AddTOCEntry
                 for (iEntry = 1; iEntry <= ort->TOCEntriesCount; ++iEntry) {
@@ -3379,7 +3347,7 @@ namespace EnergyPlus::OutputReportTabular {
         //   timestep to the appropriate bin.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -3507,7 +3475,7 @@ namespace EnergyPlus::OutputReportTabular {
         //   holding the data that will be reported later.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
 
@@ -3553,13 +3521,6 @@ namespace EnergyPlus::OutputReportTabular {
         // local copies of some of the MonthlyColumns array references since
         // profiling showed that they were slow.
 
-        static Array1D_int MonthlyColumnsTypeOfVar;
-        static Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
-        static Array1D<iAggType> MonthlyColumnsAggType;
-        static Array1D_int MonthlyColumnsVarNum;
-        static Array1D_int MonthlyTablesNumColumns;
-        static int curFirstColumn(0);
-
         if (!state.dataGlobal->DoWeathSim) return;
         auto &ort(state.dataOutRptTab);
         assert(state.dataGlobal->TimeStepZoneSec > 0.0);
@@ -3567,22 +3528,22 @@ namespace EnergyPlus::OutputReportTabular {
         // create temporary arrays to speed processing of these arrays
         if (ort->GatherMonthlyResultsForTimestepRunOnce) {
             // MonthlyColumns
-            MonthlyColumnsTypeOfVar.allocate(ort->MonthlyColumns.I());
-            MonthlyColumnsStepType.allocate(ort->MonthlyColumns.I());
-            MonthlyColumnsAggType.allocate(ort->MonthlyColumns.I());
-            MonthlyColumnsVarNum.allocate(ort->MonthlyColumns.I());
+            state.dataOutRptTab->MonthlyColumnsTypeOfVar.allocate(ort->MonthlyColumns.I());
+            state.dataOutRptTab->MonthlyColumnsStepType.allocate(ort->MonthlyColumns.I());
+            state.dataOutRptTab->MonthlyColumnsAggType.allocate(ort->MonthlyColumns.I());
+            state.dataOutRptTab->MonthlyColumnsVarNum.allocate(ort->MonthlyColumns.I());
             for (int i = ort->MonthlyColumns.l(), e = ort->MonthlyColumns.u(); i <= e; ++i) {
                 auto const &col(ort->MonthlyColumns(i));
-                MonthlyColumnsTypeOfVar(i) = col.typeOfVar;
-                MonthlyColumnsStepType(i) = col.stepType;
-                MonthlyColumnsAggType(i) = col.aggType;
-                MonthlyColumnsVarNum(i) = col.varNum;
+                state.dataOutRptTab->MonthlyColumnsTypeOfVar(i) = col.typeOfVar;
+                state.dataOutRptTab->MonthlyColumnsStepType(i) = col.stepType;
+                state.dataOutRptTab->MonthlyColumnsAggType(i) = col.aggType;
+                state.dataOutRptTab->MonthlyColumnsVarNum(i) = col.varNum;
             }
 
             // MonthlyTables
-            MonthlyTablesNumColumns.allocate(ort->MonthlyTables.I());
+            state.dataOutRptTab->MonthlyTablesNumColumns.allocate(ort->MonthlyTables.I());
             for (int i = ort->MonthlyTables.l(), e = ort->MonthlyTables.u(); i <= e; ++i) {
-                MonthlyTablesNumColumns(i) = ort->MonthlyTables(i).numColumns;
+                state.dataOutRptTab->MonthlyTablesNumColumns(i) = ort->MonthlyTables(i).numColumns;
             }
 
             // set flag so this block is only executed once
@@ -3599,18 +3560,18 @@ namespace EnergyPlus::OutputReportTabular {
         for (iTable = 1; iTable <= ort->MonthlyTablesCount; ++iTable) {
             activeMinMax = false;     // at the beginning of the new timestep
             activeHoursShown = false; // fix by JG addressing CR6482
-            curFirstColumn = ort->MonthlyTables(iTable).firstColumn;
-            for (jColumn = 1; jColumn <= MonthlyTablesNumColumns(iTable); ++jColumn) {
-                curCol = jColumn + curFirstColumn - 1;
-                curTypeOfVar = MonthlyColumnsTypeOfVar(curCol);
-                curStepType = MonthlyColumnsStepType(curCol);
+            state.dataOutRptTab->curFirstColumn = ort->MonthlyTables(iTable).firstColumn;
+            for (jColumn = 1; jColumn <= state.dataOutRptTab->MonthlyTablesNumColumns(iTable); ++jColumn) {
+                curCol = jColumn + state.dataOutRptTab->curFirstColumn - 1;
+                curTypeOfVar = state.dataOutRptTab->MonthlyColumnsTypeOfVar(curCol);
+                curStepType = state.dataOutRptTab->MonthlyColumnsStepType(curCol);
                 if (((curStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
                      (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) ||
                     ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
                      (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
                     //  the above condition used to include the following prior to new scan method
                     //  (MonthlyColumns(curCol)%aggType .EQ. iAggType::ValueWhenMaxMin)
-                    curVarNum = MonthlyColumnsVarNum(curCol);
+                    curVarNum = state.dataOutRptTab->MonthlyColumnsVarNum(curCol);
                     curValue = GetInternalVariableValue(state, curTypeOfVar, curVarNum);
                     // Get the value from the result array
                     oldResultValue = ort->MonthlyColumns(curCol).reslt(state.dataEnvrn->Month);
@@ -3630,7 +3591,7 @@ namespace EnergyPlus::OutputReportTabular {
                     // perform the selected aggregation type
                     // use next lines since it is faster was: SELECT CASE (MonthlyColumns(curCol)%aggType)
                     {
-                        auto const SELECT_CASE_var(MonthlyColumnsAggType(curCol));
+                        auto const SELECT_CASE_var(state.dataOutRptTab->MonthlyColumnsAggType(curCol));
                         if (SELECT_CASE_var == iAggType::SumOrAvg) {
                             if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                 newResultValue = oldResultValue + curValue;
@@ -3934,7 +3895,7 @@ namespace EnergyPlus::OutputReportTabular {
                     ort->gatherTotalsBEPS(iResource) += curMeterValue;
                 }
 
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                     if (curMeterNumber > 0) {
                         curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
@@ -4092,7 +4053,7 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 }
 
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (ort->ffSchedUsed(iResource)) {
                         curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                         if (curMeterNumber > 0) {
@@ -4211,7 +4172,7 @@ namespace EnergyPlus::OutputReportTabular {
                         ort->gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                         // if new peak demand is set, then gather all of the end use values at this particular
                         // time to find the components of the peak demand
-                        for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                        for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                             curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                             if (curMeterNumber > 0) {
                                 curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
@@ -4234,7 +4195,7 @@ namespace EnergyPlus::OutputReportTabular {
         if ((ort->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                     if (curMeterNumber > 0) {
                         curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
@@ -4264,35 +4225,26 @@ namespace EnergyPlus::OutputReportTabular {
         // The routine generates an annual table with the following columns which correspond to
         // the output variables and data structures shown.
 
-        // Using/Aliasing
-        using DataHeatBalance::BuildingPreDefRep;
-
-        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
-        using DataHeatBalance::ZoneTotalExhaustHeatLoss;
-        using DataHeatBalSurface::SumSurfaceHeatEmission;
-
-        using DataHVACGlobals::TimeStepSys;
-
-        SysTotalHVACReliefHeatLoss = 0;
-        SysTotalHVACRejectHeatLoss = 0;
+        state.dataHeatBal->SysTotalHVACReliefHeatLoss = 0;
+        state.dataHeatBal->SysTotalHVACRejectHeatLoss = 0;
         auto &ort(state.dataOutRptTab);
 
         if (!ort->displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
 
         // Only gather zone report at zone time steps
         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
-            BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * DataGlobalConstants::convertJtoGJ;
+            state.dataHeatBal->BuildingPreDefRep.emiEnvelopConv += state.dataHeatBalSurf->SumSurfaceHeatEmission * DataGlobalConstants::convertJtoGJ;
             return;
         }
 
         CalcHeatEmissionReport(state);
-        BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * DataGlobalConstants::convertJtoGJ;
-        BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * DataGlobalConstants::convertJtoGJ;
-        BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * DataGlobalConstants::convertJtoGJ;
-        BuildingPreDefRep.emiHVACReject += SysTotalHVACRejectHeatLoss * DataGlobalConstants::convertJtoGJ;
+        state.dataHeatBal->BuildingPreDefRep.emiZoneExfiltration += state.dataHeatBal->ZoneTotalExfiltrationHeatLoss * DataGlobalConstants::convertJtoGJ;
+        state.dataHeatBal->BuildingPreDefRep.emiZoneExhaust += state.dataHeatBal->ZoneTotalExhaustHeatLoss * DataGlobalConstants::convertJtoGJ;
+        state.dataHeatBal->BuildingPreDefRep.emiHVACRelief += state.dataHeatBal->SysTotalHVACReliefHeatLoss * DataGlobalConstants::convertJtoGJ;
+        state.dataHeatBal->BuildingPreDefRep.emiHVACReject += state.dataHeatBal->SysTotalHVACRejectHeatLoss * DataGlobalConstants::convertJtoGJ;
 
-        BuildingPreDefRep.emiTotHeat = BuildingPreDefRep.emiEnvelopConv + BuildingPreDefRep.emiZoneExfiltration + BuildingPreDefRep.emiZoneExhaust +
-                                       BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;
+        state.dataHeatBal->BuildingPreDefRep.emiTotHeat = state.dataHeatBal->BuildingPreDefRep.emiEnvelopConv + state.dataHeatBal->BuildingPreDefRep.emiZoneExfiltration + state.dataHeatBal->BuildingPreDefRep.emiZoneExhaust +
+                                       state.dataHeatBal->BuildingPreDefRep.emiHVACRelief + state.dataHeatBal->BuildingPreDefRep.emiHVACReject;
     }
 
 
@@ -4304,88 +4256,77 @@ namespace EnergyPlus::OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using DataHeatBalance::BuildingPreDefRep;
-        using DataHeatBalance::NumRefrigCondensers;
-        using DataHeatBalance::NumRefrigeratedRacks;
-        using DataHeatBalance::SysTotalHVACRejectHeatLoss;
-        using DataHeatBalance::SysTotalHVACReliefHeatLoss;
-        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
-        using DataHeatBalance::ZoneTotalExhaustHeatLoss;
         using DataHVACGlobals::AirCooled;
         using DataHVACGlobals::EvapCooled;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using DataHVACGlobals::WaterCooled;
-        using EvaporativeCoolers::EvapCond;
-        using EvaporativeCoolers::NumEvapCool;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
         using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
-        using HeatingCoils::HeatingCoil;
-        using HeatingCoils::NumHeatingCoils;
 
         static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataEnvrn->OutDryBulbTemp);
         static Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
         Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
-        SysTotalHVACReliefHeatLoss = 0;
-        SysTotalHVACRejectHeatLoss = 0;
+        state.dataHeatBal->SysTotalHVACReliefHeatLoss = 0;
+        state.dataHeatBal->SysTotalHVACRejectHeatLoss = 0;
 
         // HVAC relief air
         for (int iOACtrl = 1; iOACtrl <= state.dataMixedAir->NumOAControllers; ++iOACtrl) {
-            SysTotalHVACReliefHeatLoss += state.dataMixedAir->OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
+            state.dataHeatBal->SysTotalHVACReliefHeatLoss += state.dataMixedAir->OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
         }
 
         // Condenser water loop
         for (int iCooler = 1; iCooler <= state.dataCondenserLoopTowers->NumSimpleTowers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss +=
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
                 state.dataCondenserLoopTowers->towers(iCooler).Qactual * TimeStepSysSec + state.dataCondenserLoopTowers->towers(iCooler).FanEnergy + state.dataCondenserLoopTowers->towers(iCooler).BasinHeaterConsumption;
         }
         for (int iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
         }
         for (auto &cooler : state.dataFluidCoolers->SimpleFluidCooler) {
-            SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
         }
 
         // Air- and Evap-cooled chiller
         auto &ElectricChiller(state.dataPlantChillers->ElectricChiller);
         for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumElectricChillers; ++iChiller) {
             if (ElectricChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         auto &EngineDrivenChiller(state.dataPlantChillers->EngineDrivenChiller);
         for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumEngineDrivenChillers; ++iChiller) {
             if (EngineDrivenChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += EngineDrivenChiller(iChiller).CondenserEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += EngineDrivenChiller(iChiller).CondenserEnergy;
             }
         }
         auto &GTChiller(state.dataPlantChillers->GTChiller);
         for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumGTChillers; ++iChiller) {
             if (GTChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += GTChiller(iChiller).CondenserEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += GTChiller(iChiller).CondenserEnergy;
             }
         }
         auto &ConstCOPChiller(state.dataPlantChillers->ConstCOPChiller);
         for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumConstCOPChillers; ++iChiller) {
             if (ConstCOPChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ConstCOPChiller(iChiller).CondenserEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += ConstCOPChiller(iChiller).CondenserEnergy;
             }
         }
         auto &ElectricEIRChiller(state.dataChillerElectricEIR->ElectricEIRChiller);
         for (int iChiller = 1; iChiller <= state.dataChillerElectricEIR->NumElectricEIRChillers; ++iChiller) {
             if (ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
             }
         }
         auto &ElecReformEIRChiller(state.dataChillerReformulatedEIR->ElecReformEIRChiller);
         for (int iChiller = 1; iChiller <= state.dataChillerReformulatedEIR->NumElecReformEIRChillers; ++iChiller) {
             if (ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
             }
         }
 
         // Water / steam boiler
         for (int iBoiler = 1; iBoiler <= state.dataBoilers->numBoilers; ++iBoiler) {
-            SysTotalHVACRejectHeatLoss += state.dataBoilers->Boiler(iBoiler).FuelConsumed + state.dataBoilers->Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers->Boiler(iBoiler).BoilerEnergy;
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataBoilers->Boiler(iBoiler).FuelConsumed + state.dataBoilers->Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers->Boiler(iBoiler).BoilerEnergy;
         }
 
         // DX Coils air to air
@@ -4396,18 +4337,18 @@ namespace EnergyPlus::OutputReportTabular {
                 DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
                 DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                 if (DXCoil(iCoil).CondenserType(1) == AirCooled) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecCoolingConsumption + DXCoil(iCoil).DefrostConsumption +
+                    state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecCoolingConsumption + DXCoil(iCoil).DefrostConsumption +
                                                   DXCoil(iCoil).CrankcaseHeaterConsumption + DXCoil(iCoil).TotalCoolingEnergy;
                 } else if (DXCoil(iCoil).CondenserType(1) == EvapCooled) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
+                    state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
                                                   DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
                 }
                 if (DXCoil(iCoil).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
+                    state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
                 }
             } else if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
                        DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
-                SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecHeatingConsumption + DXCoil(iCoil).DefrostConsumption + DXCoil(iCoil).FuelConsumed +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecHeatingConsumption + DXCoil(iCoil).DefrostConsumption + DXCoil(iCoil).FuelConsumed +
                                               DXCoil(iCoil).CrankcaseHeaterConsumption - DXCoil(iCoil).TotalHeatingEnergy;
             }
         }
@@ -4416,24 +4357,25 @@ namespace EnergyPlus::OutputReportTabular {
         for (int iCoil = 1; iCoil <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++iCoil) {
             if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                 if (VarSpeedCoil(iCoil).CondenserType == AirCooled) {
-                    SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                    state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
                                                   VarSpeedCoil(iCoil).DefrostConsumption + VarSpeedCoil(iCoil).EnergyLoadTotal;
                 } else if (VarSpeedCoil(iCoil).CondenserType == EvapCooled) {
-                    SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).EvapCondPumpElecConsumption + VarSpeedCoil(iCoil).BasinHeaterConsumption +
+                    state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).EvapCondPumpElecConsumption + VarSpeedCoil(iCoil).BasinHeaterConsumption +
                                                   VarSpeedCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
                 }
             } else if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
-                SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
                                               VarSpeedCoil(iCoil).DefrostConsumption - VarSpeedCoil(iCoil).EnergyLoadTotal;
             }
         }
 
         // Heating coils - fuel
-        for (int iCoil = 1; iCoil <= NumHeatingCoils; ++iCoil) {
-            if (HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage ||
-                HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
-                SysTotalHVACRejectHeatLoss +=
-                    HeatingCoil(iCoil).FuelUseLoad + HeatingCoil(iCoil).ParasiticFuelLoad - HeatingCoil(iCoil).HeatingCoilLoad;
+        for (int iCoil = 1; iCoil <= state.dataHeatingCoils->NumHeatingCoils; ++iCoil) {
+            if (state.dataHeatingCoils->HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage ||
+                state.dataHeatingCoils->HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataHeatingCoils->HeatingCoil(iCoil).FuelUseLoad +
+                                                                 state.dataHeatingCoils->HeatingCoil(iCoil).ParasiticFuelLoad -
+                                                                 state.dataHeatingCoils->HeatingCoil(iCoil).HeatingCoilLoad;
             }
         }
 
@@ -4441,10 +4383,10 @@ namespace EnergyPlus::OutputReportTabular {
         auto &TESCoil(state.dataPackagedThermalStorageCoil->TESCoil);
         for (int iCoil = 1; iCoil <= state.dataPackagedThermalStorageCoil->NumTESCoils; ++iCoil) {
             if (TESCoil(iCoil).CondenserType == AirCooled) {
-                SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy +
                                               TESCoil(iCoil).ElectColdWeatherEnergy - TESCoil(iCoil).Q_Ambient;
             } else if (TESCoil(iCoil).CondenserType == EvapCooled) {
-                SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapCondPumpElecConsumption + TESCoil(iCoil).ElectEvapCondBasinHeaterEnergy +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapCondPumpElecConsumption + TESCoil(iCoil).ElectEvapCondBasinHeaterEnergy +
                                               TESCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC - TESCoil(iCoil).Q_Ambient;
             }
         }
@@ -4453,7 +4395,7 @@ namespace EnergyPlus::OutputReportTabular {
         auto &WaterThermalTank(state.dataWaterThermalTanks->WaterThermalTank);
         for (int iTank = 1; iTank <= state.dataWaterThermalTanks->numWaterThermalTank; ++iTank) {
             if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::AmbientTempEnum::OutsideAir) {
-                SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
             }
         }
 
@@ -4461,38 +4403,39 @@ namespace EnergyPlus::OutputReportTabular {
         auto &VRF(state.dataHVACVarRefFlow->VRF);
         for (int iCoil = 1; iCoil <= state.dataHVACVarRefFlow->NumVRFCond; ++iCoil) {
             if (VRF(iCoil).CondenserType == AirCooled) {
-                SysTotalHVACRejectHeatLoss += VRF(iCoil).CoolElecConsumption + VRF(iCoil).HeatElecConsumption +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += VRF(iCoil).CoolElecConsumption + VRF(iCoil).HeatElecConsumption +
                                               VRF(iCoil).CrankCaseHeaterElecConsumption + VRF(iCoil).DefrostConsumption +
                                               (VRF(iCoil).TotalCoolingCapacity - VRF(iCoil).TotalHeatingCapacity) * TimeStepSysSec;
             } else if (VRF(iCoil).CondenserType == EvapCooled) {
-                SysTotalHVACRejectHeatLoss += VRF(iCoil).EvapCondPumpElecConsumption + VRF(iCoil).BasinHeaterConsumption +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += VRF(iCoil).EvapCondPumpElecConsumption + VRF(iCoil).BasinHeaterConsumption +
                                               VRF(iCoil).EvapWaterConsumpRate * TimeStepSysSec * RhoWater * H2OHtOfVap_HVAC;
             } else if (VRF(iCoil).CondenserType == WaterCooled) {
-                SysTotalHVACRejectHeatLoss += VRF(iCoil).QCondEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += VRF(iCoil).QCondEnergy;
             }
         }
 
         // Refrigerated Rack
         auto &RefrigRack(state.dataRefrigCase->RefrigRack);
-        for (int iRef = 1; iRef <= NumRefrigeratedRacks; ++iRef) {
+        for (int iRef = 1; iRef <= state.dataRefrigCase->NumRefrigeratedRacks; ++iRef) {
             if (RefrigRack(iRef).CondenserType == AirCooled) {
-                SysTotalHVACRejectHeatLoss += RefrigRack(iRef).RackElecConsumption + RefrigRack(iRef).RackCoolingEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += RefrigRack(iRef).RackElecConsumption + RefrigRack(iRef).RackCoolingEnergy;
             } else if (RefrigRack(iRef).CondenserType == EvapCooled) {
-                SysTotalHVACRejectHeatLoss += RefrigRack(iRef).EvapPumpConsumption + RefrigRack(iRef).BasinHeaterConsumption +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += RefrigRack(iRef).EvapPumpConsumption + RefrigRack(iRef).BasinHeaterConsumption +
                                               RefrigRack(iRef).EvapWaterConsumption * RhoWater * H2OHtOfVap_HVAC;
             } else if (RefrigRack(iRef).CondenserType == WaterCooled) {
-                SysTotalHVACRejectHeatLoss += RefrigRack(iRef).CondEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += RefrigRack(iRef).CondEnergy;
             }
         }
 
         // Refrigerated Case - Condenser
-        for (int iRef = 1; iRef <= NumRefrigCondensers; ++iRef) {
-            SysTotalHVACRejectHeatLoss += state.dataRefrigCase->Condenser(iRef).CondEnergy;
+        for (int iRef = 1; iRef <= state.dataRefrigCase->NumRefrigCondensers; ++iRef) {
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataRefrigCase->Condenser(iRef).CondEnergy;
         }
 
         // Evaporative coolers
-        for (int iCooler = 1; iCooler <= NumEvapCool; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC + EvapCond(iCooler).EvapCoolerEnergy;
+        for (int iCooler = 1; iCooler <= state.dataEvapCoolers->NumEvapCool; ++iCooler) {
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataEvapCoolers->EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC +
+                                          state.dataEvapCoolers->EvapCond(iCooler).EvapCoolerEnergy;
         }
     }
 
@@ -4559,40 +4502,12 @@ namespace EnergyPlus::OutputReportTabular {
         // The peak reports follow a similar example.
 
         // Using/Aliasing
-        using DataHeatBalance::BuildingPreDefRep;
-        using DataHeatBalance::ZnAirRpt;
-        using DataHeatBalance::ZnRpt;
-        using DataHeatBalance::Zone;
-        using DataHeatBalance::ZonePreDefRep;
-        using DataHeatBalance::ZoneWinHeatGainRep;
-        using DataHeatBalance::ZoneWinHeatGainRepEnergy;
-        using DataHeatBalance::ZoneWinHeatLossRep;
-        using DataHeatBalance::ZoneWinHeatLossRepEnergy;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
-        using LowTempRadiantSystem::CFloRadSys;
-        using LowTempRadiantSystem::ElecRadSys;
-        using LowTempRadiantSystem::HydrRadSys;
-        using LowTempRadiantSystem::NumOfCFloLowTempRadSys;
-        using LowTempRadiantSystem::NumOfElecLowTempRadSys;
-        using LowTempRadiantSystem::NumOfHydrLowTempRadSys;
 
-        static int iZone(0);
-        static int iRadiant(0);
-        static int iunit(0);
-        static int curZone(0);
-        static Real64 eqpSens(0.0);
-        static Real64 total(0.0);
-        // the following arrays store the radiant total for each timestep
-        static Array1D<Real64> radiantHeat;
-        static Array1D<Real64> radiantCool;
-        static Array1D<Real64> ATUHeat;
-        static Array1D<Real64> ATUCool;
-        static int timestepTimeStamp(0);
-        static Real64 bldgHtPk(0.0);
-        static Real64 bldgClPk(0.0);
-        static Real64 timeStepRatio(0.0);
+        auto &Zone(state.dataHeatBal->Zone);
+        auto &ZonePreDefRep(state.dataHeatBal->ZonePreDefRep);
 
         Real64 mult; // zone list and group multipliers
 
@@ -4607,299 +4522,301 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (ort->GatherHeatGainReportfirstTime) {
-            radiantHeat.allocate(state.dataGlobal->NumOfZones);
-            radiantCool.allocate(state.dataGlobal->NumOfZones);
-            ATUHeat.allocate(state.dataGlobal->NumOfZones);
-            ATUCool.allocate(state.dataGlobal->NumOfZones);
+            state.dataOutRptTab->radiantHeat.allocate(state.dataGlobal->NumOfZones);
+            state.dataOutRptTab->radiantCool.allocate(state.dataGlobal->NumOfZones);
+            state.dataOutRptTab->ATUHeat.allocate(state.dataGlobal->NumOfZones);
+            state.dataOutRptTab->ATUCool.allocate(state.dataGlobal->NumOfZones);
             ort->GatherHeatGainReportfirstTime = false;
         }
         // clear the radiant surface accumulation variables
-        radiantHeat = 0.0;
-        radiantCool = 0.0;
+        state.dataOutRptTab->radiantHeat = 0.0;
+        state.dataOutRptTab->radiantCool = 0.0;
         // clear the ATU accumulation variables
-        ATUHeat = 0.0;
-        ATUCool = 0.0;
+        state.dataOutRptTab->ATUHeat = 0.0;
+        state.dataOutRptTab->ATUCool = 0.0;
         //--------------------
         //     ANNUAL
         //--------------------
         // HVAC annual heating by ATU
         // HVAC annual cooling by ATU
-        for (iunit = 1; iunit <= state.dataDefineEquipment->NumAirDistUnits; ++iunit) {
+        for (state.dataOutRptTab->iunitGHGR = 1; state.dataOutRptTab->iunitGHGR <= state.dataDefineEquipment->NumAirDistUnits; ++state.dataOutRptTab->iunitGHGR) {
             // HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
-            curZone = state.dataDefineEquipment->AirDistUnit(iunit).ZoneNum;
-            if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnHvacATUHt += state.dataDefineEquipment->AirDistUnit(iunit).HeatGain;
-                ZonePreDefRep(curZone).SHGSAnHvacATUCl -= state.dataDefineEquipment->AirDistUnit(iunit).CoolGain;
-                ATUHeat(curZone) += state.dataDefineEquipment->AirDistUnit(iunit).HeatRate;
-                ATUCool(curZone) -= state.dataDefineEquipment->AirDistUnit(iunit).CoolRate;
+            state.dataOutRptTab->curZoneGHGR = state.dataDefineEquipment->AirDistUnit(state.dataOutRptTab->iunitGHGR).ZoneNum;
+            if ((state.dataOutRptTab->curZoneGHGR > 0) && (state.dataOutRptTab->curZoneGHGR <= state.dataGlobal->NumOfZones)) {
+                ZonePreDefRep(state.dataOutRptTab->curZoneGHGR).SHGSAnHvacATUHt += state.dataDefineEquipment->AirDistUnit(state.dataOutRptTab->iunitGHGR).HeatGain;
+                ZonePreDefRep(state.dataOutRptTab->curZoneGHGR).SHGSAnHvacATUCl -= state.dataDefineEquipment->AirDistUnit(state.dataOutRptTab->iunitGHGR).CoolGain;
+                state.dataOutRptTab->ATUHeat(state.dataOutRptTab->curZoneGHGR) += state.dataDefineEquipment->AirDistUnit(state.dataOutRptTab->iunitGHGR).HeatRate;
+                state.dataOutRptTab->ATUCool(state.dataOutRptTab->curZoneGHGR) -= state.dataDefineEquipment->AirDistUnit(state.dataOutRptTab->iunitGHGR).CoolRate;
             }
         }
-        timeStepRatio = TimeStepSys / state.dataGlobal->TimeStepZone; // the fraction of the zone time step used by the system timestep
-        for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-            mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+        state.dataOutRptTab->timeStepRatio = TimeStepSys / state.dataGlobal->TimeStepZone; // the fraction of the zone time step used by the system timestep
+        for (state.dataOutRptTab->iZoneGHGR = 1; state.dataOutRptTab->iZoneGHGR <= state.dataGlobal->NumOfZones; ++state.dataOutRptTab->iZoneGHGR) {
+            mult = Zone(state.dataOutRptTab->iZoneGHGR).Multiplier * Zone(state.dataOutRptTab->iZoneGHGR).ListMultiplier;
             // People Sensible Heat Addition
-            ZonePreDefRep(iZone).SHGSAnPeoplAdd += ZnRpt(iZone).PeopleSenGain * mult * timeStepRatio;
+            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnPeoplAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGain * mult * state.dataOutRptTab->timeStepRatio;
             // Lights Sensible Heat Addition
-            ZonePreDefRep(iZone).SHGSAnLiteAdd += ZnRpt(iZone).LtsTotGain * mult * timeStepRatio;
+            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnLiteAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGain * mult * state.dataOutRptTab->timeStepRatio;
             // HVAC Input Sensible Air Heating
             // HVAC Input Sensible Air Cooling
             Real64 ZoneEqHeatorCool =
-                ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem * mult - ATUHeat(iZone) - ATUCool(iZone);
+                state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult - state.dataOutRptTab->ATUHeat(state.dataOutRptTab->iZoneGHGR) - state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR);
             if (ZoneEqHeatorCool > 0.0) {
-                ZonePreDefRep(iZone).SHGSAnZoneEqHt += ZoneEqHeatorCool * TimeStepSys * DataGlobalConstants::SecInHour;
+                ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnZoneEqHt += ZoneEqHeatorCool * TimeStepSys * DataGlobalConstants::SecInHour;
             } else {
-                ZonePreDefRep(iZone).SHGSAnZoneEqCl += ZoneEqHeatorCool * TimeStepSys * DataGlobalConstants::SecInHour;
+                ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnZoneEqCl += ZoneEqHeatorCool * TimeStepSys * DataGlobalConstants::SecInHour;
             }
             // Interzone Air Transfer Heat Addition
             // Interzone Air Transfer Heat Removal
-            if (ZnAirRpt(iZone).SumMCpDTzones > 0.0) {
-                ZonePreDefRep(iZone).SHGSAnIzaAdd += ZnAirRpt(iZone).SumMCpDTzones * mult * TimeStepSys * DataGlobalConstants::SecInHour;
+            if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones > 0.0) {
+                ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnIzaAdd += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult * TimeStepSys * DataGlobalConstants::SecInHour;
             } else {
-                ZonePreDefRep(iZone).SHGSAnIzaRem += ZnAirRpt(iZone).SumMCpDTzones * mult * TimeStepSys * DataGlobalConstants::SecInHour;
+                ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnIzaRem += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult * TimeStepSys * DataGlobalConstants::SecInHour;
             }
             // Window Heat Addition
             // Window Heat Removal
-            ZonePreDefRep(iZone).SHGSAnWindAdd += ZoneWinHeatGainRepEnergy(iZone) * mult * timeStepRatio;
-            ZonePreDefRep(iZone).SHGSAnWindRem -= ZoneWinHeatLossRepEnergy(iZone) * mult * timeStepRatio;
+            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnWindAdd += state.dataHeatBal->ZoneWinHeatGainRepEnergy(state.dataOutRptTab->iZoneGHGR) * mult * state.dataOutRptTab->timeStepRatio;
+            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnWindRem -= state.dataHeatBal->ZoneWinHeatLossRepEnergy(state.dataOutRptTab->iZoneGHGR) * mult * state.dataOutRptTab->timeStepRatio;
             // Infiltration Heat Addition
             // Infiltration Heat Removal
-            if (ZnAirRpt(iZone).SumMCpDtInfil > 0.0) {
-                ZonePreDefRep(iZone).SHGSAnInfilAdd += ZnAirRpt(iZone).SumMCpDtInfil * mult * TimeStepSys * DataGlobalConstants::SecInHour;
+            if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil > 0.0) {
+                ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnInfilAdd += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult * TimeStepSys * DataGlobalConstants::SecInHour;
             } else {
-                ZonePreDefRep(iZone).SHGSAnInfilRem += ZnAirRpt(iZone).SumMCpDtInfil * mult * TimeStepSys * DataGlobalConstants::SecInHour;
+                ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnInfilRem += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult * TimeStepSys * DataGlobalConstants::SecInHour;
             }
             // Equipment Sensible Heat Addition
             // Equipment Sensible Heat Removal
             // the following variables are already gains so they do not need to be converted by multiplying by time.
-            eqpSens = (ZnRpt(iZone).ElecRadGain + ZnRpt(iZone).GasRadGain + ZnRpt(iZone).HWRadGain + ZnRpt(iZone).SteamRadGain +
-                       ZnRpt(iZone).OtherRadGain + ZnRpt(iZone).ElecConGain + ZnRpt(iZone).GasConGain + ZnRpt(iZone).HWConGain +
-                       ZnRpt(iZone).SteamConGain + ZnRpt(iZone).OtherConGain) *
-                      timeStepRatio;
-            if (eqpSens > 0.0) {
-                ZonePreDefRep(iZone).SHGSAnEquipAdd += eqpSens * mult;
+            state.dataOutRptTab->eqpSensGHGR = (state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGain + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGain + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGain + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGain +
+                       state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGain + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGain + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGain + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGain +
+                       state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGain + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGain) *
+                      state.dataOutRptTab->timeStepRatio;
+            if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
+                ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnEquipAdd += state.dataOutRptTab->eqpSensGHGR * mult;
             } else {
-                ZonePreDefRep(iZone).SHGSAnEquipRem += eqpSens * mult;
+                ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnEquipRem += state.dataOutRptTab->eqpSensGHGR * mult;
             }
         }
-        curZone = 0;
+        state.dataOutRptTab->curZoneGHGR = 0;
         // HVAC Input Heated Surface Heating
         // HVAC Input Cooled Surface Cooling
-        for (iRadiant = 1; iRadiant <= state.dataVentilatedSlab->NumOfVentSlabs; ++iRadiant) {
-            curZone = state.dataVentilatedSlab->VentSlab(iRadiant).ZonePtr;
-            mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
-            if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnSurfHt += state.dataVentilatedSlab->VentSlab(iRadiant).RadHeatingEnergy * mult;
-                ZonePreDefRep(curZone).SHGSAnSurfCl -= state.dataVentilatedSlab->VentSlab(iRadiant).RadCoolingEnergy * mult;
-                radiantHeat(curZone) = state.dataVentilatedSlab->VentSlab(iRadiant).RadHeatingPower * mult;
-                radiantCool(curZone) = -state.dataVentilatedSlab->VentSlab(iRadiant).RadCoolingPower * mult;
+        for (state.dataOutRptTab->iRadiantGHGR = 1; state.dataOutRptTab->iRadiantGHGR <= state.dataVentilatedSlab->NumOfVentSlabs; ++state.dataOutRptTab->iRadiantGHGR) {
+            state.dataOutRptTab->curZoneGHGR = state.dataVentilatedSlab->VentSlab(state.dataOutRptTab->iRadiantGHGR).ZonePtr;
+            mult = Zone(state.dataOutRptTab->curZoneGHGR).Multiplier * Zone(state.dataOutRptTab->curZoneGHGR).ListMultiplier;
+            if ((state.dataOutRptTab->curZoneGHGR > 0) && (state.dataOutRptTab->curZoneGHGR <= state.dataGlobal->NumOfZones)) {
+                ZonePreDefRep(state.dataOutRptTab->curZoneGHGR).SHGSAnSurfHt += state.dataVentilatedSlab->VentSlab(state.dataOutRptTab->iRadiantGHGR).RadHeatingEnergy * mult;
+                ZonePreDefRep(state.dataOutRptTab->curZoneGHGR).SHGSAnSurfCl -= state.dataVentilatedSlab->VentSlab(state.dataOutRptTab->iRadiantGHGR).RadCoolingEnergy * mult;
+                state.dataOutRptTab->radiantHeat(state.dataOutRptTab->curZoneGHGR) = state.dataVentilatedSlab->VentSlab(state.dataOutRptTab->iRadiantGHGR).RadHeatingPower * mult;
+                state.dataOutRptTab->radiantCool(state.dataOutRptTab->curZoneGHGR) = -state.dataVentilatedSlab->VentSlab(state.dataOutRptTab->iRadiantGHGR).RadCoolingPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfHydrLowTempRadSys; ++iRadiant) {
-            curZone = HydrRadSys(iRadiant).ZonePtr;
-            mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
-            if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnSurfHt += HydrRadSys(iRadiant).HeatEnergy * mult;
-                ZonePreDefRep(curZone).SHGSAnSurfCl -= HydrRadSys(iRadiant).CoolEnergy * mult;
-                radiantHeat(curZone) += HydrRadSys(iRadiant).HeatPower * mult;
-                radiantCool(curZone) -= HydrRadSys(iRadiant).CoolPower * mult;
+        for (state.dataOutRptTab->iRadiantGHGR = 1; state.dataOutRptTab->iRadiantGHGR <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++state.dataOutRptTab->iRadiantGHGR) {
+            state.dataOutRptTab->curZoneGHGR = state.dataLowTempRadSys->HydrRadSys(state.dataOutRptTab->iRadiantGHGR).ZonePtr;
+            mult = Zone(state.dataOutRptTab->curZoneGHGR).Multiplier * Zone(state.dataOutRptTab->curZoneGHGR).ListMultiplier;
+            if ((state.dataOutRptTab->curZoneGHGR > 0) && (state.dataOutRptTab->curZoneGHGR <= state.dataGlobal->NumOfZones)) {
+                ZonePreDefRep(state.dataOutRptTab->curZoneGHGR).SHGSAnSurfHt += state.dataLowTempRadSys->HydrRadSys(state.dataOutRptTab->iRadiantGHGR).HeatEnergy * mult;
+                ZonePreDefRep(state.dataOutRptTab->curZoneGHGR).SHGSAnSurfCl -= state.dataLowTempRadSys->HydrRadSys(state.dataOutRptTab->iRadiantGHGR).CoolEnergy * mult;
+                state.dataOutRptTab->radiantHeat(state.dataOutRptTab->curZoneGHGR) += state.dataLowTempRadSys->HydrRadSys(state.dataOutRptTab->iRadiantGHGR).HeatPower * mult;
+                state.dataOutRptTab->radiantCool(state.dataOutRptTab->curZoneGHGR) -= state.dataLowTempRadSys->HydrRadSys(state.dataOutRptTab->iRadiantGHGR).CoolPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfCFloLowTempRadSys; ++iRadiant) {
-            curZone = CFloRadSys(iRadiant).ZonePtr;
-            mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
-            if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnSurfHt += CFloRadSys(iRadiant).HeatEnergy * mult;
-                ZonePreDefRep(curZone).SHGSAnSurfCl -= CFloRadSys(iRadiant).CoolEnergy * mult;
-                radiantHeat(curZone) += CFloRadSys(iRadiant).HeatPower * mult;
-                radiantCool(curZone) -= CFloRadSys(iRadiant).CoolPower * mult;
+        for (state.dataOutRptTab->iRadiantGHGR = 1; state.dataOutRptTab->iRadiantGHGR <= state.dataLowTempRadSys->NumOfCFloLowTempRadSys; ++state.dataOutRptTab->iRadiantGHGR) {
+            state.dataOutRptTab->curZoneGHGR = state.dataLowTempRadSys->CFloRadSys(state.dataOutRptTab->iRadiantGHGR).ZonePtr;
+            mult = Zone(state.dataOutRptTab->curZoneGHGR).Multiplier * Zone(state.dataOutRptTab->curZoneGHGR).ListMultiplier;
+            if ((state.dataOutRptTab->curZoneGHGR > 0) && (state.dataOutRptTab->curZoneGHGR <= state.dataGlobal->NumOfZones)) {
+                ZonePreDefRep(state.dataOutRptTab->curZoneGHGR).SHGSAnSurfHt += state.dataLowTempRadSys->CFloRadSys(state.dataOutRptTab->iRadiantGHGR).HeatEnergy * mult;
+                ZonePreDefRep(state.dataOutRptTab->curZoneGHGR).SHGSAnSurfCl -= state.dataLowTempRadSys->CFloRadSys(state.dataOutRptTab->iRadiantGHGR).CoolEnergy * mult;
+                state.dataOutRptTab->radiantHeat(state.dataOutRptTab->curZoneGHGR) += state.dataLowTempRadSys->CFloRadSys(state.dataOutRptTab->iRadiantGHGR).HeatPower * mult;
+                state.dataOutRptTab->radiantCool(state.dataOutRptTab->curZoneGHGR) -= state.dataLowTempRadSys->CFloRadSys(state.dataOutRptTab->iRadiantGHGR).CoolPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfElecLowTempRadSys; ++iRadiant) {
-            curZone = ElecRadSys(iRadiant).ZonePtr;
-            mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
-            if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnSurfHt += ElecRadSys(iRadiant).HeatEnergy * mult;
-                radiantHeat(curZone) += ElecRadSys(iRadiant).HeatPower * mult;
+        for (state.dataOutRptTab->iRadiantGHGR = 1; state.dataOutRptTab->iRadiantGHGR <= state.dataLowTempRadSys->NumOfElecLowTempRadSys; ++state.dataOutRptTab->iRadiantGHGR) {
+            state.dataOutRptTab->curZoneGHGR = state.dataLowTempRadSys->ElecRadSys(state.dataOutRptTab->iRadiantGHGR).ZonePtr;
+            mult = Zone(state.dataOutRptTab->curZoneGHGR).Multiplier * Zone(state.dataOutRptTab->curZoneGHGR).ListMultiplier;
+            if ((state.dataOutRptTab->curZoneGHGR > 0) && (state.dataOutRptTab->curZoneGHGR <= state.dataGlobal->NumOfZones)) {
+                ZonePreDefRep(state.dataOutRptTab->curZoneGHGR).SHGSAnSurfHt += state.dataLowTempRadSys->ElecRadSys(state.dataOutRptTab->iRadiantGHGR).HeatEnergy * mult;
+                state.dataOutRptTab->radiantHeat(state.dataOutRptTab->curZoneGHGR) += state.dataLowTempRadSys->ElecRadSys(state.dataOutRptTab->iRadiantGHGR).HeatPower * mult;
             }
         }
         // Opaque Surface Conduction and Other Heat Addition
         // Opaque Surface Conduction and Other Heat Removal
-        for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+        for (state.dataOutRptTab->iZoneGHGR = 1; state.dataOutRptTab->iZoneGHGR <= state.dataGlobal->NumOfZones; ++state.dataOutRptTab->iZoneGHGR) {
             // ZonePreDefRep variables above already inlude zone list and group multipliers
-            total = ZonePreDefRep(iZone).SHGSAnPeoplAdd + ZonePreDefRep(iZone).SHGSAnLiteAdd + ZonePreDefRep(iZone).SHGSAnZoneEqHt +
-                    ZonePreDefRep(iZone).SHGSAnZoneEqCl + ZonePreDefRep(iZone).SHGSAnHvacATUHt + ZonePreDefRep(iZone).SHGSAnHvacATUCl +
-                    ZonePreDefRep(iZone).SHGSAnIzaAdd + ZonePreDefRep(iZone).SHGSAnIzaRem +
-                    ZonePreDefRep(iZone).SHGSAnWindAdd + ZonePreDefRep(iZone).SHGSAnWindRem + ZonePreDefRep(iZone).SHGSAnInfilAdd +
-                    ZonePreDefRep(iZone).SHGSAnInfilRem + ZonePreDefRep(iZone).SHGSAnEquipAdd + ZonePreDefRep(iZone).SHGSAnEquipRem +
-                    ZonePreDefRep(iZone).SHGSAnSurfHt + ZonePreDefRep(iZone).SHGSAnSurfCl;
-            total = -total; // want to know the negative value of the sum since the row should add up to zero
-            if (total > 0) {
-                ZonePreDefRep(iZone).SHGSAnOtherAdd = total;
+            state.dataOutRptTab->totalGHGR = ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnPeoplAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnLiteAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnZoneEqHt +
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnZoneEqCl + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnHvacATUHt + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnHvacATUCl +
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnIzaAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnIzaRem +
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnWindAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnWindRem + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnInfilAdd +
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnInfilRem + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnEquipAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnEquipRem +
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnSurfHt + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnSurfCl;
+            state.dataOutRptTab->totalGHGR = -state.dataOutRptTab->totalGHGR; // want to know the negative value of the sum since the row should add up to zero
+            if (state.dataOutRptTab->totalGHGR > 0) {
+                ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnOtherAdd = state.dataOutRptTab->totalGHGR;
             } else {
-                ZonePreDefRep(iZone).SHGSAnOtherRem = total;
+                ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnOtherRem = state.dataOutRptTab->totalGHGR;
             }
         }
         //--------------------------------
         // ZONE PEAK COOLING AND HEATING
         //--------------------------------
-        for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-            mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+        for (state.dataOutRptTab->iZoneGHGR = 1; state.dataOutRptTab->iZoneGHGR <= state.dataGlobal->NumOfZones; ++state.dataOutRptTab->iZoneGHGR) {
+            mult = Zone(state.dataOutRptTab->iZoneGHGR).Multiplier * Zone(state.dataOutRptTab->iZoneGHGR).ListMultiplier;
             // RR I can't get the Infiltration Heat Addition/Removal columns to add up.
             // THis is the only suspect line, mixing MCpDt terms and a power term looks fishy.
-            if ((ZnAirRpt(iZone).SumMCpDTsystem + radiantHeat(iZone) + ZnAirRpt(iZone).SumNonAirSystem * mult) > 0) {
-                if ((ZnAirRpt(iZone).SumMCpDTsystem + radiantHeat(iZone) + ZnAirRpt(iZone).SumNonAirSystem * mult) > ZonePreDefRep(iZone).htPeak) {
-                    ZonePreDefRep(iZone).htPeak = ZnAirRpt(iZone).SumMCpDTsystem + radiantHeat(iZone) + ZnAirRpt(iZone).SumNonAirSystem * mult;
+            if ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataOutRptTab->radiantHeat(state.dataOutRptTab->iZoneGHGR) + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult) > 0) {
+                if ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataOutRptTab->radiantHeat(state.dataOutRptTab->iZoneGHGR) + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult) > ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).htPeak) {
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).htPeak = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataOutRptTab->radiantHeat(state.dataOutRptTab->iZoneGHGR) + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult;
                     // determine timestamp
                     //      ActualTimeS = CurrentTime-TimeStepZone+SysTimeElapsed
                     //      ActualtimeE = ActualTimeS+TimeStepSys
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
                     ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-                    EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
-                    ZonePreDefRep(iZone).htPtTimeStamp = timestepTimeStamp;
+                    EncodeMonDayHrMin(
+                        state.dataOutRptTab->timestepTimeStampGHGR, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).htPtTimeStamp = state.dataOutRptTab->timestepTimeStampGHGR;
                     // HVAC Input Sensible Air Heating
                     // HVAC Input Sensible Air Cooling
                     // non-HVAC ZnAirRpt variables DO NOT include zone multipliers
-                    ZonePreDefRep(iZone).SHGSHtHvacHt = ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem * mult;
-                    ZonePreDefRep(iZone).SHGSHtHvacCl = 0.0;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtHvacHt = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtHvacCl = 0.0;
                     // HVAC Input Heated Surface Heating
                     // HVAC Input Cooled Surface Cooling
-                    ZonePreDefRep(iZone).SHGSHtSurfHt = radiantHeat(iZone); // multipliers included above
-                    ZonePreDefRep(iZone).SHGSHtSurfCl = radiantCool(iZone); // multipliers included above
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtSurfHt = state.dataOutRptTab->radiantHeat(state.dataOutRptTab->iZoneGHGR); // multipliers included above
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtSurfCl = state.dataOutRptTab->radiantCool(state.dataOutRptTab->iZoneGHGR); // multipliers included above
                     // HVAC ATU Heating at Heat Peak
                     // HVAC ATU Cooling at Heat Peak
-                    ZonePreDefRep(iZone).SHGSHtHvacATUHt = ATUHeat(iZone); // multipliers included above
-                    ZonePreDefRep(iZone).SHGSHtHvacATUCl = ATUCool(iZone); // multipliers included above
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtHvacATUHt = state.dataOutRptTab->ATUHeat(state.dataOutRptTab->iZoneGHGR); // multipliers included above
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtHvacATUCl = state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR); // multipliers included above
                     // People Sensible Heat Addition
-                    ZonePreDefRep(iZone).SHGSHtPeoplAdd = ZnRpt(iZone).PeopleSenGainRate * mult;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtPeoplAdd = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
                     // Lights Sensible Heat Addition
-                    ZonePreDefRep(iZone).SHGSHtLiteAdd = ZnRpt(iZone).LtsTotGainRate * mult;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtLiteAdd = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
                     // Equipment Sensible Heat Addition
                     // Equipment Sensible Heat Removal
                     // non-HVAC ZnAirRpt variables DO NOT include zone multipliers
-                    eqpSens = ZnRpt(iZone).ElecRadGainRate + ZnRpt(iZone).GasRadGainRate + ZnRpt(iZone).HWRadGainRate +
-                              ZnRpt(iZone).SteamRadGainRate + ZnRpt(iZone).OtherRadGainRate + ZnRpt(iZone).ElecConGainRate +
-                              ZnRpt(iZone).GasConGainRate + ZnRpt(iZone).HWConGainRate + ZnRpt(iZone).SteamConGainRate +
-                              ZnRpt(iZone).OtherConGainRate;
-                    if (eqpSens > 0.0) {
-                        ZonePreDefRep(iZone).SHGSHtEquipAdd = eqpSens * mult;
-                        ZonePreDefRep(iZone).SHGSHtEquipRem = 0.0;
+                    state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
+                              state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
+                              state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
+                              state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+                    if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtEquipAdd = state.dataOutRptTab->eqpSensGHGR * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtEquipRem = 0.0;
                     } else {
-                        ZonePreDefRep(iZone).SHGSHtEquipAdd = 0.0;
-                        ZonePreDefRep(iZone).SHGSHtEquipRem = eqpSens * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtEquipAdd = 0.0;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtEquipRem = state.dataOutRptTab->eqpSensGHGR * mult;
                     }
                     // Window Heat Addition
                     // Window Heat Removal
-                    ZonePreDefRep(iZone).SHGSHtWindAdd = ZoneWinHeatGainRep(iZone) * mult;
-                    ZonePreDefRep(iZone).SHGSHtWindRem = -ZoneWinHeatLossRep(iZone) * mult;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtWindAdd = state.dataHeatBal->ZoneWinHeatGainRep(state.dataOutRptTab->iZoneGHGR) * mult;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtWindRem = -state.dataHeatBal->ZoneWinHeatLossRep(state.dataOutRptTab->iZoneGHGR) * mult;
                     // mixing object heat addition and removal
-                    if (ZnAirRpt(iZone).SumMCpDTzones > 0.0) {
-                        ZonePreDefRep(iZone).SHGSHtIzaAdd = ZnAirRpt(iZone).SumMCpDTzones * mult;
-                        ZonePreDefRep(iZone).SHGSHtIzaRem = 0.0;
+                    if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones > 0.0) {
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtIzaAdd = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtIzaRem = 0.0;
                     } else {
-                        ZonePreDefRep(iZone).SHGSHtIzaAdd = 0.0;
-                        ZonePreDefRep(iZone).SHGSHtIzaRem = ZnAirRpt(iZone).SumMCpDTzones * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtIzaAdd = 0.0;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtIzaRem = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult;
                     }
                     // Infiltration Heat Addition
                     // Infiltration Heat Removal
-                    if (ZnAirRpt(iZone).SumMCpDtInfil > 0.0) {
-                        ZonePreDefRep(iZone).SHGSHtInfilAdd = ZnAirRpt(iZone).SumMCpDtInfil * mult;
-                        ZonePreDefRep(iZone).SHGSHtInfilRem = 0.0;
+                    if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil > 0.0) {
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtInfilAdd = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtInfilRem = 0.0;
                     } else {
-                        ZonePreDefRep(iZone).SHGSHtInfilAdd = 0.0;
-                        ZonePreDefRep(iZone).SHGSHtInfilRem = ZnAirRpt(iZone).SumMCpDtInfil * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtInfilAdd = 0.0;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtInfilRem = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult;
                     }
                     // Opaque Surface Conduction and Other Heat Addition
                     // Opaque Surface Conduction and Other Heat Removal
-                    total = ZonePreDefRep(iZone).SHGSHtPeoplAdd + ZonePreDefRep(iZone).SHGSHtLiteAdd + ZonePreDefRep(iZone).SHGSHtHvacHt +
-                            ZonePreDefRep(iZone).SHGSHtHvacCl + ZonePreDefRep(iZone).SHGSHtIzaAdd + ZonePreDefRep(iZone).SHGSHtIzaRem +
-                            ZonePreDefRep(iZone).SHGSHtWindAdd + ZonePreDefRep(iZone).SHGSHtWindRem + ZonePreDefRep(iZone).SHGSHtInfilAdd +
-                            ZonePreDefRep(iZone).SHGSHtInfilRem + ZonePreDefRep(iZone).SHGSHtEquipAdd + ZonePreDefRep(iZone).SHGSHtEquipRem +
-                            ZonePreDefRep(iZone).SHGSHtSurfHt + ZonePreDefRep(iZone).SHGSHtSurfCl;
-                    total = -total; // want to know the negative value of the sum since the row should add up to zero
-                    if (total > 0) {
-                        ZonePreDefRep(iZone).SHGSHtOtherAdd = total;
-                        ZonePreDefRep(iZone).SHGSHtOtherRem = 0.0;
+                    state.dataOutRptTab->totalGHGR = ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtPeoplAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtLiteAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtHvacHt +
+                            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtHvacCl + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtIzaAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtIzaRem +
+                            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtWindAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtWindRem + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtInfilAdd +
+                            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtInfilRem + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtEquipAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtEquipRem +
+                            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtSurfHt + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtSurfCl;
+                    state.dataOutRptTab->totalGHGR = -state.dataOutRptTab->totalGHGR; // want to know the negative value of the sum since the row should add up to zero
+                    if (state.dataOutRptTab->totalGHGR > 0) {
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtOtherAdd = state.dataOutRptTab->totalGHGR;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtOtherRem = 0.0;
                     } else {
-                        ZonePreDefRep(iZone).SHGSHtOtherAdd = 0.0;
-                        ZonePreDefRep(iZone).SHGSHtOtherRem = total;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtOtherAdd = 0.0;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtOtherRem = state.dataOutRptTab->totalGHGR;
                     }
                 }
             } else {
-                if ((ZnAirRpt(iZone).SumMCpDTsystem + radiantCool(iZone) + ZnAirRpt(iZone).SumNonAirSystem * mult) < ZonePreDefRep(iZone).clPeak) {
-                    ZonePreDefRep(iZone).clPeak = ZnAirRpt(iZone).SumMCpDTsystem + radiantCool(iZone) + ZnAirRpt(iZone).SumNonAirSystem * mult;
+                if ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataOutRptTab->radiantCool(state.dataOutRptTab->iZoneGHGR) + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult) < ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).clPeak) {
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).clPeak = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataOutRptTab->radiantCool(state.dataOutRptTab->iZoneGHGR) + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult;
                     // determine timestamp
                     //      ActualTimeS = CurrentTime-TimeStepZone+SysTimeElapsed
                     //      ActualtimeE = ActualTimeS+TimeStepSys
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
                     ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-                    EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
-                    ZonePreDefRep(iZone).clPtTimeStamp = timestepTimeStamp;
+                    EncodeMonDayHrMin(
+                        state.dataOutRptTab->timestepTimeStampGHGR, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).clPtTimeStamp = state.dataOutRptTab->timestepTimeStampGHGR;
                     // HVAC Input Sensible Air Heating
                     // HVAC Input Sensible Air Cooling
-                    ZonePreDefRep(iZone).SHGSClHvacHt = 0.0;
-                    ZonePreDefRep(iZone).SHGSClHvacCl = ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem * mult;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClHvacHt = 0.0;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClHvacCl = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult;
                     // HVAC Input Heated Surface Heating
                     // HVAC Input Cooled Surface Cooling
-                    ZonePreDefRep(iZone).SHGSClSurfHt = radiantHeat(iZone);
-                    ZonePreDefRep(iZone).SHGSClSurfCl = radiantCool(iZone);
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClSurfHt = state.dataOutRptTab->radiantHeat(state.dataOutRptTab->iZoneGHGR);
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClSurfCl = state.dataOutRptTab->radiantCool(state.dataOutRptTab->iZoneGHGR);
                     // HVAC heating by ATU at cool peak
                     // HVAC cooling by ATU at cool peak
-                    ZonePreDefRep(iZone).SHGSClHvacATUHt = ATUHeat(iZone);
-                    ZonePreDefRep(iZone).SHGSClHvacATUCl = ATUCool(iZone);
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClHvacATUHt = state.dataOutRptTab->ATUHeat(state.dataOutRptTab->iZoneGHGR);
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClHvacATUCl = state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR);
                     // People Sensible Heat Addition
-                    ZonePreDefRep(iZone).SHGSClPeoplAdd = ZnRpt(iZone).PeopleSenGainRate * mult;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClPeoplAdd = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
                     // Lights Sensible Heat Addition
-                    ZonePreDefRep(iZone).SHGSClLiteAdd = ZnRpt(iZone).LtsTotGainRate * mult;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClLiteAdd = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
                     // Equipment Sensible Heat Addition
                     // Equipment Sensible Heat Removal
-                    eqpSens = ZnRpt(iZone).ElecRadGainRate + ZnRpt(iZone).GasRadGainRate + ZnRpt(iZone).HWRadGainRate +
-                              ZnRpt(iZone).SteamRadGainRate + ZnRpt(iZone).OtherRadGainRate + ZnRpt(iZone).ElecConGainRate +
-                              ZnRpt(iZone).GasConGainRate + ZnRpt(iZone).HWConGainRate + ZnRpt(iZone).SteamConGainRate +
-                              ZnRpt(iZone).OtherConGainRate;
-                    if (eqpSens > 0.0) {
-                        ZonePreDefRep(iZone).SHGSClEquipAdd = eqpSens * mult;
-                        ZonePreDefRep(iZone).SHGSClEquipRem = 0.0;
+                    state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
+                              state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
+                              state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
+                              state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+                    if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClEquipAdd = state.dataOutRptTab->eqpSensGHGR * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClEquipRem = 0.0;
                     } else {
-                        ZonePreDefRep(iZone).SHGSClEquipAdd = 0.0;
-                        ZonePreDefRep(iZone).SHGSClEquipRem = eqpSens * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClEquipAdd = 0.0;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClEquipRem = state.dataOutRptTab->eqpSensGHGR * mult;
                     }
                     // Window Heat Addition
                     // Window Heat Removal
-                    ZonePreDefRep(iZone).SHGSClWindAdd = ZoneWinHeatGainRep(iZone) * mult;
-                    ZonePreDefRep(iZone).SHGSClWindRem = -ZoneWinHeatLossRep(iZone) * mult;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClWindAdd = state.dataHeatBal->ZoneWinHeatGainRep(state.dataOutRptTab->iZoneGHGR) * mult;
+                    ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClWindRem = -state.dataHeatBal->ZoneWinHeatLossRep(state.dataOutRptTab->iZoneGHGR) * mult;
                     // mixing object cool addition and removal
-                    if (ZnAirRpt(iZone).SumMCpDTzones > 0.0) {
-                        ZonePreDefRep(iZone).SHGSClIzaAdd = ZnAirRpt(iZone).SumMCpDTzones * mult;
-                        ZonePreDefRep(iZone).SHGSClIzaRem = 0.0;
+                    if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones > 0.0) {
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClIzaAdd = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClIzaRem = 0.0;
                     } else {
-                        ZonePreDefRep(iZone).SHGSClIzaAdd = 0.0;
-                        ZonePreDefRep(iZone).SHGSClIzaRem = ZnAirRpt(iZone).SumMCpDTzones * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClIzaAdd = 0.0;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClIzaRem = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult;
                     }
                     // Infiltration Heat Addition
                     // Infiltration Heat Removal
-                    if (ZnAirRpt(iZone).SumMCpDtInfil > 0.0) {
-                        ZonePreDefRep(iZone).SHGSClInfilAdd = ZnAirRpt(iZone).SumMCpDtInfil * mult;
-                        ZonePreDefRep(iZone).SHGSClInfilRem = 0.0;
+                    if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil > 0.0) {
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClInfilAdd = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClInfilRem = 0.0;
                     } else {
-                        ZonePreDefRep(iZone).SHGSClInfilAdd = 0.0;
-                        ZonePreDefRep(iZone).SHGSClInfilRem = ZnAirRpt(iZone).SumMCpDtInfil * mult;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClInfilAdd = 0.0;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClInfilRem = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult;
                     }
                     // Opaque Surface Conduction and Other Heat Addition
                     // Opaque Surface Conduction and Other Heat Removal
-                    total = ZonePreDefRep(iZone).SHGSClPeoplAdd + ZonePreDefRep(iZone).SHGSClLiteAdd + ZonePreDefRep(iZone).SHGSClHvacHt +
-                            ZonePreDefRep(iZone).SHGSClHvacCl + ZonePreDefRep(iZone).SHGSClIzaAdd + ZonePreDefRep(iZone).SHGSClIzaRem +
-                            ZonePreDefRep(iZone).SHGSClWindAdd + ZonePreDefRep(iZone).SHGSClWindRem + ZonePreDefRep(iZone).SHGSClInfilAdd +
-                            ZonePreDefRep(iZone).SHGSClInfilRem + ZonePreDefRep(iZone).SHGSClEquipAdd + ZonePreDefRep(iZone).SHGSClEquipRem +
-                            ZonePreDefRep(iZone).SHGSClSurfHt + ZonePreDefRep(iZone).SHGSClSurfCl;
-                    total = -total; // want to know the negative value of the sum since the row should add up to zero
-                    if (total > 0) {
-                        ZonePreDefRep(iZone).SHGSClOtherAdd = total;
-                        ZonePreDefRep(iZone).SHGSClOtherRem = 0.0;
+                    state.dataOutRptTab->totalGHGR = ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClPeoplAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClLiteAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClHvacHt +
+                            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClHvacCl + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClIzaAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClIzaRem +
+                            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClWindAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClWindRem + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClInfilAdd +
+                            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClInfilRem + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClEquipAdd + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClEquipRem +
+                            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClSurfHt + ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClSurfCl;
+                    state.dataOutRptTab->totalGHGR = -state.dataOutRptTab->totalGHGR; // want to know the negative value of the sum since the row should add up to zero
+                    if (state.dataOutRptTab->totalGHGR > 0) {
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClOtherAdd = state.dataOutRptTab->totalGHGR;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClOtherRem = 0.0;
                     } else {
-                        ZonePreDefRep(iZone).SHGSClOtherAdd = 0.0;
-                        ZonePreDefRep(iZone).SHGSClOtherRem = total;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClOtherAdd = 0.0;
+                        ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClOtherRem = state.dataOutRptTab->totalGHGR;
                     }
                 }
             }
@@ -4907,190 +4824,190 @@ namespace EnergyPlus::OutputReportTabular {
         //------------------------------------
         // BUILDING PEAK COOLING AND HEATING
         //------------------------------------
-        bldgHtPk = 0.0;
-        bldgClPk = 0.0;
-        for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-            mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
-            if ((ZnAirRpt(iZone).SumMCpDTsystem + radiantHeat(iZone) + ZnAirRpt(iZone).SumNonAirSystem * mult) > 0) {
-                bldgHtPk += ZnAirRpt(iZone).SumMCpDTsystem + radiantHeat(iZone) + ZnAirRpt(iZone).SumNonAirSystem * mult;
+        state.dataOutRptTab->bldgHtPk = 0.0;
+        state.dataOutRptTab->bldgClPk = 0.0;
+        for (state.dataOutRptTab->iZoneGHGR = 1; state.dataOutRptTab->iZoneGHGR <= state.dataGlobal->NumOfZones; ++state.dataOutRptTab->iZoneGHGR) {
+            mult = Zone(state.dataOutRptTab->iZoneGHGR).Multiplier * Zone(state.dataOutRptTab->iZoneGHGR).ListMultiplier;
+            if ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataOutRptTab->radiantHeat(state.dataOutRptTab->iZoneGHGR) + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult) > 0) {
+                state.dataOutRptTab->bldgHtPk += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataOutRptTab->radiantHeat(state.dataOutRptTab->iZoneGHGR) + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult;
             } else {
-                bldgClPk += ZnAirRpt(iZone).SumMCpDTsystem + radiantCool(iZone) + ZnAirRpt(iZone).SumNonAirSystem * mult;
+                state.dataOutRptTab->bldgClPk += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataOutRptTab->radiantCool(state.dataOutRptTab->iZoneGHGR) + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult;
             }
         }
-        if (bldgHtPk > BuildingPreDefRep.htPeak) {
-            BuildingPreDefRep.htPeak = bldgHtPk;
+        if (state.dataOutRptTab->bldgHtPk > state.dataHeatBal->BuildingPreDefRep.htPeak) {
+            state.dataHeatBal->BuildingPreDefRep.htPeak = state.dataOutRptTab->bldgHtPk;
             // determine timestamp
             //  ActualTimeS = CurrentTime-TimeStepZone+SysTimeElapsed
             //  ActualtimeE = ActualTimeS+TimeStepSys
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
             ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-            EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
-            BuildingPreDefRep.htPtTimeStamp = timestepTimeStamp;
+            EncodeMonDayHrMin(state.dataOutRptTab->timestepTimeStampGHGR, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+            state.dataHeatBal->BuildingPreDefRep.htPtTimeStamp = state.dataOutRptTab->timestepTimeStampGHGR;
             // reset building level results to zero prior to accumulating across zones
-            BuildingPreDefRep.SHGSHtHvacHt = 0.0;
-            BuildingPreDefRep.SHGSHtHvacCl = 0.0;
-            BuildingPreDefRep.SHGSHtHvacATUHt = 0.0;
-            BuildingPreDefRep.SHGSHtHvacATUCl = 0.0;
-            BuildingPreDefRep.SHGSHtSurfHt = 0.0;
-            BuildingPreDefRep.SHGSHtSurfCl = 0.0;
-            BuildingPreDefRep.SHGSHtPeoplAdd = 0.0;
-            BuildingPreDefRep.SHGSHtLiteAdd = 0.0;
-            BuildingPreDefRep.SHGSHtEquipAdd = 0.0;
-            BuildingPreDefRep.SHGSHtWindAdd = 0.0;
-            BuildingPreDefRep.SHGSHtIzaAdd = 0.0;
-            BuildingPreDefRep.SHGSHtInfilAdd = 0.0;
-            BuildingPreDefRep.SHGSHtOtherAdd = 0.0;
-            BuildingPreDefRep.SHGSHtEquipRem = 0.0;
-            BuildingPreDefRep.SHGSHtWindRem = 0.0;
-            BuildingPreDefRep.SHGSHtIzaRem = 0.0;
-            BuildingPreDefRep.SHGSHtInfilRem = 0.0;
-            BuildingPreDefRep.SHGSHtOtherRem = 0.0;
-            for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacHt = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacCl = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUHt = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUCl = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtSurfHt = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtSurfCl = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtPeoplAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtLiteAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtWindAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtIzaAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtInfilAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtOtherAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipRem = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtWindRem = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtIzaRem = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtInfilRem = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtOtherRem = 0.0;
+            for (state.dataOutRptTab->iZoneGHGR = 1; state.dataOutRptTab->iZoneGHGR <= state.dataGlobal->NumOfZones; ++state.dataOutRptTab->iZoneGHGR) {
+                mult = Zone(state.dataOutRptTab->iZoneGHGR).Multiplier * Zone(state.dataOutRptTab->iZoneGHGR).ListMultiplier;
                 // HVAC Input Sensible Air Heating
                 // HVAC Input Sensible Air Cooling
-                BuildingPreDefRep.SHGSHtHvacHt += ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacHt += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult;
                 // HVAC Input Heated Surface Heating
                 // HVAC Input Cooled Surface Cooling
-                BuildingPreDefRep.SHGSHtSurfHt += radiantHeat(iZone);
-                BuildingPreDefRep.SHGSHtSurfCl += radiantCool(iZone);
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtSurfHt += state.dataOutRptTab->radiantHeat(state.dataOutRptTab->iZoneGHGR);
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtSurfCl += state.dataOutRptTab->radiantCool(state.dataOutRptTab->iZoneGHGR);
                 // HVAC ATU Heating
                 // HVAC ATU Cooling
-                BuildingPreDefRep.SHGSHtHvacATUHt += ATUHeat(iZone);
-                BuildingPreDefRep.SHGSHtHvacATUCl += ATUCool(iZone);
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUHt += state.dataOutRptTab->ATUHeat(state.dataOutRptTab->iZoneGHGR);
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUCl += state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR);
                 // People Sensible Heat Addition
-                BuildingPreDefRep.SHGSHtPeoplAdd += ZnRpt(iZone).PeopleSenGainRate * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtPeoplAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
                 // Lights Sensible Heat Addition
-                BuildingPreDefRep.SHGSHtLiteAdd += ZnRpt(iZone).LtsTotGainRate * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtLiteAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
                 // Equipment Sensible Heat Addition
                 // Equipment Sensible Heat Removal
-                eqpSens = ZnRpt(iZone).ElecRadGainRate + ZnRpt(iZone).GasRadGainRate + ZnRpt(iZone).HWRadGainRate + ZnRpt(iZone).SteamRadGainRate +
-                          ZnRpt(iZone).OtherRadGainRate + ZnRpt(iZone).ElecConGainRate + ZnRpt(iZone).GasConGainRate + ZnRpt(iZone).HWConGainRate +
-                          ZnRpt(iZone).SteamConGainRate + ZnRpt(iZone).OtherConGainRate;
-                if (eqpSens > 0.0) {
-                    BuildingPreDefRep.SHGSHtEquipAdd += eqpSens * mult;
+                state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
+                          state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
+                          state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+                if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
+                    state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipAdd += state.dataOutRptTab->eqpSensGHGR * mult;
                 } else {
-                    BuildingPreDefRep.SHGSHtEquipRem += eqpSens * mult;
+                    state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipRem += state.dataOutRptTab->eqpSensGHGR * mult;
                 }
                 // Window Heat Addition
                 // Window Heat Removal
-                BuildingPreDefRep.SHGSHtWindAdd += ZoneWinHeatGainRep(iZone) * mult;
-                BuildingPreDefRep.SHGSHtWindRem -= ZoneWinHeatLossRep(iZone) * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtWindAdd += state.dataHeatBal->ZoneWinHeatGainRep(state.dataOutRptTab->iZoneGHGR) * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtWindRem -= state.dataHeatBal->ZoneWinHeatLossRep(state.dataOutRptTab->iZoneGHGR) * mult;
                 // mixing object heat addition and removal
-                if (ZnAirRpt(iZone).SumMCpDTzones > 0.0) {
-                    BuildingPreDefRep.SHGSHtIzaAdd += ZnAirRpt(iZone).SumMCpDTzones * mult;
+                if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones > 0.0) {
+                    state.dataHeatBal->BuildingPreDefRep.SHGSHtIzaAdd += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult;
                 } else {
-                    BuildingPreDefRep.SHGSHtIzaRem += ZnAirRpt(iZone).SumMCpDTzones * mult;
+                    state.dataHeatBal->BuildingPreDefRep.SHGSHtIzaRem += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult;
                 }
                 // Infiltration Heat Addition
                 // Infiltration Heat Removal
-                if (ZnAirRpt(iZone).SumMCpDtInfil > 00) {
-                    BuildingPreDefRep.SHGSHtInfilAdd += ZnAirRpt(iZone).SumMCpDtInfil * mult;
+                if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil > 00) {
+                    state.dataHeatBal->BuildingPreDefRep.SHGSHtInfilAdd += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult;
                 } else {
-                    BuildingPreDefRep.SHGSHtInfilRem += ZnAirRpt(iZone).SumMCpDtInfil * mult;
+                    state.dataHeatBal->BuildingPreDefRep.SHGSHtInfilRem += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult;
                 }
             }
             // Opaque Surface Conduction and Other Heat Addition
             // Opaque Surface Conduction and Other Heat Removal
-            total = BuildingPreDefRep.SHGSHtPeoplAdd + BuildingPreDefRep.SHGSHtLiteAdd + BuildingPreDefRep.SHGSHtHvacHt +
-                    BuildingPreDefRep.SHGSHtHvacCl + BuildingPreDefRep.SHGSHtIzaAdd + BuildingPreDefRep.SHGSHtIzaRem +
-                    BuildingPreDefRep.SHGSHtWindAdd + BuildingPreDefRep.SHGSHtWindRem + BuildingPreDefRep.SHGSHtInfilAdd +
-                    BuildingPreDefRep.SHGSHtInfilRem + BuildingPreDefRep.SHGSHtEquipAdd + BuildingPreDefRep.SHGSHtEquipRem +
-                    BuildingPreDefRep.SHGSHtSurfHt + BuildingPreDefRep.SHGSHtSurfCl;
-            total = -total; // want to know the negative value of the sum since the row should add up to zero
-            if (total > 0) {
-                BuildingPreDefRep.SHGSHtOtherAdd += total;
+            state.dataOutRptTab->totalGHGR = state.dataHeatBal->BuildingPreDefRep.SHGSHtPeoplAdd + state.dataHeatBal->BuildingPreDefRep.SHGSHtLiteAdd + state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacHt +
+                    state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacCl + state.dataHeatBal->BuildingPreDefRep.SHGSHtIzaAdd + state.dataHeatBal->BuildingPreDefRep.SHGSHtIzaRem +
+                    state.dataHeatBal->BuildingPreDefRep.SHGSHtWindAdd + state.dataHeatBal->BuildingPreDefRep.SHGSHtWindRem + state.dataHeatBal->BuildingPreDefRep.SHGSHtInfilAdd +
+                    state.dataHeatBal->BuildingPreDefRep.SHGSHtInfilRem + state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipAdd + state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipRem +
+                    state.dataHeatBal->BuildingPreDefRep.SHGSHtSurfHt + state.dataHeatBal->BuildingPreDefRep.SHGSHtSurfCl;
+            state.dataOutRptTab->totalGHGR = -state.dataOutRptTab->totalGHGR; // want to know the negative value of the sum since the row should add up to zero
+            if (state.dataOutRptTab->totalGHGR > 0) {
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtOtherAdd += state.dataOutRptTab->totalGHGR;
             } else {
-                BuildingPreDefRep.SHGSHtOtherRem += total;
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtOtherRem += state.dataOutRptTab->totalGHGR;
             }
         }
-        if (bldgClPk < BuildingPreDefRep.clPeak) {
-            BuildingPreDefRep.clPeak = bldgClPk;
+        if (state.dataOutRptTab->bldgClPk < state.dataHeatBal->BuildingPreDefRep.clPeak) {
+            state.dataHeatBal->BuildingPreDefRep.clPeak = state.dataOutRptTab->bldgClPk;
             // determine timestamp
             //  ActualTimeS = CurrentTime-TimeStepZone+SysTimeElapsed
             //  ActualtimeE = ActualTimeS+TimeStepSys
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
             ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-            EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
-            BuildingPreDefRep.clPtTimeStamp = timestepTimeStamp;
+            EncodeMonDayHrMin(state.dataOutRptTab->timestepTimeStampGHGR, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+            state.dataHeatBal->BuildingPreDefRep.clPtTimeStamp = state.dataOutRptTab->timestepTimeStampGHGR;
             // reset building level results to zero prior to accumulating across zones
-            BuildingPreDefRep.SHGSClHvacHt = 0.0;
-            BuildingPreDefRep.SHGSClHvacCl = 0.0;
-            BuildingPreDefRep.SHGSClSurfHt = 0.0;
-            BuildingPreDefRep.SHGSClSurfCl = 0.0;
-            BuildingPreDefRep.SHGSClHvacATUHt = 0.0;
-            BuildingPreDefRep.SHGSClHvacATUCl = 0.0;
-            BuildingPreDefRep.SHGSClPeoplAdd = 0.0;
-            BuildingPreDefRep.SHGSClLiteAdd = 0.0;
-            BuildingPreDefRep.SHGSClEquipAdd = 0.0;
-            BuildingPreDefRep.SHGSClWindAdd = 0.0;
-            BuildingPreDefRep.SHGSClIzaAdd = 0.0;
-            BuildingPreDefRep.SHGSClInfilAdd = 0.0;
-            BuildingPreDefRep.SHGSClOtherAdd = 0.0;
-            BuildingPreDefRep.SHGSClEquipRem = 0.0;
-            BuildingPreDefRep.SHGSClWindRem = 0.0;
-            BuildingPreDefRep.SHGSClIzaRem = 0.0;
-            BuildingPreDefRep.SHGSClInfilRem = 0.0;
-            BuildingPreDefRep.SHGSClOtherRem = 0.0;
-            for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClHvacHt = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClHvacCl = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClSurfHt = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClSurfCl = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUHt = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUCl = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClPeoplAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClLiteAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClEquipAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClWindAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClIzaAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClInfilAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClOtherAdd = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClEquipRem = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClWindRem = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClIzaRem = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClInfilRem = 0.0;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClOtherRem = 0.0;
+            for (state.dataOutRptTab->iZoneGHGR = 1; state.dataOutRptTab->iZoneGHGR <= state.dataGlobal->NumOfZones; ++state.dataOutRptTab->iZoneGHGR) {
+                mult = Zone(state.dataOutRptTab->iZoneGHGR).Multiplier * Zone(state.dataOutRptTab->iZoneGHGR).ListMultiplier;
                 // HVAC Input Sensible Air Heating
                 // HVAC Input Sensible Air Cooling
-                BuildingPreDefRep.SHGSClHvacCl += ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSClHvacCl += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem + state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumNonAirSystem * mult;
                 // HVAC Input Heated Surface Heating
                 // HVAC Input Cooled Surface Cooling
-                BuildingPreDefRep.SHGSClSurfHt += radiantHeat(iZone);
-                BuildingPreDefRep.SHGSClSurfCl += radiantCool(iZone);
+                state.dataHeatBal->BuildingPreDefRep.SHGSClSurfHt += state.dataOutRptTab->radiantHeat(state.dataOutRptTab->iZoneGHGR);
+                state.dataHeatBal->BuildingPreDefRep.SHGSClSurfCl += state.dataOutRptTab->radiantCool(state.dataOutRptTab->iZoneGHGR);
                 // HVAC ATU Heating
                 // HVAC ATU Cooling
-                BuildingPreDefRep.SHGSClHvacATUHt += ATUHeat(iZone);
-                BuildingPreDefRep.SHGSClHvacATUCl += ATUCool(iZone);
+                state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUHt += state.dataOutRptTab->ATUHeat(state.dataOutRptTab->iZoneGHGR);
+                state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUCl += state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR);
                 // People Sensible Heat Addition
-                BuildingPreDefRep.SHGSClPeoplAdd += ZnRpt(iZone).PeopleSenGainRate * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSClPeoplAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
                 // Lights Sensible Heat Addition
-                BuildingPreDefRep.SHGSClLiteAdd += ZnRpt(iZone).LtsTotGainRate * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSClLiteAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
                 // Equipment Sensible Heat Addition
                 // Equipment Sensible Heat Removal
-                eqpSens = ZnRpt(iZone).ElecRadGainRate + ZnRpt(iZone).GasRadGainRate + ZnRpt(iZone).HWRadGainRate + ZnRpt(iZone).SteamRadGainRate +
-                          ZnRpt(iZone).OtherRadGainRate + ZnRpt(iZone).ElecConGainRate + ZnRpt(iZone).GasConGainRate + ZnRpt(iZone).HWConGainRate +
-                          ZnRpt(iZone).SteamConGainRate + ZnRpt(iZone).OtherConGainRate;
-                if (eqpSens > 0.0) {
-                    BuildingPreDefRep.SHGSClEquipAdd += eqpSens * mult;
+                state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
+                          state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
+                          state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate + state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+                if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
+                    state.dataHeatBal->BuildingPreDefRep.SHGSClEquipAdd += state.dataOutRptTab->eqpSensGHGR * mult;
                 } else {
-                    BuildingPreDefRep.SHGSClEquipRem += eqpSens * mult;
+                    state.dataHeatBal->BuildingPreDefRep.SHGSClEquipRem += state.dataOutRptTab->eqpSensGHGR * mult;
                 }
                 // Window Heat Addition
                 // Window Heat Removal
-                BuildingPreDefRep.SHGSClWindAdd += ZoneWinHeatGainRep(iZone) * mult;
-                BuildingPreDefRep.SHGSClWindRem -= ZoneWinHeatLossRep(iZone) * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSClWindAdd += state.dataHeatBal->ZoneWinHeatGainRep(state.dataOutRptTab->iZoneGHGR) * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSClWindRem -= state.dataHeatBal->ZoneWinHeatLossRep(state.dataOutRptTab->iZoneGHGR) * mult;
                 // mixing object cool addition and removal
-                if (ZnAirRpt(iZone).SumMCpDTzones > 0.0) {
-                    BuildingPreDefRep.SHGSClIzaAdd += ZnAirRpt(iZone).SumMCpDTzones * mult;
+                if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones > 0.0) {
+                    state.dataHeatBal->BuildingPreDefRep.SHGSClIzaAdd += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult;
                 } else {
-                    BuildingPreDefRep.SHGSClIzaRem += ZnAirRpt(iZone).SumMCpDTzones * mult;
+                    state.dataHeatBal->BuildingPreDefRep.SHGSClIzaRem += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult;
                 }
                 // Infiltration Heat Addition
                 // Infiltration Heat Removal
-                if (ZnAirRpt(iZone).SumMCpDtInfil > 00) {
-                    BuildingPreDefRep.SHGSClInfilAdd += ZnAirRpt(iZone).SumMCpDtInfil * mult;
+                if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil > 00) {
+                    state.dataHeatBal->BuildingPreDefRep.SHGSClInfilAdd += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult;
                 } else {
-                    BuildingPreDefRep.SHGSClInfilRem += ZnAirRpt(iZone).SumMCpDtInfil * mult;
+                    state.dataHeatBal->BuildingPreDefRep.SHGSClInfilRem += state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult;
                 }
             }
             // Opaque Surface Conduction and Other Heat Addition
             // Opaque Surface Conduction and Other Heat Removal
-            total = BuildingPreDefRep.SHGSClPeoplAdd + BuildingPreDefRep.SHGSClLiteAdd + BuildingPreDefRep.SHGSClHvacHt +
-                    BuildingPreDefRep.SHGSClHvacCl + BuildingPreDefRep.SHGSClIzaAdd + BuildingPreDefRep.SHGSClIzaRem +
-                    BuildingPreDefRep.SHGSClWindAdd + BuildingPreDefRep.SHGSClWindRem + BuildingPreDefRep.SHGSClInfilAdd +
-                    BuildingPreDefRep.SHGSClInfilRem + BuildingPreDefRep.SHGSClEquipAdd + BuildingPreDefRep.SHGSClEquipRem +
-                    BuildingPreDefRep.SHGSClSurfHt + BuildingPreDefRep.SHGSClSurfCl;
-            total = -total; // want to know the negative value of the sum since the row should add up to zero
-            if (total > 0) {
-                BuildingPreDefRep.SHGSClOtherAdd += total;
+            state.dataOutRptTab->totalGHGR = state.dataHeatBal->BuildingPreDefRep.SHGSClPeoplAdd + state.dataHeatBal->BuildingPreDefRep.SHGSClLiteAdd + state.dataHeatBal->BuildingPreDefRep.SHGSClHvacHt +
+                    state.dataHeatBal->BuildingPreDefRep.SHGSClHvacCl + state.dataHeatBal->BuildingPreDefRep.SHGSClIzaAdd + state.dataHeatBal->BuildingPreDefRep.SHGSClIzaRem +
+                    state.dataHeatBal->BuildingPreDefRep.SHGSClWindAdd + state.dataHeatBal->BuildingPreDefRep.SHGSClWindRem + state.dataHeatBal->BuildingPreDefRep.SHGSClInfilAdd +
+                    state.dataHeatBal->BuildingPreDefRep.SHGSClInfilRem + state.dataHeatBal->BuildingPreDefRep.SHGSClEquipAdd + state.dataHeatBal->BuildingPreDefRep.SHGSClEquipRem +
+                    state.dataHeatBal->BuildingPreDefRep.SHGSClSurfHt + state.dataHeatBal->BuildingPreDefRep.SHGSClSurfCl;
+            state.dataOutRptTab->totalGHGR = -state.dataOutRptTab->totalGHGR; // want to know the negative value of the sum since the row should add up to zero
+            if (state.dataOutRptTab->totalGHGR > 0) {
+                state.dataHeatBal->BuildingPreDefRep.SHGSClOtherAdd += state.dataOutRptTab->totalGHGR;
             } else {
-                BuildingPreDefRep.SHGSClOtherRem += total;
+                state.dataHeatBal->BuildingPreDefRep.SHGSClOtherRem += state.dataOutRptTab->totalGHGR;
             }
         }
     }
@@ -5108,7 +5025,7 @@ namespace EnergyPlus::OutputReportTabular {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       January 2021, J. Yuan 
+        //       MODIFIED       January 2021, J. Yuan
         //                      Modified to accommodate dual-unit reporting
         //       RE-ENGINEERED  na
 
@@ -5121,7 +5038,7 @@ namespace EnergyPlus::OutputReportTabular {
         FillRemainingPredefinedEntries(state);
         auto &ort(state.dataOutRptTab);
 
-        // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc) 
+        // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc)
         // when ort->unitsStyle inputs should have been concretely processed and assigned.
         if (ort->unitsStyle_SQLite == iUnitsStyle::NotFound) {
             ort->unitsStyle_SQLite = ort->unitsStyle; // This is the default UseOutputControlTableStyles
@@ -5147,7 +5064,7 @@ namespace EnergyPlus::OutputReportTabular {
             if (ort->displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
             if (ort->displayVisualResilienceSummary) WriteVisualResilienceTables(state);
 
-            coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
+            state.dataRptCoilSelection->coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables(state);                                // moved to come after zone load components is finished
 
             if (state.dataGlobal->DoWeathSim) {
@@ -5177,14 +5094,14 @@ namespace EnergyPlus::OutputReportTabular {
         print(state.files.audit, variable_fmt, "numCompSizeTableEntry", state.dataOutRptPredefined->numCompSizeTableEntry);
     }
 
-    bool produceDualUnitsFlags(const int& iUnit_Sys, const iUnitsStyle& unitsStyle_Tab, const iUnitsStyle& unitsStyle_Sql, 
+    bool produceDualUnitsFlags(const int& iUnit_Sys, const iUnitsStyle& unitsStyle_Tab, const iUnitsStyle& unitsStyle_Sql,
         iUnitsStyle& unitsStyle_Cur, bool& produce_Tab, bool& produce_Sql)
     {
         // January 2021:
         // PURPOSE OF THIS SUBROUTINE:
-        // This routine sets the order and flags for tabular data and sqlite writing for a Dual-Unit reporting. 
+        // This routine sets the order and flags for tabular data and sqlite writing for a Dual-Unit reporting.
         // It will set the unit styles to used, a flag for tabular data writing, and a flag for sqlite writing.
-        // The function will return a false flag if only a second round of (SQLite) writing is needed 
+        // The function will return a false flag if only a second round of (SQLite) writing is needed
         // and will return a true flag if a second round SQLite writing is not needed.
 
         bool brkflag(false);
@@ -5197,7 +5114,7 @@ namespace EnergyPlus::OutputReportTabular {
             } else {
                 produce_Sql = false;
             }
-        } else { // iUnit_Sys == 1 
+        } else { // iUnit_Sys == 1
             unitsStyle_Cur = unitsStyle_Sql;
             produce_Tab = false;
             produce_Sql = true;
@@ -5882,13 +5799,7 @@ namespace EnergyPlus::OutputReportTabular {
         //   any additional report entries for the predefined reports.
 
         // Using/Aliasing
-        using DataHeatBalance::BuildingPreDefRep;
-        using DataHeatBalance::Lights;
-        using DataHeatBalance::TotLights;
-        using DataHeatBalance::ZnAirRpt;
-        using DataHeatBalance::Zone;
-        using DataHeatBalance::ZonePreDefRep;
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
         using DataOutputs::iNumberOfAutoCalcedFields;
         using DataOutputs::iNumberOfAutoSizedFields;
         using DataOutputs::iNumberOfDefaultedFields;
@@ -5904,31 +5815,11 @@ namespace EnergyPlus::OutputReportTabular {
         int zonePt;
         int iZone;
         Real64 mult; // zone list and group multipliers
-        static Real64 totalVolume(0.0);
-        static int numUncondZones(0);
-        static int numCondZones(0);
         int StartOfWeek;
-        static Real64 HrsPerWeek(0.0);
         Real64 consumptionTotal;
-        // sensible heat gain report totals
-        static Real64 totalZoneEqHt(0.0);
-        static Real64 totalZoneEqCl(0.0);
-        static Real64 totalHvacATUHt(0.0);
-        static Real64 totalHvacATUCl(0.0);
-        static Real64 totalSurfHt(0.0);
-        static Real64 totalSurfCl(0.0);
-        static Real64 totalPeoplAdd(0.0);
-        static Real64 totalLiteAdd(0.0);
-        static Real64 totalEquipAdd(0.0);
-        static Real64 totalWindAdd(0.0);
-        static Real64 totalIzaAdd(0.0);
-        static Real64 totalInfilAdd(0.0);
-        static Real64 totalOtherAdd(0.0);
-        static Real64 totalEquipRem(0.0);
-        static Real64 totalWindRem(0.0);
-        static Real64 totalIzaRem(0.0);
-        static Real64 totalInfilRem(0.0);
-        static Real64 totalOtherRem(0.0);
+
+        auto &Zone(state.dataHeatBal->Zone);
+        auto &ZonePreDefRep(state.dataHeatBal->ZonePreDefRep);
 
         auto &ort(state.dataOutRptTab);
 
@@ -5937,28 +5828,28 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Interior Connected Lighting Power
         consumptionTotal = 0.0;
-        for (iLight = 1; iLight <= TotLights; ++iLight) {
-            zonePt = Lights(iLight).ZonePtr;
+        for (iLight = 1; iLight <= state.dataHeatBal->TotLights; ++iLight) {
+            zonePt = state.dataHeatBal->Lights(iLight).ZonePtr;
             mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
             if (Zone(zonePt).SystemZoneNodeNumber > 0) { // conditioned y/n
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtCond, Lights(iLight).Name, "Y");
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtCond, state.dataHeatBal->Lights(iLight).Name, "Y");
             } else {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtCond, Lights(iLight).Name, "N");
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtCond, state.dataHeatBal->Lights(iLight).Name, "N");
             }
             PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchInLtAvgHrSchd, Lights(iLight).Name, ScheduleAverageHoursPerWeek(state, Lights(iLight).SchedPtr, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear));
+                state.dataOutRptPredefined->pdchInLtAvgHrSchd, state.dataHeatBal->Lights(iLight).Name, ScheduleAverageHoursPerWeek(state, state.dataHeatBal->Lights(iLight).SchedPtr, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear));
             // average operating hours per week
             if (ort->gatherElapsedTimeBEPS > 0) {
-                HrsPerWeek = 24 * 7 * Lights(iLight).SumTimeNotZeroCons / ort->gatherElapsedTimeBEPS;
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtAvgHrOper, Lights(iLight).Name, HrsPerWeek);
+                state.dataOutRptTab->HrsPerWeek = 24 * 7 * state.dataHeatBal->Lights(iLight).SumTimeNotZeroCons / ort->gatherElapsedTimeBEPS;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtAvgHrOper, state.dataHeatBal->Lights(iLight).Name, state.dataOutRptTab->HrsPerWeek);
             }
             // full load hours per week
-            if ((Lights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS) > 0) {
-                HrsPerWeek = 24 * 7 * Lights(iLight).SumConsumption / (Lights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtFullLoadHrs, Lights(iLight).Name, HrsPerWeek);
+            if ((state.dataHeatBal->Lights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS) > 0) {
+                state.dataOutRptTab->HrsPerWeek = 24 * 7 * state.dataHeatBal->Lights(iLight).SumConsumption / (state.dataHeatBal->Lights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtFullLoadHrs, state.dataHeatBal->Lights(iLight).Name, state.dataOutRptTab->HrsPerWeek);
             }
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtConsump, Lights(iLight).Name, Lights(iLight).SumConsumption * mult / 1000000000.0);
-            consumptionTotal += Lights(iLight).SumConsumption / 1000000000.0;
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtConsump, state.dataHeatBal->Lights(iLight).Name, state.dataHeatBal->Lights(iLight).SumConsumption * mult / 1000000000.0);
+            consumptionTotal += state.dataHeatBal->Lights(iLight).SumConsumption / 1000000000.0;
         }
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtConsump, "Interior Lighting Total", consumptionTotal);
 
@@ -5972,14 +5863,14 @@ namespace EnergyPlus::OutputReportTabular {
             }
             // average operating hours per week
             if (ort->gatherElapsedTimeBEPS > 0) {
-                HrsPerWeek = 24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumTimeNotZeroCons / ort->gatherElapsedTimeBEPS;
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtAvgHrOper, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, HrsPerWeek);
+                state.dataOutRptTab->HrsPerWeek = 24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumTimeNotZeroCons / ort->gatherElapsedTimeBEPS;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtAvgHrOper, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, state.dataOutRptTab->HrsPerWeek);
             }
             // full load hours per week
             if ((state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS) > 0) {
-                HrsPerWeek =
+                state.dataOutRptTab->HrsPerWeek =
                     24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / (state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtFullLoadHrs, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, HrsPerWeek);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtFullLoadHrs, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, state.dataOutRptTab->HrsPerWeek);
             }
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtConsump, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / 1000000000.0);
             consumptionTotal += state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / 1000000000.0;
@@ -6006,8 +5897,8 @@ namespace EnergyPlus::OutputReportTabular {
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
                 // AFN infiltration -- check that afn sim is being done.
-                if (!(AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-                    AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
+                if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+                    state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
                     ZonePreDefRep(iZone).AFNInfilVolTotalStdDen = 0.0;
                     ZonePreDefRep(iZone).AFNInfilVolMin = 0.0;
                     ZonePreDefRep(iZone).AFNInfilVolTotalOcc = 0.0;
@@ -6015,7 +5906,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // air loop name
                 std::string airLoopName = "";
-                int ctrlZoneNum = DataHeatBalance::Zone(iZone).ZoneEqNum;
+                int ctrlZoneNum = Zone(iZone).ZoneEqNum;
                 if (ctrlZoneNum > 0) {
                     for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
                         int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
@@ -6048,7 +5939,7 @@ namespace EnergyPlus::OutputReportTabular {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoZoneVol1, Zone(iZone).Name, Zone(iZone).Volume);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoZoneVol2, Zone(iZone).Name, Zone(iZone).Volume);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneVol, Zone(iZone).Name, Zone(iZone).Volume);
-                    totalVolume += Zone(iZone).Volume * zoneMult;
+                    state.dataOutRptTab->totalVolume += Zone(iZone).Volume * zoneMult;
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
                     totalArea += Zone(iZone).FloorArea * zoneMult;
 
@@ -6071,24 +5962,22 @@ namespace EnergyPlus::OutputReportTabular {
                             (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
                             3);
                     }
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, Zone(iZone).Name, ZonePreDefRep(iZone).MechVentVolTotalStdDen, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, Zone(iZone).Name, ZonePreDefRep(iZone).MechVentVolTotalStdDen);
                     totalMechVentVol += ZonePreDefRep(iZone).MechVentVolTotalStdDen * zoneMult;
 
                     // Natural ventilation
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchOaTaBzNatVent,
                                      Zone(iZone).Name,
-                                     ZonePreDefRep(iZone).SimpVentVolTotalStdDen + ZonePreDefRep(iZone).AFNVentVolTotalStdDen,
-                                     0);
+                                     ZonePreDefRep(iZone).SimpVentVolTotalStdDen + ZonePreDefRep(iZone).AFNVentVolTotalStdDen);
                     totalNatVentVol += (ZonePreDefRep(iZone).SimpVentVolTotalStdDen + ZonePreDefRep(iZone).AFNVentVolTotalStdDen) * zoneMult;
 
-                    // Total ventilation 
+                    // Total ventilation
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchOaTaBzTotVent,
                                      Zone(iZone).Name,
                                      ZonePreDefRep(iZone).MechVentVolTotalStdDen + ZonePreDefRep(iZone).SimpVentVolTotalStdDen +
-                                         ZonePreDefRep(iZone).AFNVentVolTotalStdDen,
-                                     0);
+                                         ZonePreDefRep(iZone).AFNVentVolTotalStdDen);
 
                     // infiltration
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
@@ -6120,7 +6009,7 @@ namespace EnergyPlus::OutputReportTabular {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoMinSimpVent, Zone(iZone).Name, ZonePreDefRep(iZone).SimpVentVolMin / (Zone(iZone).Volume), 3);
                     }
 
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolTotalStdDen, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolTotalStdDen);
                     totalInfilVol += ZonePreDefRep(iZone).InfilVolTotalStdDen * zoneMult;
 
                     // Total ventilation and infiltration
@@ -6128,16 +6017,15 @@ namespace EnergyPlus::OutputReportTabular {
                                      state.dataOutRptPredefined->pdchOaTaBzTotVentInfil,
                                      Zone(iZone).Name,
                                      ZonePreDefRep(iZone).MechVentVolTotalStdDen + ZonePreDefRep(iZone).SimpVentVolTotalStdDen +
-                                         ZonePreDefRep(iZone).AFNInfilVolTotalStdDen + ZonePreDefRep(iZone).InfilVolTotalStdDen,
-                                     0);
+                                         ZonePreDefRep(iZone).AFNInfilVolTotalStdDen + ZonePreDefRep(iZone).InfilVolTotalStdDen);
 
                     // Dynamic target ventilation Voz-dyn
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTotal, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTotal);
                     totalVozDyn += ZonePreDefRep(iZone).VozTargetTotal * zoneMult;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelow, 0);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAt, 0);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAbove, 0);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, Zone(iZone).Name, ZonePreDefRep(iZone).TotVentTimeNonZeroUnocc, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelow);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAt);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAbove);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, Zone(iZone).Name, ZonePreDefRep(iZone).TotVentTimeNonZeroUnocc);
 
                     if (Zone(iZone).isNominalOccupied && (ZonePreDefRep(iZone).TotTimeOcc > 0.0)) {
                         Real64 totTimeOccSec = ZonePreDefRep(iZone).TotTimeOcc * SecInHour;
@@ -6148,7 +6036,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                         // Natural ventilation
                         Real64 natVent = (ZonePreDefRep(iZone).SimpVentVolTotalOccStdDen + ZonePreDefRep(iZone).AFNVentVolTotalOccStdDen) / totTimeOccSec;
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzNatVent, Zone(iZone).Name, natVent);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzNatVent, Zone(iZone).Name, natVent, 4);
                         totalNatVentRateOcc += natVent * zoneMult;
 
                         // Total ventilation
@@ -6167,127 +6055,220 @@ namespace EnergyPlus::OutputReportTabular {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, Zone(iZone).Name, avgVoz, 4);
                         totalVozDynOcc += avgVoz * zoneMult;
                         PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelowOcc, 0);
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelowOcc);
                         PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAtOcc, 0);
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAtOcc);
                         PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAboveOcc, 0);
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAboveOcc);
                     }
                 }
             }
         }
 
-        for (int iSys = 1; iSys <= DataHVACGlobals::NumPrimaryAirSys; ++iSys) {
+        for (int iSys = 1; iSys <= state.dataHVACGlobal->NumPrimaryAirSys; ++iSys) {
             // Total Outdoor Air by Airloop
             PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchOaTaAlMechVent,
                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal,
-                0);
+                state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal);
             PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchOaTaAlNatVent,
                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal,
-                0);
+                state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal);
             PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchOaTaAlTotVent,
                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal,
-                0);
+                state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal);
             PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchOaTaAlSumDynTrgVent,
                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVoz,
-                0);
+                state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVoz);
             PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchOaTaAlTmBelow,
                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotal,
-                0);
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotal);
             PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchOaTaAlTmAt,
                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotal,
-                0);
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotal);
             PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchOaTaAlTmAbove,
                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotal,
-                0);
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotal);
             PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchOaTaAlTmAboveUnocc,
                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccTotal,
-                0);
-            // Average Outdoor Air During Occupancy by Airloop
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccTotal);
+
+            // Air loop times at OA limiting factors
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctNoLimit,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNone]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctLimit,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorLimits]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctEcono,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEconomizer]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctExhaust,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorExhaust]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctMixedLimit,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorMixedAir]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctHiHumid,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorHighHum]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctDCV,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDCV]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctNiteVent,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNightVent]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctDemand,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDemandLimit]);
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchOaTmFctEMS,
+                             state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEMS]);
+
             if (state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal > 0.0) {
+                // Average Outdoor Air During Occupancy by Airloop
+                Real64 totTimeOccSec = state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal * SecInHour;
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaOccAlMechVent,
                                  state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                                 state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc /
-                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc / totTimeOccSec,
                                  4);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaOccAlNatVent,
                                  state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                                 state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc /
-                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc / totTimeOccSec,
                                  4);
                 PreDefTableEntry(
                     state,
                     state.dataOutRptPredefined->pdchOaOccAlTotVent,
                     state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
                     (state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc) /
-                        state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                        totTimeOccSec,
                     4);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaOccAlSumDynTrgVent,
                                  state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                                 state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVozOcc /
-                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVozOcc / totTimeOccSec,
                                  4);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaOccAlTmBelow,
                                  state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotalOcc,
-                                 0);
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotalOcc);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaOccAlTmAt,
                                  state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotalOcc,
-                                 0);
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotalOcc);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaOccAlTmAbove,
                                  state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotalOcc,
-                                 0);
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotalOcc);
+
+                // Average Outdoor Air at OA Limiting Factors During Occupancy by Airloop
+                // lambda to set avgFlow during occupancy for a given airloop and limiting factor type
+                auto avgFlowRate = [&state](int sysNum, int limitingFactorType) {
+                    Real64 avgFlow = 0.0;
+                    int time = state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtOALimitOcc[limitingFactorType];
+                    if (time > 0) {
+                        avgFlow = state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotAtLimitOcc[limitingFactorType] / (time * SecInHour);
+                    } else {
+                        avgFlow = 0.0;
+                    }
+                    return avgFlow;
+                };
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaAvFctNoLimit,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 avgFlowRate(iSys, MixedAir::limitFactorNone),
+                                 4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaAvFctLimit,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 avgFlowRate(iSys, MixedAir::limitFactorLimits),
+                                 4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaAvFctEcono,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 avgFlowRate(iSys, MixedAir::limitFactorEconomizer),
+                                 4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaAvFctExhaust,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 avgFlowRate(iSys, MixedAir::limitFactorExhaust),
+                                 4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaAvFctMixedLimit,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 avgFlowRate(iSys, MixedAir::limitFactorMixedAir),
+                                 4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaAvFctHiHumid,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 avgFlowRate(iSys, MixedAir::limitFactorHighHum),
+                                 4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaAvFctDCV,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 avgFlowRate(iSys, MixedAir::limitFactorDCV),
+                                 4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaAvFctNiteVent,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 avgFlowRate(iSys, MixedAir::limitFactorNightVent),
+                                 4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaAvFctDemand,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 avgFlowRate(iSys, MixedAir::limitFactorDemandLimit),
+                                 4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaAvFctEMS,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 avgFlowRate(iSys, MixedAir::limitFactorEMS),
+                                 4);
             }
         }
         // add total rows for outdoor air details
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchOaMvDesZnOa, "Total Facility", state.dataOutRptPredefined->TotalVozMax, 4);
 
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneVol, "Total Facility", totalVolume);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneVol, "Total Facility", state.dataOutRptTab->totalVolume);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneArea, "Total Facility", totalArea);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvNomNumOcc, "Total Facility", totalOccupants);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvAvgNumOcc, "Total Facility", totalAverageOccupants);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvMinDynTrgVent, "Total Facility", totalVozMin, 3);
 
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, "Total Facility", totalMechVentVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzNatVent, "Total Facility", totalNatVentVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVent, "Total Facility", totalMechVentVol + totalNatVentVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, "Total Facility", totalInfilVol, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, "Total Facility", totalMechVentVol);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzNatVent, "Total Facility", totalNatVentVol);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVent, "Total Facility", totalMechVentVol + totalNatVentVol);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, "Total Facility", totalInfilVol);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaTaBzTotVentInfil, "Total Facility", totalMechVentVol + totalNatVentVol + totalInfilVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, "Total Facility", totalVozDyn, 0);
+            state, state.dataOutRptPredefined->pdchOaTaBzTotVentInfil, "Total Facility", totalMechVentVol + totalNatVentVol + totalInfilVol);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, "Total Facility", totalVozDyn);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynForOA);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaTaBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynForOA);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynForOA);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneVentUnoccForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneVentUnoccForOA);
 
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzMechVent, "Total Facility", totalMechVentRateOcc, 4);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzNatVent, "Total Facility", totalNatVentRateOcc, 4);
@@ -6300,24 +6281,24 @@ namespace EnergyPlus::OutputReportTabular {
                          4);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, "Total Facility", totalVozDynOcc, 4);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynOccForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynOccForOA);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynOccForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynOccForOA);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA);
 
         // Add the number of central air distributions system to the count report
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "HVAC Air Loops", NumPrimaryAirSys);
         // Add the number of conditioned and unconditioned zones to the count report
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             if (Zone(iZone).SystemZoneNodeNumber > 0) { // conditioned zones only
-                ++numCondZones;
+                ++state.dataOutRptTab->numCondZones;
             } else {
-                ++numUncondZones;
+                ++state.dataOutRptTab->numUncondZones;
             }
         }
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Conditioned Zones", numCondZones);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Unconditioned Zones", numUncondZones);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Conditioned Zones", state.dataOutRptTab->numCondZones);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Unconditioned Zones", state.dataOutRptTab->numUncondZones);
         // add the number of plenums to the count report
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Supply Plenums", state.dataZonePlenum->NumZoneSupplyPlenums);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Return Plenums", state.dataZonePlenum->NumZoneReturnPlenums);
@@ -6402,89 +6383,89 @@ namespace EnergyPlus::OutputReportTabular {
         }
         // totals for annual report
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-            totalZoneEqHt += ZonePreDefRep(iZone).SHGSAnZoneEqHt;
-            totalZoneEqCl += ZonePreDefRep(iZone).SHGSAnZoneEqCl;
-            totalHvacATUHt += ZonePreDefRep(iZone).SHGSAnHvacATUHt;
-            totalHvacATUCl += ZonePreDefRep(iZone).SHGSAnHvacATUCl;
-            totalSurfHt += ZonePreDefRep(iZone).SHGSAnSurfHt;
-            totalSurfCl += ZonePreDefRep(iZone).SHGSAnSurfCl;
-            totalPeoplAdd += ZonePreDefRep(iZone).SHGSAnPeoplAdd;
-            totalLiteAdd += ZonePreDefRep(iZone).SHGSAnLiteAdd;
-            totalEquipAdd += ZonePreDefRep(iZone).SHGSAnEquipAdd;
-            totalWindAdd += ZonePreDefRep(iZone).SHGSAnWindAdd;
-            totalIzaAdd += ZonePreDefRep(iZone).SHGSAnIzaAdd;
-            totalInfilAdd += ZonePreDefRep(iZone).SHGSAnInfilAdd;
-            totalOtherAdd += ZonePreDefRep(iZone).SHGSAnOtherAdd;
-            totalEquipRem += ZonePreDefRep(iZone).SHGSAnEquipRem;
-            totalWindRem += ZonePreDefRep(iZone).SHGSAnWindRem;
-            totalIzaRem += ZonePreDefRep(iZone).SHGSAnIzaRem;
-            totalInfilRem += ZonePreDefRep(iZone).SHGSAnInfilRem;
-            totalOtherRem += ZonePreDefRep(iZone).SHGSAnOtherRem;
+            state.dataOutRptTab->totalZoneEqHt += ZonePreDefRep(iZone).SHGSAnZoneEqHt;
+            state.dataOutRptTab->totalZoneEqCl += ZonePreDefRep(iZone).SHGSAnZoneEqCl;
+            state.dataOutRptTab->totalHvacATUHt += ZonePreDefRep(iZone).SHGSAnHvacATUHt;
+            state.dataOutRptTab->totalHvacATUCl += ZonePreDefRep(iZone).SHGSAnHvacATUCl;
+            state.dataOutRptTab->totalSurfHt += ZonePreDefRep(iZone).SHGSAnSurfHt;
+            state.dataOutRptTab->totalSurfCl += ZonePreDefRep(iZone).SHGSAnSurfCl;
+            state.dataOutRptTab->totalPeoplAdd += ZonePreDefRep(iZone).SHGSAnPeoplAdd;
+            state.dataOutRptTab->totalLiteAdd += ZonePreDefRep(iZone).SHGSAnLiteAdd;
+            state.dataOutRptTab->totalEquipAdd += ZonePreDefRep(iZone).SHGSAnEquipAdd;
+            state.dataOutRptTab->totalWindAdd += ZonePreDefRep(iZone).SHGSAnWindAdd;
+            state.dataOutRptTab->totalIzaAdd += ZonePreDefRep(iZone).SHGSAnIzaAdd;
+            state.dataOutRptTab->totalInfilAdd += ZonePreDefRep(iZone).SHGSAnInfilAdd;
+            state.dataOutRptTab->totalOtherAdd += ZonePreDefRep(iZone).SHGSAnOtherAdd;
+            state.dataOutRptTab->totalEquipRem += ZonePreDefRep(iZone).SHGSAnEquipRem;
+            state.dataOutRptTab->totalWindRem += ZonePreDefRep(iZone).SHGSAnWindRem;
+            state.dataOutRptTab->totalIzaRem += ZonePreDefRep(iZone).SHGSAnIzaRem;
+            state.dataOutRptTab->totalInfilRem += ZonePreDefRep(iZone).SHGSAnInfilRem;
+            state.dataOutRptTab->totalOtherRem += ZonePreDefRep(iZone).SHGSAnOtherRem;
         }
         // PreDefTableEntry(state,  pdchSHGSAnHvacHt, "Total Facility", totalHvacHt * convertJtoGJ, 3 );
         // PreDefTableEntry(state,  pdchSHGSAnHvacCl, "Total Facility", totalHvacCl * convertJtoGJ, 3 );
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnZoneEqHt, "Total Facility", totalZoneEqHt * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnZoneEqCl, "Total Facility", totalZoneEqCl * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnHvacATUHt, "Total Facility", totalHvacATUHt * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnHvacATUCl, "Total Facility", totalHvacATUCl * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnSurfHt, "Total Facility", totalSurfHt * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnSurfCl, "Total Facility", totalSurfCl * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnPeoplAdd, "Total Facility", totalPeoplAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnLiteAdd, "Total Facility", totalLiteAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnEquipAdd, "Total Facility", totalEquipAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnWindAdd, "Total Facility", totalWindAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnIzaAdd, "Total Facility", totalIzaAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnInfilAdd, "Total Facility", totalInfilAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnOtherAdd, "Total Facility", totalOtherAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnEquipRem, "Total Facility", totalEquipRem * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnWindRem, "Total Facility", totalWindRem * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnIzaRem, "Total Facility", totalIzaRem * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnInfilRem, "Total Facility", totalInfilRem * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnOtherRem, "Total Facility", totalOtherRem * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnZoneEqHt, "Total Facility", state.dataOutRptTab->totalZoneEqHt * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnZoneEqCl, "Total Facility", state.dataOutRptTab->totalZoneEqCl * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnHvacATUHt, "Total Facility", state.dataOutRptTab->totalHvacATUHt * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnHvacATUCl, "Total Facility", state.dataOutRptTab->totalHvacATUCl * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnSurfHt, "Total Facility", state.dataOutRptTab->totalSurfHt * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnSurfCl, "Total Facility", state.dataOutRptTab->totalSurfCl * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnPeoplAdd, "Total Facility", state.dataOutRptTab->totalPeoplAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnLiteAdd, "Total Facility", state.dataOutRptTab->totalLiteAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnEquipAdd, "Total Facility", state.dataOutRptTab->totalEquipAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnWindAdd, "Total Facility", state.dataOutRptTab->totalWindAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnIzaAdd, "Total Facility", state.dataOutRptTab->totalIzaAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnInfilAdd, "Total Facility", state.dataOutRptTab->totalInfilAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnOtherAdd, "Total Facility", state.dataOutRptTab->totalOtherAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnEquipRem, "Total Facility", state.dataOutRptTab->totalEquipRem * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnWindRem, "Total Facility", state.dataOutRptTab->totalWindRem * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnIzaRem, "Total Facility", state.dataOutRptTab->totalIzaRem * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnInfilRem, "Total Facility", state.dataOutRptTab->totalInfilRem * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnOtherRem, "Total Facility", state.dataOutRptTab->totalOtherRem * DataGlobalConstants::convertJtoGJ, 3);
         // building level results for peak cooling
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClTimePeak, "Total Facility", DateToString(BuildingPreDefRep.clPtTimeStamp));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClTimePeak, "Total Facility", DateToString(state.dataHeatBal->BuildingPreDefRep.clPtTimeStamp));
         // PreDefTableEntry(state,  pdchSHGSClHvacHt, "Total Facility", BuildingPreDefRep.SHGSClHvacHt );
         // PreDefTableEntry(state,  pdchSHGSClHvacCl, "Total Facility", BuildingPreDefRep.SHGSClHvacCl );
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacHt, "Total Facility", (BuildingPreDefRep.SHGSClHvacHt - BuildingPreDefRep.SHGSClHvacATUHt));
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacCl, "Total Facility", (BuildingPreDefRep.SHGSClHvacCl - BuildingPreDefRep.SHGSClHvacATUCl));
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacATUHt, "Total Facility", BuildingPreDefRep.SHGSClHvacATUHt);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacATUCl, "Total Facility", BuildingPreDefRep.SHGSClHvacATUCl);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClSurfHt, "Total Facility", BuildingPreDefRep.SHGSClSurfHt);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClSurfCl, "Total Facility", BuildingPreDefRep.SHGSClSurfCl);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClPeoplAdd, "Total Facility", BuildingPreDefRep.SHGSClPeoplAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClLiteAdd, "Total Facility", BuildingPreDefRep.SHGSClLiteAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClEquipAdd, "Total Facility", BuildingPreDefRep.SHGSClEquipAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClWindAdd, "Total Facility", BuildingPreDefRep.SHGSClWindAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClIzaAdd, "Total Facility", BuildingPreDefRep.SHGSClIzaAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClInfilAdd, "Total Facility", BuildingPreDefRep.SHGSClInfilAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClOtherAdd, "Total Facility", BuildingPreDefRep.SHGSClOtherAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClEquipRem, "Total Facility", BuildingPreDefRep.SHGSClEquipRem);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClWindRem, "Total Facility", BuildingPreDefRep.SHGSClWindRem);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClIzaRem, "Total Facility", BuildingPreDefRep.SHGSClIzaRem);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClInfilRem, "Total Facility", BuildingPreDefRep.SHGSClInfilRem);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClOtherRem, "Total Facility", BuildingPreDefRep.SHGSClOtherRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacHt, "Total Facility", (state.dataHeatBal->BuildingPreDefRep.SHGSClHvacHt - state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUHt));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacCl, "Total Facility", (state.dataHeatBal->BuildingPreDefRep.SHGSClHvacCl - state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUCl));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacATUHt, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUHt);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacATUCl, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUCl);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClSurfHt, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClSurfHt);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClSurfCl, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClSurfCl);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClPeoplAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClPeoplAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClLiteAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClLiteAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClEquipAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClEquipAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClWindAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClWindAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClIzaAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClIzaAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClInfilAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClInfilAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClOtherAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClOtherAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClEquipRem, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClEquipRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClWindRem, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClWindRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClIzaRem, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClIzaRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClInfilRem, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClInfilRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClOtherRem, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSClOtherRem);
         // building level results for peak heating
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtTimePeak, "Total Facility", DateToString(BuildingPreDefRep.htPtTimeStamp));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtTimePeak, "Total Facility", DateToString(state.dataHeatBal->BuildingPreDefRep.htPtTimeStamp));
         // PreDefTableEntry(state,  pdchSHGSHtHvacHt, "Total Facility", BuildingPreDefRep.SHGSHtHvacHt );
         // PreDefTableEntry(state,  pdchSHGSHtHvacCl, "Total Facility", BuildingPreDefRep.SHGSHtHvacCl );
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacHt, "Total Facility", (BuildingPreDefRep.SHGSHtHvacHt - BuildingPreDefRep.SHGSHtHvacATUHt));
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacCl, "Total Facility", (BuildingPreDefRep.SHGSHtHvacCl - BuildingPreDefRep.SHGSHtHvacATUCl));
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacATUHt, "Total Facility", BuildingPreDefRep.SHGSHtHvacATUHt);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacATUCl, "Total Facility", BuildingPreDefRep.SHGSHtHvacATUCl);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtSurfHt, "Total Facility", BuildingPreDefRep.SHGSHtSurfHt);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtSurfCl, "Total Facility", BuildingPreDefRep.SHGSHtSurfCl);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtPeoplAdd, "Total Facility", BuildingPreDefRep.SHGSHtPeoplAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtLiteAdd, "Total Facility", BuildingPreDefRep.SHGSHtLiteAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtEquipAdd, "Total Facility", BuildingPreDefRep.SHGSHtEquipAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtWindAdd, "Total Facility", BuildingPreDefRep.SHGSHtWindAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtIzaAdd, "Total Facility", BuildingPreDefRep.SHGSHtIzaAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtInfilAdd, "Total Facility", BuildingPreDefRep.SHGSHtInfilAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtOtherAdd, "Total Facility", BuildingPreDefRep.SHGSHtOtherAdd);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtEquipRem, "Total Facility", BuildingPreDefRep.SHGSHtEquipRem);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtWindRem, "Total Facility", BuildingPreDefRep.SHGSHtWindRem);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtIzaRem, "Total Facility", BuildingPreDefRep.SHGSHtIzaRem);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtInfilRem, "Total Facility", BuildingPreDefRep.SHGSHtInfilRem);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtOtherRem, "Total Facility", BuildingPreDefRep.SHGSHtOtherRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacHt, "Total Facility", (state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacHt - state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUHt));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacCl, "Total Facility", (state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacCl - state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUCl));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacATUHt, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUHt);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacATUCl, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUCl);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtSurfHt, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtSurfHt);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtSurfCl, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtSurfCl);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtPeoplAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtPeoplAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtLiteAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtLiteAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtEquipAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtWindAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtWindAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtIzaAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtIzaAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtInfilAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtInfilAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtOtherAdd, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtOtherAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtEquipRem, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtWindRem, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtWindRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtIzaRem, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtIzaRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtInfilRem, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtInfilRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtOtherRem, "Total Facility", state.dataHeatBal->BuildingPreDefRep.SHGSHtOtherRem);
 
         // LEED Report
         // 1.1A-General Information
@@ -6500,8 +6481,8 @@ namespace EnergyPlus::OutputReportTabular {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", "-");
         }
         // LEED schedule sub table
-        for (long iSch = 1; iSch <= ScheduleManager::NumSchedules; ++iSch) {
-            std::string curSchName = ScheduleManager::Schedule(iSch).Name;
+        for (long iSch = 1; iSch <= state.dataScheduleMgr->NumSchedules; ++iSch) {
+            std::string curSchName = state.dataScheduleMgr->Schedule(iSch).Name;
             std::string curSchType = ScheduleManager::GetScheduleType(state, iSch);
             if (UtilityRoutines::SameString(curSchType, "FRACTION")) {
                 PreDefTableEntry(state,
@@ -6547,7 +6528,6 @@ namespace EnergyPlus::OutputReportTabular {
         int curCol;
         Real64 curVal;
         Real64 curConversionFactor;
-        static Real64 curConversionOffset(0.0);
         int columnUsedCount;
         int columnRecount;
         int digitsShown;
@@ -6670,17 +6650,17 @@ namespace EnergyPlus::OutputReportTabular {
                         if (unitsStyle_cur == iUnitsStyle::InchPound) {
                             varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
                             LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
-                            GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+                            GetUnitConversion(state, indexUnitConv, curConversionFactor, state.dataOutRptTab->curConversionOffset, curUnits);
                         } else { // just do the Joule conversion
                             // if units is in Joules, convert if specified
                             if (UtilityRoutines::SameString(unitEnumToString(ort->MonthlyColumns(curCol).units), "J")) {
                                 curUnits = energyUnitsString;
                                 curConversionFactor = energyUnitsConversionFactor;
-                                curConversionOffset = 0.0;
+                                state.dataOutRptTab->curConversionOffset = 0.0;
                             } else { // if not joules don't perform conversion
                                 curUnits = unitEnumToString(ort->MonthlyColumns(curCol).units);
                                 curConversionFactor = 1.0;
-                                curConversionOffset = 0.0;
+                                state.dataOutRptTab->curConversionOffset = 0.0;
                             }
                         }
                         {
@@ -6699,14 +6679,14 @@ namespace EnergyPlus::OutputReportTabular {
                                         if (ort->MonthlyColumns(curCol).duration(lMonth) != 0) {
                                             curVal = ((ort->MonthlyColumns(curCol).reslt(lMonth) / ort->MonthlyColumns(curCol).duration(lMonth)) *
                                                       curConversionFactor) +
-                                                     curConversionOffset;
+                                                     state.dataOutRptTab->curConversionOffset;
                                         } else {
                                             curVal = 0.0;
                                         }
-                                        sumVal += (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
+                                        sumVal += (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + state.dataOutRptTab->curConversionOffset;
                                         sumDuration += ort->MonthlyColumns(curCol).duration(lMonth);
                                     } else {
-                                        curVal = (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
+                                        curVal = (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + state.dataOutRptTab->curConversionOffset;
                                         sumVal += curVal;
                                     }
                                     if (ort->IsMonthGathered(lMonth)) {
@@ -6800,7 +6780,7 @@ namespace EnergyPlus::OutputReportTabular {
                                 minVal = storedMaxVal;
                                 maxVal = storedMinVal;
                                 for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                    curVal = ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor + curConversionOffset;
+                                    curVal = ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor + state.dataOutRptTab->curConversionOffset;
                                     if (ort->IsMonthGathered(lMonth)) {
                                         tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
                                         if (curVal > maxVal) maxVal = curVal;
@@ -6863,7 +6843,7 @@ namespace EnergyPlus::OutputReportTabular {
                                         // value was very small
                                         // restructured the following lines to hide showing HUGE and -HUGE values in output table CR8154 Glazer
                                         if ((curVal < veryLarge) && (curVal > verySmall)) {
-                                            curVal = curVal * curConversionFactor + curConversionOffset;
+                                            curVal = curVal * curConversionFactor + state.dataOutRptTab->curConversionOffset;
                                             if (curVal > maxVal) maxVal = curVal;
                                             if (curVal < minVal) minVal = curVal;
                                             if (curVal < veryLarge && curVal > verySmall) {
@@ -7236,8 +7216,6 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::deviationFromSetPtThresholdClg;
-        using DataHVACGlobals::deviationFromSetPtThresholdHtg;
         using DataWater::StorageTankDataStruct;
         using ScheduleManager::GetScheduleName;
 
@@ -7272,9 +7250,9 @@ namespace EnergyPlus::OutputReportTabular {
         Array2D<Real64> useVal(13, 15);
         Array2D<Real64> normalVal(13, 4);
         Array1D<Real64> collapsedTotal(13);
-        Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
-        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
-        Array2D<Real64> endUseSubOther(13, DataGlobalConstants::iEndUse.size());
+        Array2D<Real64> collapsedEndUse(13, state.dataGlobalConst->iEndUse.size());
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
+        Array2D<Real64> endUseSubOther(13, state.dataGlobalConst->iEndUse.size());
         Real64 totalOnsiteHeat;
         Real64 totalOnsiteWater;
         Real64 totalWater;
@@ -7312,13 +7290,6 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 useValColAddFuel13;
 
         std::string subCatName;
-        static Real64 leedSiteIntLite(0.0);
-        static Real64 leedSiteSpHeat(0.0);
-        static Real64 leedSiteSpCool(0.0);
-        static Real64 leedSiteFanInt(0.0);
-        static Real64 leedSiteSrvWatr(0.0);
-        static Real64 leedSiteRecept(0.0);
-        static Real64 leedSiteTotal(0.0);
         Real64 unconvert;
 
         // Jan 2021: Added temp storage
@@ -7360,7 +7331,7 @@ namespace EnergyPlus::OutputReportTabular {
                 // determine building floor areas
                 DetermineBuildingFloorArea(state);
                 // collapse the gatherEndUseBEPS array to the resource groups displayed
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(1, jEndUse) = ort->gatherEndUseBEPS(1, jEndUse);   // electricity
                     collapsedEndUse(2, jEndUse) = ort->gatherEndUseBEPS(2, jEndUse);   // natural gas
                     collapsedEndUse(3, jEndUse) = ort->gatherEndUseBEPS(6, jEndUse);   // gasoline
@@ -7419,7 +7390,7 @@ namespace EnergyPlus::OutputReportTabular {
                                                        format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
                     }
                 }
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1);   // electricity
                         collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2);   // natural gas
@@ -7467,7 +7438,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // convert units into GJ (divide by 1,000,000,000) if J otherwise kWh
                 for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= largeConversionFactor;
@@ -7476,7 +7447,7 @@ namespace EnergyPlus::OutputReportTabular {
                     collapsedTotal(iResource) /= largeConversionFactor;
                 }
                 // do water
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(13, jEndUse) /= waterConversionFactor;
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedEndUseSub(kEndUseSub, jEndUse, 13) /= waterConversionFactor;
@@ -7515,7 +7486,7 @@ namespace EnergyPlus::OutputReportTabular {
                 ort->gatherElecSurplusSold /= largeConversionFactor;
 
                 // get change in overall state of charge for electrical storage devices.
-                if (facilityElectricServiceObj->numElecStorageDevices > 0) {
+                if (state.dataElectPwrSvcMgr->facilityElectricServiceObj->numElecStorageDevices > 0) {
                     // All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not
                     // necessary OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum(
                     // ElecStorage.ThisTimeStepStateOfCharge() ) ) + gatherElecStorage;
@@ -7528,8 +7499,8 @@ namespace EnergyPlus::OutputReportTabular {
                 resourcePrimaryHeating = 0;
                 heatingMaximum = 0.0;
                 for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                    if (collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) > heatingMaximum) {
-                        heatingMaximum = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    if (collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) > heatingMaximum) {
+                        heatingMaximum = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
                         resourcePrimaryHeating = iResource;
                     }
                 }
@@ -7977,7 +7948,7 @@ namespace EnergyPlus::OutputReportTabular {
                             state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", RealToStr(convBldgGrossFloorArea, 2));
                     }
                 }
-                
+
                 tableBody(1, 2) = RealToStr(convBldgCondFloorArea, 2);
                 tableBody(1, 3) = RealToStr(convBldgGrossFloorArea - convBldgCondFloorArea, 2);
 
@@ -8008,22 +7979,22 @@ namespace EnergyPlus::OutputReportTabular {
                 columnWidth = 10; // array assignment - same for all columns
                 tableBody.allocate(13, 16);
                 for (iResource = 1; iResource <= 13; ++iResource) {
-                    useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                    useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                    useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                    useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
+                    useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling));
+                    useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
+                    useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
                     useVal(iResource, 5) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
                     useVal(iResource, 6) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                    useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                    useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                    useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                    useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                    useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                    useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                    useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                    useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
+                    useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans));
+                    useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps));
+                    useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
+                    useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification));
+                    useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
+                    useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
+                    useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
+                    useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
 
                     useVal(iResource, 15) = collapsedTotal(iResource); // totals
                 }
@@ -8266,42 +8237,42 @@ namespace EnergyPlus::OutputReportTabular {
                         state, state.dataOutRptPredefined->pdchLeedEcsProc, "Total", processElecCost + processGasCost + processOthrCost, 2);
                 }
                 // accumulate for percentage table
-                leedSiteIntLite = 0.0;
-                leedSiteSpHeat = 0.0;
-                leedSiteSpCool = 0.0;
-                leedSiteFanInt = 0.0;
-                leedSiteSrvWatr = 0.0;
-                leedSiteRecept = 0.0;
-                leedSiteTotal = 0.0;
+                state.dataOutRptTab->leedSiteIntLite = 0.0;
+                state.dataOutRptTab->leedSiteSpHeat = 0.0;
+                state.dataOutRptTab->leedSiteSpCool = 0.0;
+                state.dataOutRptTab->leedSiteFanInt = 0.0;
+                state.dataOutRptTab->leedSiteSrvWatr = 0.0;
+                state.dataOutRptTab->leedSiteRecept = 0.0;
+                state.dataOutRptTab->leedSiteTotal = 0.0;
                 for (iResource = 1; iResource <= 12; ++iResource) { // don't bother with water
-                    leedSiteIntLite += useVal(iResource, 3);
-                    leedSiteSpHeat += useVal(iResource, 1);
-                    leedSiteSpCool += useVal(iResource, 2);
-                    leedSiteFanInt += useVal(iResource, 7);
-                    leedSiteSrvWatr += useVal(iResource, 12);
-                    leedSiteRecept += useVal(iResource, 5);
-                    leedSiteTotal += useVal(iResource, 15);
+                    state.dataOutRptTab->leedSiteIntLite += useVal(iResource, 3);
+                    state.dataOutRptTab->leedSiteSpHeat += useVal(iResource, 1);
+                    state.dataOutRptTab->leedSiteSpCool += useVal(iResource, 2);
+                    state.dataOutRptTab->leedSiteFanInt += useVal(iResource, 7);
+                    state.dataOutRptTab->leedSiteSrvWatr += useVal(iResource, 12);
+                    state.dataOutRptTab->leedSiteRecept += useVal(iResource, 5);
+                    state.dataOutRptTab->leedSiteTotal += useVal(iResource, 15);
                 }
-                if (leedSiteTotal != 0) {
+                if (state.dataOutRptTab->leedSiteTotal != 0) {
                     if (produceTabular) {
                         PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Interior Lighting (All)", 100 * leedSiteIntLite / leedSiteTotal, 2);
+                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Interior Lighting (All)", 100 * state.dataOutRptTab->leedSiteIntLite / state.dataOutRptTab->leedSiteTotal, 2);
                         PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Space Heating", 100 * leedSiteSpHeat / leedSiteTotal, 2);
+                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Space Heating", 100 * state.dataOutRptTab->leedSiteSpHeat / state.dataOutRptTab->leedSiteTotal, 2);
                         PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Space Cooling", 100 * leedSiteSpCool / leedSiteTotal, 2);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Fans (All)", 100 * leedSiteFanInt / leedSiteTotal, 2);
+                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Space Cooling", 100 * state.dataOutRptTab->leedSiteSpCool / state.dataOutRptTab->leedSiteTotal, 2);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Fans (All)", 100 * state.dataOutRptTab->leedSiteFanInt / state.dataOutRptTab->leedSiteTotal, 2);
                         PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Service Water Heating", 100 * leedSiteSrvWatr / leedSiteTotal, 2);
+                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Service Water Heating", 100 * state.dataOutRptTab->leedSiteSrvWatr / state.dataOutRptTab->leedSiteTotal, 2);
                         PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Receptacle Equipment", 100 * leedSiteRecept / leedSiteTotal, 2);
+                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Receptacle Equipment", 100 * state.dataOutRptTab->leedSiteRecept / state.dataOutRptTab->leedSiteTotal, 2);
                         PreDefTableEntry(state,
                                          state.dataOutRptPredefined->pdchLeedEupPerc,
                                          "Miscellaneous",
                                          100 *
-                                             (leedSiteTotal - (leedSiteIntLite + leedSiteSpHeat + leedSiteSpCool + leedSiteFanInt + leedSiteSrvWatr +
-                                                               leedSiteRecept)) /
-                                             leedSiteTotal,
+                                             (state.dataOutRptTab->leedSiteTotal - (state.dataOutRptTab->leedSiteIntLite + state.dataOutRptTab->leedSiteSpHeat + state.dataOutRptTab->leedSiteSpCool + state.dataOutRptTab->leedSiteFanInt + state.dataOutRptTab->leedSiteSrvWatr +
+                                                               state.dataOutRptTab->leedSiteRecept)) /
+                                             state.dataOutRptTab->leedSiteTotal,
                                          2);
                     }
                 }
@@ -8376,7 +8347,7 @@ namespace EnergyPlus::OutputReportTabular {
                 // if not, determine the difference for the 'other' row
                 ort->needOtherRowLEED45 = false; // set array to all false assuming no other rows are needed
                 for (iResource = 1; iResource <= 13; ++iResource) {
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                             // set the value to the total for the end use
                             endUseSubOther(iResource, jEndUse) = collapsedEndUse(iResource, jEndUse);
@@ -8398,7 +8369,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // determine the number of rows needed for sub-table
                 numRows = 0;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             ++numRows;
@@ -8422,7 +8393,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // Build row head and subcategories columns
                 i = 1;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
@@ -8491,7 +8462,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 for (iResource = 1; iResource <= 13; ++iResource) {
                     i = 1;
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                             for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                                 tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
@@ -8572,7 +8543,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 for (iResource = 1; iResource <= 12; ++iResource) {
                     i = 1;
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                             for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                                 if (produceTabular) {
@@ -8615,31 +8586,31 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody.allocate(13, 4);
                 for (iResource = 1; iResource <= 13; ++iResource) {
                     normalVal(iResource, 1) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) +
                         collapsedEndUse(iResource,
-                                        DataGlobalConstants::iEndUse.at(
+                                        state.dataGlobalConst->iEndUse.at(
                                             DataGlobalConstants::EndUse::ExteriorLights)); // Lights     <- InteriorLights | <- ExteriorLights
 
                     normalVal(iResource, 2) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification)) +
                         collapsedEndUse(iResource,
-                                        DataGlobalConstants::iEndUse.at(
+                                        state.dataGlobalConst->iEndUse.at(
                                             DataGlobalConstants::EndUse::WaterSystem)); // HVAC       <- fans | <- pumps | <- heating | <- cooling |
                                                                                         // <- heat rejection | <- humidification | <- water system
                                                                                         // domestic hot water
 
                     normalVal(iResource, 3) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) +
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) +
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) +
                         collapsedEndUse(iResource,
-                                        DataGlobalConstants::iEndUse.at(
+                                        state.dataGlobalConst->iEndUse.at(
                                             DataGlobalConstants::EndUse::Refrigeration)); // Other      <- InteriorEquipment | <- ExteriorEquipment |
                                                                                           // <- generator fuel | <- Heat Recovery (parasitics) | <-
                                                                                           // Refrigeration
@@ -9118,11 +9089,12 @@ namespace EnergyPlus::OutputReportTabular {
                     rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
                     if (unitsStyle_cur != iUnitsStyle::InchPound) {
-                            tableBody(1, 1) = RealToStr(std::abs(deviationFromSetPtThresholdHtg), 2);
-                        tableBody(1, 2) = RealToStr(deviationFromSetPtThresholdClg, 2);
+                        tableBody(1, 1) = RealToStr(std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg), 2);
+                        tableBody(1, 2) = RealToStr(state.dataHVACGlobal->deviationFromSetPtThresholdClg, 2);
                     } else {
-                        tableBody(1, 1) = RealToStr(ConvertIPdelta(state, indexUnitConv, std::abs(deviationFromSetPtThresholdHtg)), 2);
-                        tableBody(1, 2) = RealToStr(ConvertIPdelta(state, indexUnitConv, deviationFromSetPtThresholdClg), 2);
+                        tableBody(1, 1) =
+                            RealToStr(ConvertIPdelta(state, indexUnitConv, std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg)), 2);
+                        tableBody(1, 2) = RealToStr(ConvertIPdelta(state, indexUnitConv, state.dataHVACGlobal->deviationFromSetPtThresholdClg), 2);
                     }
 
                     if (produceTabular) {
@@ -9255,8 +9227,8 @@ namespace EnergyPlus::OutputReportTabular {
         // all arrays are in the format: (row, columnm)
         Array2D<Real64> useVal(13, 15);
         Array1D<Real64> collapsedTotal(13);
-        Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
-        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
+        Array2D<Real64> collapsedEndUse(13, state.dataGlobalConst->iEndUse.size());
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
         int iResource;
         Real64 largeConversionFactor;
         Real64 areaConversionFactor;
@@ -9283,7 +9255,7 @@ namespace EnergyPlus::OutputReportTabular {
                 if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
                 // collapse the gatherEndUseBEPS array to the resource groups displayed
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(1, jEndUse) = ort->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
                     collapsedEndUse(2, jEndUse) = ort->gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
                     collapsedEndUse(3, jEndUse) = ort->gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
@@ -9333,7 +9305,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // convert units into MJ (divide by 1,000,000) if J otherwise kWh
                 for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
                     }
                     collapsedTotal(iResource) /= largeConversionFactor;
@@ -9345,22 +9317,22 @@ namespace EnergyPlus::OutputReportTabular {
                 columnWidth = 10; // array assignment - same for all columns
                 tableBody.allocate(12, 16);
                 for (iResource = 1; iResource <= 13; ++iResource) {
-                    useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                    useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                    useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                    useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
+                    useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling));
+                    useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
+                    useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
                     useVal(iResource, 5) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
                     useVal(iResource, 6) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                    useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                    useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                    useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                    useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                    useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                    useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                    useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                    useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
+                    useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans));
+                    useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps));
+                    useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
+                    useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification));
+                    useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
+                    useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
+                    useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
+                    useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
 
                     useVal(iResource, 15) = collapsedTotal(iResource); // totals
                 }
@@ -9629,12 +9601,12 @@ namespace EnergyPlus::OutputReportTabular {
         // all arrays are in the format: (row, column)
         Array2D<Real64> useVal(13, 15);
         Array1D<Real64> collapsedTotal(13);
-        Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
-        Array2D<Real64> collapsedIndEndUse(13, DataGlobalConstants::iEndUse.size());
+        Array2D<Real64> collapsedEndUse(13, state.dataGlobalConst->iEndUse.size());
+        Array2D<Real64> collapsedIndEndUse(13, state.dataGlobalConst->iEndUse.size());
         Array1D_int collapsedTimeStep(13);
-        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
-        Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
-        Array2D<Real64> endUseSubOther(13, DataGlobalConstants::iEndUse.size());
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
+        Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
+        Array2D<Real64> endUseSubOther(13, state.dataGlobalConst->iEndUse.size());
         int iResource;
         int kEndUseSub;
         int i;
@@ -9657,7 +9629,7 @@ namespace EnergyPlus::OutputReportTabular {
                 iUnitsStyle unitsStyle_cur = ort->unitsStyle;
                 bool produceTabular = true;
                 bool produceSQLite = false;
-                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;                
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
                 // totals - select which additional fuel to display and which other district heating
                 collapsedTotal = 0.0;
@@ -9715,7 +9687,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // collapse the gatherEndUseBEPS array to the resource groups displayed
                 collapsedEndUse = 0.0;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(1, jEndUse) = ort->gatherDemandEndUse(1, jEndUse) * powerConversion;                  // electricity
                     collapsedEndUse(2, jEndUse) = ort->gatherDemandEndUse(2, jEndUse) * powerConversion;                  // natural gas
                     collapsedEndUse(3, jEndUse) = ort->gatherDemandEndUse(6, jEndUse) * powerConversion;                  // gasoline
@@ -9730,7 +9702,7 @@ namespace EnergyPlus::OutputReportTabular {
                     collapsedEndUse(12, jEndUse) = ort->gatherDemandEndUse(distrHeatSelected, jEndUse) * powerConversion; // district heating
                     collapsedEndUse(13, jEndUse) = ort->gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
                 }
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedEndUseSub(kEndUseSub, jEndUse, 1) =
                             ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion; // electricity
@@ -9759,7 +9731,7 @@ namespace EnergyPlus::OutputReportTabular {
                 // collapse the gatherEndUseBEPS array to the resource groups displayed
                 // no unit conversion, it is done at the reporting stage if necessary
                 collapsedIndEndUse = 0.0;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedIndEndUse(1, jEndUse) = ort->gatherDemandIndEndUse(1, jEndUse);                  // electricity
                     collapsedIndEndUse(2, jEndUse) = ort->gatherDemandIndEndUse(2, jEndUse);                  // natural gas
                     collapsedIndEndUse(3, jEndUse) = ort->gatherDemandIndEndUse(6, jEndUse);                  // gasoline
@@ -9774,7 +9746,7 @@ namespace EnergyPlus::OutputReportTabular {
                     collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(distrHeatSelected, jEndUse); // district heating
                     collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);                 // water
                 }
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
                         collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
@@ -9814,22 +9786,22 @@ namespace EnergyPlus::OutputReportTabular {
                 columnWidth = 10; // array assignment - same for all columns
                 tableBody.allocate(13, 17);
                 for (iResource = 1; iResource <= 13; ++iResource) {
-                    useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                    useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                    useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                    useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
+                    useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling));
+                    useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
+                    useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
                     useVal(iResource, 5) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
                     useVal(iResource, 6) =
-                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                    useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                    useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                    useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                    useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                    useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                    useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                    useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                    useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+                        collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
+                    useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans));
+                    useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps));
+                    useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
+                    useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification));
+                    useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
+                    useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
+                    useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
+                    useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
                     useVal(iResource, 15) = collapsedTotal(iResource); // totals
                 }
 
@@ -9926,7 +9898,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 //---- End Uses By Subcategory Sub-Table
                 numRows = 0;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             ++numRows;
@@ -9947,7 +9919,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // Build row head and subcategories columns
                 i = 1;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
@@ -10008,7 +9980,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 for (iResource = 1; iResource <= 13; ++iResource) {
                     i = 1;
-                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                             for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                                 tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
@@ -10068,7 +10040,7 @@ namespace EnergyPlus::OutputReportTabular {
 
             // EAp2-4/5. Performance Rating Method Compliance
             for (iResource = 1; iResource <= 13; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (ort->needOtherRowLEED45(jEndUse)) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories == 0) {
                             endUseSubOther(iResource, jEndUse) =
@@ -10104,7 +10076,7 @@ namespace EnergyPlus::OutputReportTabular {
 
             for (iResource = 1; iResource <= 12; ++iResource) {
                 i = 1;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             PreDefTableEntry(state,
@@ -10181,8 +10153,6 @@ namespace EnergyPlus::OutputReportTabular {
         int NumCols; // number of columns in report table
         static std::string SIunit;
         static std::string m2_unitName;
-        static Real64 m2_unitConv(0.0);
-        static int unitConvIndex(0);
         static std::string IPunitName;
         Real64 IPqty;
         Real64 IPsingleValue;
@@ -10227,12 +10197,12 @@ namespace EnergyPlus::OutputReportTabular {
             rowHead(9) = "Cost Estimate Total (~~$~~)";
             if (unitsStyle_cur == iUnitsStyle::InchPound) {
                     SIunit = "[m2]";
-                LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
-                m2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWCCT, m2_unitName);
+                state.dataOutRptTab->m2_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWCCT, 1.0);
                 rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/ft2)";
             } else {
                 rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/m2)";
-                m2_unitConv = 1.0;
+                state.dataOutRptTab->m2_unitConv = 1.0;
             }
             TableBodyData = 0.0;
             tableBody = "";
@@ -10267,7 +10237,7 @@ namespace EnergyPlus::OutputReportTabular {
             TableBodyData(1, 9) = state.dataCostEstimateManager->RefrncBldg.GrandTotal;
             tableBody(1, 9) = RealToStr(TableBodyData(1, 9), 2);
             if (ort->buildingConditionedFloorArea > 0.0) {
-                TableBodyData(1, 10) = TableBodyData(1, 9) / (ort->buildingConditionedFloorArea * m2_unitConv);
+                TableBodyData(1, 10) = TableBodyData(1, 9) / (ort->buildingConditionedFloorArea * state.dataOutRptTab->m2_unitConv);
             }
             tableBody(1, 10) = RealToStr(TableBodyData(1, 10), 2);
 
@@ -10302,7 +10272,7 @@ namespace EnergyPlus::OutputReportTabular {
             TableBodyData(2, 9) = state.dataCostEstimateManager->CurntBldg.GrandTotal;
             tableBody(2, 9) = RealToStr(TableBodyData(2, 9), 2);
             if (ort->buildingConditionedFloorArea > 0) {
-                TableBodyData(2, 10) = TableBodyData(2, 9) / (ort->buildingConditionedFloorArea * m2_unitConv);
+                TableBodyData(2, 10) = TableBodyData(2, 9) / (ort->buildingConditionedFloorArea * state.dataOutRptTab->m2_unitConv);
             }
             tableBody(2, 10) = RealToStr(TableBodyData(2, 10), 2);
 
@@ -10317,7 +10287,7 @@ namespace EnergyPlus::OutputReportTabular {
             tableBody(3, 8) = RealToStr(TableBodyData(3, 8), 2);
             tableBody(3, 9) = RealToStr(TableBodyData(3, 9), 2);
             tableBody(3, 10) = RealToStr(TableBodyData(3, 10), 2);
-            
+
             if (produceTabular) {
                 WriteSubtitle(state, "Construction Cost Estimate Summary");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -10366,12 +10336,12 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
                 tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
                 if (unitsStyle_cur == iUnitsStyle::InchPound) {
-                    LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, unitConvIndex, IPunitName);
-                    if (unitConvIndex != 0) {
-                        IPqty = ConvertIP(state, unitConvIndex, state.dataCostEstimateManager->CostLineItem(item).Qty);
+                    LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, state.dataOutRptTab->unitConvIndexWCCT, IPunitName);
+                    if (state.dataOutRptTab->unitConvIndexWCCT != 0) {
+                        IPqty = ConvertIP(state, state.dataOutRptTab->unitConvIndexWCCT, state.dataCostEstimateManager->CostLineItem(item).Qty);
                         tableBody(3, item) = RealToStr(IPqty, 2);
                         tableBody(4, item) = IPunitName;
-                        IPsingleValue = ConvertIP(state, unitConvIndex, 1.0);
+                        IPsingleValue = ConvertIP(state, state.dataOutRptTab->unitConvIndexWCCT, 1.0);
                         if (IPsingleValue != 0.0) {
                             IPvaluePer = state.dataCostEstimateManager->CostLineItem(item).ValuePer / IPsingleValue;
                             tableBody(5, item) = RealToStr(IPvaluePer, 2);
@@ -10426,43 +10396,18 @@ namespace EnergyPlus::OutputReportTabular {
         //   This report actually consists of many sub-tables each with
         //   its own call to WriteTable.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHeatBalance::BuildingAzimuth;
-        using DataHeatBalance::BuildingRotationAppendixG;
-        using DataHeatBalance::Lights;
-        using DataHeatBalance::People;
-        using DataHeatBalance::TotElecEquip;
-        using DataHeatBalance::TotGasEquip;
-        using DataHeatBalance::TotHWEquip;
-        using DataHeatBalance::TotLights;
-        using DataHeatBalance::TotOthEquip;
-        using DataHeatBalance::TotPeople;
-        using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneData;
-        using DataHeatBalance::ZoneElectric;
-        using DataHeatBalance::ZoneGas;
-        using DataHeatBalance::ZoneHWEq;
-        using DataHeatBalance::ZoneOtherEq;
         using DataStringGlobals::VerString;
         using DataSurfaces::ExternalEnvironment;
-        using DataSurfaces::FrameDivider;
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
         using DataSurfaces::KivaFoundation;
         using DataSurfaces::OtherSideCondModeledExt;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass;
-        using DataSurfaces::TotSurfaces;
-
         using General::SafeDivide;
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const wwrcTotal(1);
@@ -10475,14 +10420,6 @@ namespace EnergyPlus::OutputReportTabular {
         int const wwrrWindow(3);
         int const wwrrWWR(4);
         int const wwrrAbvGndWWR(5);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // all arrays are in the format: (row, column)
         Array1D_string columnHead;
@@ -10540,32 +10477,14 @@ namespace EnergyPlus::OutputReportTabular {
         bool zoneIsCond;
         bool usezoneFloorArea;
 
-        static int grandTotal(1);
-        static int condTotal(2);
-        static int uncondTotal(3);
-        static int notpartTotal(4);
         int iTotal;
         static std::string SIunit;
-        static int unitConvIndex(0);
-        static Real64 m_unitConv(0.0);
-        static Real64 m2_unitConv(0.0);
-        static Real64 m3_unitConv(0.0);
-        static Real64 Wm2_unitConv(0.0);
         static std::string m_unitName;
         static std::string m2_unitName;
         static std::string m3_unitName;
         static std::string Wm2_unitName;
 
         // zone summary total
-        static Array1D<Real64> zstArea(4);
-        static Array1D<Real64> zstVolume(4);
-        static Array1D<Real64> zstWallArea(4);
-        static Array1D<Real64> zstUndWallArea(4);
-        static Array1D<Real64> zstWindowArea(4);
-        static Array1D<Real64> zstOpeningArea(4);
-        static Array1D<Real64> zstLight(4);
-        static Array1D<Real64> zstPeople(4);
-        static Array1D<Real64> zstPlug(4);
 
         //zstArea = 0.0;
         //zstVolume = 0.0;
@@ -10574,7 +10493,7 @@ namespace EnergyPlus::OutputReportTabular {
         //zstWindowArea = 0.0;
         //zstOpeningArea = 0.0;
         //zstLight = 0.0;
-        //zstPeople = 0.0;
+        //state.dataOutRptTab->zstPeople = 0.0;
         //zstPlug = 0.0;
 
         // misc
@@ -10592,6 +10511,7 @@ namespace EnergyPlus::OutputReportTabular {
         zoneGlassArea.allocate(state.dataGlobal->NumOfZones);
         // zoneGlassArea = 0.0;
         auto &ort(state.dataOutRptTab);
+        auto &Zone(state.dataHeatBal->Zone);
 
         // all arrays are in the format: (row, columnm)
         if (ort->displayTabularVeriSum) {
@@ -10608,15 +10528,15 @@ namespace EnergyPlus::OutputReportTabular {
                 }
 
                 // Moved these initializations into the loop
-                zstArea = 0.0;
-                zstVolume = 0.0;
-                zstWallArea = 0.0;
-                zstUndWallArea = 0.0;
-                zstWindowArea = 0.0;
-                zstOpeningArea = 0.0;
-                zstLight = 0.0;
-                zstPeople = 0.0;
-                zstPlug = 0.0;
+                state.dataOutRptTab->zstArea = 0.0;
+                state.dataOutRptTab->zstVolume = 0.0;
+                state.dataOutRptTab->zstWallArea = 0.0;
+                state.dataOutRptTab->zstUndWallArea = 0.0;
+                state.dataOutRptTab->zstWindowArea = 0.0;
+                state.dataOutRptTab->zstOpeningArea = 0.0;
+                state.dataOutRptTab->zstLight = 0.0;
+                state.dataOutRptTab->zstPeople = 0.0;
+                state.dataOutRptTab->zstPlug = 0.0;
 
                 zoneOpeningArea = 0.0;
 
@@ -10625,26 +10545,26 @@ namespace EnergyPlus::OutputReportTabular {
                 // do unit conversions if necessary
                 if (unitsStyle_cur == iUnitsStyle::InchPound) {
                     SIunit = "[m]";
-                    LookupSItoIP(state, SIunit, unitConvIndex, m_unitName);
-                    m_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, m_unitName);
+                    state.dataOutRptTab->m_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
                     SIunit = "[m2]";
-                    LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
-                    m2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, m2_unitName);
+                    state.dataOutRptTab->m2_unitConvWVST = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
                     SIunit = "[m3]";
-                    LookupSItoIP(state, SIunit, unitConvIndex, m3_unitName);
-                    m3_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, m3_unitName);
+                    state.dataOutRptTab->m3_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
                     SIunit = "[W/m2]";
-                    LookupSItoIP(state, SIunit, unitConvIndex, Wm2_unitName);
-                    Wm2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, Wm2_unitName);
+                    state.dataOutRptTab->Wm2_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
                 } else {
                     m_unitName = "[m]";
-                    m_unitConv = 1.0;
+                    state.dataOutRptTab->m_unitConv = 1.0;
                     m2_unitName = "[m2]";
-                    m2_unitConv = 1.0;
+                    state.dataOutRptTab->m2_unitConvWVST = 1.0;
                     m3_unitName = "[m3]";
-                    m3_unitConv = 1.0;
+                    state.dataOutRptTab->m3_unitConv = 1.0;
                     Wm2_unitName = "[W/m2]";
-                    Wm2_unitConv = 1.0;
+                    state.dataOutRptTab->Wm2_unitConv = 1.0;
                 }
                 //---- General Sub-Table
 
@@ -10676,12 +10596,12 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(1, 3) = state.dataEnvrn->WeatherFileLocationTitle;             // weather
                 tableBody(1, 4) = RealToStr(state.dataEnvrn->Latitude, 2);               // latitude
                 tableBody(1, 5) = RealToStr(state.dataEnvrn->Longitude, 2);              // longitude
-                tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2); // Elevation
+                tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * state.dataOutRptTab->m_unitConv, 2); // Elevation
                 tableBody(1, 7) = RealToStr(state.dataEnvrn->TimeZoneNumber, 2);         // Time Zone
-                tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);                         // north axis angle
-                tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2);               // Rotation for Appendix G
+                tableBody(1, 8) = RealToStr(state.dataHeatBal->BuildingAzimuth, 2);                         // north axis angle
+                tableBody(1, 9) = RealToStr(state.dataHeatBal->BuildingRotationAppendixG, 2);               // Rotation for Appendix G
                 tableBody(1, 10) = RealToStr(ort->gatherElapsedTimeBEPS, 2);             // hours simulated
-                //  tableBody(9,1) = TRIM(fmt::to_string(state.dataOutRptPredefined->numTableEntry)) !number of table entries for predefined tables
+                //  tableBody(9,1) = TRIM(fmt::to_string(numTableEntry)) !number of table entries for predefined tables
 
                 if (produceTabular) {
                     WriteSubtitle(state, "General");
@@ -10762,33 +10682,33 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 }
 
-                for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
+                for (iSurf = 1; iSurf <= state.dataSurface->TotSurfaces; ++iSurf) {
                     // only exterior surfaces including underground
-                    if (!Surface(iSurf).HeatTransSurf) continue;
-                    isAboveGround = (Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == OtherSideCondModeledExt);
-                    if (isAboveGround || (Surface(iSurf).ExtBoundCond == Ground) || (Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) ||
-                        (Surface(iSurf).ExtBoundCond == KivaFoundation)) {
-                        curAzimuth = Surface(iSurf).Azimuth;
+                    if (!state.dataSurface->Surface(iSurf).HeatTransSurf) continue;
+                    isAboveGround = (state.dataSurface->Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (state.dataSurface->Surface(iSurf).ExtBoundCond == OtherSideCondModeledExt);
+                    if (isAboveGround || (state.dataSurface->Surface(iSurf).ExtBoundCond == Ground) || (state.dataSurface->Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) ||
+                        (state.dataSurface->Surface(iSurf).ExtBoundCond == KivaFoundation)) {
+                        curAzimuth = state.dataSurface->Surface(iSurf).Azimuth;
                         // Round to two decimals, like the display in tables
                         curAzimuth = round(curAzimuth * 100.0) / 100.0;
-                        curArea = Surface(iSurf).GrossArea;
-                        if (Surface(iSurf).FrameDivider != 0) {
-                            frameWidth = FrameDivider(Surface(iSurf).FrameDivider).FrameWidth;
-                            frameArea = (Surface(iSurf).Height + 2.0 * frameWidth) * (Surface(iSurf).Width + 2.0 * frameWidth) -
-                                        (Surface(iSurf).Height * Surface(iSurf).Width);
+                        curArea = state.dataSurface->Surface(iSurf).GrossArea;
+                        if (state.dataSurface->Surface(iSurf).FrameDivider != 0) {
+                            frameWidth = state.dataSurface->FrameDivider(state.dataSurface->Surface(iSurf).FrameDivider).FrameWidth;
+                            frameArea = (state.dataSurface->Surface(iSurf).Height + 2.0 * frameWidth) * (state.dataSurface->Surface(iSurf).Width + 2.0 * frameWidth) -
+                                        (state.dataSurface->Surface(iSurf).Height * state.dataSurface->Surface(iSurf).Width);
                             curArea += frameArea;
                         }
-                        zonePt = Surface(iSurf).Zone;
+                        zonePt = state.dataSurface->Surface(iSurf).Zone;
                         isConditioned = false;
                         if (zonePt > 0) {
                             if (Zone(zonePt).SystemZoneNodeNumber > 0) {
                                 isConditioned = true;
                             }
                         }
-                        if ((Surface(iSurf).Tilt >= 60.0) && (Surface(iSurf).Tilt <= 120.0)) {
+                        if ((state.dataSurface->Surface(iSurf).Tilt >= 60.0) && (state.dataSurface->Surface(iSurf).Tilt <= 120.0)) {
                             // vertical walls and windows
                             {
-                                auto const SELECT_CASE_var(Surface(iSurf).Class);
+                                auto const SELECT_CASE_var(state.dataSurface->Surface(iSurf).Class);
                                 if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
                                     (SELECT_CASE_var == SurfaceClass::Roof)) {
                                     mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
@@ -10825,13 +10745,13 @@ namespace EnergyPlus::OutputReportTabular {
                                         if (produceTabular) {
                                             print(state.files.debug,
                                                   "{},Wall,{:.1R},{:.1R}\n",
-                                                  Surface(iSurf).Name,
+                                                  state.dataSurface->Surface(iSurf).Name,
                                                   curArea * mult,
-                                                  Surface(iSurf).Tilt);
+                                                  state.dataSurface->Surface(iSurf).Tilt);
                                         }
                                     }
                                 } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
+                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
                                     if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
                                         windowAreaN += curArea * mult;
                                         if (isConditioned) windowAreaNcond += curArea * mult;
@@ -10846,22 +10766,22 @@ namespace EnergyPlus::OutputReportTabular {
                                         if (isConditioned) windowAreaWcond += curArea * mult;
                                     }
                                     zoneOpeningArea(zonePt) +=
-                                        curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
-                                    zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
+                                        curArea * state.dataSurface->Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
+                                    zoneGlassArea(zonePt) += state.dataSurface->Surface(iSurf).GrossArea * state.dataSurface->Surface(iSurf).Multiplier;
                                     if (DetailedWWR) {
                                         if (produceTabular) {
                                             print(state.files.debug,
                                                   "{},Window,{:.1R},{:.1R}\n",
-                                                  Surface(iSurf).Name,
+                                                  state.dataSurface->Surface(iSurf).Name,
                                                   curArea * mult,
-                                                  Surface(iSurf).Tilt);
+                                                  state.dataSurface->Surface(iSurf).Tilt);
                                         }
                                     }
                                 }
                             }
-                        } else if (Surface(iSurf).Tilt < 60.0) { // roof and skylights
+                        } else if (state.dataSurface->Surface(iSurf).Tilt < 60.0) { // roof and skylights
                             {
-                                auto const SELECT_CASE_var(Surface(iSurf).Class);
+                                auto const SELECT_CASE_var(state.dataSurface->Surface(iSurf).Class);
                                 if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
                                     (SELECT_CASE_var == SurfaceClass::Roof)) {
                                     mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
@@ -10870,21 +10790,21 @@ namespace EnergyPlus::OutputReportTabular {
                                         if (produceTabular) {
                                             print(state.files.debug,
                                                   "{},Roof,{:.1R},{:.1R}\n",
-                                                  Surface(iSurf).Name,
+                                                  state.dataSurface->Surface(iSurf).Name,
                                                   curArea * mult,
-                                                  Surface(iSurf).Tilt);
+                                                  state.dataSurface->Surface(iSurf).Tilt);
                                         }
                                     }
                                 } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
+                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
                                     skylightArea += curArea * mult;
                                     if (DetailedWWR) {
                                         if (produceTabular) {
                                             print(state.files.debug,
                                                   "{},Skylight,{:.1R},{:.1R}\n",
-                                                  Surface(iSurf).Name,
+                                                  state.dataSurface->Surface(iSurf).Name,
                                                   curArea * mult,
-                                                  Surface(iSurf).Tilt);
+                                                  state.dataSurface->Surface(iSurf).Tilt);
                                         }
                                     }
                                 }
@@ -10916,23 +10836,23 @@ namespace EnergyPlus::OutputReportTabular {
 
                 tableBody = "";
 
-                tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaN * m2_unitConv, 2);
-                tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaS * m2_unitConv, 2);
-                tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaE * m2_unitConv, 2);
-                tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaW * m2_unitConv, 2);
-                tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * m2_unitConv, 2);
+                tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaN * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaS * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaE * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaW * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
-                tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaN * m2_unitConv, 2);
-                tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaS * m2_unitConv, 2);
-                tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaE * m2_unitConv, 2);
-                tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaW * m2_unitConv, 2);
-                tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * m2_unitConv, 2);
+                tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaN * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaS * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaE * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaW * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
-                tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaN * m2_unitConv, 2);
-                tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaS * m2_unitConv, 2);
-                tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaE * m2_unitConv, 2);
-                tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaW * m2_unitConv, 2);
-                tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * m2_unitConv, 2);
+                tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaN * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaS * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaE * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaW * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
                 tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, wallAreaN), 2);
                 tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, wallAreaS), 2);
@@ -10990,23 +10910,23 @@ namespace EnergyPlus::OutputReportTabular {
 
                 tableBody = "";
 
-                tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaNcond * m2_unitConv, 2);
-                tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaScond * m2_unitConv, 2);
-                tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaEcond * m2_unitConv, 2);
-                tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaWcond * m2_unitConv, 2);
-                tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * m2_unitConv, 2);
+                tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaNcond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaScond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaEcond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaWcond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
-                tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaNcond * m2_unitConv, 2);
-                tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaScond * m2_unitConv, 2);
-                tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaEcond * m2_unitConv, 2);
-                tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaWcond * m2_unitConv, 2);
-                tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * m2_unitConv, 2);
+                tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaNcond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaScond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaEcond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaWcond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
-                tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaNcond * m2_unitConv, 2);
-                tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaScond * m2_unitConv, 2);
-                tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaEcond * m2_unitConv, 2);
-                tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaWcond * m2_unitConv, 2);
-                tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * m2_unitConv, 2);
+                tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaNcond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaScond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaEcond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaWcond * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
                 tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, wallAreaNcond), 2);
                 tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, wallAreaScond), 2);
@@ -11062,8 +10982,8 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 }
 
-                tableBody(1, 1) = RealToStr(roofArea * m2_unitConv, 2);
-                tableBody(1, 2) = RealToStr(skylightArea * m2_unitConv, 2);
+                tableBody(1, 1) = RealToStr(roofArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+                tableBody(1, 2) = RealToStr(skylightArea * state.dataOutRptTab->m2_unitConvWVST, 2);
                 tableBody(1, 3) = RealToStr(100.0 * SafeDivide(skylightArea, roofArea), 2);
 
                 if (produceTabular) {
@@ -11142,7 +11062,7 @@ namespace EnergyPlus::OutputReportTabular {
                             //      CALL ShowContinueError(state, 'Calculated based on degrees=['//  &
                             //         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
                             //         '] m2, Calculated from user entered Wall class surfaces=['//  &
-                            //         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:state.dataGlobal->NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
+                            //         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
                             ShowContinueError(state, "Check classes of surfaces and tilts for discrepancies.");
                             ShowContinueError(state,
                                               "Total wall area by ASHRAE 90.1 definition=" +
@@ -11182,10 +11102,10 @@ namespace EnergyPlus::OutputReportTabular {
                 columnHead(12) = "Plug and Process " + Wm2_unitName;
 
                 rowHead = "";
-                rowHead(state.dataGlobal->NumOfZones + grandTotal) = "Total";
-                rowHead(state.dataGlobal->NumOfZones + condTotal) = "Conditioned Total";
-                rowHead(state.dataGlobal->NumOfZones + uncondTotal) = "Unconditioned Total";
-                rowHead(state.dataGlobal->NumOfZones + notpartTotal) = "Not Part of Total";
+                rowHead(state.dataGlobal->NumOfZones + state.dataOutRptTab->grandTotal) = "Total";
+                rowHead(state.dataGlobal->NumOfZones + state.dataOutRptTab->condTotal) = "Conditioned Total";
+                rowHead(state.dataGlobal->NumOfZones + state.dataOutRptTab->uncondTotal) = "Unconditioned Total";
+                rowHead(state.dataGlobal->NumOfZones + state.dataOutRptTab->notpartTotal) = "Not Part of Total";
 
                 tableBody = "";
 
@@ -11208,8 +11128,8 @@ namespace EnergyPlus::OutputReportTabular {
                         tableBody(3, iZone) = "No";
                         usezoneFloorArea = false;
                     }
-                    tableBody(1, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv, 2);
-                    tableBody(4, iZone) = RealToStr(Zone(iZone).Volume * m3_unitConv, 2);
+                    tableBody(1, iZone) = RealToStr(Zone(iZone).FloorArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+                    tableBody(4, iZone) = RealToStr(Zone(iZone).Volume * state.dataOutRptTab->m3_unitConv, 2);
                     // no unit conversion necessary since done automatically
                     if (produceTabular) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
@@ -11226,54 +11146,54 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                     }
                     tableBody(5, iZone) = RealToStr(mult, 2);
-                    tableBody(6, iZone) = RealToStr(Zone(iZone).ExtGrossWallArea * m2_unitConv, 2);
-                    tableBody(7, iZone) = RealToStr(Zone(iZone).ExtGrossGroundWallArea * m2_unitConv, 2);
-                    tableBody(8, iZone) = RealToStr(zoneGlassArea(iZone) * m2_unitConv, 2);
-                    tableBody(9, iZone) = RealToStr(zoneOpeningArea(iZone) * m2_unitConv, 2);
+                    tableBody(6, iZone) = RealToStr(Zone(iZone).ExtGrossWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+                    tableBody(7, iZone) = RealToStr(Zone(iZone).ExtGrossGroundWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+                    tableBody(8, iZone) = RealToStr(zoneGlassArea(iZone) * state.dataOutRptTab->m2_unitConvWVST, 2);
+                    tableBody(9, iZone) = RealToStr(zoneOpeningArea(iZone) * state.dataOutRptTab->m2_unitConvWVST, 2);
                     // lighting density
                     totLightPower = 0.0;
-                    for (iLight = 1; iLight <= TotLights; ++iLight) {
-                        if (iZone == Lights(iLight).ZonePtr) {
-                            totLightPower += Lights(iLight).DesignLevel;
+                    for (iLight = 1; iLight <= state.dataHeatBal->TotLights; ++iLight) {
+                        if (iZone == state.dataHeatBal->Lights(iLight).ZonePtr) {
+                            totLightPower += state.dataHeatBal->Lights(iLight).DesignLevel;
                         }
                     }
                     if (Zone(iZone).FloorArea > 0) {
-                        tableBody(10, iZone) = RealToStr(Wm2_unitConv * totLightPower / Zone(iZone).FloorArea, 4);
+                        tableBody(10, iZone) = RealToStr(state.dataOutRptTab->Wm2_unitConv * totLightPower / Zone(iZone).FloorArea, 4);
                     }
                     // people density
                     totNumPeople = 0.0;
-                    for (iPeople = 1; iPeople <= TotPeople; ++iPeople) {
-                        if (iZone == People(iPeople).ZonePtr) {
-                            totNumPeople += People(iPeople).NumberOfPeople;
+                    for (iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
+                        if (iZone == state.dataHeatBal->People(iPeople).ZonePtr) {
+                            totNumPeople += state.dataHeatBal->People(iPeople).NumberOfPeople;
                         }
                     }
                     if (totNumPeople > 0) {
-                        tableBody(11, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv / totNumPeople, 2);
+                        tableBody(11, iZone) = RealToStr(Zone(iZone).FloorArea * state.dataOutRptTab->m2_unitConvWVST / totNumPeople, 2);
                     }
                     // plug and process density
                     totPlugProcess = 0.0;
-                    for (iPlugProc = 1; iPlugProc <= TotElecEquip; ++iPlugProc) {
-                        if (iZone == ZoneElectric(iPlugProc).ZonePtr) {
-                            totPlugProcess += ZoneElectric(iPlugProc).DesignLevel;
+                    for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotElecEquip; ++iPlugProc) {
+                        if (iZone == state.dataHeatBal->ZoneElectric(iPlugProc).ZonePtr) {
+                            totPlugProcess += state.dataHeatBal->ZoneElectric(iPlugProc).DesignLevel;
                         }
                     }
-                    for (iPlugProc = 1; iPlugProc <= TotGasEquip; ++iPlugProc) {
-                        if (iZone == ZoneGas(iPlugProc).ZonePtr) {
-                            totPlugProcess += ZoneGas(iPlugProc).DesignLevel;
+                    for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotGasEquip; ++iPlugProc) {
+                        if (iZone == state.dataHeatBal->ZoneGas(iPlugProc).ZonePtr) {
+                            totPlugProcess += state.dataHeatBal->ZoneGas(iPlugProc).DesignLevel;
                         }
                     }
-                    for (iPlugProc = 1; iPlugProc <= TotOthEquip; ++iPlugProc) {
-                        if (iZone == ZoneOtherEq(iPlugProc).ZonePtr) {
-                            totPlugProcess += ZoneOtherEq(iPlugProc).DesignLevel;
+                    for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotOthEquip; ++iPlugProc) {
+                        if (iZone == state.dataHeatBal->ZoneOtherEq(iPlugProc).ZonePtr) {
+                            totPlugProcess += state.dataHeatBal->ZoneOtherEq(iPlugProc).DesignLevel;
                         }
                     }
-                    for (iPlugProc = 1; iPlugProc <= TotHWEquip; ++iPlugProc) {
-                        if (iZone == ZoneHWEq(iPlugProc).ZonePtr) {
-                            totPlugProcess += ZoneHWEq(iPlugProc).DesignLevel;
+                    for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotHWEquip; ++iPlugProc) {
+                        if (iZone == state.dataHeatBal->ZoneHWEq(iPlugProc).ZonePtr) {
+                            totPlugProcess += state.dataHeatBal->ZoneHWEq(iPlugProc).DesignLevel;
                         }
                     }
                     if (Zone(iZone).FloorArea > 0) {
-                        tableBody(12, iZone) = RealToStr(totPlugProcess * Wm2_unitConv / Zone(iZone).FloorArea, 4);
+                        tableBody(12, iZone) = RealToStr(totPlugProcess * state.dataOutRptTab->Wm2_unitConv / Zone(iZone).FloorArea, 4);
                     }
 
                     // total rows for Total / Not Part of Total
@@ -11281,70 +11201,70 @@ namespace EnergyPlus::OutputReportTabular {
 
                     // If not part of total, goes directly to this row
                     if (!usezoneFloorArea) {
-                        zstArea(notpartTotal) += mult * Zone(iZone).FloorArea;
-                        zstVolume(notpartTotal) += mult * Zone(iZone).Volume;
-                        zstWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                        zstUndWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                        zstWindowArea(notpartTotal) += mult * zoneGlassArea(iZone);
-                        zstOpeningArea(notpartTotal) += mult * zoneOpeningArea(iZone);
-                        zstLight(notpartTotal) += mult * totLightPower;
-                        zstPeople(notpartTotal) += mult * totNumPeople;
-                        zstPlug(notpartTotal) += mult * totPlugProcess;
+                        state.dataOutRptTab->zstArea(state.dataOutRptTab->notpartTotal) += mult * Zone(iZone).FloorArea;
+                        state.dataOutRptTab->zstVolume(state.dataOutRptTab->notpartTotal) += mult * Zone(iZone).Volume;
+                        state.dataOutRptTab->zstWallArea(state.dataOutRptTab->notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                        state.dataOutRptTab->zstUndWallArea(state.dataOutRptTab->notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                        state.dataOutRptTab->zstWindowArea(state.dataOutRptTab->notpartTotal) += mult * zoneGlassArea(iZone);
+                        state.dataOutRptTab->zstOpeningArea(state.dataOutRptTab->notpartTotal) += mult * zoneOpeningArea(iZone);
+                        state.dataOutRptTab->zstLight(state.dataOutRptTab->notpartTotal) += mult * totLightPower;
+                        state.dataOutRptTab->zstPeople(state.dataOutRptTab->notpartTotal) += mult * totNumPeople;
+                        state.dataOutRptTab->zstPlug(state.dataOutRptTab->notpartTotal) += mult * totPlugProcess;
                     } else {
                         // Add it to the 'Total'
-                        zstArea(grandTotal) += mult * Zone(iZone).FloorArea;
-                        zstVolume(grandTotal) += mult * Zone(iZone).Volume;
-                        zstWallArea(grandTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                        zstUndWallArea(grandTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                        zstWindowArea(grandTotal) += mult * zoneGlassArea(iZone);
-                        zstOpeningArea(grandTotal) += mult * zoneOpeningArea(iZone);
-                        zstLight(grandTotal) += mult * totLightPower;
-                        zstPeople(grandTotal) += mult * totNumPeople;
-                        zstPlug(grandTotal) += mult * totPlugProcess;
+                        state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal) += mult * Zone(iZone).FloorArea;
+                        state.dataOutRptTab->zstVolume(state.dataOutRptTab->grandTotal) += mult * Zone(iZone).Volume;
+                        state.dataOutRptTab->zstWallArea(state.dataOutRptTab->grandTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                        state.dataOutRptTab->zstUndWallArea(state.dataOutRptTab->grandTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                        state.dataOutRptTab->zstWindowArea(state.dataOutRptTab->grandTotal) += mult * zoneGlassArea(iZone);
+                        state.dataOutRptTab->zstOpeningArea(state.dataOutRptTab->grandTotal) += mult * zoneOpeningArea(iZone);
+                        state.dataOutRptTab->zstLight(state.dataOutRptTab->grandTotal) += mult * totLightPower;
+                        state.dataOutRptTab->zstPeople(state.dataOutRptTab->grandTotal) += mult * totNumPeople;
+                        state.dataOutRptTab->zstPlug(state.dataOutRptTab->grandTotal) += mult * totPlugProcess;
 
                         // Subtotal between cond/unconditioned
                         if (zoneIsCond) {
-                            zstArea(condTotal) += mult * Zone(iZone).FloorArea;
-                            zstVolume(condTotal) += mult * Zone(iZone).Volume;
-                            zstWallArea(condTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                            zstUndWallArea(condTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                            zstWindowArea(condTotal) += mult * zoneGlassArea(iZone);
-                            zstOpeningArea(condTotal) += mult * zoneOpeningArea(iZone);
-                            zstLight(condTotal) += mult * totLightPower;
-                            zstPeople(condTotal) += mult * totNumPeople;
-                            zstPlug(condTotal) += mult * totPlugProcess;
+                            state.dataOutRptTab->zstArea(state.dataOutRptTab->condTotal) += mult * Zone(iZone).FloorArea;
+                            state.dataOutRptTab->zstVolume(state.dataOutRptTab->condTotal) += mult * Zone(iZone).Volume;
+                            state.dataOutRptTab->zstWallArea(state.dataOutRptTab->condTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                            state.dataOutRptTab->zstUndWallArea(state.dataOutRptTab->condTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                            state.dataOutRptTab->zstWindowArea(state.dataOutRptTab->condTotal) += mult * zoneGlassArea(iZone);
+                            state.dataOutRptTab->zstOpeningArea(state.dataOutRptTab->condTotal) += mult * zoneOpeningArea(iZone);
+                            state.dataOutRptTab->zstLight(state.dataOutRptTab->condTotal) += mult * totLightPower;
+                            state.dataOutRptTab->zstPeople(state.dataOutRptTab->condTotal) += mult * totNumPeople;
+                            state.dataOutRptTab->zstPlug(state.dataOutRptTab->condTotal) += mult * totPlugProcess;
                         } else if (!zoneIsCond) {
-                            zstArea(uncondTotal) += mult * Zone(iZone).FloorArea;
-                            zstVolume(uncondTotal) += mult * Zone(iZone).Volume;
-                            zstWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                            zstUndWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                            zstWindowArea(uncondTotal) += mult * zoneGlassArea(iZone);
-                            zstOpeningArea(uncondTotal) += mult * zoneOpeningArea(iZone);
-                            zstLight(uncondTotal) += mult * totLightPower;
-                            zstPeople(uncondTotal) += mult * totNumPeople;
-                            zstPlug(uncondTotal) += mult * totPlugProcess;
+                            state.dataOutRptTab->zstArea(state.dataOutRptTab->uncondTotal) += mult * Zone(iZone).FloorArea;
+                            state.dataOutRptTab->zstVolume(state.dataOutRptTab->uncondTotal) += mult * Zone(iZone).Volume;
+                            state.dataOutRptTab->zstWallArea(state.dataOutRptTab->uncondTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                            state.dataOutRptTab->zstUndWallArea(state.dataOutRptTab->uncondTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                            state.dataOutRptTab->zstWindowArea(state.dataOutRptTab->uncondTotal) += mult * zoneGlassArea(iZone);
+                            state.dataOutRptTab->zstOpeningArea(state.dataOutRptTab->uncondTotal) += mult * zoneOpeningArea(iZone);
+                            state.dataOutRptTab->zstLight(state.dataOutRptTab->uncondTotal) += mult * totLightPower;
+                            state.dataOutRptTab->zstPeople(state.dataOutRptTab->uncondTotal) += mult * totNumPeople;
+                            state.dataOutRptTab->zstPlug(state.dataOutRptTab->uncondTotal) += mult * totPlugProcess;
                         }
                     }
                 }
                 for (iTotal = 1; iTotal <= 4; ++iTotal) {
-                    tableBody(1, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv, 2);
-                    tableBody(4, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstVolume(iTotal) * m3_unitConv, 2);
-                    tableBody(6, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstWallArea(iTotal) * m2_unitConv, 2);
-                    tableBody(7, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstUndWallArea(iTotal) * m2_unitConv, 2);
-                    tableBody(8, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstWindowArea(iTotal) * m2_unitConv, 2);
-                    tableBody(9, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstOpeningArea(iTotal) * m2_unitConv, 2);
-                    if (zstArea(iTotal) != 0) {
-                        tableBody(10, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstLight(iTotal) * Wm2_unitConv / zstArea(iTotal), 4);
-                        tableBody(12, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstPlug(iTotal) * Wm2_unitConv / zstArea(iTotal), 4);
+                    tableBody(1, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST, 2);
+                    tableBody(4, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstVolume(iTotal) * state.dataOutRptTab->m3_unitConv, 2);
+                    tableBody(6, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstWallArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST, 2);
+                    tableBody(7, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstUndWallArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST, 2);
+                    tableBody(8, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstWindowArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST, 2);
+                    tableBody(9, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstOpeningArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST, 2);
+                    if (state.dataOutRptTab->zstArea(iTotal) != 0) {
+                        tableBody(10, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstLight(iTotal) * state.dataOutRptTab->Wm2_unitConv / state.dataOutRptTab->zstArea(iTotal), 4);
+                        tableBody(12, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstPlug(iTotal) * state.dataOutRptTab->Wm2_unitConv / state.dataOutRptTab->zstArea(iTotal), 4);
                     }
-                    if (zstPeople(iTotal) != 0) {
-                        tableBody(11, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv / zstPeople(iTotal), 2);
+                    if (state.dataOutRptTab->zstPeople(iTotal) != 0) {
+                        tableBody(11, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST / state.dataOutRptTab->zstPeople(iTotal), 2);
                     }
                 }
                 if (produceTabular) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, "Totals", zstArea(grandTotal), 2);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, "Totals", zstArea(condTotal), 2);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, "Totals", zstArea(uncondTotal), 2);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, "Totals", state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal), 2);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, "Totals", state.dataOutRptTab->zstArea(state.dataOutRptTab->condTotal), 2);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, "Totals", state.dataOutRptTab->zstArea(state.dataOutRptTab->uncondTotal), 2);
                 }
 
                 if (produceTabular) {
@@ -11381,29 +11301,6 @@ namespace EnergyPlus::OutputReportTabular {
         // occupied hours not meeting comfort bounds for ASHRAE-55 and
         // CEN-15251 adaptive models.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // Using/Aliasing
-        using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Array1D_string columnHead(5);
         Array1D_int columnWidth;
         Array1D_string rowHead;
@@ -11414,11 +11311,11 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Should deallocate after writing table. - LKL
 
-        if (ort->displayAdaptiveComfort && TotPeople > 0) {
-            peopleInd.allocate(TotPeople);
+        if (ort->displayAdaptiveComfort && state.dataHeatBal->TotPeople > 0) {
+            peopleInd.allocate(state.dataHeatBal->TotPeople);
 
-            for (i = 1; i <= TotPeople; ++i) {
-                if (People(i).AdaptiveASH55 || People(i).AdaptiveCEN15251) {
+            for (i = 1; i <= state.dataHeatBal->TotPeople; ++i) {
+                if (state.dataHeatBal->People(i).AdaptiveASH55 || state.dataHeatBal->People(i).AdaptiveCEN15251) {
                     ++ort->numPeopleAdaptive;
                     peopleInd(ort->numPeopleAdaptive) = i;
                 }
@@ -11440,15 +11337,15 @@ namespace EnergyPlus::OutputReportTabular {
 
             tableBody = "";
             for (i = 1; i <= ort->numPeopleAdaptive; ++i) {
-                rowHead(i) = People(i).Name;
-                if (People(i).AdaptiveASH55) {
-                    tableBody(1, i) = RealToStr(People(peopleInd(i)).TimeNotMetASH5590, 2);
-                    tableBody(2, i) = RealToStr(People(peopleInd(i)).TimeNotMetASH5580, 2);
+                rowHead(i) = state.dataHeatBal->People(i).Name;
+                if (state.dataHeatBal->People(i).AdaptiveASH55) {
+                    tableBody(1, i) = RealToStr(state.dataHeatBal->People(peopleInd(i)).TimeNotMetASH5590, 2);
+                    tableBody(2, i) = RealToStr(state.dataHeatBal->People(peopleInd(i)).TimeNotMetASH5580, 2);
                 }
-                if (People(i).AdaptiveCEN15251) {
-                    tableBody(3, i) = RealToStr(People(peopleInd(i)).TimeNotMetCEN15251CatI, 2);
-                    tableBody(4, i) = RealToStr(People(peopleInd(i)).TimeNotMetCEN15251CatII, 2);
-                    tableBody(5, i) = RealToStr(People(peopleInd(i)).TimeNotMetCEN15251CatIII, 2);
+                if (state.dataHeatBal->People(i).AdaptiveCEN15251) {
+                    tableBody(3, i) = RealToStr(state.dataHeatBal->People(peopleInd(i)).TimeNotMetCEN15251CatI, 2);
+                    tableBody(4, i) = RealToStr(state.dataHeatBal->People(peopleInd(i)).TimeNotMetCEN15251CatII, 2);
+                    tableBody(5, i) = RealToStr(state.dataHeatBal->People(peopleInd(i)).TimeNotMetCEN15251CatIII, 2);
                 }
             }
 
@@ -11475,7 +11372,7 @@ namespace EnergyPlus::OutputReportTabular {
             columnMin[j] = ZoneBins(1)[j];
         }
         for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
-            std::string ZoneName = Zone(i).Name;
+            std::string ZoneName = state.dataHeatBal->Zone(i).Name;
             for (int j = 0; j < columnNum; j++) {
                 Real64 curValue = ZoneBins(i)[j];
                 if (curValue > columnMax[j]) columnMax[j] = curValue;
@@ -11498,6 +11395,8 @@ namespace EnergyPlus::OutputReportTabular {
                             std::vector<int> const &columnHead,
                             Array1D<std::vector<Real64>> const &ZoneBins)
     {
+        auto &Zone(state.dataHeatBal->Zone);
+
         std::vector<Real64> columnMax(columnNum - 1, 0);
         std::vector<Real64> columnMin(columnNum - 1, 0);
         std::vector<Real64> columnSum(columnNum - 1, 0);
@@ -11529,12 +11428,6 @@ namespace EnergyPlus::OutputReportTabular {
     {
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZoneHeatIndexHourBins;
-        using DataHeatBalFanSys::ZoneHeatIndexOccuHourBins;
-        using DataHeatBalFanSys::ZoneHumidexHourBins;
-        using DataHeatBalFanSys::ZoneHumidexOccuHourBins;
-        using DataHeatBalFanSys::ZoneLowSETHours;
-        using DataHeatBalFanSys::ZoneHighSETHours;
         auto &ort(state.dataOutRptTab);
 
         if (state.dataGlobal->NumOfZones > 0) {
@@ -11544,31 +11437,31 @@ namespace EnergyPlus::OutputReportTabular {
                                            state.dataOutRptPredefined->pdchHIHourExtremeCaution,
                                            state.dataOutRptPredefined->pdchHIHourDanger,
                                            state.dataOutRptPredefined->pdchHIHourExtremeDanger};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneHeatIndexHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHeatIndexHourBins);
 
             columnHead = {state.dataOutRptPredefined->pdchHIOccuHourSafe,
                           state.dataOutRptPredefined->pdchHIOccuHourCaution,
                           state.dataOutRptPredefined->pdchHIOccuHourExtremeCaution,
                           state.dataOutRptPredefined->pdchHIOccuHourDanger,
                           state.dataOutRptPredefined->pdchHIOccuHourExtremeDanger};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneHeatIndexOccuHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins);
 
             columnHead = {state.dataOutRptPredefined->pdchHumidexHourLittle,
                           state.dataOutRptPredefined->pdchHumidexHourSome,
                           state.dataOutRptPredefined->pdchHumidexHourGreat,
                           state.dataOutRptPredefined->pdchHumidexHourDanger,
                           state.dataOutRptPredefined->pdchHumidexHourStroke};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneHumidexHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHumidexHourBins);
 
             columnHead = {state.dataOutRptPredefined->pdchHumidexOccuHourLittle,
                           state.dataOutRptPredefined->pdchHumidexOccuHourSome,
                           state.dataOutRptPredefined->pdchHumidexOccuHourGreat,
                           state.dataOutRptPredefined->pdchHumidexOccuHourDanger,
                           state.dataOutRptPredefined->pdchHumidexOccuHourStroke };
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneHumidexOccuHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHumidexOccuHourBins);
 
             bool hasPierceSET = true;
-            if (TotPeople == 0) {
+            if (state.dataHeatBal->TotPeople == 0) {
                 hasPierceSET = false;
                 if (ort->displayThermalResilienceSummaryExplicitly) {
                     ShowWarningError(state, "Writing Annual Thermal Resilience Summary - SET Hours reports: "
@@ -11576,13 +11469,13 @@ namespace EnergyPlus::OutputReportTabular {
                                      "but no People object is defined.");
                 }
             }
-            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
-                if (!People(iPeople).Pierce) {
+            for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
+                if (!state.dataHeatBal->People(iPeople).Pierce) {
                     hasPierceSET = false;
                     if (ort->displayThermalResilienceSummaryExplicitly) {
                         ShowWarningError(state,  "Writing Annual Thermal Resilience Summary - SET Hours reports: "
                                           "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
-                                          "but no Pierce model is defined in " + People(iPeople).Name + " object.");
+                                          "but no Pierce model is defined in " + state.dataHeatBal->People(iPeople).Name + " object.");
                     }
                 }
             }
@@ -11593,13 +11486,13 @@ namespace EnergyPlus::OutputReportTabular {
                               state.dataOutRptPredefined->pdchHeatingSETOccuHours,
                               state.dataOutRptPredefined->pdchHeatingSETUnmetDuration,
                               state.dataOutRptPredefined->pdchHeatingSETUnmetTime};
-                WriteSETHoursTable(state, columnNum, columnHead, ZoneLowSETHours);
+                WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneLowSETHours);
 
                 columnHead = {state.dataOutRptPredefined->pdchCoolingSETHours,
                               state.dataOutRptPredefined->pdchCoolingSETOccuHours,
                               state.dataOutRptPredefined->pdchCoolingSETUnmetDuration,
                               state.dataOutRptPredefined->pdchCoolingSETUnmetTime};
-                WriteSETHoursTable(state, columnNum, columnHead, ZoneHighSETHours);
+                WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHighSETHours);
             }
         }
     }
@@ -11608,19 +11501,17 @@ namespace EnergyPlus::OutputReportTabular {
     {
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZoneCO2LevelHourBins;
-        using DataHeatBalFanSys::ZoneCO2LevelOccuHourBins;
         if (state.dataGlobal->NumOfZones > 0) {
             int columnNum = 3;
             std::vector<int> columnHead = {state.dataOutRptPredefined->pdchCO2HourSafe,
                                            state.dataOutRptPredefined->pdchCO2HourCaution,
                                            state.dataOutRptPredefined->pdchCO2HourHazard};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneCO2LevelHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneCO2LevelHourBins);
 
             columnHead = {state.dataOutRptPredefined->pdchCO2OccuHourSafe,
                           state.dataOutRptPredefined->pdchCO2OccuHourCaution,
                           state.dataOutRptPredefined->pdchCO2OccuHourHazard};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneCO2LevelOccuHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins);
         }
     }
 
@@ -11628,15 +11519,13 @@ namespace EnergyPlus::OutputReportTabular {
     {
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZoneLightingLevelHourBins;
-        using DataHeatBalFanSys::ZoneLightingLevelOccuHourBins;
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) {
                 if (state.dataOutRptTab->displayVisualResilienceSummaryExplicitly) {
                     ShowWarningError(state, "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
                                      "Zone Average Daylighting Reference Point Illuminance output is required, "
-                                     "but no Daylight Method is defined in Zone:" + Zone(ZoneNum).Name);
+                                     "but no Daylight Method is defined in Zone:" + state.dataHeatBal->Zone(ZoneNum).Name);
                 }
             }
         }
@@ -11647,13 +11536,13 @@ namespace EnergyPlus::OutputReportTabular {
                                            state.dataOutRptPredefined->pdchIllumHourDim,
                                            state.dataOutRptPredefined->pdchIllumHourAdequate,
                                            state.dataOutRptPredefined->pdchIllumHourBright};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneLightingLevelHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneLightingLevelHourBins);
 
             columnHead = {state.dataOutRptPredefined->pdchIllumOccuHourDark,
                           state.dataOutRptPredefined->pdchIllumOccuHourDim,
                           state.dataOutRptPredefined->pdchIllumOccuHourAdequate,
                           state.dataOutRptPredefined->pdchIllumOccuHourBright};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneLightingLevelOccuHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins);
         }
     }
 
@@ -11699,7 +11588,7 @@ namespace EnergyPlus::OutputReportTabular {
                     rowHead(1) = "Heat Emissions [MJ]";
                     energyconversion = 1.0e3;
                 } else if (unitsStyle_cur == iUnitsStyle::None) {
-                    rowHead(1) = "Heat Emissions [GJ]"; 
+                    rowHead(1) = "Heat Emissions [GJ]";
                     energyconversion = 1.0;
                 } else {
                     rowHead(1) = "Heat Emissions [GJ]";
@@ -11714,12 +11603,12 @@ namespace EnergyPlus::OutputReportTabular {
                 columnHead(6) = "Total";
 
                 tableBody = "";
-                tableBody(1, 1) = RealToStr(BuildingPreDefRep.emiEnvelopConv * energyconversion, 2);
-                tableBody(2, 1) = RealToStr(BuildingPreDefRep.emiZoneExfiltration * energyconversion, 2);
-                tableBody(3, 1) = RealToStr(BuildingPreDefRep.emiZoneExhaust * energyconversion, 2);
-                tableBody(4, 1) = RealToStr(BuildingPreDefRep.emiHVACRelief * energyconversion, 2);
-                tableBody(5, 1) = RealToStr(BuildingPreDefRep.emiHVACReject * energyconversion, 2);
-                tableBody(6, 1) = RealToStr(BuildingPreDefRep.emiTotHeat * energyconversion, 2);
+                tableBody(1, 1) = RealToStr(state.dataHeatBal->BuildingPreDefRep.emiEnvelopConv * energyconversion, 2);
+                tableBody(2, 1) = RealToStr(state.dataHeatBal->BuildingPreDefRep.emiZoneExfiltration * energyconversion, 2);
+                tableBody(3, 1) = RealToStr(state.dataHeatBal->BuildingPreDefRep.emiZoneExhaust * energyconversion, 2);
+                tableBody(4, 1) = RealToStr(state.dataHeatBal->BuildingPreDefRep.emiHVACRelief * energyconversion, 2);
+                tableBody(5, 1) = RealToStr(state.dataHeatBal->BuildingPreDefRep.emiHVACReject * energyconversion, 2);
+                tableBody(6, 1) = RealToStr(state.dataHeatBal->BuildingPreDefRep.emiTotHeat * energyconversion, 2);
 
                 if (produceTabular) {
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -12038,9 +11927,6 @@ namespace EnergyPlus::OutputReportTabular {
         int jUnique;
         static std::string curColHeadWithSI;
         static std::string curColHead;
-        static int indexUnitConv(0);
-        static Real64 curValueSI(0.0);
-        static Real64 curValue(0.0);
         auto &ort(state.dataOutRptTab);
 
         if (ort->displayComponentSizing) {
@@ -12143,8 +12029,8 @@ namespace EnergyPlus::OutputReportTabular {
                         // do the unit conversions
                         curColHeadWithSI = uniqueDesc(jUnique);
                         if (unitsStyle_cur == iUnitsStyle::InchPound) {
-                            LookupSItoIP(state, curColHeadWithSI, indexUnitConv, curColHead);
-                            colUnitConv(jUnique) = indexUnitConv;
+                            LookupSItoIP(state, curColHeadWithSI, state.dataOutRptTab->indexUnitConvWCS, curColHead);
+                            colUnitConv(jUnique) = state.dataOutRptTab->indexUnitConvWCS;
                         } else {
                             curColHead = curColHeadWithSI;
                             colUnitConv(jUnique) = 0;
@@ -12175,20 +12061,20 @@ namespace EnergyPlus::OutputReportTabular {
                                 }
                             }
                             if ((foundDesc >= 1) && (foundObj >= 1)) {
-                                curValueSI = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).valField;
+                                state.dataOutRptTab->curValueSIWCS = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).valField;
                                 if (unitsStyle_cur == iUnitsStyle::InchPound) {
                                     if (colUnitConv(foundDesc) != 0) {
-                                        curValue = ConvertIP(state, colUnitConv(foundDesc), curValueSI);
+                                        state.dataOutRptTab->curValueWCS = ConvertIP(state, colUnitConv(foundDesc), state.dataOutRptTab->curValueSIWCS);
                                     } else {
-                                        curValue = curValueSI;
+                                        state.dataOutRptTab->curValueWCS = state.dataOutRptTab->curValueSIWCS;
                                     }
                                 } else {
-                                    curValue = curValueSI;
+                                    state.dataOutRptTab->curValueWCS = state.dataOutRptTab->curValueSIWCS;
                                 }
-                                if (std::abs(curValue) >= 1.0) {
-                                    tableBody(foundDesc, foundObj) = RealToStr(curValue, 2);
+                                if (std::abs(state.dataOutRptTab->curValueWCS) >= 1.0) {
+                                    tableBody(foundDesc, foundObj) = RealToStr(state.dataOutRptTab->curValueWCS, 2);
                                 } else {
-                                    tableBody(foundDesc, foundObj) = RealToStr(curValue, 6);
+                                    tableBody(foundDesc, foundObj) = RealToStr(state.dataOutRptTab->curValueWCS, 6);
                                 }
                                 state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written = true;
                             }
@@ -12198,7 +12084,7 @@ namespace EnergyPlus::OutputReportTabular {
                     if (produceTabular) {
                         WriteSubtitle(state, state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
                     }
-                    
+
                     if (state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
                             state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:NoReheat") {
                             if (produceTabular) {
@@ -12223,7 +12109,7 @@ namespace EnergyPlus::OutputReportTabular {
                                        "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
                         }
                     }
-                    
+
                     if (produceSQLite) {
                         if (sqlite) {
                             sqlite->createSQLiteTabularDataRecords(tableBody,
@@ -12267,26 +12153,8 @@ namespace EnergyPlus::OutputReportTabular {
         //   Create arrays for the call to WriteTable and then call it.
         //   Use <br> tag to put multiple rows into a single cell.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
         using namespace DataShadowingCombinations;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // all arrays are in the format: (row, column)
@@ -12309,23 +12177,23 @@ namespace EnergyPlus::OutputReportTabular {
         // displaySurfaceShadowing = false  for debugging
         if (ort->displaySurfaceShadowing) {
             numreceivingfields = 0;
-            for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
-                numreceivingfields += ShadowComb(HTS).NumGenSurf;
-                numreceivingfields += ShadowComb(HTS).NumSubSurf;
+            for (HTS = 1; HTS <= state.dataSurface->TotSurfaces; ++HTS) {
+                numreceivingfields += state.dataShadowComb->ShadowComb(HTS).NumGenSurf;
+                numreceivingfields += state.dataShadowComb->ShadowComb(HTS).NumSubSurf;
             }
 
             state.dataOutRptPredefined->ShadowRelate.allocate(numreceivingfields);
             state.dataOutRptPredefined->numShadowRelate = 0;
-            for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
-                for (NGSS = 1; NGSS <= ShadowComb(HTS).NumGenSurf; ++NGSS) {
+            for (HTS = 1; HTS <= state.dataSurface->TotSurfaces; ++HTS) {
+                for (NGSS = 1; NGSS <= state.dataShadowComb->ShadowComb(HTS).NumGenSurf; ++NGSS) {
                     ++state.dataOutRptPredefined->numShadowRelate;
-                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).GenSurf(NGSS);
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = state.dataShadowComb->ShadowComb(HTS).GenSurf(NGSS);
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSurface;
                 }
-                for (NGSS = 1; NGSS <= ShadowComb(HTS).NumSubSurf; ++NGSS) {
+                for (NGSS = 1; NGSS <= state.dataShadowComb->ShadowComb(HTS).NumSubSurf; ++NGSS) {
                     ++state.dataOutRptPredefined->numShadowRelate;
-                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).SubSurf(NGSS);
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = state.dataShadowComb->ShadowComb(HTS).SubSurf(NGSS);
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSubsurface;
                 }
@@ -12343,7 +12211,7 @@ namespace EnergyPlus::OutputReportTabular {
                 for (iShadRel = 1; iShadRel <= state.dataOutRptPredefined->numShadowRelate; ++iShadRel) {
                     if (state.dataOutRptPredefined->ShadowRelate(iShadRel).recKind == iKindRec) {
                         curRecSurf = state.dataOutRptPredefined->ShadowRelate(iShadRel).recSurf;
-                        std::string const &name(Surface(state.dataOutRptPredefined->ShadowRelate(iShadRel).castSurf).Name);
+                        std::string const &name(state.dataSurface->Surface(state.dataOutRptPredefined->ShadowRelate(iShadRel).castSurf).Name);
                         auto &elem(shadow_map[curRecSurf]);            // Creates the entry if not present (and zero-initializes the int in the pair)
                         elem.first += static_cast<int>(name.length()); // Accumulate total of name lengths
                         elem.second.push_back(&name);                  // Add this name
@@ -12362,7 +12230,7 @@ namespace EnergyPlus::OutputReportTabular {
                 for (auto const &elem : shadow_map) {
                     ++jUnique;
                     curRecSurf = elem.first;
-                    rowHead(jUnique) = Surface(curRecSurf).Name;
+                    rowHead(jUnique) = state.dataSurface->Surface(curRecSurf).Name;
                     listOfSurf.clear();
                     listOfSurf.reserve(elem.second.first + (3 * numUnique)); // To avoid string allocations during appends
                     for (auto const *p : elem.second.second) {
@@ -12615,30 +12483,6 @@ namespace EnergyPlus::OutputReportTabular {
         // METHODOLOGY EMPLOYED:
         //   Call the AddTOCEntry routine for each zone.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Using/Aliasing
-        using DataHeatBalance::Zone;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int iZone;
         auto &ort(state.dataOutRptTab);
 
@@ -12646,12 +12490,12 @@ namespace EnergyPlus::OutputReportTabular {
             if (ort->displayZoneComponentLoadSummary) {
                 for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
-                    AddTOCEntry(state, "Zone Component Load Summary", Zone(iZone).Name);
+                    AddTOCEntry(state, "Zone Component Load Summary", state.dataHeatBal->Zone(iZone).Name);
                 }
             }
             if (ort->displayAirLoopComponentLoadSummary) {
-                for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
-                    AddTOCEntry(state, "AirLoop Component Load Summary", DataSizing::FinalSysSizing(AirLoopNum).AirPriLoopName);
+                for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
+                    AddTOCEntry(state, "AirLoop Component Load Summary", state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName);
                 }
             }
             if (ort->displayFacilityComponentLoadSummary) {
@@ -12671,30 +12515,6 @@ namespace EnergyPlus::OutputReportTabular {
         // PURPOSE OF THIS SUBROUTINE:
         //   Allocate the arrays related to the load component report
 
-        // METHODOLOGY EMPLOYED:
-        //   Use the ALLOCATE command
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using DataSurfaces::TotSurfaces;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &ort(state.dataOutRptTab);
 
@@ -12702,19 +12522,19 @@ namespace EnergyPlus::OutputReportTabular {
             // For many of the following arrays the last dimension is the number of environments and is same as sizing arrays
             ort->radiantPulseTimestep.allocate({0, state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays}, state.dataGlobal->NumOfZones);
             ort->radiantPulseTimestep = 0;
-            ort->radiantPulseReceived.allocate({0, state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays}, TotSurfaces);
+            ort->radiantPulseReceived.allocate({0, state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays}, state.dataSurface->TotSurfaces);
             ort->radiantPulseReceived = 0.0;
-            ort->loadConvectedNormal.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, TotSurfaces);
+            ort->loadConvectedNormal.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, state.dataSurface->TotSurfaces);
             ort->loadConvectedNormal = 0.0;
-            ort->loadConvectedWithPulse.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, TotSurfaces);
+            ort->loadConvectedWithPulse.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, state.dataSurface->TotSurfaces);
             ort->loadConvectedWithPulse = 0.0;
-            ort->netSurfRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->netSurfRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->netSurfRadSeq = 0.0;
-            ort->decayCurveCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->decayCurveCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->decayCurveCool = 0.0;
-            ort->decayCurveHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->decayCurveHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->decayCurveHeat = 0.0;
-            ort->ITABSFseq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->ITABSFseq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->ITABSFseq = 0.0;
             ort->TMULTseq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             ort->TMULTseq = 0.0;
@@ -12730,7 +12550,7 @@ namespace EnergyPlus::OutputReportTabular {
             ort->lightRetAirSeq = 0.0;
             ort->lightLWRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             ort->lightLWRadSeq = 0.0;
-            ort->lightSWRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->lightSWRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->lightSWRadSeq = 0.0;
             ort->equipInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             ort->equipInstantSeq = 0.0;
@@ -12770,7 +12590,7 @@ namespace EnergyPlus::OutputReportTabular {
             ort->interZoneMixLatentSeq = 0.0;
             ort->feneCondInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             ort->feneCondInstantSeq = 0.0;
-            ort->feneSolarRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->feneSolarRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->feneSolarRadSeq = 0.0;
             ort->AllocateLoadComponentArraysDoAllocate = false;
         }
@@ -12787,29 +12607,6 @@ namespace EnergyPlus::OutputReportTabular {
         // PURPOSE OF THIS SUBROUTINE:
         //   Deallocate the arrays related to the load component report that will not
         //   be needed in the reporting.
-
-        // METHODOLOGY EMPLOYED:
-        //   Use the DEALLOCATE command
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using DataSurfaces::TotSurfaces;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &ort(state.dataOutRptTab);
@@ -12834,82 +12631,56 @@ namespace EnergyPlus::OutputReportTabular {
         // Decay curve is the fraction of the heat convected from a surface over the initial radiant heat
         // absorbed by the surface.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataSizing::CalcFinalZoneSizing;
-        using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int ZoneNum(0);
-        static int SurfNum(0);
-        static int TimeStep(0);
-        static int TimeOfPulse(0);
-        static int CoolDesSelected(0); // design day selected for cooling
-        static int HeatDesSelected(0); // design day selected for heating
         int i;
         Real64 diff;
         auto &ort(state.dataOutRptTab);
+        auto &Zone(state.dataHeatBal->Zone);
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            ZoneNum = Surface(SurfNum).Zone;
-            if (ZoneNum == 0) continue;
-            if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
-            CoolDesSelected = CalcFinalZoneSizing(ZoneNum).CoolDDNum;
+        for (state.dataOutRptTab->SurfNumCLCDC = 1; state.dataOutRptTab->SurfNumCLCDC <= state.dataSurface->TotSurfaces; ++state.dataOutRptTab->SurfNumCLCDC) {
+            state.dataOutRptTab->ZoneNumCLCDC = state.dataSurface->Surface(state.dataOutRptTab->SurfNumCLCDC).Zone;
+            if (state.dataOutRptTab->ZoneNumCLCDC == 0) continue;
+            if (!state.dataZoneEquip->ZoneEquipConfig(state.dataOutRptTab->ZoneNumCLCDC).IsControlled) continue;
+            state.dataOutRptTab->CoolDesSelectedCLCDC = state.dataSize->CalcFinalZoneSizing(state.dataOutRptTab->ZoneNumCLCDC).CoolDDNum;
             // loop over timesteps after pulse occurred
-            if (CoolDesSelected != 0) {
-                TimeOfPulse = ort->radiantPulseTimestep(CoolDesSelected, ZoneNum);
+            if (state.dataOutRptTab->CoolDesSelectedCLCDC != 0) {
+                state.dataOutRptTab->TimeOfPulseCLCDC = ort->radiantPulseTimestep(state.dataOutRptTab->CoolDesSelectedCLCDC, state.dataOutRptTab->ZoneNumCLCDC);
                 // if the CoolDesSelected time is on a different day than
                 // when the pulse occurred, need to scan back and find when
                 // the pulse occurred.
-                if (TimeOfPulse == 0) {
-                    for (i = CoolDesSelected; i >= 1; --i) {
-                        TimeOfPulse = ort->radiantPulseTimestep(i, ZoneNum);
-                        if (TimeOfPulse != 0) break;
+                if (state.dataOutRptTab->TimeOfPulseCLCDC == 0) {
+                    for (i = state.dataOutRptTab->CoolDesSelectedCLCDC; i >= 1; --i) {
+                        state.dataOutRptTab->TimeOfPulseCLCDC = ort->radiantPulseTimestep(i, state.dataOutRptTab->ZoneNumCLCDC);
+                        if (state.dataOutRptTab->TimeOfPulseCLCDC != 0) break;
                     }
                 }
-                if (TimeOfPulse == 0) TimeOfPulse = 1;
-                for (TimeStep = TimeOfPulse; TimeStep <= state.dataGlobal->NumOfTimeStepInHour * 24; ++TimeStep) {
-                    if (ort->radiantPulseReceived(CoolDesSelected, SurfNum) != 0.0) {
-                        diff = ort->loadConvectedWithPulse(CoolDesSelected, TimeStep, SurfNum) - ort->loadConvectedNormal(CoolDesSelected, TimeStep, SurfNum);
-                        ort->decayCurveCool(TimeStep - TimeOfPulse + 1, SurfNum) = -diff / ort->radiantPulseReceived(CoolDesSelected, SurfNum);
+                if (state.dataOutRptTab->TimeOfPulseCLCDC == 0) state.dataOutRptTab->TimeOfPulseCLCDC = 1;
+                for (state.dataOutRptTab->TimeStepCLCDC = state.dataOutRptTab->TimeOfPulseCLCDC; state.dataOutRptTab->TimeStepCLCDC <= state.dataGlobal->NumOfTimeStepInHour * 24; ++state.dataOutRptTab->TimeStepCLCDC) {
+                    if (ort->radiantPulseReceived(state.dataOutRptTab->CoolDesSelectedCLCDC, state.dataOutRptTab->SurfNumCLCDC) != 0.0) {
+                        diff = ort->loadConvectedWithPulse(state.dataOutRptTab->CoolDesSelectedCLCDC, state.dataOutRptTab->TimeStepCLCDC, state.dataOutRptTab->SurfNumCLCDC) - ort->loadConvectedNormal(state.dataOutRptTab->CoolDesSelectedCLCDC, state.dataOutRptTab->TimeStepCLCDC, state.dataOutRptTab->SurfNumCLCDC);
+                        ort->decayCurveCool(state.dataOutRptTab->TimeStepCLCDC - state.dataOutRptTab->TimeOfPulseCLCDC + 1, state.dataOutRptTab->SurfNumCLCDC) = -diff / ort->radiantPulseReceived(state.dataOutRptTab->CoolDesSelectedCLCDC, state.dataOutRptTab->SurfNumCLCDC);
                     } else {
-                        ort->decayCurveCool(TimeStep - TimeOfPulse + 1, SurfNum) = 0.0;
+                        ort->decayCurveCool(state.dataOutRptTab->TimeStepCLCDC - state.dataOutRptTab->TimeOfPulseCLCDC + 1, state.dataOutRptTab->SurfNumCLCDC) = 0.0;
                     }
                 }
             }
-            HeatDesSelected = CalcFinalZoneSizing(ZoneNum).HeatDDNum;
-            if (HeatDesSelected != 0) {
-                TimeOfPulse = ort->radiantPulseTimestep(HeatDesSelected, ZoneNum);
+            state.dataOutRptTab->HeatDesSelectedCLCDC = state.dataSize->CalcFinalZoneSizing(state.dataOutRptTab->ZoneNumCLCDC).HeatDDNum;
+            if (state.dataOutRptTab->HeatDesSelectedCLCDC != 0) {
+                state.dataOutRptTab->TimeOfPulseCLCDC = ort->radiantPulseTimestep(state.dataOutRptTab->HeatDesSelectedCLCDC, state.dataOutRptTab->ZoneNumCLCDC);
                 // scan back to the day that the heating pulse occurs, if necessary
-                if (TimeOfPulse == 0) {
-                    for (i = HeatDesSelected; i >= 1; --i) {
-                        TimeOfPulse = ort->radiantPulseTimestep(i, ZoneNum);
-                        if (TimeOfPulse != 0) break;
+                if (state.dataOutRptTab->TimeOfPulseCLCDC == 0) {
+                    for (i = state.dataOutRptTab->HeatDesSelectedCLCDC; i >= 1; --i) {
+                        state.dataOutRptTab->TimeOfPulseCLCDC = ort->radiantPulseTimestep(i, state.dataOutRptTab->ZoneNumCLCDC);
+                        if (state.dataOutRptTab->TimeOfPulseCLCDC != 0) break;
                     }
                 }
-                if (TimeOfPulse == 0) TimeOfPulse = 1;
-                for (TimeStep = TimeOfPulse; TimeStep <= state.dataGlobal->NumOfTimeStepInHour * 24; ++TimeStep) {
-                    if (ort->radiantPulseReceived(HeatDesSelected, SurfNum) != 0.0) {
-                        diff = ort->loadConvectedWithPulse(HeatDesSelected, TimeStep, SurfNum) - ort->loadConvectedNormal(HeatDesSelected, TimeStep, SurfNum);
-                        ort->decayCurveHeat(TimeStep - TimeOfPulse + 1, SurfNum) = -diff / ort->radiantPulseReceived(HeatDesSelected, SurfNum);
+                if (state.dataOutRptTab->TimeOfPulseCLCDC == 0) state.dataOutRptTab->TimeOfPulseCLCDC = 1;
+                for (state.dataOutRptTab->TimeStepCLCDC = state.dataOutRptTab->TimeOfPulseCLCDC; state.dataOutRptTab->TimeStepCLCDC <= state.dataGlobal->NumOfTimeStepInHour * 24; ++state.dataOutRptTab->TimeStepCLCDC) {
+                    if (ort->radiantPulseReceived(state.dataOutRptTab->HeatDesSelectedCLCDC, state.dataOutRptTab->SurfNumCLCDC) != 0.0) {
+                        diff = ort->loadConvectedWithPulse(state.dataOutRptTab->HeatDesSelectedCLCDC, state.dataOutRptTab->TimeStepCLCDC, state.dataOutRptTab->SurfNumCLCDC) - ort->loadConvectedNormal(state.dataOutRptTab->HeatDesSelectedCLCDC, state.dataOutRptTab->TimeStepCLCDC, state.dataOutRptTab->SurfNumCLCDC);
+                        ort->decayCurveHeat(state.dataOutRptTab->TimeStepCLCDC - state.dataOutRptTab->TimeOfPulseCLCDC + 1, state.dataOutRptTab->SurfNumCLCDC) = -diff / ort->radiantPulseReceived(state.dataOutRptTab->HeatDesSelectedCLCDC, state.dataOutRptTab->SurfNumCLCDC);
                     } else {
-                        ort->decayCurveHeat(TimeStep - TimeOfPulse + 1, SurfNum) = 0.0;
+                        ort->decayCurveHeat(state.dataOutRptTab->TimeStepCLCDC - state.dataOutRptTab->TimeOfPulseCLCDC + 1, state.dataOutRptTab->SurfNumCLCDC) = 0.0;
                     }
                 }
             }
@@ -12925,9 +12696,9 @@ namespace EnergyPlus::OutputReportTabular {
                   "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n");
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
-                    if (Surface(kSurf).Zone != iZone) continue;
-                    print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", Zone(iZone).Name, Surface(kSurf).Name);
+                for (int kSurf : state.dataSurface->AllSurfaceListReportOrder) {
+                    if (state.dataSurface->Surface(kSurf).Zone != iZone) continue;
+                    print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", Zone(iZone).Name, state.dataSurface->Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(state.dataGlobal->NumOfTimeStepInHour * 24, 36); ++jTime) {
                         print(state.files.eio, ",{:6.3F}", ort->decayCurveCool(jTime, kSurf));
                     }
@@ -12935,9 +12706,9 @@ namespace EnergyPlus::OutputReportTabular {
                     print(state.files.eio, "\n");
                 }
 
-                for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
-                    if (Surface(kSurf).Zone != iZone) continue;
-                    print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", Zone(iZone).Name, Surface(kSurf).Name);
+                for (int kSurf : state.dataSurface->AllSurfaceListReportOrder) {
+                    if (state.dataSurface->Surface(kSurf).Zone != iZone) continue;
+                    print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", Zone(iZone).Name, state.dataSurface->Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(state.dataGlobal->NumOfTimeStepInHour * 24, 36); ++jTime) {
                         print(state.files.eio, ",{:6.3F}", ort->decayCurveHeat(jTime, kSurf));
                     }
@@ -12962,51 +12733,20 @@ namespace EnergyPlus::OutputReportTabular {
         // METHODOLOGY EMPLOYED:
         //   Save sequence of values for report during sizing.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using DataSizing::CurOverallSimDay;
-        using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
-        using DataSurfaces::SurfWinGainConvGlazShadGapToZoneRep;
-        using DataSurfaces::SurfWinGainConvGlazToZoneRep;
-        using DataSurfaces::SurfWinGainConvShadeToZoneRep;
-        using DataSurfaces::SurfWinGainFrameDividerToZoneRep;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int iSurf(0);
-        static int ZoneNum(0);
-        static int TimeStepInDay(0);
-        static Array1D_int IntGainTypesTubular(1, {IntGainTypeOf_DaylightingDeviceTubular});
         auto &ort(state.dataOutRptTab);
 
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
-            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-            ort->feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, _) = 0.0;
-            for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
-                ZoneNum = Surface(iSurf).Zone;
-                if (ZoneNum == 0) continue;
-                if (Surface(iSurf).Class != DataSurfaces::SurfaceClass::Window) continue;
+            state.dataOutRptTab->TimeStepInDayGCLS = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+            ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, _) = 0.0;
+            for (state.dataOutRptTab->iSurfGCLS = 1; state.dataOutRptTab->iSurfGCLS <= state.dataSurface->TotSurfaces; ++state.dataOutRptTab->iSurfGCLS) {
+                state.dataOutRptTab->ZoneNumGCLS = state.dataSurface->Surface(state.dataOutRptTab->iSurfGCLS).Zone;
+                if (state.dataOutRptTab->ZoneNumGCLS == 0) continue;
+                if (state.dataSurface->Surface(state.dataOutRptTab->iSurfGCLS).Class != DataSurfaces::SurfaceClass::Window) continue;
                 // IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
-                ort->feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, ZoneNum) +=
-                    SurfWinGainConvGlazToZoneRep(iSurf) + SurfWinGainConvGlazShadGapToZoneRep(iSurf) + SurfWinGainConvShadeToZoneRep(iSurf) +
-                            SurfWinGainFrameDividerToZoneRep(iSurf);
+                ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, state.dataOutRptTab->ZoneNumGCLS) +=
+                    state.dataSurface->SurfWinGainConvGlazToZoneRep(state.dataOutRptTab->iSurfGCLS) + state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(state.dataOutRptTab->iSurfGCLS) + state.dataSurface->SurfWinGainConvShadeToZoneRep(state.dataOutRptTab->iSurfGCLS) +
+                            state.dataSurface->SurfWinGainFrameDividerToZoneRep(state.dataOutRptTab->iSurfGCLS);
                 // for now assume zero instant solar - may change related
                 // to how blinds and shades absorb solar radiation and
                 // convect that heat that timestep.
@@ -13014,8 +12754,8 @@ namespace EnergyPlus::OutputReportTabular {
             }
             for (int izone = 1; izone <= state.dataGlobal->NumOfZones; ++izone) {
                 Real64 tubularGain = 0.0;
-                InternalHeatGains::SumInternalConvectionGainsByTypes(izone, IntGainTypesTubular, tubularGain);
-                ort->feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, izone) += tubularGain;
+                InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, state.dataOutRptTab->IntGainTypesTubularGCLS, tubularGain);
+                ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, izone) += tubularGain;
             }
         }
     }
@@ -13034,80 +12774,58 @@ namespace EnergyPlus::OutputReportTabular {
         // METHODOLOGY EMPLOYED:
         //   Save sequence of values for report during sizing.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
-        using DataHeatBalance::ZnAirRpt;
-        using DataHVACGlobals::TimeStepSys;
-        using DataSizing::CurOverallSimDay;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int iZone(0);
-        static int TimeStepInDay(0);
         auto &ort(state.dataOutRptTab);
 
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
-            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-            for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                ort->infilInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).InfilHeatGain - ZnAirRpt(iZone).InfilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->infilInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiSenGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiSenLossW); // air flow network
+            state.dataOutRptTab->TimeStepInDayGCLH = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+            for (state.dataOutRptTab->iZoneGCLH = 1; state.dataOutRptTab->iZoneGCLH <= state.dataGlobal->NumOfZones; ++state.dataOutRptTab->iZoneGCLH) {
+                ort->infilInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
+                    ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatGain - state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    ort->infilInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenLossW); // air flow network
                 }
-                ort->infilLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).InfilLatentGain - ZnAirRpt(iZone).InfilLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->infilLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiLatGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiLatLossW); // air flow network
-                }
-
-                ort->zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).VentilHeatGain - ZnAirRpt(iZone).VentilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenLossW); // air flow network
-                }
-                ort->zoneVentLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).VentilLatentGain - ZnAirRpt(iZone).VentilLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentLatGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentLatLossW); // air flow network
+                ort->infilLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
+                    ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentGain - state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    ort->infilLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatLossW); // air flow network
                 }
 
-                ort->interZoneMixInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).MixHeatGain - ZnAirRpt(iZone).MixHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->interZoneMixInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixSenGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixSenLossW); // air flow network
+                ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
+                    ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatGain - state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenLossW); // air flow network
                 }
-                ort->interZoneMixLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).MixLatentGain - ZnAirRpt(iZone).MixLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
-                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->interZoneMixLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixLatGainW -
-                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixLatLossW); // air flow network
+                ort->zoneVentLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
+                    ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentGain - state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatLossW); // air flow network
+                }
+
+                ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
+                    ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatGain - state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenLossW); // air flow network
+                }
+                ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
+                    ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentGain - state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
+                if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
+                        (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatGainW -
+                         state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatLossW); // air flow network
                 }
             }
         }
@@ -13169,12 +12887,13 @@ namespace EnergyPlus::OutputReportTabular {
         //   formula used is:
         //       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
 
-        using DataHVACGlobals::NumPrimaryAirSys;
-        using DataSizing::CalcFinalFacilitySizing;
-        using DataSizing::CalcFinalZoneSizing;
-        using DataSizing::SysSizPeakDDNum;
-        using DataSurfaces::TotSurfaces;
+        auto & NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+
+        auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
+        auto &FinalSysSizing(state.dataSize->FinalSysSizing);
         auto &ort(state.dataOutRptTab);
+        auto &Zone(state.dataHeatBal->Zone);
+        auto &CalcFinalFacilitySizing(state.dataSize->CalcFinalFacilitySizing);
 
         if (!((ort->displayZoneComponentLoadSummary || ort->displayAirLoopComponentLoadSummary || ort->displayFacilityComponentLoadSummary) && state.dataGlobal->CompLoadReportIsReq))
             return;
@@ -13249,9 +12968,9 @@ namespace EnergyPlus::OutputReportTabular {
             feneSolarDelaySeqHeat = 0.0;
             feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
             feneSolarDelaySeqCool = 0.0;
-            surfDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            surfDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             surfDelaySeqHeat = 0.0;
-            surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             surfDelaySeqCool = 0.0;
 
             // initialize arrays
@@ -13341,10 +13060,10 @@ namespace EnergyPlus::OutputReportTabular {
             if (ort->displayZoneComponentLoadSummary) {
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
-                    if (allocated(CalcFinalZoneSizing)) {
-                        coolDesSelected = CalcFinalZoneSizing(iZone).CoolDDNum;
+                    if (allocated(state.dataSize->CalcFinalZoneSizing)) {
+                        coolDesSelected = state.dataSize->CalcFinalZoneSizing(iZone).CoolDDNum;
                         ZoneCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
-                        timeCoolMax = CalcFinalZoneSizing(iZone).TimeStepNumAtCoolMax;
+                        timeCoolMax = state.dataSize->CalcFinalZoneSizing(iZone).TimeStepNumAtCoolMax;
                         ZoneCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
 
                         GetDelaySequences(state,
@@ -13375,11 +13094,11 @@ namespace EnergyPlus::OutputReportTabular {
                                                        surfDelaySeqCool);
                         CollectPeakZoneConditions(state, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                         // send latent load info to coil summary report
-                        coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
+                        state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
 
-                        heatDesSelected = CalcFinalZoneSizing(iZone).HeatDDNum;
+                        heatDesSelected = state.dataSize->CalcFinalZoneSizing(iZone).HeatDDNum;
                         ZoneHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
-                        timeHeatMax = CalcFinalZoneSizing(iZone).TimeStepNumAtHeatMax;
+                        timeHeatMax = state.dataSize->CalcFinalZoneSizing(iZone).TimeStepNumAtHeatMax;
                         ZoneHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
 
                         GetDelaySequences(state,
@@ -13411,7 +13130,7 @@ namespace EnergyPlus::OutputReportTabular {
                         CollectPeakZoneConditions(state, ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
 
                         // send latent load info to coil summary report
-                        coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
+                        state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
 
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneCoolCompLoadTables(iZone));
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneHeatCompLoadTables(iZone));
@@ -13440,14 +13159,14 @@ namespace EnergyPlus::OutputReportTabular {
                 for (int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop) {
                     zoneToAirLoopCool = 0;
                     zoneToAirLoopHeat = 0;
-                    if (DataSizing::FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
+                    if (FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
                         coolDesSelected = SysSizPeakDDNum(iAirLoop).SensCoolPeakDD;
                         if (coolDesSelected != 0) {
                             timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtSensCoolPk(coolDesSelected);
                         } else {
                             timeCoolMax = 0;
                         }
-                    } else if (DataSizing::FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::Ventilation) {
+                    } else if (FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::Ventilation) {
                         coolDesSelected = SysSizPeakDDNum(iAirLoop).CoolFlowPeakDD;
                         if (coolDesSelected != 0) {
                             timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtCoolFlowPk(coolDesSelected);
@@ -13713,7 +13432,7 @@ namespace EnergyPlus::OutputReportTabular {
             if (ort->displayZoneComponentLoadSummary) {
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
-                    if (allocated(CalcFinalZoneSizing)) {
+                    if (allocated(state.dataSize->CalcFinalZoneSizing)) {
                         LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone), unitsStyle_cur);
                         LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone), unitsStyle_cur);
 
@@ -13768,16 +13487,14 @@ namespace EnergyPlus::OutputReportTabular {
                            Array3D<Real64> &feneCondInstantSeq,
                            Array2D<Real64> &surfDelaySeq)
     {
-        using DataHeatBalance::Zone;
-        using DataSurfaces::Surface;
 
         // static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
-        static Array3D_bool adjFenDone;
         auto &ort(state.dataOutRptTab);
+        auto &Zone(state.dataHeatBal->Zone);
 
         if (!ort->initAdjFenDone) {
-            adjFenDone.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
-            adjFenDone = false;
+            state.dataOutRptTab->adjFenDone.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            state.dataOutRptTab->adjFenDone = false;
             ort->initAdjFenDone = true;
         }
 
@@ -13803,8 +13520,7 @@ namespace EnergyPlus::OutputReportTabular {
                 Real64 adjFeneSurfNetRadSeq = 0.0;
 
                 // code from ComputeDelayedComponents starts
-                for (int jSurf = Zone(zoneIndex).SurfaceFirst; jSurf <= Zone(zoneIndex).SurfaceLast; ++jSurf) {
-                    if (!Surface(jSurf).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+                for (int jSurf = Zone(zoneIndex).HTSurfaceFirst; jSurf <= Zone(zoneIndex).HTSurfaceLast; ++jSurf) {
 
                     // for each time step, step back through time and apply decay curve to radiant heat for each end use absorbed in each surface
                     Real64 peopleConvFromSurf = 0.0;
@@ -13818,7 +13534,7 @@ namespace EnergyPlus::OutputReportTabular {
                     for (int mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack) {
                         int sourceStep = kTimeStep - mStepBack + 1;
                         Real64 thisQRadThermInAbsMult = ort->TMULTseq(desDaySelected, sourceStep, radEnclosureNum) *
-                            ort->ITABSFseq(desDaySelected, sourceStep, jSurf) * Surface(jSurf).Area *
+                            ort->ITABSFseq(desDaySelected, sourceStep, jSurf) * state.dataSurface->Surface(jSurf).Area *
                             decayCurve(mStepBack, jSurf);
                         peopleConvFromSurf += ort->peopleRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
                         equipConvFromSurf += ort->equipRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
@@ -13847,7 +13563,7 @@ namespace EnergyPlus::OutputReportTabular {
                          lightSWConvFromSurf +
                          feneSolarConvFromSurf); // remove net radiant for the surface
                                                  // also remove the net radiant component on the instanteous conduction for fenestration
-                    if (Surface(jSurf).Class == DataSurfaces::SurfaceClass::Window) {
+                    if (state.dataSurface->Surface(jSurf).Class == DataSurfaces::SurfaceClass::Window) {
                         adjFeneSurfNetRadSeq += ort->netSurfRadSeq(desDaySelected, kTimeStep, jSurf);
                     }
                 } // for jSurf
@@ -13859,9 +13575,9 @@ namespace EnergyPlus::OutputReportTabular {
                 lightDelaySeq(kTimeStep) = lightLWConvIntoZone + lightSWConvIntoZone;
                 feneSolarDelaySeq(kTimeStep) = feneSolarConvIntoZone;
                 // also remove the net radiant component on the instanteous conduction for fenestration
-                if (!adjFenDone(desDaySelected, kTimeStep, zoneIndex)) {
+                if (!state.dataOutRptTab->adjFenDone(desDaySelected, kTimeStep, zoneIndex)) {
                     feneCondInstantSeq(desDaySelected, kTimeStep, zoneIndex) -= adjFeneSurfNetRadSeq;
-                    adjFenDone(desDaySelected, kTimeStep, zoneIndex) = true;
+                    state.dataOutRptTab->adjFenDone(desDaySelected, kTimeStep, zoneIndex) = true;
                 }
             } // for kTimeStep
 
@@ -13871,14 +13587,13 @@ namespace EnergyPlus::OutputReportTabular {
     }
 
     // Used to construct the tabular output for a single cell in the component load summary reports based on moving average
-    Real64 MovingAvgAtMaxTime(Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep)
+    Real64 MovingAvgAtMaxTime(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep)
     {
-        using DataSizing::NumTimeStepsInAvg;
         using General::MovingAvg;
         Array1D<Real64> AvgData; // sequence data after averaging
         AvgData.allocate(numTimeSteps);
         AvgData = 0.;
-        MovingAvg(dataSeq * 1.0, numTimeSteps, NumTimeStepsInAvg, AvgData);
+        MovingAvg(dataSeq * 1.0, numTimeSteps, state.dataSize->NumTimeStepsInAvg, AvgData);
         return AvgData(maxTimeStep);
     }
 
@@ -13898,20 +13613,14 @@ namespace EnergyPlus::OutputReportTabular {
                                         Array3D<Real64> const &feneCondInstantSeq,
                                         Array2D<Real64> const &surfDelaySeq)
     {
-        using DataHeatBalance::Zone;
-        using DataSizing::CalcZoneSizing;
-        using DataSizing::NumTimeStepsInAvg;
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
         using DataSurfaces::KivaFoundation;
-        using DataSurfaces::OSC;
         using DataSurfaces::OtherSideCoefCalcExt;
         using DataSurfaces::OtherSideCoefNoCalcExt;
         using DataSurfaces::OtherSideCondModeledExt;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass;
-        using DataSurfaces::TotSurfaces;
         using General::MovingAvg;
 
         Array1D<Real64> seqData;     // raw data sequence that has not been averaged yet
@@ -13920,6 +13629,7 @@ namespace EnergyPlus::OutputReportTabular {
         int curExtBoundCond;
         Real64 singleSurfDelay;
         auto &ort(state.dataOutRptTab);
+        auto &Zone(state.dataHeatBal->Zone);
 
         int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
@@ -13933,106 +13643,124 @@ namespace EnergyPlus::OutputReportTabular {
         if (desDaySelected != 0 && timeOfMax != 0) {
 
             // PEOPLE
-            resultCells(cSensInst, rPeople) = MovingAvgAtMaxTime(ort->peopleInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rPeople) =
+                MovingAvgAtMaxTime(state, ort->peopleInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rPeople) = true;
-            resultCells(cLatent, rPeople) = MovingAvgAtMaxTime(ort->peopleLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rPeople) =
+                MovingAvgAtMaxTime(state, ort->peopleLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rPeople) = true;
-            resultCells(cSensDelay, rPeople) = MovingAvgAtMaxTime(peopleDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rPeople) = MovingAvgAtMaxTime(state, peopleDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rPeople) = true;
 
             // LIGHTS
-            resultCells(cSensInst, rLights) = MovingAvgAtMaxTime(ort->lightInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rLights) =
+                MovingAvgAtMaxTime(state, ort->lightInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rLights) = true;
-            resultCells(cSensRA, rLights) = MovingAvgAtMaxTime(ort->lightRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensRA, rLights) =
+                MovingAvgAtMaxTime(state, ort->lightRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensRA, rLights) = true;
-            resultCells(cSensDelay, rLights) = MovingAvgAtMaxTime(lightDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rLights) = MovingAvgAtMaxTime(state, lightDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rLights) = true;
 
             // EQUIPMENT
-            resultCells(cSensInst, rEquip) = MovingAvgAtMaxTime(ort->equipInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rEquip) =
+                MovingAvgAtMaxTime(state, ort->equipInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rEquip) = true;
-            resultCells(cLatent, rEquip) = MovingAvgAtMaxTime(ort->equipLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rEquip) =
+                MovingAvgAtMaxTime(state, ort->equipLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rEquip) = true;
-            resultCells(cSensDelay, rEquip) = MovingAvgAtMaxTime(equipDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rEquip) = MovingAvgAtMaxTime(state, equipDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rEquip) = true;
 
             // REFRIGERATION EQUIPMENT
-            resultCells(cSensInst, rRefrig) = MovingAvgAtMaxTime(ort->refrigInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rRefrig) =
+                MovingAvgAtMaxTime(state, ort->refrigInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rRefrig) = true;
-            resultCells(cSensRA, rRefrig) = MovingAvgAtMaxTime(ort->refrigRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensRA, rRefrig) =
+                MovingAvgAtMaxTime(state, ort->refrigRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensRA, rRefrig) = true;
-            resultCells(cLatent, rRefrig) = MovingAvgAtMaxTime(ort->refrigLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rRefrig) =
+                MovingAvgAtMaxTime(state, ort->refrigLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rRefrig) = true;
 
             // WATER USE EQUIPMENT
-            resultCells(cSensInst, rWaterUse) = MovingAvgAtMaxTime(ort->waterUseInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rWaterUse) =
+                MovingAvgAtMaxTime(state, ort->waterUseInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rWaterUse) = true;
-            resultCells(cLatent, rWaterUse) = MovingAvgAtMaxTime(ort->waterUseLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rWaterUse) =
+                MovingAvgAtMaxTime(state, ort->waterUseLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rWaterUse) = true;
 
             // HVAC EQUIPMENT LOSSES
-            resultCells(cSensInst, rHvacLoss) = MovingAvgAtMaxTime(ort->hvacLossInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rHvacLoss) =
+                MovingAvgAtMaxTime(state, ort->hvacLossInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rHvacLoss) = true;
-            resultCells(cSensDelay, rHvacLoss) = MovingAvgAtMaxTime(hvacLossDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rHvacLoss) = MovingAvgAtMaxTime(state, hvacLossDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rHvacLoss) = true;
 
             // POWER GENERATION EQUIPMENT
-            resultCells(cSensInst, rPowerGen) = MovingAvgAtMaxTime(ort->powerGenInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rPowerGen) =
+                MovingAvgAtMaxTime(state, ort->powerGenInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rPowerGen) = true;
-            resultCells(cSensDelay, rPowerGen) = MovingAvgAtMaxTime(powerGenDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rPowerGen) = MovingAvgAtMaxTime(state, powerGenDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rPowerGen) = true;
 
             // DOAS
-            resultCells(cSensInst, rDOAS) = CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax);
+            resultCells(cSensInst, rDOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax);
             resCellsUsd(cSensInst, rDOAS) = true;
-            resultCells(cLatent, rDOAS) = CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax);
+            resultCells(cLatent, rDOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax);
             resCellsUsd(cLatent, rDOAS) = true;
 
             // INFILTRATION
-            resultCells(cSensInst, rInfil) = MovingAvgAtMaxTime(ort->infilInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rInfil) =
+                MovingAvgAtMaxTime(state, ort->infilInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rInfil) = true;
-            resultCells(cLatent, rInfil) = MovingAvgAtMaxTime(ort->infilLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rInfil) =
+                MovingAvgAtMaxTime(state, ort->infilLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rInfil) = true;
 
             // ZONE VENTILATION
-            resultCells(cSensInst, rZoneVent) = MovingAvgAtMaxTime(ort->zoneVentInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rZoneVent) =
+                MovingAvgAtMaxTime(state, ort->zoneVentInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rZoneVent) = true;
-            resultCells(cLatent, rZoneVent) = MovingAvgAtMaxTime(ort->zoneVentLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rZoneVent) =
+                MovingAvgAtMaxTime(state, ort->zoneVentLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rZoneVent) = true;
 
             // INTERZONE MIXING
             resultCells(cSensInst, rIntZonMix) =
-                MovingAvgAtMaxTime(ort->interZoneMixInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+                MovingAvgAtMaxTime(state, ort->interZoneMixInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rIntZonMix) = true;
-            resultCells(cLatent, rIntZonMix) = MovingAvgAtMaxTime(ort->interZoneMixLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rIntZonMix) =
+                MovingAvgAtMaxTime(state, ort->interZoneMixLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rIntZonMix) = true;
 
             // FENESTRATION CONDUCTION
-            resultCells(cSensInst, rFeneCond) = MovingAvgAtMaxTime(feneCondInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rFeneCond) =
+                MovingAvgAtMaxTime(state, feneCondInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rFeneCond) = true;
 
             // FENESTRATION SOLAR
-            resultCells(cSensDelay, rFeneSolr) = MovingAvgAtMaxTime(feneSolarDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rFeneSolr) = MovingAvgAtMaxTime(state, feneSolarDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rFeneSolr) = true;
 
             // opaque surfaces - must combine individual surfaces by class and other side conditions
             delayOpaque = 0.0;
-            for (int kSurf = Zone(zoneIndex).SurfaceFirst; kSurf <= Zone(zoneIndex).SurfaceLast; ++kSurf) {
-                if (!Surface(kSurf).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+            for (int kSurf = Zone(zoneIndex).HTSurfaceFirst; kSurf <= Zone(zoneIndex).HTSurfaceLast; ++kSurf) {
 
-                curExtBoundCond = Surface(kSurf).ExtBoundCond;
+                curExtBoundCond = state.dataSurface->Surface(kSurf).ExtBoundCond;
                 // if exterior is other side coefficients using ground preprocessor terms then
                 // set it to ground instead of other side coefficients
                 if (curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt) {
-                    if (has_prefixi(OSC(Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
+                    if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
                         curExtBoundCond = Ground;
                     }
                 }
                 seqData = surfDelaySeq(_, kSurf);
-                MovingAvg(seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData);
+                MovingAvg(seqData, NumOfTimeStepInDay, state.dataSize->NumTimeStepsInAvg, AvgData);
                 singleSurfDelay = AvgData(timeOfMax);
                 {
-                    auto const SELECT_CASE_var(Surface(kSurf).Class);
+                    auto const SELECT_CASE_var(state.dataSurface->Surface(kSurf).Class);
                     if (SELECT_CASE_var == SurfaceClass::Wall) {
                         {
                             auto const SELECT_CASE_var1(curExtBoundCond);
@@ -14093,15 +13821,12 @@ namespace EnergyPlus::OutputReportTabular {
     void CollectPeakZoneConditions(EnergyPlusData &state,
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling)
     {
-        using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
-        using DataSizing::CalcFinalZoneSizing;
-        using DataSizing::CoolPeakDateHrMin;
-        using DataSizing::FinalZoneSizing;
-        using DataSizing::HeatPeakDateHrMin;
         using DataSizing::SupplyAirTemperature;
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTwbFnTdbWPb;
+
+        auto &Zone(state.dataHeatBal->Zone);
+        auto &CalcFinalZoneSizing(state.dataSize->CalcFinalZoneSizing);
 
         if (timeOfMax != 0) {
 
@@ -14114,9 +13839,9 @@ namespace EnergyPlus::OutputReportTabular {
                     compLoad.peakDateHrMin = format("{}/{} {}",
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).Month,
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
-                                                    coilSelectionReportObj->getTimeText(state, timeOfMax));
+                                                    state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
                 } else {
-                    compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
+                    compLoad.peakDateHrMin = state.dataSize->CoolPeakDateHrMin(zoneIndex);
                 }
 
                 // Outside Dry Bulb Temperature
@@ -14149,7 +13874,7 @@ namespace EnergyPlus::OutputReportTabular {
                 compLoad.peakDesSensLoad = CalcFinalZoneSizing(zoneIndex).DesCoolLoad / mult; // change sign
 
                 // Design Peak Load
-                compLoad.designPeakLoad = FinalZoneSizing(zoneIndex).DesCoolLoad / mult;
+                compLoad.designPeakLoad = state.dataSize->FinalZoneSizing(zoneIndex).DesCoolLoad / mult;
 
                 // Supply air temperature
                 if (CalcFinalZoneSizing(zoneIndex).ZnCoolDgnSAMethod == SupplyAirTemperature) {
@@ -14168,9 +13893,9 @@ namespace EnergyPlus::OutputReportTabular {
                     compLoad.peakDateHrMin = format("{}/{} {}",
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).Month,
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
-                                                    coilSelectionReportObj->getTimeText(state, timeOfMax));
+                                                    state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
                 } else {
-                    compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);
+                    compLoad.peakDateHrMin = state.dataSize->HeatPeakDateHrMin(zoneIndex);
                 }
 
                 // Outside Dry Bulb Temperature
@@ -14203,7 +13928,7 @@ namespace EnergyPlus::OutputReportTabular {
                 compLoad.peakDesSensLoad = -CalcFinalZoneSizing(zoneIndex).DesHeatLoad / mult; // change sign
 
                 // Design Peak Load
-                compLoad.designPeakLoad = -FinalZoneSizing(zoneIndex).DesHeatLoad / mult;
+                compLoad.designPeakLoad = -state.dataSize->FinalZoneSizing(zoneIndex).DesHeatLoad / mult;
 
                 // Supply air temperature
                 if (CalcFinalZoneSizing(zoneIndex).ZnHeatDgnSAMethod == SupplyAirTemperature) {
@@ -14244,9 +13969,9 @@ namespace EnergyPlus::OutputReportTabular {
 
             // Number of people
             Real64 totNumPeople = 0.;
-            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
-                if (zoneIndex == People(iPeople).ZonePtr) {
-                    totNumPeople += People(iPeople).NumberOfPeople;
+            for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
+                if (zoneIndex == state.dataHeatBal->People(iPeople).ZonePtr) {
+                    totNumPeople += state.dataHeatBal->People(iPeople).NumberOfPeople;
                 }
             }
             compLoad.numPeople = totNumPeople;
@@ -14282,10 +14007,10 @@ namespace EnergyPlus::OutputReportTabular {
         using namespace DataSurfaces;
 
         for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-            areas(iZone).floor = Zone(iZone).FloorArea;
+            areas(iZone).floor = state.dataHeatBal->Zone(iZone).FloorArea;
         }
 
-        for (auto curSurface : Surface) {
+        for (auto curSurface : state.dataSurface->Surface) {
             if (!curSurface.HeatTransSurf) continue;
             bool isExterior = curSurface.ExtBoundCond == ExternalEnvironment || curSurface.ExtBoundCond == OtherSideCondModeledExt;
             bool isTouchingGround =
@@ -14538,7 +14263,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
     }
 
-    // Jan 2021: Overloaded the function with addtional parameters for dual units; 
+    // Jan 2021: Overloaded the function with addtional parameters for dual units;
     //           used overloading since the original function was checked in an existing test unit.
     // apply unit conversions to the load components summary tables
     void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, iUnitsStyle unitsStyle_para)
@@ -14633,11 +14358,11 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (kind == iOutputType::zoneOutput && ort->displayZoneComponentLoadSummary) {
             reportName = "Zone Component Load Summary";
-            zoneAirLoopFacilityName = Zone(zoneOrAirLoopIndex).Name;
+            zoneAirLoopFacilityName = state.dataHeatBal->Zone(zoneOrAirLoopIndex).Name;
             writeOutput = true;
         } else if (kind == iOutputType::airLoopOutput && ort->displayAirLoopComponentLoadSummary) {
             reportName = "AirLoop Component Load Summary";
-            zoneAirLoopFacilityName = DataSizing::FinalSysSizing(zoneOrAirLoopIndex).AirPriLoopName;
+            zoneAirLoopFacilityName = state.dataSize->FinalSysSizing(zoneOrAirLoopIndex).AirPriLoopName;
             writeOutput = true;
         } else if (kind == iOutputType::facilityOutput && ort->displayFacilityComponentLoadSummary) {
             reportName = "Facility Component Load Summary";
@@ -14912,7 +14637,7 @@ namespace EnergyPlus::OutputReportTabular {
                     for (int zi = 1; zi <= maxRow; ++zi) {
                         rowHead(zi) = fmt::to_string(zi);
                         if (curCompLoad.zoneIndices(zi) > 0) {
-                            tableBody(1, zi) = Zone(curCompLoad.zoneIndices(zi)).Name;
+                            tableBody(1, zi) = state.dataHeatBal->Zone(curCompLoad.zoneIndices(zi)).Name;
                         }
                     }
 
@@ -14949,21 +14674,7 @@ namespace EnergyPlus::OutputReportTabular {
         //   Write the first few lines of each report with headers to the output
         //   file for tabular reports.
         // Using/Aliasing
-        using DataHeatBalance::BuildingName;
         using DataStringGlobals::VerString;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         std::string const modifiedReportName(reportName + (averageOrSum == OutputProcessor::StoreType::Summed ? " per second" : ""));
         auto &ort(state.dataOutRptTab);
@@ -15331,7 +15042,7 @@ namespace EnergyPlus::OutputReportTabular {
                 for (iCol = 1; iCol <= colsColumnLabels; ++iCol) {
                     outputLine = "    <td align=\"right\">";
                     for (jRow = 1; jRow <= maxNumColLabelRows; ++jRow) {
-                        outputLine += colLabelMulti(iCol, jRow);
+                        outputLine += ConvertToEscaped(colLabelMulti(iCol, jRow), false);
                         if (jRow < maxNumColLabelRows) {
                             outputLine += "<br>";
                         }
@@ -15343,13 +15054,13 @@ namespace EnergyPlus::OutputReportTabular {
                 for (jRow = 1; jRow <= rowsBody; ++jRow) {
                     tbl_stream << "  <tr>\n";
                     if (rowLabels(jRow) != "") {
-                        tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol(state, rowLabels(jRow), true) << "</td>\n";
+                        tbl_stream << "    <td align=\"right\">" << ConvertToEscaped(InsertCurrencySymbol(state, rowLabels(jRow), true), false) << "</td>\n";
                     } else {
                         tbl_stream << "    <td align=\"right\">&nbsp;</td>\n";
                     }
                     for (iCol = 1; iCol <= colsBody; ++iCol) {
                         if (body(iCol, jRow) != "") {
-                            tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol(state, body(iCol, jRow), true) << "</td>\n";
+                            tbl_stream << "    <td align=\"right\">" << ConvertToEscaped(InsertCurrencySymbol(state, body(iCol, jRow), true), false) << "</td>\n";
                         } else {
                             tbl_stream << "    <td align=\"right\">&nbsp;</td>\n";
                         }
@@ -15684,7 +15395,7 @@ namespace EnergyPlus::OutputReportTabular {
         return s;
     }
 
-    std::string ConvertToEscaped(std::string const &inString) // Input String
+    std::string ConvertToEscaped(std::string const &inString, bool isXML) // Input String
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -15695,7 +15406,10 @@ namespace EnergyPlus::OutputReportTabular {
         // PURPOSE OF THIS SUBROUTINE:
         //   Convert to XML safe escaped character string
         //   so it excludes:
-        //               " ' < > &
+        //               " ' < > & degree-sign
+        //   If isXML=false, it does an HTML conversion, so only ` < > & ` and degree sign
+        //   Technically HTML4 doesn't support &quot, though most browsers would anyways.
+        //   Also, escaping single and double quotes is only needed inside attributes
 
         if (inString.empty()) return "";
 
@@ -15708,11 +15422,11 @@ namespace EnergyPlus::OutputReportTabular {
         while (true) {
             if (index == inputSize) break;
             c = inString[index++];
-            if (c == '\"') {
+            if ((c == '\"') && isXML) {
                 s += "&quot;";
             } else if (c == '&') {
                 s += "&amp;";
-            } else if (c == '\'') {
+            } else if ((c == '\'') && isXML) {
                 s += "&apos;";
             } else if (c == '<') {
                 s += "&lt;";
@@ -15737,9 +15451,9 @@ namespace EnergyPlus::OutputReportTabular {
             } else if (c == '\\') {
                 if (index == inputSize) break;
                 c = inString[index++];
-                if (c == '"') {
+                if ((c == '"')  && isXML) {
                     s += "&quot;";
-                } else if (c == '\'') {
+                } else if ((c == '\'') && isXML) {
                     s += "&apos;";
                 } else if (c == 'u' || c == 'x') {
                     int remainingLen = inputSize - index;
@@ -15787,7 +15501,6 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -15805,6 +15518,7 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 curZoneArea;
         int iZone;
         auto &ort(state.dataOutRptTab);
+        auto &Zone(state.dataHeatBal->Zone);
 
         ort->buildingGrossFloorArea = 0.0;
         ort->buildingConditionedFloorArea = 0.0;
@@ -15865,7 +15579,7 @@ namespace EnergyPlus::OutputReportTabular {
         // so that only last year is reported in tabular reports
         state.dataOutRptTab->gatherElapsedTimeBEPS = 0.0;
         ResetMonthlyGathering(state);
-        OutputReportTabularAnnual::ResetAnnualGathering();
+        OutputReportTabularAnnual::ResetAnnualGathering(state);
         ResetBinGathering(state);
         ResetBEPSGathering(state);
         ResetSourceEnergyEndUseGathering(state);
@@ -15888,7 +15602,6 @@ namespace EnergyPlus::OutputReportTabular {
         int kColumn;
         int curTable;
         int curCol;
-        static Real64 BigNum(0.0);
         auto &ort(state.dataOutRptTab);
 
         for (iInput = 1; iInput <= ort->MonthlyInputCount; ++iInput) {
@@ -15899,9 +15612,9 @@ namespace EnergyPlus::OutputReportTabular {
                     ort->MonthlyColumns(curCol).timeStamp = 0;
                     ort->MonthlyColumns(curCol).duration = 0.0;
                     if (ort->MonthlyColumns(curCol).aggType == iAggType::Maximum || ort->MonthlyColumns(curCol).aggType == iAggType::MaximumDuringHoursShown) {
-                        ort->MonthlyColumns(curCol).reslt = -HUGE_(BigNum);
+                        ort->MonthlyColumns(curCol).reslt = -HUGE_(state.dataOutRptTab->BigNumRMG);
                     } else if (ort->MonthlyColumns(curCol).aggType == iAggType::Minimum || ort->MonthlyColumns(curCol).aggType == iAggType::MinimumDuringHoursShown) {
-                        ort->MonthlyColumns(curCol).reslt = HUGE_(BigNum);
+                        ort->MonthlyColumns(curCol).reslt = HUGE_(state.dataOutRptTab->BigNumRMG);
                     } else {
                         ort->MonthlyColumns(curCol).reslt = 0.0;
                     }
@@ -16002,9 +15715,9 @@ namespace EnergyPlus::OutputReportTabular {
         // Jason Glazer - October 2015
         // Reset all sensible heat gas summary report gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
-        using DataHeatBalance::BuildingPreDefRep;
-        using DataHeatBalance::ZonePreDefRep;
         int iZone;
+
+        auto &ZonePreDefRep(state.dataHeatBal->ZonePreDefRep);
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             ZonePreDefRep(iZone).SHGSAnPeoplAdd = 0.;
             ZonePreDefRep(iZone).SHGSAnLiteAdd = 0.;
@@ -16066,47 +15779,47 @@ namespace EnergyPlus::OutputReportTabular {
             ZonePreDefRep(iZone).SHGSClOtherRem = 0.;
         }
 
-        BuildingPreDefRep.htPeak = 0.;
-        BuildingPreDefRep.htPtTimeStamp = 0;
-        BuildingPreDefRep.SHGSHtHvacHt = 0.0;
-        BuildingPreDefRep.SHGSHtHvacCl = 0.0;
-        BuildingPreDefRep.SHGSHtHvacATUHt = 0.0;
-        BuildingPreDefRep.SHGSHtHvacATUCl = 0.0;
-        BuildingPreDefRep.SHGSHtSurfHt = 0.0;
-        BuildingPreDefRep.SHGSHtSurfCl = 0.0;
-        BuildingPreDefRep.SHGSHtPeoplAdd = 0.0;
-        BuildingPreDefRep.SHGSHtLiteAdd = 0.0;
-        BuildingPreDefRep.SHGSHtEquipAdd = 0.0;
-        BuildingPreDefRep.SHGSHtWindAdd = 0.0;
-        BuildingPreDefRep.SHGSHtIzaAdd = 0.0;
-        BuildingPreDefRep.SHGSHtInfilAdd = 0.0;
-        BuildingPreDefRep.SHGSHtOtherAdd = 0.0;
-        BuildingPreDefRep.SHGSHtEquipRem = 0.0;
-        BuildingPreDefRep.SHGSHtWindRem = 0.0;
-        BuildingPreDefRep.SHGSHtIzaRem = 0.0;
-        BuildingPreDefRep.SHGSHtInfilRem = 0.0;
-        BuildingPreDefRep.SHGSHtOtherRem = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.htPeak = 0.;
+        state.dataHeatBal->BuildingPreDefRep.htPtTimeStamp = 0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacHt = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacCl = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUHt = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUCl = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtSurfHt = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtSurfCl = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtPeoplAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtLiteAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtWindAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtIzaAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtInfilAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtOtherAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipRem = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtWindRem = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtIzaRem = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtInfilRem = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSHtOtherRem = 0.0;
 
-        BuildingPreDefRep.clPeak = 0.;
-        BuildingPreDefRep.clPtTimeStamp = 0;
-        BuildingPreDefRep.SHGSClHvacHt = 0.0;
-        BuildingPreDefRep.SHGSClHvacCl = 0.0;
-        BuildingPreDefRep.SHGSClSurfHt = 0.0;
-        BuildingPreDefRep.SHGSClSurfCl = 0.0;
-        BuildingPreDefRep.SHGSClHvacATUHt = 0.0;
-        BuildingPreDefRep.SHGSClHvacATUCl = 0.0;
-        BuildingPreDefRep.SHGSClPeoplAdd = 0.0;
-        BuildingPreDefRep.SHGSClLiteAdd = 0.0;
-        BuildingPreDefRep.SHGSClEquipAdd = 0.0;
-        BuildingPreDefRep.SHGSClWindAdd = 0.0;
-        BuildingPreDefRep.SHGSClIzaAdd = 0.0;
-        BuildingPreDefRep.SHGSClInfilAdd = 0.0;
-        BuildingPreDefRep.SHGSClOtherAdd = 0.0;
-        BuildingPreDefRep.SHGSClEquipRem = 0.0;
-        BuildingPreDefRep.SHGSClWindRem = 0.0;
-        BuildingPreDefRep.SHGSClIzaRem = 0.0;
-        BuildingPreDefRep.SHGSClInfilRem = 0.0;
-        BuildingPreDefRep.SHGSClOtherRem = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.clPeak = 0.;
+        state.dataHeatBal->BuildingPreDefRep.clPtTimeStamp = 0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClHvacHt = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClHvacCl = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClSurfHt = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClSurfCl = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUHt = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUCl = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClPeoplAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClLiteAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClEquipAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClWindAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClIzaAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClInfilAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClOtherAdd = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClEquipRem = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClWindRem = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClIzaRem = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClInfilRem = 0.0;
+        state.dataHeatBal->BuildingPreDefRep.SHGSClOtherRem = 0.0;
     }
 
     void ResetRemainingPredefinedEntries(EnergyPlusData &state)
@@ -16114,18 +15827,16 @@ namespace EnergyPlus::OutputReportTabular {
         // Jason Glazer - October 2015
         // Reset all entries that are added to the predefined reports in the FillRemainingPredefinedEntries() function to zero for multi-year
         // simulations so that only last year is reported in tabular reports
-        using DataHeatBalance::Lights;
-        using DataHeatBalance::TotLights;
-        using DataHeatBalance::Zone;
-        using DataHeatBalance::ZonePreDefRep;
 
         Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
         int iLight;
         int iZone;
+        auto &Zone(state.dataHeatBal->Zone);
+        auto &ZonePreDefRep(state.dataHeatBal->ZonePreDefRep);
 
-        for (iLight = 1; iLight <= TotLights; ++iLight) {
-            Lights(iLight).SumTimeNotZeroCons = 0.;
-            Lights(iLight).SumConsumption = 0.;
+        for (iLight = 1; iLight <= state.dataHeatBal->TotLights; ++iLight) {
+            state.dataHeatBal->Lights(iLight).SumTimeNotZeroCons = 0.;
+            state.dataHeatBal->Lights(iLight).SumConsumption = 0.;
         }
 
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
@@ -16155,20 +15866,18 @@ namespace EnergyPlus::OutputReportTabular {
         // Jason Glazer - October 2015
         // Reset accumulation variable for adaptive comfort report to zero for multi-year simulations
         // so that only last year is reported in tabular reports
-        using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         int i;
         auto &ort(state.dataOutRptTab);
-        if (ort->displayAdaptiveComfort && TotPeople > 0) {
-            for (i = 1; i <= TotPeople; ++i) {
-                if (People(i).AdaptiveASH55) {
-                    People(i).TimeNotMetASH5590 = 0.;
-                    People(i).TimeNotMetASH5580 = 0.;
+        if (ort->displayAdaptiveComfort && state.dataHeatBal->TotPeople > 0) {
+            for (i = 1; i <= state.dataHeatBal->TotPeople; ++i) {
+                if (state.dataHeatBal->People(i).AdaptiveASH55) {
+                    state.dataHeatBal->People(i).TimeNotMetASH5590 = 0.;
+                    state.dataHeatBal->People(i).TimeNotMetASH5580 = 0.;
                 }
-                if (People(i).AdaptiveCEN15251) {
-                    People(i).TimeNotMetCEN15251CatI = 0.;
-                    People(i).TimeNotMetCEN15251CatII = 0.;
-                    People(i).TimeNotMetCEN15251CatIII = 0.;
+                if (state.dataHeatBal->People(i).AdaptiveCEN15251) {
+                    state.dataHeatBal->People(i).TimeNotMetCEN15251CatI = 0.;
+                    state.dataHeatBal->People(i).TimeNotMetCEN15251CatII = 0.;
+                    state.dataHeatBal->People(i).TimeNotMetCEN15251CatIII = 0.;
                 }
             }
         }
@@ -17378,20 +17087,18 @@ namespace EnergyPlus::OutputReportTabular {
         //    na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int found(0);
-        static int iUnit(0);
         auto &ort(state.dataOutRptTab);
 
-        for (iUnit = 1; iUnit <= ort->UnitConvSize; ++iUnit) {
-            if (UtilityRoutines::SameString(ort->UnitConv(iUnit).siName, SIunit)) {
-                if (UtilityRoutines::SameString(ort->UnitConv(iUnit).ipName, IPunit)) {
-                    found = iUnit;
+        for (state.dataOutRptTab->iUnitGsum = 1; state.dataOutRptTab->iUnitGsum <= ort->UnitConvSize; ++state.dataOutRptTab->iUnitGsum) {
+            if (UtilityRoutines::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsum).siName, SIunit)) {
+                if (UtilityRoutines::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsum).ipName, IPunit)) {
+                    state.dataOutRptTab->foundGsum = state.dataOutRptTab->iUnitGsum;
                     break;
                 }
             }
         }
-        if (found != 0) {
-            getSpecificUnitMultiplier = ort->UnitConv(found).mult;
+        if (state.dataOutRptTab->foundGsum != 0) {
+            getSpecificUnitMultiplier = ort->UnitConv(state.dataOutRptTab->foundGsum).mult;
         } else {
             ShowWarningError(state, "Unable to find a unit conversion from " + SIunit + " to " + IPunit);
             ShowContinueError(state, "Applying default conversion factor of 1.0");
@@ -17494,20 +17201,18 @@ namespace EnergyPlus::OutputReportTabular {
         //    na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int found(0);
-        static int iUnit(0);
         auto &ort(state.dataOutRptTab);
 
-        for (iUnit = 1; iUnit <= ort->UnitConvSize; ++iUnit) {
-            if (UtilityRoutines::SameString(ort->UnitConv(iUnit).siName, SIunit)) {
-                if (UtilityRoutines::SameString(ort->UnitConv(iUnit).ipName, IPunit)) {
-                    found = iUnit;
+        for (state.dataOutRptTab->iUnitGsui = 1; state.dataOutRptTab->iUnitGsui <= ort->UnitConvSize; ++state.dataOutRptTab->iUnitGsui) {
+            if (UtilityRoutines::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsui).siName, SIunit)) {
+                if (UtilityRoutines::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsui).ipName, IPunit)) {
+                    state.dataOutRptTab->foundGsui = state.dataOutRptTab->iUnitGsui;
                     break;
                 }
             }
         }
-        if (found != 0) {
-            getSpecificUnitIndex = found;
+        if (state.dataOutRptTab->foundGsui != 0) {
+            getSpecificUnitIndex = state.dataOutRptTab->foundGsui;
         } else {
             getSpecificUnitIndex = 0.0;
         }

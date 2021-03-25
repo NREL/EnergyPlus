@@ -120,7 +120,7 @@ namespace PlantComponentTemperatureSources {
 
         void calculate(EnergyPlusData &state);
 
-        void update();
+        void update(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 

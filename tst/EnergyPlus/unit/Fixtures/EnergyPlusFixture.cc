@@ -116,7 +116,7 @@ void EnergyPlusFixture::SetUp()
 
     Psychrometrics::InitializePsychRoutines();
     FluidProperties::InitializeGlycRoutines();
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
 }
 
 void EnergyPlusFixture::TearDown()
@@ -339,12 +339,12 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     int MaxNumeric = 0;
     inputProcessor->getMaxSchemaArgs(MaxArgs, MaxAlpha, MaxNumeric);
 
-    DataIPShortCuts::cAlphaFieldNames.allocate(MaxAlpha);
-    DataIPShortCuts::cAlphaArgs.allocate(MaxAlpha);
-    DataIPShortCuts::lAlphaFieldBlanks.dimension(MaxAlpha, false);
-    DataIPShortCuts::cNumericFieldNames.allocate(MaxNumeric);
-    DataIPShortCuts::rNumericArgs.dimension(MaxNumeric, 0.0);
-    DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(MaxAlpha);
+    state->dataIPShortCut->cAlphaArgs.allocate(MaxAlpha);
+    state->dataIPShortCut->lAlphaFieldBlanks.dimension(MaxAlpha, false);
+    state->dataIPShortCut->cNumericFieldNames.allocate(MaxNumeric);
+    state->dataIPShortCut->rNumericArgs.dimension(MaxNumeric, 0.0);
+    state->dataIPShortCut->lNumericFieldBlanks.dimension(MaxNumeric, false);
 
     bool is_valid = inputProcessor->validation->validate(inputProcessor->epJSON);
     bool hasErrors = inputProcessor->processErrors(*state);

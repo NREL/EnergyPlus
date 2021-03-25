@@ -84,20 +84,7 @@ namespace HybridEvapCoolingModel {
     // Supply Air Temperature, Supply Air Humidity Ratio, Electric Power, Supply Fan Electric Power, External Static Pressure
     // System Second Fuel Consumption, System Third Fuel Consumption, System Water Use
 
-    // Lookups include
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
     // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
-    using DataHVACGlobals::LimitNumSysSteps;
-    using DataHVACGlobals::NumOfSysTimeSteps;
-    using DataHVACGlobals::NumOfSysTimeStepsLastZoneTimeStep;
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
     using namespace EnergyPlus::DataEnvironment;
     using namespace Psychrometrics;
     using CurveManager::CurveValue;
@@ -1208,7 +1195,7 @@ namespace HybridEvapCoolingModel {
         // METHODOLOGY EMPLOYED:
         // 1) Clear out the set of operating settings from the previous time step.
         // 2) Iterate through each operating mode and weed out modes that are not intended to operate in current environmental conditions.
-        //		-> For each mode that is viable iterate thought the solution space and identify settings that meet the ventilation
+        //        -> For each mode that is viable iterate thought the solution space and identify settings that meet the ventilation
         // requirements
         //      -> settings that do are stored in the a container (Settings)
         // 3) Iterate through all the settings in Settings
@@ -1218,25 +1205,25 @@ namespace HybridEvapCoolingModel {
         // 6) Calculate setting power consumption, use the setting delivered ventilation and loads to calculate the
         // 7) minimum runtime fraction needed to meet those loads, then assuming that part runtime fraction calculate the setting part run time power
         // use. 8)   If the setting meets both the conditioning and humidification loads then test to see if its optimal in terms of energy use.
-        //  		->if so, save that setting as the current optimal.
-        //  		->if not ignore it.
-        //  	If the setting failed ot meet either the conditioning or humidification loads, then
-        //  	-> firstly check to see if no previous other setting (in this calculation step) has met both the load and humidification requirements
-        //  			-> if so
-        //  				-> check if this setting meets the conditioning load (only)
-        //  					-> if so
-        //  						->check to see if this setting is better at meeting the dehumidification or humidification lad
+        //          ->if so, save that setting as the current optimal.
+        //          ->if not ignore it.
+        //      If the setting failed ot meet either the conditioning or humidification loads, then
+        //      -> firstly check to see if no previous other setting (in this calculation step) has met both the load and humidification requirements
+        //              -> if so
+        //                  -> check if this setting meets the conditioning load (only)
+        //                      -> if so
+        //                          ->check to see if this setting is better at meeting the dehumidification or humidification lad
         //  than any previous setting this step.
-        //  						-> if its not, ignore it.
-        // 		  				-> if not
-        // 		  					->check to see if any previous setting met the conditioning load
-        // 		  						->if not:
-        // 		  							->see if this setting is better at meeting the conditioning load than
+        //                          -> if its not, ignore it.
+        //                           -> if not
+        //                               ->check to see if any previous setting met the conditioning load
+        //                                   ->if not:
+        //                                       ->see if this setting is better at meeting the conditioning load than
         // any previous setting this calculation step.
-        // 		  								-> if so save as current optimal
-        // 		  								-> if its not, ignore it.
-        // 		  						-> if so: then ignore it.
-        //  			->if not, then a previous setting is better than this one by default, and so ignore it.
+        //                                           -> if so save as current optimal
+        //                                           -> if its not, ignore it.
+        //                                   -> if so: then ignore it.
+        //              ->if not, then a previous setting is better than this one by default, and so ignore it.
         // 9) Identify error states if the no setting meets the environmental conditions, or the supply air humidity or temperature constraints.
         // 10) if we met the load set operating settings to be a combination of the optimal setting at the minium required runtime fraction
         // 11) if we partly met the load then do the best we can and run full out in that optimal setting.
@@ -1297,7 +1284,7 @@ namespace HybridEvapCoolingModel {
             int solution_map_sizeX = Mode.sol.MassFlowRatio.size();
             int solution_map_sizeY = Mode.sol.OutdoorAirFraction.size();
 
-            // Check that in this mode the //Outdoor Air Relative Humidity(0 - 100 % )	//Outdoor Air Humidity Ratio(g / g)//Outdoor Air
+            // Check that in this mode the //Outdoor Air Relative Humidity(0 - 100 % )    //Outdoor Air Humidity Ratio(g / g)//Outdoor Air
             // Temperature(degC)
             if (Mode.MeetsOAEnvConstraints(StepIns.Tosa, Wosa, 100 * StepIns.RHosa)) {
                 EnvironmentConditionsMet = EnvironmentConditionsMetOnce = true;
@@ -1620,7 +1607,7 @@ namespace HybridEvapCoolingModel {
             }
         }
 
-        Real64 TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
+        Real64 TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
 
         // Use the elapsed time to only give a summary of warnings related to the number of Timesteps environmental conditions, or supply air
         // temperature constraints were not met for a given day. ideally there would be a clear flag that indicates "this is the last timestep of the
@@ -1802,11 +1789,11 @@ namespace HybridEvapCoolingModel {
         Real64 LambdaRa = Psychrometrics::PsyHfgAirFnWTdb(0, InletTemp);
         RequestedHumdificationMass = OutputRequiredToHumidify;
         RequestedHumdificationLoad = OutputRequiredToHumidify * LambdaRa;                      // [W];
-        RequestedHumdificationEnergy = OutputRequiredToHumidify * LambdaRa * TimeStepSys * DataGlobalConstants::SecInHour; // [j]
+        RequestedHumdificationEnergy = OutputRequiredToHumidify * LambdaRa * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // [j]
 
         RequestedDeHumdificationMass = OutputRequiredToDehumidify;
         RequestedDeHumdificationLoad = OutputRequiredToDehumidify * LambdaRa;                      // [W];
-        RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * LambdaRa * TimeStepSys * DataGlobalConstants::SecInHour; // [j]
+        RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * LambdaRa * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // [j]
 
         MinOA_Msa = DesignMinVR; // as mass flow kg/s
 
@@ -1951,19 +1938,19 @@ namespace HybridEvapCoolingModel {
             if (QTotZoneOut > 0) // zone cooling is positive, else remain zero
             {
                 UnitTotalCoolingRate = std::abs(QTotZoneOut);                            // Watts
-                UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour; // J
+                UnitTotalCoolingEnergy = UnitTotalCoolingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // J
             } else {
                 UnitTotalHeatingRate = std::abs(QTotZoneOut);                            // Watts
-                UnitTotalHeatingEnergy = UnitTotalHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour; // J
+                UnitTotalHeatingEnergy = UnitTotalHeatingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // J
             }
 
             if (QSensZoneOut > 0) // zone cooling is positive, else remain zero
             {
                 UnitSensibleCoolingRate = std::abs(QSensZoneOut);                              // Watts
-                UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour; // J
+                UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // J
             } else {
                 UnitSensibleHeatingRate = std::abs(QSensZoneOut);                              // Watts
-                UnitSensibleHeatingEnergy = UnitSensibleHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour; // J
+                UnitSensibleHeatingEnergy = UnitSensibleHeatingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // J
             }
 
             if ((UnitTotalCoolingRate - UnitSensibleCoolingRate) > 0) {
@@ -1979,19 +1966,19 @@ namespace HybridEvapCoolingModel {
             if (QTotSystemOut > 0) // system cooling
             {
                 SystemTotalCoolingRate = std::abs(QTotSystemOut);
-                SystemTotalCoolingEnergy = SystemTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
+                SystemTotalCoolingEnergy = SystemTotalCoolingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             } else {
                 SystemTotalHeatingRate = std::abs(QTotSystemOut);
-                SystemTotalHeatingEnergy = SystemTotalHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;
+                SystemTotalHeatingEnergy = SystemTotalHeatingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             }
 
             if (QSensSystemOut > 0) // system sensible cooling
             {
                 SystemSensibleCoolingRate = std::abs(QSensSystemOut);
-                SystemSensibleCoolingEnergy = SystemSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
+                SystemSensibleCoolingEnergy = SystemSensibleCoolingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             } else {
                 SystemSensibleHeatingRate = std::abs(QSensSystemOut);
-                SystemSensibleHeatingEnergy = SystemSensibleHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;
+                SystemSensibleHeatingEnergy = SystemSensibleHeatingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             }
             if ((SystemTotalCoolingRate - SystemSensibleCoolingRate) > 0) {
                 SystemLatentCoolingRate = SystemTotalCoolingRate - SystemSensibleCoolingRate;
@@ -2016,17 +2003,17 @@ namespace HybridEvapCoolingModel {
 
         // set timestep outputs calculated considering different runtime fractions.
         SupplyFanElectricPower = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER); // Watts
-        SupplyFanElectricEnergy = SupplyFanElectricPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        SupplyFanElectricEnergy = SupplyFanElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         SecondaryFuelConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSECOND_FUEL_USE);
-        SecondaryFuelConsumption = SecondaryFuelConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        SecondaryFuelConsumption = SecondaryFuelConsumptionRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         ThirdFuelConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OTHIRD_FUEL_USE);
-        ThirdFuelConsumption = ThirdFuelConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        ThirdFuelConsumption = ThirdFuelConsumptionRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         WaterConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OWATER_USE);
-        WaterConsumption = WaterConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        WaterConsumption = WaterConsumptionRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         ExternalStaticPressure = CalculateTimeStepAverage(SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE);
 
         FinalElectricalPower = CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
-        FinalElectricalEnergy = FinalElectricalPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        FinalElectricalEnergy = FinalElectricalPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
 } // namespace HybridEvapCoolingModel

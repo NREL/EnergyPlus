@@ -191,7 +191,7 @@ namespace SteamBaseboardRadiator {
 
     void ReportSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
 
     void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state, int const BaseboardTypeNum,       // type index
                                              std::string const &BaseboardName, // component name
@@ -230,6 +230,7 @@ struct SteamBaseboardRadiatorData : BaseGlobalStruct {
     bool GetInputFlag = true;       // one time get input flag
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false;
+    Array1D_bool MyEnvrnFlag;
 
     Array1D<SteamBaseboardRadiator::SteamBaseboardParams> SteamBaseboard;
     Array1D<SteamBaseboardRadiator::SteamBaseboardDesignData> SteamBaseboardDesign;
@@ -247,6 +248,7 @@ struct SteamBaseboardRadiatorData : BaseGlobalStruct {
         LastSysTimeElapsed.clear();
         LastTimeStepSys.clear();
         MySizeFlag.clear();
+        MyEnvrnFlag.clear();
         CheckEquipName.clear();
         SetLoopIndexFlag.clear();
         GetInputFlag = true;

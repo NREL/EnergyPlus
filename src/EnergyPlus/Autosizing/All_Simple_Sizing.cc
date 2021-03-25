@@ -306,7 +306,7 @@ Real64 HeatingCoilDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _orig
         } else {
             if (this->dataDesicRegCoil && this->dataDesicDehumNum > 0) {
                 // change to Data* global
-                if (DesiccantDehumidifiers::DesicDehum(this->dataDesicDehumNum).RegenInletIsOutsideAirNode) {
+                if (state.dataDesiccantDehumidifiers->DesicDehum(this->dataDesicDehumNum).RegenInletIsOutsideAirNode) {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatOutTemp;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatRetTemp;
@@ -315,7 +315,7 @@ Real64 HeatingCoilDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _orig
         }
     }
     this->selectSizerOutput(state, errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
+    if (this->isCoilReportObject) state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
     return this->autoSizedValue;
 }
 
@@ -342,12 +342,12 @@ Real64 HeatingCoilDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _ori
         } else {
             if (this->dataDesicRegCoil && this->dataDesicDehumNum > 0) {
                 // change to Data* global
-                this->autoSizedValue = DesiccantDehumidifiers::DesicDehum(this->dataDesicDehumNum).RegenSetPointTemp;
+                this->autoSizedValue = state.dataDesiccantDehumidifiers->DesicDehum(this->dataDesicDehumNum).RegenSetPointTemp;
             }
         }
     }
     this->selectSizerOutput(state, errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilLvgAirTemp(state, this->compName, this->compType, this->autoSizedValue);
+    if (this->isCoilReportObject) state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirTemp(state, this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 
@@ -374,7 +374,7 @@ Real64 HeatingCoilDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _or
         } else {
             if (this->dataDesicRegCoil) {
                 // change to Data* global
-                if (DesiccantDehumidifiers::DesicDehum(this->dataDesicDehumNum).RegenInletIsOutsideAirNode) {
+                if (state.dataDesiccantDehumidifiers->DesicDehum(this->dataDesicDehumNum).RegenInletIsOutsideAirNode) {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatOutHumRat;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatRetHumRat;
@@ -383,7 +383,7 @@ Real64 HeatingCoilDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _or
         }
     }
     this->selectSizerOutput(state, errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(state, this->compName, this->compType, this->autoSizedValue);
+    if (this->isCoilReportObject) state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirHumRat(state, this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 

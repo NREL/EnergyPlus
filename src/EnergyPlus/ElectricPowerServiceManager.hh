@@ -291,6 +291,7 @@ public: // methods
 
 private:                            // methods
     void simulateSimpleBucketModel( // request charge discharge and
+        EnergyPlusData &state,
         Real64 &powerCharge,
         Real64 &powerDischarge,
         bool &charging,
@@ -321,11 +322,11 @@ private:                            // methods
                   int &count,                 // calculated here - stored for next timestep in main loop
                   std::vector<Real64> &Nmb,   // calculated here - stored for next timestep in main loop
                   std::vector<Real64> &OneNmb // calculated here - stored for next timestep in main loop
-                                              //	int const dim // end dimension of array
+                                              //    int const dim // end dimension of array
     );
 
     void shift(std::vector<Real64> &A, int const m, int const n, std::vector<Real64> &B
-               //	int const dim // end dimension of arrays
+               //    int const dim // end dimension of arrays
     );
 
 private: // data
@@ -725,10 +726,6 @@ public: // Creation
     }
 
 public: // Methods
-    // Destructor
-    ~ElectricPowerServiceManager()
-    {
-    }
 
     void manageElectricPowerService(EnergyPlusData &state,
                                     bool const FirstHVACIteration,
@@ -801,17 +798,15 @@ private:                      // data
 
 }; // class ElectricPowerServiceManager
 
-extern std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
-
-void createFacilityElectricPowerServiceObject();
-
-void clearFacilityElectricPowerServiceObject();
+void createFacilityElectricPowerServiceObject(EnergyPlusData &state);
 
 struct ElectPwrSvcMgrData : BaseGlobalStruct {
 
+    std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
+
     void clear_state() override
     {
-
+        this->facilityElectricServiceObj.release();
     }
 };
 

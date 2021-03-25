@@ -293,6 +293,10 @@ struct SurfaceGroundHeatExchangersData : BaseGlobalStruct {
     bool InitializeTempTop = false;
 
     Array1D<SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData> SurfaceGHE;
+    Real64 FluxTop; // top surface flux
+    Real64 FluxBtm; // bottom surface flux
+    Real64 TempBtm; // bottom surface temp
+    Real64 TempTop; // top surface temp
 
     void clear_state() override
     {
