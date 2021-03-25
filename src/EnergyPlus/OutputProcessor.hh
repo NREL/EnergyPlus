@@ -851,7 +851,7 @@ namespace OutputProcessor {
                                 int const maxValueDate                      // The date the maximum value occurred
     );
 
-    int DetermineIndexGroupKeyFromMeterName(std::string const &meterName); // the meter name
+    int DetermineIndexGroupKeyFromMeterName(EnergyPlusData &state, std::string const &meterName); // the meter name
 
     std::string DetermineIndexGroupFromMeterGroup(MeterType const &meter); // the meter
 
@@ -1110,6 +1110,23 @@ struct OutputProcessorData : BaseGlobalStruct {
     Array1D<OutputProcessor::EndUseCategoryType> EndUseCategory;
     std::unordered_map<std::string, std::string> UniqueMeterNames;
 
+    // statics
+
+    Real64 rDummy1TS = 0.0;
+    Real64 rDummy2TS = 0.0;
+    int iDummy1TS = 0;
+    int iDummy2TS = 0;
+    Real64 rDummy1 = 0.0;
+    Real64 rDummy2 = 0.0;
+    int iDummy1 = 0;
+    int iDummy2 = 0;
+    int indexGroupKey = -1;
+    bool Rept = false;
+    bool OpaqSurfWarned = false;
+    Array1D_string ValidMeterNames;
+    Array1D_int iValidMeterNames;
+    int NumValidMeters = 0;
+
     void clear_state() override
     {
         this->InstMeterCacheSize = 1000;
@@ -1183,6 +1200,21 @@ struct OutputProcessorData : BaseGlobalStruct {
         this->EnergyMeters.deallocate();
         this->EndUseCategory.deallocate();
         this->UniqueMeterNames.clear();
+
+        this->rDummy1TS = 0.0;
+        this->rDummy2TS = 0.0;
+        this->iDummy1TS = 0;
+        this->iDummy2TS = 0;
+        this->rDummy1 = 0.0;
+        this->rDummy2 = 0.0;
+        this->iDummy1 = 0;
+        this->iDummy2 = 0;
+        this->indexGroupKey = -1;
+        this->Rept = false;
+        this->OpaqSurfWarned = false;
+        this->ValidMeterNames.clear();
+        this->iValidMeterNames.clear();
+        this->NumValidMeters = 0;
     }
 };
 
