@@ -266,6 +266,7 @@
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/SystemReports.hh>
+#include <EnergyPlus/TARCOGGasses90.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/ThermalComfort.hh>

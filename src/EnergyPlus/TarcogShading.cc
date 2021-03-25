@@ -91,7 +91,8 @@ namespace TarcogShading {
 
     // Functions
 
-    void shading(Array1D<Real64> const &theta,
+    void shading(EnergyPlusData &state,
+                 Array1D<Real64> const &theta,
                  Array1D<Real64> const &gap,
                  Array1D<Real64> &hgas,
                  Array1D<Real64> &hcgas,
@@ -244,7 +245,8 @@ namespace TarcogShading {
                     Tgap = Tgaps(2);
 
                     // bi......use Tout as temp of the air at inlet
-                    shadingedge(iprop1,
+                    shadingedge(state,
+                                iprop1,
                                 frct1,
                                 press1,
                                 nmix1,
@@ -307,7 +309,8 @@ namespace TarcogShading {
                     Tgap = Tgaps(nlayer);
 
                     // bi.........use Tin as temp of the air at inlet
-                    shadingedge(iprop2,
+                    shadingedge(state,
+                                iprop2,
                                 frct2,
                                 press2,
                                 nmix2,
@@ -369,7 +372,8 @@ namespace TarcogShading {
                     // speed2 = vvent(i+1)
 
                     if ((CalcForcedVentilation != 0) && ((vvent(i) != 0) || (vvent(i + 1) != 0))) {
-                        forcedventilation(iprop1,
+                        forcedventilation(state,
+                                          iprop1,
                                           frct1,
                                           press1,
                                           nmix1,
@@ -388,7 +392,8 @@ namespace TarcogShading {
                                           qv1,
                                           nperr,
                                           ErrorMessage);
-                        forcedventilation(iprop2,
+                        forcedventilation(state,
+                                          iprop2,
                                           frct2,
                                           press2,
                                           nmix1,
@@ -408,7 +413,7 @@ namespace TarcogShading {
                                           nperr,
                                           ErrorMessage);
                     } else {
-                        shadingin(iprop1,
+                        shadingin(state,iprop1,
                                   frct1,
                                   press1,
                                   nmix1,
@@ -473,7 +478,8 @@ namespace TarcogShading {
         }
     }
 
-    void forcedventilation(const Array1D_int &iprop,
+    void forcedventilation(EnergyPlusData &state,
+                           const Array1D_int &iprop,
                            const Array1D<Real64> &frct,
                            Real64 const press,
                            int const nmix,
@@ -528,7 +534,7 @@ namespace TarcogShading {
         Real64 con;
         Real64 visc;
 
-        GASSES90(Tav, iprop, frct, press, nmix, xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, 1, nperr, ErrorMessage);
+        GASSES90(state, Tav, iprop, frct, press, nmix, xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, 1, nperr, ErrorMessage);
 
         H0 = (dens * cp * s * forcedspeed) / (4.0 * hc + 8.0 * forcedspeed);
 
@@ -541,7 +547,8 @@ namespace TarcogShading {
         hcv = 2.0 * hc + 4.0 * forcedspeed;
     }
 
-    void shadingin(const Array1D_int &iprop1,
+    void shadingin(EnergyPlusData &state,
+                   const Array1D_int &iprop1,
                    const Array1D<Real64> &frct1,
                    Real64 const press1,
                    int const nmix1,
@@ -684,7 +691,7 @@ namespace TarcogShading {
         P1 = 0.0;
         P2 = 0.0;
 
-        GASSES90(T0, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con0, visc0, dens0, cp0, pr0, 1, nperr, ErrorMessage);
+        GASSES90(state, T0, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con0, visc0, dens0, cp0, pr0, 1, nperr, ErrorMessage);
 
         // exit on error:
         if ((nperr > 0) && (nperr < 1000)) return;
@@ -711,8 +718,8 @@ namespace TarcogShading {
         Real64 const cos_Tilt = std::cos(tilt);
         while (!converged) {
             ++iter;
-            GASSES90(Tgap1, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con1, visc1, dens1, cp1, pr1, 1, nperr, ErrorMessage);
-            GASSES90(Tgap2, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, con2, visc2, dens2, cp2, pr2, 1, nperr, ErrorMessage);
+            GASSES90(state, Tgap1, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con1, visc1, dens1, cp1, pr1, 1, nperr, ErrorMessage);
+            GASSES90(state, Tgap2, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, con2, visc2, dens2, cp2, pr2, 1, nperr, ErrorMessage);
 
             //  A = dens0 * T0 * GravityConstant * ABS(cos(tilt)) * ABS(Tgap1 - Tgap2) / (Tgap1 * Tgap2)
 
@@ -837,7 +844,8 @@ namespace TarcogShading {
         }
     }
 
-    void shadingedge(const Array1D_int &iprop1,
+    void shadingedge(EnergyPlusData &state,
+                     const Array1D_int &iprop1,
                      const Array1D<Real64> &frct1,
                      Real64 const press1,
                      int const nmix1,
@@ -948,7 +956,7 @@ namespace TarcogShading {
         tilt = DataGlobalConstants::Pi / 180.0 * (angle - 90.0);
         T0 = 0.0 + DataGlobalConstants::KelvinConv;
 
-        GASSES90(T0, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con0, visc0, dens0, cp0, pr0, 1, nperr, ErrorMessage);
+        GASSES90(state, T0, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con0, visc0, dens0, cp0, pr0, 1, nperr, ErrorMessage);
         // call gasses90(Tenv, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con1, visc1, dens1, cp1, pr1, 1, &
         //                nperr, ErrorMessage)
 
@@ -979,7 +987,7 @@ namespace TarcogShading {
 
         while (!converged) {
             ++iter;
-            GASSES90(Tgap, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, con2, visc2, dens2, cp2, pr2, 1, nperr, ErrorMessage);
+            GASSES90(state, Tgap, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, con2, visc2, dens2, cp2, pr2, 1, nperr, ErrorMessage);
 
             if ((nperr > 0) && (nperr < 1000)) return;
 

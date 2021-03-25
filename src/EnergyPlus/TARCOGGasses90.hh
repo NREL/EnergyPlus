@@ -53,10 +53,19 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
-namespace EnergyPlus::TARCOGGasses90 {
+namespace EnergyPlus {
 
-    void GASSES90(Real64 tmean,
+// Using/Aliasing
+using namespace TARCOGGassesParams;
+using namespace TARCOGParams;
+
+namespace TARCOGGasses90 {
+
+    void GASSES90(EnergyPlusData &state,
+                  Real64 tmean,
                   const Array1D_int &iprop,
                   const Array1D<Real64> &frct,
                   Real64 pres,
@@ -74,8 +83,24 @@ namespace EnergyPlus::TARCOGGasses90 {
                   int &nperr,
                   std::string &ErrorMessage);
 
-    void
-    GassesLow(Real64 tmean, Real64 mwght, Real64 pressure, Real64 gama, Real64 &cond, int &nperr, std::string &ErrorMessage);
+    void GassesLow(Real64 tmean, Real64 mwght, Real64 pressure, Real64 gama, Real64 &cond, int &nperr, std::string &ErrorMessage);
+}
+struct TARCOGGasses90Data : BaseGlobalStruct {
+
+    Array1D<Real64> fvis = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D<Real64> fcon = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D<Real64> fdens = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D<Real64> fcp = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D<Real64> kprime = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D<Real64> kdblprm = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D<Real64> mukpdwn = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D<Real64> kpdown = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D<Real64> kdpdown = Array1D<Real64>(TARCOGGassesParams::maxgas);
+
+    void clear_state() override
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

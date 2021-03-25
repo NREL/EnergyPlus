@@ -871,7 +871,8 @@ namespace EnergyPlus::TARCOGMain {
                               NumOfIterations,
                               edgeGlCorrFac);
             } else if ((standard == EN673) || (standard == EN673Design)) {
-                Calc_EN673(files,
+                Calc_EN673(state,
+                           files,
                            standard,
                            nlayer,
                            tout,
@@ -1051,7 +1052,8 @@ namespace EnergyPlus::TARCOGMain {
                                       NumOfIterations,
                                       edgeGlCorrFac);
                     } else if ((standard == EN673) || (standard == EN673Design)) {
-                        Calc_EN673(files,
+                        Calc_EN673(state,
+                                   files,
                                    standard,
                                    nlayer,
                                    tout,

@@ -1545,7 +1545,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 matrixQBalance(nlayer, a, b, sconScaled, hcgas, state.dataThermalISO15099Calc->hcgapMod, asol, qv, state.dataThermalISO15099Calc->hcv, tind, tout, Gin, Gout, theta, tir, rir, emis, edgeGlCorrFac);
             } else {
                 // bi...There are no Venetian layers, or ThermalMod is not CSM, so carry on as usual:
-                shading(theta,
+                shading(state,
+                        theta,
                         gap,
                         state.dataThermalISO15099Calc->hgas,
                         hcgas,
@@ -1827,7 +1828,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                    Ra,
                    Nu);
 
-            shading(theta,
+            shading(state,
+                    theta,
                     gap,
                     state.dataThermalISO15099Calc->hgas,
                     hcgas,
@@ -2347,7 +2349,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 Real64 dens;
                 Real64 cp;
                 Real64 pr;
-                GASSES90(tLayer, state.dataThermalISO15099Calc->iprop1, state.dataThermalISO15099Calc->frct1, press1, nmix1, wght, gcon, gvis, gcp, con, visc, dens, cp, pr, 1, nperr, ErrorMessage);
+                GASSES90(state, tLayer, state.dataThermalISO15099Calc->iprop1, state.dataThermalISO15099Calc->frct1, press1, nmix1, wght, gcon, gvis, gcp, con, visc, dens, cp, pr, 1, nperr, ErrorMessage);
                 sconScaled(i) = (EffectiveOpenness(i) * con + (1 - EffectiveOpenness(i)) * scon(i)) / thick(i);
             } else {
                 sconScaled(i) = scon(i) / thick(i);
@@ -2441,7 +2443,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 state.dataThermalISO15099Calc->frcti(j) = frct(j, nlayer + 1);
             }
 
-            GASSES90(tmean,
+            GASSES90(state,
+                     tmean,
                      state.dataThermalISO15099Calc->ipropi,
                      state.dataThermalISO15099Calc->frcti,
                      presure(nlayer + 1),
@@ -2595,7 +2598,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
             }
 
             if (presure(i + 1) > VacuumPressure) {
-                GASSES90(
+                GASSES90(state,
                     tmean, state.dataThermalISO15099Calc->ipropg, state.dataThermalISO15099Calc->frctg, presure(i + 1), nmix(i + 1), wght, gcon, gvis, gcp, con, visc, dens, cp, pr, ISO15099, nperr, ErrorMessage);
 
                 // Calculate grashoff number:
