@@ -484,6 +484,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
     Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;
     Array1D<DataZoneEquipment::ReturnAir> ReturnAirPath;
     bool CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
+    Array1D_bool MyEnvrnFlag;
 
     void clear_state() override
     {
@@ -506,6 +507,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
         this->SupplyAirPath.deallocate();
         this->ReturnAirPath.deallocate();
         this->CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
+        this->MyEnvrnFlag.clear();
     }
 };
 

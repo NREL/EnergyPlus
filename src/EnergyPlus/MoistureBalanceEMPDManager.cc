@@ -159,7 +159,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         int MaterialNumAlpha;             // Number of material alpha names being passed
         int MaterialNumProp;              // Number of material properties being passed
         Array1D<Real64> MaterialProps(9); // Temporary array to transfer material properties
-        static bool ErrorsFound(false);   // If errors detected in input
+        bool ErrorsFound(false);   // If errors detected in input
 
         int EMPDMat; // EMPD Moisture Material additional properties for each base material
         int Loop;

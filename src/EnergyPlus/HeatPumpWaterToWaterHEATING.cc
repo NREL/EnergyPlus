@@ -227,7 +227,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterHEATING {
         Array1D_string AlphArray(5);  // character string data
         Array1D<Real64> NumArray(23); // numeric data
 
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         state.dataHPWaterToWaterHtg->NumGSHPs = inputProcessor->getNumObjectsFound(state, ModuleCompName);
 
@@ -564,8 +564,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterHEATING {
         std::string ErrString;
         Real64 DutyFactor;
 
-        static Real64 CurrentSimTime(0.0);
-        static Real64 PrevSimTime(0.0);
+        auto & CurrentSimTime = state.dataHPWaterToWaterHtg->CurrentSimTime;
+        auto & PrevSimTime = state.dataHPWaterToWaterHtg->PrevSimTime;
 
         // Init Module level Variables
         if (PrevSimTime != CurrentSimTime) {

@@ -369,6 +369,7 @@ struct FansData : BaseGlobalStruct
     std::unordered_map<std::string, std::string> UniqueFanNames;
     Array1D<Fans::NightVentPerfData> NightVentPerf;
     Array1D<Fans::FanNumericFieldData> FanNumericFields;
+    int ErrCount = 0;
 
     void clear_state() override
     {
@@ -386,6 +387,7 @@ struct FansData : BaseGlobalStruct
         this->UniqueFanNames.clear();
         this->NightVentPerf.deallocate();
         this->FanNumericFields.deallocate();
+        this->ErrCount = 0;
     }
 };
 

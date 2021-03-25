@@ -299,7 +299,7 @@ namespace SurfaceGeometry {
         int Count; // To count wall surfaces for ceiling height calculation
         Array1D_bool ZoneCeilingHeightEntered;
         Array1D<Real64> ZoneCeilingArea;
-        static int ErrCount(0);
+        auto & ErrCount = state.dataSurfaceGeometry->ErrCount;
         Real64 NominalUwithConvCoeffs;
         std::string cNominalU;
         std::string cNominalUwithConvCoeffs;
@@ -936,9 +936,9 @@ namespace SurfaceGeometry {
         int ConstrNum;                // Construction number
         int Found;                    // For matching interzone surfaces
         int ConstrNumFound;           // Construction number of matching interzone surface
-        static bool NonMatch(false);  // Error for non-matching interzone surfaces
+        bool NonMatch(false);  // Error for non-matching interzone surfaces
         int MovedSurfs;               // Number of Moved Surfaces (when sorting into hierarchical structure)
-        static bool SurfError(false); // General Surface Error, causes fatal error at end of routine
+        bool SurfError(false); // General Surface Error, causes fatal error at end of routine
         int BaseSurfNum;
         int TotLay;               // Total layers in a construction
         int TotLayFound;          // Total layers in the construction of a matching interzone surface
@@ -977,7 +977,7 @@ namespace SurfaceGeometry {
         int OpaqueHTSurfs;        // Number of floors, walls and roofs in a zone
         int OpaqueHTSurfsWithWin; // Number of floors, walls and roofs with windows in a zone
         int InternalMassSurfs;    // Number of internal mass surfaces in a zone
-        static bool RelWarning(false);
+        bool RelWarning(false);
         int ConstrNumSh;      // Shaded construction number for a window
         int LayNumOutside;    // Outside material numbers for a shaded construction
         int BlNum;            // Blind number
@@ -996,10 +996,10 @@ namespace SurfaceGeometry {
         int MultFound;
         int MultSurfNum;
         std::string MultString;
-        static bool WarningDisplayed(false);
-        static int ErrCount2(0);
-        static int ErrCount3(0);
-        static int ErrCount4(0); // counts of interzone area mismatches.
+        auto & WarningDisplayed = state.dataSurfaceGeometry->WarningDisplayed;
+        auto & ErrCount2 = state.dataSurfaceGeometry->ErrCount2;
+        auto & ErrCount3 = state.dataSurfaceGeometry->ErrCount3;
+        auto & ErrCount4 = state.dataSurfaceGeometry->ErrCount4;
         bool SubSurfaceSevereDisplayed;
         bool subSurfaceError(false);
         bool errFlag;
@@ -2498,7 +2498,7 @@ namespace SurfaceGeometry {
         int Found;
         std::string OutMsg;
         int ZoneNum; //For loop counter
-        static bool RelWarning(false);
+        bool RelWarning(false);
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "GlobalGeometryRules";
@@ -6997,10 +6997,10 @@ namespace SurfaceGeometry {
         int CountHTAlgoObjectsMultiSurf;
         int CountHTAlgoObjectsSurfList;
         int IOStatus; // Used in GetObjectItem
-        static bool ErrorsFoundSingleSurf(false);
-        static bool ErrorsFoundMultiSurf(false);
-        static bool ErrorsFoundSurfList(false);
-        static bool ErrorsFoundByConstruct(false);
+        bool ErrorsFoundSingleSurf(false);
+        bool ErrorsFoundMultiSurf(false);
+        bool ErrorsFoundSurfList(false);
+        bool ErrorsFoundByConstruct(false);
         DataSurfaces::iHeatTransferModel tmpAlgoInput;
         int Item;
         int Item1;
@@ -10288,15 +10288,14 @@ namespace SurfaceGeometry {
         Real64 CalcVolume;
         bool initmsg;
         int iside;
-        static bool ShowZoneSurfaces(false);
-        static bool ShowZoneSurfaceHeaders(true);
-        static int ErrCount(0);
+        auto & ShowZoneSurfaceHeaders = state.dataSurfaceGeometry->ShowZoneSurfaceHeaders;
+        auto & ErrCount5 = state.dataSurfaceGeometry->ErrCount5;
 
         // Object Data
         Polyhedron ZoneStruct;
 
         initmsg = true;
-        ShowZoneSurfaces = (inputProcessor->getNumSectionsFound("SHOWZONESURFACES_DEBUG") > 0);
+        bool ShowZoneSurfaces = (inputProcessor->getNumSectionsFound("SHOWZONESURFACES_DEBUG") > 0);
 
         enum class zoneVolumeCalculationMethod
         {
@@ -10365,7 +10364,7 @@ namespace SurfaceGeometry {
             zoneVolumeCalculationMethod volCalcMethod;
 
             if (isZoneEnclosed) {
-                CalcVolume = CalcPolyhedronVolume(ZoneStruct);
+                CalcVolume = CalcPolyhedronVolume(state, ZoneStruct);
                 volCalcMethod = zoneVolumeCalculationMethod::enclosed;
             } else if (state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0 && state.dataHeatBal->Zone(ZoneNum).CeilingHeight > 0.0 && areFloorAndCeilingSame(state, ZoneStruct)) {
                 CalcVolume = state.dataHeatBal->Zone(ZoneNum).FloorArea * state.dataHeatBal->Zone(ZoneNum).CeilingHeight;
@@ -10434,8 +10433,8 @@ namespace SurfaceGeometry {
             if (state.dataHeatBal->Zone(ZoneNum).Volume > 0.0) { // User entered zone volume, produce message if not near calculated
                 if (CalcVolume > 0.0) {
                     if (std::abs(CalcVolume - state.dataHeatBal->Zone(ZoneNum).Volume) / state.dataHeatBal->Zone(ZoneNum).Volume > 0.05) {
-                        ++ErrCount;
-                        if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                        ++ErrCount5;
+                        if (ErrCount5 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                             if (initmsg) {
                                 ShowMessage(state, "Note that the following warning(s) may/will occur if you have not enclosed your zone completely.");
                                 initmsg = false;
@@ -11621,7 +11620,6 @@ namespace SurfaceGeometry {
         int I;        // Loop Control
         Real64 Gamma; // Intermediate Result
         Real64 DotSelfX23;
-        static std::string ErrLineOut; // Character string for producing error messages
 
         // Object Data
         Vector x21;
@@ -12631,9 +12629,9 @@ namespace SurfaceGeometry {
         int NAlphas;
         int NNum;
         int IOStat;
-        static Real64 OldAspectRatio;
-        static Real64 NewAspectRatio;
-        static std::string transformPlane;
+        auto & OldAspectRatio = state.dataSurfaceGeometry->OldAspectRatio;
+        auto & NewAspectRatio = state.dataSurfaceGeometry->NewAspectRatio;
+        auto & transformPlane = state.dataSurfaceGeometry->transformPlane;
         int n;
         Real64 Xo;
         Real64 XnoRot;
@@ -12727,8 +12725,8 @@ namespace SurfaceGeometry {
 
         using namespace Vectors;
 
-        static Array1D<Vector> Triangle1(3); // working struct for a 3-sided surface
-        static Array1D<Vector> Triangle2(3); // working struct for a 3-sided surface
+        auto & Triangle1 = state.dataSurfaceGeometry->Triangle1;
+        auto & Triangle2 = state.dataSurfaceGeometry->Triangle2;
         static Vector const zero_vector(0.0);
         Vector centroid;
 
@@ -13271,21 +13269,20 @@ namespace SurfaceGeometry {
         Real64 V2len;             // Edge vector length
         bool SignFlag;            // Direction of edge turn : true is right, false is left
         bool PrevSignFlag(false); // Container for the sign of the previous iteration's edge turn
-        static Array1D<Real64> X; // containers for x,y,z vertices of the surface
-        static Array1D<Real64> Y;
-        static Array1D<Real64> Z;
-        static Array1D<Real64> A; // containers for convexity test
-        static Array1D<Real64> B;
-        static Array1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
-        static int VertSize;                   // size of X,Y,Z,A,B arrays
+        auto & X = state.dataSurfaceGeometry->X; // containers for x,y,z vertices of the surface
+        auto & Y = state.dataSurfaceGeometry->Y;
+        auto & Z = state.dataSurfaceGeometry->Z;
+        auto & A = state.dataSurfaceGeometry->A; // containers for convexity test
+        auto & B = state.dataSurfaceGeometry->B;
+        auto & SurfCollinearVerts = state.dataSurfaceGeometry->SurfCollinearVerts; // Array containing indices of collinear vertices
+        auto & VertSize = state.dataSurfaceGeometry->VertSize;                   // size of X,Y,Z,A,B arrays
+        auto & ACosZero = state.dataSurfaceGeometry->ACosZero; // set on firstTime
         Real64 cosarg;
         int M;   // Array index for SurfCollinearVerts container
         int J;   // Loop index
         int K;   // Loop index
         int Ind; // Location of surface vertex to be removed
-        static Real64 ACosZero; // set on firstTime
         bool SurfCollinearWarning;
-        static std::string ErrLineOut; // Character string for producing error messages
 
         if (state.dataSurfaceGeometry->CheckConvexityFirstTime) {
             ACosZero = std::acos(0.0);

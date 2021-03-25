@@ -372,6 +372,17 @@ struct GeneralData : BaseGlobalStruct {
     bool LineRpt = false;
     bool VarDict = false;
     bool EMSoutput = false;
+    Real64 XNext = 0.0; // used in root finder
+    std::string DXFOption1;
+    std::string DXFOption2;
+    std::string DXFWFOption1;
+    std::string DXFWFOption2;
+    std::string VRMLOption1;
+    std::string VRMLOption2;
+    std::string ViewRptOption1;
+    std::string LineRptOption1;
+    std::string VarDictOption1;
+    std::string VarDictOption2;
 
     void clear_state() override
     {
@@ -389,6 +400,17 @@ struct GeneralData : BaseGlobalStruct {
         this->LineRpt = false;
         this->VarDict = false;
         this->EMSoutput = false;
+        this->XNext = 0.0;
+        this->DXFOption1.clear();
+        this->DXFOption2.clear();
+        this->DXFWFOption1.clear();
+        this->DXFWFOption2.clear();
+        this->VRMLOption1.clear();
+        this->VRMLOption2.clear();
+        this->ViewRptOption1.clear();
+        this->LineRptOption1.clear();
+        this->VarDictOption1.clear();
+        this->VarDictOption2.clear();
     }
 };
 

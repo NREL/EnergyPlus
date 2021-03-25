@@ -224,9 +224,8 @@ namespace EnergyPlus::MixedAir {
     void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
         int CompNum;
-        static std::string CompType; // Tuned Made static
-        static std::string CompName; // Tuned Made static
-        static std::string CtrlName; // Tuned Made static
+        auto & CompType = state.dataMixedAir->CompType;
+        auto & CompName = state.dataMixedAir->CompName;
         bool ReSim(false);
         bool Sim(true);
         bool OAHeatCoil(false);
@@ -307,8 +306,8 @@ namespace EnergyPlus::MixedAir {
         // INTEGER :: CtrlNum
         int OAMixerNum;
         int OAControllerNum;         // OA controller index in OAController
-        static std::string CompType; // Tuned Made static
-        static std::string CompName; // Tuned Made static
+        auto & CompType = state.dataMixedAir->CompType; // Tuned Made static
+        auto & CompName = state.dataMixedAir->CompName; // Tuned Made static
         bool FatalErrorFlag(false);
 
         // SimOutsideAirSys can handle only 1 controller right now.  This must be
@@ -822,15 +821,15 @@ namespace EnergyPlus::MixedAir {
         int InListNum;
         int ListNum;
         int NumSimpControllers; // number of Controller:Simple objects in an OA System
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         std::string CurrentModuleObject; // Object type for getting and messages
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int MaxNums(0);           // Maximum number of numeric input fields
-        static int MaxAlphas(0);         // Maximum number of alpha input fields
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
+        int MaxNums(0);           // Maximum number of numeric input fields
+        int MaxAlphas(0);         // Maximum number of alpha input fields
+        int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
 
         if (!state.dataMixedAir->GetOASysInputFlag) return;
@@ -1197,7 +1196,7 @@ namespace EnergyPlus::MixedAir {
         Array1D_string cNumericFields;   // Numeric field names
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static bool ErrorsFound(false);  // Flag identifying errors found during get input
+        bool ErrorsFound(false);  // Flag identifying errors found during get input
         int ZoneListNum;                 // Index to Zone List
         int MechVentZoneCount;           // Index counter for zones with mechanical ventilation
         int NumArg;                      // Number of arguments from GetObjectDefMaxArgs call
@@ -1205,11 +1204,11 @@ namespace EnergyPlus::MixedAir {
         int MaxNums;                     // Maximum numbers in multiple objects
 
         int NumGroups; // Number of extensible input groups of the VentilationMechanical object
-        static int ObjIndex(0);
-        static int EquipListIndex(0);
-        static int EquipNum(0);
-        static int EquipListNum(0);
-        static int ADUNum(0);
+        int ObjIndex(0);
+        int EquipListIndex(0);
+        int EquipNum(0);
+        int EquipListNum(0);
+        int ADUNum(0);
         int jZone;
         int i;
 
@@ -1937,7 +1936,7 @@ namespace EnergyPlus::MixedAir {
         Array1D_string cNumericFields;   // Numeric field names
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         if (!state.dataMixedAir->GetOAMixerInputFlag) return;
 
@@ -2456,10 +2455,10 @@ namespace EnergyPlus::MixedAir {
         using namespace OutputReportPredefined;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-        static Array1D_bool OAControllerMyOneTimeFlag; // One-time initialization flag
-        static Array1D_bool OAControllerMyEnvrnFlag;   // One-time initialization flag
-        static Array1D_bool OAControllerMySizeFlag;    // One-time initialization flag
-        static Array1D_bool MechVentCheckFlag;         // One-time initialization flag
+        auto & OAControllerMyOneTimeFlag = state.dataMixedAir->OAControllerMyOneTimeFlag; // One-time initialization flag
+        auto & OAControllerMyEnvrnFlag = state.dataMixedAir->OAControllerMyEnvrnFlag;   // One-time initialization flag
+        auto & OAControllerMySizeFlag = state.dataMixedAir->OAControllerMySizeFlag;    // One-time initialization flag
+        auto & MechVentCheckFlag = state.dataMixedAir->MechVentCheckFlag;         // One-time initialization flag
         bool FoundZone;                                // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
         bool FoundAreaZone;                            // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
         bool FoundPeopleZone;                          // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
@@ -3718,14 +3717,6 @@ namespace EnergyPlus::MixedAir {
         Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
         Real64 CO2PeopleGeneration;       // CO2 generation from people at design level
 
-        static Real64 Ep(1.0); // zone primary air fraction
-        static Real64 Er(0.0); // zone secondary recirculation fraction
-        static Real64 Fa(1.0); // temporary variable used in multi-path VRP calc
-        static Real64 Fb(1.0);
-        static Real64 Fc(1.0);
-        static Real64 Xs(1.0);  // uncorrected system outdoor air fraction
-        static Real64 Evz(1.0); // zone ventilation efficiency
-
         int PriNode;   // primary node of zone terminal unit
         int InletNode; // outlet node of zone terminal unit
 
@@ -4276,7 +4267,7 @@ namespace EnergyPlus::MixedAir {
         Real64 EconomizerAirFlowScheduleValue; // value of economizer operation schedule (push-button type control schedule)
         Real64 MaximumOAFracBySetPoint;        // The maximum OA fraction due to freezing cooling coil check
         Real64 OutAirSignal;                   // Used to set OA mass flow rate
-        static Array1D<Real64> Par(6);         // Par(1) = mixed air node number //Tuned Made static
+        auto & Par = state.dataMixedAir->Par;  // Par(1) = mixed air node number //Tuned Made static
                                                // Par(2) = return air node number
                                                // Par(3) = outside air node number
                                                // Par(4) = mixed air mass flow rate
@@ -5023,7 +5014,7 @@ namespace EnergyPlus::MixedAir {
     // Beginning Utility Section of the Module
     //******************************************************************************
 
-    Real64 MixedAirControlTempResidual(EnergyPlusData &state, 
+    Real64 MixedAirControlTempResidual(EnergyPlusData &state,
                                        Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
                                        Array1D<Real64> const &Par // par(1) = mixed node number
     )

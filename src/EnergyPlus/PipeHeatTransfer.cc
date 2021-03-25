@@ -1011,37 +1011,24 @@ namespace EnergyPlus::PipeHeatTransfer {
         // Using/Aliasing
         using namespace DataEnvironment;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         // fluid node heat balance (see engineering doc).
-        static Real64 A1(0.0); // sum of the heat balance terms
-        static Real64 A2(0.0); // mass flow term
-        static Real64 A3(0.0); // inside pipe wall convection term
-        static Real64 A4(0.0); // fluid node heat capacity term
+        Real64 A1(0.0); // sum of the heat balance terms
+        Real64 A2(0.0); // mass flow term
+        Real64 A3(0.0); // inside pipe wall convection term
+        Real64 A4(0.0); // fluid node heat capacity term
         // pipe wall node heat balance (see engineering doc).
-        static Real64 B1(0.0); // sum of the heat balance terms
-        static Real64 B2(0.0); // inside pipe wall convection term
-        static Real64 B3(0.0); // outside pipe wall convection term
-        static Real64 B4(0.0); // fluid node heat capacity term
+        Real64 B1(0.0); // sum of the heat balance terms
+        Real64 B2(0.0); // inside pipe wall convection term
+        Real64 B3(0.0); // outside pipe wall convection term
+        Real64 B4(0.0); // fluid node heat capacity term
 
-        static Real64 AirConvCoef(0.0);           // air-pipe convection coefficient
-        static Real64 FluidConvCoef(0.0);         // fluid-pipe convection coefficient
-        static Real64 EnvHeatTransCoef(0.0);      // external convection coefficient (outside pipe)
-        static Real64 FluidNodeHeatCapacity(0.0); // local var for MCp for single node of pipe
+        Real64 AirConvCoef(0.0);           // air-pipe convection coefficient
+        Real64 FluidConvCoef(0.0);         // fluid-pipe convection coefficient
+        Real64 EnvHeatTransCoef(0.0);      // external convection coefficient (outside pipe)
+        Real64 FluidNodeHeatCapacity(0.0); // local var for MCp for single node of pipe
 
-        static int PipeDepth(0);
-        static int PipeWidth(0);
+        int PipeDepth(0);
+        int PipeWidth(0);
         int curnode;
         Real64 TempBelow;
         Real64 TempBeside;
@@ -1187,14 +1174,9 @@ namespace EnergyPlus::PipeHeatTransfer {
         // is set up, which simulates transient behavior in the soil.
         // This then interfaces with the Hanby model for near-pipe region
 
-        // REFERENCES: See Module Level Description
-
         // Using/Aliasing
         using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const NumSections(20);
         Real64 const ConvCrit(0.05);
@@ -1202,33 +1184,33 @@ namespace EnergyPlus::PipeHeatTransfer {
         Real64 const StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int IterationIndex(0);    // Index when stepping through equations
-        static int LengthIndex(0);       // Index for nodes along length of pipe
-        static int DepthIndex(0);        // Index for nodes in the depth direction
-        static int WidthIndex(0);        // Index for nodes in the width direction
-        static Real64 ConvCoef(0.0);     // Current convection coefficient = f(Wind Speed,Roughness)
-        static Real64 RadCoef(0.0);      // Current radiation coefficient
-        static Real64 QSolAbsorbed(0.0); // Current total solar energy absorbed
+        int IterationIndex(0);    // Index when stepping through equations
+        int LengthIndex(0);       // Index for nodes along length of pipe
+        int DepthIndex(0);        // Index for nodes in the depth direction
+        int WidthIndex(0);        // Index for nodes in the width direction
+        Real64 ConvCoef(0.0);     // Current convection coefficient = f(Wind Speed,Roughness)
+        Real64 RadCoef(0.0);      // Current radiation coefficient
+        Real64 QSolAbsorbed(0.0); // Current total solar energy absorbed
         Array3D<Real64> T_O(this->PipeNodeWidth, this->NumDepthNodes, NumSections);
 
         // Local variable placeholders for code readability
-        static Real64 A1(0.0);              // Placeholder for CoefA1
-        static Real64 A2(0.0);              // Placeholder for CoefA2
-        static Real64 NodeBelow(0.0);       // Placeholder for Node temp below current node
-        static Real64 NodeAbove(0.0);       // Placeholder for Node temp above current node
-        static Real64 NodeRight(0.0);       // Placeholder for Node temp to the right of current node
-        static Real64 NodeLeft(0.0);        // Placeholder for Node temp to the left of current node
-        static Real64 NodePast(0.0);        // Placeholder for Node temp at current node but previous time step
-        static Real64 PastNodeTempAbs(0.0); // Placeholder for absolute temperature (K) version of NodePast
-        static Real64 Ttemp(0.0);           // Placeholder for a current temperature node in convergence check
-        static Real64 SkyTempAbs(0.0);      // Placeholder for current sky temperature in Kelvin
-        static int TopRoughness(0);         // Placeholder for soil surface roughness
-        static Real64 TopThermAbs(0.0);     // Placeholder for soil thermal radiation absorptivity
-        static Real64 TopSolarAbs(0.0);     // Placeholder for soil solar radiation absorptivity
-        static Real64 kSoil(0.0);           // Placeholder for soil conductivity
-        static Real64 dS(0.0);              // Placeholder for soil grid spacing
-        static Real64 rho(0.0);             // Placeholder for soil density
-        static Real64 Cp(0.0);              // Placeholder for soil specific heat
+        Real64 A1(0.0);              // Placeholder for CoefA1
+        Real64 A2(0.0);              // Placeholder for CoefA2
+        Real64 NodeBelow(0.0);       // Placeholder for Node temp below current node
+        Real64 NodeAbove(0.0);       // Placeholder for Node temp above current node
+        Real64 NodeRight(0.0);       // Placeholder for Node temp to the right of current node
+        Real64 NodeLeft(0.0);        // Placeholder for Node temp to the left of current node
+        Real64 NodePast(0.0);        // Placeholder for Node temp at current node but previous time step
+        Real64 PastNodeTempAbs(0.0); // Placeholder for absolute temperature (K) version of NodePast
+        Real64 Ttemp(0.0);           // Placeholder for a current temperature node in convergence check
+        Real64 SkyTempAbs(0.0);      // Placeholder for current sky temperature in Kelvin
+        int TopRoughness(0);         // Placeholder for soil surface roughness
+        Real64 TopThermAbs(0.0);     // Placeholder for soil thermal radiation absorptivity
+        Real64 TopSolarAbs(0.0);     // Placeholder for soil solar radiation absorptivity
+        Real64 kSoil(0.0);           // Placeholder for soil conductivity
+        Real64 dS(0.0);              // Placeholder for soil grid spacing
+        Real64 rho(0.0);             // Placeholder for soil density
+        Real64 Cp(0.0);              // Placeholder for soil specific heat
 
         // There are a number of coefficients which change through the simulation, and they are updated here
         this->FourierDS = this->SoilDiffusivity * state.dataPipeHT->nsvDeltaTime / pow_2(this->dSregular); // Eq. D4

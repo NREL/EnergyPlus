@@ -125,14 +125,6 @@ namespace MatrixDataManager {
 
 } // namespace MatrixDataManager
 
-struct MatrixDataManagerData : BaseGlobalStruct {
-
-    void clear_state() override
-    {
-
-    }
-};
-
 } // namespace EnergyPlus
 
 #endif

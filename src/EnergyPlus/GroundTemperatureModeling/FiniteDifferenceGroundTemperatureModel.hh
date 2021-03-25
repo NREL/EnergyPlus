@@ -69,6 +69,10 @@ struct EnergyPlusData;
 // Derived class for Finite-Difference Model
 class FiniteDiffGroundTempsModel : public BaseGroundTempsModel
 {
+    Real64 rhoCp_soil_liq_1;
+    Real64 rhoCP_soil_liq;
+    Real64 rhoCP_soil_transient;
+    Real64 rhoCP_soil_ice;
 
 public:
     Real64 baseConductivity;

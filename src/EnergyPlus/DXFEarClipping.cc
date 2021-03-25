@@ -209,7 +209,6 @@ namespace DXFEarClipping {
         int nrangles;
         int ncverts;
         std::string line;
-        static int errcount(0);
 
         // Object Data
         Array1D<Vector_2d> vertex(nsides);
@@ -261,8 +260,8 @@ namespace DXFEarClipping {
             if (!any_gt(ears, 0)) {
                 ShowWarningError(state, "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");
-                ++errcount;
-                if (errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                ++state.dataDXFEarClipping->errcount;
+                if (state.dataDXFEarClipping->errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
                 if (state.dataGlobal->DisplayExtraWarnings) {

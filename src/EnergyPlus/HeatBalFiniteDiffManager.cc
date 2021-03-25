@@ -154,7 +154,7 @@ namespace HeatBalFiniteDiffManager {
         int MaterialNumAlpha;               // Number of material alpha names being passed
         int MaterialNumProp;                // Number of material properties being passed
         Array1D<Real64> MaterialProps(40);  // Temporary array to transfer material properties
-        static bool ErrorsFound(false);     // If errors detected in input
+        bool ErrorsFound(false);     // If errors detected in input
         int Loop;
         int NumAlphas;
         int NumNumbers;
@@ -418,7 +418,7 @@ namespace HeatBalFiniteDiffManager {
         // This subroutine sets the initial values for the FD moisture calculation
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyEnvrnFlag(true);
+        auto & MyEnvrnFlag = state.dataHeatBalFiniteDiffMgr->MyEnvrnFlag;
         int SurfNum;
         int ConstrNum; // Loop counter
         bool ErrorsFound;
@@ -1034,7 +1034,7 @@ namespace HeatBalFiniteDiffManager {
         //      finite difference procedures for
         //      all building surface constructs.
 
-        static Real64 MaxDelTemp(0.0);
+        Real64 MaxDelTemp(0.0);
 
         auto & ConstructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD;
         auto & SurfaceFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD;

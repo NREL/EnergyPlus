@@ -420,7 +420,7 @@ namespace EnergyPlus::DXCoils {
         Real64 S1SensCoolingEnergyRate;       // Stage 1   Sensible cooling rate [W]
         Real64 S1LatCoolingEnergyRate;        // Stage 1   Latent cooling rate [W]
         Real64 S1ElecCoolingPower;            // Stage 1   Electric power input [W]
-        static Real64 S1RuntimeFraction(0.0); // Stage 1   Run time fraction (overlaps with stage1&2 run time)
+        Real64 S1RuntimeFraction(0.0); // Stage 1   Run time fraction (overlaps with stage1&2 run time)
         Real64 S1EvapCondPumpElecPower;       // Stage 1   Evaporative condenser pump electric power input [W]
         Real64 S1EvapWaterConsumpRate;        // Stage 1   Evap condenser water consumption rate [m3/s]
         Real64 S1CrankcaseHeaterPower;        // Stage 1   Report variable for average crankcase heater power [W]
@@ -436,7 +436,7 @@ namespace EnergyPlus::DXCoils {
         Real64 S12LatCoolingEnergyRate;        // Stage 1&2 Latent cooling rate [W]
         Real64 S12ElecCoolingPower;            // Stage 1&2 Electric power input [W]
         Real64 S12ElecCoolFullLoadPower;       // Stage 1&2 Electric power input at full load (PLR=1) [W]
-        static Real64 S12RuntimeFraction(0.0); // Stage 1&2 Run time fraction (overlaps with stage1 run time)
+        Real64 S12RuntimeFraction(0.0); // Stage 1&2 Run time fraction (overlaps with stage1 run time)
         Real64 S12EvapCondPumpElecPower;       // Stage 1&2 Evaporative condenser pump electric power input [W]
         Real64 S12EvapWaterConsumpRate;        // Stage 1&2 Evap condenser water consumption rate [m3/s]
         Real64 S12CrankcaseHeaterPower;        // Stage 1&2 Report variable for average crankcase heater power [W]
@@ -5930,15 +5930,13 @@ namespace EnergyPlus::DXCoils {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // Using/Aliasing
-
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Real64 SmallDifferenceTest(0.00000001);
+        constexpr Real64 SmallDifferenceTest(0.00000001);
         static std::string const RoutineName("InitDXCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag;   // One time environment flag
-        static Array1D_bool MySizeFlag;    // One time sizing flag
+        auto & MyEnvrnFlag = state.dataDXCoils->MyEnvrnFlag;   // One time environment flag
+        auto & MySizeFlag = state.dataDXCoils->MySizeFlag;    // One time sizing flag
         Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
         Real64 RatedHeatPumpIndoorHumRat;  // Inlet humidity ratio to heat pump evaporator at rated conditions [kgWater/kgDryAir]
         Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
@@ -8436,7 +8434,7 @@ namespace EnergyPlus::DXCoils {
         Real64 RhoAir;                  // Density of air [kg/m3]
         Real64 RhoWater;                // Density of water [kg/m3]
         Real64 CrankcaseHeatingPower;   // power due to crankcase heater
-        static Real64 CompAmbTemp(0.0); // Ambient temperature at compressor
+        Real64 CompAmbTemp(0.0); // Ambient temperature at compressor
         Real64 AirFlowRatio;            // ratio of compressor on airflow to average timestep airflow
         // used when constant fan mode yields different air flow rates when compressor is ON and OFF
         // (e.g. Packaged Terminal Heat Pump)
@@ -8445,7 +8443,7 @@ namespace EnergyPlus::DXCoils {
         Real64 OutdoorHumRat;   // Outdoor humidity ratio at condenser (kg/kg)
         Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
 
-        static Real64 CurrentEndTime(0.0); // end time of time step for current simulation time step
+        auto & CurrentEndTime = state.dataDXCoils->CurrentEndTime;
         int Mode;                          // Performance mode for Multimode DX coil; Always 1 for other coil types
         Real64 OutletAirTemp;              // Supply air temperature (average value if constant fan, full output if cycling fan)
         Real64 OutletAirHumRat;            // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
@@ -9447,7 +9445,7 @@ namespace EnergyPlus::DXCoils {
         Real64 CondAirMassFlow;         // Condenser air mass flow rate [kg/s]
         Real64 RhoAir;                  // Density of air [kg/m3]
         Real64 CrankcaseHeatingPower;   // power due to crankcase heater
-        static Real64 CompAmbTemp(0.0); // Ambient temperature at compressor
+        Real64 CompAmbTemp(0.0); // Ambient temperature at compressor
         Real64 AirFlowRatio;            // ratio of compressor on airflow to average timestep airflow
         // used when constant fan mode yields different air flow rates when compressor is ON and OFF
         // (e.g. Packaged Terminal Heat Pump)
@@ -9456,7 +9454,7 @@ namespace EnergyPlus::DXCoils {
         Real64 OutdoorHumRat;   // Outdoor humidity ratio at condenser (kg/kg)
         Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
 
-        static Real64 CurrentEndTime(0.0); // end time of time step for current simulation time step
+        auto & CurrentEndTime = state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime;
         int Mode;                 // Performance mode for Multimode DX coil; Always 1 for other coil types
         Real64 OutletAirTemp;     // Supply air temperature (average value if constant fan, full output if cycling fan)
         Real64 OutletAirHumRat;   // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
@@ -10113,12 +10111,12 @@ namespace EnergyPlus::DXCoils {
         Real64 OutdoorWetBulb;            // Outdoor wet-bulb temperature at condenser (C)
         Real64 OutdoorHumRat;             // Outdoor humidity ratio at condenser (kg/kg)
         Real64 OutdoorPressure;           // Outdoor barometric pressure at condenser (Pa)
-        static int Mode(1);               // Performance mode for MultiMode DX coil; Always 1 for other coil types
+        constexpr int Mode(1);               // Performance mode for MultiMode DX coil; Always 1 for other coil types
         Real64 AirFlowRatio;              // Ratio of compressor on airflow to average timestep airflow
         Real64 OutletAirTemp;             // Supply air temperature (average value if constant fan, full output if cycling fan)
         Real64 OutletAirHumRat;           // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
         Real64 OutletAirEnthalpy;         // Supply air enthalpy (average value if constant fan, full output if cycling fan)
-        static Real64 CompAmbTemp(0.0);   // Ambient temperature at compressor
+        Real64 CompAmbTemp(0.0);   // Ambient temperature at compressor
 
         if (present(OnOffAirFlowRatio)) {
             AirFlowRatio = OnOffAirFlowRatio;
@@ -10594,14 +10592,14 @@ namespace EnergyPlus::DXCoils {
         Real64 RhoWater;                 // Density of water [kg/m3]
         Real64 CondAirMassFlow;          // Condenser air mass flow rate [kg/s]
         Real64 EvapCondPumpElecPower;    // Evaporative condenser electric pump power [W]
-        static int Mode(1);              // Performance mode for MultiMode DX coil; Always 1 for other coil types
+        constexpr int Mode(1);              // Performance mode for MultiMode DX coil; Always 1 for other coil types
         Real64 OutdoorDryBulb;           // Outdoor dry-bulb temperature at condenser (C)
         Real64 OutdoorWetBulb;           // Outdoor wet-bulb temperature at condenser (C)
         Real64 OutdoorHumRat;            // Outdoor humidity ratio at condenser (kg/kg)
         Real64 OutdoorPressure;          // Outdoor barometric pressure at condenser (Pa)
         bool LocalForceOn;
         Real64 AirMassFlowRatio2;        // Ratio of low speed air mass flow to rated air mass flow
-        static Real64 CompAmbTemp(0.0);  // Ambient temperature at compressor
+        Real64 CompAmbTemp(0.0);  // Ambient temperature at compressor
 
         if (present(ForceOn)) {
             LocalForceOn = true;
@@ -11139,7 +11137,7 @@ namespace EnergyPlus::DXCoils {
 
         // FUNCTION PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcCBF");
-        static Real64 SmallDifferenceTest(0.00000001);
+        constexpr Real64 SmallDifferenceTest(0.00000001);
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InletAirEnthalpy;                // Enthalpy of inlet air to evaporator at given conditions [J/kg]
@@ -11818,7 +11816,7 @@ namespace EnergyPlus::DXCoils {
         Real64 RhoWater;                 // Density of water [kg/m3]
         Real64 CondAirMassFlow;          // Condenser air mass flow rate [kg/s]
         Real64 EvapCondPumpElecPower;    // Evaporative condenser electric pump power [W]
-        static int DXMode(1);            // Performance mode for MultiMode DX coil; Always 1 for other coil types
+        constexpr int DXMode(1);            // Performance mode for MultiMode DX coil; Always 1 for other coil types
         Real64 OutdoorDryBulb;           // Outdoor dry-bulb temperature at condenser (C)
         Real64 OutdoorWetBulb;           // Outdoor wet-bulb temperature at condenser (C)
         Real64 OutdoorHumRat;            // Outdoor humidity ratio at condenser (kg/kg)
@@ -12440,7 +12438,7 @@ namespace EnergyPlus::DXCoils {
                     OutletAirDryBulbTemp = LSOutletAirDryBulbTemp;
                     OutletAirEnthalpy = LSOutletAirEnthalpy;
                 }
-                
+
                 // get low speed EIR at current conditions
                 EIRTempModFacLS = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(SpeedNum), InletAirWetBulbC, CondInletTemp);
                 EIRFlowModFacLS = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow(SpeedNum), AirMassFlowRatioLS);
@@ -13523,13 +13521,17 @@ namespace EnergyPlus::DXCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("CalcTwoSpeedDXCoilStandardRating");
 
-        static Real64 NetCoolingCapRated(0.0); // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
-        static Real64 EER(0.0);                // Energy Efficiency Ratio in SI [W/W]
-        static Real64 IEER(0.0);               // Integerated Energy Efficiency Ratio in SI [W/W]
-        static Real64 TotCapTempModFac(0.0);   // Total capacity modifier (function of entering wetbulb, outside drybulb) [-]
-        static Real64 TotCapFlowModFac(0.0);   // Total capacity modifier (function of actual supply air flow vs rated flow) [-]
-        static Real64 EIRTempModFac(0.0);      // EIR modifier (function of entering wetbulb, outside drybulb) [-]
-        static Real64 EIRFlowModFac(0.0);      // EIR modifier (function of actual supply air flow vs rated flow) [-]
+        auto & NetCoolingCapRated = state.dataDXCoils->NetCoolingCapRated;
+        auto & EER = state.dataDXCoils->EER;
+        auto & IEER = state.dataDXCoils->IEER;
+        auto & TotCapTempModFac = state.dataDXCoils->TotCapTempModFac;
+        auto & TotCapFlowModFac = state.dataDXCoils->TotCapFlowModFac;
+        auto & EIRTempModFac = state.dataDXCoils->EIRTempModFac;
+        auto & EIRFlowModFac = state.dataDXCoils->EIRFlowModFac;
+        auto & TempDryBulb_Leaving_Apoint = state.dataDXCoils->TempDryBulb_Leaving_Apoint;
+
+        constexpr Real64 AccuracyTolerance(0.2); // tolerance in AHRI 340/360 Table 6 note 1
+        constexpr int MaximumIterations(1000);
         Real64 EIR;
         Real64 TotalElecPowerRated;
         Array1D<Real64> EER_TestPoint_SI(4);      // 1 = A, 2 = B, 3= C, 4= D
@@ -13538,15 +13540,12 @@ namespace EnergyPlus::DXCoils {
         Array1D<Real64> NetPower_TestPoint(4);    // 1 = A, 2 = B, 3= C, 4= D
         Array1D<Real64> SupAirMdot_TestPoint(4);  // 1 = A, 2 = B, 3= C, 4= D
 
-        static Real64 TempDryBulb_Leaving_Apoint(0.0);
 
         Real64 HighSpeedNetCoolingCap;
         Real64 LowSpeedNetCoolingCap;
 
         Real64 PartLoadAirMassFlowRate;
         Real64 AirMassFlowRatio;
-        static Real64 AccuracyTolerance(0.2); // tolerance in AHRI 340/360 Table 6 note 1
-        static int MaximumIterations(1000);
         int SolverFlag;
         Array1D<Real64> Par(12); // Parameter array passed to solver
         Real64 EIR_HighSpeed;
@@ -13556,7 +13555,7 @@ namespace EnergyPlus::DXCoils {
         int Iter;
         Real64 ExternalStatic;
         Real64 FanStaticPressureRise;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         Real64 FanHeatCorrection;
         Real64 FanPowerCorrection;
         Real64 FanPowerPerEvapAirFlowRate;
@@ -14001,7 +14000,7 @@ namespace EnergyPlus::DXCoils {
         int AirSysNum;
         int BranchNum;
         int CompNum;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         FoundBranch = 0;
         FoundAirSysNum = 0;
@@ -15771,7 +15770,7 @@ namespace EnergyPlus::DXCoils {
         Real64 CondAirMassFlow;         // Condenser air mass flow rate [kg/s]
         Real64 RhoAir;                  // Density of air [kg/m3]
         Real64 CrankcaseHeatingPower;   // power due to crankcase heater
-        static Real64 CompAmbTemp(0.0); // Ambient temperature at compressor
+        Real64 CompAmbTemp(0.0); // Ambient temperature at compressor
         Real64 AirFlowRatio;            // ratio of compressor on airflow to average timestep airflow
         // used when constant fan mode yields different air flow rates when compressor is ON and OFF
         // (e.g. Packaged Terminal Heat Pump)
@@ -15780,7 +15779,7 @@ namespace EnergyPlus::DXCoils {
         Real64 OutdoorHumRat;   // Outdoor humidity ratio at condenser (kg/kg)
         Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
 
-        static Real64 CurrentEndTime(0.0); // end time of time step for current simulation time step
+        auto & CurrentEndTime = state.dataDXCoils->CalcVRFCoolingCoil_FluidTCtrlCurrentEndTime;
         int Mode;                          // Performance mode for Multimode DX coil; Always 1 for other coil types
         Real64 OutletAirTemp;              // Supply air temperature (average value if constant fan, full output if cycling fan)
         Real64 OutletAirHumRat;            // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
@@ -16236,7 +16235,7 @@ namespace EnergyPlus::DXCoils {
         Real64 OutdoorWetBulb;            // Outdoor wet-bulb temperature at condenser (C)
         Real64 OutdoorHumRat;             // Outdoor humidity ratio at condenser (kg/kg)
         Real64 OutdoorPressure;           // Outdoor barometric pressure at condenser (Pa)
-        static int Mode(1);               // Performance mode for MultiMode DX coil. Always 1 for other coil types
+        constexpr int Mode(1);               // Performance mode for MultiMode DX coil. Always 1 for other coil types
         Real64 AirFlowRatio;              // Ratio of compressor on airflow to average timestep airflow
         Real64 OutletAirTemp;             // Supply air temperature (average value if constant fan, full output if cycling fan)
         Real64 OutletAirHumRat;           // Supply air humidity ratio (average value if constant fan, full output if cycling fan)

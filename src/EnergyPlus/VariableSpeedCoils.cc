@@ -279,8 +279,8 @@ namespace VariableSpeedCoils {
         int NumAlphas;           // Number of variables in String format
         int NumNums;             // Number of variables in Numeric format
         int NumParams;           // Total number of input fields
-        static int MaxNums(0);   // Maximum number of numeric input fields
-        static int MaxAlphas(0); // Maximum number of alpha input fields
+        int MaxNums(0);          // Maximum number of numeric input fields
+        int MaxAlphas(0);        // Maximum number of alpha input fields
         int IOStat;
         int AlfaFieldIncre;              // increment number of Alfa field
         bool ErrorsFound(false);         // If errors detected in input
@@ -3074,9 +3074,6 @@ namespace VariableSpeedCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirInletNode;                // Node Number of the air inlet
         int WaterInletNode;              // Node Number of the Water inlet
-        static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
-        static Array1D_bool MySizeFlag;  // used for sizing PTHP inputs one time
-        static Array1D_bool MyPlantScanFlag;
         Real64 rho;   // local fluid density
         Real64 Cp;    // local fluid specific heat
         int SpeedCal; // calculated speed level
@@ -3093,12 +3090,12 @@ namespace VariableSpeedCoils {
 
         if (state.dataVariableSpeedCoils->MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            MySizeFlag.allocate(state.dataVariableSpeedCoils->NumVarSpeedCoils);
-            MyEnvrnFlag.allocate(state.dataVariableSpeedCoils->NumVarSpeedCoils);
-            MyPlantScanFlag.allocate(state.dataVariableSpeedCoils->NumVarSpeedCoils);
-            MySizeFlag = true;
-            MyEnvrnFlag = true;
-            MyPlantScanFlag = true;
+            state.dataVariableSpeedCoils->MySizeFlag.allocate(state.dataVariableSpeedCoils->NumVarSpeedCoils);
+            state.dataVariableSpeedCoils->MyEnvrnFlag.allocate(state.dataVariableSpeedCoils->NumVarSpeedCoils);
+            state.dataVariableSpeedCoils->MyPlantScanFlag.allocate(state.dataVariableSpeedCoils->NumVarSpeedCoils);
+            state.dataVariableSpeedCoils->MySizeFlag = true;
+            state.dataVariableSpeedCoils->MyEnvrnFlag = true;
+            state.dataVariableSpeedCoils->MyPlantScanFlag = true;
             state.dataVariableSpeedCoils->MyOneTimeFlag = false;
         }
 
@@ -3106,20 +3103,20 @@ namespace VariableSpeedCoils {
                   // VarSpeedCoil object
 
         // variable-speed heat pump water heating, begin
-        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed && MySizeFlag(DXCoilNum)) {
+        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed && state.dataVariableSpeedCoils->MySizeFlag(DXCoilNum)) {
 
             SizeVarSpeedCoil(state, DXCoilNum);
 
             //   get rated coil bypass factor excluding fan heat
 
-            MySizeFlag(DXCoilNum) = false;
+            state.dataVariableSpeedCoils->MySizeFlag(DXCoilNum) = false;
         }
         // variable-speed heat pump water heating, end
 
         // water source
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit)) { // fix coil type
-            if (MyPlantScanFlag(DXCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
+            if (state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
                 // switch from coil type numbers in DataHVACGlobals, to coil type numbers in plant.
                 int plantTypeOfNum(0);
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
@@ -3144,17 +3141,17 @@ namespace VariableSpeedCoils {
                 if (errFlag) {
                     ShowFatalError(state, "InitVarSpeedCoil: Program terminated for previous conditions.");
                 }
-                MyPlantScanFlag(DXCoilNum) = false;
+                state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum) = false;
             }
         } else {
-            MyPlantScanFlag(DXCoilNum) = false;
+            state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum) = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(DXCoilNum) && !MyPlantScanFlag(DXCoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataVariableSpeedCoils->MySizeFlag(DXCoilNum) && !state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum)) {
             // for each furnace, do the sizing once.
             SizeVarSpeedCoil(state, DXCoilNum);
 
-            MySizeFlag(DXCoilNum) = false;
+            state.dataVariableSpeedCoils->MySizeFlag(DXCoilNum) = false;
 
             // Multispeed Cooling
             if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
@@ -3436,7 +3433,7 @@ namespace VariableSpeedCoils {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DXCoilNum) && !MyPlantScanFlag(DXCoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataVariableSpeedCoils->MyEnvrnFlag(DXCoilNum) && !state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum)) {
             // Do the initializations to start simulation
 
             AirInletNode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum;
@@ -3515,12 +3512,12 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = true;
             state.dataHeatBal->HeatReclaimVS_DXCoil(DXCoilNum).AvailCapacity = 0.0;
 
-            MyEnvrnFlag(DXCoilNum) = false;
+            state.dataVariableSpeedCoils->MyEnvrnFlag(DXCoilNum) = false;
 
         } // End If for the Begin Environment initializations
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(DXCoilNum) = true;
+            state.dataVariableSpeedCoils->MyEnvrnFlag(DXCoilNum) = true;
         }
 
         // Do the following initializations (every time step): This should be the info from
@@ -4968,12 +4965,6 @@ namespace VariableSpeedCoils {
 
         bool LatDegradModelSimFlag;             // Latent degradation model simulation flag
         int NumIteration;                       // Iteration Counter
-        static int Count(0);                    // No idea what this is for.
-        static Real64 LoadSideInletDBTemp_Init; // rated conditions
-        static Real64 LoadSideInletWBTemp_Init; // rated conditions
-        static Real64 LoadSideInletHumRat_Init; // rated conditions
-        static Real64 LoadSideInletEnth_Init;   // rated conditions
-        static Real64 CpAir_Init;               // rated conditions
         Real64 LoadSideInletDBTemp_Unit;        // calc conditions for unit
         Real64 LoadSideInletWBTemp_Unit;        // calc conditions for unit
         Real64 LoadSideInletHumRat_Unit;        // calc conditions for unit
@@ -5002,12 +4993,6 @@ namespace VariableSpeedCoils {
         Real64 MaxOutletEnth;                   // max possible outlet enthalpy
 
         // ADDED VARIABLES FOR air source coil
-        static Real64 OutdoorDryBulb(0.0);        // Outdoor dry-bulb temperature at condenser (C)
-        static Real64 OutdoorWetBulb(0.0);        // Outdoor wet-bulb temperature at condenser (C)
-        static Real64 OutdoorHumRat(0.0);         // Outdoor humidity ratio at condenser (kg/kg)
-        static Real64 OutdoorPressure(0.0);       // Outdoor barometric pressure at condenser (Pa)
-        static Real64 CrankcaseHeatingPower(0.0); // power due to crankcase heater
-        static Real64 CompAmbTemp(0.0);           // Ambient temperature at compressor
         Real64 CondInletTemp;                     // Condenser inlet temperature (C). Outdoor dry-bulb temp for air-cooled condenser.
         // Outdoor Wetbulb +(1 - effectiveness)*(outdoor drybulb - outdoor wetbulb) for evap condenser.
         Real64 CondInletHumRat; // Condenser inlet humidity ratio (kg/kg). Zero for air-cooled condenser.
@@ -5023,13 +5008,13 @@ namespace VariableSpeedCoils {
 
         if (state.dataVariableSpeedCoils->firstTime) {
             // Set indoor air conditions to the rated condition
-            LoadSideInletDBTemp_Init = 26.7;
-            LoadSideInletHumRat_Init = 0.0111;
-            LoadSideInletEnth_Init = PsyHFnTdbW(LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init);
-            CpAir_Init = PsyCpAirFnW(LoadSideInletHumRat_Init);
+            state.dataVariableSpeedCoils->LoadSideInletDBTemp_Init = 26.7;
+            state.dataVariableSpeedCoils->LoadSideInletHumRat_Init = 0.0111;
+            state.dataVariableSpeedCoils->LoadSideInletEnth_Init = PsyHFnTdbW(state.dataVariableSpeedCoils->LoadSideInletDBTemp_Init, state.dataVariableSpeedCoils->LoadSideInletHumRat_Init);
+            state.dataVariableSpeedCoils->CpAir_Init = PsyCpAirFnW(state.dataVariableSpeedCoils->LoadSideInletHumRat_Init);
             state.dataVariableSpeedCoils->firstTime = false;
         }
-        LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb(state, LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init, state.dataEnvrn->OutBaroPress, RoutineName);
+        state.dataVariableSpeedCoils->LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb(state, state.dataVariableSpeedCoils->LoadSideInletDBTemp_Init, state.dataVariableSpeedCoils->LoadSideInletHumRat_Init, state.dataEnvrn->OutBaroPress, RoutineName);
 
         MaxSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds;
 
@@ -5053,18 +5038,18 @@ namespace VariableSpeedCoils {
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed) {
             // Get condenser outdoor node info from DX COOLING Coil
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
-                OutdoorDryBulb = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Temp;
-                OutdoorHumRat = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).HumRat;
-                OutdoorPressure = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Press;
-                OutdoorWetBulb = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).OutAirWetBulb;
+                state.dataVariableSpeedCoils->OutdoorDryBulb_CalcVarSpeedCoilCooling = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Temp;
+                state.dataVariableSpeedCoils->OutdoorHumRat_CalcVarSpeedCoilCooling = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).HumRat;
+                state.dataVariableSpeedCoils->OutdoorPressure_CalcVarSpeedCoilCooling = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Press;
+                state.dataVariableSpeedCoils->OutdoorWetBulb_CalcVarSpeedCoilCooling = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).OutAirWetBulb;
             } else {
-                OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
-                OutdoorHumRat = state.dataEnvrn->OutHumRat;
-                OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
+                state.dataVariableSpeedCoils->OutdoorDryBulb_CalcVarSpeedCoilCooling = state.dataEnvrn->OutDryBulbTemp;
+                state.dataVariableSpeedCoils->OutdoorHumRat_CalcVarSpeedCoilCooling = state.dataEnvrn->OutHumRat;
+                state.dataVariableSpeedCoils->OutdoorPressure_CalcVarSpeedCoilCooling = state.dataEnvrn->OutBaroPress;
+                state.dataVariableSpeedCoils->OutdoorWetBulb_CalcVarSpeedCoilCooling = state.dataEnvrn->OutWetBulbTemp;
             }
 
-            RhoSourceAir = PsyRhoAirFnPbTdbW(state, OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
+            RhoSourceAir = PsyRhoAirFnPbTdbW(state, state.dataVariableSpeedCoils->OutdoorPressure_CalcVarSpeedCoilCooling, state.dataVariableSpeedCoils->OutdoorDryBulb_CalcVarSpeedCoilCooling, state.dataVariableSpeedCoils->OutdoorHumRat_CalcVarSpeedCoilCooling);
 
             if ((SpeedNum == 1) || (SpeedNum > MaxSpeed) || (SpeedRatio == 1.0)) {
                 CondAirMassFlow = RhoSourceAir * state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondAirFlow(SpeedCal);
@@ -5082,12 +5067,12 @@ namespace VariableSpeedCoils {
                                          (1.0 - SpeedRatio) * state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondEffect(SpeedCal - 1);
                 }
                 // (Outdoor wet-bulb temp from DataEnvironment) + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
-                CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - EvapCondEffectSped);
-                CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, OutdoorPressure);
-                CompAmbTemp = CondInletTemp;
+                CondInletTemp = state.dataVariableSpeedCoils->OutdoorWetBulb_CalcVarSpeedCoilCooling + (state.dataVariableSpeedCoils->OutdoorDryBulb_CalcVarSpeedCoilCooling - state.dataVariableSpeedCoils->OutdoorWetBulb_CalcVarSpeedCoilCooling) * (1.0 - EvapCondEffectSped);
+                CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, state.dataVariableSpeedCoils->OutdoorWetBulb_CalcVarSpeedCoilCooling, state.dataVariableSpeedCoils->OutdoorPressure_CalcVarSpeedCoilCooling);
+                state.dataVariableSpeedCoils->CompAmbTemp_CalcVarSpeedCoilCooling = CondInletTemp;
             } else {                            // AIR COOLED CONDENSER
-                CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
-                CompAmbTemp = OutdoorDryBulb;
+                CondInletTemp = state.dataVariableSpeedCoils->OutdoorDryBulb_CalcVarSpeedCoilCooling; // Outdoor dry-bulb temp
+                state.dataVariableSpeedCoils->CompAmbTemp_CalcVarSpeedCoilCooling = state.dataVariableSpeedCoils->OutdoorDryBulb_CalcVarSpeedCoilCooling;
                 CondInletHumRat = state.dataEnvrn->OutHumRat;
             }
 
@@ -5099,10 +5084,10 @@ namespace VariableSpeedCoils {
 
             // If used in a heat pump, the value of MaxOAT in the heating coil overrides that in the cooling coil (in GetInput)
             // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
-            if (OutdoorDryBulb < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
-                CrankcaseHeatingPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity;
+            if (state.dataVariableSpeedCoils->OutdoorDryBulb_CalcVarSpeedCoilCooling < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
+                state.dataVariableSpeedCoils->CrankcaseHeatingPower_CalcVarSpeedCoilCooling = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity;
             } else {
-                CrankcaseHeatingPower = 0.0;
+                state.dataVariableSpeedCoils->CrankcaseHeatingPower_CalcVarSpeedCoilCooling = 0.0;
             }
         } else {
             state.dataVariableSpeedCoils->SourceSideMassFlowRate = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterMassFlowRate;
@@ -5188,11 +5173,11 @@ namespace VariableSpeedCoils {
             ++NumIteration;
             if (NumIteration == 1) {
                 // Set indoor air conditions to the rated conditions
-                state.dataVariableSpeedCoils->LoadSideInletDBTemp = LoadSideInletDBTemp_Init;
-                state.dataVariableSpeedCoils->LoadSideInletHumRat = LoadSideInletHumRat_Init;
-                state.dataVariableSpeedCoils->LoadSideInletWBTemp = LoadSideInletWBTemp_Init;
-                state.dataVariableSpeedCoils->LoadSideInletEnth = LoadSideInletEnth_Init;
-                CpAir = CpAir_Init;
+                state.dataVariableSpeedCoils->LoadSideInletDBTemp = state.dataVariableSpeedCoils->LoadSideInletDBTemp_Init;
+                state.dataVariableSpeedCoils->LoadSideInletHumRat = state.dataVariableSpeedCoils->LoadSideInletHumRat_Init;
+                state.dataVariableSpeedCoils->LoadSideInletWBTemp = state.dataVariableSpeedCoils->LoadSideInletWBTemp_Init;
+                state.dataVariableSpeedCoils->LoadSideInletEnth = state.dataVariableSpeedCoils->LoadSideInletEnth_Init;
+                CpAir = state.dataVariableSpeedCoils->CpAir_Init;
             } else {
                 // Set indoor air conditions to the actual condition
                 state.dataVariableSpeedCoils->LoadSideInletDBTemp = LoadSideInletDBTemp_Unit;
@@ -5440,8 +5425,8 @@ namespace VariableSpeedCoils {
                 //             H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir/s]
                 //                                /RhoWater [kgWater/m3]
                 //******************
-                RhoEvapCondWater = RhoH2O(OutdoorDryBulb);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterConsumpRate = (CondInletHumRat - OutdoorHumRat) * CondAirMassFlow / RhoEvapCondWater * RuntimeFrac;
+                RhoEvapCondWater = RhoH2O(state.dataVariableSpeedCoils->OutdoorDryBulb_CalcVarSpeedCoilCooling);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterConsumpRate = (CondInletHumRat - state.dataVariableSpeedCoils->OutdoorHumRat_CalcVarSpeedCoilCooling) * CondAirMassFlow / RhoEvapCondWater * RuntimeFrac;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower * RuntimeFrac;
                 // Calculate basin heater power
                 CalcBasinHeaterPower(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
@@ -5451,7 +5436,7 @@ namespace VariableSpeedCoils {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPower *= (1.0 - RuntimeFrac);
             }
 
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower = CrankcaseHeatingPower * (1.0 - RuntimeFrac);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower = state.dataVariableSpeedCoils->CrankcaseHeatingPower_CalcVarSpeedCoilCooling * (1.0 - RuntimeFrac);
 
             // set water system demand request (if needed)
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupplyMode == state.dataVariableSpeedCoils->WaterSupplyFromTank) {
@@ -5477,7 +5462,6 @@ namespace VariableSpeedCoils {
             }
         }
 
-        ++Count;
         // Actual outlet conditions are "average" for time step
         if (CyclingScheme == ContFanCycCoil) {
             // continuous fan, cycling compressor
@@ -6164,19 +6148,18 @@ namespace VariableSpeedCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpSource; // Specific heat of water [J/kg_C]
         Real64 CpAir;    // Specific heat of air [J/kg_C]
-
         Real64 AirMassFlowRatio;    // airflow ratio at low speed
         Real64 WaterMassFlowRatio;  // airflow ratio at high speed
         Real64 TotCapAirFFModFac;   // air flow fraction modification
         Real64 TotCapWaterFFModFac; // water flow fraction modification
-        Real64 TotCapTempModFac;    // total capacity temperature correctio fraction
+        Real64 TotCapTempModFac;    // total capacity temperature correction fraction
         Real64 EIRAirFFModFac;      // air flow fraction modification
         Real64 EIRWaterFFModFac;    // water flow fraction modification
-        Real64 EIRTempModFac;       // total capacity temperature correctio fraction
-        Real64 EIR;                 // total capacity temperature correctio fraction
+        Real64 EIRTempModFac;       // total capacity temperature correction fraction
+        Real64 EIR;                 // total capacity temperature correction fraction
         int MaxSpeed;               // maximum speed level
         int SpeedCal;               // calculated speed level
-        Real64 QLoadTotal1;         // heating capacit at low speed
+        Real64 QLoadTotal1;         // heating capacity at low speed
         Real64 QLoadTotal2;         // heating capacity at high speed
         Real64 Winput1;             // power consumption at low speed
         Real64 Winput2;             // power consumption at high speed
@@ -6188,20 +6171,6 @@ namespace VariableSpeedCoils {
         Real64 rhoair(0.0); // entering air density
 
         // ADDED VARIABLES FOR air source coil
-        static Real64 OutdoorCoilT(0.0);              // Outdoor coil temperature (C)
-        static Real64 OutdoorCoildw(0.0);             // Outdoor coil delta w assuming coil temp of OutdoorCoilT (kg/kg)
-        static Real64 OutdoorDryBulb(0.0);            // Outdoor dry-bulb temperature at condenser (C)
-        static Real64 OutdoorWetBulb(0.0);            // Outdoor wet-bulb temperature at condenser (C)
-        static Real64 OutdoorHumRat(0.0);             // Outdoor humidity ratio at condenser (kg/kg)
-        static Real64 OutdoorPressure(0.0);           // Outdoor barometric pressure at condenser (Pa)
-        static Real64 FractionalDefrostTime(0.0);     // Fraction of time step system is in defrost
-        static Real64 HeatingCapacityMultiplier(0.0); // Multiplier for heating capacity when system is in defrost
-        static Real64 InputPowerMultiplier(0.0);      // Multiplier for power when system is in defrost
-        static Real64 LoadDueToDefrost(0.0);          // Additional load due to defrost
-        static Real64 CrankcaseHeatingPower(0.0);     // power due to crankcase heater
-        static Real64 DefrostEIRTempModFac(0.0);      // EIR modifier for defrost (function of entering wetbulb, outside drybulb)
-        static Real64 TotRatedCapacity(0.0);          // total rated capacity at the given speed and speed ratio for defrosting
-
         MaxSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds;
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
@@ -6220,26 +6189,26 @@ namespace VariableSpeedCoils {
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed) {
             // Get condenser outdoor node info from DX Heating Coil
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
-                OutdoorDryBulb = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Temp;
-                OutdoorHumRat = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).HumRat;
-                OutdoorPressure = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Press;
-                OutdoorWetBulb = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).OutAirWetBulb;
+                state.dataVariableSpeedCoils->OutdoorDryBulb = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Temp;
+                state.dataVariableSpeedCoils->OutdoorHumRat = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).HumRat;
+                state.dataVariableSpeedCoils->OutdoorPressure = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Press;
+                state.dataVariableSpeedCoils->OutdoorWetBulb = state.dataLoopNodes->Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).OutAirWetBulb;
             } else {
-                OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
-                OutdoorHumRat = state.dataEnvrn->OutHumRat;
-                OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
+                state.dataVariableSpeedCoils->OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
+                state.dataVariableSpeedCoils->OutdoorHumRat = state.dataEnvrn->OutHumRat;
+                state.dataVariableSpeedCoils->OutdoorPressure = state.dataEnvrn->OutBaroPress;
+                state.dataVariableSpeedCoils->OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             }
             state.dataVariableSpeedCoils->SourceSideMassFlowRate = 1.0; // not used and avoid divided by zero
-            state.dataVariableSpeedCoils->SourceSideInletTemp = OutdoorDryBulb;
-            state.dataVariableSpeedCoils->SourceSideInletEnth = PsyHFnTdbW(OutdoorDryBulb, OutdoorHumRat);
+            state.dataVariableSpeedCoils->SourceSideInletTemp = state.dataVariableSpeedCoils->OutdoorDryBulb;
+            state.dataVariableSpeedCoils->SourceSideInletEnth = PsyHFnTdbW(state.dataVariableSpeedCoils->OutdoorDryBulb, state.dataVariableSpeedCoils->OutdoorHumRat);
             CpSource = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
 
             // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
-            if (OutdoorDryBulb < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
-                CrankcaseHeatingPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity;
+            if (state.dataVariableSpeedCoils->OutdoorDryBulb < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
+                state.dataVariableSpeedCoils->CrankcaseHeatingPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity;
             } else {
-                CrankcaseHeatingPower = 0.0;
+                state.dataVariableSpeedCoils->CrankcaseHeatingPower = 0.0;
             }
         } else {
             state.dataVariableSpeedCoils->SourceSideMassFlowRate = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterMassFlowRate;
@@ -6261,7 +6230,7 @@ namespace VariableSpeedCoils {
         }
 
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed) &&
-            (OutdoorDryBulb < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MinOATCompressor)) {
+            (state.dataVariableSpeedCoils->OutdoorDryBulb < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MinOATCompressor)) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
             return;
         }
@@ -6320,7 +6289,7 @@ namespace VariableSpeedCoils {
 
             state.dataVariableSpeedCoils->QLoadTotal = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(SpeedCal) * TotCapTempModFac * TotCapAirFFModFac * TotCapWaterFFModFac;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).capModFacTotal = TotCapTempModFac * TotCapAirFFModFac * TotCapWaterFFModFac;
-            TotRatedCapacity = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(SpeedCal); // for defrosting power cal
+            state.dataVariableSpeedCoils->TotRatedCapacity = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(SpeedCal); // for defrosting power cal
 
             EIRTempModFac = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(SpeedCal), state.dataVariableSpeedCoils->LoadSideInletDBTemp, state.dataVariableSpeedCoils->SourceSideInletTemp);
             EIRAirFFModFac = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(SpeedCal), AirMassFlowRatio);
@@ -6415,7 +6384,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->QLoadTotal = QLoadTotal2 * SpeedRatio + (1.0 - SpeedRatio) * QLoadTotal1;
             state.dataVariableSpeedCoils->Winput = Winput2 * SpeedRatio + (1.0 - SpeedRatio) * Winput1;
             QWasteHeat = QWasteHeat2 * SpeedRatio + (1.0 - SpeedRatio) * QWasteHeat1;
-            TotRatedCapacity = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(SpeedCal) * SpeedRatio +
+            state.dataVariableSpeedCoils->TotRatedCapacity = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(SpeedCal) * SpeedRatio +
                                (1.0 - SpeedRatio) * state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(SpeedCal - 1);
         }
 
@@ -6424,45 +6393,45 @@ namespace VariableSpeedCoils {
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed) {
             // Calculating adjustment factors for defrost
             // Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
-            OutdoorCoilT = 0.82 * OutdoorDryBulb - 8.589;
-            OutdoorCoildw = max(1.0e-6, (OutdoorHumRat - PsyWFnTdpPb(state, OutdoorCoilT, OutdoorPressure)));
+            state.dataVariableSpeedCoils->OutdoorCoilT = 0.82 * state.dataVariableSpeedCoils->OutdoorDryBulb - 8.589;
+            state.dataVariableSpeedCoils->OutdoorCoildw = max(1.0e-6, (state.dataVariableSpeedCoils->OutdoorHumRat - PsyWFnTdpPb(state, state.dataVariableSpeedCoils->OutdoorCoilT, state.dataVariableSpeedCoils->OutdoorPressure)));
 
             // Initializing defrost adjustment factors
-            LoadDueToDefrost = 0.0;
-            HeatingCapacityMultiplier = 1.0;
-            FractionalDefrostTime = 0.0;
-            InputPowerMultiplier = 1.0;
+            state.dataVariableSpeedCoils->LoadDueToDefrost = 0.0;
+            state.dataVariableSpeedCoils->HeatingCapacityMultiplier = 1.0;
+            state.dataVariableSpeedCoils->FractionalDefrostTime = 0.0;
+            state.dataVariableSpeedCoils->InputPowerMultiplier = 1.0;
             // Check outdoor temperature to determine of defrost is active
-            if (OutdoorDryBulb <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATDefrost) {
+            if (state.dataVariableSpeedCoils->OutdoorDryBulb <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATDefrost) {
                 // Calculate defrost adjustment factors depending on defrost control type
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostControl == state.dataVariableSpeedCoils->Timed) {
-                    FractionalDefrostTime = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostTime;
-                    HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
-                    InputPowerMultiplier = 0.90 - 36.45 * OutdoorCoildw;
+                    state.dataVariableSpeedCoils->FractionalDefrostTime = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostTime;
+                    state.dataVariableSpeedCoils->HeatingCapacityMultiplier = 0.909 - 107.33 * state.dataVariableSpeedCoils->OutdoorCoildw;
+                    state.dataVariableSpeedCoils->InputPowerMultiplier = 0.90 - 36.45 * state.dataVariableSpeedCoils->OutdoorCoildw;
                 } else { // else defrost control is on-demand
-                    FractionalDefrostTime = 1.0 / (1.0 + 0.01446 / OutdoorCoildw);
-                    HeatingCapacityMultiplier = 0.875 * (1.0 - FractionalDefrostTime);
-                    InputPowerMultiplier = 0.954 * (1.0 - FractionalDefrostTime);
+                    state.dataVariableSpeedCoils->FractionalDefrostTime = 1.0 / (1.0 + 0.01446 / state.dataVariableSpeedCoils->OutdoorCoildw);
+                    state.dataVariableSpeedCoils->HeatingCapacityMultiplier = 0.875 * (1.0 - state.dataVariableSpeedCoils->FractionalDefrostTime);
+                    state.dataVariableSpeedCoils->InputPowerMultiplier = 0.954 * (1.0 - state.dataVariableSpeedCoils->FractionalDefrostTime);
                 }
                 // correction fractional defrost time shorten by runtime fraction
-                FractionalDefrostTime *= RuntimeFrac;
+                state.dataVariableSpeedCoils->FractionalDefrostTime *= RuntimeFrac;
 
-                if (FractionalDefrostTime > 0.0) {
+                if (state.dataVariableSpeedCoils->FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
                     if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy == state.dataVariableSpeedCoils->ReverseCycle) {
-                        LoadDueToDefrost = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (TotRatedCapacity / 1.01667);
-                        DefrostEIRTempModFac =
-                            CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostEIRFT, max(15.555, state.dataVariableSpeedCoils->LoadSideInletWBTemp), max(15.555, OutdoorDryBulb));
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower = DefrostEIRTempModFac * (TotRatedCapacity / 1.01667) * FractionalDefrostTime;
+                        state.dataVariableSpeedCoils->LoadDueToDefrost = (0.01 * state.dataVariableSpeedCoils->FractionalDefrostTime) * (7.222 - state.dataVariableSpeedCoils->OutdoorDryBulb) * (state.dataVariableSpeedCoils->TotRatedCapacity / 1.01667);
+                        state.dataVariableSpeedCoils->DefrostEIRTempModFac =
+                            CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostEIRFT, max(15.555, state.dataVariableSpeedCoils->LoadSideInletWBTemp), max(15.555, state.dataVariableSpeedCoils->OutdoorDryBulb));
+                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower = state.dataVariableSpeedCoils->DefrostEIRTempModFac * (state.dataVariableSpeedCoils->TotRatedCapacity / 1.01667) * state.dataVariableSpeedCoils->FractionalDefrostTime;
                     } else { // Defrost strategy is resistive
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostCapacity * FractionalDefrostTime;
+                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostCapacity * state.dataVariableSpeedCoils->FractionalDefrostTime;
                     }
                 } else { // Defrost is not active because (OutDryBulbTemp > VarSpeedCoil(DXCoilNum).MaxOATDefrost)
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower = 0.0;
                 }
             }
 
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower = CrankcaseHeatingPower * (1.0 - RuntimeFrac);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower = state.dataVariableSpeedCoils->CrankcaseHeatingPower * (1.0 - RuntimeFrac);
             //! Modify total heating capacity based on defrost heating capacity multiplier
             //! MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
             //  IF(PRESENT(MaxHeatCap))THEN
@@ -6470,9 +6439,9 @@ namespace VariableSpeedCoils {
             //  ELSE
             //    TotCap = TotCap * HeatingCapacityMultiplier
             //  END IF
-            state.dataVariableSpeedCoils->QLoadTotal =  state.dataVariableSpeedCoils->QLoadTotal * HeatingCapacityMultiplier - LoadDueToDefrost;
+            state.dataVariableSpeedCoils->QLoadTotal =  state.dataVariableSpeedCoils->QLoadTotal * state.dataVariableSpeedCoils->HeatingCapacityMultiplier - state.dataVariableSpeedCoils->LoadDueToDefrost;
             // count the powr separately
-            state.dataVariableSpeedCoils->Winput *= InputPowerMultiplier; //+ VarSpeedCoil(DXCoilNum)%DefrostPower
+            state.dataVariableSpeedCoils->Winput *= state.dataVariableSpeedCoils->InputPowerMultiplier; //+ VarSpeedCoil(DXCoilNum)%DefrostPower
         }
 
         state.dataVariableSpeedCoils->QSource =  state.dataVariableSpeedCoils->QLoadTotal + QWasteHeat -  state.dataVariableSpeedCoils->Winput;
@@ -7404,8 +7373,8 @@ namespace VariableSpeedCoils {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcTotCapSHR_VSWSHP");
-        static int const MaxIter(30);        // Maximum number of iterations for dry evaporator calculations
-        static Real64 const Tolerance(0.01); // Error tolerance for dry evaporator iterations
+        constexpr int MaxIter(30);        // Maximum number of iterations for dry evaporator calculations
+        constexpr Real64 Tolerance(0.01); // Error tolerance for dry evaporator iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TotCapWaterFlowModFac1; // Total capacity modifier (function of actual supply water flow vs nominal flow) at low speed

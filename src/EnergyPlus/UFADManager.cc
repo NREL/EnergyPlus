@@ -172,8 +172,7 @@ namespace EnergyPlus::UFADManager {
         // METHODOLOGY EMPLOYED:
         // Note that much of the initialization is done in RoomAirManager, SharedDVCVUFDataInit
 
-        static Array1D_bool MySizeFlag;
-        static Real64 NumShadesDown(0.0);
+        Real64 NumShadesDown(0.0);
         int UINum;             // index to underfloor interior zone model data
 
         // Do the one time initializations
@@ -182,12 +181,12 @@ namespace EnergyPlus::UFADManager {
             state.dataUFADManager->ThickOccupiedSubzoneMin = 0.2;
             state.dataUFADManager->HeightIntMassDefault = 2.0;
             state.dataUFADManager->MyOneTimeFlag = false;
-            MySizeFlag.dimension(state.dataGlobal->NumOfZones, true);
+            state.dataUFADManager->MySizeFlag.dimension(state.dataGlobal->NumOfZones, true);
         }
 
-        if (MySizeFlag(ZoneNum)) {
+        if (state.dataUFADManager->MySizeFlag(ZoneNum)) {
             SizeUCSDUF(state, ZoneNum, ZoneModelType);
-            MySizeFlag(ZoneNum) = false;
+            state.dataUFADManager->MySizeFlag(ZoneNum) = false;
         }
 
         // initialize these variables every timestep
@@ -239,14 +238,14 @@ namespace EnergyPlus::UFADManager {
 
         using DataSizing::AutoSize;
 
-        int UINum;                            // index to underfloor interior zone model data
-        static Real64 NumberOfOccupants(0.0); // design number of occupants in the zone
-        static Real64 NumberOfPlumes(0.0);    // design number of plumes in the zone
-        static Real64 ZoneElecConv(0.0);      // zone elec equip design convective gain [W]
-        static Real64 ZoneGasConv(0.0);       // zone gas equip design convective gain [W]
-        static Real64 ZoneOthEqConv(0.0);     // zone other equip design convective gain [W]
-        static Real64 ZoneHWEqConv(0.0);      // zone hot water equip design convective gain [W]
-        static Real64 ZoneSteamEqConv(0.0);   // zone steam equip design convective gain [W]
+        int UINum;                     // index to underfloor interior zone model data
+        Real64 NumberOfOccupants(0.0); // design number of occupants in the zone
+        Real64 NumberOfPlumes(0.0);    // design number of plumes in the zone
+        Real64 ZoneElecConv(0.0);      // zone elec equip design convective gain [W]
+        Real64 ZoneGasConv(0.0);       // zone gas equip design convective gain [W]
+        Real64 ZoneOthEqConv(0.0);     // zone other equip design convective gain [W]
+        Real64 ZoneHWEqConv(0.0);      // zone hot water equip design convective gain [W]
+        Real64 ZoneSteamEqConv(0.0);   // zone steam equip design convective gain [W]
 
         if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFI) {
             UINum = state.dataRoomAirMod->ZoneUFPtr(ZoneNum);
@@ -1454,9 +1453,9 @@ namespace EnergyPlus::UFADManager {
         Real64 HeightOccupiedSubzoneAve; // Height of center of occupied air subzone
         Real64 ZoneMult;                 // total zone multiplier
         int ZoneNodeNum;                 // node number of the HVAC zone node
-        static Real64 TempDepCoef(0.0);  // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
-        static Real64 TempIndCoef(0.0);  // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-        static Array1D_int IntGainTypesOccupied(30,
+        Real64 TempDepCoef(0.0);  // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
+        Real64 TempIndCoef(0.0);  // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
+        static const Array1D_int IntGainTypesOccupied(30,
                                                 {IntGainTypeOf_People,
                                                  IntGainTypeOf_WaterHeaterMixed,
                                                  IntGainTypeOf_WaterHeaterStratified,
@@ -1488,7 +1487,7 @@ namespace EnergyPlus::UFADManager {
                                                  IntGainTypeOf_RefrigerationSecondaryPipe,
                                                  IntGainTypeOf_RefrigerationWalkIn});
 
-        static Array1D_int IntGainTypesUpSubzone(2, {IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights});
+        static const Array1D_int IntGainTypesUpSubzone(2, {IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights});
         Real64 RetAirGains;
 
         // Exact solution or Euler method

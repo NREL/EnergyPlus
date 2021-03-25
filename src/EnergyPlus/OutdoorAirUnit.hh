@@ -305,6 +305,11 @@ struct EnergyPlusData;
         std::unordered_set<std::string> SupplyFanUniqueNames;
         std::unordered_set<std::string> ExhaustFanUniqueNames;
         std::unordered_set<std::string> ComponentListUniqueNames;
+        Array1D_bool MyEnvrnFlag;
+        Array1D_bool MyPlantScanFlag;
+        Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+        bool HeatActive = false;
+        bool CoolActive = false;
 
         void clear_state() override
         {
@@ -320,6 +325,11 @@ struct EnergyPlusData;
             ComponentListUniqueNames.clear();
             MyOneTimeFlag = true;
             ZoneEquipmentListChecked = false;
+            this->MyEnvrnFlag.clear();
+            this->MyPlantScanFlag.clear();
+            this->MyZoneEqFlag.clear();
+            this->HeatActive = false;
+            this->CoolActive = false;
         }
     };
 

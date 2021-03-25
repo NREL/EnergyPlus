@@ -289,10 +289,10 @@ namespace OutdoorAirUnit {
         int NumInList;
         int InListNum;
         int ListNum;
-        static bool ErrorsFound(false);
-        static int MaxNums(0);           // Maximum number of numeric input fields
-        static int MaxAlphas(0);         // Maximum number of alpha input fields
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
+        bool ErrorsFound(false);
+        int MaxNums(0);           // Maximum number of numeric input fields
+        int MaxAlphas(0);         // Maximum number of alpha input fields
+        int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         bool IsValid;                    // Set for outside air node check
         Array1D_string cAlphaArgs;       // Alpha input items for object
         std::string CurrentModuleObject; // Object type for getting and messages
@@ -302,7 +302,7 @@ namespace OutdoorAirUnit {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         Array1D<Real64> NumArray;
         Array1D_string AlphArray;
-        static bool errFlag(false);
+        bool errFlag(false);
 
 
         // Figure out how many outdoor air units there are in the input file
@@ -1059,28 +1059,15 @@ namespace OutdoorAirUnit {
         using SteamCoils::GetCoilMaxSteamFlowRate;
         using WaterCoils::SimulateWaterCoilComponents;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CurrentModuleObject("ZoneHVAC:OutdoorAirUnit");
         static std::string const RoutineName("SizeOutdoorAirUnit");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool MyOneTimeFlag( true );
-        // static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-        ////////////////////////////////////////////////////////////////////////////////////
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+        auto & MyEnvrnFlag = state.dataOutdoorAirUnit->MyEnvrnFlag;
+        auto & MyPlantScanFlag = state.dataOutdoorAirUnit->MyPlantScanFlag;
+        auto & MyZoneEqFlag = state.dataOutdoorAirUnit->MyZoneEqFlag; // used to set up zone equipment availability managers
         int InNode;                       // inlet node number in outdoor air unit
         int OutNode;                      // outlet node number in outdoor air unit
         int OutsideAirNode;               // outside air node number outdoor air unit
@@ -1090,7 +1077,6 @@ namespace OutdoorAirUnit {
         int compLoop;                     // local do loop index
         Real64 rho;
         bool errFlag;
-
 
         // Do the one time initializations
 
@@ -2090,13 +2076,13 @@ namespace OutdoorAirUnit {
         int WHCoilInletNode;
         int WHCoilOutletNode;
         Real64 QUnitOut;
-        static int DXSystemIndex(0);
+        int DXSystemIndex(0);
         Real64 CompAirOutTemp;
         Real64 FanEffect;
         bool DrawFan; // fan position If .True., the temperature increasing by fan operating is considered
         Real64 Dxsystemouttemp;
-        static bool HeatActive(false);
-        static bool CoolActive(false);
+        auto & HeatActive = state.dataOutdoorAirUnit->HeatActive;
+        auto & CoolActive = state.dataOutdoorAirUnit->CoolActive;
 
         auto & OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);
 
