@@ -398,7 +398,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_getDesignCapacities_Test)
     EXPECT_NEAR(optload, 0.0, 0.001);
 }
 
-TEST_F(EnergyPlusFixture, ExhAbsorption_calHeater_Fix_Test)
+TEST_F(EnergyPlusFixture, ExhAbsorption_calcHeater_Fix_Test)
 {
     std::string const idf_objects = delimited_string({
         "  ChillerHeater:Absorption:DoubleEffect,                                                                     ",

@@ -243,7 +243,7 @@ TEST_F(EnergyPlusFixture, GasAbsorption_getDesignCapacities_Test)
     EXPECT_NEAR(optload, 0.0, 0.001);
 }
 
-TEST_F(EnergyPlusFixture, GasAbsorption_calHeater_Fix_Test)
+TEST_F(EnergyPlusFixture, GasAbsorption_calculateHeater_Fix_Test)
 {
     std::string const idf_objects = delimited_string({
         "  ChillerHeater:Absorption:DirectFired,                                                                      ",
