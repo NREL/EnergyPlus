@@ -1250,9 +1250,6 @@ namespace ThermalComfort {
         Real64 const CloEmiss(0.8); // Clothing Emissivity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D<Real64> Coeff(2);      // Coefficients used in Range-Kutta's Method
-        static Array1D<Real64> Temp(2);       // Temperature
-        static Array1D<Real64> TempChange(2); // Change of temperature
         Real64 BodyWt;                        // Weight of body, kg
         Real64 DayNum;                        // Number of days of acclimation
         int NumDay;                           // Loop counter for DayNum
@@ -1372,9 +1369,9 @@ namespace ThermalComfort {
                 state.dataThermalComforts->Time = 0.0;
                 state.dataThermalComforts->TimeChange = 0.01;
                 SweatSuppFac = 1.0;
-                Temp(1) = state.dataThermalComforts->CoreTemp;
-                Temp(2) = state.dataThermalComforts->SkinTemp;
-                Coeff(1) = Coeff(2) = 0.0;
+                state.dataThermalComforts->Temp(1) = state.dataThermalComforts->CoreTemp;
+                state.dataThermalComforts->Temp(2) = state.dataThermalComforts->SkinTemp;
+                state.dataThermalComforts->Coeff(1) = state.dataThermalComforts->Coeff(2) = 0.0;
                 //  PHYSIOLOGICAL ADJUSTMENTS IN HEAT ACCLIMATION.
                 state.dataThermalComforts->AcclPattern = 1.0 - std::exp(-0.12 * (DayNum - 1.0));
                 state.dataThermalComforts->CoreTempNeut = 36.9 - 0.6 * state.dataThermalComforts->AcclPattern;
@@ -1382,7 +1379,7 @@ namespace ThermalComfort {
                 state.dataThermalComforts->ActLevel -= 0.07 * state.dataThermalComforts->ActLevel * state.dataThermalComforts->AcclPattern;
                 Real64 const SkinTempNeut_fac(1.0 / (1.0 - SkinWetNeut));
                 //  CALCULATION OF CoreTempChange/TempChange & SkinTempChange/TempChange
-                DERIV(state, TempIndiceNum, Temp, TempChange);
+                DERIV(state, TempIndiceNum, state.dataThermalComforts->Temp, state.dataThermalComforts->TempChange);
                 while (true) {
                     //  CALCULATION OF THERMAL SENSATION VOTE (TSV).
                     //  THE TSV MODEL CAN BE APPLIED TO UNACCLIMATED MAN ONLY.
@@ -1403,11 +1400,11 @@ namespace ThermalComfort {
                     state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).ThermalComfortMRT = state.dataThermalComforts->RadTemp;
                     state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).ThermalComfortOpTemp = (state.dataThermalComforts->RadTemp + state.dataThermalComforts->AirTemp) / 2.0;
 
-                    state.dataThermalComforts->CoreTemp = Temp(1);
-                    state.dataThermalComforts->SkinTemp = Temp(2);
+                    state.dataThermalComforts->CoreTemp = state.dataThermalComforts->Temp(1);
+                    state.dataThermalComforts->SkinTemp = state.dataThermalComforts->Temp(2);
                     state.dataThermalComforts->EvapHeatLossSweatPrev = state.dataThermalComforts->EvapHeatLossSweat;
 
-                    RKG(state, TempIndiceNum, state.dataThermalComforts->TimeChange, state.dataThermalComforts->Time, Temp, TempChange, Coeff);
+                    RKG(state, TempIndiceNum, state.dataThermalComforts->TimeChange, state.dataThermalComforts->Time, state.dataThermalComforts->Temp, state.dataThermalComforts->TempChange, state.dataThermalComforts->Coeff);
 
                     if (state.dataThermalComforts->Time > TimeExpos) break;
                 }
@@ -1865,25 +1862,22 @@ namespace ThermalComfort {
         int SurfNum2;                     // surface number used in "for" loop
         int ZoneNum2;                     // zone number index
         Real64 SumAET;                    // Intermediate calculational variable (area*emissivity*T) sum
-        static Array1D<Real64> SurfaceAE; // Product of area and emissivity for each surface
-        static Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
-        static bool FirstTimeError;       // Only report the error message one time
 
         // Initialize ZoneAESum for all zones and SurfaceAE for all surfaces at the start of the simulation
         if (state.dataThermalComforts->FirstTimeSurfaceWeightedFlag) {
-            FirstTimeError = true;
+            state.dataThermalComforts->FirstTimeError = true;
             state.dataThermalComforts->FirstTimeSurfaceWeightedFlag = false;
-            SurfaceAE.allocate(state.dataSurface->TotSurfaces);
-            ZoneAESum.allocate(state.dataGlobal->NumOfZones);
-            SurfaceAE = 0.0;
-            ZoneAESum = 0.0;
+            state.dataThermalComforts->SurfaceAE.allocate(state.dataSurface->TotSurfaces);
+            state.dataThermalComforts->ZoneAESum.allocate(state.dataGlobal->NumOfZones);
+            state.dataThermalComforts->SurfaceAE = 0.0;
+            state.dataThermalComforts->ZoneAESum = 0.0;
             for (SurfNum2 = 1; SurfNum2 <= state.dataSurface->TotSurfaces; ++SurfNum2) {
                 if (state.dataSurface->Surface(SurfNum2).HeatTransSurf) {
-                    SurfaceAE(SurfNum2) = state.dataSurface->Surface(SurfNum2).Area * state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
+                    state.dataThermalComforts->SurfaceAE(SurfNum2) = state.dataSurface->Surface(SurfNum2).Area * state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
                     ZoneNum2 = state.dataSurface->Surface(SurfNum2).Zone;
                     // Do NOT include the contribution of the Surface that is being surface weighted in this calculation since it will already be
                     // accounted for
-                    if ((ZoneNum2 > 0) && (SurfNum2 != SurfNum)) ZoneAESum(ZoneNum2) += SurfaceAE(SurfNum2);
+                    if ((ZoneNum2 > 0) && (SurfNum2 != SurfNum)) state.dataThermalComforts->ZoneAESum(ZoneNum2) += state.dataThermalComforts->SurfaceAE(SurfNum2);
                 }
             }
         }
@@ -1891,23 +1885,23 @@ namespace ThermalComfort {
         // Calculate the sum of area*emissivity and area*emissivity*temperature for all surfaces in the zone EXCEPT the surface being weighted
         // Note that area*emissivity needs to be recalculated because of the possibility of changes to the emissivity via the EMS
         SumAET = 0.0;
-        ZoneAESum(ZoneNum) = 0.0;
+        state.dataThermalComforts->ZoneAESum(ZoneNum) = 0.0;
         for (SurfNum2 = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum2 <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum2) {
             if (SurfNum2 != SurfNum) {
-                SurfaceAE(SurfNum2) = state.dataSurface->Surface(SurfNum2).Area * state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
-                SumAET += SurfaceAE(SurfNum2) * state.dataHeatBalSurf->TH(2, 1, SurfNum2);
-                ZoneAESum(ZoneNum) += SurfaceAE(SurfNum2);
+                state.dataThermalComforts->SurfaceAE(SurfNum2) = state.dataSurface->Surface(SurfNum2).Area * state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
+                SumAET += state.dataThermalComforts->SurfaceAE(SurfNum2) * state.dataHeatBalSurf->TH(2, 1, SurfNum2);
+                state.dataThermalComforts->ZoneAESum(ZoneNum) += state.dataThermalComforts->SurfaceAE(SurfNum2);
             }
         }
 
         // Now weight the MRT--half comes from the surface used for weighting (SurfNum) and the rest from the adjusted MRT that excludes this surface
-        if (ZoneAESum(ZoneNum) > 0.01) {
-            CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->TH(2, 1, SurfNum) + (SumAET / ZoneAESum(ZoneNum)));
+        if (state.dataThermalComforts->ZoneAESum(ZoneNum) > 0.01) {
+            CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->TH(2, 1, SurfNum) + (SumAET / state.dataThermalComforts->ZoneAESum(ZoneNum)));
         } else {
-            if (FirstTimeError) {
+            if (state.dataThermalComforts->FirstTimeError) {
                 ShowWarningError(state, "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\"");
                 ShowContinueError(state, "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone.");
-                FirstTimeError = false;
+                state.dataThermalComforts->FirstTimeError = false;
                 CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->TH(2, 1, SurfNum) + state.dataHeatBalFanSys->MAT(ZoneNum));
             }
         }
@@ -2434,12 +2428,9 @@ namespace ThermalComfort {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string lineAvg;
         std::string epwLine;
-        static Real64 avgDryBulbASH(0.0);
         Real64 dryBulb;
-        static Array1D<Real64> monthlyTemp(12, 0.0);
         Real64 tComf;
         Real64 numOccupants;
-        static bool useStatData(false);
         int readStat;
         int jStartDay;
         int calcStartDay;
@@ -2455,9 +2446,9 @@ namespace ThermalComfort {
 
         if (initiate) { // not optional on initiate=true.  would otherwise check for presence
             weathersimulation = wthrsim;
-            avgDryBulbASH = 0.0;
+            state.dataThermalComforts->avgDryBulbASH = 0.0;
             state.dataThermalComforts->runningAverageASH = 0.0;
-            monthlyTemp = 0.0;
+            state.dataThermalComforts->monthlyTemp = 0.0;
             inavgdrybulb = avgdrybulb;
         } else {
             weathersimulation = false;
@@ -2483,9 +2474,9 @@ namespace ThermalComfort {
                     }
                 }
                 for (i = 1; i <= 12; ++i) {
-                    monthlyTemp(i) = StrToReal(GetColumnUsingTabs(lineAvg, i + 2));
+                    state.dataThermalComforts->monthlyTemp(i) = StrToReal(GetColumnUsingTabs(lineAvg, i + 2));
                 }
-                useStatData = true;
+                state.dataThermalComforts->useStatData = true;
             } else if (epwFileExists) {
                 // determine number of days in year
                 int DaysInYear;
@@ -2508,7 +2499,7 @@ namespace ThermalComfort {
                         epwFile.readLine();
                     }
                     for (i = 1; i <= 30; ++i) {
-                        avgDryBulbASH = 0.0;
+                        state.dataThermalComforts->avgDryBulbASH = 0.0;
                         for (j = 1; j <= 24; ++j) {
                             epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
@@ -2517,9 +2508,9 @@ namespace ThermalComfort {
                             }
                             pos = index(epwLine, ',');
                             dryBulb = StrToReal(epwLine.substr(0, pos));
-                            avgDryBulbASH += (dryBulb / 24.0);
+                            state.dataThermalComforts->avgDryBulbASH += (dryBulb / 24.0);
                         }
-                        state.dataThermalComforts->DailyAveOutTemp(i) = avgDryBulbASH;
+                        state.dataThermalComforts->DailyAveOutTemp(i) = state.dataThermalComforts->avgDryBulbASH;
                     }
                 } else { // Do special things for wrapping the epw
                     calcEndDay = jStartDay;
@@ -2527,7 +2518,7 @@ namespace ThermalComfort {
                     calcEndHr = 24 * calcEndDay;
                     calcStartHr = 24 * calcStartDay + 1;
                     for (i = 1; i <= calcEndDay; ++i) {
-                        avgDryBulbASH = 0.0;
+                        state.dataThermalComforts->avgDryBulbASH = 0.0;
                         for (j = 1; j <= 24; ++j) {
                             epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
@@ -2536,15 +2527,15 @@ namespace ThermalComfort {
                             }
                             pos = index(epwLine, ',');
                             dryBulb = StrToReal(epwLine.substr(0, pos));
-                            avgDryBulbASH += (dryBulb / 24.0);
+                            state.dataThermalComforts->avgDryBulbASH += (dryBulb / 24.0);
                         }
-                        state.dataThermalComforts->DailyAveOutTemp(i + 30 - calcEndDay) = avgDryBulbASH;
+                        state.dataThermalComforts->DailyAveOutTemp(i + 30 - calcEndDay) = state.dataThermalComforts->avgDryBulbASH;
                     }
                     for (i = calcEndHr + 1; i <= calcStartHr - 1; ++i) {
                         epwLine = epwFile.readLine().data;
                     }
                     for (i = 1; i <= 30 - calcEndDay; ++i) {
-                        avgDryBulbASH = 0.0;
+                        state.dataThermalComforts->avgDryBulbASH = 0.0;
                         for (j = 1; j <= 24; ++j) {
                             epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
@@ -2553,46 +2544,46 @@ namespace ThermalComfort {
                             }
                             pos = index(epwLine, ',');
                             dryBulb = StrToReal(epwLine.substr(0, pos));
-                            avgDryBulbASH += (dryBulb / 24.0);
+                            state.dataThermalComforts->avgDryBulbASH += (dryBulb / 24.0);
                         }
-                        state.dataThermalComforts->DailyAveOutTemp(i) = avgDryBulbASH;
+                        state.dataThermalComforts->DailyAveOutTemp(i) = state.dataThermalComforts->avgDryBulbASH;
                     }
                 }
                 state.dataThermalComforts->useEpwData = true;
             }
         } else if (initiate && !weathersimulation) {
             state.dataThermalComforts->runningAverageASH = inavgdrybulb;
-            monthlyTemp = inavgdrybulb;
-            avgDryBulbASH = 0.0;
+            state.dataThermalComforts->monthlyTemp = inavgdrybulb;
+            state.dataThermalComforts->avgDryBulbASH = 0.0;
         }
 
         if (initiate) return;
 
         if (state.dataGlobal->BeginDayFlag && state.dataThermalComforts->useEpwData) {
             // Update the running average, reset the daily avg
-            state.dataThermalComforts->DailyAveOutTemp(30) = avgDryBulbASH;
+            state.dataThermalComforts->DailyAveOutTemp(30) = state.dataThermalComforts->avgDryBulbASH;
             Real64 sum = 0.0;
             for (i = 1; i <= 29; i++) {
                 sum += state.dataThermalComforts->DailyAveOutTemp(i);
             }
-            state.dataThermalComforts->runningAverageASH = (sum + avgDryBulbASH) / 30.0;
+            state.dataThermalComforts->runningAverageASH = (sum + state.dataThermalComforts->avgDryBulbASH) / 30.0;
             for (i = 1; i <= 29; i++) {
                 state.dataThermalComforts->DailyAveOutTemp(i) = state.dataThermalComforts->DailyAveOutTemp(i + 1);
             }
-            avgDryBulbASH = 0.0;
+            state.dataThermalComforts->avgDryBulbASH = 0.0;
         }
 
         // If exists BeginMonthFlag we can use it to call InvJulianDay once per month.
-        if (state.dataGlobal->BeginDayFlag && useStatData) {
+        if (state.dataGlobal->BeginDayFlag && state.dataThermalComforts->useStatData) {
             //  CALL InvJulianDay(DayOfYear,pMonth,pDay,0)
             //  runningAverageASH = monthlyTemp(pMonth)
-            state.dataThermalComforts->runningAverageASH = monthlyTemp(state.dataEnvrn->Month);
+            state.dataThermalComforts->runningAverageASH = state.dataThermalComforts->monthlyTemp(state.dataEnvrn->Month);
         }
 
         // Update the daily average
         // IF (BeginHourFlag .and. useEpwData) THEN
         if (state.dataGlobal->BeginHourFlag) {
-            avgDryBulbASH += (state.dataEnvrn->OutDryBulbTemp / 24.0);
+            state.dataThermalComforts->avgDryBulbASH += (state.dataEnvrn->OutDryBulbTemp / 24.0);
         }
 
         for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= state.dataHeatBal->TotPeople; ++state.dataThermalComforts->PeopleNum) {
@@ -2672,14 +2663,10 @@ namespace ThermalComfort {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string epwLine;
-        static Real64 avgDryBulbCEN(0.0);
         Real64 dryBulb;
         Real64 tComf;
         Real64 tComfLow;
-        static Real64 runningAverageCEN(0.0);
         Real64 numOccupants;
-        static bool useEpwData(false);
-        static bool firstDaySet(false); // first day is set with initiate -- so do not update
         int readStat;
         int jStartDay;
         int calcStartDay;
@@ -2696,8 +2683,8 @@ namespace ThermalComfort {
         if (initiate) { // not optional on initiate=true.  would otherwise check for presence
             weathersimulation = wthrsim;
             inavgdrybulb = avgdrybulb;
-            avgDryBulbCEN = 0.0;
-            runningAverageCEN = 0.0;
+            state.dataThermalComforts->avgDryBulbCEN = 0.0;
+            state.dataThermalComforts->runningAverageCEN = 0.0;
         } else {
             weathersimulation = false;
             inavgdrybulb = 0.0;
@@ -2718,9 +2705,9 @@ namespace ThermalComfort {
                     for (i = 1; i <= calcStartHr - 1; ++i) {
                         epwFile.readLine();
                     }
-                    runningAverageCEN = 0.0;
+                    state.dataThermalComforts->runningAverageCEN = 0.0;
                     for (i = 1; i <= 7; ++i) {
-                        avgDryBulbCEN = 0.0;
+                        state.dataThermalComforts->avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
                             epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
@@ -2729,9 +2716,9 @@ namespace ThermalComfort {
                             }
                             pos = index(epwLine, ',');
                             dryBulb = StrToReal(epwLine.substr(0, pos));
-                            avgDryBulbCEN += (dryBulb / 24.0);
+                            state.dataThermalComforts->avgDryBulbCEN += (dryBulb / 24.0);
                         }
-                        runningAverageCEN += alpha_pow(i) * avgDryBulbCEN;
+                        state.dataThermalComforts->runningAverageCEN += alpha_pow(i) * state.dataThermalComforts->avgDryBulbCEN;
                     }
                 } else { // Do special things for wrapping the epw
                     calcEndDay = jStartDay;
@@ -2739,7 +2726,7 @@ namespace ThermalComfort {
                     calcEndHr = 24 * calcEndDay;
                     calcStartHr = 24 * (calcStartDay - 1) + 1;
                     for (i = 1; i <= calcEndDay; ++i) {
-                        avgDryBulbCEN = 0.0;
+                        state.dataThermalComforts->avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
                             epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
@@ -2748,15 +2735,15 @@ namespace ThermalComfort {
                             }
                             pos = index(epwLine, ',');
                             dryBulb = StrToReal(epwLine.substr(0, pos));
-                            avgDryBulbCEN += (dryBulb / 24.0);
+                            state.dataThermalComforts->avgDryBulbCEN += (dryBulb / 24.0);
                         }
-                        runningAverageCEN += std::pow(alpha, calcEndDay - i) * avgDryBulbCEN;
+                        state.dataThermalComforts->runningAverageCEN += std::pow(alpha, calcEndDay - i) * state.dataThermalComforts->avgDryBulbCEN;
                     }
                     for (i = calcEndHr + 1; i <= calcStartHr - 1; ++i) {
                         epwFile.readLine();
                     }
                     for (i = 1; i <= 7 - calcEndDay; ++i) {
-                        avgDryBulbCEN = 0.0;
+                        state.dataThermalComforts->avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
                             epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
@@ -2765,33 +2752,33 @@ namespace ThermalComfort {
                             }
                             pos = index(epwLine, ',');
                             dryBulb = StrToReal(epwLine.substr(0, pos));
-                            avgDryBulbCEN += (dryBulb / 24.0);
+                            state.dataThermalComforts->avgDryBulbCEN += (dryBulb / 24.0);
                         }
-                        runningAverageCEN += alpha_pow(i) * avgDryBulbCEN;
+                        state.dataThermalComforts->runningAverageCEN += alpha_pow(i) * state.dataThermalComforts->avgDryBulbCEN;
                     }
                 }
-                runningAverageCEN *= (1.0 - alpha);
-                avgDryBulbCEN = 0.0;
-                useEpwData = true;
-                firstDaySet = true;
+                state.dataThermalComforts->runningAverageCEN *= (1.0 - alpha);
+                state.dataThermalComforts->avgDryBulbCEN = 0.0;
+                state.dataThermalComforts->useEpwDataCEN = true;
+                state.dataThermalComforts->firstDaySet = true;
             }
         } else if (initiate && !weathersimulation) {
-            runningAverageCEN = inavgdrybulb;
-            avgDryBulbCEN = 0.0;
+            state.dataThermalComforts->runningAverageCEN = inavgdrybulb;
+            state.dataThermalComforts->avgDryBulbCEN = 0.0;
         }
         if (initiate) return;
 
-        if (state.dataGlobal->BeginDayFlag && !firstDaySet) {
+        if (state.dataGlobal->BeginDayFlag && !state.dataThermalComforts->firstDaySet) {
             // Update the running average, reset the daily avg
-            runningAverageCEN = 0.2 * runningAverageCEN + 0.8 * avgDryBulbCEN;
-            avgDryBulbCEN = 0.0;
+            state.dataThermalComforts->runningAverageCEN = 0.2 * state.dataThermalComforts->runningAverageCEN + 0.8 * state.dataThermalComforts->avgDryBulbCEN;
+            state.dataThermalComforts->avgDryBulbCEN = 0.0;
         }
 
-        firstDaySet = false;
+        state.dataThermalComforts->firstDaySet = false;
 
         // Update the daily average
         if (state.dataGlobal->BeginHourFlag) {
-            avgDryBulbCEN += (state.dataEnvrn->OutDryBulbTemp / 24.0);
+            state.dataThermalComforts->avgDryBulbCEN += (state.dataEnvrn->OutDryBulbTemp / 24.0);
         }
 
         for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= state.dataHeatBal->TotPeople; ++state.dataThermalComforts->PeopleNum) {
@@ -2805,14 +2792,14 @@ namespace ThermalComfort {
             state.dataThermalComforts->RadTemp = CalcRadTemp(state, state.dataThermalComforts->PeopleNum);
             state.dataThermalComforts->OpTemp = (state.dataThermalComforts->AirTemp + state.dataThermalComforts->RadTemp) / 2.0;
             state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).ThermalComfortOpTemp = state.dataThermalComforts->OpTemp;
-            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).CEN15251RunningMeanOutdoorTemp = runningAverageCEN;
-            if (runningAverageCEN >= 10.0 && runningAverageCEN <= 30.0) {
+            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).CEN15251RunningMeanOutdoorTemp = state.dataThermalComforts->runningAverageCEN;
+            if (state.dataThermalComforts->runningAverageCEN >= 10.0 && state.dataThermalComforts->runningAverageCEN <= 30.0) {
                 // Calculate the comfort here (people/output handling loop)
                 numOccupants = state.dataHeatBal->People(state.dataThermalComforts->PeopleNum).NumberOfPeople * GetCurrentScheduleValue(state, state.dataHeatBal->People(state.dataThermalComforts->PeopleNum).NumberOfPeoplePtr);
-                tComf = 0.33 * runningAverageCEN + 18.8;
+                tComf = 0.33 * state.dataThermalComforts->runningAverageCEN + 18.8;
                 state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).TComfCEN15251 = tComf;
                 if (numOccupants > 0) {
-                    if (runningAverageCEN < 15) {
+                    if (state.dataThermalComforts->runningAverageCEN < 15) {
                         tComfLow = 23.75; // Lower limit is constant in this region
                     } else {
                         tComfLow = tComf;
