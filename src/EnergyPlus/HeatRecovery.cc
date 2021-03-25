@@ -308,7 +308,7 @@ namespace HeatRecovery {
         int NumNumbers;                                                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                                                   // Used in GetObjectItem
         bool ErrorsFound(false);                                 // Set to true if errors in input, fatal at end of routine
-        static std::string HeatExchPerfType;                            // Desiccant balanced heat exchanger performance data type
+        std::string HeatExchPerfType;                            // Desiccant balanced heat exchanger performance data type
         constexpr const char * RoutineName("GetHeatRecoveryInput: "); // include trailing blank space
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
@@ -3509,8 +3509,8 @@ namespace HeatRecovery {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         int SolFla;               // Flag of solver
-        static Real64 NTU0(0.0);  // lower bound for NTU
-        static Real64 NTU1(50.0); // upper bound for NTU
+        Real64 const NTU0(0.0);  // lower bound for NTU
+        Real64 const NTU1(50.0); // upper bound for NTU
         Array1D<Real64> Par(2);
 
         Par(1) = Eps;
@@ -3629,13 +3629,13 @@ namespace HeatRecovery {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static std::string CharValue;          // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto & OutputChar = state.dataHeatRecovery->OutputChar;
+        auto & OutputCharLo = state.dataHeatRecovery->OutputCharLo;
+        auto & OutputCharHi = state.dataHeatRecovery->OutputCharHi;
+        auto & CharValue = state.dataHeatRecovery->CharValue;
+        auto & TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast;
+        auto & CurrentEndTime = state.dataHeatRecovery->CurrentEndTime;
+        auto & CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast;
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -3978,13 +3978,14 @@ namespace HeatRecovery {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static std::string CharValue;          // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto & OutputChar = state.dataHeatRecovery->OutputChar2;
+        auto & OutputCharLo = state.dataHeatRecovery->OutputCharLo2;
+        auto & OutputCharHi = state.dataHeatRecovery->OutputCharHi2;
+        auto & CharValue = state.dataHeatRecovery->CharValue2;
+        auto & TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast2;
+        auto & CurrentEndTime = state.dataHeatRecovery->CurrentEndTime2;
+        auto & CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast2;
+
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -4324,13 +4325,13 @@ namespace HeatRecovery {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static std::string CharValue;          // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto & OutputChar = state.dataHeatRecovery->OutputChar3;
+        auto & OutputCharLo = state.dataHeatRecovery->OutputCharLo3;
+        auto & OutputCharHi = state.dataHeatRecovery->OutputCharHi3;
+        auto & CharValue = state.dataHeatRecovery->CharValue3;
+        auto & TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast3;
+        auto & CurrentEndTime = state.dataHeatRecovery->CurrentEndTime3;
+        auto & CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast3;
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -4492,13 +4493,13 @@ namespace HeatRecovery {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static std::string CharValue;          // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto & OutputChar = state.dataHeatRecovery->OutputChar4;
+        auto & OutputCharLo = state.dataHeatRecovery->OutputCharLo4;
+        auto & OutputCharHi = state.dataHeatRecovery->OutputCharHi4;
+        auto & CharValue = state.dataHeatRecovery->CharValue4;
+        auto & TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast4;
+        auto & CurrentEndTime = state.dataHeatRecovery->CurrentEndTime4;
+        auto & CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast4;
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -4650,27 +4651,14 @@ namespace HeatRecovery {
 
         using Psychrometrics::PsyRhFnTdbWPb;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  CHARACTER(len=*), PARAMETER :: OutputFormat  ='(F10.6)'
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 RegenInletRH(0.0);       // Regeneration inlet air relative humidity
-        static Real64 ProcInletRH(0.0);        // Process inlet air relative humidity
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto & RegenInletRH = state.dataHeatRecovery->RegenInletRH2;
+        auto & ProcInletRH = state.dataHeatRecovery->ProcInletRH2;
+        auto & OutputChar = state.dataHeatRecovery->OutputChar6;
+        auto & OutputCharLo = state.dataHeatRecovery->OutputCharLo6;
+        auto & OutputCharHi = state.dataHeatRecovery->OutputCharHi6;
+        auto & TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast6;
+        auto & CurrentEndTime = state.dataHeatRecovery->CurrentEndTime6;
+        auto & CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast6;
         // current end time is compared with last to see if time step changed
 
         if (state.dataGlobal->WarmupFlag || FirstHVACIteration) return;
@@ -4850,14 +4838,14 @@ namespace HeatRecovery {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 RegenInletRH(0.0);       // Regeneration inlet air relative humidity
-        static Real64 ProcInletRH(0.0);        // Process inlet air relative humidity
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto & RegenInletRH = state.dataHeatRecovery->RegenInletRH;
+        auto & ProcInletRH = state.dataHeatRecovery->ProcInletRH;
+        auto & OutputChar = state.dataHeatRecovery->OutputChar5;
+        auto & OutputCharLo = state.dataHeatRecovery->OutputCharLo5;
+        auto & OutputCharHi = state.dataHeatRecovery->OutputCharHi5;
+        auto & TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast5;
+        auto & CurrentEndTime = state.dataHeatRecovery->CurrentEndTime5;
+        auto & CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast5;
         // current end time is compared with last to see if time step changed
 
         if (state.dataGlobal->WarmupFlag || FirstHVACIteration) return;
@@ -5016,24 +5004,12 @@ namespace HeatRecovery {
         auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS
+        auto & OutputCharProc = state.dataHeatRecovery->OutputCharProc;
+        auto & OutputCharRegen = state.dataHeatRecovery->OutputCharRegen;
+        auto & TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast7;
+        auto & CurrentEndTime = state.dataHeatRecovery->CurrentEndTime7;
+        auto & CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast7;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  CHARACTER(len=*), PARAMETER :: OutputFormat  ='(F10.6)'
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string OutputCharProc;     // character string for warning messages
-        static std::string OutputCharRegen;    // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
         // current end time is compared with last to see if time step changed
         Real64 ABSImbalancedFlow; // absolute value of process and regeneration air flow imbalance fraction
 
