@@ -942,7 +942,6 @@ namespace EnergyPlus::ExternalInterface {
 
         // Using/Aliasing
         using DataStringGlobals::altpathChar;
-        using DataStringGlobals::CurrentWorkingFolder;
         using DataStringGlobals::pathChar;
         using DataSystemVariables::CheckForActualFileName;
 

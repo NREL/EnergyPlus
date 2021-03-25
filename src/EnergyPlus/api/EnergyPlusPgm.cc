@@ -226,12 +226,6 @@ int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath
 
 void commonInitialize(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
-
-    // Windows: ensure that EnergyPlusAPI.dll's notion of the "static singleton IOFiles" matches
-    // the exe's notion.
-    // TODO: Remove this after we have eliminated all remaining calls to IOFiles::getSingleton
-    EnergyPlus::IOFiles::setSingleton(&state.files);
-
     // Disable C++ i/o synching with C methods for speed
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
@@ -263,12 +257,12 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
     epStartTime("EntireRun=");
 #endif
 
-    DataStringGlobals::CurrentDateTime = CreateCurrentDateTimeString();
+    state.dataStrGlobals->CurrentDateTime = CreateCurrentDateTimeString();
 
     state.dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setStartDateTimeStamp(state.dataStrGlobals->CurrentDateTime.substr(5));
 
-    DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
+    DataStringGlobals::VerString += "," + state.dataStrGlobals->CurrentDateTime;
 
     DataSystemVariables::processEnvironmentVariables(state);
 
@@ -323,7 +317,7 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
             DisplayString(state, "Couldn't change directory; aborting EnergyPlus");
             return EXIT_FAILURE;
         }
-        DataStringGlobals::ProgramPath = filepath + DataStringGlobals::pathChar;
+        state.dataStrGlobals->ProgramPath = filepath + DataStringGlobals::pathChar;
         int dummy_argc = 1;
         const char *dummy_argv[1] = {"energyplus"};
         CommandLineInterface::ProcessArgs(state, dummy_argc, dummy_argv);
