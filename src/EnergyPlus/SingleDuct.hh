@@ -354,19 +354,127 @@ struct SingleDuctData : BaseGlobalStruct {
     bool InitATMixerFlag = true;           // Flag set to make sure you do begin simulation initializaztions once for mixer
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
+    int SysNumGSI = 0;   // The Sys that you are currently loading input into
+    int SysIndexGSI = 0; // The Sys that you are currently loading input into
+    int NumVAVSysGSI = 0;
+    int NumNoRHVAVSysGSI = 0;
+    int NumVAVVSGSI = 0;
+    int NumCBVAVSysGSI = 0;
+    int NumNoRHCBVAVSysGSI = 0;
+    int NumAlphasGSI = 0;
+    int NumNumsGSI = 0;
+    int NumCVNoReheatSysGSI = 0;
+    int MaxNumsGSI = 0;           // Maximum number of numeric input fields
+    int MaxAlphasGSI = 0;         // Maximum number of alpha input fields
+    int TotalArgsGSI = 0;         // Total number of alpha and numeric arguments  = max for a
+    Real64 CoilInTempSS = 0.0;
+    Real64 DesCoilLoadSS = 0.0;
+    Real64 DesZoneHeatLoadSS = 0.0;
+    Real64 ZoneDesTempSS = 0.0;
+    Real64 ZoneDesHumRatSS = 0.0;
+    int CoilWaterInletNodeSS = 0;
+    int CoilWaterOutletNodeSS = 0;
+    int CoilSteamInletNodeSS = 0;
+    int CoilSteamOutletNodeSS = 0;
+    int DummyWaterIndexSS = 1;
+    Real64 UserInputMaxHeatAirVolFlowRateSS = 0.0; // user input for MaxHeatAirVolFlowRate
+    Real64 MinAirMassFlowRevActSVAV = 0.0; // minimum air mass flow rate used in "reverse action" air mass flow rate calculation
+    Real64 MaxAirMassFlowRevActSVAV = 0.0; // maximum air mass flow rate used in "reverse action" air mass flow rate calculation
+    Real64 ZoneTempSCBVAV = 0.0;       // zone air temperature [C]
+    Real64 MaxHeatTempSCBVAV = 0.0;    // maximum supply air temperature [C]
+    Real64 MassFlowReqSCBVAV = 0.0;    // air mass flow rate required to meet the coil heating load [W]
+    Real64 MassFlowActualSCBVAV = 0.0; // air mass flow rate actually used [W]
+    Real64 QZoneMaxSCBVAV = 0.0;       // maximum zone heat addition rate given constraints of MaxHeatTemp and max        /
+                                       // available air mass flow rate [W]
+    Real64 MinMassAirFlowSCBVAV = 0.0; // the air flow rate during heating for normal acting damper
+    Real64 QZoneMax2SCBVAV = 0.0;      // temporary variable
+    Real64 QZoneMax3SCBVAV = 0.0;      // temporary variable
+    Real64 TAirMaxSCV = 0.0;  // Maximum zone supply air temperature [C]
+    Real64 QMaxSCV = 0.0;     // Maximum heat addition rate imposed by the max zone supply air temperature [W]
+    Real64 ZoneTempSCV = 0.0; // Zone temperature [C]
+    Real64 QMax2SCV = 0.0;
+    int SysNumSATM = 0;
+    Real64 PriMassFlowRateCATM = 0.0;
+    Real64 PriEnthalpyCATM = 0.0;
+    Real64 PriHumRatCATM = 0.0;
+    Real64 PriTempCATM = 0.0;
+
+    Real64 SecAirMassFlowRateCATM = 0.0;
+    Real64 SecAirEnthalpyCATM = 0.0;
+    Real64 SecAirHumRatCATM = 0.0;
+    Real64 SecAirTempCATM = 0.0;
+
+    Real64 MixedAirMassFlowRateCATM = 0.0;
+    Real64 MixedAirEnthalpyCATM = 0.0;
+    Real64 MixedAirHumRatCATM = 0.0;
+    Real64 MixedAirTempCATM = 0.0;
+
+
     void clear_state() override {
-        SysATMixer.deallocate();
-        sd_airterminal.deallocate();
-        SysUniqueNames.clear();
-        CheckEquipName.deallocate();
-        NumATMixers = 0;
-        NumConstVolSys = 0;
-        NumSDAirTerminal = 0;
-        GetInputFlag = true;
-        GetATMixerFlag = true;
-        InitSysFlag = true;
-        InitATMixerFlag = true;
-        ZoneEquipmentListChecked = false;
+        this->SysATMixer.deallocate();
+        this->sd_airterminal.deallocate();
+        this->SysUniqueNames.clear();
+        this->CheckEquipName.deallocate();
+        this->NumATMixers = 0;
+        this->NumConstVolSys = 0;
+        this->NumSDAirTerminal = 0;
+        this->GetInputFlag = true;
+        this->GetATMixerFlag = true;
+        this->InitSysFlag = true;
+        this->InitATMixerFlag = true;
+        this->ZoneEquipmentListChecked = false;
+
+        this->SysNumGSI = 0;   // The Sys that you are currently loading input into
+        this->SysIndexGSI = 0; // The Sys that you are currently loading input into
+        this->NumVAVSysGSI = 0;
+        this->NumNoRHVAVSysGSI = 0;
+        this->NumVAVVSGSI = 0;
+        this->NumCBVAVSysGSI = 0;
+        this->NumNoRHCBVAVSysGSI = 0;
+        this->NumAlphasGSI = 0;
+        this->NumNumsGSI = 0;
+        this->NumCVNoReheatSysGSI = 0;
+        this->MaxNumsGSI = 0;   // Maximum number of numeric input fields
+        this->MaxAlphasGSI = 0; // Maximum number of alpha input fields
+        this->TotalArgsGSI = 0; // Total number of alpha and numeric arguments  = max for a
+        this->CoilInTempSS = 0.0;
+        this->DesCoilLoadSS = 0.0;
+        this->DesZoneHeatLoadSS = 0.0;
+        this->ZoneDesTempSS = 0.0;
+        this->ZoneDesHumRatSS = 0.0;
+        this->CoilWaterInletNodeSS = 0;
+        this->CoilWaterOutletNodeSS = 0;
+        this->CoilSteamInletNodeSS = 0;
+        this->CoilSteamOutletNodeSS = 0;
+        this->DummyWaterIndexSS = 1;
+        this->UserInputMaxHeatAirVolFlowRateSS = 0.0; // user input for MaxHeatAirVolFlowRate
+        this->MinAirMassFlowRevActSVAV = 0.0;         // minimum air mass flow rate used in "reverse action" air mass flow rate calculation
+        this->MaxAirMassFlowRevActSVAV = 0.0;         // maximum air mass flow rate used in "reverse action" air mass flow rate calculation
+        this->ZoneTempSCBVAV = 0.0;                   // zone air temperature [C]
+        this->MaxHeatTempSCBVAV = 0.0;                // maximum supply air temperature [C]
+        this->MassFlowReqSCBVAV = 0.0;                // air mass flow rate required to meet the coil heating load [W]
+        this->MassFlowActualSCBVAV = 0.0;             // air mass flow rate actually used [W]
+        this->QZoneMaxSCBVAV = 0.0;                   // maximum zone heat addition rate given constraints of MaxHeatTemp and max        /
+        this->MinMassAirFlowSCBVAV = 0.0; // the air flow rate during heating for normal acting damper
+        this->QZoneMax2SCBVAV = 0.0;      // temporary variable
+        this->QZoneMax3SCBVAV = 0.0;      // temporary variable
+        this->TAirMaxSCV = 0.0;           // Maximum zone supply air temperature [C]
+        this->QMaxSCV = 0.0;              // Maximum heat addition rate imposed by the max zone supply air temperature [W]
+        this->ZoneTempSCV = 0.0;          // Zone temperature [C]
+        this->QMax2SCV = 0.0;
+        this->SysNumSATM = 0;
+        this->PriMassFlowRateCATM = 0.0;
+        this->PriEnthalpyCATM = 0.0;
+        this->PriHumRatCATM = 0.0;
+        this->PriTempCATM = 0.0;
+        this->SecAirMassFlowRateCATM = 0.0;
+        this->SecAirEnthalpyCATM = 0.0;
+        this->SecAirHumRatCATM = 0.0;
+        this->SecAirTempCATM = 0.0;
+        this->MixedAirMassFlowRateCATM = 0.0;
+        this->MixedAirEnthalpyCATM = 0.0;
+        this->MixedAirHumRatCATM = 0.0;
+        this->MixedAirTempCATM = 0.0;
     }
 };
 
