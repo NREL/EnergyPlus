@@ -144,14 +144,52 @@ namespace General {
                    Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
     );
 
-    Real64 InterpSw(Real64 SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
-                    Real64 A,         // Glazing property in unswitched state
-                    Real64 B          // Glazing property in fully switched state
-    );
+    constexpr Real64 InterpGeneral(Real64 const Lower,
+                                Real64 const Upper,
+                                Real64 const InterpFac
+    )
+    {
+        return Lower + InterpFac * (Upper - Lower);
+    }
 
-    Real64 InterpBlind(Real64 ProfAng,           // Profile angle (rad)
-                       Array1A<Real64> PropArray // Array of blind properties
-    );
+    constexpr Real64 InterpProfSlat(Real64 const SlatLower,
+                                    Real64 const SlatUpper,
+                                    Real64 const ProfLower,
+                                    Real64 const ProfUpper,
+                                    Real64 const SlatInterpFac,
+                                    Real64 const ProfInterpFac
+    )
+    {
+        Real64 ValA = SlatLower + SlatInterpFac * (SlatUpper - SlatLower);
+        Real64 ValB = ProfLower + SlatInterpFac * (ProfUpper - ProfLower);
+        return ValA + ProfInterpFac * (ValB - ValA);
+    }
+
+    inline Real64 InterpSw(Real64 const SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
+                           Real64 const A,         // Glazing property in unswitched state
+                           Real64 const B          // Glazing property in fully switched state
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Fred Winkelmann
+        //       DATE WRITTEN   February 1999
+
+        // PURPOSE OF THIS FUNCTION:
+        // For switchable glazing, calculates a weighted average of properties
+        // A and B
+
+        // Return value
+        Real64 InterpSw;
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 locSwitchFac;
+
+        locSwitchFac = min(SwitchFac, 1.0);
+        locSwitchFac = max(locSwitchFac, 0.0);
+
+        InterpSw = (1.0 - locSwitchFac) * A + locSwitchFac * B;
+        return InterpSw;
+    }
 
     Real64 InterpProfAng(Real64 ProfAng,           // Profile angle (rad)
                          Array1S<Real64> PropArray // Array of blind properties
