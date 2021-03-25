@@ -526,9 +526,6 @@ namespace ThermalISO15099Calc {
         Array1D<Real64> frctg = Array1D<Real64>(maxgas);
         Array1D_int ipropg = Array1D_int(maxgas);
 
-        Real64 cpa = 0.0;
-        Real64 aveGlassConductivity = 0.0;
-
         Real64 rtot = 0.0;
         Real64 sft = 0.0;
         Real64 hcins = 0.0;
@@ -541,11 +538,117 @@ namespace ThermalISO15099Calc {
         Real64 fluxs = 0.0;
         Real64 qeff = 0.0;
         Real64 flux_nonsolar = 0.0;
+        Real64 cpa = 0.0;
+        Real64 aveGlassConductivity = 0.0;
+
         int iFP = 0;
         int kFP = 0;
 
         void clear_state() override
         {
+            this->thetas.clear();
+            this->rir.clear();
+            this->hcgass.clear();
+            this->hrgass.clear();
+            this->rs.clear();
+            this->qs.clear();
+            this->qvs.clear();
+            this->LaminateAU.clear();
+            this->sumsolU.clear();
+            this->sol0.clear();
+            this->qcgas.clear();
+            this->qcgaps.clear();
+            this->qrgas.clear();
+            this->qrgaps.clear();
+            this->Atop_NOSD.clear();
+            this->Abot_NOSD.clear();
+            this->Al_NOSD.clear();
+            this->Ar_NOSD.clear();
+            this->Ah_NOSD.clear();
+            this->EffectiveOpenness_NOSD.clear();
+            this->SlatThick_NOSD.clear();
+            this->SlatWidth_NOSD.clear();
+            this->SlatAngle_NOSD.clear();
+            this->SlatCond_NOSD.clear();
+            this->SlatSpacing_NOSD.clear();
+            this->SlatCurve_NOSD.clear();
+            this->vvent_NOSD.clear();
+            this->tvent_NOSD.clear();
+            this->qv_NOSD.clear();
+            this->q_NOSD.clear();
+            this->LayerType_NOSD.clear();
+            this->gap_NOSD.clear();
+            this->thick_NOSD.clear();
+            this->scon_NOSD.clear();
+            this->emis_NOSD.clear();
+            this->rir_NOSD.clear();
+            this->tir_NOSD.clear();
+            this->theta_NOSD.clear();
+            this->frct_NOSD.clear();
+            this->iprop_NOSD.clear();
+            this->nmix_NOSD.clear();
+            this->presure_NOSD.clear();
+            this->hcgas_NOSD.clear();
+            this->hrgas_NOSD.clear();
+            this->LaminateA_NOSD.clear();
+            this->LaminateB_NOSD.clear();
+            this->sumsol_NOSD.clear();
+            this->Ra_NOSD.clear();
+            this->Nu_NOSD.clear();
+            this->Ebb.clear();
+            this->Ebf.clear();
+            this->Rb.clear();
+            this->Rf.clear();
+            this->Ebbs.clear();
+            this->Ebfs.clear();
+            this->Rbs.clear();
+            this->Rfs.clear();
+            this->Ebb_NOSD.clear();
+            this->Ebf_NOSD.clear();
+            this->Rb_NOSD.clear();
+            this->Rf_NOSD.clear();
+            this->ShadeGapKeffConv_NOSD.clear();
+            this->qcgas_NOSD.clear();
+            this->Keff_NOSD.clear();
+            this->qrgas_NOSD.clear();
+            this->nslice_NOSD.clear();
+            this->vfreevent_NOSD.clear();
+            this->vfreevent.clear();
+            this->Atop_eff.clear();
+            this->Abot_eff.clear();
+            this->Al_eff.clear();
+            this->Ar_eff.clear();
+            this->Ah_eff.clear();
+            this->EffectiveOpenness.clear();
+            this->hgas.clear();
+            this->Tgap.clear();
+            this->hcgapMod.clear();
+            this->hcv.clear();
+            this->iprop1.clear();
+            this->frct1.clear();
+            this->frcti.clear();
+            this->ipropi.clear();
+            this->frctg.clear();
+            this->ipropg.clear();
+
+            this->rtot = 0.0;
+            this->sft = 0.0;
+            this->hcins = 0.0;
+            this->hrins = 0.0;
+            this->hins = 0.0;
+            this->hcouts = 0.0;
+            this->hrouts = 0.0;
+            this->houts = 0.0;
+            this->ufactors = 0.0;
+            this->fluxs = 0.0;
+            this->qeff = 0.0;
+            this->flux_nonsolar = 0.0;
+            this->cpa = 0.0;
+            this->aveGlassConductivity = 0.0;
+
+            this->iFP = 0;
+            this->kFP = 0;
+
         }
     };
 
