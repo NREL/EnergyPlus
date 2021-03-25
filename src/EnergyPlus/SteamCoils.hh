@@ -280,7 +280,9 @@ struct SteamCoilsData : BaseGlobalStruct {
     Array1D_bool CheckEquipName;
     bool GetSteamCoilsInputFlag = true; // Flag set to make sure you get input once
     bool MyOneTimeFlag = true;          // one time initialization flag
-
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyPlantScanFlag;
+    int ErrCount = 0;
     Array1D<SteamCoils::SteamCoilEquipConditions> SteamCoil;
 
     void clear_state() override
@@ -292,6 +294,9 @@ struct SteamCoilsData : BaseGlobalStruct {
         MySizeFlag.deallocate();
         CoilWarningOnceFlag.deallocate();
         CheckEquipName.deallocate();
+        this->MyEnvrnFlag.clear();
+        this->MyPlantScanFlag.clear();
+        this->ErrCount = 0;
     }
 
     // Default Constructor

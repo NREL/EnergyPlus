@@ -238,7 +238,7 @@ namespace SteamCoils {
         Array1D<Real64> NumArray;        // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
+        int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
                                          //  certain object in the input file
 
         CurrentModuleObject = "Coil:Heating:Steam";
@@ -456,8 +456,8 @@ namespace SteamCoils {
         int AirOutletNode;
         Real64 SteamDensity;
         Real64 StartEnthSteam;
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyPlantScanFlag;
+        auto & MyEnvrnFlag = state.dataSteamCoils->MyEnvrnFlag;
+        auto & MyPlantScanFlag = state.dataSteamCoils->MyPlantScanFlag;
         bool errFlag;
 
         if (state.dataSteamCoils->MyOneTimeFlag) {
@@ -988,31 +988,31 @@ namespace SteamCoils {
         static std::string const RoutineName("CalcSteamAirCoil");
         static std::string const RoutineNameSizeSteamCoil("SizeSteamCoil");
 
-        static Real64 SteamMassFlowRate(0.0);
-        static Real64 AirMassFlow(0.0); // [kg/sec]
-        static Real64 TempAirIn(0.0);   // [C]
-        static Real64 TempAirOut(0.0);  // [C]
-        static Real64 Win(0.0);
-        static Real64 TempSteamIn(0.0);
-        static Real64 TempWaterOut(0.0);
-        static Real64 CapacitanceAir(0.0);
-        static Real64 HeatingCoilLoad(0.0);
-        static Real64 CoilPress(0.0);
-        static Real64 EnthSteamInDry(0.0);
-        static Real64 EnthSteamOutWet(0.0);
-        static Real64 LatentHeatSteam(0.0);
-        static Real64 SubcoolDeltaTemp(0.0);
-        static Real64 TempSetPoint(0.0);
-        static Real64 QCoilReq(0.0);
-        static Real64 QCoilCap(0.0);
-        static Real64 QSteamCoilMaxHT(0.0);
-        static Real64 TempWaterAtmPress(0.0);
-        static Real64 TempLoopOutToPump(0.0);
-        static Real64 EnergyLossToEnvironment(0.0);
-        static Real64 EnthCoilOutlet(0.0);
-        static Real64 EnthPumpInlet(0.0);
-        static Real64 EnthAtAtmPress(0.0);
-        static Real64 CpWater(0.0);
+        Real64 SteamMassFlowRate(0.0);
+        Real64 AirMassFlow(0.0); // [kg/sec]
+        Real64 TempAirIn(0.0);   // [C]
+        Real64 TempAirOut(0.0);  // [C]
+        Real64 Win(0.0);
+        Real64 TempSteamIn(0.0);
+        Real64 TempWaterOut(0.0);
+        Real64 CapacitanceAir(0.0);
+        Real64 HeatingCoilLoad(0.0);
+        Real64 CoilPress(0.0);
+        Real64 EnthSteamInDry(0.0);
+        Real64 EnthSteamOutWet(0.0);
+        Real64 LatentHeatSteam(0.0);
+        Real64 SubcoolDeltaTemp(0.0);
+        Real64 TempSetPoint(0.0);
+        Real64 QCoilReq(0.0);
+        Real64 QCoilCap(0.0);
+        Real64 QSteamCoilMaxHT(0.0);
+        Real64 TempWaterAtmPress(0.0);
+        Real64 TempLoopOutToPump(0.0);
+        Real64 EnergyLossToEnvironment(0.0);
+        Real64 EnthCoilOutlet(0.0);
+        Real64 EnthPumpInlet(0.0);
+        Real64 EnthAtAtmPress(0.0);
+        Real64 CpWater(0.0);
 
         QCoilReq = QCoilRequested;
         TempAirIn = state.dataSteamCoils->SteamCoil(CoilNum).InletAirTemp;
@@ -1578,7 +1578,7 @@ namespace SteamCoils {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
-        static int ErrCount(0);
+        auto & ErrCount = state.dataSteamCoils->ErrCount;
 
         // Obtains and Allocates SteamCoil related parameters from input file
         if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered

@@ -165,6 +165,18 @@ struct NodeInputManagerData : BaseGlobalStruct
     // Object Data
     Array1D<NodeInputManager::NodeListDef> NodeLists; // Node Lists
 
+    Real64 RhoAirStdInit;
+    Real64 RhoWaterStdInit;
+    Array1D_int NodeWetBulbSchedPtr;
+    Array1D_bool NodeRelHumidityRepReq;
+    Array1D_int NodeRelHumiditySchedPtr;
+    Array1D_bool NodeDewPointRepReq;
+    Array1D_int NodeDewPointSchedPtr;
+    Array1D_bool NodeSpecificHeatRepReq;
+    Array1D_int NodeSpecificHeatSchedPtr;
+    std::vector<std::string> nodeReportingStrings;
+    std::vector<std::string> nodeFluidNames;
+
     void clear_state() override
     {
         this->CalcMoreNodeInfoMyOneTimeFlag = true;
