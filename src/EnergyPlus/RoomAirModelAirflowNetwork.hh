@@ -98,9 +98,6 @@ namespace RoomAirModelAirflowNetwork {
     };
 
     // Object data
-    extern Array1D<RAFNData> RAFN;
-
-    void clear_state();
 
     void SimRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
@@ -112,10 +109,19 @@ namespace RoomAirModelAirflowNetwork {
 
 struct RoomAirModelAirflowNetworkData : BaseGlobalStruct
 {
+    bool InitRoomAirModelAirflowNetworkOneTimeFlag = true;
+    bool InitRoomAirModelAirflowNetworkOneTimeFlagConf = true;
+    bool InitRoomAirModelAirflowNetworkEnvrnFlag = true;
+    bool LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = true;
+    Array1D<RoomAirModelAirflowNetwork::RAFNData> RAFN;
 
     void clear_state() override
     {
-
+        this->InitRoomAirModelAirflowNetworkOneTimeFlag = true;
+        this->InitRoomAirModelAirflowNetworkOneTimeFlagConf = true;
+        this->InitRoomAirModelAirflowNetworkEnvrnFlag = true;
+        this->LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = true;
+        this->RAFN.clear();
     }
 };
 

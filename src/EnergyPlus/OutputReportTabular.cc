@@ -4260,9 +4260,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHVACGlobals::EvapCooled;
         auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using DataHVACGlobals::WaterCooled;
-        using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
-        using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
-
         static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataEnvrn->OutDryBulbTemp);
         static Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
         Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
@@ -4279,8 +4276,8 @@ namespace EnergyPlus::OutputReportTabular {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
                 state.dataCondenserLoopTowers->towers(iCooler).Qactual * TimeStepSysSec + state.dataCondenserLoopTowers->towers(iCooler).FanEnergy + state.dataCondenserLoopTowers->towers(iCooler).BasinHeaterConsumption;
         }
-        for (int iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
-            state.dataHeatBal->SysTotalHVACRejectHeatLoss += SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
+        for (int iCooler = 1; iCooler <= state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers; ++iCooler) {
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataEvapFluidCoolers->SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + state.dataEvapFluidCoolers->SimpleEvapFluidCooler(iCooler).FanEnergy;
         }
         for (auto &cooler : state.dataFluidCoolers->SimpleFluidCooler) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
@@ -11004,7 +11001,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
 
                 //---- Hybrid Model: Internal Thermal Mass Sub-Table
-                if (FlagHybridModel_TM) {
+                if (state.dataHybridModel->FlagHybridModel_TM) {
                     rowHead.allocate(state.dataGlobal->NumOfZones);
                     NumOfCol = 2;
                     columnHead.allocate(NumOfCol);
@@ -11020,7 +11017,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                     for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                         rowHead(iZone) = Zone(iZone).Name;
-                        if (HybridModelZone(iZone).InternalThermalMassCalc_T) {
+                        if (state.dataHybridModel->HybridModelZone(iZone).InternalThermalMassCalc_T) {
                             tableBody(1, iZone) = "Yes";
                         } else {
                             tableBody(1, iZone) = "No";

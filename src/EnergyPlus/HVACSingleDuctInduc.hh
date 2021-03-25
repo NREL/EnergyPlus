@@ -200,15 +200,15 @@ struct HVACSingleDuctInducData : BaseGlobalStruct {
     void clear_state() override
     {
         this->NumIndUnits = 0;
-        this->NumFourPipes = 0;
-        this->CheckEquipName.clear();
+        this->IndUnit.deallocate();
         this->GetIUInputFlag = true;
+        this->NumFourPipes = 0;
         this->MyOneTimeFlag = true;
         this->MyEnvrnFlag.deallocate();
         this->MySizeFlag.deallocate();
         this->MyPlantScanFlag.deallocate();
         this->MyAirDistInitFlag.deallocate();
-        this->IndUnit.deallocate();
+        this->CheckEquipName.deallocate();
         this->ZoneEquipmentListChecked = false;
     }
 };

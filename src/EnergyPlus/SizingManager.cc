@@ -1085,7 +1085,6 @@ namespace EnergyPlus::SizingManager {
                     for (int indUnitNum = 1; indUnitNum <= NumIndUnits; ++indUnitNum) {
                         if (AirLoopNum == IndUnit(indUnitNum).AirLoopNum) {
                             int termUnitSizingIndex = AirDistUnit(IndUnit(indUnitNum).ADUNum).TermUnitSizingNum;
-
                             airLoopHeatingMaximumFlowRateSum +=
                                 IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             airLoopHeatingMinimumFlowRateSum +=

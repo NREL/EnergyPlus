@@ -769,7 +769,7 @@ namespace SurfaceGeometry {
         } // ZoneNum
 
         // Set up solar distribution enclosures allowing for any air boundaries
-        SetupEnclosuresAndAirBoundaries(state, DataViewFactorInformation::ZoneSolarInfo, SurfaceGeometry::enclosureType::SolarEnclosures, ErrorsFound);
+        SetupEnclosuresAndAirBoundaries(state, state.dataViewFactor->ZoneSolarInfo, SurfaceGeometry::enclosureType::SolarEnclosures, ErrorsFound);
 
         // Do the Stratosphere check
         SetZoneOutBulbTempAt(state);
@@ -2330,7 +2330,7 @@ namespace SurfaceGeometry {
         GetSurfaceHeatTransferAlgorithmOverrides(state, ErrorsFound);
 
         // Set up enclosures, process Air Boundaries if any
-        SetupEnclosuresAndAirBoundaries(state, DataViewFactorInformation::ZoneRadiantInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
+        SetupEnclosuresAndAirBoundaries(state, state.dataViewFactor->ZoneRadiantInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
 
         GetSurfaceSrdSurfsData(state, ErrorsFound);
 
@@ -13203,9 +13203,9 @@ namespace SurfaceGeometry {
                 }
             }
             if (radiantSetup) {
-                DataViewFactorInformation::NumOfRadiantEnclosures = enclosureNum;
+                state.dataViewFactor->NumOfRadiantEnclosures = enclosureNum;
             } else {
-                DataViewFactorInformation::NumOfSolarEnclosures = enclosureNum;
+                state.dataViewFactor->NumOfSolarEnclosures = enclosureNum;
             }
         } else {
             // There are no grouped radiant air boundaries, assign each zone to it's own radiant enclosure
@@ -13224,9 +13224,9 @@ namespace SurfaceGeometry {
                 }
             }
             if (radiantSetup) {
-                DataViewFactorInformation::NumOfRadiantEnclosures = state.dataGlobal->NumOfZones;
+                state.dataViewFactor->NumOfRadiantEnclosures = state.dataGlobal->NumOfZones;
             } else {
-                DataViewFactorInformation::NumOfSolarEnclosures = state.dataGlobal->NumOfZones;
+                state.dataViewFactor->NumOfSolarEnclosures = state.dataGlobal->NumOfZones;
             }
         }
     }
