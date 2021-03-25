@@ -219,6 +219,12 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinSlatAngThisTSDegEMSon.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinSlatAngThisTSDegEMSValue.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinSlatsBlockBeam.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinSlatsAngIndex.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinSlatsAngInterpFac.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinProfileAng.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinProfAngIndex.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinProfAngInterpFac.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinBlindBmBmTrans.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinBlindAirFlowPermeability.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinTotGlazingThickness.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinTanProfileAngHor.dimension(NumSurfaces, 0);
