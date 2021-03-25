@@ -27,6 +27,8 @@
 
 namespace ObjexxFCL {
 
+// this file contains the changes for function approximation:
+// power function, and min/max
 typedef  std::intmax_t  SSize;
 /*
 float myxor(float x, float y)
