@@ -8437,8 +8437,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->files.outputControl.sqlite = true;
-    DataStringGlobals::outputSqlFileName = "eplussqlite1.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout1.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite1.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout1.sql";
 
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
@@ -8447,8 +8447,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
@@ -8462,8 +8462,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite2.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout2.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite2.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout2.sql";
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound);
@@ -8471,8 +8471,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
@@ -8486,8 +8486,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite3.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout3.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite3.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout3.sql";
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None);
@@ -8495,8 +8495,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
@@ -8511,8 +8511,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite4.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout4.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite4.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout4.sql";
 
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
@@ -8521,8 +8521,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
@@ -8538,8 +8538,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite5.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout5.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite5.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout5.sql";
 
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
@@ -8548,8 +8548,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
@@ -9641,7 +9641,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
 
     OutputReportTabular::CloseOutputTabularFile(*state);
 
-    std::vector<std::string> lines = read_lines_in_file(DataStringGlobals::outputTblHtmFileName);
+    std::vector<std::string> lines = read_lines_in_file(state->dataStrGlobals->outputTblHtmFileName);
 
     // Lambda helper to locate a line in the html file, and compare that line with the expected html after trimming
     auto compare_html_output = [this, &lines](const std::string& lookup, const std::string& expectedHTMLString) {
@@ -9654,7 +9654,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
         }
         EXPECT_FALSE(found_cell.empty())
             << "Did not find the lookup string '" << lookup
-            << "' string in the html output at '" << DataStringGlobals::outputTblHtmFileName
+            << "' string in the html output at '" << state->dataStrGlobals->outputTblHtmFileName
             << "'..." << '\n' << delimited_string(lines);
 
         // Trim leading and trailing spaces
@@ -9697,6 +9697,6 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
     }
 
     // Clean up
-    FileSystem::removeFile(DataStringGlobals::outputTblHtmFileName);
+    FileSystem::removeFile(state->dataStrGlobals->outputTblHtmFileName);
 
 }

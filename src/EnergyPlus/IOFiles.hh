@@ -349,9 +349,6 @@ public:
     std::string outputErrFileName{"eplusout.err"};
     std::unique_ptr<std::ostream> err_stream;
 
-    static IOFiles &getSingleton();
-    static void setSingleton(IOFiles *newSingleton) noexcept;
-
     static bool hasSingleton() { return getSingletonInternal() != nullptr; }
 
     JsonOutputStreams json; // Internal streams used for json outputs

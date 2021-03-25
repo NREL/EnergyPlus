@@ -245,7 +245,7 @@ namespace SimulationManager {
 
         if (sqlite) {
             sqlite->sqliteBegin();
-            sqlite->createSQLiteSimulationsRecord(1, DataStringGlobals::VerString, DataStringGlobals::CurrentDateTime);
+            sqlite->createSQLiteSimulationsRecord(1, DataStringGlobals::VerString, state.dataStrGlobals->CurrentDateTime);
             sqlite->sqliteCommit();
         }
 
