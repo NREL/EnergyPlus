@@ -55,7 +55,7 @@
 #include <iostream>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.in.hh>
 #include <EnergyPlus/FileSystem.hh>
 
 // We don't have a remove_all function since we do not use std::filesystem (or boost::filesystem), so make a very sketchy and crude one for testing

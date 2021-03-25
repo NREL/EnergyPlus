@@ -52,7 +52,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.in.hh>
 
 #include "../TestHelpers/IdfParser.hh"
 

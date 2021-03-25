@@ -59,7 +59,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.in.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -358,7 +358,6 @@ void InputProcessor::processInput(EnergyPlusData &state)
 
 bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
 {
-    using DataStringGlobals::MatchVersion;
     auto it = epJSON.find("Version");
     if (it != epJSON.end()) {
         for (auto const &version : it.value()) {
@@ -366,15 +365,15 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
             if (v.empty()) {
                 ShowWarningError(state, "Input errors occurred and version ID was left blank, verify file version");
             } else {
-                std::string::size_type const lenVer(len(MatchVersion));
+                std::string::size_type const lenVer(len(state.dataStrGlobals->MatchVersion));
                 int Which;
-                if ((lenVer > 0) && (MatchVersion[lenVer - 1] == '0')) {
-                    Which = static_cast<int>(index(v.substr(0, lenVer - 2), MatchVersion.substr(0, lenVer - 2)));
+                if ((lenVer > 0) && (state.dataStrGlobals->MatchVersion[lenVer - 1] == '0')) {
+                    Which = static_cast<int>(index(v.substr(0, lenVer - 2), state.dataStrGlobals->MatchVersion.substr(0, lenVer - 2)));
                 } else {
-                    Which = static_cast<int>(index(v, MatchVersion));
+                    Which = static_cast<int>(index(v, state.dataStrGlobals->MatchVersion));
                 }
                 if (Which != 0) {
-                    ShowWarningError(state, "Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
+                    ShowWarningError(state, "Version: in IDF=\"" + v + "\" not the same as expected=\"" + state.dataStrGlobals->MatchVersion + "\"");
                     return false;
                 }
             }

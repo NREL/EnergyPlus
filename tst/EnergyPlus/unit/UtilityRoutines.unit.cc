@@ -58,7 +58,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.in.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 

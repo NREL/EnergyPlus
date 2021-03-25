@@ -5,7 +5,7 @@ endif()
 
 set(PYTHON_API_VERSION_MAJOR 0)
 set(PYTHON_API_VERSION_MINOR 2)
-configure_file(DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc")
+configure_file(DataStringGlobals.in.hh "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.hh")
 configure_file(ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc")
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema")
 
@@ -200,8 +200,7 @@ set(SRC
     DataShadowingCombinations.hh
     DataSizing.cc
     DataSizing.hh
-    "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc"
-    DataStringGlobals.hh
+    "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.hh"
     DataSurfaceColors.cc
     DataSurfaceColors.hh
     DataSurfaceLists.cc
@@ -687,7 +686,7 @@ set(INPUTPARSING_SRC
     "${PROJECT_SOURCE_DIR}/third_party/milo/diyfp.h"
     "${PROJECT_SOURCE_DIR}/third_party/milo/ieee754.h"
     "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc"
-    DataStringGlobals.hh
+        DataStringGlobals.in.hh
     FileSystem.cc
     FileSystem.hh
     InputProcessing/EmbeddedEpJSONSchema.hh

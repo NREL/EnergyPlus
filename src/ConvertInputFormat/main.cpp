@@ -50,7 +50,7 @@
 #include <omp.h>
 #endif
 
-#include "EnergyPlus/DataStringGlobals.hh"
+#include "EnergyPlus/DataStringGlobals.in.hh"
 #include "EnergyPlus/FileSystem.hh"
 #include "EnergyPlus/InputProcessing/EmbeddedEpJSONSchema.hh"
 #include "EnergyPlus/InputProcessing/IdfParser.hh"

@@ -46,7 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.in.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>

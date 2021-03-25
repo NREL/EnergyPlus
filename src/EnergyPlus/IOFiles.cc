@@ -48,7 +48,7 @@
 #include <EnergyPlus/IOFiles.hh>
 
 #include "Data/EnergyPlusData.hh"
-#include "DataStringGlobals.hh"
+#include "DataStringGlobals.in.hh"
 #include "FileSystem.hh"
 #include "UtilityRoutines.hh"
 #include "InputProcessing/InputProcessor.hh"

@@ -60,7 +60,7 @@
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.in.hh>
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
@@ -481,9 +481,8 @@ void DXFOut(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-        using namespace DataSurfaces;
+    using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    using DataStringGlobals::VerString;
     using namespace DXFEarClipping;
 
     // Locals
@@ -558,7 +557,7 @@ void DXFOut(EnergyPlusData &state,
 
     print(dxffile, Format_707); // Comment
 
-    print(dxffile, Format_708, "Program Version", ",", VerString);
+    print(dxffile, Format_708, "Program Version", ",", state.dataStrGlobals->VerString);
 
     if (PolygonAction.empty()) {
         print(dxffile, Format_708, "Polygon Action", ",", "ThickPolyline");
@@ -857,7 +856,6 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
     // Using/Aliasing
         using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    using DataStringGlobals::VerString;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -897,7 +895,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
 
     print(dxffile, Format_707); // Comment
 
-    print(dxffile, Format_708, "Program Version", ",", VerString);
+    print(dxffile, Format_708, "Program Version", ",", state.dataStrGlobals->VerString);
 
     print(dxffile, Format_708, "DXF using Lines", ' ', ' ');
 
@@ -1065,7 +1063,6 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     // Using/Aliasing
         using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    using DataStringGlobals::VerString;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1105,7 +1102,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
 
     print(dxffile, Format_707); // Comment
 
-    print(dxffile, Format_708, "Program Version", ",", VerString);
+    print(dxffile, Format_708, "Program Version", ",", state.dataStrGlobals->VerString);
     print(dxffile, Format_708, "DXF using Wireframe", ' ', ' ');
 
     WriteDXFCommon(state, dxffile, ColorScheme);
@@ -1801,7 +1798,6 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
 
     // Using/Aliasing
         using namespace DataSurfaces;
-    using DataStringGlobals::VerString;
     using namespace DXFEarClipping;
 
     // Locals
@@ -1857,9 +1853,9 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     print(wrlfile, Format_702);
 
     if (ColorScheme == "") {
-        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, VerString, "Default"); // World Info
+        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerString, "Default"); // World Info
     } else {
-        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, VerString, ColorScheme); // World Info
+        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerString, ColorScheme); // World Info
     }
 
     print(wrlfile, "# Zone Names\n");

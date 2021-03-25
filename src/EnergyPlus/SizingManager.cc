@@ -59,7 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.in.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/DualDuct.hh>
@@ -4009,11 +4009,6 @@ namespace EnergyPlus::SizingManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine writes one item of zone sizing data to the "eio" file..
-
-        // Using/Aliasing
-        using DataStringGlobals::VerString;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (state.dataSizingManager->ReportZoneSizingMyOneTimeFlag) {
             static constexpr auto Format_990(

@@ -49,7 +49,7 @@
 #include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/state.h>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.in.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
@@ -62,8 +62,9 @@ void initializeFunctionalAPI(EnergyPlusState) {
     EnergyPlus::FluidProperties::InitializeGlycRoutines();
 }
 
-const char * apiVersionFromEPlus(EnergyPlusState) {
-    return EnergyPlus::DataStringGlobals::PythonAPIVersion.c_str();
+const char * apiVersionFromEPlus(EnergyPlusState state) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataStrGlobals->PythonAPIVersion.c_str();
 }
 
 void registerErrorCallback(EnergyPlusState state, std::function<void(EnergyPlus::Error, const std::string &)> f) {

@@ -53,7 +53,7 @@
 
 // EnergyPlus Headers
 //#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.in.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 

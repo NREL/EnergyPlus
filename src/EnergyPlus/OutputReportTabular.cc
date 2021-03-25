@@ -88,7 +88,7 @@
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.in.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -2982,9 +2982,6 @@ namespace EnergyPlus::OutputReportTabular {
         //   the output is in a CSV file if it is comma delimited otherwise
         //   it is in a TXT file.
 
-        // Using/Aliasing
-        using DataStringGlobals::VerString;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iStyle;
         std::string curDel;
@@ -3000,7 +2997,7 @@ namespace EnergyPlus::OutputReportTabular {
                 if (ort->TableStyle(iStyle) == iTableStyle::Comma) {
                     DisplayString(state, "Writing tabular output file results using comma format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblCsvFileName, state.files.outputControl.tabular);
-                    tbl_stream << "Program Version:" << curDel << VerString << '\n';
+                    tbl_stream << "Program Version:" << curDel << state.dataStrGlobals->VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:" << curDel << state.dataHeatBal->BuildingName << '\n';
@@ -3013,7 +3010,7 @@ namespace EnergyPlus::OutputReportTabular {
                 } else if (ort->TableStyle(iStyle) == iTableStyle::Tab) {
                     DisplayString(state, "Writing tabular output file results using tab format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTabFileName, state.files.outputControl.tabular);
-                    tbl_stream << "Program Version" << curDel << VerString << '\n';
+                    tbl_stream << "Program Version" << curDel << state.dataStrGlobals->VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:" << curDel << state.dataHeatBal->BuildingName << '\n';
@@ -3044,7 +3041,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "<body>\n";
                     tbl_stream << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>\n";
                     tbl_stream << "<a name=top></a>\n";
-                    tbl_stream << "<p>Program Version:<b>" << VerString << "</b></p>\n";
+                    tbl_stream << "<p>Program Version:<b>" << state.dataStrGlobals->VerString << "</b></p>\n";
                     tbl_stream << "<p>Tabular Output Report in Format: <b>HTML</b></p>\n";
                     tbl_stream << "<p>Building: <b>" << state.dataHeatBal->BuildingName << "</b></p>\n";
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
@@ -3064,7 +3061,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "  <state.dataHeatBal->BuildingName>" << state.dataHeatBal->BuildingName << "</state.dataHeatBal->BuildingName>\n";
                     tbl_stream << "  <EnvironmentName>" << state.dataEnvrn->EnvironmentName << "</EnvironmentName>\n";
                     tbl_stream << "  <WeatherFileLocationTitle>" << state.dataEnvrn->WeatherFileLocationTitle << "</WeatherFileLocationTitle>\n";
-                    tbl_stream << "  <ProgramVersion>" << VerString << "</ProgramVersion>\n";
+                    tbl_stream << "  <ProgramVersion>" << state.dataStrGlobals->VerString << "</ProgramVersion>\n";
                     tbl_stream << "  <SimulationTimestamp>\n";
                     tbl_stream << "    <Date>\n";
                     tbl_stream << "      " << std::setw(4) << ort->td(1) << '-' << std::setfill('0') << std::setw(2) << ort->td(2) << '-' << std::setw(2)
@@ -3079,7 +3076,7 @@ namespace EnergyPlus::OutputReportTabular {
                 } else {
                     DisplayString(state, "Writing tabular output file results using text format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTxtFileName, state.files.outputControl.tabular);
-                    tbl_stream << "Program Version: " << VerString << '\n';
+                    tbl_stream << "Program Version: " << state.dataStrGlobals->VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:        " << state.dataHeatBal->BuildingName << '\n';
@@ -10455,7 +10452,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using DataHeatBalance::ZoneData;
-        using DataStringGlobals::VerString;
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
@@ -10666,7 +10662,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 tableBody = "";
 
-                tableBody(1, 1) = VerString;                                             // program
+                tableBody(1, 1) = state.dataStrGlobals->VerString;                                             // program
                 tableBody(1, 2) = state.dataEnvrn->EnvironmentName;                      // runperiod name
                 tableBody(1, 3) = state.dataEnvrn->WeatherFileLocationTitle;             // weather
                 tableBody(1, 4) = RealToStr(state.dataEnvrn->Latitude, 2);               // latitude
@@ -14765,7 +14761,6 @@ namespace EnergyPlus::OutputReportTabular {
         //   Write the first few lines of each report with headers to the output
         //   file for tabular reports.
         // Using/Aliasing
-        using DataStringGlobals::VerString;
 
         std::string const modifiedReportName(reportName + (averageOrSum == OutputProcessor::StoreType::Summed ? " per second" : ""));
         auto &ort(state.dataOutRptTab);
