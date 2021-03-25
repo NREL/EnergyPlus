@@ -83,7 +83,6 @@ namespace GroundTemperatureManager {
         int objectType(0);
 
         auto & CurrentModuleObjects = state.dataGrndTempModelMgr->CurrentModuleObjects;
-        auto & groundTempModels = state.dataGrndTempModelMgr->groundTempModels;
 
         std::string objectType_str_UPPERCase = UtilityRoutines::MakeUPPERCase(objectType_str);
 

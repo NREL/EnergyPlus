@@ -261,8 +261,6 @@ namespace EnergyPlus::SetPointManager {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
-        int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
 
         int NumNums;   // Number of real numbers returned by GetObjectItem
         int NumAlphas; // Number of alphanumerics returned by GetObjectItem
@@ -3601,9 +3599,6 @@ namespace EnergyPlus::SetPointManager {
         int ZonesCooledIndex; // Cooled zones index in an air loop
         int BranchNumPlantSide;
         int CompNumPlantSide;
-        int TypeNum(0);
-        int NumChiller(0);
-        int TypeOf_Num(0);
 
         state.dataSetPointManager->ManagerOn = true;
 
@@ -5216,14 +5211,12 @@ namespace EnergyPlus::SetPointManager {
         int RetNode;
         int OAMixOAInNode;
         Real64 FanDeltaT;
-        Real64 TSupNoHC(0.0); // supply temperature with no heating or cooling
         Real64 TMixAtMinOA;
         Real64 EnthMixAtMinOA;
         Real64 HumRatMixAtMinOA;
         int AirLoopNum;
         Real64 OAFrac;
         int LoopInNode;
-        Real64 ExtrRateNoHC(0.0); // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
 
         ZoneInletNode = this->ZoneInletNodeNum;
         ZoneNum = this->ControlZoneNum;

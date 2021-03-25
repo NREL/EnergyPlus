@@ -270,13 +270,6 @@ namespace HVACHXAssistedCoolingCoil {
         int MaxAlphas(0);          // Maximum number of alpha input fields
         int TotalArgs(0);          // Total number of alpha and numeric arguments (max) for a
 
-        auto & TotalNumHXAssistedCoils = state.dataHVACAssistedCC->TotalNumHXAssistedCoils;
-        auto & HXAssistedCoil = state.dataHVACAssistedCC->HXAssistedCoil;
-        auto & HXAssistedCoilOutletTemp = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp;
-        auto & HXAssistedCoilOutletHumRat = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat;
-        auto & CheckEquipName = state.dataHVACAssistedCC->CheckEquipName;
-        auto & UniqueHXAssistedCoilNames = state.dataHVACAssistedCC->UniqueHXAssistedCoilNames;
-
         NumHXAssistedDXCoils = inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted");
         NumHXAssistedWaterCoils = inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted");
         state.dataHVACAssistedCC->TotalNumHXAssistedCoils = NumHXAssistedDXCoils + NumHXAssistedWaterCoils;
@@ -760,7 +753,6 @@ namespace HVACHXAssistedCoolingCoil {
 
         // METHODOLOGY EMPLOYED:
         //  Uses the status flags to trigger initializations.
-        auto & HXAssistedCoil = state.dataHVACAssistedCC->HXAssistedCoil;
 
         // Do these initializations every time
         state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).MassFlowRate =
@@ -799,39 +791,19 @@ namespace HVACHXAssistedCoolingCoil {
         //  combination. The cooling coil exiting air temperature is used as
         //  an indicator of convergence.
 
-        // METHODOLOGY EMPLOYED:
-        //  na
-
-        // REFERENCES:
-        //  na
-
         // Using/Aliasing
         using DXCoils::SimDXCoil;
         using HeatRecovery::SimHeatRecovery;
         using WaterCoils::SimulateWaterCoilComponents;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // (used only for Coil:DX:CoolingBypassFactorEmpirical)
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIter(50); // Maximum number of iterations
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto & CoilOutputTempLast = state.dataHVACAssistedCC->CoilOutputTempLast; // Exiting cooling coil temperature from last iteration
 
         Real64 AirMassFlow;               // Inlet air mass flow rate
         Real64 Error;                     // Error (exiting coil temp from last iteration minus current coil exiting temp)
         Real64 ErrorLast;                 // check for oscillations
         int Iter;                         // Number of iterations
         int CompanionCoilIndexNum;        // Index to DX coil
-        auto & HXAssistedCoil = state.dataHVACAssistedCC->HXAssistedCoil;
 
         AirMassFlow = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).MassFlowRate;
         Error = 1.0;       // Initialize error (CoilOutputTemp last iteration minus current CoilOutputTemp)

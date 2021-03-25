@@ -91,8 +91,6 @@ struct GroundTemperatureManagerData : BaseGlobalStruct {
 
     std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
 
-    std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
-
     void clear_state() override
     {
         this->groundTempModels.clear();

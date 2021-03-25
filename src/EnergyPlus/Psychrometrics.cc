@@ -488,28 +488,15 @@ Array1D_string const PsyRoutineNames(NumPsychMonitors,
         // METHODOLOGY EMPLOYED:
         // Uses an Iterative procedure to calculate WetBulbTemperature
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::Iterate;
 
         // Return value
         Real64 TWB; // result=> Temperature Wet-Bulb {C}
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
         // FUNCTION PARAMETER DEFINITIONS:
         int constexpr itmax(100); // Maximum No of Iterations
-        Real64 const convTol(0.0001);
         static std::string const RoutineName("PsyTwbFnTdbWPb");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 tBoil;                       // Boiling temperature of water at given pressure

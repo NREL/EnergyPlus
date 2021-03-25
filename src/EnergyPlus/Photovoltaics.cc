@@ -1122,7 +1122,6 @@ namespace Photovoltaics {
         auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto & MyEnvrnFlag = state.dataPhotovoltaicState->MyEnvrnFlag;
         Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 
         // perform the one time initializations
@@ -1187,7 +1186,6 @@ namespace Photovoltaics {
         Real64 const MinInsolation(30.0);
         int const KMAX(100);
         Real64 const EtaIni(0.10); // initial value of eta
-        auto & PVTimeStep = state.dataPhotovoltaicState->PVTimeStep;
         Real64 DummyErr;
         Real64 ETA;
         Real64 Tambient;

@@ -768,7 +768,6 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         int InstructionNum2;
         int ExpressionNum;
         int ESVariableNum;
-        int VariableNum;
         int WhileLoopExitCounter;      // to avoid infinite loop in While loop
         bool seriousErrorFound(false); // once it gets set true (inside EvaluateExpresssion) it will trigger a fatal (in WriteTrace)
 
@@ -1020,9 +1019,6 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         bool OperatorProcessing;
         int CountDoLooping;
         bool LastED; // last character in a numeric was an E or D
-
-        // Object Data
-        auto & Token = state.dataRuntimeLangProcessor->Token;
 
         CountDoLooping = 0;
         NumErrors = 0;

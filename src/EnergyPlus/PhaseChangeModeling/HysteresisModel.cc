@@ -318,13 +318,8 @@ namespace HysteresisPhaseChange {
     {
 
         // convenience variables
-<<<<<<< HEAD
-        DataIPShortCuts::cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-        state.dataHysteresisPhaseChange->numHysteresisModels = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
-=======
         state.dataIPShortCut->cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-        numHysteresisModels = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
->>>>>>> origin/develop
+        state.dataHysteresisPhaseChange->numHysteresisModels = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         // loop over all hysteresis input instances, if zero, this will simply not do anything
         for (int hmNum = 1; hmNum <= state.dataHysteresisPhaseChange->numHysteresisModels; ++hmNum) {
@@ -356,15 +351,9 @@ namespace HysteresisPhaseChange {
             }
 
             // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-<<<<<<< HEAD
             for (auto &existingHysteresisModel : state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels) {
-                if (DataIPShortCuts::cAlphaArgs(1) == existingHysteresisModel.name) {
-                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
-=======
-            for (auto &existingHysteresisModel : hysteresisPhaseChangeModels) {
                 if (state.dataIPShortCut->cAlphaArgs(1) == existingHysteresisModel.name) {
                     ShowFatalError(state, "Invalid input for " + state.dataIPShortCut->cCurrentModuleObject +
->>>>>>> origin/develop
                                    " object: Duplicate name found: " + existingHysteresisModel.name);
                 }
             }

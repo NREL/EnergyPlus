@@ -754,7 +754,7 @@ namespace DaylightingDevices {
 
                 if (SurfNum == 0) {
                     ShowSevereError(state, cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " + state.dataIPShortCut->cAlphaArgs(2) + " not found.");
-                    state.dataDaylightingDevices->GetShelfInputErrorsFound
+                    state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                 } else {
                     if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " + state.dataIPShortCut->cAlphaArgs(2) +
@@ -782,7 +782,7 @@ namespace DaylightingDevices {
 
                     if (state.dataSurface->Surface(SurfNum).Sides != 4) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " + state.dataIPShortCut->cAlphaArgs(2) + " must have 4 sides.");
-                        state.dataDaylightingDevices->GetShelfInputErrorsFound
+                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     }
                     if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " + state.dataIPShortCut->cAlphaArgs(2) +
@@ -800,7 +800,7 @@ namespace DaylightingDevices {
 
                     if (SurfNum == 0) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Inside shelf " + state.dataIPShortCut->cAlphaArgs(3) + " not found.");
-                        state.dataDaylightingDevices->GetShelfInputErrorsFound
+                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     } else {
                         // No error if shelf belongs to more than one window, e.g. concave corners
 
@@ -826,7 +826,7 @@ namespace DaylightingDevices {
 
                     if (SurfNum == 0) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Outside shelf " + state.dataIPShortCut->cAlphaArgs(4) + " not found.");
-                        state.dataDaylightingDevices->GetShelfInputErrorsFound
+                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     } else {
                         // No error if shelf belongs to more than one window, e.g. concave corners
 
