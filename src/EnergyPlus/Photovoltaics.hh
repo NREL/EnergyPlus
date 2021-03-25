@@ -329,7 +329,6 @@ struct PhotovoltaicStateData : BaseGlobalStruct {
         MyOneTimeFlag = true;
         firstTime = true;
         MyEnvrnFlag.clear();
-
     }
 };
 

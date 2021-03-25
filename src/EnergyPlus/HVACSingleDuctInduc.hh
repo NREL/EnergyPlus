@@ -63,22 +63,8 @@ struct EnergyPlusData;
 
 namespace HVACSingleDuctInduc {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    int constexpr SingleDuct_CV_FourPipeInduc = 1;
-    int constexpr SingleDuct_CV_2PipeInduc = 2;
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
-
-    // PRIVATE UpdateIndUnit
-    // PRIVATE ReportIndUnit
-
-    // Types
+    int constexpr SingleDuct_CV_FourPipeInduc(1);
+    int constexpr SingleDuct_CV_2PipeInduc(2);
 
     struct IndUnitData
     {
@@ -154,10 +140,6 @@ namespace HVACSingleDuctInduc {
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
     };
 
-    // Object Data
-
-    // Functions
-
     void SimIndUnit(EnergyPlusData &state, std::string const &CompName,   // name of the terminal unit
                     bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                     int const ZoneNum,             // index of zone served by the terminal unit
@@ -203,18 +185,17 @@ namespace HVACSingleDuctInduc {
 } // namespace HVACSingleDuctInduc
 
 struct HVACSingleDuctInducData : BaseGlobalStruct {
-
     int NumIndUnits = 0;
     int NumFourPipes = 0;
     Array1D_bool CheckEquipName;
     bool GetIUInputFlag = true; // First time, input is "gotten"
-    Array1D<HVACSingleDuctInduc::IndUnitData> IndUnit;
-
     bool MyOneTimeFlag = true;
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MySizeFlag;
     Array1D_bool MyPlantScanFlag;
     Array1D_bool MyAirDistInitFlag;
+    Array1D<HVACSingleDuctInduc::IndUnitData> IndUnit;
+    bool ZoneEquipmentListChecked = false;
 
     void clear_state() override
     {
@@ -228,6 +209,7 @@ struct HVACSingleDuctInducData : BaseGlobalStruct {
         this->MyPlantScanFlag.deallocate();
         this->MyAirDistInitFlag.deallocate();
         this->CheckEquipName.deallocate();
+        this->ZoneEquipmentListChecked = false;
     }
 };
 

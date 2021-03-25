@@ -133,14 +133,52 @@ namespace General {
                    Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
     );
 
-    Real64 InterpSw(Real64 SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
-                    Real64 A,         // Glazing property in unswitched state
-                    Real64 B          // Glazing property in fully switched state
-    );
+    constexpr Real64 InterpGeneral(Real64 const Lower,
+                                Real64 const Upper,
+                                Real64 const InterpFac
+    )
+    {
+        return Lower + InterpFac * (Upper - Lower);
+    }
 
-    Real64 InterpBlind(Real64 ProfAng,           // Profile angle (rad)
-                       Array1A<Real64> PropArray // Array of blind properties
-    );
+    constexpr Real64 InterpProfSlat(Real64 const SlatLower,
+                                    Real64 const SlatUpper,
+                                    Real64 const ProfLower,
+                                    Real64 const ProfUpper,
+                                    Real64 const SlatInterpFac,
+                                    Real64 const ProfInterpFac
+    )
+    {
+        Real64 ValA = SlatLower + SlatInterpFac * (SlatUpper - SlatLower);
+        Real64 ValB = ProfLower + SlatInterpFac * (ProfUpper - ProfLower);
+        return ValA + ProfInterpFac * (ValB - ValA);
+    }
+
+    inline Real64 InterpSw(Real64 const SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
+                           Real64 const A,         // Glazing property in unswitched state
+                           Real64 const B          // Glazing property in fully switched state
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Fred Winkelmann
+        //       DATE WRITTEN   February 1999
+
+        // PURPOSE OF THIS FUNCTION:
+        // For switchable glazing, calculates a weighted average of properties
+        // A and B
+
+        // Return value
+        Real64 InterpSw;
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 locSwitchFac;
+
+        locSwitchFac = min(SwitchFac, 1.0);
+        locSwitchFac = max(locSwitchFac, 0.0);
+
+        InterpSw = (1.0 - locSwitchFac) * A + locSwitchFac * B;
+        return InterpSw;
+    }
 
     Real64 InterpProfAng(Real64 ProfAng,           // Profile angle (rad)
                          Array1S<Real64> PropArray // Array of blind properties
@@ -372,6 +410,17 @@ struct GeneralData : BaseGlobalStruct {
     bool LineRpt = false;
     bool VarDict = false;
     bool EMSoutput = false;
+    Real64 XNext = 0.0; // used in root finder
+    std::string DXFOption1;
+    std::string DXFOption2;
+    std::string DXFWFOption1;
+    std::string DXFWFOption2;
+    std::string VRMLOption1;
+    std::string VRMLOption2;
+    std::string ViewRptOption1;
+    std::string LineRptOption1;
+    std::string VarDictOption1;
+    std::string VarDictOption2;
 
     void clear_state() override
     {
@@ -389,6 +438,17 @@ struct GeneralData : BaseGlobalStruct {
         this->LineRpt = false;
         this->VarDict = false;
         this->EMSoutput = false;
+        this->XNext = 0.0;
+        this->DXFOption1.clear();
+        this->DXFOption2.clear();
+        this->DXFWFOption1.clear();
+        this->DXFWFOption2.clear();
+        this->VRMLOption1.clear();
+        this->VRMLOption2.clear();
+        this->ViewRptOption1.clear();
+        this->LineRptOption1.clear();
+        this->VarDictOption1.clear();
+        this->VarDictOption2.clear();
     }
 };
 

@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/TARCOGArgs.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGasses90.hh>
@@ -298,19 +299,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         EP_SIZE_CHECK(Nu, maxlay);
         EP_SIZE_CHECK(Keff, maxlay);
         EP_SIZE_CHECK(ShadeGapKeffConv, MaxGap);
-
-        static Array1D<Real64> thetas(maxlay2);
-        static Array1D<Real64> rir(maxlay2);
-        static Array1D<Real64> hcgass(maxlay1);
-        static Array1D<Real64> hrgass(maxlay1);
-        static Array1D<Real64> rs(maxlay3, 0.0);
-
+        
         //  REAL(r64) :: grho(maxgas,3)
-        static Array1D<Real64> qs(maxlay3);
-        static Array1D<Real64> qvs(maxlay1);
-        static Array1D<Real64> LaminateAU(maxlay);
-        static Array1D<Real64> sumsolU(maxlay);
-        static Array1D<Real64> sol0(maxlay);
         Real64 shgct_NOSD;
         Real64 trmout;
 
@@ -325,10 +315,6 @@ namespace EnergyPlus::ThermalISO15099Calc {
         Real64 qc1;
         Real64 qc2;
         Real64 qcgg;
-        static Array1D<Real64> qcgas(maxlay1);
-        static Array1D<Real64> qcgaps(maxlay1);
-        static Array1D<Real64> qrgas(maxlay1);
-        static Array1D<Real64> qrgaps(maxlay1);
 
         Real64 ShadeHcModifiedOut;
         Real64 ShadeHcModifiedIn;
@@ -339,22 +325,6 @@ namespace EnergyPlus::ThermalISO15099Calc {
         int nlayer_NOSD;
         Real64 AchievedErrorTolerance_NOSD;
         int NumOfIter_NOSD;
-        static Array1D<Real64> Atop_NOSD(maxlay);
-        static Array1D<Real64> Abot_NOSD(maxlay);
-        static Array1D<Real64> Al_NOSD(maxlay);
-        static Array1D<Real64> Ar_NOSD(maxlay);
-        static Array1D<Real64> Ah_NOSD(maxlay);
-        static Array1D<Real64> EffectiveOpenness_NOSD(maxlay);
-        static Array1D<Real64> SlatThick_NOSD(maxlay);
-        static Array1D<Real64> SlatWidth_NOSD(maxlay);
-        static Array1D<Real64> SlatAngle_NOSD(maxlay);
-        static Array1D<Real64> SlatCond_NOSD(maxlay);
-        static Array1D<Real64> SlatSpacing_NOSD(maxlay);
-        static Array1D<Real64> SlatCurve_NOSD(maxlay);
-        static Array1D<Real64> vvent_NOSD(maxlay1);
-        static Array1D<Real64> tvent_NOSD(maxlay1);
-        static Array1D<Real64> qv_NOSD(maxlay1);
-        static Array1D<Real64> q_NOSD(maxlay3);
         Real64 hin_NOSD;
         Real64 flux_NOSD;
         Real64 hcin_NOSD;
@@ -363,61 +333,21 @@ namespace EnergyPlus::ThermalISO15099Calc {
         Real64 hrout_NOSD;
         Real64 tamb_NOSD;
         Real64 troom_NOSD;
-        static Array1D_int LayerType_NOSD(maxlay);
         Real64 ufactor_NOSD;
         Real64 sc_NOSD;
         Real64 hflux_NOSD;
         Real64 shgc_NOSD;
         Real64 hout_NOSD;
-        static Array1D<Real64> gap_NOSD(maxlay);
-        static Array1D<Real64> thick_NOSD(maxlay);
-        static Array1D<Real64> scon_NOSD(maxlay);
-        static Array1D<Real64> emis_NOSD(maxlay2);
-        static Array1D<Real64> rir_NOSD(maxlay2);
-        static Array1D<Real64> tir_NOSD(maxlay2);
-        static Array1D<Real64> theta_NOSD(maxlay2);
-        static Array2D<Real64> frct_NOSD(maxgas, maxlay1);
-        static Array2D_int iprop_NOSD(maxgas, maxlay1);
-        static Array1D_int nmix_NOSD(maxlay1);
-        static Array1D<Real64> presure_NOSD(maxlay1);
-        static Array1D<Real64> hcgas_NOSD(maxlay1);
-        static Array1D<Real64> hrgas_NOSD(maxlay1);
         // REAL(r64) ::  rs_NOSD(maxlay3)!,sol(maxlay)
-        static Array1D<Real64> LaminateA_NOSD(maxlay);
-        static Array1D<Real64> LaminateB_NOSD(maxlay);
-        static Array1D<Real64> sumsol_NOSD(maxlay);
-        static Array1D<Real64> Ra_NOSD(maxlay);
-        static Array1D<Real64> Nu_NOSD(maxlay);
         Real64 ShadeEmisRatioOut_NOSD;
         Real64 ShadeEmisRatioIn_NOSD;
         Real64 ShadeHcRatioOut_NOSD;
         Real64 ShadeHcRatioIn_NOSD;
         Real64 ShadeHcModifiedOut_NOSD;
         Real64 ShadeHcModifiedIn_NOSD;
-        static Array1D<Real64> Ebb(maxlay);
-        static Array1D<Real64> Ebf(maxlay);
-        static Array1D<Real64> Rb(maxlay);
-        static Array1D<Real64> Rf(maxlay);
-        static Array1D<Real64> Ebbs(maxlay);
-        static Array1D<Real64> Ebfs(maxlay);
-        static Array1D<Real64> Rbs(maxlay);
-        static Array1D<Real64> Rfs(maxlay);
-        static Array1D<Real64> Ebb_NOSD(maxlay);
-        static Array1D<Real64> Ebf_NOSD(maxlay);
-        static Array1D<Real64> Rb_NOSD(maxlay);
-        static Array1D<Real64> Rf_NOSD(maxlay);
-
-        static Array1D<Real64> ShadeGapKeffConv_NOSD(MaxGap);
-        static Array1D<Real64> qcgas_NOSD(maxlay1);
-        static Array1D<Real64> Keff_NOSD(maxlay1);
-        static Array1D<Real64> qrgas_NOSD(maxlay1);
-        static Array1D_int nslice_NOSD(maxlay);
-        static Array1D<Real64> vfreevent_NOSD(maxlay1);
 
         int FirstSpecularLayer;
         int LastSpecularLayer;
-
-        static Array1D<Real64> vfreevent(maxlay1);
 
         // cbi...Other variables:
         Real64 flux;
@@ -429,25 +359,6 @@ namespace EnergyPlus::ThermalISO15099Calc {
         int j;
         int OriginalIndex;
         int UnshadedDebug;
-        static Real64 rtot(0.0);
-        static Real64 sft(0.0);
-        static Real64 hcins(0.0);
-        static Real64 hrins(0.0);
-        static Real64 hins(0.0);
-        static Real64 hcouts(0.0);
-        static Real64 hrouts(0.0);
-        static Real64 houts(0.0);
-        static Real64 ufactors(0.0);
-        static Real64 fluxs(0.0);
-        static Real64 qeff(0.0);
-        static Real64 flux_nonsolar(0.0);
-
-        static Array1D<Real64> Atop_eff(maxlay, 0.0);
-        static Array1D<Real64> Abot_eff(maxlay, 0.0);
-        static Array1D<Real64> Al_eff(maxlay, 0.0);
-        static Array1D<Real64> Ar_eff(maxlay, 0.0);
-        static Array1D<Real64> Ah_eff(maxlay, 0.0);
-        static Array1D<Real64> EffectiveOpenness(maxlay, 0.0);
 
         // Autodesk:Uninit Initialize variables used uninitialized
         shgc_NOSD = 0.0;            // Autodesk:Uninit Force default initialization
@@ -495,9 +406,9 @@ namespace EnergyPlus::ThermalISO15099Calc {
                               shgc,
                               ufactor,
                               flux,
-                              LaminateAU,
-                              sumsolU,
-                              sol0,
+                              state.dataThermalISO15099Calc->LaminateAU,
+                              state.dataThermalISO15099Calc->sumsolU,
+                              state.dataThermalISO15099Calc->sol0,
                               hint,
                               houtt,
                               trmout,
@@ -505,16 +416,30 @@ namespace EnergyPlus::ThermalISO15099Calc {
                               ebroom,
                               Gout,
                               Gin,
-                              rir,
-                              vfreevent,
+                              state.dataThermalISO15099Calc->rir,
+                              state.dataThermalISO15099Calc->vfreevent,
                               nperr,
                               ErrorMessage );
 
         for (int i = 1; i <= nlayer; ++i) {
-            EffectiveOpenness(i) = Ah(i) / (width * height);
+            state.dataThermalISO15099Calc->EffectiveOpenness(i) = Ah(i) / (width * height);
         }
 
-        updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
+        updateEffectiveMultipliers(nlayer,
+                                   width,
+                                   height,
+                                   Atop,
+                                   Abot,
+                                   Al,
+                                   Ar,
+                                   Ah,
+                                   state.dataThermalISO15099Calc->Atop_eff,
+                                   state.dataThermalISO15099Calc->Abot_eff,
+                                   state.dataThermalISO15099Calc->Al_eff,
+                                   state.dataThermalISO15099Calc->Ar_eff,
+                                   state.dataThermalISO15099Calc->Ah_eff,
+                                   LayerType,
+                                   SlatAngle);
 
         // No option to take hardcoded variables.  All gas coefficients are now passed from outside.
         // if (GoAhead(nperr)) call propcon90(ISO15099,mgas,xgcon,xgvis,xgcp,xgrho,xwght,nperr)
@@ -554,7 +479,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         if ((dir > 0.0) || (SHGCCalc == 0)) {
             // call therm1d to calculate heat flux with solar radiation
 
-            therm1d(files,
+            therm1d(state,
+                    files,
                     nlayer,
                     iwd,
                     tout,
@@ -571,7 +497,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                     ebroom,
                     Gin,
                     tir,
-                    rir,
+                    state.dataThermalISO15099Calc->rir,
                     emis,
                     gap,
                     thick,
@@ -611,24 +537,24 @@ namespace EnergyPlus::ThermalISO15099Calc {
                     tamb,
                     troom,
                     ibc,
-                    Atop_eff,
-                    Abot_eff,
-                    Al_eff,
-                    Ar_eff,
-                    Ah_eff,
-                    EffectiveOpenness,
+                    state.dataThermalISO15099Calc->Atop_eff,
+                    state.dataThermalISO15099Calc->Abot_eff,
+                    state.dataThermalISO15099Calc->Al_eff,
+                    state.dataThermalISO15099Calc->Ar_eff,
+                    state.dataThermalISO15099Calc->Ah_eff,
+                    state.dataThermalISO15099Calc->EffectiveOpenness,
                     vvent,
                     tvent,
                     LayerType,
                     Ra,
                     Nu,
-                    vfreevent,
-                    qcgas,
-                    qrgas,
-                    Ebf,
-                    Ebb,
-                    Rf,
-                    Rb,
+                    state.dataThermalISO15099Calc->vfreevent,
+                    state.dataThermalISO15099Calc->qcgas,
+                    state.dataThermalISO15099Calc->qrgas,
+                    state.dataThermalISO15099Calc->Ebf,
+                    state.dataThermalISO15099Calc->Ebb,
+                    state.dataThermalISO15099Calc->Rf,
+                    state.dataThermalISO15099Calc->Rb,
                     ShadeEmisRatioOut,
                     ShadeEmisRatioIn,
                     ShadeHcModifiedOut,
@@ -658,37 +584,37 @@ namespace EnergyPlus::ThermalISO15099Calc {
 
             // No need to store results in case of non-ufactor run
             if ((SHGCCalc > 0) && (dir > 0.0)) {
-                solarISO15099(totsol, rtot, rs, nlayer, asol, sft);
-                shgct = sft;
+                solarISO15099(totsol, state.dataThermalISO15099Calc->rtot, state.dataThermalISO15099Calc->rs, nlayer, asol, state.dataThermalISO15099Calc->sft);
+                shgct = state.dataThermalISO15099Calc->sft;
                 shgct_NOSD = 0.0;
-                hcins = hcin;
-                hrins = hrin;
-                hins = hin;
-                hcouts = hcout;
-                hrouts = hrout;
-                houts = hout;
-                ufactors = ufactor;
-                fluxs = flux;
+                state.dataThermalISO15099Calc->hcins = hcin;
+                state.dataThermalISO15099Calc->hrins = hrin;
+                state.dataThermalISO15099Calc->hins = hin;
+                state.dataThermalISO15099Calc->hcouts = hcout;
+                state.dataThermalISO15099Calc->hrouts = hrout;
+                state.dataThermalISO15099Calc->houts = hout;
+                state.dataThermalISO15099Calc->ufactors = ufactor;
+                state.dataThermalISO15099Calc->fluxs = flux;
                 for (i = 1; i <= nlayer; ++i) {
-                    thetas(2 * i - 1) = theta(2 * i - 1);
-                    thetas(2 * i) = theta(2 * i);
-                    Ebbs(i) = Ebb(i);
-                    Ebfs(i) = Ebf(i);
-                    Rbs(i) = Rb(i);
-                    Rfs(i) = Rf(i);
-                    qs(2 * i - 1) = q(2 * i - 1);
-                    qs(2 * i) = q(2 * i);
+                    state.dataThermalISO15099Calc->thetas(2 * i - 1) = theta(2 * i - 1);
+                    state.dataThermalISO15099Calc->thetas(2 * i) = theta(2 * i);
+                    state.dataThermalISO15099Calc->Ebbs(i) = state.dataThermalISO15099Calc->Ebb(i);
+                    state.dataThermalISO15099Calc->Ebfs(i) = state.dataThermalISO15099Calc->Ebf(i);
+                    state.dataThermalISO15099Calc->Rbs(i) = state.dataThermalISO15099Calc->Rb(i);
+                    state.dataThermalISO15099Calc->Rfs(i) = state.dataThermalISO15099Calc->Rf(i);
+                    state.dataThermalISO15099Calc->qs(2 * i - 1) = q(2 * i - 1);
+                    state.dataThermalISO15099Calc->qs(2 * i) = q(2 * i);
                     // qprims(2*i - 1) = qprim(2*i - 1)
                     // qprims(2*i) = qprim(2*i)
-                    qvs(2 * i - 1) = qv(2 * i - 1);
-                    qvs(2 * i) = qv(2 * i);
-                    hcgass(i) = hcgas(i);
-                    hrgass(i) = hrgas(i);
-                    qrgaps(i) = qrgas(i);
-                    qcgaps(i) = qcgas(i);
+                    state.dataThermalISO15099Calc->qvs(2 * i - 1) = qv(2 * i - 1);
+                    state.dataThermalISO15099Calc->qvs(2 * i) = qv(2 * i);
+                    state.dataThermalISO15099Calc->hcgass(i) = hcgas(i);
+                    state.dataThermalISO15099Calc->hrgass(i) = hrgas(i);
+                    state.dataThermalISO15099Calc->qrgaps(i) = state.dataThermalISO15099Calc->qrgas(i);
+                    state.dataThermalISO15099Calc->qcgaps(i) = state.dataThermalISO15099Calc->qcgas(i);
                 }
                 //    CHECK THIS!
-                qs(2 * nlayer + 1) = q(2 * nlayer + 1);
+                state.dataThermalISO15099Calc->qs(2 * nlayer + 1) = q(2 * nlayer + 1);
             } // if (UFactorCalc.gt.0) then
         }
 
@@ -704,7 +630,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
             hout = houtt;
 
             // call therm1d to calculate heat flux without solar radiation
-            therm1d(files,
+            therm1d(state,
+                    files,
                     nlayer,
                     iwd,
                     tout,
@@ -721,13 +648,13 @@ namespace EnergyPlus::ThermalISO15099Calc {
                     ebroom,
                     Gin,
                     tir,
-                    rir,
+                    state.dataThermalISO15099Calc->rir,
                     emis,
                     gap,
                     thick,
                     scon,
                     tilt,
-                    sol0,
+                    state.dataThermalISO15099Calc->sol0,
                     height,
                     heightt,
                     width,
@@ -761,24 +688,24 @@ namespace EnergyPlus::ThermalISO15099Calc {
                     tamb,
                     troom,
                     ibc,
-                    Atop_eff,
-                    Abot_eff,
-                    Al_eff,
-                    Ar_eff,
-                    Ah_eff,
-                    EffectiveOpenness,
+                    state.dataThermalISO15099Calc->Atop_eff,
+                    state.dataThermalISO15099Calc->Abot_eff,
+                    state.dataThermalISO15099Calc->Al_eff,
+                    state.dataThermalISO15099Calc->Ar_eff,
+                    state.dataThermalISO15099Calc->Ah_eff,
+                    state.dataThermalISO15099Calc->EffectiveOpenness,
                     vvent,
                     tvent,
                     LayerType,
                     Ra,
                     Nu,
-                    vfreevent,
-                    qcgas,
-                    qrgas,
-                    Ebf,
-                    Ebb,
-                    Rf,
-                    Rb,
+                    state.dataThermalISO15099Calc->vfreevent,
+                    state.dataThermalISO15099Calc->qcgas,
+                    state.dataThermalISO15099Calc->qrgas,
+                    state.dataThermalISO15099Calc->Ebf,
+                    state.dataThermalISO15099Calc->Ebb,
+                    state.dataThermalISO15099Calc->Rf,
+                    state.dataThermalISO15099Calc->Rb,
                     ShadeEmisRatioOut,
                     ShadeEmisRatioIn,
                     ShadeHcModifiedOut,
@@ -822,63 +749,63 @@ namespace EnergyPlus::ThermalISO15099Calc {
             NeedUnshadedRun = false;
             // bi...Set outdoor & indoor gas properties:
             if (NeedUnshadedRun) {
-                nmix_NOSD(1) = nmix(1);
-                presure_NOSD(1) = presure(1);
-                nmix_NOSD(nlayer_NOSD + 1) = nmix(nlayer + 1);
-                presure_NOSD(nlayer_NOSD + 1) = presure(nlayer + 1);
+                state.dataThermalISO15099Calc->nmix_NOSD(1) = nmix(1);
+                state.dataThermalISO15099Calc->presure_NOSD(1) = presure(1);
+                state.dataThermalISO15099Calc->nmix_NOSD(nlayer_NOSD + 1) = nmix(nlayer + 1);
+                state.dataThermalISO15099Calc->presure_NOSD(nlayer_NOSD + 1) = presure(nlayer + 1);
                 for (j = 1; j <= nmix(1); ++j) {
-                    iprop_NOSD(j, 1) = iprop(j, 1);
-                    frct_NOSD(j, 1) = frct(j, 1);
+                    state.dataThermalISO15099Calc->iprop_NOSD(j, 1) = iprop(j, 1);
+                    state.dataThermalISO15099Calc->frct_NOSD(j, 1) = frct(j, 1);
                 }
                 for (j = 1; j <= nmix(nlayer_NOSD + 1); ++j) {
-                    iprop_NOSD(j, nlayer_NOSD + 1) = iprop(j, nlayer + 1);
-                    frct_NOSD(j, nlayer_NOSD + 1) = frct(j, nlayer + 1);
+                    state.dataThermalISO15099Calc->iprop_NOSD(j, nlayer_NOSD + 1) = iprop(j, nlayer + 1);
+                    state.dataThermalISO15099Calc->frct_NOSD(j, nlayer_NOSD + 1) = frct(j, nlayer + 1);
                 }
                 for (i = 1; i <= nlayer_NOSD; ++i) {
                     OriginalIndex = FirstSpecularLayer + i - 1;
-                    Atop_NOSD(i) = Atop_eff(OriginalIndex);
-                    Abot_NOSD(i) = Abot_eff(OriginalIndex);
-                    Al_NOSD(i) = Al_eff(OriginalIndex);
-                    Ar_NOSD(i) = Ar_eff(OriginalIndex);
-                    Ah_NOSD(i) = Ah_eff(OriginalIndex);
+                    state.dataThermalISO15099Calc->Atop_NOSD(i) = state.dataThermalISO15099Calc->Atop_eff(OriginalIndex);
+                    state.dataThermalISO15099Calc->Abot_NOSD(i) = state.dataThermalISO15099Calc->Abot_eff(OriginalIndex);
+                    state.dataThermalISO15099Calc->Al_NOSD(i) = state.dataThermalISO15099Calc->Al_eff(OriginalIndex);
+                    state.dataThermalISO15099Calc->Ar_NOSD(i) = state.dataThermalISO15099Calc->Ar_eff(OriginalIndex);
+                    state.dataThermalISO15099Calc->Ah_NOSD(i) = state.dataThermalISO15099Calc->Ah_eff(OriginalIndex);
 
-                    SlatThick_NOSD(i) = SlatThick(OriginalIndex);
-                    SlatWidth_NOSD(i) = SlatWidth(OriginalIndex);
-                    SlatAngle_NOSD(i) = SlatAngle(OriginalIndex);
-                    SlatCond_NOSD(i) = SlatCond(OriginalIndex);
-                    SlatSpacing_NOSD(i) = SlatSpacing(OriginalIndex);
-                    SlatCurve_NOSD(i) = SlatCurve(OriginalIndex);
+                    state.dataThermalISO15099Calc->SlatThick_NOSD(i) = SlatThick(OriginalIndex);
+                    state.dataThermalISO15099Calc->SlatWidth_NOSD(i) = SlatWidth(OriginalIndex);
+                    state.dataThermalISO15099Calc->SlatAngle_NOSD(i) = SlatAngle(OriginalIndex);
+                    state.dataThermalISO15099Calc->SlatCond_NOSD(i) = SlatCond(OriginalIndex);
+                    state.dataThermalISO15099Calc->SlatSpacing_NOSD(i) = SlatSpacing(OriginalIndex);
+                    state.dataThermalISO15099Calc->SlatCurve_NOSD(i) = SlatCurve(OriginalIndex);
 
                     // cbi...    TO do when Forced Ventilation is implemented: take care of appropriate arguments!!!
                     //      vvent_NOSD
                     //      tvent_NOSD
 
-                    LayerType_NOSD(i) = LayerType(OriginalIndex);
+                    state.dataThermalISO15099Calc->LayerType_NOSD(i) = LayerType(OriginalIndex);
 
-                    thick_NOSD(i) = thick(OriginalIndex);
-                    scon_NOSD(i) = scon(OriginalIndex);
-                    tir_NOSD(2 * i - 1) = tir(2 * OriginalIndex - 1);
-                    emis_NOSD(2 * i - 1) = emis(2 * OriginalIndex - 1);
-                    emis_NOSD(2 * i) = emis(2 * OriginalIndex);
-                    rir_NOSD(2 * i - 1) = rir(2 * OriginalIndex - 1);
-                    rir_NOSD(2 * i) = rir(2 * OriginalIndex);
+                    state.dataThermalISO15099Calc->thick_NOSD(i) = thick(OriginalIndex);
+                    state.dataThermalISO15099Calc->scon_NOSD(i) = scon(OriginalIndex);
+                    state.dataThermalISO15099Calc->tir_NOSD(2 * i - 1) = tir(2 * OriginalIndex - 1);
+                    state.dataThermalISO15099Calc->emis_NOSD(2 * i - 1) = emis(2 * OriginalIndex - 1);
+                    state.dataThermalISO15099Calc->emis_NOSD(2 * i) = emis(2 * OriginalIndex);
+                    state.dataThermalISO15099Calc->rir_NOSD(2 * i - 1) = state.dataThermalISO15099Calc->rir(2 * OriginalIndex - 1);
+                    state.dataThermalISO15099Calc->rir_NOSD(2 * i) = state.dataThermalISO15099Calc->rir(2 * OriginalIndex);
 
-                    gap_NOSD(i) = gap(OriginalIndex);
+                    state.dataThermalISO15099Calc->gap_NOSD(i) = gap(OriginalIndex);
 
                     if (i < nlayer_NOSD) {
-                        nmix_NOSD(i + 1) = nmix(OriginalIndex + 1);
-                        presure_NOSD(i + 1) = presure(OriginalIndex + 1);
-                        for (j = 1; j <= nmix_NOSD(i + 1); ++j) {
-                            iprop_NOSD(j, i + 1) = iprop(j, OriginalIndex + 1);
-                            frct_NOSD(j, i + 1) = frct(j, OriginalIndex + 1);
+                        state.dataThermalISO15099Calc->nmix_NOSD(i + 1) = nmix(OriginalIndex + 1);
+                        state.dataThermalISO15099Calc->presure_NOSD(i + 1) = presure(OriginalIndex + 1);
+                        for (j = 1; j <= state.dataThermalISO15099Calc->nmix_NOSD(i + 1); ++j) {
+                            state.dataThermalISO15099Calc->iprop_NOSD(j, i + 1) = iprop(j, OriginalIndex + 1);
+                            state.dataThermalISO15099Calc->frct_NOSD(j, i + 1) = frct(j, OriginalIndex + 1);
                         }
                     }
 
-                    LaminateA_NOSD(i) = LaminateA(OriginalIndex);
-                    LaminateB_NOSD(i) = LaminateB(OriginalIndex);
-                    sumsol_NOSD(i) = sumsol(OriginalIndex);
+                    state.dataThermalISO15099Calc->LaminateA_NOSD(i) = LaminateA(OriginalIndex);
+                    state.dataThermalISO15099Calc->LaminateB_NOSD(i) = LaminateB(OriginalIndex);
+                    state.dataThermalISO15099Calc->sumsol_NOSD(i) = sumsol(OriginalIndex);
 
-                    nslice_NOSD(i) = nslice(OriginalIndex);
+                    state.dataThermalISO15099Calc->nslice_NOSD(i) = nslice(OriginalIndex);
                 }
 
                 //    This is UNSHADED pass - no solar radiation:
@@ -892,7 +819,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                     print(files.DebugOutputFile, "UNSHADED RUN:\n");
                     print(files.DebugOutputFile, "\n");
 
-                    WriteInputArguments(state, files.DebugOutputFile,
+                    WriteInputArguments(state,
+                                        files.DebugOutputFile,
                                         files.DBGD,
                                         tout,
                                         tind,
@@ -920,34 +848,34 @@ namespace EnergyPlus::ThermalISO15099Calc {
                                         tilt,
                                         totsol,
                                         nlayer_NOSD,
-                                        LayerType_NOSD,
-                                        thick_NOSD,
-                                        scon_NOSD,
+                                        state.dataThermalISO15099Calc->LayerType_NOSD,
+                                        state.dataThermalISO15099Calc->thick_NOSD,
+                                        state.dataThermalISO15099Calc->scon_NOSD,
                                         asol,
-                                        tir_NOSD,
-                                        emis_NOSD,
-                                        Atop_NOSD,
-                                        Abot_NOSD,
-                                        Al_NOSD,
-                                        Ar_NOSD,
-                                        Ah_NOSD,
-                                        SlatThick_NOSD,
-                                        SlatWidth_NOSD,
-                                        SlatAngle_NOSD,
-                                        SlatCond_NOSD,
-                                        SlatSpacing_NOSD,
-                                        SlatCurve_NOSD,
-                                        nslice_NOSD,
-                                        LaminateA_NOSD,
-                                        LaminateB_NOSD,
-                                        sumsol_NOSD,
-                                        gap_NOSD,
-                                        vvent_NOSD,
-                                        tvent_NOSD,
-                                        presure_NOSD,
-                                        nmix_NOSD,
-                                        iprop_NOSD,
-                                        frct_NOSD,
+                                        state.dataThermalISO15099Calc->tir_NOSD,
+                                        state.dataThermalISO15099Calc->emis_NOSD,
+                                        state.dataThermalISO15099Calc->Atop_NOSD,
+                                        state.dataThermalISO15099Calc->Abot_NOSD,
+                                        state.dataThermalISO15099Calc->Al_NOSD,
+                                        state.dataThermalISO15099Calc->Ar_NOSD,
+                                        state.dataThermalISO15099Calc->Ah_NOSD,
+                                        state.dataThermalISO15099Calc->SlatThick_NOSD,
+                                        state.dataThermalISO15099Calc->SlatWidth_NOSD,
+                                        state.dataThermalISO15099Calc->SlatAngle_NOSD,
+                                        state.dataThermalISO15099Calc->SlatCond_NOSD,
+                                        state.dataThermalISO15099Calc->SlatSpacing_NOSD,
+                                        state.dataThermalISO15099Calc->SlatCurve_NOSD,
+                                        state.dataThermalISO15099Calc->nslice_NOSD,
+                                        state.dataThermalISO15099Calc->LaminateA_NOSD,
+                                        state.dataThermalISO15099Calc->LaminateB_NOSD,
+                                        state.dataThermalISO15099Calc->sumsol_NOSD,
+                                        state.dataThermalISO15099Calc->gap_NOSD,
+                                        state.dataThermalISO15099Calc->vvent_NOSD,
+                                        state.dataThermalISO15099Calc->tvent_NOSD,
+                                        state.dataThermalISO15099Calc->presure_NOSD,
+                                        state.dataThermalISO15099Calc->nmix_NOSD,
+                                        state.dataThermalISO15099Calc->iprop_NOSD,
+                                        state.dataThermalISO15099Calc->frct_NOSD,
                                         xgcon,
                                         xgvis,
                                         xgcp,
@@ -959,7 +887,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 //      This is "Unshaded, No solar radiation" pass
                 // cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                 // call therm1d to calculate heat flux with solar radiation
-                therm1d(files,
+                therm1d(state,
+                        files,
                         nlayer_NOSD,
                         iwd,
                         tout,
@@ -975,21 +904,21 @@ namespace EnergyPlus::ThermalISO15099Calc {
                         trmin,
                         ebroom,
                         Gin,
-                        tir_NOSD,
-                        rir_NOSD,
-                        emis_NOSD,
-                        gap_NOSD,
-                        thick_NOSD,
-                        scon_NOSD,
+                        state.dataThermalISO15099Calc->tir_NOSD,
+                        state.dataThermalISO15099Calc->rir_NOSD,
+                        state.dataThermalISO15099Calc->emis_NOSD,
+                        state.dataThermalISO15099Calc->gap_NOSD,
+                        state.dataThermalISO15099Calc->thick_NOSD,
+                        state.dataThermalISO15099Calc->scon_NOSD,
                         tilt,
-                        sol0,
+                        state.dataThermalISO15099Calc->sol0,
                         height,
                         heightt,
                         width,
-                        iprop_NOSD,
-                        frct_NOSD,
-                        presure_NOSD,
-                        nmix_NOSD,
+                        state.dataThermalISO15099Calc->iprop_NOSD,
+                        state.dataThermalISO15099Calc->frct_NOSD,
+                        state.dataThermalISO15099Calc->presure_NOSD,
+                        state.dataThermalISO15099Calc->nmix_NOSD,
                         xwght,
                         xgcon,
                         xgvis,
@@ -998,9 +927,9 @@ namespace EnergyPlus::ThermalISO15099Calc {
                         SupportPillar,
                         PillarSpacing,
                         PillarRadius,
-                        theta_NOSD,
-                        q_NOSD,
-                        qv_NOSD,
+                        state.dataThermalISO15099Calc->theta_NOSD,
+                        state.dataThermalISO15099Calc->q_NOSD,
+                        state.dataThermalISO15099Calc->qv_NOSD,
                         flux_NOSD,
                         hcin_NOSD,
                         hrin_NOSD,
@@ -1008,32 +937,32 @@ namespace EnergyPlus::ThermalISO15099Calc {
                         hrout_NOSD,
                         hin_NOSD,
                         hout_NOSD,
-                        hcgas_NOSD,
-                        hrgas_NOSD,
+                        state.dataThermalISO15099Calc->hcgas_NOSD,
+                        state.dataThermalISO15099Calc->hrgas_NOSD,
                         ufactor_NOSD,
                         nperr,
                         ErrorMessage,
                         tamb_NOSD,
                         troom_NOSD,
                         ibc,
-                        Atop_NOSD,
-                        Abot_NOSD,
-                        Al_NOSD,
-                        Ar_NOSD,
-                        Ah_NOSD,
-                        EffectiveOpenness_NOSD,
-                        vvent_NOSD,
-                        tvent_NOSD,
-                        LayerType_NOSD,
-                        Ra_NOSD,
-                        Nu_NOSD,
-                        vfreevent_NOSD,
-                        qcgas_NOSD,
-                        qrgas_NOSD,
-                        Ebf_NOSD,
-                        Ebb_NOSD,
-                        Rf_NOSD,
-                        Rb_NOSD,
+                        state.dataThermalISO15099Calc->Atop_NOSD,
+                        state.dataThermalISO15099Calc->Abot_NOSD,
+                        state.dataThermalISO15099Calc->Al_NOSD,
+                        state.dataThermalISO15099Calc->Ar_NOSD,
+                        state.dataThermalISO15099Calc->Ah_NOSD,
+                        state.dataThermalISO15099Calc->EffectiveOpenness_NOSD,
+                        state.dataThermalISO15099Calc->vvent_NOSD,
+                        state.dataThermalISO15099Calc->tvent_NOSD,
+                        state.dataThermalISO15099Calc->LayerType_NOSD,
+                        state.dataThermalISO15099Calc->Ra_NOSD,
+                        state.dataThermalISO15099Calc->Nu_NOSD,
+                        state.dataThermalISO15099Calc->vfreevent_NOSD,
+                        state.dataThermalISO15099Calc->qcgas_NOSD,
+                        state.dataThermalISO15099Calc->qrgas_NOSD,
+                        state.dataThermalISO15099Calc->Ebf_NOSD,
+                        state.dataThermalISO15099Calc->Ebb_NOSD,
+                        state.dataThermalISO15099Calc->Rf_NOSD,
+                        state.dataThermalISO15099Calc->Rb_NOSD,
                         ShadeEmisRatioOut_NOSD,
                         ShadeEmisRatioIn_NOSD,
                         ShadeHcModifiedOut_NOSD,
@@ -1061,15 +990,15 @@ namespace EnergyPlus::ThermalISO15099Calc {
                                          files.DBGD,
                                          nlayer_NOSD,
                                          tamb,
-                                         q_NOSD,
-                                         qv_NOSD,
-                                         qcgas_NOSD,
-                                         qrgas_NOSD,
-                                         theta_NOSD,
-                                         vfreevent_NOSD,
-                                         vvent_NOSD,
-                                         Keff_NOSD,
-                                         ShadeGapKeffConv_NOSD,
+                                         state.dataThermalISO15099Calc->q_NOSD,
+                                         state.dataThermalISO15099Calc->qv_NOSD,
+                                         state.dataThermalISO15099Calc->qcgas_NOSD,
+                                         state.dataThermalISO15099Calc->qrgas_NOSD,
+                                         state.dataThermalISO15099Calc->theta_NOSD,
+                                         state.dataThermalISO15099Calc->vfreevent_NOSD,
+                                         state.dataThermalISO15099Calc->vvent_NOSD,
+                                         state.dataThermalISO15099Calc->Keff_NOSD,
+                                         state.dataThermalISO15099Calc->ShadeGapKeffConv_NOSD,
                                          troom_NOSD,
                                          ufactor_NOSD,
                                          shgc_NOSD,
@@ -1080,13 +1009,13 @@ namespace EnergyPlus::ThermalISO15099Calc {
                                          hrin_NOSD,
                                          hcout_NOSD,
                                          hrout_NOSD,
-                                         Ra_NOSD,
-                                         Nu_NOSD,
-                                         LayerType_NOSD,
-                                         Ebf_NOSD,
-                                         Ebb_NOSD,
-                                         Rf_NOSD,
-                                         Rb_NOSD,
+                                         state.dataThermalISO15099Calc->Ra_NOSD,
+                                         state.dataThermalISO15099Calc->Nu_NOSD,
+                                         state.dataThermalISO15099Calc->LayerType_NOSD,
+                                         state.dataThermalISO15099Calc->Ebf_NOSD,
+                                         state.dataThermalISO15099Calc->Ebb_NOSD,
+                                         state.dataThermalISO15099Calc->Rf_NOSD,
+                                         state.dataThermalISO15099Calc->Rb_NOSD,
                                          ebsky,
                                          Gout,
                                          ebroom,
@@ -1097,8 +1026,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                                          ShadeHcRatioOut_NOSD,
                                          hcin_NOSD,
                                          hcout_NOSD,
-                                         hcgas_NOSD,
-                                         hrgas_NOSD,
+                                         state.dataThermalISO15099Calc->hcgas_NOSD,
+                                         state.dataThermalISO15099Calc->hrgas_NOSD,
                                          AchievedErrorTolerance_NOSD,
                                          NumOfIter_NOSD); // Autodesk:Uninit shgc_NOSD, sc_NOSD, hflux_NOSD,
                                                           // ShadeHcRatioIn_NOSD, ShadeHcRatioOut_NOSD were
@@ -1120,8 +1049,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                         // Keff(i)   = gap(i)   * qprim(2*i+1) / (theta(2*i+1) - theta(2*i))
                         if ((i > 1) && (i < nlayer)) {
                             tgg = gap(i - 1) + gap(i) + thick(i);
-                            qc1 = qcgas(i - 1);
-                            qc2 = qcgas(i);
+                            qc1 = state.dataThermalISO15099Calc->qcgas(i - 1);
+                            qc2 = state.dataThermalISO15099Calc->qcgas(i);
                             qcgg = (qc1 + qc2) / 2.0;
                             ShadeGapKeffConv(i) = tgg * qcgg / (theta(2 * i + 1) - theta(2 * i - 2));
                         }
@@ -1132,42 +1061,42 @@ namespace EnergyPlus::ThermalISO15099Calc {
         } // if (UFactorCalc.ne.0) then
 
         // bi...  For debugging purposes:
-        qeff = ufactor * std::abs(tout - tind);
-        flux_nonsolar = flux;
+        state.dataThermalISO15099Calc->qeff = ufactor * std::abs(tout - tind);
+        state.dataThermalISO15099Calc->flux_nonsolar = flux;
 
         if ((SHGCCalc > 0) && (dir > 0.0)) {
-            shgc = totsol - (fluxs - flux) / dir;
+            shgc = totsol - (state.dataThermalISO15099Calc->fluxs - flux) / dir;
             sc = shgc / 0.87;
-            hcin = hcins;
-            hrin = hrins;
-            hin = hins;
-            hcout = hcouts;
-            hrout = hrouts;
-            hout = houts;
-            flux = fluxs; // <--- ???
+            hcin = state.dataThermalISO15099Calc->hcins;
+            hrin = state.dataThermalISO15099Calc->hrins;
+            hin = state.dataThermalISO15099Calc->hins;
+            hcout = state.dataThermalISO15099Calc->hcouts;
+            hrout = state.dataThermalISO15099Calc->hrouts;
+            hout = state.dataThermalISO15099Calc->houts;
+            flux = state.dataThermalISO15099Calc->fluxs; // <--- ???
             for (i = 1; i <= nlayer; ++i) {
-                theta(2 * i - 1) = thetas(2 * i - 1);
-                theta(2 * i) = thetas(2 * i);
-                Ebb(i) = Ebbs(i);
-                Ebf(i) = Ebfs(i);
-                Rb(i) = Rbs(i);
-                Rf(i) = Rfs(i);
-                q(2 * i - 1) = qs(2 * i - 1);
-                q(2 * i) = qs(2 * i);
+                theta(2 * i - 1) = state.dataThermalISO15099Calc->thetas(2 * i - 1);
+                theta(2 * i) = state.dataThermalISO15099Calc->thetas(2 * i);
+                state.dataThermalISO15099Calc->Ebb(i) = state.dataThermalISO15099Calc->Ebbs(i);
+                state.dataThermalISO15099Calc->Ebf(i) = state.dataThermalISO15099Calc->Ebfs(i);
+                state.dataThermalISO15099Calc->Rb(i) = state.dataThermalISO15099Calc->Rbs(i);
+                state.dataThermalISO15099Calc->Rf(i) = state.dataThermalISO15099Calc->Rfs(i);
+                q(2 * i - 1) = state.dataThermalISO15099Calc->qs(2 * i - 1);
+                q(2 * i) = state.dataThermalISO15099Calc->qs(2 * i);
                 // qprim(2*i - 1) = qprims(2*i - 1)
                 // qprim(2*i) = qprims(2*i)
-                qv(2 * i - 1) = qvs(2 * i - 1);
-                qv(2 * i) = qvs(2 * i);
-                hcgas(i) = hcgass(i);
-                hrgas(i) = hrgass(i);
-                qcgas(i) = qcgaps(i);
-                qrgas(i) = qrgaps(i);
+                qv(2 * i - 1) = state.dataThermalISO15099Calc->qvs(2 * i - 1);
+                qv(2 * i) = state.dataThermalISO15099Calc->qvs(2 * i);
+                hcgas(i) = state.dataThermalISO15099Calc->hcgass(i);
+                hrgas(i) = state.dataThermalISO15099Calc->hrgass(i);
+                state.dataThermalISO15099Calc->qcgas(i) = state.dataThermalISO15099Calc->qcgaps(i);
+                state.dataThermalISO15099Calc->qrgas(i) = state.dataThermalISO15099Calc->qrgaps(i);
                 AchievedErrorTolerance = AchievedErrorToleranceSolar;
                 NumOfIter = NumOfIterSolar;
             }
 
             // bi    CHECK THIS!
-            q(2 * nlayer + 1) = qs(2 * nlayer + 1);
+            q(2 * nlayer + 1) = state.dataThermalISO15099Calc->qs(2 * nlayer + 1);
         }
 
         hflux = flux; // save flux value for output table
@@ -1180,10 +1109,10 @@ namespace EnergyPlus::ThermalISO15099Calc {
                                  tamb,
                                  q,
                                  qv,
-                                 qcgas,
-                                 qrgas,
+                                 state.dataThermalISO15099Calc->qcgas,
+                                 state.dataThermalISO15099Calc->qrgas,
                                  theta,
-                                 vfreevent,
+                                 state.dataThermalISO15099Calc->vfreevent,
                                  vvent,
                                  Keff,
                                  ShadeGapKeffConv,
@@ -1200,10 +1129,10 @@ namespace EnergyPlus::ThermalISO15099Calc {
                                  Ra,
                                  Nu,
                                  LayerType,
-                                 Ebf,
-                                 Ebb,
-                                 Rf,
-                                 Rb,
+                                 state.dataThermalISO15099Calc->Ebf,
+                                 state.dataThermalISO15099Calc->Ebb,
+                                 state.dataThermalISO15099Calc->Rf,
+                                 state.dataThermalISO15099Calc->Rb,
                                  ebsky,
                                  Gout,
                                  ebroom,
@@ -1221,7 +1150,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         } // if WriteDebugOutput.eq.true - writing output file
     }
 
-    void therm1d(Files &files,
+    void therm1d(EnergyPlusData &state,
+                 Files &files,
                  int const nlayer,
                  int const iwd,
                  Real64 &tout,
@@ -1377,11 +1307,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
 
         Array2D<Real64> a(4 * nlayer, 4 * nlayer);
         Array1D<Real64> b(4 * nlayer);
-        static Array1D<Real64> hgas(maxlay1);
         // REAL(r64) :: hhatv(maxlay3),hcv(maxlay3), Ebgap(maxlay3), Tgap(maxlay1)
-        static Array1D<Real64> Tgap(maxlay1);
-        static Array1D<Real64> hcgapMod(maxlay1);
-        static Array1D<Real64> hcv(maxlay1);
 
         // REAL(r64) ::  alpha
         int maxiter;
@@ -1492,10 +1418,10 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 files, nlayer, index, theta, trmout, tamb, trmin, troom, ebsky, ebroom, hcin, hcout, hrin, hrout, hin, hout, Ebb, Ebf, Rb, Rf, nperr);
         }
 
-        Tgap(1) = tout;
-        Tgap(nlayer + 1) = tind;
+        state.dataThermalISO15099Calc->Tgap(1) = tout;
+        state.dataThermalISO15099Calc->Tgap(nlayer + 1) = tind;
         for (i = 2; i <= nlayer; ++i) {
-            Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
+            state.dataThermalISO15099Calc->Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
         }
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //!!! MAIN ITERATION LOOP
@@ -1526,12 +1452,13 @@ namespace EnergyPlus::ThermalISO15099Calc {
                     updateGapTemperature = true;
                 }
                 if (updateGapTemperature) {
-                    Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
+                    state.dataThermalISO15099Calc->Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
                 }
             }
 
             // evaluate convective/conductive components of gap
-            hatter(nlayer,
+            hatter(state,
+                   nlayer,
                    iwd,
                    tout,
                    tind,
@@ -1549,7 +1476,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                    scon,
                    tilt,
                    theta,
-                   Tgap,
+                   state.dataThermalISO15099Calc->Tgap,
                    Radiation,
                    trmout,
                    trmin,
@@ -1565,7 +1492,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                    SupportPillar,
                    PillarSpacing,
                    PillarRadius,
-                   hgas,
+                   state.dataThermalISO15099Calc->hgas,
                    hcgas,
                    hrgas,
                    hcin,
@@ -1581,7 +1508,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                    Ra,
                    Nu);
 
-            effectiveLayerCond(nlayer,
+            effectiveLayerCond(state,
+                               nlayer,
                                LayerType,
                                scon,
                                thick,
@@ -1614,12 +1542,13 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 // qv(i)    = 0.0d0
                 // hcv(i)   = 0.0d0
                 // end do
-                matrixQBalance(nlayer, a, b, sconScaled, hcgas, hcgapMod, asol, qv, hcv, tind, tout, Gin, Gout, theta, tir, rir, emis, edgeGlCorrFac);
+                matrixQBalance(nlayer, a, b, sconScaled, hcgas, state.dataThermalISO15099Calc->hcgapMod, asol, qv, state.dataThermalISO15099Calc->hcv, tind, tout, Gin, Gout, theta, tir, rir, emis, edgeGlCorrFac);
             } else {
                 // bi...There are no Venetian layers, or ThermalMod is not CSM, so carry on as usual:
-                shading(theta,
+                shading(state,
+                        theta,
                         gap,
-                        hgas,
+                        state.dataThermalISO15099Calc->hgas,
                         hcgas,
                         hrgas,
                         frct,
@@ -1644,9 +1573,9 @@ namespace EnergyPlus::ThermalISO15099Calc {
                         vvent,
                         tvent,
                         LayerType,
-                        Tgap,
+                        state.dataThermalISO15099Calc->Tgap,
                         qv,
-                        hcv,
+                        state.dataThermalISO15099Calc->hcv,
                         nperr,
                         ErrorMessage,
                         vfreevent);
@@ -1654,7 +1583,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 // exit on error
                 if (!(GoAhead(nperr))) return;
 
-                matrixQBalance(nlayer, a, b, sconScaled, hcgas, hcgapMod, asol, qv, hcv, tind, tout, Gin, Gout, theta, tir, rir, emis, edgeGlCorrFac);
+                matrixQBalance(nlayer, a, b, sconScaled, hcgas, state.dataThermalISO15099Calc->hcgapMod, asol, qv, state.dataThermalISO15099Calc->hcv, tind, tout, Gin, Gout, theta, tir, rir, emis, edgeGlCorrFac);
 
             } //  end if
 
@@ -1734,11 +1663,11 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 j = 2 * (i - 1);
                 if (updateGapTemperature) {
                     if (i == 1) {
-                        Tgap(1) = tout;
+                        state.dataThermalISO15099Calc->Tgap(1) = tout;
                     } else if (i == (nlayer + 1)) {
-                        Tgap(i) = tind;
+                        state.dataThermalISO15099Calc->Tgap(i) = tind;
                     } else {
-                        Tgap(i) = (theta(j) + theta(j + 1)) / 2;
+                        state.dataThermalISO15099Calc->Tgap(i) = (theta(j) + theta(j + 1)) / 2;
                     }
                 }
             }
@@ -1843,12 +1772,13 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 }
 
                 if (updateGapTemperature) {
-                    Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
+                    state.dataThermalISO15099Calc->Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
                 }
             }
 
             // Simon: It is important to recalculate coefficients from most accurate run
-            hatter(nlayer,
+            hatter(state,
+                   nlayer,
                    iwd,
                    tout,
                    tind,
@@ -1866,7 +1796,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                    scon,
                    tilt,
                    theta,
-                   Tgap,
+                   state.dataThermalISO15099Calc->Tgap,
                    Radiation,
                    trmout,
                    trmin,
@@ -1882,7 +1812,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                    SupportPillar,
                    PillarSpacing,
                    PillarRadius,
-                   hgas,
+                   state.dataThermalISO15099Calc->hgas,
                    hcgas,
                    hrgas,
                    hcin,
@@ -1898,9 +1828,10 @@ namespace EnergyPlus::ThermalISO15099Calc {
                    Ra,
                    Nu);
 
-            shading(theta,
+            shading(state,
+                    theta,
                     gap,
-                    hgas,
+                    state.dataThermalISO15099Calc->hgas,
                     hcgas,
                     hrgas,
                     frct,
@@ -1925,9 +1856,9 @@ namespace EnergyPlus::ThermalISO15099Calc {
                     vvent,
                     tvent,
                     LayerType,
-                    Tgap,
+                    state.dataThermalISO15099Calc->Tgap,
                     qv,
-                    hcv,
+                    state.dataThermalISO15099Calc->hcv,
                     nperr,
                     ErrorMessage,
                     vfreevent);
@@ -2170,7 +2101,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         }
     }
 
-    void hatter(int const nlayer,
+    void hatter(EnergyPlusData &state,
+                int const nlayer,
                 int const iwd,
                 Real64 const tout,
                 Real64 const tind,
@@ -2273,7 +2205,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         // evaluate convective/conductive components of gap grashof number, thermal conductivity and their derivatives:
         nface = 2 * nlayer;
 
-        filmg(tilt,
+        filmg(state,
+              tilt,
               theta,
               Tgap,
               nlayer,
@@ -2300,7 +2233,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         }
 
         // this is adding influence of pillar to hgas
-        filmPillar(SupportPillar, scon, PillarSpacing, PillarRadius, nlayer, gap, hcgas, VacuumMaxGapThickness, nperr, ErrorMessage);
+        filmPillar(state,
+                   SupportPillar, scon, PillarSpacing, PillarRadius, nlayer, gap, hcgas, VacuumMaxGapThickness, nperr, ErrorMessage);
 
         if (!(GoAhead(nperr))) {
             return;
@@ -2323,6 +2257,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
         // convective indoor film coeff:
         if (ibc(2) <= 0) {
             filmi(
+                state,
                 tind, theta(nface), nlayer, tilt, wsi, heightt, iprop, frct, presure, nmix, wght, gcon, gvis, gcp, hcin, ibc(2), nperr, ErrorMessage);
         } else if (ibc(2) == 1) {
             hcin = hin - hrin;
@@ -2379,7 +2314,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         tamb = (hcout * tout + hrout * trmout) / (hcout + hrout);
     }
 
-    void effectiveLayerCond(int const nlayer,
+    void effectiveLayerCond(EnergyPlusData &state,
+                            int const nlayer,
                             const Array1D_int &LayerType,             // Layer type
                             const Array1D<Real64> &scon,              // Layer thermal conductivity
                             const Array1D<Real64> &thick,             // Layer thickness
@@ -2398,17 +2334,14 @@ namespace EnergyPlus::ThermalISO15099Calc {
                             std::string &ErrorMessage                // Error message
     )
     {
-        static Array1D_int iprop1(maxgas);
-        static Array1D<Real64> frct1(maxgas);
-
         for (auto i = 1; i <= nlayer; ++i) {
             if (LayerType(i) != SPECULAR) {
                 auto tLayer = (theta(2 * i - 1) + theta(2 * i)) / 2;
                 auto nmix1 = nmix(i);
                 auto press1 = (pressure(i) + pressure(i + 1)) / 2.0;
                 for (auto j = 1; j <= maxgas; ++j) {
-                    iprop1(j) = iprop(j, i);
-                    frct1(j) = frct(j, i);
+                    state.dataThermalISO15099Calc->iprop1(j) = iprop(j, i);
+                    state.dataThermalISO15099Calc->frct1(j) = frct(j, i);
                 }
 
                 Real64 con;
@@ -2416,7 +2349,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 Real64 dens;
                 Real64 cp;
                 Real64 pr;
-                GASSES90(tLayer, iprop1, frct1, press1, nmix1, wght, gcon, gvis, gcp, con, visc, dens, cp, pr, 1, nperr, ErrorMessage);
+                GASSES90(state, tLayer, state.dataThermalISO15099Calc->iprop1, state.dataThermalISO15099Calc->frct1, press1, nmix1, wght, gcon, gvis, gcp, con, visc, dens, cp, pr, 1, nperr, ErrorMessage);
                 sconScaled(i) = (EffectiveOpenness(i) * con + (1 - EffectiveOpenness(i)) * scon(i)) / thick(i);
             } else {
                 sconScaled(i) = scon(i) / thick(i);
@@ -2424,7 +2357,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         }
     }
 
-    void filmi(Real64 const tair,
+    void filmi(EnergyPlusData &state,
+               Real64 const tair,
                Real64 const t,
                int const nlayer,
                Real64 const tilt,
@@ -2475,9 +2409,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
         gcp.dim(3, maxgas);
 
         // Locals
-        static Array1D<Real64> frcti(maxgas);
         int j;
-        static Array1D_int ipropi(maxgas);
         Real64 tiltr;
         Real64 tmean;
         Real64 delt;
@@ -2507,13 +2439,14 @@ namespace EnergyPlus::ThermalISO15099Calc {
             delt = std::abs(tair - t);
 
             for (j = 1; j <= nmix(nlayer + 1); ++j) {
-                ipropi(j) = iprop(j, nlayer + 1);
-                frcti(j) = frct(j, nlayer + 1);
+                state.dataThermalISO15099Calc->ipropi(j) = iprop(j, nlayer + 1);
+                state.dataThermalISO15099Calc->frcti(j) = frct(j, nlayer + 1);
             }
 
-            GASSES90(tmean,
-                     ipropi,
-                     frcti,
+            GASSES90(state,
+                     tmean,
+                     state.dataThermalISO15099Calc->ipropi,
+                     state.dataThermalISO15099Calc->frcti,
                      presure(nlayer + 1),
                      nmix(nlayer + 1),
                      wght,
@@ -2565,7 +2498,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         } // end main IF
     }
 
-    void filmg(Real64 const tilt,
+    void filmg(EnergyPlusData &state,
+               Real64 const tilt,
                const Array1D<Real64> &theta,
                const Array1D<Real64> &Tgap,
                int const nlayer,
@@ -2642,8 +2576,6 @@ namespace EnergyPlus::ThermalISO15099Calc {
         Real64 ra;
         Real64 asp;
         Real64 gnu;
-        static Array1D<Real64> frctg(maxgas);
-        static Array1D_int ipropg(maxgas);
         int i;
         int j;
         int k;
@@ -2661,13 +2593,13 @@ namespace EnergyPlus::ThermalISO15099Calc {
             // Temperatures should not be equal. This can happen in initial temperature guess before iterations started
             if (delt == 0.0) delt = 1.0e-6;
             for (l = 1; l <= nmix(i + 1); ++l) {
-                ipropg(l) = iprop(l, i + 1);
-                frctg(l) = frct(l, i + 1);
+                state.dataThermalISO15099Calc->ipropg(l) = iprop(l, i + 1);
+                state.dataThermalISO15099Calc->frctg(l) = frct(l, i + 1);
             }
 
             if (presure(i + 1) > VacuumPressure) {
-                GASSES90(
-                    tmean, ipropg, frctg, presure(i + 1), nmix(i + 1), wght, gcon, gvis, gcp, con, visc, dens, cp, pr, ISO15099, nperr, ErrorMessage);
+                GASSES90(state,
+                    tmean, state.dataThermalISO15099Calc->ipropg, state.dataThermalISO15099Calc->frctg, presure(i + 1), nmix(i + 1), wght, gcon, gvis, gcp, con, visc, dens, cp, pr, ISO15099, nperr, ErrorMessage);
 
                 // Calculate grashoff number:
                 // The grashoff number is the Rayleigh Number (equation 5.29) in SPC142 divided by the Prandtl Number (prand):
@@ -2695,7 +2627,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         }
     }
 
-    void filmPillar(const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
+    void filmPillar(EnergyPlusData &state,
+                    const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
                     const Array1D<Real64> &scon,          // Conductivity of glass layers
                     const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
                     const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
@@ -2723,22 +2656,17 @@ namespace EnergyPlus::ThermalISO15099Calc {
         //   0 - does not have support pillar
         //   1 - have support pillar
 
-        static Real64 cpa(0.0);
-        static Real64 aveGlassConductivity(0.0);
-        static int i(0);
-        static int k(0);
-
-        for (i = 1; i <= nlayer - 1; ++i) {
-            k = 2 * i + 1;
-            if (SupportPillar(i) == YES_SupportPillar) {
+        for (state.dataThermalISO15099Calc->iFP = 1; state.dataThermalISO15099Calc->iFP <= nlayer - 1; ++state.dataThermalISO15099Calc->iFP) {
+            state.dataThermalISO15099Calc->kFP = 2 * state.dataThermalISO15099Calc->iFP + 1;
+            if (SupportPillar(state.dataThermalISO15099Calc->iFP) == YES_SupportPillar) {
 
                 // Average glass conductivity is taken as average from both glass surrounding gap
-                aveGlassConductivity = (scon(i) + scon(i + 1)) / 2;
+                state.dataThermalISO15099Calc->aveGlassConductivity = (scon(state.dataThermalISO15099Calc->iFP) + scon(state.dataThermalISO15099Calc->iFP + 1)) / 2;
 
-                cpa = 2.0 * aveGlassConductivity * PillarRadius(i) / (pow_2(PillarSpacing(i)) * (1.0 + 2.0 * gap(i) / (DataGlobalConstants::Pi * PillarRadius(i))));
+                state.dataThermalISO15099Calc->cpa = 2.0 * state.dataThermalISO15099Calc->aveGlassConductivity * PillarRadius(state.dataThermalISO15099Calc->iFP) / (pow_2(PillarSpacing(state.dataThermalISO15099Calc->iFP)) * (1.0 + 2.0 * gap(state.dataThermalISO15099Calc->iFP) / (DataGlobalConstants::Pi * PillarRadius(state.dataThermalISO15099Calc->iFP))));
 
                 // It is important to add on prevoius values caluculated for gas
-                hcgas(i + 1) += cpa;
+                hcgas(state.dataThermalISO15099Calc->iFP + 1) += state.dataThermalISO15099Calc->cpa;
             } // if (SupportPillar(i).eq.YES_SupportPillar) then
         }
     }
@@ -2898,7 +2826,6 @@ namespace EnergyPlus::ThermalISO15099Calc {
                                const Array1D<Real64> &Rf,
                                int &)
     {
-
         static std::string dynFormat;
         int i;
 

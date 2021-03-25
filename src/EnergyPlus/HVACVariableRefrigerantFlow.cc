@@ -72,6 +72,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -2226,7 +2227,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 ErrorsFound = true;
             }
 
-            if (lNumericFieldBlanks(23)) {
+            if (lAlphaFieldBlanks(23)) {
                 if (state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType == DataHVACGlobals::WaterCooled) {
                     ShowSevereError(state, cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cNumericFieldNames(23) + " is blank.");
                     ShowContinueError(state, "...input is required when " + cAlphaFieldNames(34) + " = " + cAlphaArgs(34));
@@ -2299,7 +2300,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             }
 
             if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatRecoveryUsed) {
-                if (lNumericFieldBlanks(29)) {
+                if (lAlphaFieldBlanks(29)) {
                     state.dataHVACVarRefFlow->VRF(VRFNum).MinOATHeatRecovery = max(state.dataHVACVarRefFlow->VRF(VRFNum).MinOATCooling, state.dataHVACVarRefFlow->VRF(VRFNum).MinOATHeating);
                 } else {
                     state.dataHVACVarRefFlow->VRF(VRFNum).MinOATHeatRecovery = rNumericArgs(29);
@@ -2315,7 +2316,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         ShowContinueError(state, format("... adjusted {} = {:.2T} C", cNumericFieldNames(29), state.dataHVACVarRefFlow->VRF(VRFNum).MinOATHeatRecovery));
                     }
                 }
-                if (lNumericFieldBlanks(30)) {
+                if (lAlphaFieldBlanks(30)) {
                     state.dataHVACVarRefFlow->VRF(VRFNum).MaxOATHeatRecovery = min(state.dataHVACVarRefFlow->VRF(VRFNum).MaxOATCooling, state.dataHVACVarRefFlow->VRF(VRFNum).MaxOATHeating);
                 } else {
                     state.dataHVACVarRefFlow->VRF(VRFNum).MaxOATHeatRecovery = rNumericArgs(30);
@@ -7143,7 +7144,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         static std::string const RoutineName("SizeVRF: "); // include trailing blank space
 
-        static Array1D_bool CheckVRFCombinationRatio;
+        auto & CheckVRFCombinationRatio = state.dataHVACVarRefFlow->CheckVRFCombinationRatio;
         bool FoundAll;                      // temporary variable used to check all terminal units
         bool errFlag;                       // temporary variable used for error checking
         Real64 TUCoolingCapacity;           // total terminal unit cooling capacity
@@ -7152,7 +7153,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         int TUListNum;                      // index to terminal unit list
         int TUIndex;                        // index to terminal unit
         int NumTU;                          // DO Loop index counter
-        static bool MyOneTimeEIOFlag(true); // eio header flag reporting
+        auto & MyOneTimeEIOFlag = state.dataHVACVarRefFlow->MyOneTimeEIOFlag; // eio header flag reporting
         Real64 OnOffAirFlowRat;             // temporary variable used when sizing coils
         Real64 DXCoilCap;                   // capacity of DX cooling coil (W)
         bool IsAutoSize;                    // Indicator to autosize
@@ -8772,7 +8773,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         Real64 SpecHumIn(0.0);      // specific humidity ratio at inlet node
         int TUListIndex;            // index to TU list for this VRF system
         int IndexToTUInTUList;      // index to TU in specific list for the VRF system
-        static int ATMixOutNode(0); // terminal unit mixer outlet node
+        auto & ATMixOutNode = state.dataHVACVarRefFlow->ATMixOutNode;
         int ZoneNode;               // Zone node of VRFTU is serving
 
         VRFCond = this->VRFSysNum;
@@ -11946,7 +11947,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         int IndexToTUInTUList;      // index to TU in specific list for the VRF system
         Real64 EvapTemp;            // evaporating temperature
         Real64 CondTemp;            // condensing temperature
-        static int ATMixOutNode(0); // outlet node of ATM Mixer
+        auto & ATMixOutNode2 = state.dataHVACVarRefFlow->ATMixOutNode2; // outlet node of ATM Mixer
         int ZoneNode;               // Zone node of VRFTU is serving
 
 
@@ -11974,7 +11975,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         if (this->ATMixerExists) {
             // There is an air terminal mixer
-            ATMixOutNode = this->ATMixerOutNode;
+            ATMixOutNode2 = this->ATMixerOutNode;
             if (this->ATMixerType == DataHVACGlobals::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
                 // set the primary air inlet mass flow rate
                 state.dataLoopNodes->Node(this->ATMixerPriNode).MassFlowRate =
@@ -11984,7 +11985,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 SimATMixer(state, this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
             }
         } else {
-            ATMixOutNode = 0;
+            ATMixOutNode2 = 0;
             // simulate OA Mixer
             if (this->OAMixerUsed) SimOAMixer(state, this->OAMixerName, FirstHVACIteration, this->OAMixerIndex);
         }
@@ -12092,9 +12093,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (this->ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 // Air terminal supply side mixer, calculate supply side mixer output
                 SimATMixer(state, this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
-                TempOut = state.dataLoopNodes->Node(ATMixOutNode).Temp;
-                SpecHumOut = state.dataLoopNodes->Node(ATMixOutNode).HumRat;
-                AirMassFlow = state.dataLoopNodes->Node(ATMixOutNode).MassFlowRate;
+                TempOut = state.dataLoopNodes->Node(ATMixOutNode2).Temp;
+                SpecHumOut = state.dataLoopNodes->Node(ATMixOutNode2).HumRat;
+                AirMassFlow = state.dataLoopNodes->Node(ATMixOutNode2).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
                 TempOut = state.dataLoopNodes->Node(VRFTUOutletNodeNum).Temp;

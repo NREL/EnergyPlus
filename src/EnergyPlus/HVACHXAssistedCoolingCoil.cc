@@ -94,45 +94,9 @@ namespace HVACHXAssistedCoolingCoil {
     //   Augmentation of the Cooling Coil. 15th Symposium on Improving Building Systems in Hot and Humid
     //   Climates, July 24-26, 2006.
 
-    // OTHER NOTES:
-
-    // USE STATEMENTS:
-    //  Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
-    // unused0909USE DataEnvironment, ONLY: CurMnDy, EnvironmentName
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Calculation algorithms for the module
-    // Update routine to update output node information
-    // PRIVATE UpdateHXAssistedCoolingCoil
-    // Not required.  All updates done by the individual components
-    // (cooling coil and air-to-air heat exchanger)
-
-    // Reporting routines for module
-    // PRIVATE ReportHXAssistedCoolingCoil
-    // No reporting variables for this compound component
-
-    // Utility routines for module
-
-    // Object Data
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
 
     void SimHXAssistedCoolingCoil(EnergyPlusData &state,
                                   std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
@@ -305,6 +269,13 @@ namespace HVACHXAssistedCoolingCoil {
         int MaxNums(0);            // Maximum number of numeric input fields
         int MaxAlphas(0);          // Maximum number of alpha input fields
         int TotalArgs(0);          // Total number of alpha and numeric arguments (max) for a
+
+        auto & TotalNumHXAssistedCoils = state.dataHVACAssistedCC->TotalNumHXAssistedCoils;
+        auto & HXAssistedCoil = state.dataHVACAssistedCC->HXAssistedCoil;
+        auto & HXAssistedCoilOutletTemp = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp;
+        auto & HXAssistedCoilOutletHumRat = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat;
+        auto & CheckEquipName = state.dataHVACAssistedCC->CheckEquipName;
+        auto & UniqueHXAssistedCoilNames = state.dataHVACAssistedCC->UniqueHXAssistedCoilNames;
 
         NumHXAssistedDXCoils = inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted");
         NumHXAssistedWaterCoils = inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted");
@@ -789,6 +760,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         // METHODOLOGY EMPLOYED:
         //  Uses the status flags to trigger initializations.
+        auto & HXAssistedCoil = state.dataHVACAssistedCC->HXAssistedCoil;
 
         // Do these initializations every time
         state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).MassFlowRate =
@@ -852,11 +824,14 @@ namespace HVACHXAssistedCoolingCoil {
         //  na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        auto & CoilOutputTempLast = state.dataHVACAssistedCC->CoilOutputTempLast; // Exiting cooling coil temperature from last iteration
+
         Real64 AirMassFlow;               // Inlet air mass flow rate
         Real64 Error;                     // Error (exiting coil temp from last iteration minus current coil exiting temp)
         Real64 ErrorLast;                 // check for oscillations
         int Iter;                         // Number of iterations
         int CompanionCoilIndexNum;        // Index to DX coil
+        auto & HXAssistedCoil = state.dataHVACAssistedCC->HXAssistedCoil;
 
         AirMassFlow = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).MassFlowRate;
         Error = 1.0;       // Initialize error (CoilOutputTemp last iteration minus current CoilOutputTemp)
@@ -1096,8 +1071,10 @@ namespace HVACHXAssistedCoolingCoil {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
-        int ErrCount(0);
+        auto & ErrCount = state.dataHVACAssistedCC->ErrCount;
         bool errFlag;
+
+        auto & HXAssistedCoil = state.dataHVACAssistedCC->HXAssistedCoil;
 
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data
@@ -1109,7 +1086,7 @@ namespace HVACHXAssistedCoolingCoil {
         errFlag = false;
 
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = UtilityRoutines::FindItem(CoilName, HXAssistedCoil);
         } else {
             WhichCoil = 0;
         }
@@ -1339,6 +1316,7 @@ namespace HVACHXAssistedCoolingCoil {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
 
+        auto & HXAssistedCoil = state.dataHVACAssistedCC->HXAssistedCoil;
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
@@ -1347,7 +1325,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = UtilityRoutines::FindItem(CoilName, HXAssistedCoil);
         } else {
             WhichCoil = 0;
         }
@@ -1499,7 +1477,6 @@ namespace HVACHXAssistedCoolingCoil {
             state.dataHVACAssistedCC->GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
-        //  state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum)%CoolingCoilName            = AlphArray(7)
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
             WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         } else {
@@ -1681,7 +1658,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
-        int ErrCount(0);
+        auto & ErrCount = state.dataHVACAssistedCC->ErrCount2;
 
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data

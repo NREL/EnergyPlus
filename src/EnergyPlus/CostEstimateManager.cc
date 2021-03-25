@@ -128,7 +128,6 @@ namespace CostEstimateManager {
         // Get Cost Estimation object input.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item; // Item to be "gotten"
@@ -152,22 +151,22 @@ namespace CostEstimateManager {
         if (!allocated(state.dataCostEstimateManager->CostLineItem)) {
             state.dataCostEstimateManager->CostLineItem.allocate(state.dataCostEstimateManager->NumLineItems);
         }
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ComponentCost:LineItem";
 
         for (Item = 1; Item <= state.dataCostEstimateManager->NumLineItems; ++Item) {
-            inputProcessor->getObjectItem(state, cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-            state.dataCostEstimateManager->CostLineItem(Item).LineName = cAlphaArgs(1);
-            state.dataCostEstimateManager->CostLineItem(Item).ParentObjType = cAlphaArgs(3);
-            state.dataCostEstimateManager->CostLineItem(Item).ParentObjName = cAlphaArgs(4);
-            state.dataCostEstimateManager->CostLineItem(Item).PerEach = rNumericArgs(1);
-            state.dataCostEstimateManager->CostLineItem(Item).PerSquareMeter = rNumericArgs(2);
-            state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap = rNumericArgs(3);
-            state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP = rNumericArgs(4);
-            state.dataCostEstimateManager->CostLineItem(Item).PerCubicMeter = rNumericArgs(5);
-            state.dataCostEstimateManager->CostLineItem(Item).PerCubMeterPerSec = rNumericArgs(6);
-            state.dataCostEstimateManager->CostLineItem(Item).PerUAinWattperDelK = rNumericArgs(7);
-            state.dataCostEstimateManager->CostLineItem(Item).Qty = rNumericArgs(8);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, Item, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+            state.dataCostEstimateManager->CostLineItem(Item).LineName = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataCostEstimateManager->CostLineItem(Item).ParentObjType = state.dataIPShortCut->cAlphaArgs(3);
+            state.dataCostEstimateManager->CostLineItem(Item).ParentObjName = state.dataIPShortCut->cAlphaArgs(4);
+            state.dataCostEstimateManager->CostLineItem(Item).PerEach = state.dataIPShortCut->rNumericArgs(1);
+            state.dataCostEstimateManager->CostLineItem(Item).PerSquareMeter = state.dataIPShortCut->rNumericArgs(2);
+            state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap = state.dataIPShortCut->rNumericArgs(3);
+            state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP = state.dataIPShortCut->rNumericArgs(4);
+            state.dataCostEstimateManager->CostLineItem(Item).PerCubicMeter = state.dataIPShortCut->rNumericArgs(5);
+            state.dataCostEstimateManager->CostLineItem(Item).PerCubMeterPerSec = state.dataIPShortCut->rNumericArgs(6);
+            state.dataCostEstimateManager->CostLineItem(Item).PerUAinWattperDelK = state.dataIPShortCut->rNumericArgs(7);
+            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataIPShortCut->rNumericArgs(8);
         }
 
         // most input error checking to be performed later within Case construct in Calc routine.
@@ -175,14 +174,14 @@ namespace CostEstimateManager {
         cCurrentModuleObject = "ComponentCost:Adjustments";
         NumCostAdjust = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumCostAdjust == 1) {
-            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-            state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter = rNumericArgs(1);
-            state.dataCostEstimateManager->CurntBldg.DesignFeeFrac = rNumericArgs(2);
-            state.dataCostEstimateManager->CurntBldg.ContractorFeeFrac = rNumericArgs(3);
-            state.dataCostEstimateManager->CurntBldg.ContingencyFrac = rNumericArgs(4);
-            state.dataCostEstimateManager->CurntBldg.BondCostFrac = rNumericArgs(5);
-            state.dataCostEstimateManager->CurntBldg.CommissioningFrac = rNumericArgs(6);
-            state.dataCostEstimateManager->CurntBldg.RegionalModifier = rNumericArgs(7);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+            state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter = state.dataIPShortCut->rNumericArgs(1);
+            state.dataCostEstimateManager->CurntBldg.DesignFeeFrac = state.dataIPShortCut->rNumericArgs(2);
+            state.dataCostEstimateManager->CurntBldg.ContractorFeeFrac = state.dataIPShortCut->rNumericArgs(3);
+            state.dataCostEstimateManager->CurntBldg.ContingencyFrac = state.dataIPShortCut->rNumericArgs(4);
+            state.dataCostEstimateManager->CurntBldg.BondCostFrac = state.dataIPShortCut->rNumericArgs(5);
+            state.dataCostEstimateManager->CurntBldg.CommissioningFrac = state.dataIPShortCut->rNumericArgs(6);
+            state.dataCostEstimateManager->CurntBldg.RegionalModifier = state.dataIPShortCut->rNumericArgs(7);
 
         } else if (NumCostAdjust > 1) {
             ShowSevereError(state, cCurrentModuleObject + ": Only one instance of this object is allowed.");
@@ -192,15 +191,15 @@ namespace CostEstimateManager {
         cCurrentModuleObject = "ComponentCost:Reference";
         NumRefAdjust = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumRefAdjust == 1) {
-            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-            state.dataCostEstimateManager->RefrncBldg.LineItemTot = rNumericArgs(1);
-            state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter = rNumericArgs(2);
-            state.dataCostEstimateManager->RefrncBldg.DesignFeeFrac = rNumericArgs(3);
-            state.dataCostEstimateManager->RefrncBldg.ContractorFeeFrac = rNumericArgs(4);
-            state.dataCostEstimateManager->RefrncBldg.ContingencyFrac = rNumericArgs(5);
-            state.dataCostEstimateManager->RefrncBldg.BondCostFrac = rNumericArgs(6);
-            state.dataCostEstimateManager->RefrncBldg.CommissioningFrac = rNumericArgs(7);
-            state.dataCostEstimateManager->RefrncBldg.RegionalModifier = rNumericArgs(8);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+            state.dataCostEstimateManager->RefrncBldg.LineItemTot = state.dataIPShortCut->rNumericArgs(1);
+            state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter = state.dataIPShortCut->rNumericArgs(2);
+            state.dataCostEstimateManager->RefrncBldg.DesignFeeFrac = state.dataIPShortCut->rNumericArgs(3);
+            state.dataCostEstimateManager->RefrncBldg.ContractorFeeFrac = state.dataIPShortCut->rNumericArgs(4);
+            state.dataCostEstimateManager->RefrncBldg.ContingencyFrac = state.dataIPShortCut->rNumericArgs(5);
+            state.dataCostEstimateManager->RefrncBldg.BondCostFrac = state.dataIPShortCut->rNumericArgs(6);
+            state.dataCostEstimateManager->RefrncBldg.CommissioningFrac = state.dataIPShortCut->rNumericArgs(7);
+            state.dataCostEstimateManager->RefrncBldg.RegionalModifier = state.dataIPShortCut->rNumericArgs(8);
 
         } else if (NumRefAdjust > 1) {
             ShowSevereError(state, cCurrentModuleObject + " : Only one instance of this object is allowed.");

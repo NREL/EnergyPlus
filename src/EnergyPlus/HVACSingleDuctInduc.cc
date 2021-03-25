@@ -98,15 +98,8 @@ namespace HVACSingleDuctInduc {
     // The terminal boxes are modeled as compound components: heating coil, cooling coil and
     // mixer. The combined components are controlled to meet the zone load.
 
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
     // Using/Aliasing
     using namespace DataLoopNode;
-    // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
@@ -114,18 +107,6 @@ namespace HVACSingleDuctInduc {
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
-
-    // Object Data
-
-    // Functions
 
     void SimIndUnit(EnergyPlusData &state,
                     std::string const &CompName,   // name of the terminal unit
@@ -155,6 +136,9 @@ namespace HVACSingleDuctInduc {
             state.dataHVACSingleDuctInduc->GetIUInputFlag = false;
         }
 
+        auto & IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
+        auto & NumIndUnits = state.dataHVACSingleDuctInduc->NumIndUnits;
+
         // Get the induction unit index
         if (CompIndex == 0) {
             IUNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACSingleDuctInduc->IndUnit);
@@ -171,7 +155,7 @@ namespace HVACSingleDuctInduc {
                         "SimIndUnit: Invalid CompIndex passed={}, Number of Induction Units={}, System name={}", CompIndex, state.dataHVACSingleDuctInduc->NumIndUnits, CompName));
             }
             if (state.dataHVACSingleDuctInduc->CheckEquipName(IUNum)) {
-                if (CompName != state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name) {
+                if (CompName != IndUnit(IUNum).Name) {
                     ShowFatalError(state,
                                    format("SimIndUnit: Invalid CompIndex passed={}, Induction Unit name={}, stored Induction Unit for that index={}",
                                           CompIndex,
@@ -265,6 +249,10 @@ namespace HVACSingleDuctInduc {
         int ADUNum;
         bool errFlag;
 
+        auto & IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
+        auto & NumFourPipes = state.dataHVACSingleDuctInduc->NumFourPipes;
+        auto & NumIndUnits = state.dataHVACSingleDuctInduc->NumIndUnits;
+        auto & CheckEquipName = state.dataHVACSingleDuctInduc->CheckEquipName;
         auto &ZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig);
 
         // find the number of each type of induction unit
@@ -496,12 +484,20 @@ namespace HVACSingleDuctInduc {
         Real64 IndRat;   // unit induction ratio
         Real64 RhoAir;   // air density at outside pressure and standard temperature and humidity
 
-        bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;                                    // Loop checking control variable
         Real64 rho;                                  // local fluid density
         int HWOutletNode;                            // local node index for hot water coil's outlet node
         int CWOutletNode;                            // local node index for cold water coil's outlet node
         bool errFlag(false);
+
+        auto & ZoneEquipmentListChecked = state.dataHVACSingleDuctInduc->ZoneEquipmentListChecked;
+        auto & IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
+        auto & MyOneTimeFlag = state.dataHVACSingleDuctInduc->MyOneTimeFlag;
+        auto & NumIndUnits = state.dataHVACSingleDuctInduc->NumIndUnits;
+        auto & MyEnvrnFlag = state.dataHVACSingleDuctInduc->MyEnvrnFlag;
+        auto & MySizeFlag = state.dataHVACSingleDuctInduc->MySizeFlag;
+        auto & MyPlantScanFlag = state.dataHVACSingleDuctInduc->MyPlantScanFlag;
+        auto & MyAirDistInitFlag = state.dataHVACSingleDuctInduc->MyAirDistInitFlag;
 
         // Do the one time initializations
         if (state.dataHVACSingleDuctInduc->MyOneTimeFlag) {
@@ -770,6 +766,7 @@ namespace HVACSingleDuctInduc {
         MaxVolHotWaterFlowUser = 0.0;
         MaxVolColdWaterFlowDes = 0.0;
         MaxVolColdWaterFlowUser = 0.0;
+        auto & IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
 
         auto &TermUnitSizing(state.dataSize->TermUnitSizing);
 
@@ -1117,7 +1114,7 @@ namespace HVACSingleDuctInduc {
         Real64 ErrTolerance;
         int HWOutletNode;
         int CWOutletNode;
-
+        auto & IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
         UnitOn = true;
         PowerMet = 0.0;
         InducRat = state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio;
@@ -1364,7 +1361,7 @@ namespace HVACSingleDuctInduc {
         int HWOutletNode;
         int CWOutletNode;
 
-
+        auto & IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
 
         PriNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).PriAirInNode;
         OutletNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode;
@@ -1553,7 +1550,11 @@ namespace HVACSingleDuctInduc {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int ItemNum;
 
-        if (state.dataHVACSingleDuctInduc->GetIUInputFlag) {
+        auto & IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
+        auto & GetIUInputFlag = state.dataHVACSingleDuctInduc->GetIUInputFlag;
+        auto & NumIndUnits = state.dataHVACSingleDuctInduc->NumIndUnits;
+
+        if (GetIUInputFlag) {
             GetIndUnits(state);
             state.dataHVACSingleDuctInduc->GetIUInputFlag = false;
         }

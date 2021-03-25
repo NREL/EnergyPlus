@@ -804,7 +804,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                         auto const SELECT_CASE_var(cAlphaArgs(4));
                         if ((SELECT_CASE_var == "FLOW") || (SELECT_CASE_var == "FLOW/ZONE")) {
                             state.dataHeatBal->Infiltration(Loop).DesignLevel = rNumericArgs(1);
-                            if (lNumericFieldBlanks(1)) {
+                            if (lAlphaFieldBlanks(1)) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Infiltration(Loop).Name + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(1) + ", but that field is blank.  0 Infiltration will result.");
                             }
@@ -830,7 +830,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                     ErrorsFound = true;
                                 }
                             }
-                            if (lNumericFieldBlanks(2)) {
+                            if (lAlphaFieldBlanks(2)) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Infiltration(Loop).Name + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(2) + ", but that field is blank.  0 Infiltration will result.");
                             }
@@ -854,7 +854,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                     ErrorsFound = true;
                                 }
                             }
-                            if (lNumericFieldBlanks(3)) {
+                            if (lAlphaFieldBlanks(3)) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Infiltration(Loop).Name + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(3) + ", but that field is blank.  0 Infiltration will result.");
                             }
@@ -877,7 +877,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                     ErrorsFound = true;
                                 }
                             }
-                            if (lNumericFieldBlanks(3)) {
+                            if (lAlphaFieldBlanks(3)) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Infiltration(Loop).Name + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(3) + ", but that field is blank.  0 Infiltration will result.");
                             }
@@ -900,7 +900,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                     ErrorsFound = true;
                                 }
                             }
-                            if (lNumericFieldBlanks(4)) {
+                            if (lAlphaFieldBlanks(4)) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Infiltration(Loop).Name + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(4) + ", but that field is blank.  0 Infiltration will result.");
                             }
@@ -1306,7 +1306,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                         auto const SELECT_CASE_var(cAlphaArgs(4));
                         if ((SELECT_CASE_var == "FLOW") || (SELECT_CASE_var == "FLOW/ZONE")) {
                             state.dataHeatBal->Ventilation(Loop).DesignLevel = rNumericArgs(1);
-                            if (lNumericFieldBlanks(1)) {
+                            if (lAlphaFieldBlanks(1)) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Ventilation(Loop).Name + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(1) + ", but that field is blank.  0 Ventilation will result.");
                             }
@@ -1330,7 +1330,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                     ErrorsFound = true;
                                 }
                             }
-                            if (lNumericFieldBlanks(2)) {
+                            if (lAlphaFieldBlanks(2)) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Ventilation(Loop).Name + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(2) + ", but that field is blank.  0 Ventilation will result.");
                             }
@@ -1354,7 +1354,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                     ErrorsFound = true;
                                 }
                             }
-                            if (lNumericFieldBlanks(3)) {
+                            if (lAlphaFieldBlanks(3)) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Ventilation(Loop).Name + "\", " + cAlphaFieldNames(4) +
                                                  "specifies " + cNumericFieldNames(3) + ", but that field is blank.  0 Ventilation will result.");
                             }
@@ -1378,7 +1378,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                     ErrorsFound = true;
                                 }
                             }
-                            if (lNumericFieldBlanks(4)) {
+                            if (lAlphaFieldBlanks(4)) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Ventilation(Loop).Name + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(4) + ", but that field is blank.  0 Ventilation will result.");
                             }
@@ -1611,7 +1611,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                     }
 
                     // Check delta temperature value and schedule fields
-                    //    IF (lNumericFieldBlanks(13) .AND. cAlphaArgs(8) .EQ. BlankString) THEN
+                    //    if (lAlphaFieldBlanks(13) .AND. cAlphaArgs(8) .EQ. BlankString) THEN
                     //      CALL ShowWarningError(state, RoutineName//'Both the delta temperature value and delta schedule are blank. ')
                     //      CALL ShowContinueError(state, 'Will set the temperature to a constant value of '//TRIM(format("{:.1R}", -VentilTempLimit))
                     //      &
@@ -2338,7 +2338,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                 auto const SELECT_CASE_var(cAlphaArgs(4));
                 if ((SELECT_CASE_var == "FLOW/ZONE") || (SELECT_CASE_var == "FLOW")) {
                     state.dataHeatBal->Mixing(Loop).DesignLevel = rNumericArgs(1);
-                    if (lNumericFieldBlanks(1)) {
+                    if (lAlphaFieldBlanks(1)) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
                                          cNumericFieldNames(1) + ", but that field is blank.  0 Mixing will result.");
                     }
@@ -2361,7 +2361,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     }
-                    if (lNumericFieldBlanks(2)) {
+                    if (lAlphaFieldBlanks(2)) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
                                          cNumericFieldNames(2) + ", but that field is blank.  0 Mixing will result.");
                     }
@@ -2384,7 +2384,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     }
-                    if (lNumericFieldBlanks(3)) {
+                    if (lAlphaFieldBlanks(3)) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
                                          cNumericFieldNames(3) + ", but that field is blank.  0 Mixing will result.");
                     }
@@ -2407,7 +2407,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     }
-                    if (lNumericFieldBlanks(4)) {
+                    if (lAlphaFieldBlanks(4)) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
                                          cNumericFieldNames(4) + ", but that field is blank.  0 Mixing will result.");
                     }
@@ -2804,7 +2804,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                     auto const SELECT_CASE_var(cAlphaArgs(4));
                     if ((SELECT_CASE_var == "FLOW/ZONE") || (SELECT_CASE_var == "FLOW")) {
                         state.dataHeatBal->CrossMixing(Loop).DesignLevel = rNumericArgs(1);
-                        if (lNumericFieldBlanks(1)) {
+                        if (lAlphaFieldBlanks(1)) {
                             ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
                                 cNumericFieldNames(1) + ", but that field is blank.  0 Cross Mixing will result.");
                         }
@@ -2829,7 +2829,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                 ErrorsFound = true;
                             }
                         }
-                        if (lNumericFieldBlanks(2)) {
+                        if (lAlphaFieldBlanks(2)) {
                             ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
                                 cNumericFieldNames(2) + ", but that field is blank.  0 Cross Mixing will result.");
                         }
@@ -2855,7 +2855,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                 ErrorsFound = true;
                             }
                         }
-                        if (lNumericFieldBlanks(3)) {
+                        if (lAlphaFieldBlanks(3)) {
                             ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
                                 cNumericFieldNames(3) + ", but that field is blank.  0 Cross Mixing will result.");
                         }
@@ -2880,7 +2880,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                                 ErrorsFound = true;
                             }
                         }
-                        if (lNumericFieldBlanks(4)) {
+                        if (lAlphaFieldBlanks(4)) {
                             ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
                                 cNumericFieldNames(4) + ", but that field is blank.  0 Cross Mixing will result.");
                         }
@@ -3344,7 +3344,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                 }         //(lAlphaFieldBlanks(AlphaNum)) THEN
 
                 NumbNum = 1;
-                if (lNumericFieldBlanks(NumbNum)) {
+                if (lAlphaFieldBlanks(NumbNum)) {
                     state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber) = 3.0; // default height of 3 meters
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + cNumericFieldNames(NumbNum) +
                                      " is blank and the default value of 3.0 will be used.");
@@ -3358,7 +3358,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                 }
 
                 ++NumbNum; // 2
-                if (lNumericFieldBlanks(NumbNum)) {
+                if (lAlphaFieldBlanks(NumbNum)) {
                     state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorArea(ConnectionNumber) = 9.0; // default area of 9 m2
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + cNumericFieldNames(NumbNum) +
                                      " is blank and the default value of 9 m2 will be used.");
@@ -3846,7 +3846,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
         //     Get room air model parameters for all zones at once
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas; // States which alpha value to read from a
@@ -3865,6 +3864,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
         state.dataRoomAirMod->AirModel.allocate(state.dataGlobal->NumOfZones);
 
         ErrorsFound = false;
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "RoomAirModelType";
         NumOfAirModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -3877,32 +3877,32 @@ namespace EnergyPlus::HeatBalanceAirManager {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           AirModelNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNumbers,
                                           Status,
                                           _,
                                           _,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (ZoneNum != 0) {
                 if (!state.dataRoomAirMod->AirModel(ZoneNum).AirModelName.empty()) {
-                    ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "Duplicate zone name, only one type of roomair model is allowed per zone");
-                    ShowContinueError(state, "Zone " + cAlphaArgs(2) + " was already assigned a roomair model by " + cCurrentModuleObject + " = " +
+                    ShowContinueError(state, "Zone " + state.dataIPShortCut->cAlphaArgs(2) + " was already assigned a roomair model by " + cCurrentModuleObject + " = " +
                             state.dataRoomAirMod->AirModel(ZoneNum).AirModelName);
                     ShowContinueError(state, format("Air Model Type for zone already set to {}", DataRoomAirModel::ChAirModel[static_cast<int>(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType)]));
-                    ShowContinueError(state, "Trying to overwrite with model type = " + cAlphaArgs(3));
+                    ShowContinueError(state, "Trying to overwrite with model type = " + state.dataIPShortCut->cAlphaArgs(3));
                     ErrorsFound = true;
                 }
-                state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = cAlphaArgs(1);
-                state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = cAlphaArgs(2);
+                state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = state.dataIPShortCut->cAlphaArgs(1);
+                state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
 
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(3));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
                     if (SELECT_CASE_var == "MIXING") {
                         state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                     } else if (SELECT_CASE_var == "ONENODEDISPLACEMENTVENTILATION") {
@@ -3911,9 +3911,9 @@ namespace EnergyPlus::HeatBalanceAirManager {
                         state.dataRoomAirMod->MundtModelUsed = true;
                         IsNotOK = false;
                         ValidateComponent(
-                            state, "RoomAirSettings:OneNodeDisplacementVentilation", "zone_name", cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
+                            state, "RoomAirSettings:OneNodeDisplacementVentilation", "zone_name", state.dataIPShortCut->cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
                         if (IsNotOK) {
-                            ShowContinueError(state, "In " + cCurrentModuleObject + '=' + cAlphaArgs(1) + '.');
+                            ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "THREENODEDISPLACEMENTVENTILATION") {
@@ -3922,9 +3922,9 @@ namespace EnergyPlus::HeatBalanceAirManager {
                         state.dataRoomAirMod->UCSDModelUsed = true;
                         IsNotOK = false;
                         ValidateComponent(
-                            state, "RoomAirSettings:ThreeNodeDisplacementVentilation", "zone_name", cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
+                            state, "RoomAirSettings:ThreeNodeDisplacementVentilation", "zone_name", state.dataIPShortCut->cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
                         if (IsNotOK) {
-                            ShowContinueError(state, "In " + cCurrentModuleObject + '=' + cAlphaArgs(1) + '.');
+                            ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "CROSSVENTILATION") {
@@ -3932,9 +3932,9 @@ namespace EnergyPlus::HeatBalanceAirManager {
                         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                         state.dataRoomAirMod->UCSDModelUsed = true;
                         IsNotOK = false;
-                        ValidateComponent(state, "RoomAirSettings:CrossVentilation", "zone_name", cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
+                        ValidateComponent(state, "RoomAirSettings:CrossVentilation", "zone_name", state.dataIPShortCut->cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
                         if (IsNotOK) {
-                            ShowContinueError(state, "In " + cCurrentModuleObject + '=' + cAlphaArgs(1) + '.');
+                            ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "UNDERFLOORAIRDISTRIBUTIONINTERIOR") {
@@ -3942,9 +3942,9 @@ namespace EnergyPlus::HeatBalanceAirManager {
                         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                         state.dataRoomAirMod->UCSDModelUsed = true;
                         ValidateComponent(state,
-                            "RoomAirSettings:UnderFloorAirDistributionInterior", "zone_name", cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
+                            "RoomAirSettings:UnderFloorAirDistributionInterior", "zone_name", state.dataIPShortCut->cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
                         if (IsNotOK) {
-                            ShowContinueError(state, "In " + cCurrentModuleObject + '=' + cAlphaArgs(1) + '.');
+                            ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "UNDERFLOORAIRDISTRIBUTIONEXTERIOR") {
@@ -3952,9 +3952,9 @@ namespace EnergyPlus::HeatBalanceAirManager {
                         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                         state.dataRoomAirMod->UCSDModelUsed = true;
                         ValidateComponent(state,
-                            "RoomAirSettings:UnderFloorAirDistributionExterior", "zone_name", cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
+                            "RoomAirSettings:UnderFloorAirDistributionExterior", "zone_name", state.dataIPShortCut->cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
                         if (IsNotOK) {
-                            ShowContinueError(state, "In " + cCurrentModuleObject + '=' + cAlphaArgs(1) + '.');
+                            ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "USERDEFINED") {
@@ -3965,36 +3965,36 @@ namespace EnergyPlus::HeatBalanceAirManager {
                         state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::AirflowNetwork;
                         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                         if (inputProcessor->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
-                            ShowSevereError(state, "In " + cCurrentModuleObject + " = " + cAlphaArgs(1) + ": " + cAlphaFieldNames(3) + " = AIRFLOWNETWORK.");
+                            ShowSevereError(state, "In " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ": " + state.dataIPShortCut->cAlphaFieldNames(3) + " = AIRFLOWNETWORK.");
                             ShowContinueError(state, "This model requires AirflowNetwork:* objects to form a complete network, including "
                                               "AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.");
                             ShowContinueError(state, "AirflowNetwork:SimulationControl not found.");
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowWarningError(state, "Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                        ShowContinueError(state, "The mixing air model will be used for Zone =" + cAlphaArgs(2));
+                        ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowContinueError(state, "The mixing air model will be used for Zone =" + state.dataIPShortCut->cAlphaArgs(2));
                         state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                     }
                 }
 
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(4));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
                     if (SELECT_CASE_var == "DIRECT") {
                         state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;
                     } else if (SELECT_CASE_var == "INDIRECT") {
                         state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Indirect;
                     } else {
-                        ShowWarningError(state, "Invalid " + cAlphaFieldNames(4) + " = " + cAlphaArgs(4));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                        ShowContinueError(state, "The direct coupling scheme will be used for Zone =" + cAlphaArgs(2));
+                        ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowContinueError(state, "The direct coupling scheme will be used for Zone =" + state.dataIPShortCut->cAlphaArgs(2));
                         state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;
                     }
                 }
             } else { // Zone Not Found
-                ShowSevereError(state, cCurrentModuleObject + ", Zone not found=" + cAlphaArgs(2));
-                ShowContinueError(state, "occurs in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, cCurrentModuleObject + ", Zone not found=" + state.dataIPShortCut->cAlphaArgs(2));
+                ShowContinueError(state, "occurs in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
         } // AirModel_Param_Loop

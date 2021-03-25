@@ -220,12 +220,18 @@ bool processInput(std::string const &inputFilePath, json const &schema, OutputTy
         return false;
     }
 
+#ifdef _WIN32
+    std::string const NL("\r\n"); // Platform newline
+#else
+    std::string const NL("\n"); // Platform newline
+#endif
+
     try {
         if (!isEpJSON) {
             std::string input_file;
             std::string line;
             while (std::getline(input_stream, line)) {
-                input_file.append(line + EnergyPlus::DataStringGlobals::NL);
+                input_file.append(line + NL);
             }
             if (input_file.empty()) {
                 displayMessage("Failed to read input file: " + inputFilePath);

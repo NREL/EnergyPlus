@@ -67,18 +67,6 @@ namespace EnergyPlus {
 
 namespace GroundTemperatureManager {
 
-    Array1D_string const CurrentModuleObjects(7,
-                                              {"Site:GroundTemperature:Undisturbed:KusudaAchenbach",
-                                               "Site:GroundTemperature:Undisturbed:FiniteDifference",
-                                               "Site:GroundTemperature:BuildingSurface",
-                                               "Site:GroundTemperature:Shallow",
-                                               "Site:GroundTemperature:Deep",
-                                               "Site:GroundTemperature:FCfactorMethod",
-                                               "Site:GroundTemperature:Undisturbed:Xing"});
-
-
-    //******************************************************************************
-
     std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
@@ -93,6 +81,9 @@ namespace GroundTemperatureManager {
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int objectType(0);
+
+        auto & CurrentModuleObjects = state.dataGrndTempModelMgr->CurrentModuleObjects;
+        auto & groundTempModels = state.dataGrndTempModelMgr->groundTempModels;
 
         std::string objectType_str_UPPERCase = UtilityRoutines::MakeUPPERCase(objectType_str);
 
@@ -148,10 +139,6 @@ namespace GroundTemperatureManager {
             return nullptr;
         }
     }
-
-    //******************************************************************************
-
-    //******************************************************************************
 
 } // namespace GroundTemperatureManager
 

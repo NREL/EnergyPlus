@@ -380,6 +380,9 @@ struct ExternalInterfaceData : BaseGlobalStruct {
     std::string const socCfgFilNam = "socket.cfg"; // socket configuration file
     std::unordered_map<std::string, std::string> UniqueFMUInputVarNames;
 
+    int nOutVal;       // Number of output values (E+ -> ExternalInterface)
+    int nInpVar;       // Number of input values (ExternalInterface -> E+)
+
     void clear_state() override
     {
         this->tComm = 0.0;
@@ -430,6 +433,11 @@ struct ExternalInterfaceData : BaseGlobalStruct {
         this->FirstCallTStep = true;      // Flag for first call during time stepping
         this->fmiEndSimulation = 0;        // Flag to indicate end of simulation
         this->UniqueFMUInputVarNames.clear();
+
+        // these were statics without an initial value
+//        int nOutVal;       // Number of output values (E+ -> ExternalInterface)
+//        int nInpVar;       // Number of input values (ExternalInterface -> E+)
+
     }
 };
 

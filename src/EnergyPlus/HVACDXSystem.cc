@@ -106,12 +106,6 @@ namespace HVACDXSystem {
     // To encapsulate the data and algorithms required to
     // manage the state.dataHVACDXSys->DXCoolingSystem System Component
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // OTHER NOTES:
-
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
@@ -119,32 +113,7 @@ namespace HVACDXSystem {
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    Real64 const MinAirMassFlow = 0.001;
-
-    Real64 const LatCapTimeConst(45.0);
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Make this type allocatable
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Update routine to check convergence and update nodes
-
-    // Object Data
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
+    Real64 constexpr LatCapTimeConst(45.0);
 
     void SimDXCoolingSystem(EnergyPlusData &state, std::string const &DXCoolingSystemName, // Name of DXSystem:Airloop object
                             bool const FirstHVACIteration,          // True when first HVAC iteration
@@ -185,17 +154,11 @@ namespace HVACDXSystem {
         Real64 AirMassFlow;   // DX System air mass flow rate
         int InletNodeNum;     // DX System inlet node number
         int OutletNodeNum;    // DX System outlet node number
-        // local variables for calling variable speed coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
+
+        auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
 
         // Obtains and Allocates DX Cooling System related parameters from input file
         if (state.dataHVACDXSys->GetInputFlag) { // First time subroutine has been entered
-            // Get the state.dataHVACDXSys->DXCoolingSystem input
             GetDXCoolingSystemInput(state);
             state.dataHVACDXSys->GetInputFlag = false;
         }
@@ -217,7 +180,7 @@ namespace HVACDXSystem {
                                       DXCoolingSystemName));
             }
             if (state.dataHVACDXSys->CheckEquipName(DXSystemNum)) {
-                if (DXCoolingSystemName != state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name) {
+                if (DXCoolingSystemName != DXCoolingSystem(DXSystemNum).Name) {
                     ShowFatalError(
                         state,
                         format("SimulateDXCoolingSystem: Invalid CompIndex passed={}, DX Unit name={}, stored DX Unit Name for that index={}",
@@ -284,18 +247,18 @@ namespace HVACDXSystem {
             } else if (SELECT_CASE_var == Coil_CoolingAirToAirVariableSpeed) { // Coil:Cooling:DX:VariableSpeed
 
                 SimVariableSpeedCoils(state, CompName,
-                                      state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
-                                      state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FanOpMode,
-                                      MaxONOFFCyclesperHour,
-                                      HPTimeConstant,
-                                      FanDelayTime,
+                                      DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
+                                      DXCoolingSystem(DXSystemNum).FanOpMode,
+                                      state.dataHVACDXSys->MaxONOFFCyclesperHour,
+                                      state.dataHVACDXSys->HPTimeConstant,
+                                      state.dataHVACDXSys->FanDelayTime,
                                       On,
-                                      state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).PartLoadFrac,
-                                      state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedNum,
-                                      state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedRatio,
-                                      QZnReq,
-                                      QLatReq,
-                                      OnOffAirFlowRatio);
+                                      DXCoolingSystem(DXSystemNum).PartLoadFrac,
+                                      DXCoolingSystem(DXSystemNum).SpeedNum,
+                                      DXCoolingSystem(DXSystemNum).SpeedRatio,
+                                      state.dataHVACDXSys->QZnReq,
+                                      state.dataHVACDXSys->QLatReq,
+                                      state.dataHVACDXSys->OnOffAirFlowRatio);
 
             } else if (SELECT_CASE_var == CoilDX_PackagedThermalStorageCooling) {
 
@@ -370,8 +333,7 @@ namespace HVACDXSystem {
         int NumNums;
         int IOStat;
         static std::string const RoutineName("GetDXCoolingSystemInput: "); // include trailing blank space
-        static bool ErrorsFound(false);                                    // If errors detected in input
-        static bool ErrFound(false);                                       // used for mining functions
+        bool ErrorsFound(false);                                    // If errors detected in input
         bool IsNotOK;                                                      // Flag to verify name
         int DXCoolSysNum;
         bool FanErrorsFound;             // flag returned on fan operating mode check
@@ -384,13 +346,15 @@ namespace HVACDXSystem {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
-        //  certain object in the input file
+
+        auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
+        auto &ErrFound(state.dataHVACDXSys->ErrFound);
+        auto &TotalArgs(state.dataHVACDXSys->TotalArgs);
 
         CurrentModuleObject = "CoilSystem:Cooling:DX";
         state.dataHVACDXSys->NumDXSystem = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
-        state.dataHVACDXSys->DXCoolingSystem.allocate(state.dataHVACDXSys->NumDXSystem);
+        DXCoolingSystem.allocate(state.dataHVACDXSys->NumDXSystem);
         state.dataHVACDXSys->CheckEquipName.dimension(state.dataHVACDXSys->NumDXSystem, true);
 
         inputProcessor->getObjectDefMaxArgs(state, "CoilSystem:Cooling:DX", TotalArgs, NumAlphas, NumNums);
@@ -553,24 +517,24 @@ namespace HVACDXSystem {
 
             // Dehumidification control mode
             if (UtilityRoutines::SameString(Alphas(8), "None")) {
-                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_None;
+                DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::None;
             } else if (UtilityRoutines::SameString(Alphas(8), "")) {
-                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_None;
+                DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::None;
             } else if (UtilityRoutines::SameString(Alphas(8), "Multimode")) {
-                if (state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
-                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_Multimode;
-                } else if (state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
-                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_Multimode;
+                if (DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
+                    DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::Multimode;
+                } else if (DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
+                    DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::Multimode;
                 } else {
                     ShowWarningError(state, "Invalid entry for " + cAlphaFields(8) + " :" + Alphas(8));
                     ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name + "\".");
                     ShowContinueError(state, "Valid only with cooling coil type = Coil:Cooling:DX:TwoStageWithHumidityControlMode or "
                                       "CoilSystem:Cooling:DX:HeatExchangerAssisted.");
                     ShowContinueError(state, "Setting " + cAlphaFields(8) + " to None.");
-                    state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_None;
+                    DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::None;
                 }
             } else if (UtilityRoutines::SameString(Alphas(8), "CoolReheat")) {
-                state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_CoolReheat;
+                DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl::CoolReheat;
             } else {
                 ShowSevereError(state, "Invalid entry for " + cAlphaFields(8) + " :" + Alphas(8));
                 ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).Name + "\".");
@@ -658,8 +622,8 @@ namespace HVACDXSystem {
         }
 
         for (DXSystemNum = 1; DXSystemNum <= state.dataHVACDXSys->NumDXSystem; ++DXSystemNum) {
-            // Setup Report variables for the state.dataHVACDXSys->DXCoolingSystem that is not reported in the components themselves
-            if (UtilityRoutines::SameString(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilType, "Coil:Cooling:DX:TwoSpeed")) {
+            // Setup Report variables for the DXCoolingSystem that is not reported in the components themselves
+            if (UtilityRoutines::SameString(DXCoolingSystem(DXSystemNum).CoolingCoilType, "Coil:Cooling:DX:TwoSpeed")) {
                 SetupOutputVariable(state, "Coil System Cycling Ratio",
                                     OutputProcessor::Unit::None,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CycRatio,
@@ -765,24 +729,23 @@ namespace HVACDXSystem {
         int OutNode;     // outlet node number
         int ControlNode; // control node number
         int DXSysIndex;
-        static bool MyOneTimeFlag(true);
-        static bool MySetPointCheckFlag(true);
         int OutdoorAirUnitNum;    // "ONLY" for ZoneHVAC:OutdoorAirUnit
         Real64 OAUCoilOutletTemp; // "ONLY" for zoneHVAC:OutdoorAirUnit
 
+        auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
 
-        if (MyOneTimeFlag) {
+        if (state.dataHVACDXSys->MyOneTimeFlag) {
 
-            MyOneTimeFlag = false;
+            state.dataHVACDXSys->MyOneTimeFlag = false;
         }
         if (AirLoopNum == -1) { // This Dx system is component of ZoneHVAC:OutdoorAirUnit
             OutdoorAirUnitNum = OAUnitNum;
             OAUCoilOutletTemp = OAUCoilOutTemp;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataHVACDXSys->MySetPointCheckFlag && DoSetPointTest) {
             for (DXSysIndex = 1; DXSysIndex <= state.dataHVACDXSys->NumDXSystem; ++DXSysIndex) {
-                ControlNode = state.dataHVACDXSys->DXCoolingSystem(DXSysIndex).DXSystemControlNodeNum;
+                ControlNode = DXCoolingSystem(DXSysIndex).DXSystemControlNodeNum;
                 if (ControlNode > 0) {
                     if (AirLoopNum == -1) {                                 // Outdoor Air Unit
                         state.dataLoopNodes->Node(ControlNode).TempSetPoint = OAUCoilOutletTemp; // Set the coil outlet temperature
@@ -812,7 +775,7 @@ namespace HVACDXSystem {
                                 }
                             }
                         }
-                        if ((state.dataHVACDXSys->DXCoolingSystem(DXSysIndex).DehumidControlType != DehumidControl_None) &&
+                        if ((DXCoolingSystem(DXSysIndex).DehumidControlType != DehumidControl::None) &&
                             (state.dataLoopNodes->Node(ControlNode).HumRatMax == SensedNodeFlagValue)) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, state.dataHVACDXSys->DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
@@ -833,7 +796,7 @@ namespace HVACDXSystem {
                     }
                 }
             }
-            MySetPointCheckFlag = false;
+            state.dataHVACDXSys->MySetPointCheckFlag = false;
         }
 
         if (!state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).VSCoilFanInfoSet && AirLoopNum > 0) {
@@ -916,8 +879,8 @@ namespace HVACDXSystem {
                 }
                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
                 //  If HumRatMax is zero, then there is no request from SetpointManager:SingleZone:Humidity:Maximum
-                if ((state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl_None) && (state.dataLoopNodes->Node(ControlNode).HumRatMax > 0.0)) {
-                    if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).RunOnLatentLoad) {
+                if ((DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl::None) && (state.dataLoopNodes->Node(ControlNode).HumRatMax > 0.0)) {
+                    if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnLatentLoad) {
                         FrostControlSetPointLimit(state, DXSystemNum,
                                                   state.dataLoopNodes->Node(ControlNode).TempSetPoint,
                                                   state.dataLoopNodes->Node(ControlNode).HumRatMax,
@@ -938,9 +901,9 @@ namespace HVACDXSystem {
                                               state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                               1);
                 }
-                state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint - (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(OutNode).Temp);
-                if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl_None) {
-                    if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).RunOnLatentLoad) {
+                DXCoolingSystem(DXSystemNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint - (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(OutNode).Temp);
+                if (DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl::None) {
+                    if (DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil && DXCoolingSystem(DXSystemNum).RunOnLatentLoad) {
                         FrostControlSetPointLimit(state, DXSystemNum,
                                                   state.dataLoopNodes->Node(ControlNode).TempSetPoint,
                                                   state.dataLoopNodes->Node(ControlNode).HumRatMax,
@@ -1052,6 +1015,7 @@ namespace HVACDXSystem {
         int VSCoilIndex;              // variable-speed coil index
         int I;                        // interation increment
 
+        auto &DXCoolingSystem(state.dataHVACDXSys->DXCoolingSystem);
         // Set local variables
         // Retrieve the load on the controlled zone
         OutletNode = state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
@@ -1217,7 +1181,7 @@ namespace HVACDXSystem {
                         // then overcool to meet moisture load
 
                         if ((OutletHumRatDXCoil > DesOutHumRat) && (PartLoadFrac < 1.0) &&
-                            (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat)) {
+                            (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::CoolReheat)) {
 
                             //           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
                             //           do not run the compressor
@@ -1300,7 +1264,7 @@ namespace HVACDXSystem {
 
                         //         Check the dehumidification control type. If it's multimode, turn off the HX to find the sensible PLR. Then check to
                         //         see if the humidity load is met without the use of the HX. Always run the HX for the other modes.
-                        if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl_Multimode) {
+                        if (DXCoolingSystem(DXSystemNum).DehumidControlType != DehumidControl::Multimode) {
                             HXUnitOn = true;
                         } else {
                             HXUnitOn = false;
@@ -1351,7 +1315,7 @@ namespace HVACDXSystem {
                             //           If this temp is greater than or very near the desired outlet temp, then run the compressor at PartLoadFrac
                             //           = 1. (i.e. HX iterates to find solution, don't allow the tolerance in solution to trip up RegulaFalsi. So if
                             //           solution is very near request, run compressor at PLR = 1)
-                            OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                             if ((OutletTempDXCoil > DesOutTemp) || std::abs(OutletTempDXCoil - DesOutTemp) <= (Acc * 2.0)) {
                                 PartLoadFrac = 1.0;
                             } else {
@@ -1388,7 +1352,7 @@ namespace HVACDXSystem {
                                                                  HXUnitOn,
                                                                  _,
                                                                  state.dataHVACDXSys->EconomizerFlag);
-                                        TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                        TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     TempMinPLR = TempMaxPLR;
                                     while ((TempOutletTempDXCoil - DesOutTemp) < 0.0 && TempMinPLR >= 0.0) {
@@ -1406,7 +1370,7 @@ namespace HVACDXSystem {
                                                                  HXUnitOn,
                                                                  _,
                                                                  state.dataHVACDXSys->EconomizerFlag);
-                                        TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                        TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     //               Relax boundary slightly to assure a solution can be found using RegulaFalsi (i.e. one boundary
                                     //               may be very near the desired result)
@@ -1488,13 +1452,13 @@ namespace HVACDXSystem {
                         if (PartLoadFrac == 0.0) {
                             OutletHumRatDXCoil = NoLoadHumRatOut;
                         } else {
-                            OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                         }
 
                         // If humidity setpoint is not satisfied and humidity control type is MultiMode,
                         // then enable heat exchanger and run to meet sensible load
 
-                        if ((OutletHumRatDXCoil > DesOutHumRat) && (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_Multimode)) {
+                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::Multimode)) {
 
                             // Determine required part load when heat exchanger is ON
                             HXUnitOn = true;
@@ -1509,7 +1473,7 @@ namespace HVACDXSystem {
                                                      _,
                                                      state.dataHVACDXSys->EconomizerFlag);
 
-                            OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                             //           FullOutput will be different than the FullOutput determined above during sensible PLR calculations
                             FullOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
@@ -1592,7 +1556,7 @@ namespace HVACDXSystem {
                         // a new latent PLR
 
                         if (OutletHumRatDXCoil > DesOutHumRat && PartLoadFrac < 1.0 &&
-                            state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat) {
+                            DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::CoolReheat) {
 
                             //           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
                             //           do not run the compressor
@@ -1637,7 +1601,7 @@ namespace HVACDXSystem {
                                                                  HXUnitOn,
                                                                  _,
                                                                  state.dataHVACDXSys->EconomizerFlag);
-                                        OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                        OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     TempMinPLR = TempMaxPLR;
                                     while ((OutletHumRatDXCoil - TempOutletHumRatDXCoil) <= 0.0 && TempMinPLR >= 0.0) {
@@ -1655,7 +1619,7 @@ namespace HVACDXSystem {
                                                                  HXUnitOn,
                                                                  _,
                                                                  state.dataHVACDXSys->EconomizerFlag);
-                                        OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                        OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     //               tighter boundary of solution has been found, call RegulaFalsi a second time
                                     TempSolveRoot::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par);
@@ -1813,7 +1777,7 @@ namespace HVACDXSystem {
                             DehumidMode = 0;
                         }
 
-                        if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat) {
+                        if (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::CoolReheat) {
 
                             //           Simulate MultiSpeed DX coil at sensible result
                             SimDXCoilMultiSpeed(state, CompName, SpeedRatio, CycRatio, state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
@@ -1979,7 +1943,7 @@ namespace HVACDXSystem {
                         // If humidity setpoint is not satisfied and humidity control type is Multimode,
                         // then turn on enhanced dehumidification mode 1
 
-                        if ((OutletHumRatDXCoil > DesOutHumRat) && (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_Multimode)) {
+                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::Multimode)) {
 
                             // Determine required part load for enhanced dehumidification mode 1
 
@@ -2109,7 +2073,7 @@ namespace HVACDXSystem {
                             OutletHumRatDXCoil = state.dataDXCoils->DXCoilOutletHumRat(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                         }
 
-                        if ((OutletHumRatDXCoil > DesOutHumRat) && (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat)) {
+                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::CoolReheat)) {
 
                             //            CoolReheat operates cooling stage 1 and/or 2 to meet DesOutHumRat. Dehumidification mode is not active.
                             DehumidMode = 0;
@@ -2425,7 +2389,7 @@ namespace HVACDXSystem {
                         // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
                         // then overcool to meet moisture load
 
-                        if ((OutletHumRatDXCoil > DesOutHumRat) && (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat)) {
+                        if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl::CoolReheat)) {
 
                             if ((NumOfSpeeds > 1 && SpeedNum == NumOfSpeeds && SpeedRatio == 1.0) || (NumOfSpeeds == 1 && CycRatio == 1.0)) {
                                 PartLoadFrac = 1.0;
@@ -3273,14 +3237,14 @@ namespace HVACDXSystem {
         TESOpMode = int(Par(3));
 
         {
-            auto const SELECT_CASE_var(TESOpMode);
-            if (SELECT_CASE_var == CoolingOnlyMode) {
+            auto const SELECT_CASE_var(static_cast <TESMode>(TESOpMode));
+            if (SELECT_CASE_var == TESMode::CoolingOnlyMode) {
                 CalcTESCoilCoolingOnlyMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == CoolingAndChargeMode) {
+            } else if (SELECT_CASE_var == TESMode::CoolingAndChargeMode) {
                 CalcTESCoilCoolingAndChargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
+            } else if (SELECT_CASE_var == TESMode::CoolingAndDischargeMode) {
                 CalcTESCoilCoolingAndDischargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == DischargeOnlyMode) {
+            } else if (SELECT_CASE_var == TESMode::DischargeOnlyMode) {
                 CalcTESCoilDischargeOnlyMode(state, CoilIndex, PartLoadRatio);
             }
         }
@@ -3353,14 +3317,14 @@ namespace HVACDXSystem {
         TESOpMode = int(Par(3));
 
         {
-            auto const SELECT_CASE_var(TESOpMode);
-            if (SELECT_CASE_var == CoolingOnlyMode) {
+            auto const SELECT_CASE_var(static_cast <TESMode>(TESOpMode));
+            if (SELECT_CASE_var == TESMode::CoolingOnlyMode) {
                 CalcTESCoilCoolingOnlyMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == CoolingAndChargeMode) {
+            } else if (SELECT_CASE_var == TESMode::CoolingAndChargeMode) {
                 CalcTESCoilCoolingAndChargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
+            } else if (SELECT_CASE_var == TESMode::CoolingAndDischargeMode) {
                 CalcTESCoilCoolingAndDischargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-            } else if (SELECT_CASE_var == DischargeOnlyMode) {
+            } else if (SELECT_CASE_var == TESMode::DischargeOnlyMode) {
                 CalcTESCoilDischargeOnlyMode(state, CoilIndex, PartLoadRatio);
             }
         }
@@ -3538,14 +3502,6 @@ namespace HVACDXSystem {
         int CoilIndex;                            // index of this coil
         Real64 OutletAirTemp;                     // outlet air temperature [C]
         int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 SpeedRatio(0.0);            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
@@ -3553,16 +3509,16 @@ namespace HVACDXSystem {
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->MaxONOFFCyclesperHourCycling,
+                              state.dataHVACDXSys->HPTimeConstantCycling,
+                              state.dataHVACDXSys->FanDelayTimeCycling,
                               On,
                               PartLoadRatio,
-                              SpeedNum,
-                              SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->SpeedNum,
+                              state.dataHVACDXSys->SpeedRatio,
+                              state.dataHVACDXSys->QZnReqCycling,
+                              state.dataHVACDXSys->QLatReqCycling,
+                              state.dataHVACDXSys->OnOffAirFlowRatioCycling);
 
         OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
@@ -3615,32 +3571,24 @@ namespace HVACDXSystem {
         int CoilIndex;                            // index of this coil
         Real64 OutletAirTemp;                     // outlet air temperature [C]
         int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 PartLoadRatio(1.0);         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
-        SpeedNum = int(Par(3));
+        state.dataHVACDXSys->mySpeedNum = int(Par(3));
 
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->myMaxONOFFCyclesperHour,
+                              state.dataHVACDXSys->myHPTimeConstant,
+                              state.dataHVACDXSys->myFanDelayTime,
                               On,
-                              PartLoadRatio,
-                              SpeedNum,
+                              state.dataHVACDXSys->PartLoadRatio,
+                              state.dataHVACDXSys->mySpeedNum,
                               SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->myQZnReq,
+                              state.dataHVACDXSys->myQLatReq,
+                              state.dataHVACDXSys->myOnOffAirFlowRatio);
 
         OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
@@ -3691,14 +3639,6 @@ namespace HVACDXSystem {
         int CoilIndex;                            // index of this coil
         Real64 OutletAirHumRat;                   // outlet air humidity ratio [kg/kg]
         int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 SpeedRatio(0.0);            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
@@ -3706,16 +3646,16 @@ namespace HVACDXSystem {
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->MaxONOFFCyclesperHourCyclingHum,
+                              state.dataHVACDXSys->HPTimeConstantCyclingHum,
+                              state.dataHVACDXSys->FanDelayTimeCyclingHum,
                               On,
                               PartLoadRatio,
-                              SpeedNum,
-                              SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->SpeedNumCyclingHum,
+                              state.dataHVACDXSys->SpeedRatioCyclingHum,
+                              state.dataHVACDXSys->QZnReqCyclingHum,
+                              state.dataHVACDXSys->QLatReqCyclingHum,
+                              state.dataHVACDXSys->OnOffAirFlowRatioCyclingHum);
 
         OutletAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirHumRat;
         Residuum = Par(2) - OutletAirHumRat;
@@ -3769,32 +3709,24 @@ namespace HVACDXSystem {
         int CoilIndex;                            // index of this coil
         Real64 OutletAirHumRat;                   // outlet air humidity ratio [kg/kg]
         int FanOpMode;                            // Supply air fan operating mode
-        static int SpeedNum(1);                   // speed number of variable speed DX cooling coil
-        static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
-        static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-        static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
-        static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-        static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-        static Real64 PartLoadRatio(1.0);         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
-        SpeedNum = int(Par(3));
+        state.dataHVACDXSys->SpeedNumSpeedHum = int(Par(3));
 
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
+                              state.dataHVACDXSys->MaxONOFFCyclesperHourSpeedHum,
+                              state.dataHVACDXSys->HPTimeConstantSpeedHum,
+                              state.dataHVACDXSys->FanDelayTimeSpeedHum,
                               On,
-                              PartLoadRatio,
-                              SpeedNum,
+                              state.dataHVACDXSys->PartLoadRatioSpeedHum,
+                              state.dataHVACDXSys->SpeedNumSpeedHum,
                               SpeedRatio,
-                              QZnReq,
-                              QLatReq,
-                              OnOffAirFlowRatio);
+                              state.dataHVACDXSys->QZnReqSpeedHum,
+                              state.dataHVACDXSys->QLatReqSpeedHum,
+                              state.dataHVACDXSys->OnOffAirFlowRatioSpeedHum);
 
         OutletAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirHumRat;
         Residuum = Par(2) - OutletAirHumRat;

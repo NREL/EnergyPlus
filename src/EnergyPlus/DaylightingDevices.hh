@@ -106,6 +106,7 @@ struct DaylightingDevicesData : BaseGlobalStruct {
     bool ShelfReported = false;
     bool GetTDDInputErrorsFound = false; // Set to true if errors in input, fatal at end of routine
     bool GetShelfInputErrorsFound = false; // Set to true if errors in input, fatal at end of routine
+    bool MyEnvrnFlag = true;
 
     void clear_state() override
     {
@@ -113,6 +114,7 @@ struct DaylightingDevicesData : BaseGlobalStruct {
         this->ShelfReported = false;
         this->GetTDDInputErrorsFound = false;
         this->GetShelfInputErrorsFound = false;
+        this->MyEnvrnFlag = true;
     }
 };
 

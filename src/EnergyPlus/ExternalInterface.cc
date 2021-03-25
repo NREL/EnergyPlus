@@ -158,31 +158,24 @@ namespace EnergyPlus::ExternalInterface {
         // METHODOLOGY EMPLOYED:
         // Uses InputProcessor "Get" routines to obtain data.
 
-        // Using/Aliasing
-        using DataIPShortCuts::cAlphaArgs;
-        using DataIPShortCuts::cAlphaFieldNames;
-        using DataIPShortCuts::cCurrentModuleObject;
-        using DataIPShortCuts::cNumericFieldNames;
-        using DataIPShortCuts::rNumericArgs;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
         int Loop;       // Loop counter
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ExternalInterface";
         state.dataExternalInterface->NumExternalInterfaces = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (Loop = 1; Loop <= state.dataExternalInterface->NumExternalInterfaces; ++Loop) { // This loop determines whether the external interface is for FMU or BCVTB
             inputProcessor->getObjectItem(
-                state, cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
-            if (UtilityRoutines::SameString(cAlphaArgs(1), "PtolemyServer")) { // The BCVTB interface is activated.
+                state, cCurrentModuleObject, Loop, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus, _, _, state.dataIPShortCut->cAlphaFieldNames, state.dataIPShortCut->cNumericFieldNames);
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "PtolemyServer")) { // The BCVTB interface is activated.
                 ++state.dataExternalInterface->NumExternalInterfacesBCVTB;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(1),
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1),
                                                    "FunctionalMockupUnitImport")) { // The functional mock up unit import interface is activated.
                 ++state.dataExternalInterface->NumExternalInterfacesFMUImport;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(1),
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1),
                                                    "FunctionalMockupUnitExport")) { // The functional mock up unit export interface is activated.
                 ++state.dataExternalInterface->NumExternalInterfacesFMUExport;
             }
@@ -406,8 +399,6 @@ namespace EnergyPlus::ExternalInterface {
         std::string xmlStrOut;    // xml values in string, separated by ';'
         std::string xmlStrOutTyp; // xml values in string, separated by ';'
         std::string xmlStrIn;     // xml values in string, separated by ';'
-        static int nOutVal;       // Number of output values (E+ -> ExternalInterface)
-        static int nInpVar;       // Number of input values (ExternalInterface -> E+)
         int retVal;               // Return value of function call, used for error handling
         int mainVersion;          // The version number
 
@@ -467,22 +458,22 @@ namespace EnergyPlus::ExternalInterface {
                     retVal = getepvariables(simCfgFilNam.c_str(),
                                             &xmlStrOutTypArr[0],
                                             &xmlStrOutArr[0],
-                                            &nOutVal,
+                                            &state.dataExternalInterface->nOutVal,
                                             xmlStrInKey.c_str(),
                                             &state.dataExternalInterface->nInKeys,
                                             &xmlStrInArr[0],
-                                            &nInpVar,
+                                            &state.dataExternalInterface->nInpVar,
                                             state.dataExternalInterface->inpVarTypes.data(),
                                             &lenXmlStr);
                 } else if (state.dataExternalInterface->haveExternalInterfaceFMUExport) {
                     retVal = getepvariablesFMU(simCfgFilNam.c_str(),
                                                &xmlStrOutTypArr[0],
                                                &xmlStrOutArr[0],
-                                               &nOutVal,
+                                               &state.dataExternalInterface->nOutVal,
                                                xmlStrInKey.c_str(),
                                                &state.dataExternalInterface->nInKeys,
                                                &xmlStrInArr[0],
-                                               &nInpVar,
+                                               &state.dataExternalInterface->nInpVar,
                                                state.dataExternalInterface->inpVarTypes.data(),
                                                &lenXmlStr);
                 } else {
@@ -515,44 +506,44 @@ namespace EnergyPlus::ExternalInterface {
             }
             StopExternalInterfaceIfError(state);
 
-            if (nOutVal + nInpVar > maxVar) {
+            if (state.dataExternalInterface->nOutVal + state.dataExternalInterface->nInpVar > maxVar) {
                 ShowSevereError(state, "ExternalInterface: Too many variables to be exchanged.");
-                ShowContinueError(state, format("Attempted to exchange {} outputs", nOutVal));
-                ShowContinueError(state, format("plus {} inputs.", nOutVal));
+                ShowContinueError(state, format("Attempted to exchange {} outputs", state.dataExternalInterface->nOutVal));
+                ShowContinueError(state, format("plus {} inputs.", state.dataExternalInterface->nOutVal));
                 ShowContinueError(state, format("Maximum allowed is sum is {}.", maxVar));
                 ShowContinueError(state, "To fix, increase maxVar in ExternalInterface.cc");
                 state.dataExternalInterface->ErrorsFound = true;
             }
             StopExternalInterfaceIfError(state);
 
-            if (nOutVal < 0) {
+            if (state.dataExternalInterface->nOutVal < 0) {
                 ShowSevereError(state, "ExternalInterface: Error when getting number of xml values for outputs.");
                 state.dataExternalInterface->ErrorsFound = true;
             } else {
-                ParseString(xmlStrOut, state.dataExternalInterface->varNames, nOutVal);
-                ParseString(xmlStrOutTyp, state.dataExternalInterface->varKeys, nOutVal);
+                ParseString(xmlStrOut, state.dataExternalInterface->varNames, state.dataExternalInterface->nOutVal);
+                ParseString(xmlStrOutTyp, state.dataExternalInterface->varKeys, state.dataExternalInterface->nOutVal);
             }
             StopExternalInterfaceIfError(state);
 
-            if (nInpVar < 0) {
+            if (state.dataExternalInterface->nInpVar < 0) {
                 ShowSevereError(state, "ExternalInterface: Error when getting number of xml values for inputs.");
                 state.dataExternalInterface->ErrorsFound = true;
             } else {
-                ParseString(xmlStrIn, state.dataExternalInterface->inpVarNames, nInpVar);
+                ParseString(xmlStrIn, state.dataExternalInterface->inpVarNames, state.dataExternalInterface->nInpVar);
             }
             StopExternalInterfaceIfError(state);
 
-            DisplayString(state, format("Number of outputs in ExternalInterface = {}", nOutVal));
-            DisplayString(state, format("Number of inputs  in ExternalInterface = {}", nInpVar));
+            DisplayString(state, format("Number of outputs in ExternalInterface = {}", state.dataExternalInterface->nOutVal));
+            DisplayString(state, format("Number of inputs  in ExternalInterface = {}", state.dataExternalInterface->nInpVar));
 
             state.dataExternalInterface->InitExternalInterfacefirstCall = false;
 
         } else if (!state.dataExternalInterface->configuredControlPoints) {
-            state.dataExternalInterface->keyVarIndexes.allocate(nOutVal);
-            state.dataExternalInterface->varTypes.allocate(nOutVal);
-            GetReportVariableKey(state, state.dataExternalInterface->varKeys, nOutVal, state.dataExternalInterface->varNames, state.dataExternalInterface->keyVarIndexes, state.dataExternalInterface->varTypes);
-            state.dataExternalInterface->varInd.allocate(nInpVar);
-            for (i = 1; i <= nInpVar; ++i) {
+            state.dataExternalInterface->keyVarIndexes.allocate(state.dataExternalInterface->nOutVal);
+            state.dataExternalInterface->varTypes.allocate(state.dataExternalInterface->nOutVal);
+            GetReportVariableKey(state, state.dataExternalInterface->varKeys, state.dataExternalInterface->nOutVal, state.dataExternalInterface->varNames, state.dataExternalInterface->keyVarIndexes, state.dataExternalInterface->varTypes);
+            state.dataExternalInterface->varInd.allocate(state.dataExternalInterface->nInpVar);
+            for (i = 1; i <= state.dataExternalInterface->nInpVar; ++i) {
                 if (state.dataExternalInterface->inpVarTypes(i) == indexSchedule) {
                     state.dataExternalInterface->varInd(i) = GetDayScheduleIndex(state, state.dataExternalInterface->inpVarNames(i));
                 } else if (state.dataExternalInterface->inpVarTypes(i) == indexVariable) {
@@ -568,7 +559,7 @@ namespace EnergyPlus::ExternalInterface {
             }
             StopExternalInterfaceIfError(state);
             // Configure Erl variables
-            for (i = 1; i <= nInpVar; ++i) {
+            for (i = 1; i <= state.dataExternalInterface->nInpVar; ++i) {
                 if (state.dataExternalInterface->inpVarTypes(i) == indexVariable) { // ems-globalvariable
                     state.dataExternalInterface->useEMS = true;
                     if (!isExternalInterfaceErlVariable(state, state.dataExternalInterface->varInd(i))) {
@@ -950,13 +941,7 @@ namespace EnergyPlus::ExternalInterface {
         // This routine initializes the input and outputs variables used for the co-simulation with FMUs.
 
         // Using/Aliasing
-        using DataIPShortCuts::cAlphaArgs;
-        using DataIPShortCuts::cAlphaFieldNames;
-        using DataIPShortCuts::cCurrentModuleObject;
-        using DataIPShortCuts::cNumericFieldNames;
-        using DataIPShortCuts::rNumericArgs;
         using DataStringGlobals::altpathChar;
-        using DataStringGlobals::CurrentWorkingFolder;
         using DataStringGlobals::pathChar;
         using DataSystemVariables::CheckForActualFileName;
 
@@ -1004,26 +989,27 @@ namespace EnergyPlus::ExternalInterface {
             // Get and store the names of all FMUs in EnergyPlus data structure
             strippedFileName.allocate(state.dataExternalInterface->NumFMUObjects);
             fullFileName.allocate(state.dataExternalInterface->NumFMUObjects);
+            auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
             for (Loop = 1; Loop <= state.dataExternalInterface->NumFMUObjects; ++Loop) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Loop,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
                                               _,
                                               _,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
                 // Get the FMU name
-                state.dataExternalInterface->FMU(Loop).Name = cAlphaArgs(1);
+                state.dataExternalInterface->FMU(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-                std::string contextString = cCurrentModuleObject + ", " + cAlphaFieldNames(1) + ": ";
+                std::string contextString = cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(1) + ": ";
 
-                CheckForActualFileName(state, cAlphaArgs(1), fileExist, tempFullFileName, contextString);
+                CheckForActualFileName(state, state.dataIPShortCut->cAlphaArgs(1), fileExist, tempFullFileName, contextString);
 
                 if (fileExist) {
                     pos = index(state.dataExternalInterface->FMU(Loop).Name, pathChar, true); // look backwards
@@ -1042,9 +1028,9 @@ namespace EnergyPlus::ExternalInterface {
                     state.dataExternalInterface->ErrorsFound = true;
                 }
                 // Get fmu time out
-                state.dataExternalInterface->FMU(Loop).TimeOut = rNumericArgs(1);
+                state.dataExternalInterface->FMU(Loop).TimeOut = state.dataIPShortCut->rNumericArgs(1);
                 // Get fmu logging on
-                state.dataExternalInterface->FMU(Loop).LoggingOn = rNumericArgs(2);
+                state.dataExternalInterface->FMU(Loop).LoggingOn = state.dataIPShortCut->rNumericArgs(2);
             }
 
             // check for dups that aren't the same file
@@ -1086,17 +1072,17 @@ namespace EnergyPlus::ExternalInterface {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   l,
-                                                  cAlphaArgs,
+                                                  state.dataIPShortCut->cAlphaArgs,
                                                   NumAlphas,
-                                                  rNumericArgs,
+                                                  state.dataIPShortCut->rNumericArgs,
                                                   NumNumbers,
                                                   IOStatus,
                                                   _,
                                                   _,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
-                    if (UtilityRoutines::SameString(cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
-                        Name_NEW = cAlphaArgs(4);
+                                                  state.dataIPShortCut->cAlphaFieldNames,
+                                                  state.dataIPShortCut->cNumericFieldNames);
+                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
+                        Name_NEW = state.dataIPShortCut->cAlphaArgs(4);
                         if (!UtilityRoutines::SameString(Name_OLD, Name_NEW)) {
                             FOUND = UtilityRoutines::FindItem(Name_NEW, state.dataExternalInterface->checkInstanceName);
                             if (FOUND == 0) {
@@ -1263,20 +1249,20 @@ namespace EnergyPlus::ExternalInterface {
                         inputProcessor->getObjectItem(state,
                                                       cCurrentModuleObject,
                                                       l,
-                                                      cAlphaArgs,
+                                                      state.dataIPShortCut->cAlphaArgs,
                                                       NumAlphas,
-                                                      rNumericArgs,
+                                                      state.dataIPShortCut->rNumericArgs,
                                                       NumNumbers,
                                                       IOStatus,
                                                       _,
                                                       _,
-                                                      cAlphaFieldNames,
-                                                      cNumericFieldNames);
-                        if (UtilityRoutines::SameString(cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name) &&
-                            UtilityRoutines::SameString(cAlphaArgs(4), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
-                            state.dataExternalInterface->FMU(i).Instance(j).fmuInputVariable(k).Name = cAlphaArgs(5);
-                            state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).VarKey = cAlphaArgs(1);
-                            state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).Name = cAlphaArgs(2);
+                                                      state.dataIPShortCut->cAlphaFieldNames,
+                                                      state.dataIPShortCut->cNumericFieldNames);
+                        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name) &&
+                            UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
+                            state.dataExternalInterface->FMU(i).Instance(j).fmuInputVariable(k).Name = state.dataIPShortCut->cAlphaArgs(5);
+                            state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).VarKey = state.dataIPShortCut->cAlphaArgs(1);
+                            state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).Name = state.dataIPShortCut->cAlphaArgs(2);
                             // verify whether we have duplicate FMU input variables in the idf
                             GlobalNames::VerifyUniqueInterObjectName(state, state.dataExternalInterface->UniqueFMUInputVarNames,
                                                                      state.dataExternalInterface->FMU(i).Instance(j).fmuInputVariable(k).Name,
@@ -1395,16 +1381,16 @@ namespace EnergyPlus::ExternalInterface {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   k,
-                                                  cAlphaArgs,
+                                                  state.dataIPShortCut->cAlphaArgs,
                                                   NumAlphas,
-                                                  rNumericArgs,
+                                                  state.dataIPShortCut->rNumericArgs,
                                                   NumNumbers,
                                                   IOStatus,
                                                   _,
                                                   _,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
-                    if (UtilityRoutines::SameString(cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
+                                                  state.dataIPShortCut->cAlphaFieldNames,
+                                                  state.dataIPShortCut->cNumericFieldNames);
+                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
                         state.dataExternalInterface->FMU(i).TotNumOutputVariablesSchedule = j;
                         ++j;
                     }
@@ -1420,20 +1406,20 @@ namespace EnergyPlus::ExternalInterface {
                         inputProcessor->getObjectItem(state,
                                                       cCurrentModuleObject,
                                                       l,
-                                                      cAlphaArgs,
+                                                      state.dataIPShortCut->cAlphaArgs,
                                                       NumAlphas,
-                                                      rNumericArgs,
+                                                      state.dataIPShortCut->rNumericArgs,
                                                       NumNumbers,
                                                       IOStatus,
                                                       _,
                                                       _,
-                                                      cAlphaFieldNames,
-                                                      cNumericFieldNames);
-                        if (UtilityRoutines::SameString(cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name) &&
-                            UtilityRoutines::SameString(cAlphaArgs(4), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
-                            state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableSchedule(k).Name = cAlphaArgs(5);
-                            state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableSchedule(k).Name = cAlphaArgs(1);
-                            state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableSchedule(k).InitialValue = rNumericArgs(1);
+                                                      state.dataIPShortCut->cAlphaFieldNames,
+                                                      state.dataIPShortCut->cNumericFieldNames);
+                        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name) &&
+                            UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
+                            state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableSchedule(k).Name = state.dataIPShortCut->cAlphaArgs(5);
+                            state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableSchedule(k).Name = state.dataIPShortCut->cAlphaArgs(1);
+                            state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableSchedule(k).InitialValue = state.dataIPShortCut->rNumericArgs(1);
 
                             // get the value reference by using the FMU name and the variable name.
 
@@ -1499,16 +1485,16 @@ namespace EnergyPlus::ExternalInterface {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   k,
-                                                  cAlphaArgs,
+                                                  state.dataIPShortCut->cAlphaArgs,
                                                   NumAlphas,
-                                                  rNumericArgs,
+                                                  state.dataIPShortCut->rNumericArgs,
                                                   NumNumbers,
                                                   IOStatus,
                                                   _,
                                                   _,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
-                    if (UtilityRoutines::SameString(cAlphaArgs(2), state.dataExternalInterface->FMU(i).Name)) {
+                                                  state.dataIPShortCut->cAlphaFieldNames,
+                                                  state.dataIPShortCut->cNumericFieldNames);
+                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), state.dataExternalInterface->FMU(i).Name)) {
                         state.dataExternalInterface->FMU(i).TotNumOutputVariablesVariable = j;
                         ++j;
                     }
@@ -1524,19 +1510,19 @@ namespace EnergyPlus::ExternalInterface {
                         inputProcessor->getObjectItem(state,
                                                       cCurrentModuleObject,
                                                       l,
-                                                      cAlphaArgs,
+                                                      state.dataIPShortCut->cAlphaArgs,
                                                       NumAlphas,
-                                                      rNumericArgs,
+                                                      state.dataIPShortCut->rNumericArgs,
                                                       NumNumbers,
                                                       IOStatus,
                                                       _,
                                                       _,
-                                                      cAlphaFieldNames,
-                                                      cNumericFieldNames);
-                        if (UtilityRoutines::SameString(cAlphaArgs(2), state.dataExternalInterface->FMU(i).Name) &&
-                            UtilityRoutines::SameString(cAlphaArgs(3), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
-                            state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableVariable(k).Name = cAlphaArgs(4);
-                            state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableVariable(k).Name = cAlphaArgs(1);
+                                                      state.dataIPShortCut->cAlphaFieldNames,
+                                                      state.dataIPShortCut->cNumericFieldNames);
+                        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), state.dataExternalInterface->FMU(i).Name) &&
+                            UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
+                            state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableVariable(k).Name = state.dataIPShortCut->cAlphaArgs(4);
+                            state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableVariable(k).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                             // get the value reference by using the FMU name and the variable name.
                             auto NameCharArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableVariable(k).Name));
@@ -1598,16 +1584,16 @@ namespace EnergyPlus::ExternalInterface {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   k,
-                                                  cAlphaArgs,
+                                                  state.dataIPShortCut->cAlphaArgs,
                                                   NumAlphas,
-                                                  rNumericArgs,
+                                                  state.dataIPShortCut->rNumericArgs,
                                                   NumNumbers,
                                                   IOStatus,
                                                   _,
                                                   _,
-                                                  cAlphaFieldNames,
-                                                  cNumericFieldNames);
-                    if (UtilityRoutines::SameString(cAlphaArgs(5), state.dataExternalInterface->FMU(i).Name)) {
+                                                  state.dataIPShortCut->cAlphaFieldNames,
+                                                  state.dataIPShortCut->cNumericFieldNames);
+                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), state.dataExternalInterface->FMU(i).Name)) {
                         state.dataExternalInterface->FMU(i).TotNumOutputVariablesActuator = j;
                         ++j;
                     }
@@ -1623,19 +1609,19 @@ namespace EnergyPlus::ExternalInterface {
                         inputProcessor->getObjectItem(state,
                                                       cCurrentModuleObject,
                                                       l,
-                                                      cAlphaArgs,
+                                                      state.dataIPShortCut->cAlphaArgs,
                                                       NumAlphas,
-                                                      rNumericArgs,
+                                                      state.dataIPShortCut->rNumericArgs,
                                                       NumNumbers,
                                                       IOStatus,
                                                       _,
                                                       _,
-                                                      cAlphaFieldNames,
-                                                      cNumericFieldNames);
-                        if (UtilityRoutines::SameString(cAlphaArgs(5), state.dataExternalInterface->FMU(i).Name) &&
-                            UtilityRoutines::SameString(cAlphaArgs(6), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
-                            state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableActuator(k).Name = cAlphaArgs(7);
-                            state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableActuator(k).Name = cAlphaArgs(1);
+                                                      state.dataIPShortCut->cAlphaFieldNames,
+                                                      state.dataIPShortCut->cNumericFieldNames);
+                        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), state.dataExternalInterface->FMU(i).Name) &&
+                            UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
+                            state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableActuator(k).Name = state.dataIPShortCut->cAlphaArgs(7);
+                            state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableActuator(k).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                             // get the value reference by using the FMU name and the variable name.
                             auto tempNameArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableActuator(k).Name));
@@ -2116,24 +2102,18 @@ namespace EnergyPlus::ExternalInterface {
         // METHODOLOGY EMPLOYED:
         // Use GetObjectItem from the Input Processor
 
-        // Using/Aliasing
-        using DataIPShortCuts::cAlphaArgs;
-        using DataIPShortCuts::cAlphaFieldNames;
-        using DataIPShortCuts::cCurrentModuleObject;
-        using DataIPShortCuts::cNumericFieldNames;
-        using DataIPShortCuts::rNumericArgs;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas(0);  // Number of Alphas for each GetObjectItem call
         int NumNumbers(0); // Number of Numbers for each GetObjectItem call
         int IOStatus(0);   // Used in GetObjectItem
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "SimulationControl";
         int const NumRunControl = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumRunControl > 0) {
             inputProcessor->getObjectItem(
-                state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
-            if (cAlphaArgs(5) == "NO") { // This run does not have a weather file simulation.
+                state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus, _, _, state.dataIPShortCut->cAlphaFieldNames, state.dataIPShortCut->cNumericFieldNames);
+            if (state.dataIPShortCut->cAlphaArgs(5) == "NO") { // This run does not have a weather file simulation.
                 ShowSevereError(state, "ExternalInterface: Error in idf file, section SimulationControl:");
                 ShowContinueError(state, "When using the ExternalInterface, a run period from the weather file must be specified");
                 ShowContinueError(state, "in the idf file, because the ExternalInterface interface is not active during");
@@ -2363,25 +2343,19 @@ namespace EnergyPlus::ExternalInterface {
         // This subroutine verifies the correctness of the fields of
         // the ExternalInterface object in the idf file
 
-        // Using/Aliasing
-        using DataIPShortCuts::cAlphaArgs;
-        using DataIPShortCuts::cAlphaFieldNames;
-        using DataIPShortCuts::cCurrentModuleObject;
-        using DataIPShortCuts::cNumericFieldNames;
-        using DataIPShortCuts::rNumericArgs;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas(0);  // Number of Alphas for each GetObjectItem call
         int NumNumbers(0); // Number of Numbers for each GetObjectItem call
         int IOStatus(0);   // Used in GetObjectItem
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "ExternalInterface";
         inputProcessor->getObjectItem(
-            state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
-        if ((!UtilityRoutines::SameString(cAlphaArgs(1), "PtolemyServer")) &&
-            (!UtilityRoutines::SameString(cAlphaArgs(1), "FunctionalMockupUnitImport")) &&
-            (!UtilityRoutines::SameString(cAlphaArgs(1), "FunctionalMockupUnitExport"))) {
-            ShowSevereError(state, "VerifyExternalInterfaceObject: " + cCurrentModuleObject + ", invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) +
+            state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus, _, _, state.dataIPShortCut->cAlphaFieldNames, state.dataIPShortCut->cNumericFieldNames);
+        if ((!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "PtolemyServer")) &&
+            (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "FunctionalMockupUnitImport")) &&
+            (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "FunctionalMockupUnitExport"))) {
+            ShowSevereError(state, "VerifyExternalInterfaceObject: " + cCurrentModuleObject + ", invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                             "\".");
             ShowContinueError(state, "only \"PtolemyServer or FunctionalMockupUnitImport or FunctionalMockupUnitExport\" allowed.");
             state.dataExternalInterface->ErrorsFound = true;

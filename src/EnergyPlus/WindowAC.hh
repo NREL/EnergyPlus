@@ -227,6 +227,8 @@ namespace WindowAC {
         Array1D<WindowAC::WindACData> WindAC;
         Array1D<WindowAC::WindACNumericFieldData> WindACNumericFields; // holds window AC numeric input fields character field name
 
+        Array1D_bool MyEnvrnFlag;  // one time initialization flag
+        Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 
         void clear_state() override
         {
@@ -240,6 +242,8 @@ namespace WindowAC {
             this->CheckEquipName.deallocate();
             this->WindAC.deallocate();
             this->WindACNumericFields.deallocate();
+            this->MyEnvrnFlag.deallocate();
+            this->MyZoneEqFlag.deallocate();
         }
 
         // Default Constructor

@@ -470,10 +470,10 @@ namespace EnergyPlus::WindowEquivalentLayer {
         // hcout = 15.d0          ! Outside convective film conductance at 2.8 m/s (6.2 mph) wind speed
         // BeamSolarInc = 783.0d0 ! Direct normal incident solar radiation, W/m2
 
-        Real64 const TOL(0.01);
-        Real64 const TIN(297.15);
-        Real64 const TOUT(305.15);
-        Real64 const BeamSolarInc(783.0);
+        constexpr Real64 TOL(0.01);
+        constexpr Real64 TIN(297.15);
+        constexpr Real64 TOUT(305.15);
+        constexpr Real64 BeamSolarInc(783.0);
         static std::string const RoutineName("CalcEQLWindowSHGCAndTransNormal: ");
 
         Real64 HCOUT;
@@ -995,8 +995,8 @@ namespace EnergyPlus::WindowEquivalentLayer {
         // Argument array dimensioning
         EP_SIZE_CHECK(F_P, state.dataWindowEquivalentLayer->hipDIM);
 
-        static int const KMAX(8); // max steps
-        static int const NPANMAX(std::pow(2, KMAX));
+        constexpr Real64 KMAX(8); // max steps
+        int const NPANMAX(std::pow(2, KMAX));
         Real64 const TOL(0.0005); // convergence tolerance
         static std::string const RoutineName("HEMINT");
 
@@ -1583,7 +1583,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         // Eight surface flat-fabric model with rectangular enclosure. If you want the back-side
         // reflectance call this routine a second time with reversed front and back properties
 
-        int const N(6);
+        constexpr int N(6);
         static std::string const TauDD_Name("PD_DIFF TauDD");
         static std::string const RhoDD_Name("PD_DIFF RhoDD");
 
@@ -4417,7 +4417,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         //   0=outside, 1=betw layer 1-2, ..., NL=inside
 
         // FUNCTION PARAMETER DEFINITIONS:
-        int const MaxIter(100); // maximum number of iterations allowed
+        constexpr int MaxIter(100); // maximum number of iterations allowed
         static std::string const RoutineName("ASHWAT_ThermalCalc: ");
 
         Real64 ALPHA;
@@ -6919,17 +6919,15 @@ namespace EnergyPlus::WindowEquivalentLayer {
         // PURPOSE OF THIS SUBROUTINE:
         //  Returns property ratios for estimating diffuse properties.
 
-        static Real64 X1MRDiff(-1.0);
-        static Real64 XTAUDiff(-1.0);
         Array1D<Real64> P(state.dataWindowEquivalentLayer->hipDIM);
 
-        if (XTAUDiff < 0.0) {
+        if (state.dataWindowEquivalentLayer->XTAUDiff < 0.0) {
             // calculate and save on first call
-            X1MRDiff = HEMINT(state, Specular_F, state.dataWindowEquivalentLayer->hipRHO, P);
-            XTAUDiff = HEMINT(state, Specular_F, state.dataWindowEquivalentLayer->hipTAU, P);
+            state.dataWindowEquivalentLayer->X1MRDiff = HEMINT(state, Specular_F, state.dataWindowEquivalentLayer->hipRHO, P);
+            state.dataWindowEquivalentLayer->XTAUDiff = HEMINT(state, Specular_F, state.dataWindowEquivalentLayer->hipTAU, P);
         }
-        RAT_TAUDiff = XTAUDiff;
-        RAT_1MRDiff = X1MRDiff;
+        RAT_TAUDiff = state.dataWindowEquivalentLayer->XTAUDiff;
+        RAT_1MRDiff = state.dataWindowEquivalentLayer->X1MRDiff;
     }
 
     Real64 Specular_F(EnergyPlusData &state,
@@ -7720,7 +7718,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         // at time of manufacture, default = 21 C / 1 ATM
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Real64 GapThickMin(0.0001); // Minimum gap thickness allowed, m
+        constexpr Real64 GapThickMin(0.0001); // Minimum gap thickness allowed, m
         static std::string const RoutineName("BuildGap: ");
 
         Real64 PMan;
@@ -8119,7 +8117,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
         Real64 ProfAngVer; // Solar vertical profile angle (radians) for horizontal blind
         Real64 ProfAngHor; // Solar horizontal profile angle (radians) for vertical blind
         Real64 IncAng;     // incident angle degree
-        static Array2D<Real64> Abs1(2, CFSMAXNL + 1);
+        Array2D<Real64> Abs1(2, CFSMAXNL + 1);
         int Lay;       // window layer index
         int EQLNum;    // equivalent layer window construction index
         int ConstrNum; // construction index

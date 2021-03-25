@@ -55,21 +55,13 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACCooledBeam.hh>
-#include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
-#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
@@ -87,17 +79,9 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
-    DataIPShortCuts::clear_state();
     DataOutputs::clear_state();
-    DataStringGlobals::clear_state();
-    DesiccantDehumidifiers::clear_state();
-    ElectricBaseboardRadiator::clear_state();
     FluidProperties::clear_state();
-    HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
-    HeatBalFiniteDiffManager::clear_state();
-    Humidifiers::clear_state();
-    HVACCooledBeam::clear_state();
     HVACFan::clearHVACFanObjects();
     PhotovoltaicThermalCollectors::clear_state();
     Psychrometrics::clear_state();

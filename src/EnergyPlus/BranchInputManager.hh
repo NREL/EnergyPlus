@@ -366,6 +366,7 @@ namespace BranchInputManager {
         Array1D<BranchInputManager::ConnectorData> ConnectorLists;  // Connector List data for each Connector List
         Array1D<BranchInputManager::SplitterData> Splitters;        // Splitter Data for each Splitter
         Array1D<BranchInputManager::MixerData> Mixers;              // Mixer Data for each Mixer
+        Array1D<BranchInputManager::ComponentData> BComponents; // Component data to be returned
 
         void clear_state() override
         {
@@ -386,6 +387,7 @@ namespace BranchInputManager {
             this->ConnectorLists.deallocate();
             this->Splitters.deallocate();
             this->Mixers.deallocate();
+            this->BComponents.deallocate();
         }
     };
 

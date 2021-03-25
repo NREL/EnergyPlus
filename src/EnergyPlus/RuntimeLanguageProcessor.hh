@@ -226,7 +226,7 @@ struct RuntimeLanguageProcessorData : BaseGlobalStruct {
     std::unordered_map<std::string, std::string> ErlStackUniqueNames;
     std::unordered_map<std::string, std::string> RuntimeReportVarUniqueNames;
     bool WriteTraceMyOneTimeFlag = false;
-
+    Array1D<RuntimeLanguageProcessor::TokenType> Token;
     Array1D<RuntimeLanguageProcessor::TokenType> PEToken;
 
     void clear_state() override {
@@ -266,8 +266,8 @@ struct RuntimeLanguageProcessorData : BaseGlobalStruct {
         this->ErlStackUniqueNames.clear();
         this->RuntimeReportVarUniqueNames.clear();
         this->WriteTraceMyOneTimeFlag = false;
-
         this->PEToken.clear();
+        this->Token.clear();
     }
 };
 

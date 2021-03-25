@@ -139,7 +139,7 @@ namespace TranspiredCollector {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        static int UTSCNum(0); // local number index for UTSC
+        int UTSCNum(0); // local number index for UTSC
 
         if (state.dataTranspiredCollector->GetInputFlag) {
             GetTranspiredCollectorInput(state);
@@ -225,7 +225,6 @@ namespace TranspiredCollector {
         // Extensible UTSC object for underlying heat transfer surfaces and for multisystem
 
         // Using/Aliasing
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using DataHeatBalance::MediumRough;
         using DataHeatBalance::MediumSmooth;
@@ -308,10 +307,10 @@ namespace TranspiredCollector {
                                           Numbers,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             // first handle alphas
             state.dataTranspiredCollector->UTSC(Item).Name = Alphas(1);
@@ -399,16 +398,16 @@ namespace TranspiredCollector {
             state.dataTranspiredCollector->UTSC(Item).OSCMName = Alphas(2);
             Found = UtilityRoutines::FindItemInList(state.dataTranspiredCollector->UTSC(Item).OSCMName, state.dataSurface->OSCM);
             if (Found == 0) {
-                ShowSevereError(state, cAlphaFieldNames(2) + " not found=" + state.dataTranspiredCollector->UTSC(Item).OSCMName + " in " + CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
+                ShowSevereError(state, state.dataIPShortCut->cAlphaFieldNames(2) + " not found=" + state.dataTranspiredCollector->UTSC(Item).OSCMName + " in " + CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
                 ErrorsFound = true;
             }
             state.dataTranspiredCollector->UTSC(Item).OSCMPtr = Found;
-            if (lAlphaFieldBlanks(3)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 state.dataTranspiredCollector->UTSC(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataTranspiredCollector->UTSC(Item).SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (state.dataTranspiredCollector->UTSC(Item).SchedPtr == 0) {
-                    ShowSevereError(state, cAlphaFieldNames(3) + "not found=" + Alphas(3) + " in " + CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
+                    ShowSevereError(state, state.dataIPShortCut->cAlphaFieldNames(3) + "not found=" + Alphas(3) + " in " + CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
                     ErrorsFound = true;
                     continue;
                 }
@@ -440,7 +439,7 @@ namespace TranspiredCollector {
 
             state.dataTranspiredCollector->UTSC(Item).FreeHeatSetPointSchedPtr = GetScheduleIndex(state, Alphas(8));
             if (state.dataTranspiredCollector->UTSC(Item).FreeHeatSetPointSchedPtr == 0) {
-                ShowSevereError(state, cAlphaFieldNames(8) + " not found=" + Alphas(8) + " in " + CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
+                ShowSevereError(state, state.dataIPShortCut->cAlphaFieldNames(8) + " not found=" + Alphas(8) + " in " + CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
                 ErrorsFound = true;
                 continue;
             }
@@ -450,7 +449,7 @@ namespace TranspiredCollector {
             } else if (UtilityRoutines::SameString(Alphas(9), "Square")) {
                 state.dataTranspiredCollector->UTSC(Item).Layout = state.dataTranspiredCollector->Layout_Square;
             } else {
-                ShowSevereError(state, cAlphaFieldNames(9) + " has incorrect entry of " + Alphas(9) + " in " + CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
+                ShowSevereError(state, state.dataIPShortCut->cAlphaFieldNames(9) + " has incorrect entry of " + Alphas(9) + " in " + CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
                 ErrorsFound = true;
                 continue;
             }
@@ -460,7 +459,7 @@ namespace TranspiredCollector {
             } else if (UtilityRoutines::SameString(Alphas(10), "VanDeckerHollandsBrunger2001")) {
                 state.dataTranspiredCollector->UTSC(Item).Correlation = state.dataTranspiredCollector->Correlation_VanDeckerHollandsBrunger2001;
             } else {
-                ShowSevereError(state, cAlphaFieldNames(10) + " has incorrect entry of " + Alphas(9) + " in " + CurrentModuleObject + " =" +
+                ShowSevereError(state, state.dataIPShortCut->cAlphaFieldNames(10) + " has incorrect entry of " + Alphas(9) + " in " + CurrentModuleObject + " =" +
                                 state.dataTranspiredCollector->UTSC(Item).Name);
                 ErrorsFound = true;
                 continue;
@@ -477,7 +476,7 @@ namespace TranspiredCollector {
 
             // Was it set?
             if (state.dataTranspiredCollector->UTSC(Item).CollRoughness == 0) {
-                ShowSevereError(state, cAlphaFieldNames(11) + " has incorrect entry of " + Alphas(11) + " in " + CurrentModuleObject + " =" +
+                ShowSevereError(state, state.dataIPShortCut->cAlphaFieldNames(11) + " has incorrect entry of " + Alphas(11) + " in " + CurrentModuleObject + " =" +
                                 state.dataTranspiredCollector->UTSC(Item).Name);
                 ErrorsFound = true;
             }
@@ -528,7 +527,7 @@ namespace TranspiredCollector {
                 // check surface orientation, warn if upside down
                 if ((state.dataSurface->Surface(Found).Tilt < -95.0) || (state.dataSurface->Surface(Found).Tilt > 95.0)) {
                     ShowWarningError(state, "Suspected input problem with collector surface = " + Alphas(ThisSurf + AlphaOffset));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataTranspiredCollector->UTSC(Item).Name);
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataTranspiredCollector->UTSC(Item).Name);
                     ShowContinueError(state, "Surface used for solar collector faces down");
                     ShowContinueError(state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", state.dataSurface->Surface(Found).Tilt));
                 }
@@ -713,9 +712,7 @@ namespace TranspiredCollector {
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
         int UTSCUnitNum;
-        static Array1D_bool MyEnvrnFlag;
         int ControlNode;
-        // unused  INTEGER             :: InletNode
         int SplitBranch;
         int thisUTSC;
         Real64 Tamb;
@@ -745,7 +742,7 @@ namespace TranspiredCollector {
                 }
             }
 
-            MyEnvrnFlag.dimension(state.dataTranspiredCollector->NumUTSC, true);
+            state.dataTranspiredCollector->MyEnvrnFlag.dimension(state.dataTranspiredCollector->NumUTSC, true);
             state.dataTranspiredCollector->MyOneTimeFlag = false;
         } // first time
 
@@ -777,14 +774,14 @@ namespace TranspiredCollector {
             state.dataTranspiredCollector->MySetPointCheckFlag = false;
         }
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(UTSCNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataTranspiredCollector->MyEnvrnFlag(UTSCNum)) {
             state.dataTranspiredCollector->UTSC(UTSCNum).TplenLast = 22.5;
             state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast = 22.0;
 
-            MyEnvrnFlag(UTSCNum) = false;
+            state.dataTranspiredCollector->MyEnvrnFlag(UTSCNum) = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(UTSCNum) = true;
+            state.dataTranspiredCollector->MyEnvrnFlag(UTSCNum) = true;
         }
 
         // determine average ambient temperature

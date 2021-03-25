@@ -1024,7 +1024,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
 }
 
 // Modified from previous GaseousConstituents fuel supply model to use LiquidGeneric fuel type
-TEST_F(EnergyPlusFixture, FuelCellTest_Zero_Cp_Fix)
+TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
 {
     // state->clear_state();
 

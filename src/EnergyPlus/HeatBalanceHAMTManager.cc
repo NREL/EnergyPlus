@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -130,7 +131,7 @@ namespace HeatBalanceHAMTManager {
         // Manages the Heat and Moisture Transfer calculations.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool OneTimeFlag(true);
+        auto & OneTimeFlag = state.dataHeatBalHAMTMgr->OneTimeFlag;
 
         if (OneTimeFlag) {
             OneTimeFlag = false;
@@ -1023,14 +1024,11 @@ namespace HeatBalanceHAMTManager {
         int matid;
         int itter;
         int cid;
-        // unused1208    INTEGER :: cid1
         int adj;
         int adjl;
 
-        //    INTEGER, SAVE :: tempErrCount=0
-        static int qvpErrCount(0);
-        //    INTEGER, SAVE :: tempErrReport=0
-        static int qvpErrReport(0);
+        auto & qvpErrCount = state.dataHeatBalHAMTMgr->qvpErrCount;
+        auto & qvpErrReport = state.dataHeatBalHAMTMgr->qvpErrReport;
         Real64 denominator;
 
         auto &cells(state.dataHeatBalHAMTMgr->cells);

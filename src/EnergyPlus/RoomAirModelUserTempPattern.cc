@@ -135,29 +135,7 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        auto & MyEnvrnFlag = state.dataRoomAirModelTempPattern->MyEnvrnFlag; // flag for init once at start of environment
         int SurfNum;                     // do loop counter
 
         if (state.dataRoomAirModelTempPattern->MyOneTimeFlag) {
@@ -430,6 +408,7 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         Real64 thisZeta;                     // non-dimensional height
         Real64 DeltaHeight;                  // height difference in m
         Real64 tempDeltaTai;                 // temporary temperature difference
+        auto & SetupOutputFlag = state.dataRoomAirModelTempPattern->SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
 
         if (state.dataRoomAirModelTempPattern->MyOneTimeFlag2) {
             state.dataRoomAirModelTempPattern->SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init

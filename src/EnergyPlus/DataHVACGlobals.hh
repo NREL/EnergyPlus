@@ -477,6 +477,10 @@ struct HVACGlobalsData : BaseGlobalStruct {
     bool AirLoopInit = false;         // flag for whether InitAirLoops has been called
     bool AirLoopsSimOnce = false;     // True means that the air loops have been simulated once in this environment
     bool GetAirPathDataDone = false;  // True means that air loops inputs have been processed
+    bool StandardRatingsMyOneTimeFlag = true;
+    bool StandardRatingsMyCoolOneTimeFlag = true;
+    bool StandardRatingsMyCoolOneTimeFlag2 = true;
+    bool StandardRatingsMyHeatOneTimeFlag = true;
 
     void clear_state() override
     {
@@ -556,6 +560,10 @@ struct HVACGlobalsData : BaseGlobalStruct {
         this->AirLoopInit = false;         // flag for whether InitAirLoops has been called
         this->AirLoopsSimOnce = false;     // True means that the air loops have been simulated once in this environment
         this->GetAirPathDataDone = false;  // True means that air loops inputs have been processed
+        this->StandardRatingsMyOneTimeFlag = true;
+        this->StandardRatingsMyCoolOneTimeFlag = true;
+        this->StandardRatingsMyCoolOneTimeFlag2 = true;
+        this->StandardRatingsMyHeatOneTimeFlag = true;
     }
 };
 

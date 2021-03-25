@@ -216,7 +216,8 @@ namespace AirLoopHVACDOAS {
         std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
         std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
         std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
-
+        bool SummerDesignDayFlag = true;
+        bool WinterDesignDayFlag = true;
         void clear_state() override
         {
             this->GetInputOnceFlag = true;
@@ -226,6 +227,8 @@ namespace AirLoopHVACDOAS {
             this->airloopDOAS.clear();
             this->airloopMixer.clear();
             this->airloopSplitter.clear();
+            this->SummerDesignDayFlag = true;
+            this->WinterDesignDayFlag = true;
         }
     };
 

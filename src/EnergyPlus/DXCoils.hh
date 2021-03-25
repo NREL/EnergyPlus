@@ -984,6 +984,20 @@ struct DXCoilsData : BaseGlobalStruct {
     Array1D<DXCoils::DXCoilData> DXCoil;
     Array1D<DXCoils::DXCoilNumericFieldData> DXCoilNumericFields;
 
+    Array1D_bool MyEnvrnFlag;   // One time environment flag
+    Array1D_bool MySizeFlag;    // One time sizing flag
+    Real64 CurrentEndTime = 0.0;
+    Real64 CalcVRFCoolingCoil_FluidTCtrlCurrentEndTime = 0.0;
+    Real64 CalcVRFCoolingCoilCurrentEndTime = 0.0;
+    Real64 NetCoolingCapRated = 0.0; // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
+    Real64 EER = 0.0;                // Energy Efficiency Ratio in SI [W/W]
+    Real64 IEER = 0.0;               // Integerated Energy Efficiency Ratio in SI [W/W]
+    Real64 TotCapTempModFac = 0.0;   // Total capacity modifier (function of entering wetbulb, outside drybulb) [-]
+    Real64 TotCapFlowModFac = 0.0;   // Total capacity modifier (function of actual supply air flow vs rated flow) [-]
+    Real64 EIRTempModFac = 0.0;      // EIR modifier (function of entering wetbulb, outside drybulb) [-]
+    Real64 EIRFlowModFac = 0.0;      // EIR modifier (function of actual supply air flow vs rated flow) [-]
+    Real64 TempDryBulb_Leaving_Apoint = 0.0;
+    
     void clear_state() override
     {
         this->GetCoilsInputFlag = true;
@@ -1019,6 +1033,19 @@ struct DXCoilsData : BaseGlobalStruct {
         this->DXCoilHeatInletAirWBTemp.deallocate();
         this->DXCoil.deallocate();
         this->DXCoilNumericFields.deallocate();
+        this->MyEnvrnFlag.clear();
+        this->MySizeFlag.clear();
+        this->CurrentEndTime = 0.0;
+        this->CalcVRFCoolingCoilCurrentEndTime = 0.0;
+        this->CalcVRFCoolingCoil_FluidTCtrlCurrentEndTime = 0.0;
+        this->NetCoolingCapRated = 0.0;
+        this->EER = 0.0;
+        this->IEER = 0.0;
+        this->TotCapTempModFac = 0.0;
+        this->TotCapFlowModFac = 0.0;
+        this->EIRTempModFac = 0.0;
+        this->EIRFlowModFac = 0.0;
+        this->TempDryBulb_Leaving_Apoint = 0.0;
     }
 };
 

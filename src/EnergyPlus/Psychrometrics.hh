@@ -1390,6 +1390,11 @@ extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 
 
 struct PsychrometricsData : BaseGlobalStruct
 {
+    Real64 iconvTol = 0.0001;
+    Real64 last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
+    Real64 last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
+    Real64 Press_Save = -99999.0;
+    Real64 tSat_Save = -99999.0;
 
 #ifdef EP_psych_stats
     Array1D<Int64> NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
@@ -1397,23 +1402,17 @@ struct PsychrometricsData : BaseGlobalStruct
 #endif
 
     Array1D_int iPsyErrIndex = Array1D_int(Psychrometrics::NumPsychMonitors, 0); // Number of times error occurred
-
     std::string String;
     bool ReportErrors = true;
-
-    Real64 last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
-    Real64 last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
-    Real64 Press_Save = -99999.0;
-    Real64 tSat_Save = -99999.0;
 
     void clear_state() override
     {
         iPsyErrIndex = Array1D_int(Psychrometrics::NumPsychMonitors, 0);
+        iconvTol = 0.0001;
         last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
         last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
         Press_Save = -99999.0;
         tSat_Save = -99999.0;
-
         String = "";
         ReportErrors = true;
 

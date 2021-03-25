@@ -503,7 +503,7 @@ Array1D_string const PsyRoutineNames(NumPsychMonitors,
         // FUNCTION PARAMETER DEFINITIONS:
         int constexpr itmax(100); // Maximum No of Iterations
         Real64 const convTol(0.0001);
-        const char *  RoutineName("PsyTwbFnTdbWPb");
+        static std::string const RoutineName("PsyTwbFnTdbWPb");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -615,7 +615,7 @@ Array1D_string const PsyRoutineNames(NumPsychMonitors,
             error = W - newW;
 
             // Using Iterative Procedure to Calculate WetBulb
-            Iterate(ResultX, convTol, WBT, error, X1, Y1, iter, icvg);
+            Iterate(ResultX, state.dataPsychrometrics->iconvTol, WBT, error, X1, Y1, iter, icvg);
             WBT = ResultX;
 
             // If converged, leave iteration loop.

@@ -53,6 +53,7 @@
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
@@ -1521,7 +1522,7 @@ namespace FaultsManager {
                 }
 
                 // Reference offset value is required for Humidistat Offset Type: ThermostatOffsetIndependent
-                if (lNumericFieldBlanks(1)) {
+                if (lAlphaFieldBlanks(1)) {
                     ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\": " + cNumericFieldNames(1) +
                                     " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetIndependent\".");
                     state.dataFaultsMgr->ErrorsFound = true;
@@ -1580,7 +1581,7 @@ namespace FaultsManager {
             }
 
             // Reference offset value is required
-            if (lNumericFieldBlanks(1)) {
+            if (lAlphaFieldBlanks(1)) {
                 ShowSevereError(state, cFaultCurrentObject + " = \"" + cNumericFieldNames(1) + "\" cannot be blank.");
                 state.dataFaultsMgr->ErrorsFound = true;
             } else {

@@ -318,8 +318,13 @@ namespace HysteresisPhaseChange {
     {
 
         // convenience variables
+<<<<<<< HEAD
         DataIPShortCuts::cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
         state.dataHysteresisPhaseChange->numHysteresisModels = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+=======
+        state.dataIPShortCut->cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
+        numHysteresisModels = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+>>>>>>> origin/develop
 
         // loop over all hysteresis input instances, if zero, this will simply not do anything
         for (int hmNum = 1; hmNum <= state.dataHysteresisPhaseChange->numHysteresisModels; ++hmNum) {
@@ -331,49 +336,55 @@ namespace HysteresisPhaseChange {
 
             // get the input data and store it in the Shortcuts structures
             inputProcessor->getObjectItem(state,
-                                          DataIPShortCuts::cCurrentModuleObject,
+                                          state.dataIPShortCut->cCurrentModuleObject,
                                           hmNum,
-                                          DataIPShortCuts::cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           numAlphas,
-                                          DataIPShortCuts::rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           numNumbers,
                                           ioStatus,
-                                          DataIPShortCuts::lNumericFieldBlanks,
-                                          DataIPShortCuts::lAlphaFieldBlanks,
-                                          DataIPShortCuts::cAlphaFieldNames,
-                                          DataIPShortCuts::cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             // the input processor validates the numeric inputs based on the IDD definition
             // still validate the name to make sure there aren't any duplicates or blanks
             // blanks are easy: fatal if blank
-            if (DataIPShortCuts::lAlphaFieldBlanks[0]) {
-                ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+            if (state.dataIPShortCut->lAlphaFieldBlanks[0]) {
+                ShowFatalError(state, "Invalid input for " + state.dataIPShortCut->cCurrentModuleObject + " object: Name cannot be blank");
             }
 
             // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
+<<<<<<< HEAD
             for (auto &existingHysteresisModel : state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels) {
                 if (DataIPShortCuts::cAlphaArgs(1) == existingHysteresisModel.name) {
                     ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+=======
+            for (auto &existingHysteresisModel : hysteresisPhaseChangeModels) {
+                if (state.dataIPShortCut->cAlphaArgs(1) == existingHysteresisModel.name) {
+                    ShowFatalError(state, "Invalid input for " + state.dataIPShortCut->cCurrentModuleObject +
+>>>>>>> origin/develop
                                    " object: Duplicate name found: " + existingHysteresisModel.name);
                 }
             }
 
             // now build out a new hysteresis instance and add it to the vector
             HysteresisPhaseChange thisHM;
-            thisHM.name = DataIPShortCuts::cAlphaArgs(1);
-            thisHM.totalLatentHeat = DataIPShortCuts::rNumericArgs(1);
-            thisHM.fullyLiquidThermalConductivity = DataIPShortCuts::rNumericArgs(2);
-            thisHM.fullyLiquidDensity = DataIPShortCuts::rNumericArgs(3);
-            thisHM.specificHeatLiquid = DataIPShortCuts::rNumericArgs(4);
-            thisHM.deltaTempMeltingHigh = DataIPShortCuts::rNumericArgs(5);
-            thisHM.peakTempMelting = DataIPShortCuts::rNumericArgs(6);
-            thisHM.deltaTempMeltingLow = DataIPShortCuts::rNumericArgs(7);
-            thisHM.fullySolidThermalConductivity = DataIPShortCuts::rNumericArgs(8);
-            thisHM.fullySolidDensity = DataIPShortCuts::rNumericArgs(9);
-            thisHM.specificHeatSolid = DataIPShortCuts::rNumericArgs(10);
-            thisHM.deltaTempFreezingHigh = DataIPShortCuts::rNumericArgs(11);
-            thisHM.peakTempFreezing = DataIPShortCuts::rNumericArgs(12);
-            thisHM.deltaTempFreezingLow = DataIPShortCuts::rNumericArgs(13);
+            thisHM.name = state.dataIPShortCut->cAlphaArgs(1);
+            thisHM.totalLatentHeat = state.dataIPShortCut->rNumericArgs(1);
+            thisHM.fullyLiquidThermalConductivity = state.dataIPShortCut->rNumericArgs(2);
+            thisHM.fullyLiquidDensity = state.dataIPShortCut->rNumericArgs(3);
+            thisHM.specificHeatLiquid = state.dataIPShortCut->rNumericArgs(4);
+            thisHM.deltaTempMeltingHigh = state.dataIPShortCut->rNumericArgs(5);
+            thisHM.peakTempMelting = state.dataIPShortCut->rNumericArgs(6);
+            thisHM.deltaTempMeltingLow = state.dataIPShortCut->rNumericArgs(7);
+            thisHM.fullySolidThermalConductivity = state.dataIPShortCut->rNumericArgs(8);
+            thisHM.fullySolidDensity = state.dataIPShortCut->rNumericArgs(9);
+            thisHM.specificHeatSolid = state.dataIPShortCut->rNumericArgs(10);
+            thisHM.deltaTempFreezingHigh = state.dataIPShortCut->rNumericArgs(11);
+            thisHM.peakTempFreezing = state.dataIPShortCut->rNumericArgs(12);
+            thisHM.deltaTempFreezingLow = state.dataIPShortCut->rNumericArgs(13);
             thisHM.specHeatTransition = (thisHM.specificHeatSolid + thisHM.specificHeatLiquid) / 2.0;
             thisHM.CpOld = thisHM.specificHeatSolid;
             state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels.push_back(thisHM);

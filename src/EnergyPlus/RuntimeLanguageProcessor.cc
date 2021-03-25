@@ -65,6 +65,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
@@ -767,6 +768,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         int InstructionNum2;
         int ExpressionNum;
         int ESVariableNum;
+        int VariableNum;
         int WhileLoopExitCounter;      // to avoid infinite loop in While loop
         bool seriousErrorFound(false); // once it gets set true (inside EvaluateExpresssion) it will trigger a fatal (in WriteTrace)
 
@@ -1020,6 +1022,8 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         bool LastED; // last character in a numeric was an E or D
 
         // Object Data
+        auto & Token = state.dataRuntimeLangProcessor->Token;
+
         CountDoLooping = 0;
         NumErrors = 0;
         //  Error = 'No errors.'

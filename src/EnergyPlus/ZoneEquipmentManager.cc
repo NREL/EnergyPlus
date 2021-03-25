@@ -2673,7 +2673,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 CalcAirFlowSimple(state, 0);
             } else {
                 CalcAirFlowSimple(state, 0, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
-            }        
+            }
         }
 
         for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
@@ -4340,7 +4340,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                             FinalTotalReturnMassFlow += newReturnFlow;
                         }
                     }
-                } 
+                }
             } else {
                 FinalTotalReturnMassFlow = ExpTotalReturnMassFlow;
             }
@@ -4677,7 +4677,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using namespace DataLoopNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const StdGravity(9.80665); // The acceleration of gravity at the sea level (m/s2)
+        constexpr Real64 StdGravity(9.80665); // The acceleration of gravity at the sea level (m/s2)
         static std::string const RoutineNameMixing("CalcAirFlowSimple:Mixing");
         static std::string const RoutineNameCrossMixing("CalcAirFlowSimple:CrossMixing");
         static std::string const RoutineNameRefrigerationDoorMixing("CalcAirFlowSimple:RefrigerationDoorMixing");
@@ -5634,10 +5634,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using HVACStandAloneERV::GetStandAloneERVReturnAirNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  INTEGER      :: ERVNum=0                   ! the stand alone ERV index
-        static int ZoneNum(0); // zone index
-        int j;                 // index
-        int I;                 // index
+        int ZoneNum(0); // zone index
+        int j;          // index
+        int I;          // index
 
         if (allocated(state.dataZoneEquip->ZoneEquipList)) {
             ZoneNum = state.dataHeatBal->ZoneAirBalance(OutdoorNum).ZonePtr;
