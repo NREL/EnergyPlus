@@ -165,9 +165,9 @@ namespace OutAirNodeManager {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int MaxNums(0);           // Maximum number of numeric input fields
-        static int MaxAlphas(0);         // Maximum number of alpha input fields
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
+        int MaxNums(0);           // Maximum number of numeric input fields
+        int MaxAlphas(0);         // Maximum number of alpha input fields
+        int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
 
         NumOutAirInletNodeLists = inputProcessor->getNumObjectsFound(state, "OutdoorAir:NodeList");
         NumOutsideAirNodeSingles = inputProcessor->getNumObjectsFound(state, "OutdoorAir:Node");
@@ -497,7 +497,6 @@ namespace OutAirNodeManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_int TmpNums;
         int DummyNumber;
-        static bool errFlag(false);
 
         if (state.dataOutAirNodeMgr->GetOutAirNodesInputFlag) { // First time subroutine has been entered
             GetOutAirNodesInput(state);     // Get Out Air Nodes data
@@ -522,6 +521,7 @@ namespace OutAirNodeManager {
                 state.dataOutAirNodeMgr->OutsideAirNodeList.redimension(++state.dataOutAirNodeMgr->NumOutsideAirNodes);
                 state.dataOutAirNodeMgr->OutsideAirNodeList(state.dataOutAirNodeMgr->NumOutsideAirNodes) = NodeNumber;
                 TmpNums = state.dataOutAirNodeMgr->OutsideAirNodeList;
+                bool errFlag(false);
                 // register new node..
                 GetNodeNums(state,
                             state.dataLoopNodes->NodeID(NodeNumber),
