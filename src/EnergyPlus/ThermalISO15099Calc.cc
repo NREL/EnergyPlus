@@ -554,7 +554,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         if ((dir > 0.0) || (SHGCCalc == 0)) {
             // call therm1d to calculate heat flux with solar radiation
 
-            therm1d(files,
+            therm1d(state,
+                    files,
                     nlayer,
                     iwd,
                     tout,
@@ -704,7 +705,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
             hout = houtt;
 
             // call therm1d to calculate heat flux without solar radiation
-            therm1d(files,
+            therm1d(state,
+                    files,
                     nlayer,
                     iwd,
                     tout,
@@ -959,7 +961,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 //      This is "Unshaded, No solar radiation" pass
                 // cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                 // call therm1d to calculate heat flux with solar radiation
-                therm1d(files,
+                therm1d(state,
+                        files,
                         nlayer_NOSD,
                         iwd,
                         tout,
