@@ -1110,6 +1110,7 @@ struct SetPointManagerData : BaseGlobalStruct {
     Array1D<SetPointManager::DefineReturnWaterChWSetPointManager> ReturnWaterResetChWSetPtMgr;    // return water reset
     Array1D<SetPointManager::DefineReturnWaterHWSetPointManager> ReturnWaterResetHWSetPtMgr;      // hot-water return water reset
     Array1D<SetPointManager::DefineScheduledTESSetPointManager> SchTESSetPtMgr;                   // Array for TES Scheduled Setpoint Manager data
+    Real64 TotEnergyPre = 0.0;
 
     void clear_state() override
     {
@@ -1206,6 +1207,7 @@ struct SetPointManagerData : BaseGlobalStruct {
         InitSetPointManagersMyEnvrnFlag = true;
         RunSubOptCondEntTemp = false;
         RunFinalOptCondEntTemp = false;
+        TotEnergyPre = 0.0;
     }
 
 };
