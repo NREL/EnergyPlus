@@ -59,42 +59,6 @@ namespace EnergyPlus {
 
 namespace DataStringGlobals {
 
-    extern std::string outputErrFileName;
-    extern std::string outputMddFileName;
-    extern std::string outputRddFileName;
-    extern std::string outputShdFileName;
-    extern std::string outputTblCsvFileName;
-    extern std::string outputTblHtmFileName;
-    extern std::string outputTblTabFileName;
-    extern std::string outputTblTxtFileName;
-    extern std::string outputTblXmlFileName;
-    extern std::string inputFileName;
-    extern std::string inputIddFileName;
-    extern std::string inputEpJSONSchemaFileName;
-    extern std::string outputAdsFileName;
-    extern std::string outputGLHEFileName;
-    extern std::string outputDelightOutFileName;
-    extern std::string outputIperrFileName;
-    extern std::string outputPerfLogFileName;
-    extern std::string outputSqlFileName;
-    extern std::string outputSqliteErrFileName;
-    extern std::string eplusADSFileName;
-    extern std::string outputCsvFileName;
-    extern std::string outputMtrCsvFileName;
-    extern std::string outputRvauditFileName;
-    extern std::string weatherFileNameOnly;
-    extern std::string idfDirPathName;
-    extern std::string outDirPathName;
-    extern std::string idfFileNameOnly;
-    extern std::string inputDirPathName;
-    extern std::string outputDirPathName;
-    extern std::string inputFileNameOnly;
-    extern std::string exeDirectory;
-
-    // MODULE PARAMETER DEFINITIONS:
-    extern std::string const UpperCase;
-    extern std::string const LowerCase;
-
 #ifdef _WIN32
     char constexpr pathChar('\\');
     char constexpr altpathChar('/');
@@ -118,27 +82,71 @@ namespace DataStringGlobals {
     char constexpr CharTab('\t');      // tab
     char constexpr CharSpace(' ');     // space
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern std::string ProgramPath;          // Path for Program from INI file
-    extern std::string CurrentWorkingFolder; // Current working directory for run
-    extern std::string FullName;             // Full name of file to open, including path
-    extern std::string IDDVerString;         // Version information from the IDD (line 1)
     extern std::string VerString;            // String that represents version information
     extern std::string MatchVersion;         // String to be matched by Version object
-    extern std::string CurrentDateTime;      // For printing current date and time at start of run
-
     extern std::string PythonAPIVersion;
-
-    // Functions
-    void clear_state();
 
 } // namespace DataStringGlobals
 
 struct DataStringGlobalsData : BaseGlobalStruct {
 
+    std::string outputMddFileName = "eplusout.mdd";
+    std::string outputRddFileName = "eplusout.rdd";
+    std::string outputShdFileName = "eplusout.shd";
+    std::string outputTblCsvFileName = "eplustbl.csv";
+    std::string outputTblHtmFileName = "eplustbl.htm";
+    std::string outputTblTabFileName = "eplustbl.tab";
+    std::string outputTblTxtFileName = "eplustbl.txt";
+    std::string outputTblXmlFileName = "eplustbl.xml";
+    std::string outputAdsFileName = "eplusADS.out";
+    std::string outputGLHEFileName = "eplusout.glhe";
+    std::string outputDelightOutFileName = "eplusout.delightout";
+    std::string outputIperrFileName = "eplusout.iperr";
+    std::string outputPerfLogFileName = "eplusout_perflog.csv";
+    std::string outputSqlFileName = "eplusout.sql";
+    std::string outputSqliteErrFileName = "eplussqlite.err";
+    std::string outputCsvFileName = "eplusout.csv";
+    std::string outputMtrCsvFileName = "eplusmtr.csv";
+    std::string outputRvauditFileName = "eplusout.rvaudit";
+    std::string outputErrFileName;
+    std::string eplusADSFileName;
+    std::string inputFileName;
+    std::string inputIddFileName;
+    std::string inputEpJSONSchemaFileName;
+    std::string weatherFileNameOnly;
+    std::string idfDirPathName;
+    std::string outDirPathName;
+    std::string idfFileNameOnly;
+    std::string inputDirPathName;
+    std::string outputDirPathName;
+    std::string inputFileNameOnly;
+    std::string exeDirectory;
+    std::string ProgramPath;          // Path for Program from INI file
+    std::string CurrentWorkingFolder; // Current working directory for run
+    std::string FullName;             // Full name of file to open, including path
+    std::string IDDVerString;         // Version information from the IDD (line 1)
+    std::string CurrentDateTime;      // For printing current date and time at start of run
+
+    
     void clear_state() override
     {
-
+        eplusADSFileName.clear();
+        idfFileNameOnly.clear();
+        idfDirPathName.clear();
+        outDirPathName.clear();
+        inputFileNameOnly.clear();
+        inputDirPathName.clear();
+        outputDirPathName.clear();
+        exeDirectory.clear();
+        inputFileName.clear();
+        inputIddFileName.clear();
+        inputEpJSONSchemaFileName.clear();
+        FullName.clear();
+        weatherFileNameOnly.clear();
+        ProgramPath.clear();
+        CurrentWorkingFolder.clear();
+        CurrentDateTime.clear();
+        IDDVerString.clear();
     }
 };
 
