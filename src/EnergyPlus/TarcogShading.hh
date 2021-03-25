@@ -221,10 +221,10 @@ struct TarcogShadingData : BaseGlobalStruct {
 
     void clear_state() override
     {
-        frct1.clear();
-        frct2.clear();
-        iprop1.clear();
-        iprop2.clear();
+        frct1 = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        frct2 = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        iprop1 = Array1D_int(TARCOGGassesParams::maxgas);
+        iprop2 = Array1D_int(TARCOGGassesParams::maxgas);
     }
 };
 
