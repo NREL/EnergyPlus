@@ -59,13 +59,7 @@ namespace EnergyPlus {
 
 namespace DataStringGlobals {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
     extern std::string outputErrFileName;
-
-
     extern std::string outputMddFileName;
     extern std::string outputRddFileName;
     extern std::string outputShdFileName;
@@ -88,7 +82,6 @@ namespace DataStringGlobals {
     extern std::string outputCsvFileName;
     extern std::string outputMtrCsvFileName;
     extern std::string outputRvauditFileName;
-
     extern std::string weatherFileNameOnly;
     extern std::string idfDirPathName;
     extern std::string outDirPathName;
@@ -101,22 +94,29 @@ namespace DataStringGlobals {
     // MODULE PARAMETER DEFINITIONS:
     extern std::string const UpperCase;
     extern std::string const LowerCase;
-    extern std::string const AccentedUpperCase;
-    extern std::string const AccentedLowerCase;
-    extern std::string const AllCase;
-    extern std::string const NL; // Platform newline
-    extern char const pathChar;
-    extern char const altpathChar;
-    extern char const CharComma;     // comma
-    extern char const CharSemicolon; // semicolon
-    extern char const CharTab;       // tab
-    extern char const CharSpace;     // space
 
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
+#ifdef _WIN32
+    char constexpr pathChar('\\');
+    char constexpr altpathChar('/');
+#elif __linux__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#elif __unix__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#elif __posix__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#elif __APPLE__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#else
+#error "Invalid platform detection in DataStringGlobals."
+#endif
+    char constexpr CharComma(',');     // comma
+    char constexpr CharSemicolon(';'); // semicolon
+    char constexpr CharTab('\t');      // tab
+    char constexpr CharSpace(' ');     // space
 
     // MODULE VARIABLE DECLARATIONS:
     extern std::string ProgramPath;          // Path for Program from INI file

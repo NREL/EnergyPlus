@@ -62,63 +62,9 @@ namespace DataStringGlobals {
     // This data-only module is a repository for string variables used in parsing
     // "pieces" of EnergyPlus.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // None!--This module is USEd by other modules; it should not USE anything.
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
     // MODULE PARAMETER DEFINITIONS:
     std::string const UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
     std::string const LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
-    std::string const AccentedUpperCase("ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
-    std::string const AccentedLowerCase("àáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
-    std::string const AllCase("àáâãäåæçèéêëìíîïðñòóôõöøùúûüýÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-#ifdef _WIN32
-    std::string const NL("\r\n"); // Platform newline
-#else
-    std::string const NL("\n"); // Platform newline
-#endif
-#ifdef _WIN32
-    char const pathChar('\\');
-    char const altpathChar('/');
-#elif __linux__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#elif __unix__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#elif __posix__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#elif __APPLE__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#else
-#error "Invalid platform detection in DataStringGlobals."
-#endif
-    char const CharComma(',');     // comma
-    char const CharSemicolon(';'); // semicolon
-    char const CharTab('\t');      // tab
-    char const CharSpace(' ');     // space
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
 
     std::string outputMddFileName("eplusout.mdd");
     std::string outputRddFileName("eplusout.rdd");
