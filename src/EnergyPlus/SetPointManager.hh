@@ -1111,6 +1111,13 @@ struct SetPointManagerData : BaseGlobalStruct {
     Array1D<SetPointManager::DefineReturnWaterHWSetPointManager> ReturnWaterResetHWSetPtMgr;      // hot-water return water reset
     Array1D<SetPointManager::DefineScheduledTESSetPointManager> SchTESSetPtMgr;                   // Array for TES Scheduled Setpoint Manager data
 
+    Real64 CondWaterSetPoint = 0; // Condenser entering water temperature setpoint this timestep, C
+    Real64 EvapOutletTemp = 0;    // Evaporator water outlet temperature (C)
+    Real64 CondTempLimit = 0;     // Condenser entering water temperature setpoint lower limit
+    Real64 CurLoad = 0;           // Current cooling load, W
+    Real64 TotEnergy = 0;         // Total energy consumptions at this time step
+    Real64 TotEnergyPre = 0;      // Total energy consumptions at the previous time step
+    
     void clear_state() override
     {
 
@@ -1206,6 +1213,12 @@ struct SetPointManagerData : BaseGlobalStruct {
         InitSetPointManagersMyEnvrnFlag = true;
         RunSubOptCondEntTemp = false;
         RunFinalOptCondEntTemp = false;
+        CondWaterSetPoint = 0;
+        EvapOutletTemp = 0;
+        CondTempLimit = 0;
+        CurLoad = 0;
+        TotEnergy = 0;
+        TotEnergyPre = 0;
     }
 
 };

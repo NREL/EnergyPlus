@@ -53,9 +53,6 @@
 namespace EnergyPlus {
 
     EnergyPlusData::EnergyPlusData() {
-        // todo, try to eliminate the need for the singleton
-        IOFiles::setSingleton(&files);
-
         this->dataAirLoop = std::make_unique<DataAirLoopData>();
         this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
         this->dataAirSystemsData = std::make_unique<AirSystemsData>();
@@ -186,7 +183,6 @@ namespace EnergyPlus {
         this->dataMoistureBalEMPD = std::make_unique<MoistureBalanceEMPDManagerData>();
         this->dataMstBal = std::make_unique<MoistureBalanceData>();
         this->dataMstBalEMPD = std::make_unique<MoistureBalanceEMPDData>();
-        this->dataMundtSimMgr = std::make_unique<MundtSimMgrData>();
         this->dataNodeInputMgr = std::make_unique<NodeInputManagerData>();
         this->dataOutAirNodeMgr = std::make_unique<OutAirNodeManagerData>();
         this->dataOutRptPredefined = std::make_unique<OutputReportPredefinedData>();
@@ -263,6 +259,10 @@ namespace EnergyPlus {
         this->dataTARCOGOutputs = std::make_unique<TARCOGOutputData>();
         this->dataThermalChimneys = std::make_unique<ThermalChimneysData>();
         this->dataThermalComforts = std::make_unique<ThermalComfortsData>();
+        this->dataThermalISO15099Calc = std::make_unique<ThermalISO15099CalcData>();
+        this->dataTARCOGGasses90 = std::make_unique<TARCOGGasses90Data>();
+        this->dataTARCOGMain = std::make_unique<TARCOGMainData>();
+        this->dataTarcogShading = std::make_unique<TarcogShadingData>();
         this->dataTimingsData = std::make_unique<DataTimingsData>();
         this->dataTranspiredCollector = std::make_unique<TranspiredCollectorData>();
         this->dataUCSDShared = std::make_unique<UCSDSharedData>();
@@ -432,7 +432,6 @@ namespace EnergyPlus {
         this->dataMoistureBalEMPD->clear_state();
         this->dataMstBal->clear_state();
         this->dataMstBalEMPD->clear_state();
-        this->dataMundtSimMgr->clear_state();
         this->dataNodeInputMgr->clear_state();
         this->dataOutAirNodeMgr->clear_state();
         this->dataOutRptPredefined->clear_state();
@@ -509,6 +508,10 @@ namespace EnergyPlus {
         this->dataTARCOGOutputs->clear_state();
         this->dataThermalChimneys->clear_state();
         this->dataThermalComforts->clear_state();
+        this->dataThermalISO15099Calc->clear_state();
+        this->dataTARCOGGasses90->clear_state();
+        this->dataTARCOGMain->clear_state();
+        this->dataTarcogShading->clear_state();
         this->dataTimingsData->clear_state();
         this->dataTranspiredCollector->clear_state();
         this->dataUCSDShared->clear_state();

@@ -56,7 +56,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -86,7 +85,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
     DataOutputs::clear_state();
-    DataStringGlobals::clear_state();
     DataViewFactorInformation::clear_state();
     EvaporativeFluidCoolers::clear_state();
     FluidProperties::clear_state();

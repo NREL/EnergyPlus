@@ -261,8 +261,8 @@ namespace EnergyPlus::SetPointManager {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        static int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
-        static int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
+        int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
+        int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
 
         int NumNums;   // Number of real numbers returned by GetObjectItem
         int NumAlphas; // Number of alphanumerics returned by GetObjectItem
@@ -3601,9 +3601,9 @@ namespace EnergyPlus::SetPointManager {
         int ZonesCooledIndex; // Cooled zones index in an air loop
         int BranchNumPlantSide;
         int CompNumPlantSide;
-        static int TypeNum(0);
-        static int NumChiller(0);
-        static int TypeOf_Num(0);
+        int TypeNum(0);
+        int NumChiller(0);
+        int TypeOf_Num(0);
 
         state.dataSetPointManager->ManagerOn = true;
 
@@ -5206,14 +5206,14 @@ namespace EnergyPlus::SetPointManager {
         int RetNode;
         int OAMixOAInNode;
         Real64 FanDeltaT;
-        static Real64 TSupNoHC(0.0); // supply temperature with no heating or cooling
+        Real64 TSupNoHC(0.0); // supply temperature with no heating or cooling
         Real64 TMixAtMinOA;
         Real64 EnthMixAtMinOA;
         Real64 HumRatMixAtMinOA;
         int AirLoopNum;
         Real64 OAFrac;
         int LoopInNode;
-        static Real64 ExtrRateNoHC(0.0); // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
+        Real64 ExtrRateNoHC(0.0); // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
 
         ZoneInletNode = this->ZoneInletNodeNum;
         ZoneNum = this->ControlZoneNum;
@@ -6917,12 +6917,12 @@ namespace EnergyPlus::SetPointManager {
         using namespace DataPlant;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 CondWaterSetPoint(0.0); // Condenser entering water temperature setpoint this timestep, C
-        static Real64 EvapOutletTemp(0.0);    // Evaporator water outlet temperature (C)
-        static Real64 CondTempLimit(0.0);     // Condenser entering water temperature setpoint lower limit
-        static Real64 CurLoad(0.0);           // Current cooling load, W
-        static Real64 TotEnergy(0.0);         // Total energy consumptions at this time step
-        static Real64 TotEnergyPre(0.0);      // Total energy consumptions at the previous time step
+        auto & CondWaterSetPoint = state.dataSetPointManager->CondWaterSetPoint;
+        auto & EvapOutletTemp = state.dataSetPointManager->EvapOutletTemp;
+        auto & CondTempLimit = state.dataSetPointManager->CondTempLimit;
+        auto & CurLoad = state.dataSetPointManager->CurLoad;
+        auto & TotEnergy = state.dataSetPointManager->TotEnergy;
+        auto & TotEnergyPre = state.dataSetPointManager->TotEnergyPre;
 
         if (state.dataGlobal->MetersHaveBeenInitialized) {
             // Setup meter vars

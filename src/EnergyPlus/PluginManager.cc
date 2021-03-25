@@ -443,7 +443,7 @@ namespace EnergyPlus::PluginManagement {
         if (searchPaths == 0) {
             // no search path objects in the IDF, just do the default behavior: add the current working dir and the input file dir
             PluginManager::addToPythonPath(state, ".", false);
-            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(state.dataStrGlobals->inputDirPathName);
             PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
         }
         if (searchPaths > 0) {
@@ -474,7 +474,7 @@ namespace EnergyPlus::PluginManagement {
                     // defaulted to YES
                 }
                 if (inputFileDirFlagUC == "YES") {
-                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(state.dataStrGlobals->inputDirPathName);
                     PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
                 }
                 try {

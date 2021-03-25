@@ -91,7 +91,8 @@ namespace ThermalEN673Calc {
 
     // Functions
 
-    void Calc_EN673(TARCOGOutput::Files &files,
+    void Calc_EN673(EnergyPlusData &state,
+                    TARCOGOutput::Files &files,
                     int const standard,
                     int const nlayer,
                     Real64 const tout,
@@ -184,7 +185,8 @@ namespace ThermalEN673Calc {
         rtot = 0.0;
         sft = 0.0;
         if (GoAhead(nperr)) {
-            EN673ISO10292(nlayer,
+            EN673ISO10292(state,
+                          nlayer,
                           tout,
                           tind,
                           emis,
@@ -227,7 +229,8 @@ namespace ThermalEN673Calc {
         }         // GopAhead after propcon90
     }
 
-    void EN673ISO10292(int const nlayer,
+    void EN673ISO10292(EnergyPlusData &state,
+                       int const nlayer,
                        Real64 const tout,
                        Real64 const tind,
                        const Array1D<Real64> &emis,
@@ -390,7 +393,8 @@ namespace ThermalEN673Calc {
                         ipropg(j) = iprop(i + 1, j);
                         frctg(j) = frct(i + 1, j);
                     }
-                    GASSES90(Tm,
+                    GASSES90(state,
+                             Tm,
                              ipropg,
                              frctg,
                              presure(i + 1),
@@ -458,7 +462,8 @@ namespace ThermalEN673Calc {
                                 ipropg(j) = iprop(i + 1, j);
                                 frctg(j) = frct(i + 1, j);
                             } // j, gas mix
-                            GASSES90(Tm,
+                            GASSES90(state,
+                                     Tm,
                                      ipropg,
                                      frctg,
                                      presure(i + 1),

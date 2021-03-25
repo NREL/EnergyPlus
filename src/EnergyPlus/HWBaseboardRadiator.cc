@@ -149,7 +149,7 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum;               // Index of unit in baseboard array
-        static bool GetInputFlag(true); // One time get input flag
+        auto & GetInputFlag = state.dataHWBaseboardRad->GetInputFlag;
         Real64 QZnReq;                  // Zone load not yet satisfied
         Real64 MaxWaterFlow;
         Real64 MinWaterFlow;
@@ -804,9 +804,9 @@ namespace HWBaseboardRadiator {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
-        static bool ZoneEquipmentListChecked(false);
-        static Array1D_bool MyEnvrnFlag;
+        auto & MyOneTimeFlag = state.dataHWBaseboardRad->MyOneTimeFlag;
+        auto & ZoneEquipmentListChecked = state.dataHWBaseboardRad->ZoneEquipmentListChecked;
+        auto & MyEnvrnFlag = state.dataHWBaseboardRad->MyEnvrnFlag;
         int Loop;
         int WaterInletNode;
         int ZoneNode;
@@ -1509,8 +1509,8 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
         int WaterOutletNode;
-        static int Iter(0);
-        static bool MyEnvrnFlag(true);
+        auto & Iter = state.dataHWBaseboardRad->Iter;
+        auto & MyEnvrnFlag2 = state.dataHWBaseboardRad->MyEnvrnFlag2;
         auto & HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
         auto & LastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed;
         auto & QBBRadSrcAvg = state.dataHWBaseboardRad->QBBRadSrcAvg;
@@ -1518,12 +1518,12 @@ namespace HWBaseboardRadiator {
         auto & QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
         auto & LastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys;
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag2) {
             Iter = 0;
-            MyEnvrnFlag = false;
+            MyEnvrnFlag2 = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            MyEnvrnFlag2 = true;
         }
 
         // First, update the running average if necessary...

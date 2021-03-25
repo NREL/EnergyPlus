@@ -168,15 +168,15 @@ namespace CommandLineInterface {
         opt.getUsage(usage);
 
         // Set path of EnergyPlus program path
-        exeDirectory = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+        state.dataStrGlobals->exeDirectory = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
 
         opt.get("-w")->getString(state.files.inputWeatherFileName.fileName);
 
-        opt.get("-i")->getString(inputIddFileName);
+        opt.get("-i")->getString(state.dataStrGlobals->inputIddFileName);
 
-        if (!opt.isSet("-i") && !legacyMode) inputIddFileName = exeDirectory + inputIddFileName;
+        if (!opt.isSet("-i") && !legacyMode) state.dataStrGlobals->inputIddFileName = state.dataStrGlobals->exeDirectory + state.dataStrGlobals->inputIddFileName;
 
-        opt.get("-d")->getString(outDirPathName);
+        opt.get("-d")->getString(state.dataStrGlobals->outDirPathName);
 
         state.dataGlobal->runReadVars = opt.isSet("-r");
 
@@ -214,16 +214,16 @@ namespace CommandLineInterface {
         if (opt.lastArgs.size() == 1) {
             for (size_type i = 0; i < opt.lastArgs.size(); ++i) {
                 std::string const &arg(*opt.lastArgs[i]);
-                inputFileName = arg;
+                state.dataStrGlobals->inputFileName = arg;
             }
         }
-        if (opt.lastArgs.size() == 0) inputFileName = "in.idf";
+        if (opt.lastArgs.size() == 0) state.dataStrGlobals->inputFileName = "in.idf";
 
         // Convert all paths to native paths
-        FileSystem::makeNativePath(inputFileName);
+        FileSystem::makeNativePath(state.dataStrGlobals->inputFileName);
         FileSystem::makeNativePath(state.files.inputWeatherFileName.fileName);
-        FileSystem::makeNativePath(inputIddFileName);
-        FileSystem::makeNativePath(outDirPathName);
+        FileSystem::makeNativePath(state.dataStrGlobals->inputIddFileName);
+        FileSystem::makeNativePath(state.dataStrGlobals->outDirPathName);
 
         std::vector<std::string> badOptions;
         if (opt.lastArgs.size() > 1u) {
@@ -257,10 +257,10 @@ namespace CommandLineInterface {
             }
         }
 
-        inputFileNameOnly = FileSystem::removeFileExtension(FileSystem::getFileName(inputFileName));
-        inputDirPathName = FileSystem::getParentDirectoryPath(inputFileName);
+        state.dataStrGlobals->inputFileNameOnly = FileSystem::removeFileExtension(FileSystem::getFileName(state.dataStrGlobals->inputFileName));
+        state.dataStrGlobals->inputDirPathName = FileSystem::getParentDirectoryPath(state.dataStrGlobals->inputFileName);
 
-        auto inputFileExt = FileSystem::getFileExtension(inputFileName);
+        auto inputFileExt = FileSystem::getFileExtension(state.dataStrGlobals->inputFileName);
         std::transform(inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper);
 
         // TODO: figure out better logic for determining input file type
@@ -304,15 +304,15 @@ namespace CommandLineInterface {
 
         if (opt.isSet("-d")) {
             // Add the trailing path character if necessary
-            if (outDirPathName[outDirPathName.size() - 1] != pathChar) {
-                outDirPathName += pathChar;
+            if (state.dataStrGlobals->outDirPathName[state.dataStrGlobals->outDirPathName.size() - 1] != pathChar) {
+                state.dataStrGlobals->outDirPathName += pathChar;
             }
 
             // Create directory if it doesn't already exist
-            FileSystem::makeDirectory(outDirPathName);
+            FileSystem::makeDirectory(state.dataStrGlobals->outDirPathName);
         }
 
-        outputDirPathName = outDirPathName;
+        state.dataStrGlobals->outputDirPathName = state.dataStrGlobals->outDirPathName;
 
         // File naming scheme
         std::string outputFilePrefix;
@@ -320,9 +320,9 @@ namespace CommandLineInterface {
             std::string prefixOutName;
             opt.get("-p")->getString(prefixOutName);
             FileSystem::makeNativePath(prefixOutName);
-            outputFilePrefix = outDirPathName + prefixOutName;
+            outputFilePrefix = state.dataStrGlobals->outDirPathName + prefixOutName;
         } else {
-            outputFilePrefix = outDirPathName + "eplus";
+            outputFilePrefix = state.dataStrGlobals->outDirPathName + "eplus";
         }
 
         std::string suffixType;
@@ -435,22 +435,22 @@ namespace CommandLineInterface {
         state.files.mdd.fileName = outputFilePrefix + normalSuffix + ".mdd";
         state.files.mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
         state.files.rdd.fileName = outputFilePrefix + normalSuffix + ".rdd";
-        outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
+        state.dataStrGlobals->outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         state.files.dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
-        outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
+        state.dataStrGlobals->outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
         state.files.edd.fileName = outputFilePrefix + normalSuffix + ".edd";
-        outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
+        state.dataStrGlobals->outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
         state.files.sln.fileName = outputFilePrefix + normalSuffix + ".sln";
         state.files.sci.fileName = outputFilePrefix + normalSuffix + ".sci";
         state.files.wrl.fileName = outputFilePrefix + normalSuffix + ".wrl";
-        outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
+        state.dataStrGlobals->outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
         state.files.debug.fileName = outputFilePrefix + normalSuffix + ".dbg";
-        outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
-        outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
-        outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
-        outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
-        outputTblTxtFileName = outputFilePrefix + tableSuffix + ".txt";
-        outputTblXmlFileName = outputFilePrefix + tableSuffix + ".xml";
+        state.dataStrGlobals->outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
+        state.dataStrGlobals->outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
+        state.dataStrGlobals->outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
+        state.dataStrGlobals->outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
+        state.dataStrGlobals->outputTblTxtFileName = outputFilePrefix + tableSuffix + ".txt";
+        state.dataStrGlobals->outputTblXmlFileName = outputFilePrefix + tableSuffix + ".xml";
         state.files.outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
         state.files.outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
         state.files.outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
@@ -460,24 +460,24 @@ namespace CommandLineInterface {
         state.files.outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
         state.files.outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
         state.files.outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
-        outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
+        state.dataStrGlobals->outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
         state.files.shade.fileName = outputFilePrefix + shdSuffix + ".csv";
         if (suffixType == "L" || suffixType == "l") {
-            outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
+            state.dataStrGlobals->outputSqliteErrFileName = state.dataStrGlobals->outDirPathName + sqliteSuffix + ".err";
         } else {
-            outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
+            state.dataStrGlobals->outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
         }
         state.files.screenCsv.fileName = outputFilePrefix + screenSuffix + ".csv";
         state.files.delightIn.fileName = "eplusout.delightin";
-        outputDelightOutFileName = "eplusout.delightout";
+        state.dataStrGlobals->outputDelightOutFileName = "eplusout.delightout";
         state.files.iniFile.fileName = "Energy+.ini";
         state.files.inStatFileName.fileName = weatherFilePathWithoutExtension + ".stat";
-        eplusADSFileName = inputDirPathName + "eplusADS.inp";
+        state.dataStrGlobals->eplusADSFileName = state.dataStrGlobals->inputDirPathName + "eplusADS.inp";
 
         // Readvars files
         state.files.csv.fileName = outputFilePrefix + normalSuffix + ".csv";
         state.files.mtr_csv.fileName = outputFilePrefix + meterSuffix + ".csv";
-        outputRvauditFileName = outputFilePrefix + normalSuffix + ".rvaudit";
+        state.dataStrGlobals->outputRvauditFileName = outputFilePrefix + normalSuffix + ".rvaudit";
 
         // EPMacro files
         outputEpmdetFileName = outputFilePrefix + normalSuffix + ".epmdet";
@@ -554,23 +554,23 @@ namespace CommandLineInterface {
                     exit(EXIT_FAILURE);
                 }
             }
-            CurrentWorkingFolder = iniFile.fileName;
+            state.dataStrGlobals->CurrentWorkingFolder = iniFile.fileName;
             // Relying on compiler to supply full path name here
-            const auto TempIndx = index(CurrentWorkingFolder, pathChar, true);
+            const auto TempIndx = index(state.dataStrGlobals->CurrentWorkingFolder, pathChar, true);
             if (TempIndx == std::string::npos) {
-                CurrentWorkingFolder = "";
+                state.dataStrGlobals->CurrentWorkingFolder = "";
             } else {
-                CurrentWorkingFolder.erase(TempIndx + 1);
+                state.dataStrGlobals->CurrentWorkingFolder.erase(TempIndx + 1);
             }
             //       Get directories from ini file
-            ReadINIFile(iniFile, "program", "dir", ProgramPath);
+            ReadINIFile(iniFile, "program", "dir", state.dataStrGlobals->ProgramPath);
 
-            inputIddFileName = ProgramPath + "Energy+.idd";
+            state.dataStrGlobals->inputIddFileName = state.dataStrGlobals->ProgramPath + "Energy+.idd";
         }
 
         // Check if specified files exist
-        if (!FileSystem::fileExists(inputFileName)) {
-            DisplayString(state, "ERROR: Could not find input data file: " + FileSystem::getAbsolutePath(inputFileName) + ".");
+        if (!FileSystem::fileExists(state.dataStrGlobals->inputFileName)) {
+            DisplayString(state, "ERROR: Could not find input data file: " + FileSystem::getAbsolutePath(state.dataStrGlobals->inputFileName) + ".");
             DisplayString(state, errorFollowUp);
             if (eplusRunningViaAPI) {
                 return static_cast<int>(ReturnCodes::Failure);
@@ -595,7 +595,7 @@ namespace CommandLineInterface {
 
         // Preprocessors (These will likely move to a new file)
         if (runEPMacro) {
-            std::string epMacroPath = exeDirectory + "EPMacro" + FileSystem::exeExtension;
+            std::string epMacroPath = state.dataStrGlobals->exeDirectory + "EPMacro" + FileSystem::exeExtension;
             if (!FileSystem::fileExists(epMacroPath)) {
                 DisplayString(state, "ERROR: Could not find EPMacro executable: " + FileSystem::getAbsolutePath(epMacroPath) + ".");
                 if (eplusRunningViaAPI) {
@@ -605,19 +605,19 @@ namespace CommandLineInterface {
                 }
             }
             std::string epMacroCommand = "\"" + epMacroPath + "\"";
-            bool inputFileNamedIn = (FileSystem::getAbsolutePath(inputFileName) == FileSystem::getAbsolutePath("in.imf"));
+            bool inputFileNamedIn = (FileSystem::getAbsolutePath(state.dataStrGlobals->inputFileName) == FileSystem::getAbsolutePath("in.imf"));
 
-            if (!inputFileNamedIn) FileSystem::linkFile(inputFileName.c_str(), "in.imf");
+            if (!inputFileNamedIn) FileSystem::linkFile(state.dataStrGlobals->inputFileName.c_str(), "in.imf");
             DisplayString(state, "Running EPMacro...");
             FileSystem::systemCall(epMacroCommand);
             if (!inputFileNamedIn) FileSystem::removeFile("in.imf");
             FileSystem::moveFile("audit.out", outputEpmdetFileName);
             FileSystem::moveFile("out.idf", outputEpmidfFileName);
-            inputFileName = outputEpmidfFileName;
+            state.dataStrGlobals->inputFileName = outputEpmidfFileName;
         }
 
         if (runExpandObjects) {
-            std::string expandObjectsPath = exeDirectory + "ExpandObjects" + FileSystem::exeExtension;
+            std::string expandObjectsPath = state.dataStrGlobals->exeDirectory + "ExpandObjects" + FileSystem::exeExtension;
             if (!FileSystem::fileExists(expandObjectsPath)) {
                 DisplayString(state, "ERROR: Could not find ExpandObjects executable: " + FileSystem::getAbsolutePath(expandObjectsPath) + ".");
                 if (eplusRunningViaAPI) {
@@ -627,11 +627,11 @@ namespace CommandLineInterface {
                 }
             }
             std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
-            bool inputFileNamedIn = (FileSystem::getAbsolutePath(inputFileName) == FileSystem::getAbsolutePath("in.idf"));
+            bool inputFileNamedIn = (FileSystem::getAbsolutePath(state.dataStrGlobals->inputFileName) == FileSystem::getAbsolutePath("in.idf"));
 
             // check if IDD actually exists since ExpandObjects still requires it
-            if (!FileSystem::fileExists(inputIddFileName)) {
-                DisplayString(state, "ERROR: Could not find input data dictionary: " + FileSystem::getAbsolutePath(inputIddFileName) + ".");
+            if (!FileSystem::fileExists(state.dataStrGlobals->inputIddFileName)) {
+                DisplayString(state, "ERROR: Could not find input data dictionary: " + FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFileName) + ".");
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
@@ -640,17 +640,17 @@ namespace CommandLineInterface {
                 }
             }
 
-            bool iddFileNamedEnergy = (FileSystem::getAbsolutePath(inputIddFileName) == FileSystem::getAbsolutePath("Energy+.idd"));
+            bool iddFileNamedEnergy = (FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFileName) == FileSystem::getAbsolutePath("Energy+.idd"));
 
-            if (!inputFileNamedIn) FileSystem::linkFile(inputFileName.c_str(), "in.idf");
-            if (!iddFileNamedEnergy) FileSystem::linkFile(inputIddFileName, "Energy+.idd");
+            if (!inputFileNamedIn) FileSystem::linkFile(state.dataStrGlobals->inputFileName.c_str(), "in.idf");
+            if (!iddFileNamedEnergy) FileSystem::linkFile(state.dataStrGlobals->inputIddFileName, "Energy+.idd");
             FileSystem::systemCall(expandObjectsCommand);
             if (!inputFileNamedIn) FileSystem::removeFile("in.idf");
             if (!iddFileNamedEnergy) FileSystem::removeFile("Energy+.idd");
             FileSystem::moveFile("expandedidf.err", outputExperrFileName);
             if (FileSystem::fileExists("expanded.idf")) {
                 FileSystem::moveFile("expanded.idf", outputExpidfFileName);
-                inputFileName = outputExpidfFileName;
+                state.dataStrGlobals->inputFileName = outputExpidfFileName;
             }
         }
 
@@ -797,18 +797,18 @@ namespace CommandLineInterface {
 
     int runReadVarsESO(EnergyPlusData &state)
     {
-        std::string readVarsPath = exeDirectory + "ReadVarsESO" + FileSystem::exeExtension;
+        std::string readVarsPath = state.dataStrGlobals->exeDirectory + "ReadVarsESO" + FileSystem::exeExtension;
 
         if (!FileSystem::fileExists(readVarsPath)) {
-            readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + FileSystem::exeExtension;
+            readVarsPath = state.dataStrGlobals->exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + FileSystem::exeExtension;
             if (!FileSystem::fileExists(readVarsPath)) {
                 DisplayString(state, "ERROR: Could not find ReadVarsESO executable: " + FileSystem::getAbsolutePath(readVarsPath) + ".");
                 return static_cast<int>(ReturnCodes::Failure);
             }
         }
 
-        std::string const RVIfile = inputDirPathName + inputFileNameOnly + ".rvi";
-        std::string const MVIfile = inputDirPathName + inputFileNameOnly + ".mvi";
+        std::string const RVIfile = state.dataStrGlobals->inputDirPathName + state.dataStrGlobals->inputFileNameOnly + ".rvi";
+        std::string const MVIfile = state.dataStrGlobals->inputDirPathName + state.dataStrGlobals->inputFileNameOnly + ".mvi";
 
         const auto rviFileExists = FileSystem::fileExists(RVIfile);
         if (!rviFileExists) {
@@ -845,7 +845,7 @@ namespace CommandLineInterface {
 
         if (!mviFileExists) FileSystem::removeFile(MVIfile.c_str());
 
-        FileSystem::moveFile("readvars.audit", outputRvauditFileName);
+        FileSystem::moveFile("readvars.audit", state.dataStrGlobals->outputRvauditFileName);
         return static_cast<int>(ReturnCodes::Success);
     }
 

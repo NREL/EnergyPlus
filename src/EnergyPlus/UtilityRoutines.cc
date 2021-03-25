@@ -436,20 +436,20 @@ namespace UtilityRoutines {
 
         if (finalColumn) {
             std::fstream fsPerfLog;
-            if (!FileSystem::fileExists(DataStringGlobals::outputPerfLogFileName)) {
+            if (!FileSystem::fileExists(state.dataStrGlobals->outputPerfLogFileName)) {
                 if (state.files.outputControl.perflog) {
-                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFileName, std::fstream::out); //open file normally
                     if (!fsPerfLog) {
-                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
+                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFileName + "\" for output (write).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_headerRow << std::endl;
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
             } else {
                 if (state.files.outputControl.perflog) {
-                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFileName, std::fstream::app); //append to already existing file
                     if (!fsPerfLog) {
-                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
+                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFileName + "\" for output (append).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
@@ -916,7 +916,8 @@ namespace UtilityRoutines {
         // case alphabet, it makes an appropriate substitution.
 
         // Using/Aliasing
-        using namespace DataStringGlobals;
+        static std::string const UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
+        static std::string const LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
 
         OutputString = InputString;
 
@@ -949,7 +950,8 @@ namespace UtilityRoutines {
         // case alphabet, it makes an appropriate substitution.
 
         // Using/Aliasing
-        using namespace DataStringGlobals;
+        static std::string const UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
+        static std::string const LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
 
         OutputString = InputString;
 
@@ -1583,22 +1585,22 @@ namespace UtilityRoutines {
         // If arguments OutUnit1 and/or OutUnit2 are present the
         // error message is written to these as well and the standard one.
 
-        using DataStringGlobals::IDDVerString;
         using DataStringGlobals::VerString;
 
-        auto *err_stream = []() -> std::ostream *{
-            // NOTE: this is called in too many places to justify changing the interface right now,
-            // so we are using the Singleton (not ideal)
-            if (IOFiles::hasSingleton()) {
-                return IOFiles::getSingleton().err_stream.get();
-            } else {
-                return nullptr;
-            }
-        }();
+//        auto *err_stream = []() -> std::ostream *{
+//            // NOTE: this is called in too many places to justify changing the interface right now,
+//            // so we are using the Singleton (not ideal)
+//            if (IOFiles::hasSingleton()) {
+//                return IOFiles::getSingleton().err_stream.get();
+//            } else {
+//                return nullptr;
+//            }
+//        }();
 
+        auto *err_stream = state.files.err_stream.get();
 
         if (state.dataUtilityRoutines->outputErrorHeader && err_stream) {
-            *err_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
+            *err_stream << "Program Version," << VerString << ',' << state.dataStrGlobals->IDDVerString << '\n';
             state.dataUtilityRoutines->outputErrorHeader = false;
         }
 

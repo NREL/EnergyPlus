@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataHVACControllers.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -226,6 +227,40 @@ struct SimAirServingZonesData : BaseGlobalStruct {
     Array1D_int SupNode;
     Array1D_int SupNodeType;
 
+    int TUInNode = 0;            // inlet node number of a terminal unit
+    Real64 SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system
+    Real64 OAReliefDiff = 0.0;   // local for massflow change across OA system, kg/s
+    Real64 MassFlowSetToler;
+    int salIterMax = 0;   // Maximum of iteration counters across all air loops
+    int salIterTot = 0;   // Aggregated number of iterations across all air loops
+    int NumCallsTot = 0;  // Aggregated number fo times SimAirLoopComponents() has been invoked across all air loops
+    int IterMaxSAL2 = 0;  // Maximum number of iterations performed by each controller on this air loop
+    int IterTotSAL2 = 0;  // Aggregated number of iterations performed by each controller on this air loop
+    int NumCallsSAL2 = 0; // Number of times SimAirLoopComponents() has been invoked per air loop for either Solve or ReSolve operations
+    // TRUE when primary air system & controllers simulation has converged;
+    bool AirLoopConvergedFlagSAL = false;
+    // TRUE when speculative warm restart is allowed; FALSE otherwise.
+    bool DoWarmRestartFlagSAL = false;
+    // If Status<0, no speculative warm restart attempted.
+    // If Status==0, warm restart failed.
+    // If Status>0, warm restart succeeded.
+    int WarmRestartStatusSAL = DataHVACControllers::iControllerWarmRestartNone;
+    int IterSALC = 0;        // Iteration counter
+    int ErrCountSALC = 0;    // Number of times that the maximum iterations was exceeded
+    int MaxErrCountSALC = 0; // Number of times that the maximum iterations was exceeded
+    // A character string equivalent of ErrCount
+    bool BypassOAControllerSALC; // logical to tell ManageControllers to sim or not sim controller in OA System (don't sim here)
+    // Iteration counter
+    int IterSWCC = 0;
+    // Number of times that the maximum iterations was exceeded
+    int ErrCountSWCC = 0;
+    // Number of times that the maximum iterations was exceeded
+    int MaxErrCountSWCC = 0;
+    int AirLoopPassSWCC;
+    bool BypassOAControllerSWCC;
+    bool BypassOAControllerRSALC; // logical to bypass HVAC controller calcs
+    Real64 EpSSOA = 1.0;           // zone primary air fraction
+
     void clear_state() override
     {
         this->GetAirLoopInputFlag = true;
@@ -262,6 +297,26 @@ struct SimAirServingZonesData : BaseGlobalStruct {
         this->TermUnitSizingNumsHeat.clear();
         this->SupNode.clear();
         this->SupNodeType.clear();
+
+        this->TUInNode = 0;         // inlet node number of a terminal unit
+        this->SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system
+        this->OAReliefDiff = 0.0;   // local for massflow change across OA system, kg/s
+        this->salIterMax = 0;       // Maximum of iteration counters across all air loops
+        this->salIterTot = 0;       // Aggregated number of iterations across all air loops
+        this->NumCallsTot = 0;      // Aggregated number fo times SimAirLoopComponents() has been invoked across all air loops
+        this->IterMaxSAL2 = 0;      // Maximum number of iterations performed by each controller on this air loop
+        this->IterTotSAL2 = 0;      // Aggregated number of iterations performed by each controller on this air loop
+        this->NumCallsSAL2 = 0;     // Number of times SimAirLoopComponents() has been invoked per air loop for either Solve or ReSolve operations
+        this->AirLoopConvergedFlagSAL = false;
+        this->DoWarmRestartFlagSAL = false;
+        this->WarmRestartStatusSAL = DataHVACControllers::iControllerWarmRestartNone;
+        this->IterSALC = 0;        // Iteration counter
+        this->ErrCountSALC = 0;    // Number of times that the maximum iterations was exceeded
+        this->MaxErrCountSALC = 0; // Number of times that the maximum iterations was exceeded
+        this->IterSWCC = 0;
+        this->ErrCountSWCC = 0;
+        this->MaxErrCountSWCC = 0;
+        this->EpSSOA = 1.0; // zone primary air fraction
     }
 };
 

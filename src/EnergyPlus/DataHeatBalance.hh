@@ -2212,6 +2212,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<DataHeatBalance::ZoneMassConservationData> MassConservation;
     DataHeatBalance::ZoneAirMassFlowConservation ZoneAirMassFlow;
     Array1D<DataHeatBalance::ZoneLocalEnvironmentData> ZoneLocalEnvironment;
+    bool MundtFirstTimeFlag = true;
 
     void clear_state() override
     {
@@ -2485,6 +2486,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->MassConservation.deallocate();
         this->ZoneAirMassFlow = DataHeatBalance::ZoneAirMassFlowConservation();
         this->ZoneLocalEnvironment.deallocate();
+        this->MundtFirstTimeFlag = true;
     }
 };
 
