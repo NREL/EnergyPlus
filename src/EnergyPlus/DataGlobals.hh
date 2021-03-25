@@ -158,6 +158,8 @@ struct EnergyPlusData;
         std::function<void(const std::string &)> messageCallback = nullptr;
         std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback = nullptr;
         bool eplusRunningViaAPI = false;
+        int NumOfWaterHeater;
+        bool CountNonZoneEquip = true;
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -253,6 +255,8 @@ struct EnergyPlusData;
             this->messageCallback = nullptr;
             this->errorCallback = nullptr;
             this->eplusRunningViaAPI = false;
+            this->NumOfWaterHeater = 0;
+            this->CountNonZoneEquip = true
         }
     };
 
