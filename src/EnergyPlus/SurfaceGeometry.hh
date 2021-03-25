@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/Vectors.hh>
 
 // C++ Headers
 #include <map>
@@ -438,6 +439,27 @@ struct SurfaceGeometryData : BaseGlobalStruct {
     HeatBalanceKivaManager::KivaManager kivaManager;
     SurfaceGeometry::ExposedFoundationPerimeter exposedFoundationPerimeter;
 
+    int ErrCount = 0;
+    bool WarningDisplayed = false;
+    int ErrCount2 = 0;
+    int ErrCount3 = 0;
+    int ErrCount4 = 0; // counts of interzone area mismatches.
+    bool ShowZoneSurfaceHeaders = true;
+    int ErrCount5 = 0;
+    Real64 OldAspectRatio;
+    Real64 NewAspectRatio;
+    std::string transformPlane;
+    Array1D<Vectors::Vector> Triangle1 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
+    Array1D<Vectors::Vector> Triangle2 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
+    Array1D<Real64> X; // containers for x,y,z vertices of the surface
+    Array1D<Real64> Y;
+    Array1D<Real64> Z;
+    Array1D<Real64> A; // containers for convexity test
+    Array1D<Real64> B;
+    Array1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
+    int VertSize;                   // size of X,Y,Z,A,B arrays
+    Real64 ACosZero; // set on firstTime
+
     void clear_state() override
     {
         ProcessSurfaceVerticesOneTimeFlag = true;
@@ -465,6 +487,13 @@ struct SurfaceGeometryData : BaseGlobalStruct {
         firstTime = true;
         noTransform = true;
         CheckConvexityFirstTime = true;
+        ErrCount = 0;
+        WarningDisplayed = false;
+        ErrCount2 = 0;
+        ErrCount3 = 0;
+        ErrCount4 = 0;
+        ErrCount5 = 0;
+        ShowZoneSurfaceHeaders = true;
     }
 
     // Default Constructor

@@ -260,6 +260,18 @@ namespace SystemReports {
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************
 
+    struct IdentifyLoop
+    {
+        // Members
+        int LoopNum;
+        int LoopType;
+
+        // Default Constructor
+        IdentifyLoop() : LoopNum(0), LoopType(0)
+        {
+        }
+    };
+
 } // namespace SystemReports
 
 struct SystemReportsData : BaseGlobalStruct {
@@ -387,6 +399,7 @@ struct SystemReportsData : BaseGlobalStruct {
     int ArrayCounter_UpdateAirSysSubSubCompPtrArray = 1;
     int NumCompTypes = 0;
     Array1D<SystemReports::CompTypeError> CompTypeErrors = Array1D<SystemReports::CompTypeError>(100);
+    Array1D<SystemReports::IdentifyLoop> LoopStack;
 
     void clear_state() override
     {
