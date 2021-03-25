@@ -256,7 +256,7 @@ struct EnergyPlusData;
             this->errorCallback = nullptr;
             this->eplusRunningViaAPI = false;
             this->NumOfWaterHeater = 0;
-            this->CountNonZoneEquip = true
+            this->CountNonZoneEquip = true;
         }
     };
 
