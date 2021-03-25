@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataLoopNodes->Node.allocate(5);
 
     state->dataHeatBal->Zone.allocate(1);
-    HybridModelZone.allocate(1);
+    state->dataHybridModel->HybridModelZone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -194,7 +194,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->MDotOA(1) = 0.0;
 
     // HybridModel
-    HybridModelZone(1).PeopleCountCalc_H = false;
+    state->dataHybridModel->HybridModelZone(1).PeopleCountCalc_H = false;
 
     CorrectZoneHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);

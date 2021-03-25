@@ -200,14 +200,6 @@ namespace MundtSimMgr {
 
 } // namespace MundtSimMgr
 
-struct MundtSimMgrData : BaseGlobalStruct {
-
-    void clear_state() override
-    {
-
-    }
-};
-
 } // namespace EnergyPlus
 
 #endif

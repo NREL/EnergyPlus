@@ -141,20 +141,20 @@ namespace EnergyPlus::SizingManager {
         static std::string const RoutineName("ManageSizing: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool Available(false); // an environment is available to process
+        bool Available(false); // an environment is available to process
         bool ErrorsFound(false);
-        static bool SimAir(false);
-        static bool SimZoneEquip(false);
-        static int TimeStepInDay(0); // time step number
-        static int LastMonth(0);
-        static int LastDayOfMonth(0);
-        static int CtrlZoneNum(0);       // controlled zone index
-        static int ZoneNum(0);           // index into the Zone data array for the controlled zone
-        static Real64 TempAtPeak(0.0);   // Outside temperature at peak cooling/heating for reporting
-        static Real64 HumRatAtPeak(0.0); // Outside humidity ratio at peak cooling/heating for reporting
-        static int TimeStepAtPeak(0);    // time step number at heat or cool peak
-        static int DDNum(0);             // Design Day index
-        static int AirLoopNum(0);        // air loop index
+        bool SimAir(false);
+        bool SimZoneEquip(false);
+        int TimeStepInDay(0); // time step number
+        int LastMonth(0);
+        int LastDayOfMonth(0);
+        int CtrlZoneNum(0);       // controlled zone index
+        int ZoneNum(0);           // index into the Zone data array for the controlled zone
+        Real64 TempAtPeak(0.0);   // Outside temperature at peak cooling/heating for reporting
+        Real64 HumRatAtPeak(0.0); // Outside humidity ratio at peak cooling/heating for reporting
+        int TimeStepAtPeak(0);    // time step number at heat or cool peak
+        int DDNum(0);             // Design Day index
+        int AirLoopNum(0);        // air loop index
         //  EXTERNAL            ReportZoneSizing
         //  EXTERNAL            ReportSysSizing
         std::string curName;
@@ -1085,7 +1085,6 @@ namespace EnergyPlus::SizingManager {
                     for (int indUnitNum = 1; indUnitNum <= NumIndUnits; ++indUnitNum) {
                         if (AirLoopNum == IndUnit(indUnitNum).AirLoopNum) {
                             int termUnitSizingIndex = AirDistUnit(IndUnit(indUnitNum).ADUNum).TermUnitSizingNum;
-
                             airLoopHeatingMaximumFlowRateSum +=
                                 IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             airLoopHeatingMinimumFlowRateSum +=

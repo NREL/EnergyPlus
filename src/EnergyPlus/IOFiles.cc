@@ -413,26 +413,6 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
     }
 }
 
-IOFiles &IOFiles::getSingleton()
-{
-    assert(getSingletonInternal() != nullptr);
-    if (getSingletonInternal() == nullptr) {
-        throw std::runtime_error("Invalid impossible state of no outputfiles!?!?!");
-    }
-    return *getSingletonInternal();
-}
-
-void IOFiles::setSingleton(IOFiles *newSingleton) noexcept
-{
-    getSingletonInternal() = newSingleton;
-}
-
-IOFiles *&IOFiles::getSingletonInternal()
-{
-    static IOFiles *singleton{nullptr};
-    return singleton;
-}
-
 void IOFiles::flushAll() {
 
     audit.flush();

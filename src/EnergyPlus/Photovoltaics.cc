@@ -111,18 +111,6 @@ namespace Photovoltaics {
     // Using/Aliasing
     using namespace DataPhotovoltaics;
 
-    Array1D_bool CheckEquipName;
-    bool GetInputFlag(true); // one time get input flag
-    bool MyOneTimeFlag(true);
-    bool firstTime(true);
-
-    void clear_state() {
-        CheckEquipName.clear();
-        GetInputFlag = true;
-        MyOneTimeFlag = true;
-        firstTime = true;
-    }
-
     void SimPVGenerator(EnergyPlusData &state,
                         [[maybe_unused]] GeneratorType const GeneratorType, // type of Generator !unused1208
                         std::string const &GeneratorName,                   // user specified name of Generator
@@ -147,9 +135,9 @@ namespace Photovoltaics {
         int PVnum;                      // index of unit in PV array for Equivalent one-diode model
 
         // Get PV data from input file
-        if (GetInputFlag) {
+        if (state.dataPhotovoltaicState->GetInputFlag) {
             GetPVInput(state); // for all three types of models
-            GetInputFlag = false;
+            state.dataPhotovoltaicState->GetInputFlag = false;
         }
 
         if (GeneratorIndex == 0) {
@@ -167,7 +155,7 @@ namespace Photovoltaics {
                                       state.dataPhotovoltaic->NumPVs,
                                       GeneratorName));
             }
-            if (CheckEquipName(PVnum)) {
+            if (state.dataPhotovoltaicState->CheckEquipName(PVnum)) {
                 if (GeneratorName != state.dataPhotovoltaic->PVarray(PVnum).Name) {
                     ShowFatalError(
                         state,
@@ -176,7 +164,7 @@ namespace Photovoltaics {
                                GeneratorName,
                                state.dataPhotovoltaic->PVarray(PVnum).Name));
                 }
-                CheckEquipName(PVnum) = false;
+                state.dataPhotovoltaicState->CheckEquipName(PVnum) = false;
             }
         }
 
@@ -296,7 +284,7 @@ namespace Photovoltaics {
         }
 
         if (!allocated(state.dataPhotovoltaic->PVarray)) state.dataPhotovoltaic->PVarray.allocate(state.dataPhotovoltaic->NumPVs);
-        CheckEquipName.dimension(state.dataPhotovoltaic->NumPVs, true);
+        state.dataPhotovoltaicState->CheckEquipName.dimension(state.dataPhotovoltaic->NumPVs, true);
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = state.dataPhotovoltaic->cPVGeneratorObjectName;
         for (PVnum = 1; PVnum <= state.dataPhotovoltaic->NumPVs; ++PVnum) {
@@ -1134,26 +1122,26 @@ namespace Photovoltaics {
         auto & SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto & MyEnvrnFlag = state.dataPhotovoltaicState->MyEnvrnFlag;
         Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 
         // perform the one time initializations
-        if (MyOneTimeFlag) {
+        if (state.dataPhotovoltaicState->MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            MyEnvrnFlag.dimension(state.dataPhotovoltaic->NumPVs, true);
-            MyOneTimeFlag = false;
+            state.dataPhotovoltaicState->MyEnvrnFlag.dimension(state.dataPhotovoltaic->NumPVs, true);
+            state.dataPhotovoltaicState->MyOneTimeFlag = false;
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(PVnum)) {
-
-            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK = state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
-            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
-            MyEnvrnFlag(PVnum) = false;
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataPhotovoltaicState->MyEnvrnFlag(PVnum)) {
+            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK =
+                state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK =
+                state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+            state.dataPhotovoltaicState->MyEnvrnFlag(PVnum) = false;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(PVnum) = true;
+            state.dataPhotovoltaicState->MyEnvrnFlag(PVnum) = true;
         }
 
         // Do the beginning of every time step initializations
@@ -1198,7 +1186,6 @@ namespace Photovoltaics {
         Real64 const MinInsolation(30.0);
         int const KMAX(100);
         Real64 const EtaIni(0.10); // initial value of eta
-        auto & PVTimeStep = state.dataPhotovoltaicState->PVTimeStep;
         Real64 DummyErr;
         Real64 ETA;
         Real64 Tambient;
@@ -1230,10 +1217,11 @@ namespace Photovoltaics {
         Real64 CellTempC;     // cell temperature in degrees C
 
         // if the cell temperature mode is 2, convert the timestep to seconds
-        if (firstTime && state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode == CellIntegration::DecoupledUllebergDynamic) {
-            PVTimeStep = double(state.dataGlobal->MinutesPerTimeStep) * 60.0; // Seconds per time step
+        if (state.dataPhotovoltaicState->firstTime &&
+            state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode == CellIntegration::DecoupledUllebergDynamic) {
+            state.dataPhotovoltaicState->PVTimeStep = double(state.dataGlobal->MinutesPerTimeStep) * 60.0; // Seconds per time step
         }
-        firstTime = false;
+        state.dataPhotovoltaicState->firstTime = false;
 
         // place the shunt resistance into its common block
         state.dataPhotovoltaic->ShuntResistance = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.ShuntResistance;
@@ -1264,16 +1252,20 @@ namespace Photovoltaics {
                                                   (1.0 - ETA / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha);
                     } else if (SELECT_CASE_var == CellIntegration::DecoupledUllebergDynamic) {
                         //  cell temperature based on energy balance with thermal capacity effects
-                        CellTemp =
-                            Tambient +
-                            (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
-                                std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep) +
-                            (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha - ETA) * state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation /
-                                state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef *
-                                (1.0 -
-                                 std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep));
+                        CellTemp = Tambient +
+                                   (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
+                                       std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef /
+                                                state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity *
+                                                state.dataPhotovoltaicState->PVTimeStep) +
+                                   (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha - ETA) *
+                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation /
+                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef *
+                                       (1.0 - std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef /
+                                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity *
+                                                       state.dataPhotovoltaicState->PVTimeStep));
                     } else if (SELECT_CASE_var == CellIntegration::SurfaceOutsideFace) {
-                        CellTemp = state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
+                        CellTemp =
+                            state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
                     } else if (SELECT_CASE_var == CellIntegration::TranspiredCollector) {
                         GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, CellTemp);
                         CellTemp += DataGlobalConstants::KelvinConv;
@@ -1342,11 +1334,13 @@ namespace Photovoltaics {
                 if (SELECT_CASE_var == CellIntegration::Decoupled) {
                     CellTemp = Tambient;
                 } else if (SELECT_CASE_var == CellIntegration::DecoupledUllebergDynamic) {
-                    CellTemp = Tambient +
-                               (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
-                                   std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep);
+                    CellTemp = Tambient + (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
+                                              std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef /
+                                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity *
+                                                       state.dataPhotovoltaicState->PVTimeStep);
                 } else if (SELECT_CASE_var == CellIntegration::SurfaceOutsideFace) {
-                    CellTemp = state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
+                    CellTemp =
+                        state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
                 } else if (SELECT_CASE_var == CellIntegration::TranspiredCollector) {
                     GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, CellTemp);
                     CellTemp += DataGlobalConstants::KelvinConv;

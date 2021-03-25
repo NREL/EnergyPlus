@@ -1399,7 +1399,7 @@ namespace EnergyPlus::OutputReportTabular {
         // na
 
         // Using/Aliasing
-                using DataStringGlobals::CharComma;
+        using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
 
@@ -2996,7 +2996,7 @@ namespace EnergyPlus::OutputReportTabular {
                 curDel = ort->del(iStyle);
                 if (ort->TableStyle(iStyle) == iTableStyle::Comma) {
                     DisplayString(state, "Writing tabular output file results using comma format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblCsvFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblCsvFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version:" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                     tbl_stream << '\n';
@@ -3009,7 +3009,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (ort->TableStyle(iStyle) == iTableStyle::Tab) {
                     DisplayString(state, "Writing tabular output file results using tab format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTabFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTabFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                     tbl_stream << '\n';
@@ -3022,7 +3022,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (ort->TableStyle(iStyle) == iTableStyle::HTML) {
                     DisplayString(state, "Writing tabular output file results using HTML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblHtmFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblHtmFileName, state.files.outputControl.tabular);
                     tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                     tbl_stream << "<html>\n";
                     tbl_stream << "<head>\n";
@@ -3055,7 +3055,7 @@ namespace EnergyPlus::OutputReportTabular {
                                << "</b></p>\n";
                 } else if (ort->TableStyle(iStyle) == iTableStyle::XML) {
                     DisplayString(state, "Writing tabular output file results using XML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblXmlFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFileName, state.files.outputControl.tabular);
                     tbl_stream << "<?xml version=\"1.0\"?>\n";
                     tbl_stream << "<EnergyPlusTabularReports>\n";
                     tbl_stream << "  <state.dataHeatBal->BuildingName>" << state.dataHeatBal->BuildingName << "</state.dataHeatBal->BuildingName>\n";
@@ -3075,7 +3075,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else {
                     DisplayString(state, "Writing tabular output file results using text format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTxtFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTxtFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version: " << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                     tbl_stream << '\n';
@@ -4260,11 +4260,9 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHVACGlobals::EvapCooled;
         auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using DataHVACGlobals::WaterCooled;
-        using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
-        using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
 
-        static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataEnvrn->OutDryBulbTemp);
-        static Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
+        Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataEnvrn->OutDryBulbTemp);
+        Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
         Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
         state.dataHeatBal->SysTotalHVACReliefHeatLoss = 0;
         state.dataHeatBal->SysTotalHVACRejectHeatLoss = 0;
@@ -4279,8 +4277,8 @@ namespace EnergyPlus::OutputReportTabular {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
                 state.dataCondenserLoopTowers->towers(iCooler).Qactual * TimeStepSysSec + state.dataCondenserLoopTowers->towers(iCooler).FanEnergy + state.dataCondenserLoopTowers->towers(iCooler).BasinHeaterConsumption;
         }
-        for (int iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
-            state.dataHeatBal->SysTotalHVACRejectHeatLoss += SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
+        for (int iCooler = 1; iCooler <= state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers; ++iCooler) {
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataEvapFluidCoolers->SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + state.dataEvapFluidCoolers->SimpleEvapFluidCooler(iCooler).FanEnergy;
         }
         for (auto &cooler : state.dataFluidCoolers->SimpleFluidCooler) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
@@ -9611,7 +9609,6 @@ namespace EnergyPlus::OutputReportTabular {
         int kEndUseSub;
         int i;
         int numRows;
-        static std::string footnote;
         int distrHeatSelected;
         bool bothDistrHeatNonZero;
         Real64 powerConversion;
@@ -9658,18 +9655,18 @@ namespace EnergyPlus::OutputReportTabular {
                 collapsedTotal(13) = ort->gatherDemandTotal(7); // water
                 collapsedTimeStep(13) = ort->gatherDemandTimeStamp(7);
 
-                // set flag if both puchased heating and steam both have positive demand
+                // set flag if both purchased heating and steam both have positive demand
                 bothDistrHeatNonZero = (ort->gatherDemandTotal(4) > 0.0) && (ort->gatherDemandTotal(5) > 0.0);
                 // select the district heating source that has a larger demand
                 if (ort->gatherDemandTotal(4) > ort->gatherDemandTotal(5)) {
                     distrHeatSelected = 4; // purchased heating
                     if (bothDistrHeatNonZero) {
-                        footnote += " Steam has non-zero demand but is not shown on this report.";
+                        state.dataOutRptTab->footnote += " Steam has non-zero demand but is not shown on this report.";
                     }
                 } else {
                     distrHeatSelected = 5; // steam
                     if (bothDistrHeatNonZero) {
-                        footnote += " District heating has non-zero demand but is not shown on this report.";
+                        state.dataOutRptTab->footnote += " District heating has non-zero demand but is not shown on this report.";
                     }
                 }
                 // set the time of peak demand and total demand for the purchased heating/steam
@@ -9881,7 +9878,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 if (produceTabular) {
                     WriteSubtitle(state, "End Uses");
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, state.dataOutRptTab->footnote);
                 }
                 if (produceSQLite) {
                     if (sqlite) {
@@ -9996,7 +9993,7 @@ namespace EnergyPlus::OutputReportTabular {
                 // heading for the entire sub-table
                 if (produceTabular) {
                     WriteSubtitle(state, "End Uses By Subcategory");
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, state.dataOutRptTab->footnote);
                 }
 
                 Array1D_string rowHeadTemp(rowHead);
@@ -10151,9 +10148,9 @@ namespace EnergyPlus::OutputReportTabular {
         int item;    // do-loop counter for line items
         int NumRows; // number of rows in report table excluding table header
         int NumCols; // number of columns in report table
-        static std::string SIunit;
-        static std::string m2_unitName;
-        static std::string IPunitName;
+        std::string SIunit;
+        std::string m2_unitName;
+        std::string IPunitName;
         Real64 IPqty;
         Real64 IPsingleValue;
         Real64 IPvaluePer;
@@ -10478,11 +10475,7 @@ namespace EnergyPlus::OutputReportTabular {
         bool usezoneFloorArea;
 
         int iTotal;
-        static std::string SIunit;
-        static std::string m_unitName;
-        static std::string m2_unitName;
-        static std::string m3_unitName;
-        static std::string Wm2_unitName;
+        std::string SIunit;
 
         // zone summary total
 
@@ -10545,25 +10538,25 @@ namespace EnergyPlus::OutputReportTabular {
                 // do unit conversions if necessary
                 if (unitsStyle_cur == iUnitsStyle::InchPound) {
                     SIunit = "[m]";
-                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, m_unitName);
+                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->m_unitName);
                     state.dataOutRptTab->m_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
                     SIunit = "[m2]";
-                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, m2_unitName);
+                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->m2_unitName);
                     state.dataOutRptTab->m2_unitConvWVST = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
                     SIunit = "[m3]";
-                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, m3_unitName);
+                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->m3_unitName);
                     state.dataOutRptTab->m3_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
                     SIunit = "[W/m2]";
-                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, Wm2_unitName);
+                    LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->Wm2_unitName);
                     state.dataOutRptTab->Wm2_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
                 } else {
-                    m_unitName = "[m]";
+                    state.dataOutRptTab->m_unitName = "[m]";
                     state.dataOutRptTab->m_unitConv = 1.0;
-                    m2_unitName = "[m2]";
+                    state.dataOutRptTab->m2_unitName = "[m2]";
                     state.dataOutRptTab->m2_unitConvWVST = 1.0;
-                    m3_unitName = "[m3]";
+                    state.dataOutRptTab->m3_unitName = "[m3]";
                     state.dataOutRptTab->m3_unitConv = 1.0;
-                    Wm2_unitName = "[W/m2]";
+                    state.dataOutRptTab->Wm2_unitName = "[W/m2]";
                     state.dataOutRptTab->Wm2_unitConv = 1.0;
                 }
                 //---- General Sub-Table
@@ -10582,7 +10575,7 @@ namespace EnergyPlus::OutputReportTabular {
                 rowHead(4) = "Latitude [deg]";
                 rowHead(5) = "Longitude [deg]";
 
-                rowHead(6) = "Elevation " + m_unitName;
+                rowHead(6) = "Elevation " + state.dataOutRptTab->m_unitName;
                 rowHead(7) = "Time Zone";
                 rowHead(8) = "North Axis Angle [deg]";
                 rowHead(9) = "Rotation for Appendix G [deg]";
@@ -10637,9 +10630,9 @@ namespace EnergyPlus::OutputReportTabular {
                 columnHead(wwrcSouth) = "South (135 to 225 deg)";
                 columnHead(wwrcWest) = "West (225 to 315 deg)";
 
-                rowHead(wwrrWall) = "Gross Wall Area " + m2_unitName;
-                rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + m2_unitName;
-                rowHead(wwrrWindow) = "Window Opening Area " + m2_unitName;
+                rowHead(wwrrWall) = "Gross Wall Area " + state.dataOutRptTab->m2_unitName;
+                rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + state.dataOutRptTab->m2_unitName;
+                rowHead(wwrrWindow) = "Window Opening Area " + state.dataOutRptTab->m2_unitName;
                 rowHead(wwrrWWR) = "Gross Window-Wall Ratio [%]";
                 rowHead(wwrrAbvGndWWR) = "Above Ground Window-Wall Ratio [%]";
 
@@ -10896,9 +10889,9 @@ namespace EnergyPlus::OutputReportTabular {
                 columnHead(wwrcSouth) = "South (135 to 225 deg)";
                 columnHead(wwrcWest) = "West (225 to 315 deg)";
 
-                rowHead(wwrrWall) = "Gross Wall Area " + m2_unitName;
-                rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + m2_unitName;
-                rowHead(wwrrWindow) = "Window Opening Area " + m2_unitName;
+                rowHead(wwrrWall) = "Gross Wall Area " + state.dataOutRptTab->m2_unitName;
+                rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + state.dataOutRptTab->m2_unitName;
+                rowHead(wwrrWindow) = "Window Opening Area " + state.dataOutRptTab->m2_unitName;
                 rowHead(wwrrWWR) = "Gross Window-Wall Ratio [%]";
                 rowHead(wwrrAbvGndWWR) = "Above Ground Window-Wall Ratio [%]";
 
@@ -10970,8 +10963,8 @@ namespace EnergyPlus::OutputReportTabular {
 
                 columnHead(1) = "Total";
 
-                rowHead(1) = "Gross Roof Area " + m2_unitName;
-                rowHead(2) = "Skylight Area " + m2_unitName;
+                rowHead(1) = "Gross Roof Area " + state.dataOutRptTab->m2_unitName;
+                rowHead(2) = "Skylight Area " + state.dataOutRptTab->m2_unitName;
                 rowHead(3) = "Skylight-Roof Ratio [%]";
 
                 if (DetailedWWR) {
@@ -11004,7 +10997,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
 
                 //---- Hybrid Model: Internal Thermal Mass Sub-Table
-                if (FlagHybridModel_TM) {
+                if (state.dataHybridModel->FlagHybridModel_TM) {
                     rowHead.allocate(state.dataGlobal->NumOfZones);
                     NumOfCol = 2;
                     columnHead.allocate(NumOfCol);
@@ -11020,7 +11013,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                     for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                         rowHead(iZone) = Zone(iZone).Name;
-                        if (HybridModelZone(iZone).InternalThermalMassCalc_T) {
+                        if (state.dataHybridModel->HybridModelZone(iZone).InternalThermalMassCalc_T) {
                             tableBody(1, iZone) = "Yes";
                         } else {
                             tableBody(1, iZone) = "No";
@@ -11088,18 +11081,18 @@ namespace EnergyPlus::OutputReportTabular {
                 columnWidth = 14; // array assignment - same for all columns
                 tableBody.allocate(NumOfCol, state.dataGlobal->NumOfZones + 4);
 
-                columnHead(1) = "Area " + m2_unitName;
+                columnHead(1) = "Area " + state.dataOutRptTab->m2_unitName;
                 columnHead(2) = "Conditioned (Y/N)";
                 columnHead(3) = "Part of Total Floor Area (Y/N)";
-                columnHead(4) = "Volume " + m3_unitName;
+                columnHead(4) = "Volume " + state.dataOutRptTab->m3_unitName;
                 columnHead(5) = "Multipliers";
-                columnHead(6) = "Above Ground Gross Wall Area " + m2_unitName;
-                columnHead(7) = "Underground Gross Wall Area " + m2_unitName;
-                columnHead(8) = "Window Glass Area " + m2_unitName;
-                columnHead(9) = "Opening Area " + m2_unitName;
-                columnHead(10) = "Lighting " + Wm2_unitName;
-                columnHead(11) = "People " + m2_unitName.substr(0, len(m2_unitName) - 1) + " per person" + m2_unitName[len(m2_unitName) - 1];
-                columnHead(12) = "Plug and Process " + Wm2_unitName;
+                columnHead(6) = "Above Ground Gross Wall Area " + state.dataOutRptTab->m2_unitName;
+                columnHead(7) = "Underground Gross Wall Area " + state.dataOutRptTab->m2_unitName;
+                columnHead(8) = "Window Glass Area " + state.dataOutRptTab->m2_unitName;
+                columnHead(9) = "Opening Area " + state.dataOutRptTab->m2_unitName;
+                columnHead(10) = "Lighting " + state.dataOutRptTab->Wm2_unitName;
+                columnHead(11) = "People " + state.dataOutRptTab->m2_unitName.substr(0, len(state.dataOutRptTab->m2_unitName) - 1) + " per person" + state.dataOutRptTab->m2_unitName[len(state.dataOutRptTab->m2_unitName) - 1];
+                columnHead(12) = "Plug and Process " + state.dataOutRptTab->Wm2_unitName;
 
                 rowHead = "";
                 rowHead(state.dataGlobal->NumOfZones + state.dataOutRptTab->grandTotal) = "Total";
@@ -11925,8 +11918,6 @@ namespace EnergyPlus::OutputReportTabular {
         int loopLimit;
         int iTableEntry;
         int jUnique;
-        static std::string curColHeadWithSI;
-        static std::string curColHead;
         auto &ort(state.dataOutRptTab);
 
         if (ort->displayComponentSizing) {
@@ -11940,7 +11931,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // The arrays that look for unique headers are dimensioned in the
                 // running program since the size of the number of entries is
-                // not previouslly known. Use the size of all entries since that
+                // not previously known. Use the size of all entries since that
                 // is the maximum possible.
                 uniqueDesc.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
                 uniqueObj.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
@@ -12027,15 +12018,15 @@ namespace EnergyPlus::OutputReportTabular {
                     // transfer the row and column headings first
                     for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
                         // do the unit conversions
-                        curColHeadWithSI = uniqueDesc(jUnique);
+                        state.dataOutRptTab->curColHeadWithSI = uniqueDesc(jUnique);
                         if (unitsStyle_cur == iUnitsStyle::InchPound) {
-                            LookupSItoIP(state, curColHeadWithSI, state.dataOutRptTab->indexUnitConvWCS, curColHead);
+                            LookupSItoIP(state, state.dataOutRptTab->curColHeadWithSI, state.dataOutRptTab->indexUnitConvWCS, state.dataOutRptTab->curColHead);
                             colUnitConv(jUnique) = state.dataOutRptTab->indexUnitConvWCS;
                         } else {
-                            curColHead = curColHeadWithSI;
+                            state.dataOutRptTab->curColHead = state.dataOutRptTab->curColHeadWithSI;
                             colUnitConv(jUnique) = 0;
                         }
-                        columnHead(jUnique) = curColHead;
+                        columnHead(jUnique) = state.dataOutRptTab->curColHead;
                     }
                     for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
                         rowHead(jUnique) = uniqueObj(jUnique);

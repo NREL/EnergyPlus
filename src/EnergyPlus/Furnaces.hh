@@ -505,6 +505,12 @@ namespace Furnaces {
 struct FurnacesData : BaseGlobalStruct {
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    bool GetFurnaceInputFlag = true; // Logical to allow "GetInput" only once per simulation
+    std::unordered_map<std::string, std::string> UniqueFurnaceNames;
+    bool InitFurnaceMyOneTimeFlag = true; // one time allocation flag
+    bool FlowFracFlagReady = true;        // one time flag for calculating flow fraction through controlled zone
+    bool MyAirLoopPass = true;            // one time allocation flag
+
     int NumFurnaces = 0; // The number of furnaces found in the input data file
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
@@ -535,12 +541,6 @@ struct FurnacesData : BaseGlobalStruct {
     // Object Data
     Array1D<Furnaces::FurnaceEquipConditions> Furnace;
 
-    bool GetFurnaceInputFlag = true; // Logical to allow "GetInput" only once per simulation
-    std::unordered_map<std::string, std::string> UniqueFurnaceNames;
-    bool InitFurnaceMyOneTimeFlag = true; // one time allocation flag
-    bool FlowFracFlagReady = true;        // one time flag for calculating flow fraction through controlled zone
-    bool MyAirLoopPass = true;            // one time allocation flag
-
     Array1D_bool MyEnvrnFlag;             // environment flag
     Array1D_bool MySecondOneTimeFlag;     // additional one time flag
     Array1D_bool MyFanFlag;               // used for sizing fan inputs one time
@@ -563,6 +563,12 @@ struct FurnacesData : BaseGlobalStruct {
 
     void clear_state() override
     {
+        GetFurnaceInputFlag = true;
+        UniqueFurnaceNames.clear();
+        InitFurnaceMyOneTimeFlag = true;
+        FlowFracFlagReady = true; // one time flag for calculating flow fraction through controlled zone
+        MyAirLoopPass = true;
+
         NumFurnaces = 0;
         MySizeFlag.clear();
         CheckEquipName.clear();
@@ -587,12 +593,6 @@ struct FurnacesData : BaseGlobalStruct {
         HeatingCoilName.clear();
         HeatingCoilType.clear();
         Furnace.clear();
-
-        GetFurnaceInputFlag = true;
-        UniqueFurnaceNames.clear();
-        InitFurnaceMyOneTimeFlag = true;
-        FlowFracFlagReady = true; // one time flag for calculating flow fraction through controlled zone
-        MyAirLoopPass = true;
 
         MyEnvrnFlag.clear();
         MySecondOneTimeFlag.clear();
