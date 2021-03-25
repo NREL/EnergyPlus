@@ -253,6 +253,10 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinSpecTemp.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinWindowModelType.dimension(NumSurfaces, Window5DetailedModel);
         state.dataSurface->SurfWinTDDPipeNum.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinStormWinConstr.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinActiveStormWinConstr.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinStormWinShadedConstr.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinActiveStormWinShadedConstr.dimension(NumSurfaces, 0);
     }
 
     void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound)
@@ -4416,8 +4420,6 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedConstructionList.clear();
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction = 0;
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedStormWinConstructionList.clear();
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeStormWinShadedConstruction= 0;
-
 
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Window || state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor ||
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Diffuser || state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Dome) {
@@ -4750,7 +4752,6 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedConstructionList.clear();
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction = 0;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedStormWinConstructionList.clear();
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeStormWinShadedConstruction= 0;
 
                 InitialAssociateWindowShadingControlFenestration(state, ErrorsFound, SurfNum);
 
@@ -11812,7 +11813,7 @@ namespace SurfaceGeometry {
             if (ConstrNewSt == 0) {
                 ConstrNewSt = createConstructionWithStorm(state, ConstrNum, ConstrNameSt, state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
             }
-            state.dataSurface->Surface(SurfNum).StormWinConstruction = ConstrNewSt;
+            state.dataSurface->SurfWinStormWinConstr(SurfNum) = ConstrNewSt;
 
             // create shaded constructions with storm window
             state.dataSurface->Surface(SurfNum).shadedStormWinConstructionList.resize(state.dataSurface->Surface(SurfNum).shadedConstructionList.size(), 0);  // make the shaded storm window size the same size as the number of shaded constructions
@@ -12303,8 +12304,6 @@ namespace SurfaceGeometry {
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).HasShadeControl = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HasShadeControl;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).activeShadedConstruction = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).windowShadingControlList = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).windowShadingControlList;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).StormWinConstruction = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).StormWinConstruction;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).activeStormWinShadedConstruction = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeStormWinShadedConstruction;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).shadedStormWinConstructionList = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedStormWinConstructionList;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).FrameDivider = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Multiplier = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier;

@@ -2933,7 +2933,7 @@ namespace EnergyPlus::SolarShading {
                         if (AreaSum > 0.0) state.dataSolarShading->ISABSF(SurfNum) = state.dataSurface->Surface(SurfNum).Area * state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar / AreaSum;
                     } else { // Window (floor windows are assumed to have no shading device and no divider,
                         // and assumed to be non-switchable)
-                        if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
+                        ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
                         AbsDiffTotWin = 0.0;
                         if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
                             for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotGlassLayers; ++Lay) {
@@ -2977,7 +2977,7 @@ namespace EnergyPlus::SolarShading {
                             if (AreaSum > 0.0) state.dataSolarShading->ISABSF(SurfNum) = state.dataSurface->Surface(SurfNum).Area * state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar / AreaSum;
                         } else { // Window (floor windows are assumed to have no shading device and no divider,
                             // and assumed to be non-switchable)
-                            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
+                            ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
                             AbsDiffTotWin = 0.0;
                             if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
                                 for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotGlassLayers; ++Lay) {
@@ -6020,9 +6020,6 @@ namespace EnergyPlus::SolarShading {
                     if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
                     if (!state.dataSurface->Surface(SurfNum).ExtSolar) continue;
                     int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                        ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
-                    }
                     Real64 CosInc = state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                     Real64 SunLitFract = state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                     state.dataSurface->SurfOpaqAO(SurfNum) = state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar * CosInc * SunLitFract;
@@ -6035,12 +6032,8 @@ namespace EnergyPlus::SolarShading {
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window && state.dataSurface->Surface(SurfNum).Class != SurfaceClass::TDD_Dome) continue;
                 if (!state.dataSurface->Surface(SurfNum).ExtSolar && state.dataSurface->SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) continue;
-                int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                int ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
-                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                    ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = state.dataSurface->Surface(SurfNum).activeStormWinShadedConstruction;
-                }
+                int ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
+                int ConstrNumSh = state.dataSurface->SurfWinActiveStormWinShadedConstr(SurfNum);
                 int BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
                 int ScNum = state.dataSurface->SurfWinScreenNumber(SurfNum);
                 WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum); // Set in subr. WindowShadingManager
@@ -6865,11 +6858,9 @@ namespace EnergyPlus::SolarShading {
                                         // transmitting and back window centers
                                         CosIncBack = std::abs(state.dataBSDFWindow->ComplexWind(SurfNum).sdotN(IBack));
                                     }
-                                    int ConstrNumBackSh = state.dataSurface->Surface(BackSurfNum).activeShadedConstruction;
-                                    if (state.dataSurface->SurfWinStormWinFlag(BackSurfNum) == 1) {
-                                        ConstrNumBack = state.dataSurface->Surface(BackSurfNum).StormWinConstruction;
-                                        ConstrNumBackSh = state.dataSurface->Surface(BackSurfNum).activeStormWinShadedConstruction;
-                                    }
+                                    ConstrNumBack = state.dataSurface->SurfWinActiveStormWinConstr(BackSurfNum);
+                                    int ConstrNumBackSh = state.dataSurface->SurfWinActiveStormWinShadedConstr(BackSurfNum);
+
                                     AbsBeamWin.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
                                     Real64 TransBeamWin = 0.0; // Beam solar transmittance of a window
                                     Real64 AbsBeamTotWin = 0.0; // Sum of window glass layer beam solar absorptances
@@ -7436,7 +7427,7 @@ namespace EnergyPlus::SolarShading {
                                 // are assumed to not have blinds or shades in this calculation.
                                 // For the case of the floor window a complex fenestration (strange situation) the correct back
                                 // diffuse layer absorptions have already been put into the construction
-                                if (state.dataSurface->SurfWinStormWinFlag(FloorNum) == 1) FlConstrNum = state.dataSurface->Surface(FloorNum).StormWinConstruction;
+                                FlConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(FloorNum);
 
                                 for (int Lay = 1; Lay <= state.dataConstruction->Construct(FlConstrNum).TotGlassLayers; ++Lay) {
                                     AbsBeamTotWin += state.dataConstruction->Construct(FlConstrNum).AbsDiffBack(Lay);
@@ -7648,10 +7639,7 @@ namespace EnergyPlus::SolarShading {
             for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 // TH added 3/24/2010 while debugging CR 7872
                 if (!state.dataSurface->Surface(SurfNum).ExtSolar && state.dataSurface->SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) continue;
-                int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                    ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
-                }
+
                 int SurfNum2 = SurfNum;
                 if (state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
                     int PipeNum = state.dataSurface->SurfWinTDDPipeNum(SurfNum);
@@ -7663,7 +7651,7 @@ namespace EnergyPlus::SolarShading {
                 //-------------------------------------------------------------------------
                 // EXTERIOR BEAM SOLAR RADIATION ABSORBED ON THE OUTSIDE OF OPAQUE SURFACES
                 //-------------------------------------------------------------------------
-
+                int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 if (SunLitFract > 0.0 && state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) {
                     state.dataSurface->SurfOpaqAO(SurfNum) = state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar * CosInc * SunLitFract;
 
@@ -8704,7 +8692,12 @@ namespace EnergyPlus::SolarShading {
                     state.dataSurface->Surface(ISurf).activeShadedConstruction = state.dataSurface->Surface(ISurf).shadedConstructionList[indexWindowShadingControl];
                 }
                 if (!state.dataSurface->Surface(ISurf).shadedStormWinConstructionList.empty() && indexWindowShadingControl <= state.dataSurface->Surface(ISurf).shadedStormWinConstructionList.size() - 1) {
-                    state.dataSurface->Surface(ISurf).activeStormWinShadedConstruction = state.dataSurface->Surface(ISurf).shadedStormWinConstructionList[indexWindowShadingControl];
+                    state.dataSurface->SurfWinStormWinShadedConstr(ISurf) = state.dataSurface->Surface(ISurf).shadedStormWinConstructionList[indexWindowShadingControl];
+                }
+                if (state.dataSurface->SurfWinStormWinFlag(ISurf) == 1) {
+                    state.dataSurface->SurfWinActiveStormWinShadedConstr(ISurf) = state.dataSurface->SurfWinStormWinShadedConstr(ISurf);
+                } else {
+                    state.dataSurface->SurfWinActiveStormWinShadedConstr(ISurf) = state.dataSurface->Surface(ISurf).activeShadedConstruction;
                 }
                 int IShadingCtrl = state.dataSurface->Surface(ISurf).activeWindowShadingControl;
                 int IZone = state.dataSurface->Surface(ISurf).Zone;
@@ -9962,12 +9955,8 @@ namespace EnergyPlus::SolarShading {
                 H = state.dataSurface->Surface(SurfNum).Height;
                 W = state.dataSurface->Surface(SurfNum).Width;
                 d1 = OutsReveal + 0.5 * GlazingThickness;
-                ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
-                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                    ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = state.dataSurface->Surface(SurfNum).activeStormWinShadedConstruction;
-                }
+                ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
+                ConstrNumSh = state.dataSurface->SurfWinActiveStormWinShadedConstr(SurfNum);
                 SolTransGlass = POLYF(state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum),
                                       state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef);
                 TanProfileAngVert = state.dataSurface->SurfWinTanProfileAngVert(SurfNum);
@@ -10767,12 +10756,8 @@ namespace EnergyPlus::SolarShading {
 //                        ZoneDifSolarDistAbsorbedTotl += DifSolarAbsW;   // debug [W]
 //                        ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug [W]
                     } else { // Exterior or Interior Window
-
-                        int ConstrNumSh = state.dataSurface->Surface(HeatTransSurfNum).activeShadedConstruction;
-                        if (state.dataSurface->SurfWinStormWinFlag(HeatTransSurfNum) == 1) {
-                            ConstrNum = state.dataSurface->Surface(HeatTransSurfNum).StormWinConstruction;
-                            ConstrNumSh = state.dataSurface->Surface(HeatTransSurfNum).activeStormWinShadedConstruction;
-                        }
+                        ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(HeatTransSurfNum);
+                        int ConstrNumSh = state.dataSurface->SurfWinActiveStormWinShadedConstr(HeatTransSurfNum);
                         int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                         WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(HeatTransSurfNum);
 
@@ -11303,11 +11288,8 @@ namespace EnergyPlus::SolarShading {
 
             } else { // Exterior or Interior Window
 
-                ConstrNumSh = state.dataSurface->Surface(HeatTransSurfNum).activeShadedConstruction;
-                if (state.dataSurface->SurfWinStormWinFlag(HeatTransSurfNum) == 1) {
-                    ConstrNum = state.dataSurface->Surface(HeatTransSurfNum).StormWinConstruction;
-                    ConstrNumSh = state.dataSurface->Surface(HeatTransSurfNum).activeStormWinShadedConstruction;
-                }
+                ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(HeatTransSurfNum);
+                ConstrNumSh = state.dataSurface->SurfWinActiveStormWinShadedConstr(HeatTransSurfNum);
                 TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                 ShadeFlag = state.dataSurface->SurfWinShadingFlag(HeatTransSurfNum);
 

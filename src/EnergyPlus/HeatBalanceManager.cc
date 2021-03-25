@@ -5290,6 +5290,9 @@ namespace HeatBalanceManager {
             HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties(state);
         }
 
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            state.dataSurface->SurfWinActiveStormWinConstr(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+        }
         if (state.dataSurface->TotStormWin > 0) {
             if (state.dataGlobal->BeginDayFlag) {
                 SetStormWindowControl(state);
@@ -7203,6 +7206,9 @@ namespace HeatBalanceManager {
             state.dataSurface->SurfWinStormWinFlag(SurfNum) = StormWinFlag;
             if (state.dataGlobal->BeginSimFlag) state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
             if (state.dataSurface->SurfWinStormWinFlag(SurfNum) != state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum)) state.dataHeatBal->StormWinChangeThisDay = true;
+            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
+                state.dataSurface->SurfWinActiveStormWinConstr(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
+            }
         }
     }
 

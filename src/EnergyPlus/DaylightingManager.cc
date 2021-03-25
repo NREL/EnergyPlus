@@ -1619,8 +1619,7 @@ namespace EnergyPlus::DaylightingManager {
             ExtWinType = DataDaylighting::iExtWinType::AdjZoneExtWin;
         }
 
-        IConst = state.dataSurface->Surface(IWin).Construction;
-        if (state.dataSurface->SurfWinStormWinFlag(IWin) == 1) IConst = state.dataSurface->Surface(IWin).StormWinConstruction;
+        IConst = state.dataSurface->SurfWinActiveStormWinConstr(IWin);
 
         // For thermochromic windows, the daylight and glare factors are calculated for a base window cosntruction
         //  at base TC layer temperature. During each time step calculations at DayltgInteriorIllum,
@@ -3238,7 +3237,7 @@ namespace EnergyPlus::DaylightingManager {
                         ObsVisRefl = 1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
                     } else {
                         // Obstruction is a window; assume it is bare
-                        if (state.dataSurface->SurfWinStormWinFlag(NearestHitSurfNum) == 1) ObsConstrNum = state.dataSurface->Surface(NearestHitSurfNum).StormWinConstruction;
+                        ObsConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(NearestHitSurfNum);
                         ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;
                     }
                 } else {
@@ -3626,8 +3625,7 @@ namespace EnergyPlus::DaylightingManager {
                                 SpecReflectance = 0.0;
                                 CosIncAngRefl = std::abs(dot(RAYCOS, ReflNorm));
                                 if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window) {
-                                    ConstrNumRefl = state.dataSurface->Surface(ReflSurfNum).Construction;
-                                    if (state.dataSurface->SurfWinStormWinFlag(ReflSurfNum) == 1) ConstrNumRefl = state.dataSurface->Surface(ReflSurfNum).StormWinConstruction;
+                                    ConstrNumRefl = state.dataSurface->SurfWinActiveStormWinConstr(ReflSurfNum);
                                     SpecReflectance = POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
                                 if (state.dataSurface->Surface(ReflSurfNum).ShadowingSurf && state.dataSurface->Surface(ReflSurfNum).ShadowSurfGlazingConstruct > 0)
@@ -6329,8 +6327,7 @@ namespace EnergyPlus::DaylightingManager {
                             continue;
                         }
 
-                        IConst = state.dataSurface->Surface(IWin).Construction;
-                        if (state.dataSurface->SurfWinStormWinFlag(IWin) == 1) IConst = state.dataSurface->Surface(IWin).StormWinConstruction;
+                        IConst = state.dataSurface->SurfWinActiveStormWinConstr(IWin);
                         // Vis trans at normal incidence of unswitched glass
                         TVIS1(igroup) = POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
 
@@ -7276,8 +7273,7 @@ namespace EnergyPlus::DaylightingManager {
         FLCWSK = 0.0;
         FLCWSU = 0.0;
 
-        IConst = state.dataSurface->Surface(IWin).Construction;
-        if (state.dataSurface->SurfWinStormWinFlag(IWin) == 1) IConst = state.dataSurface->Surface(IWin).StormWinConstruction;
+        IConst = state.dataSurface->SurfWinActiveStormWinConstr(IWin);
         BlindOn = false;
         ShadeOn = false;
         ScreenOn = false;
@@ -7437,8 +7433,7 @@ namespace EnergyPlus::DaylightingManager {
                                 ObsVisRefl = 1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
                             } else {
                                 // Obstruction is a window; assume it is bare
-                                if (state.dataSurface->SurfWinStormWinFlag(NearestHitSurfNum) == 1)
-                                    ObsConstrNum = state.dataSurface->Surface(NearestHitSurfNum).StormWinConstruction;
+                                ObsConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(NearestHitSurfNum);
                                 ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;
                             }
                         } else {
@@ -7592,8 +7587,7 @@ namespace EnergyPlus::DaylightingManager {
                     // between the screen's cylinders goes either up or down depending on the altitude angle of the
                     // element from which the light came.
 
-                    IConstShaded = state.dataSurface->Surface(IWin).activeShadedConstruction;
-                    if (state.dataSurface->SurfWinStormWinFlag(IWin) == 1) IConstShaded = state.dataSurface->Surface(IWin).activeStormWinShadedConstruction;
+                    IConstShaded = state.dataSurface->SurfWinActiveStormWinShadedConstr(IWin);
                     if (state.dataSurface->SurfWinSolarDiffusing(IWin)) IConstShaded = state.dataSurface->Surface(IWin).Construction;
 
                     // Transmittance of window including shade, screen or blind

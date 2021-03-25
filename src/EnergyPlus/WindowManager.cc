@@ -1608,7 +1608,7 @@ namespace WindowManager {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfWinSolarDiffusing(SurfNum) = false;
             if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window && state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment &&
-                state.dataSurface->Surface(SurfNum).StormWinConstruction == 0) {
+                state.dataSurface->SurfWinStormWinConstr(SurfNum) == 0) {
                 ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
                 if (state.dataMaterial->Material(MatNum).SolarDiffusing) {
@@ -2157,8 +2157,7 @@ namespace WindowManager {
 
         } else { // regular window, not BSDF, not EQL Window
 
-            ConstrNum = surface.Construction;
-            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) > 0) ConstrNum = surface.StormWinConstruction;
+            ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
 
             // Added for thermochromic windows
             state.dataWindowManager->locTCFlag = (state.dataConstruction->Construct(ConstrNum).TCFlag == 1);
@@ -2314,8 +2313,7 @@ namespace WindowManager {
 
             IConst = ConstrNum;
             if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
-                IConst = surface.activeShadedConstruction;
-                if (state.dataSurface->SurfWinStormWinFlag(SurfNum) > 0) IConst = surface.activeStormWinShadedConstruction;
+                IConst = state.dataSurface->SurfWinActiveStormWinShadedConstr(SurfNum);
             }
             TotLay = state.dataConstruction->Construct(IConst).TotLayers;
             IGlass = 0;
@@ -3486,12 +3484,8 @@ namespace WindowManager {
 
             // Correct WinHeatGain for interior diffuse shortwave (solar and shortwave from lights) transmitted
             // back out window
-            ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-            ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
-            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
-                ConstrNumSh = state.dataSurface->Surface(SurfNum).activeStormWinShadedConstruction;
-            }
+            ConstrNum = state.dataSurface->SurfWinActiveStormWinConstr(SurfNum);
+            ConstrNumSh = state.dataSurface->SurfWinActiveStormWinShadedConstr(SurfNum);
 
             TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff; // Default value for TransDiff here
             if (NOT_SHADED(ShadeFlag)) {
@@ -3630,8 +3624,7 @@ namespace WindowManager {
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
         // DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-        ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
-        if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNumSh = state.dataSurface->Surface(SurfNum).activeStormWinShadedConstruction;
+        ConstrNumSh = state.dataSurface->SurfWinActiveStormWinShadedConstr(SurfNum);
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
         nglassfaces = 2 * state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;
         TotGaps = state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;
