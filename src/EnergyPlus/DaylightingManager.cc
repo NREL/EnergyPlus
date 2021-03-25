@@ -8826,6 +8826,9 @@ namespace EnergyPlus::DaylightingManager {
         int ISky;  // Sky type index
         int ISky1; // Sky type index values for averaging two sky types
         int ISky2;
+        auto & DFSUHR = state.dataDaylightingManager->DFSUHR;       // Sun daylight factor for bare/shaded window
+        auto & BFSUHR = state.dataDaylightingManager->BFSUHR;       // Sun background luminance factor for bare/shaded window
+        auto & SFSUHR = state.dataDaylightingManager->SFSUHR; // Sun source luminance factor for bare/shaded window
         auto & IConstShaded = state.dataDaylightingManager->IConstShaded;
         auto & VTDark = state.dataDaylightingManager->VTDark;
         auto & VTMULT = state.dataDaylightingManager->VTMULT;
