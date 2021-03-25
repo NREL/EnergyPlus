@@ -196,7 +196,7 @@ namespace OutputProcessor {
         op->ReportList.allocate(500);
         op->NumReportList = 500;
         op->ReportList = 0;
-        op->NumExtraVars = 0; 
+        op->NumExtraVars = 0;
 
         // Initialize end use category names - the indices must match up with endUseNames in OutputReportTabular
         op->EndUseCategory.allocate(state.dataGlobalConst->iEndUse.size());
@@ -3800,17 +3800,16 @@ namespace OutputProcessor {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static int const N(100);
-        static char stamp[N];
+
         assert(reportIDString.length() + DayOfSimChr.length() + (DayType.present() ? DayType().length() : 0u) + 26 <
-               N); // Check will fit in stamp size
+               N_WriteTimeStampFormatData); // Check will fit in stamp size
 
         if (!outputFile.good()) return;
 
         switch (reportingInterval) {
         case ReportingFrequency::EachCall:
         case ReportingFrequency::TimeStep:
-            std::sprintf(stamp,
+            std::sprintf(state.dataOutputProcessor->stamp,
                          "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s",
                          reportIDString.c_str(),
                          DayOfSimChr.c_str(),
@@ -3821,7 +3820,7 @@ namespace OutputProcessor {
                          StartMinute(),
                          EndMinute(),
                          DayType().c_str());
-            print(outputFile, "{}\n", stamp);
+            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
@@ -3839,7 +3838,7 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Hourly:
-            std::sprintf(stamp,
+            std::sprintf(state.dataOutputProcessor->stamp,
                          "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s",
                          reportIDString.c_str(),
                          DayOfSimChr.c_str(),
@@ -3850,7 +3849,7 @@ namespace OutputProcessor {
                          0.0,
                          60.0,
                          DayType().c_str());
-            print(outputFile, "{}\n", stamp);
+            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
@@ -3868,8 +3867,8 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Daily:
-            std::sprintf(stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str());
-            print(outputFile, "{}\n", stamp);
+            std::sprintf(state.dataOutputProcessor->stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str());
+            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
@@ -3887,16 +3886,16 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Monthly:
-            std::sprintf(stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month());
-            print(outputFile, "{}\n", stamp);
+            std::sprintf(state.dataOutputProcessor->stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month());
+            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(
                     static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear, Month);
             }
             break;
         case ReportingFrequency::Simulation:
-            std::sprintf(stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str());
-            print(outputFile, "{}\n", stamp);
+            std::sprintf(state.dataOutputProcessor->stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str());
+            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(
                     static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear);
@@ -4237,8 +4236,6 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        static char s[129];
-
         std::string NumberOut;   // Character for producing "number out"
         Real64 repVal(repValue); // The variable's value
 
@@ -4248,8 +4245,8 @@ namespace OutputProcessor {
         if (repVal == 0.0) {
             NumberOut = "0.0";
         } else {
-            dtoa(repVal, s);
-            NumberOut = std::string(s);
+            dtoa(repVal, state.dataOutputProcessor->s_WriteReportRealData);
+            NumberOut = std::string(state.dataOutputProcessor->s_WriteReportRealData);
         }
 
         if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
@@ -4291,15 +4288,15 @@ namespace OutputProcessor {
             if (MaxValue == 0.0) {
                 MaxOut = "0.0";
             } else {
-                dtoa(MaxValue, s);
-                MaxOut = std::string(s);
+                dtoa(MaxValue, state.dataOutputProcessor->s_WriteReportRealData);
+                MaxOut = std::string(state.dataOutputProcessor->s_WriteReportRealData);
             }
 
             if (minValue == 0.0) {
                 MinOut = "0.0";
             } else {
-                dtoa(minValue, s);
-                MinOut = std::string(s);
+                dtoa(minValue, state.dataOutputProcessor->s_WriteReportRealData);
+                MinOut = std::string(state.dataOutputProcessor->s_WriteReportRealData);
             }
 
             // Append the min and max strings with date information
@@ -4330,14 +4327,13 @@ namespace OutputProcessor {
         // This subroutine writes the cumulative meter data to the output files and
         // SQL database.
 
-        static char s[129];
         std::string NumberOut; // Character for producing "number out"
 
         if (repValue == 0.0) {
             NumberOut = "0.0";
         } else {
-            dtoa(repValue, s);
-            NumberOut = std::string(s);
+            dtoa(repValue, state.dataOutputProcessor->s_WriteCumulativeReportMeterData);
+            NumberOut = std::string(state.dataOutputProcessor->s_WriteCumulativeReportMeterData);
         }
 
         if (sqlite) {
@@ -4376,14 +4372,13 @@ namespace OutputProcessor {
         // This subroutine writes for the non-cumulative meter data to the output files and
         // SQL database.
 
-        static char s[129];
         std::string NumberOut; // Character for producing "number out"
 
         if (repValue == 0.0) {
             NumberOut = "0.0";
         } else {
-            dtoa(repValue, s);
-            NumberOut = std::string(s);
+            dtoa(repValue, state.dataOutputProcessor->s_WriteReportMeterData);
+            NumberOut = std::string(state.dataOutputProcessor->s_WriteReportMeterData);
         }
 
         if (sqlite) {
@@ -4409,15 +4404,15 @@ namespace OutputProcessor {
             if (MaxValue == 0.0) {
                 MaxOut = "0.0";
             } else {
-                dtoa(MaxValue, s);
-                MaxOut = std::string(s);
+                dtoa(MaxValue, state.dataOutputProcessor->s_WriteReportMeterData);
+                MaxOut = std::string(state.dataOutputProcessor->s_WriteReportMeterData);
             }
 
             if (minValue == 0.0) {
                 MinOut = "0.0";
             } else {
-                dtoa(minValue, s);
-                MinOut = std::string(s);
+                dtoa(minValue, state.dataOutputProcessor->s_WriteReportMeterData);
+                MinOut = std::string(state.dataOutputProcessor->s_WriteReportMeterData);
             }
 
             // Append the min and max strings with date information
@@ -4457,18 +4452,16 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        static char s[129];
-
         if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface && !state.dataSysVars->ReportDuringWarmup) return;
 
-        dtoa(repValue, s);
+        dtoa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (sqlite) {
             sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, s);
+            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
         }
     }
 
@@ -4493,16 +4486,14 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        static char s[129];
-
-        i32toa(repValue, s);
+        i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (sqlite) {
             sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, s);
+            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
         }
     }
 
@@ -4527,16 +4518,14 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        static char s[129];
-
-        i64toa(repValue, s);
+        i64toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (sqlite) {
             sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, s);
+            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
         }
     }
 
@@ -5713,11 +5702,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     Real64 MinuteNow;     // What minute it is now
     bool ReportNow;       // True if this variable should be reported now
     int CurDayType;       // What kind of day it is (weekday (sunday, etc) or holiday)
-    //////////// hoisted into namespace ////////////////////////////////////////////////
-    // static int LHourP( -1 ); // Helps set hours for timestamp output
-    // static Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
-    // static Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
-    ////////////////////////////////////////////////////////////////////////////////////
     bool EndTimeStepFlag(false); // True when it's the end of the Zone Time Step
     Real64 rxTime;                      // (MinuteNow-StartMinute)/REAL(MinutesPerTimeStep,r64) - for execution time
     auto &op(state.dataOutputProcessor);
@@ -6412,9 +6396,6 @@ void AssignReportNumber(EnergyPlusData &state, int &ReportNumber)
     // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    //////////// hoisted into namespace ////////////
-    // static int ReportNumberCounter( 0 );
-    ////////////////////////////////////////////////
 
     ++state.dataOutputProcessor->ReportNumberCounter;
     ReportNumber = state.dataOutputProcessor->ReportNumberCounter;
@@ -7838,9 +7819,6 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
     using SortAndStringUtilities::SetupAndSort;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    //////////// hoisted into namespace ///////////////////////////////////////////////
-    // static bool InitFlag( true ); // for initting the keyVarIndexes array
-    ////////////////////////////////////////////////////////////////////////////////////
     int Loop; // Loop counters
     int Loop2;
     std::string::size_type Position; // Starting point of search string

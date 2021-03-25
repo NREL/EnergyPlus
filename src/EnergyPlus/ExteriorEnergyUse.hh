@@ -147,26 +147,28 @@ namespace ExteriorEnergyUse {
 
 } // namespace ExteriorEnergyUse
 
-    struct ExteriorEnergyUseData : BaseGlobalStruct {
+struct ExteriorEnergyUseData : BaseGlobalStruct
+{
 
-        int NumExteriorLights; // Number of Exterior Light Inputs
-        int NumExteriorEqs;    // Number of Exterior Equipment Inputs
-        Array1D<ExteriorEnergyUse::ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
-        Array1D<ExteriorEnergyUse::ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
-        std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
-        bool GetExteriorEnergyInputFlag; // First time, input is "gotten"
+    int NumExteriorLights = 0;                                            // Number of Exterior Light Inputs
+    int NumExteriorEqs = 0;                                               // Number of Exterior Equipment Inputs
+    Array1D<ExteriorEnergyUse::ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
+    Array1D<ExteriorEnergyUse::ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
+    std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
+    bool GetExteriorEnergyInputFlag = true; // First time, input is "gotten"
+    Real64 sumDesignLevel = 0.0;            // for predefined report of design level total
 
-        void clear_state() override {
-            NumExteriorLights = 0;
-            NumExteriorEqs = 0;
-            ExteriorLights.deallocate();
-            ExteriorEquipment.deallocate();
-            UniqueExteriorEquipNames.clear();
-            GetExteriorEnergyInputFlag = true;
-        }
-        // Default Constructor
-        ExteriorEnergyUseData() : NumExteriorLights(0), NumExteriorEqs(0), GetExteriorEnergyInputFlag(true){}
-    };
+    void clear_state() override
+    {
+        this->NumExteriorLights = 0;
+        this->NumExteriorEqs = 0;
+        this->ExteriorLights.deallocate();
+        this->ExteriorEquipment.deallocate();
+        this->UniqueExteriorEquipNames.clear();
+        this->GetExteriorEnergyInputFlag = true;
+        this->sumDesignLevel = 0.0;
+    }
+};
 
 } // namespace EnergyPlus
 
