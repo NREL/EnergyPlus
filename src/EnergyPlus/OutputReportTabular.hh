@@ -63,6 +63,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -1078,6 +1079,101 @@ struct OutputReportTabularData : BaseGlobalStruct {
     bool initAdjFenDone = false;
     int numPeopleAdaptive = 0;
 
+    Real64 BigNum = 0.0;
+    bool VarWarning = true;
+    int ErrCount1 = 0;
+    Array1D_int MonthlyColumnsTypeOfVar;
+    Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
+    Array1D<OutputReportTabular::iAggType> MonthlyColumnsAggType;
+    Array1D_int MonthlyColumnsVarNum;
+    Array1D_int MonthlyTablesNumColumns;
+    int curFirstColumn = 0;
+    int iZoneGHGR = 0;
+    int iRadiantGHGR = 0;
+    int iunitGHGR = 0;
+    int curZoneGHGR = 0;
+    Real64 eqpSensGHGR = 0.0;
+    Real64 totalGHGR = 0.0; // the following arrays store the radiant total for each timestep
+    Array1D<Real64> radiantHeat;
+    Array1D<Real64> radiantCool;
+    Array1D<Real64> ATUHeat;
+    Array1D<Real64> ATUCool;
+    int timestepTimeStampGHGR = 0;
+    Real64 bldgHtPk = 0.0;
+    Real64 bldgClPk = 0.0;
+    Real64 timeStepRatio = 0.0;
+    Real64 totalVolume = 0.0;
+    int numUncondZones = 0;
+    int numCondZones = 0;
+    Real64 HrsPerWeek = 0.0; // sensible heat gain report totals
+    Real64 totalZoneEqHt = 0.0;
+    Real64 totalZoneEqCl = 0.0;
+    Real64 totalHvacATUHt = 0.0;
+    Real64 totalHvacATUCl = 0.0;
+    Real64 totalSurfHt = 0.0;
+    Real64 totalSurfCl = 0.0;
+    Real64 totalPeoplAdd = 0.0;
+    Real64 totalLiteAdd = 0.0;
+    Real64 totalEquipAdd = 0.0;
+    Real64 totalWindAdd = 0.0;
+    Real64 totalIzaAdd = 0.0;
+    Real64 totalInfilAdd = 0.0;
+    Real64 totalOtherAdd = 0.0;
+    Real64 totalEquipRem = 0.0;
+    Real64 totalWindRem = 0.0;
+    Real64 totalIzaRem = 0.0;
+    Real64 totalInfilRem = 0.0;
+    Real64 totalOtherRem = 0.0;
+    Real64 curConversionOffset = 0.0;
+    Real64 leedSiteIntLite = 0.0;
+    Real64 leedSiteSpHeat = 0.0;
+    Real64 leedSiteSpCool = 0.0;
+    Real64 leedSiteFanInt = 0.0;
+    Real64 leedSiteSrvWatr = 0.0;
+    Real64 leedSiteRecept = 0.0;
+    Real64 leedSiteTotal = 0.0;
+    Real64 m2_unitConv = 0.0;
+    int unitConvIndexWCCT = 0;
+    int grandTotal = 1;
+    int condTotal = 2;
+    int uncondTotal = 3;
+    int notpartTotal = 4;
+    int unitConvIndexWVST = 0;
+    Real64 m_unitConv = 0.0;
+    Real64 m2_unitConvWVST = 0.0;
+    Real64 m3_unitConv = 0.0;
+    Real64 Wm2_unitConv = 0.0;
+    Array1D<Real64> zstArea = Array1D<Real64>(4);
+    Array1D<Real64> zstVolume = Array1D<Real64>(4);
+    Array1D<Real64> zstWallArea = Array1D<Real64>(4);
+    Array1D<Real64> zstUndWallArea = Array1D<Real64>(4);
+    Array1D<Real64> zstWindowArea = Array1D<Real64>(4);
+    Array1D<Real64> zstOpeningArea = Array1D<Real64>(4);
+    Array1D<Real64> zstLight = Array1D<Real64>(4);
+    Array1D<Real64> zstPeople = Array1D<Real64>(4);
+    Array1D<Real64> zstPlug = Array1D<Real64>(4);
+    int indexUnitConvWCS = 0;
+    Real64 curValueSIWCS = 0.0;
+    Real64 curValueWCS = 0.0;
+    int ZoneNumCLCDC = 0;
+    int SurfNumCLCDC = 0;
+    int TimeStepCLCDC = 0;
+    int TimeOfPulseCLCDC = 0;
+    int CoolDesSelectedCLCDC = 0; // design day selected for cooling
+    int HeatDesSelectedCLCDC = 0; // design day selected for heating
+    int iSurfGCLS = 0;
+    int ZoneNumGCLS = 0;
+    int TimeStepInDayGCLS = 0;
+    int iZoneGCLH = 0;
+    int TimeStepInDayGCLH = 0;
+    Array1D_int IntGainTypesTubularGCLS = Array1D_int(1, {DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular});
+    Array3D_bool adjFenDone;
+    Real64 BigNumRMG = 0.0;
+    int foundGsui = 0;
+    int iUnitGsui = 0;
+    int foundGsum = 0;
+    int iUnitGsum = 0;
+
     void clear_state() override
     {
         this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
@@ -1274,6 +1370,103 @@ struct OutputReportTabularData : BaseGlobalStruct {
         this->AllocateLoadComponentArraysDoAllocate = true;
         this->initAdjFenDone = false;
         this->numPeopleAdaptive = 0;
+
+        this->BigNum = 0.0;
+        this->VarWarning = true;
+        this->ErrCount1 = 0;
+        this->MonthlyColumnsTypeOfVar.clear();
+        this->MonthlyColumnsStepType.clear();
+        this->MonthlyColumnsAggType.clear();
+        this->MonthlyColumnsVarNum.clear();
+        this->MonthlyTablesNumColumns.clear();
+        this->curFirstColumn = 0;
+        this->iZoneGHGR = 0;
+        this->iRadiantGHGR = 0;
+        this->iunitGHGR = 0;
+        this->curZoneGHGR = 0;
+        this->eqpSensGHGR = 0.0;
+        this->totalGHGR = 0.0;
+        // the following arrays store the radiant total for each timestep
+        this->radiantHeat.clear();
+        this->radiantCool.clear();
+        this->ATUHeat.clear();
+        this->ATUCool.clear();
+        this->timestepTimeStampGHGR = 0;
+        this->bldgHtPk = 0.0;
+        this->bldgClPk = 0.0;
+        this->timeStepRatio = 0.0;
+        this->totalVolume = 0.0;
+        this->numUncondZones = 0;
+        this->numCondZones = 0;
+        this->HrsPerWeek = 0.0;
+        // sensible heat gain report totals
+        this->totalZoneEqHt = 0.0;
+        this->totalZoneEqCl = 0.0;
+        this->totalHvacATUHt = 0.0;
+        this->totalHvacATUCl = 0.0;
+        this->totalSurfHt = 0.0;
+        this->totalSurfCl = 0.0;
+        this->totalPeoplAdd = 0.0;
+        this->totalLiteAdd = 0.0;
+        this->totalEquipAdd = 0.0;
+        this->totalWindAdd = 0.0;
+        this->totalIzaAdd = 0.0;
+        this->totalInfilAdd = 0.0;
+        this->totalOtherAdd = 0.0;
+        this->totalEquipRem = 0.0;
+        this->totalWindRem = 0.0;
+        this->totalIzaRem = 0.0;
+        this->totalInfilRem = 0.0;
+        this->totalOtherRem = 0.0;
+        this->curConversionOffset = 0.0;
+        this->leedSiteIntLite = 0.0;
+        this->leedSiteSpHeat = 0.0;
+        this->leedSiteSpCool = 0.0;
+        this->leedSiteFanInt = 0.0;
+        this->leedSiteSrvWatr = 0.0;
+        this->leedSiteRecept = 0.0;
+        this->leedSiteTotal = 0.0;
+        this->m2_unitConv = 0.0;
+        this->unitConvIndexWCCT = 0;
+        this->grandTotal = 1;
+        this->condTotal = 2;
+        this->uncondTotal = 3;
+        this->notpartTotal = 4;
+        this->unitConvIndexWVST = 0;
+        this->m_unitConv = 0.0;
+        this->m2_unitConvWVST = 0.0;
+        this->m3_unitConv = 0.0;
+        this->Wm2_unitConv = 0.0;
+        this->zstArea = Array1D<Real64>(4);
+        this->zstVolume = Array1D<Real64>(4);
+        this->zstWallArea = Array1D<Real64>(4);
+        this->zstUndWallArea = Array1D<Real64>(4);
+        this->zstWindowArea = Array1D<Real64>(4);
+        this->zstOpeningArea = Array1D<Real64>(4);
+        this->zstLight = Array1D<Real64>(4);
+        this->zstPeople = Array1D<Real64>(4);
+        this->zstPlug = Array1D<Real64>(4);
+        this->indexUnitConvWCS = 0;
+        this->curValueSIWCS = 0.0;
+        this->curValueWCS = 0.0;
+        this->ZoneNumCLCDC = 0;
+        this->SurfNumCLCDC = 0;
+        this->TimeStepCLCDC = 0;
+        this->TimeOfPulseCLCDC = 0;
+        this->CoolDesSelectedCLCDC = 0; // design day selected for cooling
+        this->HeatDesSelectedCLCDC = 0; // design day selected for heating
+        this->iSurfGCLS = 0;
+        this->ZoneNumGCLS = 0;
+        this->TimeStepInDayGCLS = 0;
+        this->iZoneGCLH = 0;
+        this->TimeStepInDayGCLH = 0;
+        this->IntGainTypesTubularGCLS = Array1D_int(1, {DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular});
+        this->adjFenDone.clear();
+        this->BigNumRMG = 0.0;
+        this->foundGsui = 0;
+        this->iUnitGsui = 0;
+        this->foundGsum = 0;
+        this->iUnitGsum = 0;
     }
 };
 

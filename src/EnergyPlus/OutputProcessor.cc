@@ -2850,10 +2850,6 @@ namespace OutputProcessor {
         int Loop; // Loop Control
         bool PrintTimeStamp;
         int CurDayType;
-        Real64 rDummy1(0.0);
-        Real64 rDummy2(0.0);
-        int iDummy1(0);
-        int iDummy2(0);
         auto &op(state.dataOutputProcessor);
 
         if (!state.dataResultsFramework->resultsFramework->TSMeters.rDataFrameEnabled()) {
@@ -2918,10 +2914,10 @@ namespace OutputProcessor {
                                      op->EnergyMeters(Loop).TSRptNumChr,
                                      op->EnergyMeters(Loop).TSValue,
                                      ReportingFrequency::TimeStep,
-                                     rDummy1,
-                                     iDummy1,
-                                     rDummy2,
-                                     iDummy2,
+                                     state.dataOutputProcessor->rDummy1TS,
+                                     state.dataOutputProcessor->iDummy1TS,
+                                     state.dataOutputProcessor->rDummy2TS,
+                                     state.dataOutputProcessor->iDummy2TS,
                                      op->EnergyMeters(Loop).RptTSFO);
                 state.dataResultsFramework->resultsFramework->TSMeters.pushVariableValue(op->EnergyMeters(Loop).TSRptNum, op->EnergyMeters(Loop).TSValue);
             }
@@ -2979,10 +2975,6 @@ namespace OutputProcessor {
         int Loop; // Loop Control
         bool PrintTimeStamp;
         int CurDayType;
-        Real64 rDummy1(0.0);
-        Real64 rDummy2(0.0);
-        int iDummy1(0);
-        int iDummy2(0);
         auto &op(state.dataOutputProcessor);
 
         if (!state.dataResultsFramework->resultsFramework->HRMeters.rDataFrameEnabled()) {
@@ -3024,10 +3016,10 @@ namespace OutputProcessor {
                                      op->EnergyMeters(Loop).HRRptNumChr,
                                      op->EnergyMeters(Loop).HRValue,
                                      ReportingFrequency::Hourly,
-                                     rDummy1,
-                                     iDummy1,
-                                     rDummy2,
-                                     iDummy2,
+                                     state.dataOutputProcessor->rDummy1,
+                                     state.dataOutputProcessor->iDummy1,
+                                     state.dataOutputProcessor->rDummy2,
+                                     state.dataOutputProcessor->iDummy2,
                                      op->EnergyMeters(Loop).RptHRFO); // EnergyMeters(Loop)%HRMinVal, EnergyMeters(Loop)%HRMinValDate, & |
                                                                   // EnergyMeters(Loop)%HRMaxVal, EnergyMeters(Loop)%HRMaxValDate, &
                 state.dataResultsFramework->resultsFramework->HRMeters.pushVariableValue(op->EnergyMeters(Loop).HRRptNum, op->EnergyMeters(Loop).HRValue);
@@ -4716,7 +4708,7 @@ namespace OutputProcessor {
         }
     }
 
-    int DetermineIndexGroupKeyFromMeterName(std::string const &meterName) // the meter name
+    int DetermineIndexGroupKeyFromMeterName(EnergyPlusData &state, std::string const &meterName) // the meter name
     {
 
         // FUNCTION INFORMATION:
@@ -4746,44 +4738,43 @@ namespace OutputProcessor {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int indexGroupKey(-1);
 
         // Facility indices are in the 100s
         if (has(meterName, "Electricity:Facility")) {
-            indexGroupKey = 100;
+            state.dataOutputProcessor->indexGroupKey = 100;
         } else if (has(meterName, "NaturalGas:Facility")) {
-            indexGroupKey = 101;
+            state.dataOutputProcessor->indexGroupKey = 101;
         } else if (has(meterName, "DistricHeating:Facility")) {
-            indexGroupKey = 102;
+            state.dataOutputProcessor->indexGroupKey = 102;
         } else if (has(meterName, "DistricCooling:Facility")) {
-            indexGroupKey = 103;
+            state.dataOutputProcessor->indexGroupKey = 103;
         } else if (has(meterName, "ElectricityNet:Facility")) {
-            indexGroupKey = 104;
+            state.dataOutputProcessor->indexGroupKey = 104;
 
             // Building indices are in the 200s
         } else if (has(meterName, "Electricity:Building")) {
-            indexGroupKey = 201;
+            state.dataOutputProcessor->indexGroupKey = 201;
         } else if (has(meterName, "NaturalGas:Building")) {
-            indexGroupKey = 202;
+            state.dataOutputProcessor->indexGroupKey = 202;
 
             // HVAC indices are in the 300s
         } else if (has(meterName, "Electricity:HVAC")) {
-            indexGroupKey = 301;
+            state.dataOutputProcessor->indexGroupKey = 301;
 
             // InteriorLights:Electricity:Zone indices are in the 500s
         } else if (has(meterName, "InteriorLights:Electricity:Zone")) {
-            indexGroupKey = 501;
+            state.dataOutputProcessor->indexGroupKey = 501;
 
             // InteriorLights:Electricity indices are in the 400s
         } else if (has(meterName, "InteriorLights:Electricity")) {
-            indexGroupKey = 401;
+            state.dataOutputProcessor->indexGroupKey = 401;
 
             // Unknown items have negative indices
         } else {
-            indexGroupKey = -11;
+            state.dataOutputProcessor->indexGroupKey = -11;
         }
 
-        DetermineIndexGroupKeyFromMeterName = indexGroupKey;
+        DetermineIndexGroupKeyFromMeterName = state.dataOutputProcessor->indexGroupKey;
 
         return DetermineIndexGroupKeyFromMeterName;
     }
@@ -6460,7 +6451,7 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
         if (op->ReqRepVars(Loop).Used) continue;
         if (op->ReqRepVars(Loop).Key.empty()) op->ReqRepVars(Loop).Key = "*";
         if (has(op->ReqRepVars(Loop).VarName, "OPAQUE SURFACE INSIDE FACE CONDUCTION") && !state.dataGlobal->DisplayAdvancedReportVariables && !state.dataOutputProcessor->OpaqSurfWarned) {
-            ShowWarningError(state, R"(Variables containing "Opaque Surface Inside Face Conduction" are now "advanced" variables.)");
+            ShowWarningError(state, "Variables containing \"Opaque Surface Inside Face Conduction\" are now \"advanced\" variables.");
             ShowContinueError(state, "You must enter the \"Output:Diagnostics,DisplayAdvancedReportVariables;\" statement to view.");
             ShowContinueError(state, "First, though, read cautionary statements in the \"InputOutputReference\" document.");
             state.dataOutputProcessor->OpaqSurfWarned = true;
@@ -6770,7 +6761,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
             if (!op->EnergyMeters(WhichMeter).RptTS) {
                 op->EnergyMeters(WhichMeter).RptTS = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptTSFO = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6795,7 +6786,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
             if (!op->EnergyMeters(WhichMeter).RptAccTS) {
                 op->EnergyMeters(WhichMeter).RptAccTS = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccTSFO = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6823,7 +6814,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptHR = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptHRFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingHourlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6849,7 +6840,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptAccHR = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccHRFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingHourlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6877,7 +6868,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptDY = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptDYFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingDailyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6903,7 +6894,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptAccDY = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccDYFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingDailyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6931,7 +6922,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptMN = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptMNFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingMonthlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6957,7 +6948,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptAccMN = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccMNFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingMonthlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -6985,7 +6976,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptYR = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptYRFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingYearlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -7011,7 +7002,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptAccYR = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccYRFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingYearlyVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -7039,7 +7030,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptSM = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptSMFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingRunPeriodVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -7065,7 +7056,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 op->EnergyMeters(WhichMeter).RptAccSM = true;
                 if (MeterFileOnlyIndicator) op->EnergyMeters(WhichMeter).RptAccSMFO = true;
                 if (!MeterFileOnlyIndicator) op->TrackingRunPeriodVariables = true;
-                indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(WhichMeter).Name);
+                indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(WhichMeter).Name);
                 indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(WhichMeter));
                 WriteMeterDictionaryItem(state,
                                          FrequencyIndicator,
@@ -7107,12 +7098,15 @@ int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName)
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     // Valid Meter names because matching case insensitive
+    //////////// hoisted into namespace changed to GetMeterIndexFirstCall////////////
+    // static bool FirstCall( true );
+    ////////////////////////////////////////////////
     int Found;
     auto &op(state.dataOutputProcessor);
 
     if (op->GetMeterIndexFirstCall || (state.dataOutputProcessor->NumValidMeters != op->NumEnergyMeters)) {
         state.dataOutputProcessor->NumValidMeters = op->NumEnergyMeters;
-            state.dataOutputProcessor->ValidMeterNames.allocate(state.dataOutputProcessor->NumValidMeters);
+        state.dataOutputProcessor->ValidMeterNames.allocate(state.dataOutputProcessor->NumValidMeters);
         for (Found = 1; Found <= state.dataOutputProcessor->NumValidMeters; ++Found) {
             state.dataOutputProcessor->ValidMeterNames(Found) = UtilityRoutines::MakeUPPERCase(op->EnergyMeters(Found).Name);
         }
@@ -8246,7 +8240,7 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
         Meter = UtilityRoutines::FindItem(PollutionMeters(Loop), op->EnergyMeters);
         if (Meter > 0) { // All the active meters for this run are set, but all are still searched for.
 
-            indexGroupKey = DetermineIndexGroupKeyFromMeterName(op->EnergyMeters(Meter).Name);
+            indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(Meter).Name);
             indexGroup = DetermineIndexGroupFromMeterGroup(op->EnergyMeters(Meter));
             // All of the specified meters are checked and the headers printed to the meter file if this
             //  has not been done previously

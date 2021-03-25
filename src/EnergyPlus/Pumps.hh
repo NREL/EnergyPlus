@@ -285,6 +285,7 @@ struct PumpsData : BaseGlobalStruct {
     Array1D<Pumps::ReportVars> PumpEquipReport;
     std::unordered_map<std::string, std::string> PumpUniqueNames;
 
+
     void clear_state() override
     {
         this->NumPumps = 0;

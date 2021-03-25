@@ -265,6 +265,10 @@ namespace EnergyPlus {
         this->dataTARCOGOutputs = std::make_unique<TARCOGOutputData>();
         this->dataThermalChimneys = std::make_unique<ThermalChimneysData>();
         this->dataThermalComforts = std::make_unique<ThermalComfortsData>();
+        this->dataThermalISO15099Calc = std::make_unique<ThermalISO15099CalcData>();
+        this->dataTARCOGGasses90 = std::make_unique<TARCOGGasses90Data>();
+        this->dataTARCOGMain = std::make_unique<TARCOGMainData>();
+        this->dataTarcogShading = std::make_unique<TarcogShadingData>();
         this->dataTimingsData = std::make_unique<DataTimingsData>();
         this->dataTranspiredCollector = std::make_unique<TranspiredCollectorData>();
         this->dataUCSDShared = std::make_unique<UCSDSharedData>();
@@ -513,6 +517,10 @@ namespace EnergyPlus {
         this->dataTARCOGOutputs->clear_state();
         this->dataThermalChimneys->clear_state();
         this->dataThermalComforts->clear_state();
+        this->dataThermalISO15099Calc->clear_state();
+        this->dataTARCOGGasses90->clear_state();
+        this->dataTARCOGMain->clear_state();
+        this->dataTarcogShading->clear_state();
         this->dataTimingsData->clear_state();
         this->dataTranspiredCollector->clear_state();
         this->dataUCSDShared->clear_state();

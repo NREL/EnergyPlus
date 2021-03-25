@@ -1308,7 +1308,7 @@ namespace OutputProcessor {
                                                          {"BAD INPUT", -11}};
 
         for (auto const &indexGroup : resource_map) {
-            EXPECT_EQ(indexGroup.second, DetermineIndexGroupKeyFromMeterName(indexGroup.first)) << "where meterName is " << indexGroup.first;
+            EXPECT_EQ(indexGroup.second, DetermineIndexGroupKeyFromMeterName(*state, indexGroup.first)) << "where meterName is " << indexGroup.first;
         }
     }
 

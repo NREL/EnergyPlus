@@ -864,72 +864,6 @@ namespace EnergyPlus::General {
         XX_1 = X1;
     }
 
-    Real64 InterpSw(Real64 const SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
-                    Real64 const A,         // Glazing property in unswitched state
-                    Real64 const B          // Glazing property in fully switched state
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Fred Winkelmann
-        //       DATE WRITTEN   February 1999
-
-        // PURPOSE OF THIS FUNCTION:
-        // For switchable glazing, calculates a weighted average of properties
-        // A and B
-
-        // Return value
-        Real64 InterpSw;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 locSwitchFac;
-
-        locSwitchFac = min(SwitchFac, 1.0);
-        locSwitchFac = max(locSwitchFac, 0.0);
-
-        InterpSw = (1.0 - locSwitchFac) * A + locSwitchFac * B;
-        return InterpSw;
-    }
-
-    Real64 InterpBlind(Real64 const ProfAng,           // Profile angle (rad)
-                       Array1A<Real64> const PropArray // Array of blind properties
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Winkelmann
-        //       DATE WRITTEN   May 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Does profile-angle interpolation of window blind solar-thermal properties
-
-        // METHODOLOGY EMPLOYED:
-        // Linear interpolation.
-
-        // Return value
-        Real64 InterpBlind;
-
-        // Argument array dimensioning
-        PropArray.dim(37);
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 InterpFac; // Interpolation factor
-        int IAlpha;       // Profile angle index
-
-        if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-            InterpBlind = 0.0;
-        } else {
-            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);
-            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
-            InterpBlind = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
-        }
-        return InterpBlind;
-    }
-
     Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
                          Array1S<Real64> const PropArray // Array of blind properties
     )
@@ -1011,7 +945,8 @@ namespace EnergyPlus::General {
         if (VarSlats) { // Variable-angle slats
             IBeta = 1 + int(SlatAng1 * DeltaAng_inv);
             InterpFac = (SlatAng1 - DeltaAng * (IBeta - 1)) * DeltaAng_inv;
-            InterpSlatAng = PropArray(IBeta) + InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
+            InterpSlatAng = PropArray(IBeta) +
+                    InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
         } else { // Fixed-angle slats or shade
             InterpSlatAng = PropArray(1);
         }
