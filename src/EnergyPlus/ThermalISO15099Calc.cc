@@ -2591,7 +2591,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
             if (delt == 0.0) delt = 1.0e-6;
             for (l = 1; l <= nmix(i + 1); ++l) {
                 state.dataThermalISO15099Calc->ipropg(l) = iprop(l, i + 1);
-                state.dataThermalISO15099Calc->ipropg(l) = frct(l, i + 1);
+                state.dataThermalISO15099Calc->frctg(l) = frct(l, i + 1);
             }
 
             if (presure(i + 1) > VacuumPressure) {
