@@ -59,8 +59,8 @@ namespace EnergyPlus {
         this->dataAirLoop = std::make_unique<DataAirLoopData>();
         this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
         this->dataAirSystemsData = std::make_unique<AirSystemsData>();
-        this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
         this->dataAirflowNetwork = std::make_unique<AirflowNetworkData>();
+        this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
         this->dataAutoSizingBase = std::make_unique<AutoSizingBaseData>();
         this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
         this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
@@ -190,11 +190,12 @@ namespace EnergyPlus {
         this->dataNodeInputMgr = std::make_unique<NodeInputManagerData>();
         this->dataOutAirNodeMgr = std::make_unique<OutAirNodeManagerData>();
         this->dataOutRptPredefined = std::make_unique<OutputReportPredefinedData>();
+        this->dataOutRptTab = std::make_unique<OutputReportTabularData>();
         this->dataOutdoorAirUnit = std::make_unique<OutdoorAirUnitData>();
         this->dataOutput = std::make_unique<OutputsData>();
         this->dataOutputProcessor = std::make_unique<OutputProcessorData>();
-        this->dataOutRptTab = std::make_unique<OutputReportTabularData>();
         this->dataOutputReportTabularAnnual = std::make_unique<OutputReportTabularAnnualData>();
+        this->dataOutputReports = std::make_unique<OutputReportsData>();
         this->dataOutsideEnergySrcs = std::make_unique<OutsideEnergySourcesData>();
         this->dataPTHP = std::make_unique<PackagedTerminalHeatPumpData>();
         this->dataPVWatts = std::make_unique<PVWattsData>();
@@ -306,8 +307,8 @@ namespace EnergyPlus {
         this->dataAirLoop->clear_state();
         this->dataAirLoopHVACDOAS->clear_state();
         this->dataAirSystemsData->clear_state();
-        this->dataAirflowNetworkBalanceManager->clear_state();
         this->dataAirflowNetwork->clear_state();
+        this->dataAirflowNetworkBalanceManager->clear_state();
         this->dataAutoSizingBase->clear_state();
         this->dataBSDFWindow->clear_state();
         this->dataBaseSizerFanHeatInputs->clear_state();
@@ -437,11 +438,12 @@ namespace EnergyPlus {
         this->dataNodeInputMgr->clear_state();
         this->dataOutAirNodeMgr->clear_state();
         this->dataOutRptPredefined->clear_state();
+        this->dataOutRptTab->clear_state();
         this->dataOutdoorAirUnit->clear_state();
         this->dataOutput->clear_state();
         this->dataOutputProcessor->clear_state();
-        this->dataOutRptTab->clear_state();
         this->dataOutputReportTabularAnnual->clear_state();
+        this->dataOutputReports->clear_state();
         this->dataOutsideEnergySrcs->clear_state();
         this->dataPTHP->clear_state();
         this->dataPVWatts->clear_state();

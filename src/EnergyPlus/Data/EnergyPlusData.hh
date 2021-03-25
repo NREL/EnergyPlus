@@ -206,6 +206,7 @@ struct OutputProcessorData;
 struct OutputReportPredefinedData;
 struct OutputReportTabularAnnualData;
 struct OutputReportTabularData;
+struct OutputReportsData;
 struct OutputsData;
 struct OutsideEnergySourcesData;
 struct PVWattsData;
@@ -456,6 +457,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<OutputReportPredefinedData> dataOutRptPredefined;
     std::unique_ptr<OutputReportTabularAnnualData> dataOutputReportTabularAnnual;
     std::unique_ptr<OutputReportTabularData> dataOutRptTab;
+    std::unique_ptr<OutputReportsData> dataOutputReports;
     std::unique_ptr<OutputsData> dataOutput;
     std::unique_ptr<OutsideEnergySourcesData> dataOutsideEnergySrcs;
     std::unique_ptr<PVWattsData> dataPVWatts;

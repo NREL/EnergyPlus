@@ -211,6 +211,7 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
+#include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
