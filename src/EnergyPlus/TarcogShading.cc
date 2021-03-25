@@ -51,6 +51,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGasses90.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
@@ -180,8 +181,6 @@ namespace TarcogShading {
         Real64 hc;
         Real64 hc1;
         Real64 hc2;
-        static Array1D<Real64> frct1(maxgas);
-        static Array1D<Real64> frct2(maxgas);
         Real64 speed;
         Real64 Tav;
         Real64 Tgap;
@@ -202,8 +201,6 @@ namespace TarcogShading {
         int k;
         int nmix1;
         int nmix2;
-        static Array1D_int iprop1(maxgas);
-        static Array1D_int iprop2(maxgas);
 
         // init vectors:
         qv = 0.0;
@@ -230,10 +227,10 @@ namespace TarcogShading {
                 press1 = pressure(i);
                 press2 = pressure(i + 1);
                 for (j = 1; j <= maxgas; ++j) {
-                    iprop1(j) = iprop(j, i);
-                    iprop2(j) = iprop(j, i + 1);
-                    frct1(j) = frct(j, i);
-                    frct2(j) = frct(j, i + 1);
+                    state.dataTarcogShading->iprop1(j) = iprop(j, i);
+                    state.dataTarcogShading->iprop2(j) = iprop(j, i + 1);
+                    state.dataTarcogShading->frct1(j) = frct(j, i);
+                    state.dataTarcogShading->frct2(j) = frct(j, i + 1);
                 } // j
 
                 // dr.......shading on outdoor side
@@ -246,12 +243,12 @@ namespace TarcogShading {
 
                     // bi......use Tout as temp of the air at inlet
                     shadingedge(state,
-                                iprop1,
-                                frct1,
+                                state.dataTarcogShading->iprop1,
+                                state.dataTarcogShading->frct1,
                                 press1,
                                 nmix1,
-                                iprop2,
-                                frct2,
+                                state.dataTarcogShading->iprop2,
+                                state.dataTarcogShading->frct2,
                                 press2,
                                 nmix2,
                                 xwght,
@@ -310,12 +307,12 @@ namespace TarcogShading {
 
                     // bi.........use Tin as temp of the air at inlet
                     shadingedge(state,
-                                iprop2,
-                                frct2,
+                                state.dataTarcogShading->iprop2,
+                                state.dataTarcogShading->frct2,
                                 press2,
                                 nmix2,
-                                iprop1,
-                                frct1,
+                                state.dataTarcogShading->iprop1,
+                                state.dataTarcogShading->frct1,
                                 press1,
                                 nmix1,
                                 xwght,
@@ -373,8 +370,8 @@ namespace TarcogShading {
 
                     if ((CalcForcedVentilation != 0) && ((vvent(i) != 0) || (vvent(i + 1) != 0))) {
                         forcedventilation(state,
-                                          iprop1,
-                                          frct1,
+                                          state.dataTarcogShading->iprop1,
+                                          state.dataTarcogShading->frct1,
                                           press1,
                                           nmix1,
                                           xwght,
@@ -393,8 +390,8 @@ namespace TarcogShading {
                                           nperr,
                                           ErrorMessage);
                         forcedventilation(state,
-                                          iprop2,
-                                          frct2,
+                                          state.dataTarcogShading->iprop2,
+                                          state.dataTarcogShading->frct2,
                                           press2,
                                           nmix1,
                                           xwght,
@@ -413,12 +410,13 @@ namespace TarcogShading {
                                           nperr,
                                           ErrorMessage);
                     } else {
-                        shadingin(state,iprop1,
-                                  frct1,
+                        shadingin(state,
+                                  state.dataTarcogShading->iprop1,
+                                  state.dataTarcogShading->frct1,
                                   press1,
                                   nmix1,
-                                  iprop2,
-                                  frct2,
+                                  state.dataTarcogShading->iprop2,
+                                  state.dataTarcogShading->frct2,
                                   press2,
                                   nmix2,
                                   xwght,

@@ -53,8 +53,14 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
+
+// Using/Aliasing
+using namespace TARCOGGassesParams;
+using namespace TARCOGParams;
 
 namespace TarcogShading {
 
@@ -205,6 +211,22 @@ namespace TarcogShading {
     );
 
 } // namespace TarcogShading
+
+struct TarcogShadingData : BaseGlobalStruct {
+
+    Array1D<Real64> frct1 = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D<Real64> frct2 = Array1D<Real64>(TARCOGGassesParams::maxgas);
+    Array1D_int iprop1 = Array1D_int(TARCOGGassesParams::maxgas);
+    Array1D_int iprop2 = Array1D_int(TARCOGGassesParams::maxgas);
+
+    void clear_state() override
+    {
+        frct1.clear();
+        frct2.clear();
+        iprop1.clear();
+        iprop2.clear();
+    }
+};
 
 } // namespace EnergyPlus
 
