@@ -59,17 +59,13 @@ namespace EnergyPlus {
 
 namespace HysteresisPhaseChange {
 
-    bool getHysteresisModels(true);
-    int numHysteresisModels = 0;
-    std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
-
     HysteresisPhaseChange *HysteresisPhaseChange::factory(EnergyPlusData &state, const std::string &objectName)
     {
-        if (getHysteresisModels) {
+        if (state.dataHysteresisPhaseChange->getHysteresisModels) {
             readAllHysteresisModels(state);
-            getHysteresisModels = false;
+            state.dataHysteresisPhaseChange->getHysteresisModels = false;
         }
-        for (auto &hm : hysteresisPhaseChangeModels) {
+        for (auto &hm : state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels) {
             if (hm.name == objectName) {
                 return &hm;
             }
@@ -323,10 +319,10 @@ namespace HysteresisPhaseChange {
 
         // convenience variables
         state.dataIPShortCut->cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-        numHysteresisModels = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataHysteresisPhaseChange->numHysteresisModels = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         // loop over all hysteresis input instances, if zero, this will simply not do anything
-        for (int hmNum = 1; hmNum <= numHysteresisModels; ++hmNum) {
+        for (int hmNum = 1; hmNum <= state.dataHysteresisPhaseChange->numHysteresisModels; ++hmNum) {
 
             // just a few vars to pass in and out to GetObjectItem
             int ioStatus;
@@ -355,7 +351,7 @@ namespace HysteresisPhaseChange {
             }
 
             // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-            for (auto &existingHysteresisModel : hysteresisPhaseChangeModels) {
+            for (auto &existingHysteresisModel : state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels) {
                 if (state.dataIPShortCut->cAlphaArgs(1) == existingHysteresisModel.name) {
                     ShowFatalError(state, "Invalid input for " + state.dataIPShortCut->cCurrentModuleObject +
                                    " object: Duplicate name found: " + existingHysteresisModel.name);
@@ -380,15 +376,8 @@ namespace HysteresisPhaseChange {
             thisHM.deltaTempFreezingLow = state.dataIPShortCut->rNumericArgs(13);
             thisHM.specHeatTransition = (thisHM.specificHeatSolid + thisHM.specificHeatLiquid) / 2.0;
             thisHM.CpOld = thisHM.specificHeatSolid;
-            hysteresisPhaseChangeModels.push_back(thisHM);
+            state.dataHysteresisPhaseChange->hysteresisPhaseChangeModels.push_back(thisHM);
         }
-    }
-
-    void clear_state()
-    {
-        numHysteresisModels = 0;
-        getHysteresisModels = true;
-        hysteresisPhaseChangeModels.clear();
     }
 
 } // namespace HysteresisPhaseChange
