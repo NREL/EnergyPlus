@@ -99,15 +99,15 @@ struct TARCOGGasses90Data : BaseGlobalStruct {
 
     void clear_state() override
     {
-        fvis.clear();
-        fcon.clear();
-        fdens.clear();
-        fcp.clear();
-        kprime.clear();
-        kdblprm.clear();
-        mukpdwn.clear();
-        kpdown.clear();
-        kdpdown.clear();
+        fvis = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        fcon = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        fdens = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        fcp = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        kprime = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        kdblprm = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        mukpdwn = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        kpdown = Array1D<Real64>(TARCOGGassesParams::maxgas);
+        kdpdown = Array1D<Real64>(TARCOGGassesParams::maxgas);
     }
 };
 
