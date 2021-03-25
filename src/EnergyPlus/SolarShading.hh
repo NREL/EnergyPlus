@@ -453,16 +453,16 @@ struct SolarShadingData : BaseGlobalStruct {
     Array1D<Real64> YVert;
     Array1D<Real64> ZVert;
     Array1D<Real64> AbsBeamWin;                  // Glass layer beam solar absorptance of a window
-    Array1D<Real64> AbsBeamWinEQL; // layers beam solar absorptance of a window (CFSMAXNL+1)
+    Array1D<Real64> AbsBeamWinEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1); // layers beam solar absorptance of a window
     Array1D<Real64> ExtBeamAbsByShadFac; // Factor for exterior beam radiation absorbed by shade (1/m2) (absorbed radation = beam incident * ExtBeamAbsByShad
     Array1D<Real64> IntBeamAbsByShadFac; // Like ExtBeamAbsByShadFac, but for interior beam radiation.
     Array1D<Real64> WinTransBmSolar;     // Factor for exterior beam solar transmitted through window, or window plus shade, into zone at current time (m2)
     Array1D<Real64> WinTransDifSolar; // Factor for exterior diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
     Array1D<Real64> WinTransDifSolarGnd; // Factor for exterior ground diffuse solar transmitted through window with horizontally-slatted blind into zone at current time (m2)
     Array1D<Real64> WinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through window with horizontally-slatted blind into zone at current time (m2)
-    Array2D<Real64> AbsSolBeamEQL;     // absorbed exterior beam radiation by layers fraction (2, CFSMAXNL+1)
-    Array2D<Real64> AbsSolDiffEQL;     // absorbed exterior diffuse radiation by layers fraction (2, CFSMAXNL+1)
-    Array2D<Real64> AbsSolBeamBackEQL; // absorbed interior beam radiation by layers fraction from back (2, CFSMAXNL+1)
+    Array2D<Real64> AbsSolBeamEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed exterior beam radiation by layers fraction
+    Array2D<Real64> AbsSolDiffEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed exterior diffuse radiation by layers fraction
+    Array2D<Real64> AbsSolBeamBackEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed interior beam radiation by layers fraction from back
     Array1D<Real64> WinTransBmBmSolar; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
     Array1D<Real64> WinTransBmDifSolar; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
     Real64 ThetaBig = 0.0;        // Larger of ThetaBlock1 and ThetaBlock2     //Autodesk Used uninitialized in some runs
@@ -564,16 +564,16 @@ struct SolarShadingData : BaseGlobalStruct {
         this->YVert.deallocate();
         this->ZVert.deallocate();
         this->AbsBeamWin.deallocate();
-        this->AbsBeamWinEQL.deallocate();
+        this->AbsBeamWinEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1);
         this->ExtBeamAbsByShadFac.deallocate();
         this->IntBeamAbsByShadFac.deallocate();
         this->WinTransBmSolar.deallocate();
         this->WinTransDifSolar.deallocate();
         this->WinTransDifSolarGnd.deallocate();
         this->WinTransDifSolarSky.deallocate();
-        this->AbsSolBeamEQL.deallocate();
-        this->AbsSolDiffEQL.deallocate();
-        this->AbsSolBeamBackEQL.deallocate();
+        this->AbsSolBeamEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
+        this->AbsSolDiffEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
+        this->AbsSolBeamBackEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
         this->WinTransBmBmSolar.deallocate();
         this->WinTransBmDifSolar.deallocate();
         this->ThetaBig = 0.0;
