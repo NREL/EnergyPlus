@@ -99,6 +99,15 @@ struct TARCOGGasses90Data : BaseGlobalStruct {
 
     void clear_state() override
     {
+        fvis.clear();
+        fcon.clear();
+        fdens.clear();
+        fcp.clear();
+        kprime.clear();
+        kdblprm.clear();
+        mukpdwn.clear();
+        kpdown.clear();
+        kdpdown.clear();
     }
 };
 

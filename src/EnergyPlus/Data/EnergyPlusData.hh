@@ -275,6 +275,7 @@ struct ThermalChimneysData;
 struct ThermalComfortsData;
 struct ThermalISO15099CalcData;
 struct TARCOGGasses90Data;
+struct TARCOGMainData;
 struct TarcogShadingData;
 struct TranspiredCollectorData;
 struct UCSDSharedData;
@@ -527,6 +528,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<ThermalComfortsData> dataThermalComforts;
     std::unique_ptr<ThermalISO15099CalcData> dataThermalISO15099Calc;
     std::unique_ptr<TARCOGGasses90Data> dataTARCOGGasses90;
+    std::unique_ptr<TARCOGMainData> dataTARCOGMain;
     std::unique_ptr<TarcogShadingData> dataTarcogShading;
     std::unique_ptr<TranspiredCollectorData> dataTranspiredCollector;
     std::unique_ptr<UCSDSharedData> dataUCSDShared;

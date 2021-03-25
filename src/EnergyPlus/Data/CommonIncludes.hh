@@ -267,6 +267,7 @@
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/TARCOGGasses90.hh>
+#include <EnergyPlus/TARCOGMain.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/TarcogShading.hh>
 #include <EnergyPlus/ThermalChimney.hh>

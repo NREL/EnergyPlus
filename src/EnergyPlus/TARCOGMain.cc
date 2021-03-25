@@ -49,6 +49,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/TARCOGArgs.hh>
 #include <EnergyPlus/TARCOGDeflection.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
@@ -621,16 +622,9 @@ namespace EnergyPlus::TARCOGMain {
         Real64 trminTemp;
         Real64 hinTemp;
         Real64 houtTemp;
-        static Array1D<Real64> sconTemp(maxlay);
-        static Array1D<Real64> thickTemp(maxlay);
 
         // REAL(r64), dimension(maxlay) ::  sol ! Vector of Absorbed solar energy for each layer [W/m2] = dir*asol
 
-        // Internaly used
-        static bool converged(false); // used for convergence check in case of deflection calculations
-        static Array1D<Real64> told(maxlay2);
-        static Array1D<Real64> CurGap(MaxGap);
-        static Array1D<Real64> GapDefMean(MaxGap);
         Real64 dtmax;
         int i;
         int counter;
@@ -654,7 +648,7 @@ namespace EnergyPlus::TARCOGMain {
         ErrorMessage = "Normal Termination";
 
         for (i = 1; i <= nlayer - 1; ++i) {
-            CurGap(i) = gap(i);
+            state.dataTARCOGMain->CurGap(i) = gap(i);
         }
 
         Files files;
@@ -749,7 +743,7 @@ namespace EnergyPlus::TARCOGMain {
                             thick,
                             gap,
                             GapDefMax,
-                            GapDefMean,
+                            state.dataTARCOGMain->GapDefMean,
                             theta,
                             YoungsMod,
                             PoissonsRat,
@@ -757,7 +751,7 @@ namespace EnergyPlus::TARCOGMain {
                             nperr,
                             ErrorMessage);
             for (i = 1; i <= nlayer - 1; ++i) {
-                CurGap(i) = GapDefMean(i);
+                state.dataTARCOGMain->CurGap(i) = state.dataTARCOGMain->GapDefMean(i);
             } // do i = 1, nlayer - 1
         }
 
@@ -769,8 +763,8 @@ namespace EnergyPlus::TARCOGMain {
             trminTemp = trmin;
             hinTemp = hin;
             houtTemp = hout;
-            sconTemp = scon;
-            thickTemp = thick;
+            state.dataTARCOGMain->sconTemp = scon;
+            state.dataTARCOGMain->thickTemp = thick;
         }
 
         if (GoAhead(nperr)) {
@@ -792,7 +786,7 @@ namespace EnergyPlus::TARCOGMain {
                               fclr,
                               VacuumPressure,
                               VacuumMaxGapThickness,
-                              CurGap,
+                              state.dataTARCOGMain->CurGap,
                               thick,
                               scon,
                               tir,
@@ -877,7 +871,7 @@ namespace EnergyPlus::TARCOGMain {
                            nlayer,
                            tout,
                            tind,
-                           CurGap,
+                           state.dataTARCOGMain->CurGap,
                            thick,
                            scon,
                            emis,
@@ -918,8 +912,8 @@ namespace EnergyPlus::TARCOGMain {
             }
 
             if (CalcDeflection == DEFLECTION_CALC_TEMPERATURE) {
-                converged = false;
-                while (!(converged)) {
+                state.dataTARCOGMain->converged = false;
+                while (!(state.dataTARCOGMain->converged)) {
                     PanesDeflection(CalcDeflection,
                                     width,
                                     height,
@@ -930,7 +924,7 @@ namespace EnergyPlus::TARCOGMain {
                                     thick,
                                     gap,
                                     GapDefMax,
-                                    GapDefMean,
+                                    state.dataTARCOGMain->GapDefMean,
                                     theta,
                                     YoungsMod,
                                     PoissonsRat,
@@ -944,7 +938,7 @@ namespace EnergyPlus::TARCOGMain {
 
                     // store temperatures before new calculations are performed. This is necessary in order to determine
                     for (i = 1; i <= 2 * nlayer; ++i) {
-                        told(i) = theta(i);
+                        state.dataTARCOGMain->told(i) = theta(i);
                     } // do i=1, 2*nlayer
 
                     // before calling thermal calculations, return back old variables
@@ -952,8 +946,8 @@ namespace EnergyPlus::TARCOGMain {
                     trmin = trminTemp;
                     hin = hinTemp;
                     hout = houtTemp;
-                    scon = sconTemp;
-                    thick = thickTemp;
+                    scon = state.dataTARCOGMain->sconTemp;
+                    thick = state.dataTARCOGMain->thickTemp;
 
                     // after performed deflection recalculate temperatures with new gap widths
                     if (standard == ISO15099) {
@@ -973,7 +967,7 @@ namespace EnergyPlus::TARCOGMain {
                                       fclr,
                                       VacuumPressure,
                                       VacuumMaxGapThickness,
-                                      GapDefMean,
+                                      state.dataTARCOGMain->GapDefMean,
                                       thick,
                                       scon,
                                       tir,
@@ -1058,7 +1052,7 @@ namespace EnergyPlus::TARCOGMain {
                                    nlayer,
                                    tout,
                                    tind,
-                                   GapDefMean,
+                                   state.dataTARCOGMain->GapDefMean,
                                    thick,
                                    scon,
                                    emis,
@@ -1098,16 +1092,16 @@ namespace EnergyPlus::TARCOGMain {
                     // calc error
                     dtmax = 0.0;
                     for (i = 1; i <= 2 * nlayer; ++i) {
-                        dtmax = std::abs(told(i) - theta(i));
+                        dtmax = std::abs(state.dataTARCOGMain->told(i) - theta(i));
                     } // do i=1, 2*nlayer
 
                     if (dtmax < DeflectionErrorMargin) {
-                        converged = true;
+                        state.dataTARCOGMain->converged = true;
                     }
                     ++counter;
 
                     if (counter > DeflectionMaxIterations) {
-                        converged = true;
+                        state.dataTARCOGMain->converged = true;
                         nperr = 41; // Deflection calculations failed to converge
                         ErrorMessage = "Deflection calculations failed to converge";
                     }
