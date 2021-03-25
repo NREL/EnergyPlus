@@ -1221,7 +1221,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
         } // if WriteDebugOutput.eq.true - writing output file
     }
 
-    void therm1d(Files &files,
+    void therm1d(EnergyPlusData &state,
+                 Files &files,
                  int const nlayer,
                  int const iwd,
                  Real64 &tout,
@@ -1378,7 +1379,6 @@ namespace EnergyPlus::ThermalISO15099Calc {
         Array2D<Real64> a(4 * nlayer, 4 * nlayer);
         Array1D<Real64> b(4 * nlayer);
         static Array1D<Real64> hgas(maxlay1);
-        // REAL(r64) :: hhatv(maxlay3),hcv(maxlay3), Ebgap(maxlay3), Tgap(maxlay1)
         static Array1D<Real64> Tgap(maxlay1);
         static Array1D<Real64> hcgapMod(maxlay1);
         static Array1D<Real64> hcv(maxlay1);
@@ -1677,7 +1677,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
 
             LeftHandSide = a;
             RightHandSide = b;
-            EquationsSolver(LeftHandSide, RightHandSide, 4 * nlayer, nperr, ErrorMessage);
+            EquationsSolver(state, LeftHandSide, RightHandSide, 4 * nlayer, nperr, ErrorMessage);
 
             // Simon: This is much better, but also much slower convergence criteria.  Think of how to make this flexible and allow
             // user to change this from outside (through argument passing)

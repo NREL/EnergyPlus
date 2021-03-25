@@ -153,7 +153,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                        int &NumOfIterations,
                        Real64 egdeGlCorrFac);
 
-    void therm1d(TARCOGOutput::Files &files,
+    void therm1d(EnergyPlusData &state,
+                 TARCOGOutput::Files &files,
                  int nlayer,
                  int iwd,
                  Real64 &tout,

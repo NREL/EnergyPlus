@@ -270,6 +270,7 @@ struct SystemAirFlowSizerData;
 struct SystemAvailabilityManagerData;
 struct SystemReportsData;
 struct SystemVarsData;
+struct TARCOGCommonData;
 struct TARCOGOutputData;
 struct ThermalChimneysData;
 struct ThermalComfortsData;
@@ -519,6 +520,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<SystemAvailabilityManagerData> dataSystemAvailabilityManager;
     std::unique_ptr<SystemReportsData> dataSysRpts;
     std::unique_ptr<SystemVarsData> dataSysVars;
+    std::unique_ptr<TARCOGCommonData> dataTARCOGCommon;
     std::unique_ptr<TARCOGOutputData> dataTARCOGOutputs;
     std::unique_ptr<ThermalChimneysData> dataThermalChimneys;
     std::unique_ptr<ThermalComfortsData> dataThermalComforts;

@@ -260,6 +260,7 @@ namespace EnergyPlus {
         this->dataSysRpts = std::make_unique<SystemReportsData>();
         this->dataSysVars = std::make_unique<SystemVarsData>();
         this->dataSystemAvailabilityManager = std::make_unique<SystemAvailabilityManagerData>();
+        this->dataTARCOGCommon = std::make_unique<TARCOGCommonData>();
         this->dataTARCOGOutputs = std::make_unique<TARCOGOutputData>();
         this->dataThermalChimneys = std::make_unique<ThermalChimneysData>();
         this->dataThermalComforts = std::make_unique<ThermalComfortsData>();
@@ -506,6 +507,7 @@ namespace EnergyPlus {
         this->dataSysRpts->clear_state();
         this->dataSysVars->clear_state();
         this->dataSystemAvailabilityManager->clear_state();
+        this->dataTARCOGCommon->clear_state();
         this->dataTARCOGOutputs->clear_state();
         this->dataThermalChimneys->clear_state();
         this->dataThermalComforts->clear_state();
