@@ -1889,6 +1889,7 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
 
             // Calculate operating part load ratio for cooling
             if (lAvailableHeatingCapacity <= 0.0) {
+                lAvailableHeatingCapacity = 0.0;
                 lHeatPartLoadRatio = 0.0;
             } else
             {
