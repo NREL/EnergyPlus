@@ -1586,16 +1586,17 @@ namespace UtilityRoutines {
         using DataStringGlobals::IDDVerString;
         using DataStringGlobals::VerString;
 
-        auto *err_stream = []() -> std::ostream *{
-            // NOTE: this is called in too many places to justify changing the interface right now,
-            // so we are using the Singleton (not ideal)
-            if (IOFiles::hasSingleton()) {
-                return IOFiles::getSingleton().err_stream.get();
-            } else {
-                return nullptr;
-            }
-        }();
+//        auto *err_stream = []() -> std::ostream *{
+//            // NOTE: this is called in too many places to justify changing the interface right now,
+//            // so we are using the Singleton (not ideal)
+//            if (IOFiles::hasSingleton()) {
+//                return IOFiles::getSingleton().err_stream.get();
+//            } else {
+//                return nullptr;
+//            }
+//        }();
 
+        auto *err_stream = state.files.err_stream.get();
 
         if (state.dataUtilityRoutines->outputErrorHeader && err_stream) {
             *err_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';

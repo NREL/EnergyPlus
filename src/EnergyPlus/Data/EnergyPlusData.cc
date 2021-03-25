@@ -53,9 +53,6 @@
 namespace EnergyPlus {
 
     EnergyPlusData::EnergyPlusData() {
-        // todo, try to eliminate the need for the singleton
-        IOFiles::setSingleton(&files);
-
         this->dataAirLoop = std::make_unique<DataAirLoopData>();
         this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
         this->dataAirSystemsData = std::make_unique<AirSystemsData>();
