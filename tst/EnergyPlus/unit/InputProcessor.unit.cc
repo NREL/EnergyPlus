@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "Fixtures/InputProcessorFixture.hh"
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -222,7 +221,7 @@ TEST_F(InputProcessorFixture, decode_encode_1)
         "  Relative;",
         "",
         "Version,",
-        "  " + state->dataStrGlobals->MatchVersion + ";",
+        "  " + DataStringGlobals::MatchVersion + ";",
         ""
     });
 
@@ -269,7 +268,7 @@ TEST_F(InputProcessorFixture, decode_encode_2)
         "  Relative;",
         "",
         "Version,",
-        "  " + state->dataStrGlobals->MatchVersion + ";",
+        "  " + DataStringGlobals::MatchVersion + ";",
         "",
         "Zone,",
         "  Core_mid,",
@@ -338,7 +337,7 @@ TEST_F(InputProcessorFixture, decode_encode_3)
       "  10.0;",
       "",
       "Version,",
-      "  " + state->dataStrGlobals->MatchVersion + ";",
+      "  " + DataStringGlobals::MatchVersion + ";",
       ""
     }));
 
@@ -353,7 +352,7 @@ TEST_F(InputProcessorFixture, byte_order_mark)
             {
                     "\xEF\xBB\xBF Building,Bldg,0,Suburbs,0.04,0.4,FullExterior,25,6;",
                     "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative,Relative,Relative;",
-                    "Version," + state->dataStrGlobals->MatchVersion + ";"
+                    "Version," + DataStringGlobals::MatchVersion + ";"
             }));
 
     auto const expected(delimited_string({
@@ -375,7 +374,7 @@ TEST_F(InputProcessorFixture, byte_order_mark)
         "  Relative;",
         "",
         "Version,",
-        "  " + state->dataStrGlobals->MatchVersion + ";",
+        "  " + DataStringGlobals::MatchVersion + ";",
         ""
     }));
 
@@ -514,7 +513,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_1)
       "\"Version\":{"
         "\"\":{"
           "\"idf_order\":0,"
-          "\"version_identifier\":\"" + state->dataStrGlobals->MatchVersion + "\""
+          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
         "}"
       "}}"
     );
@@ -560,7 +559,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_2)
       "\"Version\":{"
         "\"\":{"
           "\"idf_order\":0,"
-          "\"version_identifier\":\"" + state->dataStrGlobals->MatchVersion + "\""
+          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
         "}"
       "}}"
     );
@@ -608,7 +607,7 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
       "\"Version\":{"
         "\"\":{"
           "\"idf_order\":0,"
-          "\"version_identifier\":\"" + state->dataStrGlobals->MatchVersion + "\""
+          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
         "}"
       "}}"
     );
@@ -902,7 +901,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                          {"minimum_number_of_warmup_days", 6}}}}},
                      {"Version",
                       {{"",
-                        {{"version_identifier", state->dataStrGlobals->MatchVersion}}}}}};
+                        {{"version_identifier", DataStringGlobals::MatchVersion}}}}}};
 
     auto const expected_idf(delimited_string({"Building,",
                                               "  Bldg,",
@@ -943,7 +942,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                                               "  Relative;",
                                               "",
                                               "Version,",
-                                              "  " + state->dataStrGlobals->MatchVersion + ";",
+                                              "  " + DataStringGlobals::MatchVersion + ";",
                                               ""}));
 
     EXPECT_TRUE(process_idf(idf));

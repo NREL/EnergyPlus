@@ -70,7 +70,7 @@ extern "C" {
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
-#include <EnergyPlus/DataStringGlobals.in.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DaylightingManager.hh>
@@ -1585,10 +1585,22 @@ namespace UtilityRoutines {
         // If arguments OutUnit1 and/or OutUnit2 are present the
         // error message is written to these as well and the standard one.
 
+        using DataStringGlobals::VerString;
+
+//        auto *err_stream = []() -> std::ostream *{
+//            // NOTE: this is called in too many places to justify changing the interface right now,
+//            // so we are using the Singleton (not ideal)
+//            if (IOFiles::hasSingleton()) {
+//                return IOFiles::getSingleton().err_stream.get();
+//            } else {
+//                return nullptr;
+//            }
+//        }();
+
         auto *err_stream = state.files.err_stream.get();
 
         if (state.dataUtilityRoutines->outputErrorHeader && err_stream) {
-            *err_stream << "Program Version," << state.dataStrGlobals->VerString << ',' << state.dataStrGlobals->IDDVerString << '\n';
+            *err_stream << "Program Version," << VerString << ',' << state.dataStrGlobals->IDDVerString << '\n';
             state.dataUtilityRoutines->outputErrorHeader = false;
         }
 

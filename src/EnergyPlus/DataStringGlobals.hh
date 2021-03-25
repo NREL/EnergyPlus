@@ -82,6 +82,10 @@ namespace DataStringGlobals {
     char constexpr CharTab('\t');      // tab
     char constexpr CharSpace(' ');     // space
 
+    extern std::string VerString;            // String that represents version information
+    extern std::string MatchVersion;         // String to be matched by Version object
+    extern std::string PythonAPIVersion;
+
 } // namespace DataStringGlobals
 
 struct DataStringGlobalsData : BaseGlobalStruct {
@@ -123,10 +127,7 @@ struct DataStringGlobalsData : BaseGlobalStruct {
     std::string IDDVerString;         // Version information from the IDD (line 1)
     std::string CurrentDateTime;      // For printing current date and time at start of run
 
-    std::string VerString = "EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}";
-    std::string MatchVersion = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"; // String to be matched by Version object
-    std::string PythonAPIVersion = "${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"; // API version string to be matched when using the Python API
-
+    
     void clear_state() override
     {
         eplusADSFileName.clear();

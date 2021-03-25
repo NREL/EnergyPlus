@@ -136,7 +136,7 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
     // make sure the static variables are cleared
     UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
 
-    state->dataStrGlobals->VerString = "EnergyPlus, Version 0.0.0-xxxx, August 14 1945";
+    DataStringGlobals::VerString = "EnergyPlus, Version 0.0.0-xxxx, August 14 1945";
 
     // call the function to test
     SimulationManager::writeIntialPerfLogValues(*state, "MODE193");

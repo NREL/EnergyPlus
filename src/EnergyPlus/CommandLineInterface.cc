@@ -51,7 +51,7 @@
 // Project headers
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataStringGlobals.in.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -113,7 +113,7 @@ namespace CommandLineInterface {
         // Define options
         ezOptionParser opt;
 
-        opt.overview = state.dataStrGlobals->VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state);
+        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state);
 
         opt.syntax = "energyplus [options] [input-file]";
 
@@ -202,7 +202,7 @@ namespace CommandLineInterface {
         }
 
         if (opt.isSet("-v")) {
-            DisplayString(state, state.dataStrGlobals->VerString);
+            DisplayString(state, VerString);
             if (eplusRunningViaAPI) {
                 // we need another return code to let runEnergyPlusAsLibrary know it should not try to run anything
                 return static_cast<int>(ReturnCodes::SuccessButHelper);

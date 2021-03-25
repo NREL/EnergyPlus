@@ -67,7 +67,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataStringGlobals.in.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
@@ -8411,6 +8411,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
     // provide a single call for writing out the Report Data Dictionary and Meter Data Dictionary.
 
     // Using/Aliasing
+    using DataStringGlobals::VerString;
     using namespace OutputProcessor;
     using General::ScanForReports;
     using SortAndStringUtilities::SetupAndSort;
@@ -8460,16 +8461,16 @@ void ProduceRDDMDD(EnergyPlusData &state)
     state.files.rdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.rdd);
     state.files.mdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.mdd);
     if (op->ProduceReportVDD == iReportVDD::Yes) {
-        print(state.files.rdd, "Program Version,{},{}{}", state.dataStrGlobals->VerString, state.dataStrGlobals->IDDVerString, '\n');
+        print(state.files.rdd, "Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.rdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
 
-        print(state.files.mdd, "Program Version,{},{}{}", state.dataStrGlobals->VerString, state.dataStrGlobals->IDDVerString, '\n');
+        print(state.files.mdd, "Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.mdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
     } else if (op->ProduceReportVDD == iReportVDD::IDF) {
-        print(state.files.rdd, "! Program Version,{},{}{}", state.dataStrGlobals->VerString, state.dataStrGlobals->IDDVerString, '\n');
+        print(state.files.rdd, "! Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.rdd, "! Output:Variable Objects (applicable to this run){}", '\n');
 
-        print(state.files.mdd, "! Program Version,{},{}{}", state.dataStrGlobals->VerString, state.dataStrGlobals->IDDVerString, '\n');
+        print(state.files.mdd, "! Program Version,{},{}{}", VerString, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.mdd, "! Output:Meter Objects (applicable to this run){}", '\n');
     }
 

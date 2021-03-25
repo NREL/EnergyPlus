@@ -114,7 +114,7 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataStringGlobals.in.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>

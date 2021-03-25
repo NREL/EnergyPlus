@@ -193,7 +193,7 @@
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataStringGlobals.in.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -259,10 +259,10 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 
     state.dataStrGlobals->CurrentDateTime = CreateCurrentDateTimeString();
 
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion(state.dataStrGlobals->VerString);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setStartDateTimeStamp(state.dataStrGlobals->CurrentDateTime.substr(5));
 
-    state.dataStrGlobals->VerString += "," + state.dataStrGlobals->CurrentDateTime;
+    DataStringGlobals::VerString += "," + state.dataStrGlobals->CurrentDateTime;
 
     DataSystemVariables::processEnvironmentVariables(state);
 
@@ -279,7 +279,7 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
     state.dataSysVars->TestAllPaths = true;
 
     DisplayString(state, "EnergyPlus Starting");
-    DisplayString(state, state.dataStrGlobals->VerString);
+    DisplayString(state, DataStringGlobals::VerString);
 
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();

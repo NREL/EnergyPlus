@@ -67,7 +67,7 @@
 #endif
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataStringGlobals.in.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {

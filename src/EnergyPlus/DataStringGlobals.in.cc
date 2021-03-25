@@ -45,91 +45,31 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef IdfParserFixture_hh_INCLUDED
-#define IdfParserFixture_hh_INCLUDED
-
-// Google Test Headers
-#include <gtest/gtest.h>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataStringGlobals.hh>
 
-#include "../TestHelpers/IdfParser.hh"
-
-#include <ostream>
-
 namespace EnergyPlus {
 
-class IdfParserFixture : public testing::Test
-{
-protected:
-    static void SetUpTestCase()
-    {
-    }
-    static void TearDownTestCase()
-    {
-    }
+namespace DataStringGlobals {
 
-    virtual void SetUp()
-    {
-    }
+    // MODULE INFORMATION:
+    //       AUTHOR         Linda K. Lawrie
+    //       DATE WRITTEN   September 1997
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-    virtual void TearDown()
-    {
-    }
+    // PURPOSE OF THIS MODULE:
+    // This data-only module is a repository for string variables used in parsing
+    // "pieces" of EnergyPlus.
 
-    // This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any
-    // delimiter can be passed in to this funciton. This allows for cross platform output string comparisons.
-    std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = "\n")
-    {
-        std::ostringstream compare_text;
-        for (auto const &str : strings) {
-            compare_text << str << delimiter;
-        }
-        return compare_text.str();
-    }
+    std::string
+        VerString("EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"); // String that
+                                                                                                                                      // represents
+                                                                                                                                      // version
+                                                                                                                                      // information
+    std::string MatchVersion("${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"); // String to be matched by Version object
+    std::string PythonAPIVersion("${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"); // API version string to be matched when using the Python API
 
-    void eat_whitespace(std::string const &idf, size_t &index)
-    {
-        IdfParser::eat_whitespace(idf, index);
-    }
-
-    void eat_comment(std::string const &idf, size_t &index)
-    {
-        IdfParser::eat_comment(idf, index);
-    }
-
-    std::string parse_string(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_string(idf, index, success);
-    }
-
-    std::string parse_value(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_value(idf, index, success);
-    }
-
-    IdfParser::Token look_ahead(std::string const &idf, size_t index)
-    {
-        return IdfParser::look_ahead(idf, index);
-    }
-
-    IdfParser::Token next_token(std::string const &idf, size_t &index)
-    {
-        return IdfParser::next_token(idf, index);
-    }
-
-    std::vector<std::vector<std::string>> parse_idf(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_idf(idf, index, success);
-    }
-
-    std::vector<std::string> parse_object(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_object(idf, index, success);
-    }
-};
+} // namespace DataStringGlobals
 
 } // namespace EnergyPlus
-
-#endif
