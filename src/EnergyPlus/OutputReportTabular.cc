@@ -10555,7 +10555,7 @@ namespace EnergyPlus::OutputReportTabular {
                     state.dataOutRptTab->m3_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
                     SIunit = "[W/m2]";
                     LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, Wm2_unitName);
-                    state.dataOutRptTab->m3_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
+                    state.dataOutRptTab->Wm2_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
                 } else {
                     m_unitName = "[m]";
                     state.dataOutRptTab->m_unitConv = 1.0;
@@ -10564,7 +10564,7 @@ namespace EnergyPlus::OutputReportTabular {
                     m3_unitName = "[m3]";
                     state.dataOutRptTab->m3_unitConv = 1.0;
                     Wm2_unitName = "[W/m2]";
-                    state.dataOutRptTab->m3_unitConv = 1.0;
+                    state.dataOutRptTab->Wm2_unitConv = 1.0;
                 }
                 //---- General Sub-Table
 
@@ -11158,7 +11158,7 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                     }
                     if (Zone(iZone).FloorArea > 0) {
-                        tableBody(10, iZone) = RealToStr(state.dataOutRptTab->m3_unitConv * totLightPower / Zone(iZone).FloorArea, 4);
+                        tableBody(10, iZone) = RealToStr(state.dataOutRptTab->Wm2_unitConv * totLightPower / Zone(iZone).FloorArea, 4);
                     }
                     // people density
                     totNumPeople = 0.0;
@@ -11193,7 +11193,7 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                     }
                     if (Zone(iZone).FloorArea > 0) {
-                        tableBody(12, iZone) = RealToStr(totPlugProcess * state.dataOutRptTab->m3_unitConv / Zone(iZone).FloorArea, 4);
+                        tableBody(12, iZone) = RealToStr(totPlugProcess * state.dataOutRptTab->Wm2_unitConv / Zone(iZone).FloorArea, 4);
                     }
 
                     // total rows for Total / Not Part of Total
@@ -11254,8 +11254,8 @@ namespace EnergyPlus::OutputReportTabular {
                     tableBody(8, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstWindowArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST, 2);
                     tableBody(9, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstOpeningArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST, 2);
                     if (state.dataOutRptTab->zstArea(iTotal) != 0) {
-                        tableBody(10, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstLight(iTotal) * state.dataOutRptTab->m3_unitConv / state.dataOutRptTab->zstArea(iTotal), 4);
-                        tableBody(12, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstPlug(iTotal) * state.dataOutRptTab->m3_unitConv / state.dataOutRptTab->zstArea(iTotal), 4);
+                        tableBody(10, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstLight(iTotal) * state.dataOutRptTab->Wm2_unitConv / state.dataOutRptTab->zstArea(iTotal), 4);
+                        tableBody(12, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstPlug(iTotal) * state.dataOutRptTab->Wm2_unitConv / state.dataOutRptTab->zstArea(iTotal), 4);
                     }
                     if (state.dataOutRptTab->zstPeople(iTotal) != 0) {
                         tableBody(11, state.dataGlobal->NumOfZones + iTotal) = RealToStr(state.dataOutRptTab->zstArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST / state.dataOutRptTab->zstPeople(iTotal), 2);

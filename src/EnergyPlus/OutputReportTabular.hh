@@ -1460,7 +1460,7 @@ struct OutputReportTabularData : BaseGlobalStruct {
         this->TimeStepInDayGCLS = 0;
         this->iZoneGCLH = 0;
         this->TimeStepInDayGCLH = 0;
-        this->IntGainTypesTubularGCLS.clear();
+        this->IntGainTypesTubularGCLS = Array1D_int(1, {DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular});
         this->adjFenDone.clear();
         this->BigNumRMG = 0.0;
         this->foundGsui = 0;
