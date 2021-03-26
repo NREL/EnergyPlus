@@ -749,19 +749,21 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
             // report out fan information
             if (this->supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
                 if (this->supplyFanIndex >= 0) {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state, this->name,
-                                                                 coilCoolingDXObjectName,
-                                                                 HVACFan::fanObjs[this->supplyFanIndex]->name,
-                                                                 DataAirSystems::objectVectorOOFanSystemModel,
-                                                                 this->supplyFanIndex);
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                                             this->name,
+                                                                                             coilCoolingDXObjectName,
+                                                                                             state.dataHVACFan->fanObjs[this->supplyFanIndex]->name,
+                                                                                             DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                             this->supplyFanIndex);
                 }
             } else {
                 if (this->supplyFanIndex >= 1) {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state, this->name,
-                                                                 coilCoolingDXObjectName,
-                                                                 state.dataFans->Fan(this->supplyFanIndex).FanName,
-                                                                 DataAirSystems::structArrayLegacyFanModels,
-                                                                 this->supplyFanIndex);
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                                             this->name,
+                                                                                             coilCoolingDXObjectName,
+                                                                                             state.dataFans->Fan(this->supplyFanIndex).FanName,
+                                                                                             DataAirSystems::structArrayLegacyFanModels,
+                                                                                             this->supplyFanIndex);
                 }
             }
 
