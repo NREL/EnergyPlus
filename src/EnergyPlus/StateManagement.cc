@@ -58,14 +58,11 @@
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
-#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
-#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 
@@ -80,9 +77,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
     DataOutputs::clear_state();
-    FluidProperties::clear_state();
     HeatBalanceManager::clear_state();
-    HVACFan::clearHVACFanObjects();
-    PhotovoltaicThermalCollectors::clear_state();
     Psychrometrics::clear_state();
 }

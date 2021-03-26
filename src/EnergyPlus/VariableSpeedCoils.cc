@@ -5753,7 +5753,7 @@ namespace VariableSpeedCoils {
         Real64 locFanElecPower = 0.0; // local for fan electric power
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex > -1) {
-                locFanElecPower = HVACFan::fanObjs[ state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex]->fanPower();
+                locFanElecPower = state.dataHVACFan->fanObjs[ state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex]->fanPower();
             }
         } else {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex > 0) {

@@ -820,7 +820,7 @@ namespace HVACDXSystem {
                         state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                             state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilName,
                             state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilType,
-                            HVACFan::fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name,
+                            state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name,
                             DataAirSystems::objectVectorOOFanSystemModel,
                             state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex);
                     }

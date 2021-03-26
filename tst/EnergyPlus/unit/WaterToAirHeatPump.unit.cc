@@ -134,61 +134,61 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    FluidProperties::RefrigData.allocate(1);
-    FluidProperties::RefrigData(1).Name = "R22";
-    FluidProperties::RefrigData(1).PsLowTempIndex = 1;
-    FluidProperties::RefrigData(1).PsHighTempIndex = 2;
-    FluidProperties::RefrigData(1).PsTemps.allocate(2);
-    FluidProperties::RefrigData(1).PsTemps(1) = -157.42;
-    FluidProperties::RefrigData(1).PsTemps(2) = 96.145;
-    FluidProperties::RefrigData(1).PsValues.allocate(2);
-    FluidProperties::RefrigData(1).PsValues(1) = 0.3795;
-    FluidProperties::RefrigData(1).PsValues(2) = 4990000.0;
+    state->dataFluidProps->RefrigData.allocate(1);
+    state->dataFluidProps->RefrigData(1).Name = "R22";
+    state->dataFluidProps->RefrigData(1).PsLowTempIndex = 1;
+    state->dataFluidProps->RefrigData(1).PsHighTempIndex = 2;
+    state->dataFluidProps->RefrigData(1).PsTemps.allocate(2);
+    state->dataFluidProps->RefrigData(1).PsTemps(1) = -157.42;
+    state->dataFluidProps->RefrigData(1).PsTemps(2) = 96.145;
+    state->dataFluidProps->RefrigData(1).PsValues.allocate(2);
+    state->dataFluidProps->RefrigData(1).PsValues(1) = 0.3795;
+    state->dataFluidProps->RefrigData(1).PsValues(2) = 4990000.0;
 
-    FluidProperties::RefrigData(1).HfLowTempIndex = 1;
-    FluidProperties::RefrigData(1).HfHighTempIndex = 2;
-    FluidProperties::RefrigData(1).PsLowPresIndex = 1;
-    FluidProperties::RefrigData(1).PsHighPresIndex = 2;
-    FluidProperties::RefrigData(1).HTemps.allocate(2);
-    FluidProperties::RefrigData(1).HfValues.allocate(2);
-    FluidProperties::RefrigData(1).HfgValues.allocate(2);
+    state->dataFluidProps->RefrigData(1).HfLowTempIndex = 1;
+    state->dataFluidProps->RefrigData(1).HfHighTempIndex = 2;
+    state->dataFluidProps->RefrigData(1).PsLowPresIndex = 1;
+    state->dataFluidProps->RefrigData(1).PsHighPresIndex = 2;
+    state->dataFluidProps->RefrigData(1).HTemps.allocate(2);
+    state->dataFluidProps->RefrigData(1).HfValues.allocate(2);
+    state->dataFluidProps->RefrigData(1).HfgValues.allocate(2);
 
-    FluidProperties::RefrigData(1).HTemps(1) = -157.42;
-    FluidProperties::RefrigData(1).HTemps(2) = 96.145;
-    FluidProperties::RefrigData(1).HfValues(1) = 29600.0;
-    FluidProperties::RefrigData(1).HfValues(2) = 366900.0;
-    FluidProperties::RefrigData(1).HfgValues(1) = 332700.0;
-    FluidProperties::RefrigData(1).HfgValues(2) = 366900.0;
-    FluidProperties::RefrigData(1).NumSuperTempPts = 2;
-    FluidProperties::RefrigData(1).NumSuperPressPts = 2;
-    FluidProperties::RefrigData(1).SHTemps.allocate(2);
-    FluidProperties::RefrigData(1).SHPress.allocate(2);
-    FluidProperties::RefrigData(1).SHTemps(1) = -157.15;
-    FluidProperties::RefrigData(1).SHTemps(2) = 152.85;
-    FluidProperties::RefrigData(1).SHPress(1) = 0.4043;
-    FluidProperties::RefrigData(1).SHPress(2) = 16500000.0;
-    FluidProperties::RefrigData(1).HshValues.allocate(2, 2);
-    FluidProperties::RefrigData(1).HshValues(1, 1) = 332800.0;
-    FluidProperties::RefrigData(1).HshValues(1, 2) = 537000.0;
-    FluidProperties::RefrigData(1).HshValues(2, 1) = 332800.0;
-    FluidProperties::RefrigData(1).HshValues(2, 2) = 537000.0;
-    FluidProperties::RefrigData(1).RhoshValues.allocate(2, 2);
-    FluidProperties::RefrigData(1).RhoshValues(1, 1) = 0.00003625;
-    FluidProperties::RefrigData(1).RhoshValues(1, 2) = 0.0;
-    FluidProperties::RefrigData(1).RhoshValues(2, 1) = 0.00003625;
-    FluidProperties::RefrigData(1).RhoshValues(2, 2) = 0.0;
+    state->dataFluidProps->RefrigData(1).HTemps(1) = -157.42;
+    state->dataFluidProps->RefrigData(1).HTemps(2) = 96.145;
+    state->dataFluidProps->RefrigData(1).HfValues(1) = 29600.0;
+    state->dataFluidProps->RefrigData(1).HfValues(2) = 366900.0;
+    state->dataFluidProps->RefrigData(1).HfgValues(1) = 332700.0;
+    state->dataFluidProps->RefrigData(1).HfgValues(2) = 366900.0;
+    state->dataFluidProps->RefrigData(1).NumSuperTempPts = 2;
+    state->dataFluidProps->RefrigData(1).NumSuperPressPts = 2;
+    state->dataFluidProps->RefrigData(1).SHTemps.allocate(2);
+    state->dataFluidProps->RefrigData(1).SHPress.allocate(2);
+    state->dataFluidProps->RefrigData(1).SHTemps(1) = -157.15;
+    state->dataFluidProps->RefrigData(1).SHTemps(2) = 152.85;
+    state->dataFluidProps->RefrigData(1).SHPress(1) = 0.4043;
+    state->dataFluidProps->RefrigData(1).SHPress(2) = 16500000.0;
+    state->dataFluidProps->RefrigData(1).HshValues.allocate(2, 2);
+    state->dataFluidProps->RefrigData(1).HshValues(1, 1) = 332800.0;
+    state->dataFluidProps->RefrigData(1).HshValues(1, 2) = 537000.0;
+    state->dataFluidProps->RefrigData(1).HshValues(2, 1) = 332800.0;
+    state->dataFluidProps->RefrigData(1).HshValues(2, 2) = 537000.0;
+    state->dataFluidProps->RefrigData(1).RhoshValues.allocate(2, 2);
+    state->dataFluidProps->RefrigData(1).RhoshValues(1, 1) = 0.00003625;
+    state->dataFluidProps->RefrigData(1).RhoshValues(1, 2) = 0.0;
+    state->dataFluidProps->RefrigData(1).RhoshValues(2, 1) = 0.00003625;
+    state->dataFluidProps->RefrigData(1).RhoshValues(2, 2) = 0.0;
 
-    FluidProperties::RefrigData(1).RhofLowTempIndex = 1;
-    FluidProperties::RefrigData(1).RhofHighTempIndex = 2;
-    FluidProperties::RefrigData(1).RhoTemps.allocate(2);
-    FluidProperties::RefrigData(1).RhoTemps(1) = -157.42;
-    FluidProperties::RefrigData(1).RhoTemps(2) = 96.145;
-    FluidProperties::RefrigData(1).RhofValues.allocate(2);
-    FluidProperties::RefrigData(1).RhofValues(1) = 1721.0;
-    FluidProperties::RefrigData(1).RhofValues(2) = 523.8;
-    FluidProperties::RefrigData(1).RhofgValues.allocate(2);
-    FluidProperties::RefrigData(1).RhofgValues(1) = 0.341;
-    FluidProperties::RefrigData(1).RhofgValues(2) = 523.8;
+    state->dataFluidProps->RefrigData(1).RhofLowTempIndex = 1;
+    state->dataFluidProps->RefrigData(1).RhofHighTempIndex = 2;
+    state->dataFluidProps->RefrigData(1).RhoTemps.allocate(2);
+    state->dataFluidProps->RefrigData(1).RhoTemps(1) = -157.42;
+    state->dataFluidProps->RefrigData(1).RhoTemps(2) = 96.145;
+    state->dataFluidProps->RefrigData(1).RhofValues.allocate(2);
+    state->dataFluidProps->RefrigData(1).RhofValues(1) = 1721.0;
+    state->dataFluidProps->RefrigData(1).RhofValues(2) = 523.8;
+    state->dataFluidProps->RefrigData(1).RhofgValues.allocate(2);
+    state->dataFluidProps->RefrigData(1).RhofgValues(1) = 0.341;
+    state->dataFluidProps->RefrigData(1).RhofgValues(2) = 523.8;
 
     GetWatertoAirHPInput(*state);
 
@@ -293,5 +293,5 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     // clean up
     state->dataWaterToAirHeatPump->WatertoAirHP.deallocate();
-    FluidProperties::RefrigData.deallocate();
+    state->dataFluidProps->RefrigData.deallocate();
 }

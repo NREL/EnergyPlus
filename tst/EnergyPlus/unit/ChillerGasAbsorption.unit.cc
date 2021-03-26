@@ -242,3 +242,120 @@ TEST_F(EnergyPlusFixture, GasAbsorption_getDesignCapacities_Test)
     EXPECT_NEAR(maxload, 0.0, 0.001);
     EXPECT_NEAR(optload, 0.0, 0.001);
 }
+
+TEST_F(EnergyPlusFixture, GasAbsorption_calculateHeater_Fix_Test)
+{
+    std::string const idf_objects = delimited_string({
+        "  ChillerHeater:Absorption:DirectFired,                                                                      ",
+        "    Big Chiller,             !- Name                                                                         ",
+        "    100000,                  !- Nominal Cooling Capacity {W}                                                 ",
+        "    0.8,                     !- Heating to Cooling Capacity Ratio                                            ",
+        "    0.97,                    !- Fuel Input to Cooling Output Ratio                                           ",
+        "    1.25,                    !- Fuel Input to Heating Output Ratio                                           ",
+        "    0.01,                    !- Electric Input to Cooling Output Ratio                                       ",
+        "    0.005,                   !- Electric Input to Heating Output Ratio                                       ",
+        "    Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name                                                ",
+        "    Big Chiller Outlet Node, !- Chilled Water Outlet Node Name                                               ",
+        "    Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name                                          ",
+        "    Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name                                        ",
+        "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name                                                 ",
+        "    Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name                                               ",
+        "    0.000001,                !- Minimum Part Load Ratio                                                      ",
+        "    1.0,                     !- Maximum Part Load Ratio                                                      ",
+        "    0.6,                     !- Optimum Part Load Ratio                                                      ",
+        "    29,                      !- Design Entering Condenser Water Temperature {C}                              ",
+        "    7,                       !- Design Leaving Chilled Water Temperature {C}                                 ",
+        "    0.0011,                  !- Design Chilled Water Flow Rate {m3/s}                                        ",
+        "    0.0011,                  !- Design Condenser Water Flow Rate {m3/s}                                      ",
+        "    0.0043,                  !- Design Hot Water Flow Rate {m3/s}                                            ",
+        "    GasAbsFlatBiQuad,        !- Cooling Capacity Function of Temperature Curve Name                          ",
+        "    GasAbsFlatBiQuad,        !- Fuel Input to Cooling Output Ratio Function of Temperature Curve Name        ",
+        "    GasAbsLinearQuad,        !- Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name    ",
+        "    GasAbsFlatBiQuad,        !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name    ",
+        "    GasAbsFlatQuad,          !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name",
+        "    GasAbsInvLinearQuad,     !- Heating Capacity Function of Cooling Capacity Curve Name                     ",
+        "    GasAbsLinearQuad,        !- Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name     ",
+        "    EnteringCondenser,       !- Temperature Curve Input Variable                                             ",
+        "    AirCooled,               !- Condenser Type                                                               ",
+        "    2,                       !- Chilled Water Temperature Lower Limit {C}                                    ",
+        "    0,                       !- Fuel Higher Heating Value {kJ/kg}                                            ",
+        "    NaturalGas,              !- Fuel Type                                                                    ",
+        "    ;                        !- Sizing Factor                                                                ",
+        "                                                                                                             ",
+        "  Curve:Biquadratic,                                                                                         ",
+        "    GasAbsFlatBiQuad,        !- Name                                                                         ",
+        "    1.000000000,             !- Coefficient1 Constant                                                        ",
+        "    0.000000000,             !- Coefficient2 x                                                               ",
+        "    0.000000000,             !- Coefficient3 x**2                                                            ",
+        "    0.000000000,             !- Coefficient4 y                                                               ",
+        "    0.000000000,             !- Coefficient5 y**2                                                            ",
+        "    0.000000000,             !- Coefficient6 x*y                                                             ",
+        "    0.,                      !- Minimum Value of x                                                           ",
+        "    50.,                     !- Maximum Value of x                                                           ",
+        "    0.,                      !- Minimum Value of y                                                           ",
+        "    50.;                     !- Maximum Value of y                                                           ",
+        "                                                                                                             ",
+        "  Curve:Quadratic,                                                                                           ",
+        "    GasAbsFlatQuad,          !- Name                                                                         ",
+        "    1.000000000,             !- Coefficient1 Constant                                                        ",
+        "    0.000000000,             !- Coefficient2 x                                                               ",
+        "    0.000000000,             !- Coefficient3 x**2                                                            ",
+        "    0.,                      !- Minimum Value of x                                                           ",
+        "    50.;                     !- Maximum Value of x                                                           ",
+        "                                                                                                             ",
+        "  Curve:Quadratic,                                                                                           ",
+        "    GasAbsLinearQuad,        !- Name                                                                         ",
+        "    0.000000000,             !- Coefficient1 Constant                                                        ",
+        "    1.000000000,             !- Coefficient2 x                                                               ",
+        "    0.000000000,             !- Coefficient3 x**2                                                            ",
+        "    0.,                      !- Minimum Value of x                                                           ",
+        "    50.;                     !- Maximum Value of x                                                           ",
+        "                                                                                                             ",
+        "  Curve:Quadratic,                                                                                           ",
+        "    GasAbsInvLinearQuad,     !- Name                                                                         ",
+        "    1.000000000,             !- Coefficient1 Constant                                                        ",
+        "    -1.000000000,            !- Coefficient2 x                                                               ",
+        "    0.000000000,             !- Coefficient3 x**2                                                            ",
+        "    0.,                      !- Minimum Value of x                                                           ",
+        "    50.;                     !- Maximum Value of x                                                           ",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    compare_err_stream("");
+
+    GetGasAbsorberInput(*state);
+
+    auto &thisChillerHeater = state->dataChillerGasAbsorption->GasAbsorber(1);
+
+    Real64 loadinput = 5000.0;
+    bool runflaginput = true;
+
+    thisChillerHeater.CoolingLoad = 100000.0;
+    thisChillerHeater.CoolPartLoadRatio = 1.0;
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+
+    thisChillerHeater.HWLoopNum = 1;
+    thisChillerHeater.HWLoopSideNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataLoopNodes->Node(3).Temp = 60.0;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.5;
+    state->dataLoopNodes->Node(4).TempSetPoint = 70.0;
+
+    thisChillerHeater.calculateHeater(*state, loadinput, runflaginput);
+
+    EXPECT_NEAR(thisChillerHeater.HeatingLoad, 21085.0, 1e-6);
+    EXPECT_NEAR(thisChillerHeater.HeatElectricPower, 400.0, 1e-6);
+    EXPECT_NEAR(thisChillerHeater.HotWaterReturnTemp, 60.0, 1e-6);
+    EXPECT_NEAR(thisChillerHeater.HotWaterSupplyTemp, 70.0, 1e-6);
+    EXPECT_NEAR(thisChillerHeater.HotWaterFlowRate, 0.5, 1e-6);
+    EXPECT_NEAR(thisChillerHeater.ElectricPower, 400.0, 1e-6);
+    EXPECT_NEAR(thisChillerHeater.HeatPartLoadRatio, 0.0, 1e-6);
+    EXPECT_NEAR(thisChillerHeater.HeatingCapacity, 0.0, 1e-6);
+    EXPECT_NEAR(thisChillerHeater.FractionOfPeriodRunning, 1.0, 1e-6);
+}

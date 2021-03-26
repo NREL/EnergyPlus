@@ -181,17 +181,13 @@ namespace PhotovoltaicThermalCollectors {
         void update(EnergyPlusData &state);
     };
 
-    extern Array1D<PVTCollectorStruct> PVT;
-
-    void clear_state();
-
     void GetPVTcollectorsInput(EnergyPlusData &state);
 
     void simPVTfromOASys(EnergyPlusData &state, int index, bool FirstHVACIteration);
 
     int getPVTindexFromName(EnergyPlusData &state, std::string const &name);
 
-    void GetPVTThermalPowerProduction(int PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy);
+    void GetPVTThermalPowerProduction(EnergyPlusData &state, int PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy);
 
     int GetAirInletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound);
 
@@ -201,8 +197,17 @@ namespace PhotovoltaicThermalCollectors {
 
 struct PhotovoltaicThermalCollectorsData : BaseGlobalStruct {
 
+    bool GetInputFlag = true; // First time, input is "gotten"
+
+    int NumPVT = 0; // count of all types of PVT in input file
+
+    Array1D<PhotovoltaicThermalCollectors::PVTCollectorStruct> PVT;
+
     void clear_state() override
     {
+        GetInputFlag = true;
+        NumPVT = 0;
+        PVT.deallocate();
 
     }
 };

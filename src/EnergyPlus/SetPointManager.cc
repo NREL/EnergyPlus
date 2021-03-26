@@ -286,6 +286,7 @@ namespace EnergyPlus::SetPointManager {
         cCurrentModuleObject = "SetpointManager:Scheduled";
         state.dataSetPointManager->NumSchSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Scheduled'
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+
         state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = NumNums;
         state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = NumAlphas;
 

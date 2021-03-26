@@ -3564,12 +3564,12 @@ namespace EvaporativeCoolers {
                 } else if (UtilityRoutines::SameString(ZoneEvapUnit(UnitLoop).FanObjectClassName, "Fan:SystemModel")) {
 
                     ZoneEvapUnit(UnitLoop).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, ZoneEvapUnit(UnitLoop).FanName)); // call constructor
+                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, ZoneEvapUnit(UnitLoop).FanName)); // call constructor
                     ZoneEvapUnit(UnitLoop).FanIndex = HVACFan::getFanObjectVectorIndex(state, ZoneEvapUnit(UnitLoop).FanName);
-                    ZoneEvapUnit(UnitLoop).FanInletNodeNum = HVACFan::fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->inletNodeNum;
-                    ZoneEvapUnit(UnitLoop).FanOutletNodeNum = HVACFan::fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->outletNodeNum;
-                    ZoneEvapUnit(UnitLoop).ActualFanVolFlowRate = HVACFan::fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->designAirVolFlowRate;
-                    ZoneEvapUnit(UnitLoop).FanAvailSchedPtr = HVACFan::fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->availSchedIndex;
+                    ZoneEvapUnit(UnitLoop).FanInletNodeNum = state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->inletNodeNum;
+                    ZoneEvapUnit(UnitLoop).FanOutletNodeNum = state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->outletNodeNum;
+                    ZoneEvapUnit(UnitLoop).ActualFanVolFlowRate = state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->designAirVolFlowRate;
+                    ZoneEvapUnit(UnitLoop).FanAvailSchedPtr = state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->availSchedIndex;
                 }
 
                 // set evap unit to cycling mode for all fan types. Note OpMode var is not used
@@ -3928,7 +3928,7 @@ namespace EvaporativeCoolers {
                 if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     GetFanVolFlow(state, ZoneEvapUnit(UnitNum).FanIndex, ZoneEvapUnit(UnitNum).ActualFanVolFlowRate);
                 } else {
-                    ZoneEvapUnit(UnitNum).ActualFanVolFlowRate = HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->designAirVolFlowRate;
+                    ZoneEvapUnit(UnitNum).ActualFanVolFlowRate = state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->designAirVolFlowRate;
                 }
             }
         }
@@ -4332,7 +4332,7 @@ namespace EvaporativeCoolers {
                                             state.dataHVACGlobal->ZoneCompTurnFansOn,
                                             state.dataHVACGlobal->ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
+                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
                     state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             }
         }
@@ -4354,7 +4354,7 @@ namespace EvaporativeCoolers {
                                             state.dataHVACGlobal->ZoneCompTurnFansOn,
                                             state.dataHVACGlobal->ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
+                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
                     state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
             }
         }
@@ -4524,7 +4524,7 @@ namespace EvaporativeCoolers {
                 Fans::SimulateFanComponents(
                     state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
         }
 
@@ -4540,7 +4540,7 @@ namespace EvaporativeCoolers {
                 Fans::SimulateFanComponents(
                     state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
         }
 
@@ -4640,7 +4640,7 @@ namespace EvaporativeCoolers {
                 Fans::SimulateFanComponents(
                     state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
         }
 
@@ -4656,7 +4656,7 @@ namespace EvaporativeCoolers {
                 Fans::SimulateFanComponents(
                     state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
         }
 

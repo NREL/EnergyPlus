@@ -1239,18 +1239,18 @@ namespace AirflowNetworkBalanceManager {
                 int outletNode;
 
                 if (UtilityRoutines::SameString(UtilityRoutines::MakeUPPERCase(fan_type), "FAN:SYSTEMMODEL")) {
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fan_name));
+                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, fan_name));
                     fanIndex = HVACFan::getFanObjectVectorIndex(state, fan_name);
                     if (fanIndex < 0) {
                         ShowSevereError(state, "...occurs in " + CurrentModuleObject + " = " + state.dataAirflowNetwork->DisSysCompCVFData(i).name);
                         success = false;
                     } else {
-                        flowRate = HVACFan::fanObjs[fanIndex]->designAirVolFlowRate;
+                        flowRate = state.dataHVACFan->fanObjs[fanIndex]->designAirVolFlowRate;
                         flowRate *= state.dataEnvrn->StdRhoAir;
                         state.dataAirflowNetwork->DisSysCompCVFData(i).FanModelFlag = true;
-                        inletNode = HVACFan::fanObjs[fanIndex]->inletNodeNum;
-                        outletNode = HVACFan::fanObjs[fanIndex]->outletNodeNum;
-                        if (HVACFan::fanObjs[fanIndex]->speedControl == HVACFan::FanSystem::SpeedControlMethod::Continuous) {
+                        inletNode = state.dataHVACFan->fanObjs[fanIndex]->inletNodeNum;
+                        outletNode = state.dataHVACFan->fanObjs[fanIndex]->outletNodeNum;
+                        if (state.dataHVACFan->fanObjs[fanIndex]->speedControl == HVACFan::FanSystem::SpeedControlMethod::Continuous) {
                             fanType_Num = FanType_SimpleVAV;
                             state.dataAirflowNetwork->VAVSystem = true;
                         } else {
@@ -5907,7 +5907,7 @@ namespace AirflowNetworkBalanceManager {
             if (ZonePressure1 <= PressureSet) {
                 // The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
                 if (!state.dataGlobal->WarmupFlag) {
-                    if (state.dataAirflowNetworkBalanceManager->ErrCountLowPre == 0) {
+                    if ( state.dataAirflowNetworkBalanceManager->ErrCountLowPre == 0) {
                         ++state.dataAirflowNetworkBalanceManager->ErrCountLowPre;
                         ShowWarningError(state, "The calculated pressure with minimum exhaust fan rate is lower than the pressure setpoint. The pressure "
                                          "control is unable to perform.");
@@ -5940,7 +5940,7 @@ namespace AirflowNetworkBalanceManager {
                             ShowRecurringWarningErrorAtEnd(state,
                                 state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).Name +
                                     ": The AFN model continues not to perform pressure control due to higher zone pressure...",
-                                                           state.dataAirflowNetworkBalanceManager->ErrIndexHighPre,
+                                state.dataAirflowNetworkBalanceManager->ErrIndexHighPre,
                                 ZonePressure2,
                                 ZonePressure2);
                         }
@@ -6020,7 +6020,7 @@ namespace AirflowNetworkBalanceManager {
                             ShowRecurringWarningErrorAtEnd(state,
                                 state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).Name +
                                     ": The AFN model continues not to perform pressure control due to higher zone pressure...",
-                                                           state.dataAirflowNetworkBalanceManager->ErrIndexHighPre,
+                                state.dataAirflowNetworkBalanceManager->ErrIndexHighPre,
                                 ZonePressure2,
                                 ZonePressure2);
                         }
@@ -9769,7 +9769,7 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetwork->DisSysCompCVFData(state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).TypeNum).AirLoopNum =
                     state.dataAirflowNetwork->AirflowNetworkLinkageData(i).AirLoopNum;
                 if (state.dataAirflowNetwork->DisSysCompCVFData(state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).TypeNum).FanModelFlag) {
-                    HVACFan::fanObjs[state.dataAirflowNetwork->DisSysCompCVFData(state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).TypeNum).FanIndex]->AirLoopNum =
+                    state.dataHVACFan->fanObjs[state.dataAirflowNetwork->DisSysCompCVFData(state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).TypeNum).FanIndex]->AirLoopNum =
                         state.dataAirflowNetwork->AirflowNetworkLinkageData(i).AirLoopNum;
                 } else {
                     SetFanAirLoopNumber(state, n, state.dataAirflowNetwork->AirflowNetworkLinkageData(i).AirLoopNum);
@@ -10119,7 +10119,7 @@ namespace AirflowNetworkBalanceManager {
                 }
                 if (state.dataAirflowNetwork->DisSysCompCVFData(i).FanModelFlag && state.dataAirflowNetwork->DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
                     int fanIndex = HVACFan::getFanObjectVectorIndex(state, state.dataAirflowNetwork->DisSysCompCVFData(i).name);
-                    if (HVACFan::fanObjs[fanIndex]->AirPathFlag) {
+                    if (state.dataHVACFan->fanObjs[fanIndex]->AirPathFlag) {
                         state.dataAirflowNetwork->DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
                     } else {
                         OnOffFanFlag = true;
@@ -10186,7 +10186,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
             if (state.dataAirflowNetwork->DisSysCompCVFData(i).FanModelFlag) {
                 int fanIndex = HVACFan::getFanObjectVectorIndex(state, state.dataAirflowNetwork->DisSysCompCVFData(i).name);
-                if (state.dataAirflowNetwork->DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff && HVACFan::fanObjs[fanIndex]->AirPathFlag) {
+                if (state.dataAirflowNetwork->DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff && state.dataHVACFan->fanObjs[fanIndex]->AirPathFlag) {
                     state.dataAirflowNetwork->DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
                     state.dataAirflowNetworkBalanceManager->SupplyFanType = FanType_SimpleConstVolume;
                     FanModelConstFlag = true;
@@ -10307,7 +10307,7 @@ namespace AirflowNetworkBalanceManager {
                     if (state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanTypeNum == FanType_SimpleVAV) {
                         if (state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanModelFlag) {
                             state.dataAirflowNetwork->DisSysCompCVFData(typeNum).MaxAirMassFlowRate =
-                                HVACFan::fanObjs[state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * state.dataEnvrn->StdRhoAir;
+                                state.dataHVACFan->fanObjs[state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * state.dataEnvrn->StdRhoAir;
                         } else {
                             Real64 FanFlow; // Return type
                             GetFanVolFlow(state, state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanIndex, FanFlow);

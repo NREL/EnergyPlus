@@ -391,10 +391,10 @@ namespace UnitHeater {
                     }
                 } else if (UtilityRoutines::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName));       // call constructor
+                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName));       // call constructor
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index = HVACFan::getFanObjectVectorIndex(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName); // zero-based
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode = HVACFan::fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->outletNodeNum;
-                    FanVolFlow = HVACFan::fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->designAirVolFlowRate;
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode = state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->outletNodeNum;
+                    FanVolFlow = state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->designAirVolFlowRate;
                     if (FanVolFlow != AutoSize && state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow != AutoSize &&
                         FanVolFlow < state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow) {
                         ShowSevereError(state, "Specified in " + CurrentModuleObject + " = " + state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
@@ -416,7 +416,7 @@ namespace UnitHeater {
                         ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                     }
 
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr = HVACFan::fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->availSchedIndex;
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr = state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->availSchedIndex;
                 }
             }
 
@@ -1640,7 +1640,7 @@ namespace UnitHeater {
         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower = Fans::GetFanPower(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
         } else {
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower = HVACFan::fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->fanPower();
+            state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower = state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->fanPower();
         }
 
         PowerMet = QUnitOut;
@@ -1717,7 +1717,7 @@ namespace UnitHeater {
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
 
             {
@@ -1782,7 +1782,7 @@ namespace UnitHeater {
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
             {
                 auto const SELECT_CASE_var(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType);
