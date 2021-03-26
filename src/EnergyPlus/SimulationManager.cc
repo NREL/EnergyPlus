@@ -686,7 +686,7 @@ namespace SimulationManager {
         int Which;
         bool ErrorsFound;
         int NumRunControl;
-        static std::string VersionID;
+        std::string VersionID;
         std::string CurrentModuleObject;
         bool CondFDAlgo;
         int Item;
