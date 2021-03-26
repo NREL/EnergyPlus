@@ -445,7 +445,7 @@ namespace PlantComponentTemperatureSources {
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
         cCurrentModuleObject = "PlantComponent:TemperatureSource";
-        state.dataPlantCompTempSrc->NumSources = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataPlantCompTempSrc->NumSources = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataPlantCompTempSrc->NumSources <= 0) {
             ShowSevereError(state, "No " + cCurrentModuleObject + " equipment specified in input file");
@@ -458,7 +458,7 @@ namespace PlantComponentTemperatureSources {
 
         // fill arrays
         for (int SourceNum = 1; SourceNum <= state.dataPlantCompTempSrc->NumSources; ++SourceNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SourceNum,
                                           state.dataIPShortCut->cAlphaArgs,

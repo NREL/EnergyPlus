@@ -327,8 +327,8 @@ namespace UnitarySystems {
     {
         std::string cCurrentModuleObject = "UnitarySystemPerformance:Multispeed";
 
-        auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
-        if (instances == inputProcessor->epJSON.end()) {
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             errorsFound = true;
         } else {
             int designSpecNum = 0;
@@ -339,7 +339,7 @@ namespace UnitarySystems {
                 int TotalArgs = 0;
                 int NumAlphas = 0;
                 int NumNumbers = 0;
-                inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+                state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
                 int IOStatus = 0;
                 Array1D_string Alphas(NumAlphas);
                 Array1D<Real64> Numbers(NumNumbers, 0.0);
@@ -347,7 +347,7 @@ namespace UnitarySystems {
                 Array1D_bool lAlphaBlanks(NumAlphas, true);
                 Array1D_string cAlphaFields(NumAlphas);
                 Array1D_string cNumericFields(NumNumbers);
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               ++designSpecNum,
                                               Alphas,
@@ -2775,8 +2775,8 @@ namespace UnitarySystems {
 
         std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
 
-        auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
-        if (instances == inputProcessor->epJSON.end()) {
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             ShowSevereError(state, "getUnitarySystemInputData: did not find AirLoopHVAC:UnitarySystem object in input file. Check inputs");
             errorsFound = true;
         } else {
@@ -2793,7 +2793,7 @@ namespace UnitarySystems {
                 if (sysNum == -1) {
                     ++state.dataUnitarySystems->numUnitarySystems;
                     auto const &thisObjName = instance.key();
-                    inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjName);
+                    state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjName);
                 } else {
                     thisSys = state.dataUnitarySystems->unitarySys[sysNum];
                 }

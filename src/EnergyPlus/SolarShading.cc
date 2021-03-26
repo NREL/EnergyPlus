@@ -373,7 +373,7 @@ namespace EnergyPlus::SolarShading {
         state.dataIPShortCut->cAlphaArgs(1) = "";
         state.dataIPShortCut->cAlphaArgs(2) = "";
         cCurrentModuleObject = "ShadowCalculation";
-        NumItems = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         NumAlphas = 0;
         NumNumbers = 0;
         if (NumItems > 1) {
@@ -381,7 +381,7 @@ namespace EnergyPlus::SolarShading {
         }
 
         if (NumItems != 0) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           1,
                                           state.dataIPShortCut->cAlphaArgs,

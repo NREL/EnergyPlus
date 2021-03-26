@@ -2474,12 +2474,12 @@ namespace EnergyPlus::GroundHeatExchangers {
         bool errorsFound = false;
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
-        state.dataGroundHeatExchanger->numVerticalGLHEs = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:System");
-        state.dataGroundHeatExchanger->numSlinkyGLHEs = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Slinky");
-        state.dataGroundHeatExchanger->numVertArray = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Array");
-        state.dataGroundHeatExchanger->numVertProps = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Properties");
-        state.dataGroundHeatExchanger->numResponseFactors = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:ResponseFactors");
-        state.dataGroundHeatExchanger->numSingleBorehole = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Single");
+        state.dataGroundHeatExchanger->numVerticalGLHEs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:System");
+        state.dataGroundHeatExchanger->numSlinkyGLHEs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Slinky");
+        state.dataGroundHeatExchanger->numVertArray = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Array");
+        state.dataGroundHeatExchanger->numVertProps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Properties");
+        state.dataGroundHeatExchanger->numResponseFactors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:ResponseFactors");
+        state.dataGroundHeatExchanger->numSingleBorehole = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Single");
 
         if (state.dataGroundHeatExchanger->numVerticalGLHEs <= 0 && state.dataGroundHeatExchanger->numSlinkyGLHEs <= 0) {
             ShowSevereError(state, "Error processing inputs for GLHE objects");
@@ -2493,8 +2493,8 @@ namespace EnergyPlus::GroundHeatExchangers {
 
             std::string currObj = "GroundHeatExchanger:Vertical:Properties";
 
-            auto const instances = inputProcessor->epJSON.find(currObj);
-            if (instances == inputProcessor->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
                                 currObj + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
@@ -2504,7 +2504,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 auto const &instance = it.value();
                 auto const &objName = it.key();
                 auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
-                inputProcessor->markObjectAsUsed(currObj, objName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
                 std::shared_ptr<GLHEVertProps> thisObj(new GLHEVertProps(state, objNameUC, instance));
                 state.dataGroundHeatExchanger->vertPropsVector.push_back(thisObj);
             }
@@ -2514,8 +2514,8 @@ namespace EnergyPlus::GroundHeatExchangers {
 
             std::string currObj = "GroundHeatExchanger:ResponseFactors";
 
-            auto const instances = inputProcessor->epJSON.find(currObj);
-            if (instances == inputProcessor->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
                                 currObj + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
@@ -2525,7 +2525,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 auto const &instance = it.value();
                 auto const &objName = it.key();
                 auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
-                inputProcessor->markObjectAsUsed(currObj, objName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
                 std::shared_ptr<GLHEResponseFactors> thisObj(new GLHEResponseFactors(state, objNameUC, instance));
                 state.dataGroundHeatExchanger->responseFactorsVector.push_back(thisObj);
             }
@@ -2535,8 +2535,8 @@ namespace EnergyPlus::GroundHeatExchangers {
 
             std::string currObj = "GroundHeatExchanger:Vertical:Array";
 
-            auto const instances = inputProcessor->epJSON.find(currObj);
-            if (instances == inputProcessor->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
                                 currObj + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
@@ -2546,7 +2546,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 auto const &instance = it.value();
                 auto const &objName = it.key();
                 auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
-                inputProcessor->markObjectAsUsed(currObj, objName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
                 std::shared_ptr<GLHEVertArray> thisObj(new GLHEVertArray(state, objNameUC, instance));
                 state.dataGroundHeatExchanger->vertArraysVector.push_back(thisObj);
             }
@@ -2556,8 +2556,8 @@ namespace EnergyPlus::GroundHeatExchangers {
 
             std::string currObj = "GroundHeatExchanger:Vertical:Single";
 
-            auto const instances = inputProcessor->epJSON.find(currObj);
-            if (instances == inputProcessor->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
                                 currObj + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
@@ -2567,7 +2567,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 auto const &instance = it.value();
                 auto const &objName = it.key();
                 auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
-                inputProcessor->markObjectAsUsed(currObj, objName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
                 std::shared_ptr<GLHEVertSingle> thisObj(new GLHEVertSingle(state, objNameUC, instance));
                 state.dataGroundHeatExchanger->singleBoreholesVector.push_back(thisObj);
             }
@@ -2577,8 +2577,8 @@ namespace EnergyPlus::GroundHeatExchangers {
 
             std::string currObj = "GroundHeatExchanger:System";
 
-            auto const instances = inputProcessor->epJSON.find(currObj);
-            if (instances == inputProcessor->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
                                 currObj + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
@@ -2588,7 +2588,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 auto const &instance = it.value();
                 auto const &objName = it.key();
                 auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
-                inputProcessor->markObjectAsUsed(currObj, objName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
                 state.dataGroundHeatExchanger->verticalGLHE.emplace_back(state, objNameUC, instance);
             }
         }
@@ -2599,8 +2599,8 @@ namespace EnergyPlus::GroundHeatExchangers {
 
             std::string currObj = "GroundHeatExchanger:Slinky";
 
-            auto const instances = inputProcessor->epJSON.find(currObj);
-            if (instances == inputProcessor->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
                                 currObj + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
@@ -2610,7 +2610,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 auto const &instance = it.value();
                 auto const &objName = it.key();
                 auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
-                inputProcessor->markObjectAsUsed(currObj, objName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
                 state.dataGroundHeatExchanger->slinkyGLHE.emplace_back(state, objNameUC, instance);
             }
         }

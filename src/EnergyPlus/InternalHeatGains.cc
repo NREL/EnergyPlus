@@ -277,43 +277,43 @@ namespace InternalHeatGains {
         MaxAlpha = -100;
         MaxNumber = -100;
         CurrentModuleObject = "People";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "Lights";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ElectricEquipment";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "GasEquipment";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "HotWaterEquipment";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "SteamEquipment";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "OtherEquipment";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
 
@@ -374,13 +374,13 @@ namespace InternalHeatGains {
         // PEOPLE: Includes both information related to the heat balance and thermal comfort
         // First, allocate and initialize the People derived type
         CurrentModuleObject = "People";
-        state.dataHeatBal->NumPeopleStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHeatBal->NumPeopleStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->PeopleObjects.allocate(state.dataHeatBal->NumPeopleStatements);
 
         state.dataHeatBal->TotPeople = 0;
         errFlag = false;
         for (Item = 1; Item <= state.dataHeatBal->NumPeopleStatements; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
                                           AlphaName,
@@ -433,7 +433,7 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               Item,
                                               AlphaName,
@@ -1187,13 +1187,13 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "Lights";
-        state.dataHeatBal->NumLightsStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHeatBal->NumLightsStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->LightsObjects.allocate(state.dataHeatBal->NumLightsStatements);
 
         state.dataHeatBal->TotLights = 0;
         errFlag = false;
         for (Item = 1; Item <= state.dataHeatBal->NumLightsStatements; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
                                           AlphaName,
@@ -1246,7 +1246,7 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               Item,
                                               AlphaName,
@@ -1652,13 +1652,13 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ElectricEquipment";
-        state.dataHeatBal->NumZoneElectricStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHeatBal->NumZoneElectricStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->ZoneElectricObjects.allocate(state.dataHeatBal->NumZoneElectricStatements);
 
         state.dataHeatBal->TotElecEquip = 0;
         errFlag = false;
         for (Item = 1; Item <= state.dataHeatBal->NumZoneElectricStatements; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
                                           AlphaName,
@@ -1711,7 +1711,7 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               Item,
                                               AlphaName,
@@ -2056,13 +2056,13 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "GasEquipment";
-        state.dataHeatBal->NumZoneGasStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHeatBal->NumZoneGasStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->ZoneGasObjects.allocate(state.dataHeatBal->NumZoneGasStatements);
 
         state.dataHeatBal->TotGasEquip = 0;
         errFlag = false;
         for (Item = 1; Item <= state.dataHeatBal->NumZoneGasStatements; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
                                           AlphaName,
@@ -2115,7 +2115,7 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               Item,
                                               AlphaName,
@@ -2474,13 +2474,13 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "HotWaterEquipment";
-        state.dataHeatBal->NumHotWaterEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHeatBal->NumHotWaterEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->HotWaterEqObjects.allocate(state.dataHeatBal->NumHotWaterEqStatements);
 
         state.dataHeatBal->TotHWEquip = 0;
         errFlag = false;
         for (Item = 1; Item <= state.dataHeatBal->NumHotWaterEqStatements; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
                                           AlphaName,
@@ -2533,7 +2533,7 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               Item,
                                               AlphaName,
@@ -2877,13 +2877,13 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "SteamEquipment";
-        state.dataHeatBal->NumSteamEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHeatBal->NumSteamEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->SteamEqObjects.allocate(state.dataHeatBal->NumSteamEqStatements);
 
         state.dataHeatBal->TotStmEquip = 0;
         errFlag = false;
         for (Item = 1; Item <= state.dataHeatBal->NumSteamEqStatements; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
                                           AlphaName,
@@ -2936,7 +2936,7 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               Item,
                                               AlphaName,
@@ -3281,13 +3281,13 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "OtherEquipment";
-        state.dataHeatBal->NumOtherEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHeatBal->NumOtherEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->OtherEqObjects.allocate(state.dataHeatBal->NumOtherEqStatements);
 
         state.dataHeatBal->TotOthEquip = 0;
         errFlag = false;
         for (Item = 1; Item <= state.dataHeatBal->NumOtherEqStatements; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
                                           AlphaName,
@@ -3340,7 +3340,7 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               Item,
                                               AlphaName,
@@ -3711,7 +3711,7 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
-        state.dataHeatBal->NumZoneITEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHeatBal->NumZoneITEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         errFlag = false;
 
         // Note that this object type does not support ZoneList due to node names in input fields
@@ -3723,7 +3723,7 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               Loop,
                                               AlphaName,
@@ -4475,13 +4475,13 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
-        state.dataHeatBal->TotBBHeat = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHeatBal->TotBBHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->ZoneBBHeat.allocate(state.dataHeatBal->TotBBHeat);
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotBBHeat; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Loop,
                                           AlphaName,
@@ -4668,13 +4668,13 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
-        state.dataHeatBal->TotCO2Gen = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHeatBal->TotCO2Gen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->ZoneCO2Gen.allocate(state.dataHeatBal->TotCO2Gen);
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotCO2Gen; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Loop,
                                           AlphaName,

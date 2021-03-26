@@ -287,102 +287,102 @@ namespace ScheduleManager {
         MaxAlps = 0;
 
         CurrentModuleObject = "ScheduleTypeLimits";
-        state.dataScheduleMgr->NumScheduleTypes = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataScheduleMgr->NumScheduleTypes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataScheduleMgr->NumScheduleTypes > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Day:Hourly";
-        NumHrDaySchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumHrDaySchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumHrDaySchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Day:Interval";
-        NumIntDaySchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumIntDaySchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumIntDaySchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Day:List";
-        NumLstDaySchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumLstDaySchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumLstDaySchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Week:Daily";
-        NumRegWeekSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumRegWeekSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumRegWeekSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Week:Compact";
-        NumCptWeekSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCptWeekSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumCptWeekSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Year";
-        NumRegSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumRegSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumRegSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "Schedule:Compact";
-        NumCptSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCptSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumCptSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas + 1);
         }
         CurrentModuleObject = "Schedule:File";
-        NumCommaFileSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCommaFileSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumCommaFileSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
 
         CurrentModuleObject = "Schedule:Constant";
-        NumConstantSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumConstantSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumConstantSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
         }
         CurrentModuleObject = "ExternalInterface:Schedule";
-        NumExternalInterfaceSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumExternalInterfaceSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         // added for FMI
         if (NumExternalInterfaceSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas + 1);
         }
         // added for FMU Import
         CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
-        NumExternalInterfaceFunctionalMockupUnitImportSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumExternalInterfaceFunctionalMockupUnitImportSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumExternalInterfaceFunctionalMockupUnitImportSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas + 1);
         }
         // added for FMU Export
         CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
-        NumExternalInterfaceFunctionalMockupUnitExportSchedules = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumExternalInterfaceFunctionalMockupUnitExportSchedules = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumExternalInterfaceFunctionalMockupUnitExportSchedules > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas + 1);
         }
         CurrentModuleObject = "Output:Schedules";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlps = max(MaxAlps, NumAlphas);
 
@@ -399,7 +399,7 @@ namespace ScheduleManager {
         CurrentModuleObject = "Schedule:Compact";
         MaxNums1 = 0;
         for (LoopIndex = 1; LoopIndex <= NumCptSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state, CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status);
             // # 'THROUGH" => Number of additional week schedules
             // # 'FOR' => Number of additional day schedules
             for (Count = 3; Count <= NumAlphas; ++Count) {
@@ -439,7 +439,7 @@ namespace ScheduleManager {
         // to update during run time
 
         CurrentModuleObject = "Schedule:File:Shading";
-        NumCommaFileShading = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCommaFileShading = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         NumAlphas = 0;
         NumNumbers = 0;
         if (NumCommaFileShading > 1) {
@@ -449,7 +449,7 @@ namespace ScheduleManager {
         NumCSVAllColumnsSchedules = 0;
 
         if (NumCommaFileShading != 0) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           1,
                                           Alphas,
@@ -650,7 +650,7 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "ScheduleTypeLimits";
         for (LoopIndex = 1; LoopIndex <= state.dataScheduleMgr->NumScheduleTypes; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -736,7 +736,7 @@ namespace ScheduleManager {
         Count = 0;
         CurrentModuleObject = "Schedule:Day:Hourly";
         for (LoopIndex = 1; LoopIndex <= NumHrDaySchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -808,7 +808,7 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Day:Interval";
         for (LoopIndex = 1; LoopIndex <= NumIntDaySchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -919,7 +919,7 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Day:List";
         for (LoopIndex = 1; LoopIndex <= NumLstDaySchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -1071,7 +1071,7 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Week:Daily";
         for (LoopIndex = 1; LoopIndex <= NumRegWeekSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -1104,7 +1104,7 @@ namespace ScheduleManager {
         Count = NumRegWeekSchedules;
         CurrentModuleObject = "Schedule:Week:Compact";
         for (LoopIndex = 1; LoopIndex <= NumCptWeekSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -1163,7 +1163,7 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Year";
         for (LoopIndex = 1; LoopIndex <= NumRegSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -1291,7 +1291,7 @@ namespace ScheduleManager {
         AddDaySch = NumRegDaySchedules;
         CurrentModuleObject = "Schedule:Compact";
         for (LoopIndex = 1; LoopIndex <= NumCptSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -1634,7 +1634,7 @@ namespace ScheduleManager {
         }
         CurrentModuleObject = "Schedule:File";
         for (LoopIndex = 1; LoopIndex <= NumCommaFileSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -2041,7 +2041,7 @@ namespace ScheduleManager {
         // Constant Schedules
         CurrentModuleObject = "Schedule:Constant";
         for (LoopIndex = 1; LoopIndex <= NumConstantSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -2105,7 +2105,7 @@ namespace ScheduleManager {
         CurrentModuleObject = "ExternalInterface:Schedule";
         for (LoopIndex = 1; LoopIndex <= NumExternalInterfaceSchedules; ++LoopIndex) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -2164,7 +2164,7 @@ namespace ScheduleManager {
         CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
         for (LoopIndex = 1; LoopIndex <= NumExternalInterfaceFunctionalMockupUnitImportSchedules; ++LoopIndex) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -2235,7 +2235,7 @@ namespace ScheduleManager {
         // added for FMU Export
         CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
         for (LoopIndex = 1; LoopIndex <= NumExternalInterfaceFunctionalMockupUnitExportSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
                                           Alphas,
@@ -2335,12 +2335,12 @@ namespace ScheduleManager {
                 state.dataScheduleMgr->NumSchedules >
             0) { // Report to EIO file
             CurrentModuleObject = "Output:Schedules";
-            NumFields = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+            NumFields = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
             //    RptSchedule=.FALSE.
             RptLevel = 1;
             for (Count = 1; Count <= NumFields; ++Count) {
-                inputProcessor->getObjectItem(state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, Status);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, Status);
                 //      RptSchedule=.TRUE.
 
                 {

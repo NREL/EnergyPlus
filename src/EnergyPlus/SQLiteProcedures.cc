@@ -88,7 +88,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
         return nullptr;
     }
     try {
-        int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound(state, "Output:SQLite");
+        int numberOfSQLiteObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:SQLite");
         bool writeOutputToSQLite = false;
         bool writeTabularDataToSQLite = false;
 
@@ -104,7 +104,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
 
             auto &sql_ort(state.dataOutRptTab);
 
-            inputProcessor->getObjectItem(state, "Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, "Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
             if (numAlphas > 0) {
                 std::string option = alphas(1);
                 if (UtilityRoutines::SameString(option, "SimpleAndTabular")) {

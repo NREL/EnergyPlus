@@ -352,12 +352,12 @@ namespace HVACDXSystem {
         auto &TotalArgs(state.dataHVACDXSys->TotalArgs);
 
         CurrentModuleObject = "CoilSystem:Cooling:DX";
-        state.dataHVACDXSys->NumDXSystem = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHVACDXSys->NumDXSystem = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         DXCoolingSystem.allocate(state.dataHVACDXSys->NumDXSystem);
         state.dataHVACDXSys->CheckEquipName.dimension(state.dataHVACDXSys->NumDXSystem, true);
 
-        inputProcessor->getObjectDefMaxArgs(state, "CoilSystem:Cooling:DX", TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "CoilSystem:Cooling:DX", TotalArgs, NumAlphas, NumNums);
 
         Alphas.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
@@ -369,7 +369,7 @@ namespace HVACDXSystem {
         // Get the data for the DX Cooling System
         for (DXCoolSysNum = 1; DXCoolSysNum <= state.dataHVACDXSys->NumDXSystem; ++DXCoolSysNum) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           DXCoolSysNum,
                                           Alphas,

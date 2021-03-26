@@ -168,11 +168,11 @@ namespace PhotovoltaicThermalCollectors {
 
         // first load the performance object info into temporary structure
         state.dataIPShortCut->cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
-        int NumSimplePVTPerform = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        int NumSimplePVTPerform = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
         if (NumSimplePVTPerform > 0) {
             tmpSimplePVTperf.allocate(NumSimplePVTPerform);
             for (Item = 1; Item <= NumSimplePVTPerform; ++Item) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               state.dataIPShortCut->cCurrentModuleObject,
                                               Item,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -211,11 +211,11 @@ namespace PhotovoltaicThermalCollectors {
 
         // now get main PVT objects
         state.dataIPShortCut->cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
-        state.dataPhotovoltaicThermalCollector->NumPVT = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataPhotovoltaicThermalCollector->NumPVT = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
         state.dataPhotovoltaicThermalCollector->PVT.allocate(state.dataPhotovoltaicThermalCollector->NumPVT);
 
         for (Item = 1; Item <= state.dataPhotovoltaicThermalCollector->NumPVT; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           Item,
                                           state.dataIPShortCut->cAlphaArgs,

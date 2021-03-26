@@ -305,7 +305,7 @@ namespace EnergyPlus::OutputReportTabular {
             return;
         }
 
-        ort->MonthlyInputCount = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        ort->MonthlyInputCount = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (ort->MonthlyInputCount > 0) {
             ort->WriteTabularFiles = true;
             // if not a run period using weather do not create reports
@@ -315,11 +315,11 @@ namespace EnergyPlus::OutputReportTabular {
                 return;
             }
         }
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         NumArray.dimension(NumNums, 0.0);
         for (int TabNum = 1, TabNum_end = ort->MonthlyInputCount; TabNum <= TabNum_end; ++TabNum) { // MonthlyInputCount is modified in the loop
-            inputProcessor->getObjectItem(state, CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
 
             if (TabNum - 1 > 0) {
                 UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
@@ -1029,13 +1029,13 @@ namespace EnergyPlus::OutputReportTabular {
             return;
         }
 
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         NumArray.dimension(NumNums, 0.0);
 
         ort->timeInYear = 0.0; // initialize the time in year counter
         // determine size of array that holds the IDF description
-        ort->OutputTableBinnedCount = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        ort->OutputTableBinnedCount = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ort->OutputTableBinned.allocate(ort->OutputTableBinnedCount);
         if (ort->OutputTableBinnedCount > 0) {
             ort->WriteTabularFiles = true;
@@ -1050,7 +1050,7 @@ namespace EnergyPlus::OutputReportTabular {
         ort->BinResultsIntervalCount = 0;
         ort->BinResultsTableCount = 0;
         for (iInObj = 1; iInObj <= ort->OutputTableBinnedCount; ++iInObj) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
                                           AlphArray,
@@ -1241,11 +1241,11 @@ namespace EnergyPlus::OutputReportTabular {
         int IOStat;               // IO Status when calling get input subroutine
         auto &ort(state.dataOutRptTab);
 
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         NumArray.dimension(NumNums, 0.0);
 
-        NumTabularStyle = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumTabularStyle = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumTabularStyle == 0) {
             AlphArray(1) = "COMMA";
@@ -1254,7 +1254,7 @@ namespace EnergyPlus::OutputReportTabular {
             ort->del(1) = CharComma; // comma
             ort->unitsStyle = iUnitsStyle::None;
         } else if (NumTabularStyle == 1) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           1,
                                           AlphArray,
@@ -1436,16 +1436,16 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         ErrorsFound = false;
-        NumTabularPredefined = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumTabularPredefined = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumTabularPredefined == 1) {
             // find out how many fields since the object is extensible
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             // allocate the temporary arrays for the call to get the filed
             AlphArray.allocate(NumAlphas);
             // don't really need the NumArray since not expecting any numbers but the call requires it
             NumArray.dimension(NumNums, 0.0);
             // get the object
-            inputProcessor->getObjectItem(state, CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
             // default all report flags to false (do not get produced)
             ort->displayTabularBEPS = false;
             // initialize the names of the predefined monthly report titles
@@ -1889,16 +1889,16 @@ namespace EnergyPlus::OutputReportTabular {
         bool isFound;
 
         isFound = false;
-        NumTabularPredefined = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumTabularPredefined = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumTabularPredefined == 1) {
             // find out how many fields since the object is extensible
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             // allocate the temporary arrays for the call to get the filed
             AlphArray.allocate(NumAlphas);
             // don't really need the NumArray since not expecting any numbers but the call requires it
             NumArray.dimension(NumNums, 0.0);
             // get the object
-            inputProcessor->getObjectItem(state, CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
             // loop through the fields looking for matching report titles
             for (iReport = 1; iReport <= NumAlphas; ++iReport) {
                 if (UtilityRoutines::SameString(AlphArray(iReport), "ZoneComponentLoadSummary")) {
@@ -1924,8 +1924,8 @@ namespace EnergyPlus::OutputReportTabular {
 
     bool hasSizingPeriodsDays(EnergyPlusData &state)
     {
-        int sizePerDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
-        int sizePerWeathFileDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays");
+        int sizePerDesDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
+        int sizePerWeathFileDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays");
         return ((sizePerDesDays + sizePerWeathFileDays) > 0);
     }
 
@@ -10663,7 +10663,7 @@ namespace EnergyPlus::OutputReportTabular {
                 totPlugProcess = 0.0;
                 kOpaque = 0;
 
-                DetailedWWR = (inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
+                DetailedWWR = (state.dataInputProcessing->inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
                 if (DetailedWWR) {
                     if (produceTabular) {
                         print(state.files.debug, "{}\n", "======90.1 Classification [>=60 & <=120] tilt = wall==================");

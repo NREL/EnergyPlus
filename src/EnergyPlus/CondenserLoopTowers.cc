@@ -228,10 +228,10 @@ namespace CondenserLoopTowers {
         Array1D_string AlphArray2(1);      // Character string input data array for VS tower coefficients
 
         // Get number of all cooling towers specified in the input data file (idf)
-        NumSingleSpeedTowers = inputProcessor->getNumObjectsFound(state, cCoolingTower_SingleSpeed);
-        NumTwoSpeedTowers = inputProcessor->getNumObjectsFound(state, cCoolingTower_TwoSpeed);
-        NumVariableSpeedTowers = inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeed);
-        NumVSMerkelTowers = inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeedMerkel);
+        NumSingleSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_SingleSpeed);
+        NumTwoSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_TwoSpeed);
+        NumVariableSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeed);
+        NumVSMerkelTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeedMerkel);
         state.dataCondenserLoopTowers->NumSimpleTowers = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers;
 
         if (state.dataCondenserLoopTowers->NumSimpleTowers <= 0)
@@ -248,8 +248,8 @@ namespace CondenserLoopTowers {
         // Allocate variable-speed tower structure with data specific to this type
         if (NumVariableSpeedTowers > 0) {
             // Allow users to input model coefficients other than default
-            NumVSCoolToolsModelCoeffs = inputProcessor->getNumObjectsFound(state, "CoolingTowerPerformance:CoolTools");
-            NumVSYorkCalcModelCoeffs = inputProcessor->getNumObjectsFound(state, "CoolingTowerPerformance:YorkCalc");
+            NumVSCoolToolsModelCoeffs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoolingTowerPerformance:CoolTools");
+            NumVSYorkCalcModelCoeffs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoolingTowerPerformance:YorkCalc");
         }
 
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -257,7 +257,7 @@ namespace CondenserLoopTowers {
         cCurrentModuleObject = cCoolingTower_SingleSpeed;
         for (SingleSpeedTowerNumber = 1; SingleSpeedTowerNumber <= NumSingleSpeedTowers; ++SingleSpeedTowerNumber) {
             TowerNum = SingleSpeedTowerNumber;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleSpeedTowerNumber,
                                           AlphArray,
@@ -620,7 +620,7 @@ namespace CondenserLoopTowers {
         cCurrentModuleObject = cCoolingTower_TwoSpeed;
         for (TwoSpeedTowerNumber = 1; TwoSpeedTowerNumber <= NumTwoSpeedTowers; ++TwoSpeedTowerNumber) {
             TowerNum = NumSingleSpeedTowers + TwoSpeedTowerNumber;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           TwoSpeedTowerNumber,
                                           AlphArray,
@@ -1019,7 +1019,7 @@ namespace CondenserLoopTowers {
         cCurrentModuleObject = cCoolingTower_VariableSpeed;
         for (VariableSpeedTowerNumber = 1; VariableSpeedTowerNumber <= NumVariableSpeedTowers; ++VariableSpeedTowerNumber) {
             TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + VariableSpeedTowerNumber;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           VariableSpeedTowerNumber,
                                           AlphArray,
@@ -1182,7 +1182,7 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).TowerModelType = ModelType::CoolToolsUserDefined;
                 // Nested Get-input routines below.  Should pull out of here and read in beforehand.
                 for (VSModelCoeffNum = 1; VSModelCoeffNum <= NumVSCoolToolsModelCoeffs; ++VSModelCoeffNum) {
-                    inputProcessor->getObjectItem(
+                    state.dataInputProcessing->inputProcessor->getObjectItem(
                         state, "CoolingTowerPerformance:CoolTools", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat);
                     if (!UtilityRoutines::SameString(AlphArray2(1), state.dataCondenserLoopTowers->towers(TowerNum).ModelCoeffObjectName)) continue;
                     state.dataCondenserLoopTowers->towers(state.dataCondenserLoopTowers->towers(TowerNum).VSTower).FoundModelCoeff = true;
@@ -1219,7 +1219,7 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(TowerNum).TowerModelType = ModelType::YorkCalcUserDefined;
                 // Nested Get-input routines below.  Should pull out of here and read in beforehand.
                 for (VSModelCoeffNum = 1; VSModelCoeffNum <= NumVSYorkCalcModelCoeffs; ++VSModelCoeffNum) {
-                    inputProcessor->getObjectItem(
+                    state.dataInputProcessing->inputProcessor->getObjectItem(
                         state, "CoolingTowerPerformance:YorkCalc", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat);
                     if (!UtilityRoutines::SameString(AlphArray2(1), state.dataCondenserLoopTowers->towers(TowerNum).ModelCoeffObjectName)) continue;
                     state.dataCondenserLoopTowers->towers(state.dataCondenserLoopTowers->towers(TowerNum).VSTower).FoundModelCoeff = true;
@@ -1529,7 +1529,7 @@ namespace CondenserLoopTowers {
         cCurrentModuleObject = cCoolingTower_VariableSpeedMerkel;
         for (MerkelVSTowerNum = 1; MerkelVSTowerNum <= NumVSMerkelTowers; ++MerkelVSTowerNum) {
             TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + MerkelVSTowerNum;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           MerkelVSTowerNum,
                                           AlphArray,

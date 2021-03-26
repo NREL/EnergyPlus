@@ -297,29 +297,29 @@ namespace CurveManager {
 
         // Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
-        NumBiQuad = inputProcessor->getNumObjectsFound(state, "Curve:Biquadratic");
-        NumCubic = inputProcessor->getNumObjectsFound(state, "Curve:Cubic");
-        NumQuartic = inputProcessor->getNumObjectsFound(state, "Curve:Quartic");
-        NumQuad = inputProcessor->getNumObjectsFound(state, "Curve:Quadratic");
-        NumQLinear = inputProcessor->getNumObjectsFound(state, "Curve:QuadLinear");
-        NumQuintLinear = inputProcessor->getNumObjectsFound(state, "Curve:QuintLinear");
-        NumQuadLinear = inputProcessor->getNumObjectsFound(state, "Curve:QuadraticLinear");
-        NumCubicLinear = inputProcessor->getNumObjectsFound(state, "Curve:CubicLinear");
-        NumLinear = inputProcessor->getNumObjectsFound(state, "Curve:Linear");
-        NumBicubic = inputProcessor->getNumObjectsFound(state, "Curve:Bicubic");
-        NumTriQuad = inputProcessor->getNumObjectsFound(state, "Curve:Triquadratic");
-        NumExponent = inputProcessor->getNumObjectsFound(state, "Curve:Exponent");
-        NumTableLookup = inputProcessor->getNumObjectsFound(state, "Table:Lookup");
-        NumFanPressRise = inputProcessor->getNumObjectsFound(state, "Curve:FanPressureRise");
-        NumExpSkewNorm = inputProcessor->getNumObjectsFound(state, "Curve:ExponentialSkewNormal");
-        NumSigmoid = inputProcessor->getNumObjectsFound(state, "Curve:Sigmoid");
-        NumRectHyper1 = inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola1");
-        NumRectHyper2 = inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola2");
-        NumExpDecay = inputProcessor->getNumObjectsFound(state, "Curve:ExponentialDecay");
-        NumDoubleExpDecay = inputProcessor->getNumObjectsFound(state, "Curve:DoubleExponentialDecay");
-        NumChillerPartLoadWithLift = inputProcessor->getNumObjectsFound(state, "Curve:ChillerPartLoadWithLift"); // zrp_Aug2014
+        NumBiQuad = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Biquadratic");
+        NumCubic = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Cubic");
+        NumQuartic = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Quartic");
+        NumQuad = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Quadratic");
+        NumQLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:QuadLinear");
+        NumQuintLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:QuintLinear");
+        NumQuadLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:QuadraticLinear");
+        NumCubicLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:CubicLinear");
+        NumLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Linear");
+        NumBicubic = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Bicubic");
+        NumTriQuad = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Triquadratic");
+        NumExponent = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Exponent");
+        NumTableLookup = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Table:Lookup");
+        NumFanPressRise = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:FanPressureRise");
+        NumExpSkewNorm = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:ExponentialSkewNormal");
+        NumSigmoid = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Sigmoid");
+        NumRectHyper1 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola1");
+        NumRectHyper2 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola2");
+        NumExpDecay = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:ExponentialDecay");
+        NumDoubleExpDecay = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:DoubleExponentialDecay");
+        NumChillerPartLoadWithLift = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:ChillerPartLoadWithLift"); // zrp_Aug2014
 
-        NumWPCValTab = inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:WindPressureCoefficientValues");
+        NumWPCValTab = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:WindPressureCoefficientValues");
 
         state.dataCurveManager->NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
                     NumTableLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
@@ -334,7 +334,7 @@ namespace CurveManager {
         // Loop over biquadratic curves and load data
         CurrentModuleObject = "Curve:Biquadratic";
         for (CurveIndex = 1; CurveIndex <= NumBiQuad; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -404,7 +404,7 @@ namespace CurveManager {
         // Loop over ChillerPartLoadWithLift curves and load data //zrp_Aug2014
         CurrentModuleObject = "Curve:ChillerPartLoadWithLift";
         for (CurveIndex = 1; CurveIndex <= NumChillerPartLoadWithLift; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -479,7 +479,7 @@ namespace CurveManager {
         // Loop over cubic curves and load data
         CurrentModuleObject = "Curve:Cubic";
         for (CurveIndex = 1; CurveIndex <= NumCubic; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -533,7 +533,7 @@ namespace CurveManager {
         // Loop over quadrinomial curves and load data
         CurrentModuleObject = "Curve:Quartic";
         for (CurveIndex = 1; CurveIndex <= NumQuartic; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -588,7 +588,7 @@ namespace CurveManager {
         // Loop over quadratic curves and load data
         CurrentModuleObject = "Curve:Quadratic";
         for (CurveIndex = 1; CurveIndex <= NumQuad; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -641,7 +641,7 @@ namespace CurveManager {
         // Loop over quadratic-linear curves and load data
         CurrentModuleObject = "Curve:QuadraticLinear";
         for (CurveIndex = 1; CurveIndex <= NumQuadLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -709,7 +709,7 @@ namespace CurveManager {
         // Loop over cubic-linear curves and load data
         CurrentModuleObject = "Curve:CubicLinear";
         for (CurveIndex = 1; CurveIndex <= NumCubicLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -777,7 +777,7 @@ namespace CurveManager {
         // Loop over linear curves and load data
         CurrentModuleObject = "Curve:Linear";
         for (CurveIndex = 1; CurveIndex <= NumLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -829,7 +829,7 @@ namespace CurveManager {
         // Loop over bicubic curves and load data
         CurrentModuleObject = "Curve:Bicubic";
         for (CurveIndex = 1; CurveIndex <= NumBicubic; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -903,7 +903,7 @@ namespace CurveManager {
         // Loop over Triquadratic curves and load data
         CurrentModuleObject = "Curve:Triquadratic";
         for (CurveIndex = 1; CurveIndex <= NumTriQuad; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -1010,7 +1010,7 @@ namespace CurveManager {
         // Loop over quad linear curves and load data
         CurrentModuleObject = "Curve:QuadLinear";
         for (CurveIndex = 1; CurveIndex <= NumQLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -1079,7 +1079,7 @@ namespace CurveManager {
         // Loop over quint linear curves and load data
         CurrentModuleObject = "Curve:QuintLinear";
         for (CurveIndex = 1; CurveIndex <= NumQuintLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -1150,7 +1150,7 @@ namespace CurveManager {
         // Loop over Exponent curves and load data
         CurrentModuleObject = "Curve:Exponent";
         for (CurveIndex = 1; CurveIndex <= NumExponent; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -1197,7 +1197,7 @@ namespace CurveManager {
         // Loop over Fan Pressure Rise curves and load data - udated 15Sep2010 for unit types
         CurrentModuleObject = "Curve:FanPressureRise";
         for (CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -1250,7 +1250,7 @@ namespace CurveManager {
         // Loop over Exponential Skew Normal curves and load data
         CurrentModuleObject = "Curve:ExponentialSkewNormal";
         for (CurveIndex = 1; CurveIndex <= NumExpSkewNorm; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -1306,7 +1306,7 @@ namespace CurveManager {
         // Loop over Sigmoid curves and load data
         CurrentModuleObject = "Curve:Sigmoid";
         for (CurveIndex = 1; CurveIndex <= NumSigmoid; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -1363,7 +1363,7 @@ namespace CurveManager {
         // Loop over Rectangular Hyperbola Type 1 curves and load data
         CurrentModuleObject = "Curve:RectangularHyperbola1";
         for (CurveIndex = 1; CurveIndex <= NumRectHyper1; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -1418,7 +1418,7 @@ namespace CurveManager {
         // Loop over Rectangular Hyperbola Type 2 curves and load data
         CurrentModuleObject = "Curve:RectangularHyperbola2";
         for (CurveIndex = 1; CurveIndex <= NumRectHyper2; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -1473,7 +1473,7 @@ namespace CurveManager {
         // Loop over Exponential Decay curves and load data
         CurrentModuleObject = "Curve:ExponentialDecay";
         for (CurveIndex = 1; CurveIndex <= NumExpDecay; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -1528,7 +1528,7 @@ namespace CurveManager {
         // ykt July,2011 Loop over DoubleExponential Decay curves and load data
         CurrentModuleObject = "Curve:DoubleExponentialDecay";
         for (CurveIndex = 1; CurveIndex <= NumDoubleExpDecay; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
@@ -1580,14 +1580,14 @@ namespace CurveManager {
         if (NumWPCValTab > 0) {
             // Get the angle values
             CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientArray";
-            int numOfCPArray = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+            int numOfCPArray = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
             if (numOfCPArray != 1) {
                 ShowSevereError(state, "GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject +
                                 " object per simulation is required when using the AirflowNetwork model.");
                 ErrorsFound = true;
             } else if (numOfCPArray == 1) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               1,
                                               Alphas,
@@ -1635,7 +1635,7 @@ namespace CurveManager {
                 // Now that we have the directions, we can read the tables themselves
                 CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientValues";
                 for (int index = 1; index <= NumWPCValTab; ++index) {
-                    inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
                                                   index,
                                                   Alphas,
@@ -1712,30 +1712,30 @@ namespace CurveManager {
         }
 
         // Create case insensitive references to independent variable input data
-        int numIndVars = inputProcessor->getNumObjectsFound(state, "Table:IndependentVariable");
+        int numIndVars = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Table:IndependentVariable");
         if (numIndVars > 0) {
             // Set Btwxt Message Callback
-            auto const &indVarInstances = inputProcessor->getObjectInstances("Table:IndependentVariable");
+            auto const &indVarInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:IndependentVariable");
             for (auto &instance : indVarInstances.items()) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
                 state.dataCurveManager->btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName),fields);
             }
         }
 
         // Create GridSpaces from Independent Variable List
-        int numIndVarLists = inputProcessor->getNumObjectsFound(state, "Table:IndependentVariableList");
+        int numIndVarLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Table:IndependentVariableList");
         std::map<std::string, std::vector<std::pair<double, double>>>
             varListLimits; // ugly, but this is needed for legacy behavior (otherwise limits are reset by Btwxt if they are within bounds).
         std::map<std::string, std::vector<double>> varListNormalizeTargets;
         if (numIndVarLists > 0) {
-            auto const indVarListInstances = inputProcessor->getObjectInstances("Table:IndependentVariableList");
+            auto const indVarListInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:IndependentVariableList");
             for (auto &instance : indVarListInstances.items()) {
 
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed("Table:IndependentVariableList", thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariableList", thisObjectName);
                 std::string varListName = UtilityRoutines::MakeUPPERCase(thisObjectName);
 
                 std::vector<Btwxt::GridAxis > gridAxes;
@@ -1866,14 +1866,14 @@ namespace CurveManager {
             }
         }
 
-        int numTblLookups = inputProcessor->getNumObjectsFound(state, "Table:Lookup");
+        int numTblLookups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Table:Lookup");
         if (numTblLookups > 0) {
-            auto const lookupInstances = inputProcessor->getObjectInstances("Table:Lookup");
+            auto const lookupInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:Lookup");
             for (auto &instance : lookupInstances.items()) {
 
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed("Table:Lookup", thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:Lookup", thisObjectName);
                 ++CurveNum;
                 state.dataCurveManager->PerfCurve(CurveNum).Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
@@ -2768,10 +2768,10 @@ namespace CurveManager {
         bool ErrsFound(false); // Set to true if errors in input, fatal at end of routine
         int CurveNum;
 
-        NumPressure = inputProcessor->getNumObjectsFound(state, CurveObjectName);
+        NumPressure = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurveObjectName);
         state.dataBranchAirLoopPlant->PressureCurve.allocate(NumPressure);
         for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurveObjectName,
                                           CurveNum,
                                           Alphas,

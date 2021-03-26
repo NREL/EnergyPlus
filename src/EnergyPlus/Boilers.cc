@@ -168,7 +168,7 @@ namespace EnergyPlus::Boilers {
 
         // GET NUMBER OF ALL EQUIPMENT
         state.dataIPShortCut->cCurrentModuleObject = "Boiler:HotWater";
-        state.dataBoilers->numBoilers = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataBoilers->numBoilers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataBoilers->numBoilers <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " Equipment specified in input file");
@@ -186,7 +186,7 @@ namespace EnergyPlus::Boilers {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           BoilerNum,
                                           state.dataIPShortCut->cAlphaArgs,

@@ -905,38 +905,38 @@ namespace Furnaces {
         MaxAlphas = 0;
 
         CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatOnly";
-        NumHeatOnly = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumHeatOnly = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatCool";
-        NumHeatCool = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumHeatCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatOnly";
-        NumUnitaryHeatOnly = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumUnitaryHeatOnly = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool";
-        NumUnitaryHeatCool = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumUnitaryHeatCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:AirToAir";
-        NumHeatPump = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumHeatPump = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:WaterToAir";
-        NumWaterToAirHeatPump = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumWaterToAirHeatPump = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -986,7 +986,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = FurnaceType_Num;
             state.dataFurnaces->Furnace(FurnaceNum).iterationMode.allocate(3);
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           GetObjectNum,
                                           Alphas,
@@ -1533,7 +1533,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = FurnaceType_Num;
             state.dataFurnaces->Furnace(FurnaceNum).iterationMode.allocate(3);
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           GetObjectNum,
                                           Alphas,
@@ -2739,7 +2739,7 @@ namespace Furnaces {
             FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + HeatPumpNum;
             state.dataFurnaces->Furnace(FurnaceNum).iterationMode.allocate(3);
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           HeatPumpNum,
                                           Alphas,
@@ -3661,7 +3661,7 @@ namespace Furnaces {
             FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + HeatPumpNum;
             state.dataFurnaces->Furnace(FurnaceNum).iterationMode.allocate(3);
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           HeatPumpNum,
                                           Alphas,

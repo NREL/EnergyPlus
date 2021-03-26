@@ -529,7 +529,7 @@ namespace UserDefinedComponents {
         std::string cCurrentModuleObject;
 
         cCurrentModuleObject = "PlantComponent:UserDefined";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
@@ -538,12 +538,12 @@ namespace UserDefinedComponents {
 
         // need to make sure GetEMSInput has run...
 
-        state.dataUserDefinedComponents->NumUserPlantComps = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataUserDefinedComponents->NumUserPlantComps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataUserDefinedComponents->NumUserPlantComps > 0) {
             state.dataUserDefinedComponents->UserPlantComp.allocate(state.dataUserDefinedComponents->NumUserPlantComps);
             state.dataUserDefinedComponents->CheckUserPlantCompName.dimension(state.dataUserDefinedComponents->NumUserPlantComps, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserPlantComps; ++CompLoop) {
-                inputProcessor->getObjectItem(
+                state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, _);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
@@ -917,20 +917,20 @@ namespace UserDefinedComponents {
         }
 
         cCurrentModuleObject = "Coil:UserDefined";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
         lAlphaFieldBlanks.dimension(NumAlphas, false);
         rNumericArgs.dimension(NumNums, 0.0);
 
-        state.dataUserDefinedComponents->NumUserCoils = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataUserDefinedComponents->NumUserCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataUserDefinedComponents->NumUserCoils > 0) {
             state.dataUserDefinedComponents->UserCoil.allocate(state.dataUserDefinedComponents->NumUserCoils);
             state.dataUserDefinedComponents->CheckUserCoilName.dimension(state.dataUserDefinedComponents->NumUserCoils, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserCoils; ++CompLoop) {
-                inputProcessor->getObjectItem(
+                state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, _);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
@@ -1258,19 +1258,19 @@ namespace UserDefinedComponents {
         }
 
         cCurrentModuleObject = "ZoneHVAC:ForcedAir:UserDefined";
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
         lAlphaFieldBlanks.dimension(NumAlphas, false);
         rNumericArgs.dimension(NumNums, 0.0);
 
-        state.dataUserDefinedComponents->NumUserZoneAir = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataUserDefinedComponents->NumUserZoneAir = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataUserDefinedComponents->NumUserZoneAir > 0) {
             state.dataUserDefinedComponents->UserZoneAirHVAC.allocate(state.dataUserDefinedComponents->NumUserZoneAir);
             state.dataUserDefinedComponents->CheckUserZoneAirName.dimension(state.dataUserDefinedComponents->NumUserZoneAir, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserZoneAir; ++CompLoop) {
-                inputProcessor->getObjectItem(
+                state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, _);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name = cAlphaArgs(1);
@@ -1639,19 +1639,19 @@ namespace UserDefinedComponents {
 
         cCurrentModuleObject = "AirTerminal:SingleDuct:UserDefined";
 
-        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
         lAlphaFieldBlanks.dimension(NumAlphas, false);
         rNumericArgs.dimension(NumNums, 0.0);
 
-        state.dataUserDefinedComponents->NumUserAirTerminals = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataUserDefinedComponents->NumUserAirTerminals = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataUserDefinedComponents->NumUserAirTerminals > 0) {
             state.dataUserDefinedComponents->UserAirTerminal.allocate(state.dataUserDefinedComponents->NumUserAirTerminals);
             state.dataUserDefinedComponents->CheckUserAirTerminal.dimension(state.dataUserDefinedComponents->NumUserAirTerminals, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserAirTerminals; ++CompLoop) {
-                inputProcessor->getObjectItem(
+                state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, _);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name = cAlphaArgs(1);

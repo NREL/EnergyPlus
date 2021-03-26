@@ -56,8 +56,9 @@
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
-void initializeFunctionalAPI(EnergyPlusState) {
-    EnergyPlus::inputProcessor = EnergyPlus::InputProcessor::factory();
+void initializeFunctionalAPI(EnergyPlusState state) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataInputProcessing->inputProcessor = EnergyPlus::InputProcessor::factory();
     EnergyPlus::Psychrometrics::InitializePsychRoutines();
     EnergyPlus::FluidProperties::InitializeGlycRoutines();
 }

@@ -180,10 +180,10 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         int NumObj;                      // count of objects
 
         CurrentModuleObject = "LifeCycleCost:Parameters";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        NumObj = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumObj = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         auto &elcc(state.dataEconLifeCycleCost);
 
@@ -191,7 +191,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             elcc->LCCparamPresent = false;
         } else if (NumObj == 1) {
             elcc->LCCparamPresent = true;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           1,
                                           AlphaArray,
@@ -436,13 +436,13 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 
         if (!elcc->LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:RecurringCosts";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        elcc->numRecurringCosts = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        elcc->numRecurringCosts = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         elcc->RecurringCosts.allocate(elcc->numRecurringCosts);
         for (iInObj = 1; iInObj <= elcc->numRecurringCosts; ++iInObj) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
                                           AlphaArray,
@@ -620,18 +620,18 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 
         if (!elcc->LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:NonrecurringCost";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        elcc->numNonrecurringCost = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        numComponentCostLineItems = inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
+        elcc->numNonrecurringCost = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        numComponentCostLineItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
         if (numComponentCostLineItems > 0) {                    // leave room for component cost total
             elcc->NonrecurringCost.allocate(elcc->numNonrecurringCost + 1); // add a place for CostEstimate total
         } else {
             elcc->NonrecurringCost.allocate(elcc->numNonrecurringCost);
         }
         for (iInObj = 1; iInObj <= elcc->numNonrecurringCost; ++iInObj) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
                                           AlphaArray,
@@ -750,17 +750,17 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 
         if (!elcc->LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:UsePriceEscalation";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        elcc->numUsePriceEscalation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        elcc->numUsePriceEscalation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         elcc->UsePriceEscalation.allocate(elcc->numUsePriceEscalation);
         for (iInObj = 1; iInObj <= elcc->numUsePriceEscalation; ++iInObj) {
             elcc->UsePriceEscalation(iInObj).Escalation.allocate(elcc->lengthStudyYears);
         }
         if (elcc->numUsePriceEscalation > 0) {
             for (iInObj = 1; iInObj <= elcc->numUsePriceEscalation; ++iInObj) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               iInObj,
                                               AlphaArray,
@@ -888,17 +888,17 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 
         if (!elcc->LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:UseAdjustment";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        elcc->numUseAdjustment = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        elcc->numUseAdjustment = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         elcc->UseAdjustment.allocate(elcc->numUseAdjustment);
         for (iInObj = 1; iInObj <= elcc->numUseAdjustment; ++iInObj) {
             elcc->UseAdjustment(iInObj).Adjustment.allocate(elcc->lengthStudyYears);
         }
         if (elcc->numUseAdjustment > 0) {
             for (iInObj = 1; iInObj <= elcc->numUseAdjustment; ++iInObj) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               iInObj,
                                               AlphaArray,

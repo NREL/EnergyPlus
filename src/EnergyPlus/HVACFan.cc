@@ -106,7 +106,7 @@ namespace HVACFan {
         std::string const &objectName)
     {
 
-        int testNum = inputProcessor->getObjectItemNum(state, "Fan:SystemModel", objectName);
+        int testNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Fan:SystemModel", objectName);
         if (testNum > 0) {
             return true;
         } else {
@@ -390,8 +390,8 @@ namespace HVACFan {
         Array1D<Real64> numericArgs;
         Array1D_string numericFieldNames;
         Array1D_bool isNumericFieldBlank;
-        int objectNum = inputProcessor->getObjectItemNum(state, locCurrentModuleObject, objectName);
-        inputProcessor->getObjectDefMaxArgs(state, locCurrentModuleObject, numTotFields, numAlphas, numNums);
+        int objectNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, locCurrentModuleObject, objectName);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, locCurrentModuleObject, numTotFields, numAlphas, numNums);
         if (numAlphas > 0) {
             alphaArgs.allocate(numAlphas);
             alphaFieldNames.allocate(numAlphas);
@@ -403,7 +403,7 @@ namespace HVACFan {
             isNumericFieldBlank.allocate(numNums);
         }
 
-        inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                       locCurrentModuleObject,
                                       objectNum,
                                       alphaArgs,

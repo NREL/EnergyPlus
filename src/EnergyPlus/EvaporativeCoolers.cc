@@ -245,11 +245,11 @@ namespace EvaporativeCoolers {
 
         state.dataEvapCoolers->GetInputEvapComponentsFlag = false;
         // Start getting the input data
-        NumDirectEvapCool = inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Direct:CelDekPad");
-        NumDryInDirectEvapCool = inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:CelDekPad");
-        NumWetInDirectEvapCool = inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:WetCoil");
-        NumRDDEvapCool = inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:ResearchSpecial");
-        NumDirectResearchSpecialEvapCool = inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Direct:ResearchSpecial");
+        NumDirectEvapCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Direct:CelDekPad");
+        NumDryInDirectEvapCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:CelDekPad");
+        NumWetInDirectEvapCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:WetCoil");
+        NumRDDEvapCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:ResearchSpecial");
+        NumDirectResearchSpecialEvapCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Direct:ResearchSpecial");
 
         // Sum up all of the Evap Cooler Types
         state.dataEvapCoolers->NumEvapCool =
@@ -264,7 +264,7 @@ namespace EvaporativeCoolers {
         cCurrentModuleObject = "EvaporativeCooler:Direct:CelDekPad";
 
         for (EvapCoolNum = 1; EvapCoolNum <= NumDirectEvapCool; ++EvapCoolNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           EvapCoolNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -337,7 +337,7 @@ namespace EvaporativeCoolers {
         for (IndEvapCoolNum = 1; IndEvapCoolNum <= NumDryInDirectEvapCool; ++IndEvapCoolNum) {
             EvapCoolNum = NumDirectEvapCool + IndEvapCoolNum;
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           IndEvapCoolNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -440,7 +440,7 @@ namespace EvaporativeCoolers {
         for (IndEvapCoolNum = 1; IndEvapCoolNum <= NumWetInDirectEvapCool; ++IndEvapCoolNum) {
             EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + IndEvapCoolNum;
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           IndEvapCoolNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -534,7 +534,7 @@ namespace EvaporativeCoolers {
         cCurrentModuleObject = "EvaporativeCooler:Indirect:ResearchSpecial";
         for (IndEvapCoolNum = 1; IndEvapCoolNum <= NumRDDEvapCool; ++IndEvapCoolNum) {
             EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + IndEvapCoolNum;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           IndEvapCoolNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -676,7 +676,7 @@ namespace EvaporativeCoolers {
         cCurrentModuleObject = "EvaporativeCooler:Direct:ResearchSpecial";
         for (DirectEvapCoolNum = 1; DirectEvapCoolNum <= NumDirectResearchSpecialEvapCool; ++DirectEvapCoolNum) {
             EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + NumRDDEvapCool + DirectEvapCoolNum;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           DirectEvapCoolNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -3474,8 +3474,8 @@ namespace EvaporativeCoolers {
         MaxAlphas = 0;
 
         CurrentModuleObject = "ZoneHVAC:EvaporativeCoolerUnit";
-        state.dataEvapCoolers->NumZoneEvapUnits = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        state.dataEvapCoolers->NumZoneEvapUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         Alphas.allocate(MaxAlphas);
@@ -3491,7 +3491,7 @@ namespace EvaporativeCoolers {
             state.dataEvapCoolers->ZoneEvapCoolerUnitFields.allocate(state.dataEvapCoolers->NumZoneEvapUnits);
 
             for (UnitLoop = 1; UnitLoop <= state.dataEvapCoolers->NumZoneEvapUnits; ++UnitLoop) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               UnitLoop,
                                               Alphas,

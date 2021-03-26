@@ -170,6 +170,7 @@ namespace EnergyPlus {
         this->dataHybridUnitaryAC = std::make_unique<HybridUnitaryAirConditionersData>();
         this->dataHysteresisPhaseChange = std::make_unique<HysteresisPhaseChangeData>();
         this->dataICEngElectGen = std::make_unique<ICEngineElectricGeneratorData>();
+        this->dataInputProcessing = std::make_unique<DataInputProcessing>();
         this->dataIPShortCut = std::make_unique<IPShortCutsData>();
         this->dataIceThermalStorage = std::make_unique<IceThermalStorageData>();
         this->dataIntegratedHP = std::make_unique<IntegratedHeatPumpGlobalData>();
@@ -425,6 +426,7 @@ namespace EnergyPlus {
         this->dataICEngElectGen->clear_state();
         this->dataIPShortCut->clear_state();
         this->dataIceThermalStorage->clear_state();
+        this->dataInputProcessing->clear_state();
         this->dataIntegratedHP->clear_state();
         this->dataInternalHeatGains->clear_state();
         this->dataLoopNodes->clear_state();

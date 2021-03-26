@@ -113,7 +113,7 @@ namespace NonZoneEquipmentManager {
         auto & CountNonZoneEquip = state.dataGlobal->CountNonZoneEquip;
 
         if (CountNonZoneEquip) {
-            NumOfWaterHeater = inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") + inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");
+            NumOfWaterHeater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") + state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");
             CountNonZoneEquip = false;
         }
 

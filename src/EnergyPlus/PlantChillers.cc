@@ -176,7 +176,7 @@ namespace PlantChillers {
 
 
         state.dataIPShortCut->cCurrentModuleObject = "Chiller:Electric";
-        state.dataPlantChillers->NumElectricChillers = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataPlantChillers->NumElectricChillers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumElectricChillers <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " Equipment specified in input file");
@@ -191,7 +191,7 @@ namespace PlantChillers {
 
         // LOAD ARRAYS WITH Electric CURVE FIT CHILLER DATA
         for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumElectricChillers; ++ChillerNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           ChillerNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -2095,7 +2095,7 @@ namespace PlantChillers {
 
 
         state.dataIPShortCut->cCurrentModuleObject = "Chiller:EngineDriven";
-        state.dataPlantChillers->NumEngineDrivenChillers = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataPlantChillers->NumEngineDrivenChillers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumEngineDrivenChillers <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -2109,7 +2109,7 @@ namespace PlantChillers {
 
         // LOAD ARRAYS WITH EngineDriven CURVE FIT CHILLER DATA
         for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumEngineDrivenChillers; ++ChillerNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           ChillerNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -4030,7 +4030,7 @@ namespace PlantChillers {
 
 
         state.dataIPShortCut->cCurrentModuleObject = "Chiller:CombustionTurbine";
-        state.dataPlantChillers->NumGTChillers = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataPlantChillers->NumGTChillers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumGTChillers <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -4043,7 +4043,7 @@ namespace PlantChillers {
         state.dataPlantChillers->GTChiller.allocate(state.dataPlantChillers->NumGTChillers);
 
         for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumGTChillers; ++ChillerNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           ChillerNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -5891,7 +5891,7 @@ namespace PlantChillers {
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
         state.dataIPShortCut->cCurrentModuleObject = "Chiller:ConstantCOP";
-        state.dataPlantChillers->NumConstCOPChillers = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataPlantChillers->NumConstCOPChillers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumConstCOPChillers <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -5905,7 +5905,7 @@ namespace PlantChillers {
 
         // LOAD ARRAYS WITH BLAST ConstCOP CHILLER DATA
         for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumConstCOPChillers; ++ChillerNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           ChillerNum,
                                           state.dataIPShortCut->cAlphaArgs,

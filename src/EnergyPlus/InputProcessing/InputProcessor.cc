@@ -178,14 +178,12 @@ json const &InputProcessor::getPatternProperties(EnergyPlusData &state, json con
 
 // Functions
 
-void InputProcessor::clear_state()
-{
+void InputProcessor::clear_state() {
     idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
     data = std::unique_ptr<DataStorage>(new DataStorage());
     epJSON = json::object();
     objectCacheMap.clear();
     unusedInputs.clear();
-
     validation = std::unique_ptr<Validation>(new Validation(&schema));
 }
 

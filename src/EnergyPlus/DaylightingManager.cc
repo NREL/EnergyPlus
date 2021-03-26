@@ -4011,7 +4011,7 @@ namespace EnergyPlus::DaylightingManager {
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         ErrorsFound = false;
         cCurrentModuleObject = "Daylighting:Controls";
-        TotDaylightingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        TotDaylightingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotDaylightingControls > 0) {
             GetInputDayliteRefPt(state, ErrorsFound);
             GetDaylightingControls(state, TotDaylightingControls, ErrorsFound);
@@ -4268,9 +4268,9 @@ namespace EnergyPlus::DaylightingManager {
 
         // TH 6/3/2010, added to report daylight factors
         cCurrentModuleObject = "Output:DaylightFactors";
-        NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumReports > 0) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           1,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -4345,7 +4345,7 @@ namespace EnergyPlus::DaylightingManager {
         CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Output:IlluminanceMap";
-        state.dataDaylightingData->TotIllumMaps = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataDaylightingData->TotIllumMaps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataDaylightingData->IllumMap.allocate(state.dataDaylightingData->TotIllumMaps);
         state.dataDaylightingData->IllumMapCalc.allocate(state.dataDaylightingData->TotIllumMaps);
@@ -4353,7 +4353,7 @@ namespace EnergyPlus::DaylightingManager {
 
         if (state.dataDaylightingData->TotIllumMaps > 0) {
             for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               MapNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -4425,13 +4425,13 @@ namespace EnergyPlus::DaylightingManager {
                 }
             } // MapNum
             cCurrentModuleObject = "OutputControl:IlluminanceMap:Style";
-            MapStyleIn = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            MapStyleIn = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             if (MapStyleIn == 0) {
                 state.dataIPShortCut->cAlphaArgs(1) = "COMMA";
                 state.dataDaylightingData->MapColSep = CharComma; // comma
             } else if (MapStyleIn == 1) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               1,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -4724,7 +4724,7 @@ namespace EnergyPlus::DaylightingManager {
         for (int iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl) {
             state.dataIPShortCut->cAlphaArgs = "";
             state.dataIPShortCut->rNumericArgs = 0.0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           iDaylCntrl,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -5113,10 +5113,10 @@ namespace EnergyPlus::DaylightingManager {
         int NumNumber;
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Daylighting:ReferencePoint";
-        state.dataDaylightingData->TotRefPoints = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataDaylightingData->TotRefPoints = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataDaylightingData->DaylRefPt.allocate(state.dataDaylightingData->TotRefPoints);
         for (auto &pt : state.dataDaylightingData->DaylRefPt) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ++RefPtNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -5267,12 +5267,12 @@ namespace EnergyPlus::DaylightingManager {
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // Get the total number of Light Well objects
         cCurrentModuleObject = "DaylightingDevice:LightWell";
-        TotLightWells = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        TotLightWells = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotLightWells == 0) return;
 
         for (loop = 1; loop <= TotLightWells; ++loop) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           loop,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -10099,8 +10099,8 @@ namespace EnergyPlus::DaylightingManager {
         OldAspectRatio = 1.0;
         NewAspectRatio = 1.0;
 
-        if (inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
-            inputProcessor->getObjectItem(state,
+        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           1,
                                           cAlphas,

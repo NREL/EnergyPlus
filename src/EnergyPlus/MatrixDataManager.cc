@@ -132,7 +132,7 @@ namespace MatrixDataManager {
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "Matrix:TwoDimension";
-        NumTwoDimMatrix = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumTwoDimMatrix = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataMatrixDataManager->NumMats = NumTwoDimMatrix;
 
@@ -140,7 +140,7 @@ namespace MatrixDataManager {
 
         MatNum = 0;
         for (MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           MatIndex,
                                           state.dataIPShortCut->cAlphaArgs,

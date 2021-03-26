@@ -326,13 +326,13 @@ namespace EnergyPlus::PlantLoadProfile {
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "LoadProfile:Plant";
-        state.dataPlantLoadProfile->NumOfPlantProfile = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataPlantLoadProfile->NumOfPlantProfile = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataPlantLoadProfile->NumOfPlantProfile > 0) {
             state.dataPlantLoadProfile->PlantProfile.allocate(state.dataPlantLoadProfile->NumOfPlantProfile);
 
             for (ProfileNum = 1; ProfileNum <= state.dataPlantLoadProfile->NumOfPlantProfile; ++ProfileNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               ProfileNum,
                                               state.dataIPShortCut->cAlphaArgs,

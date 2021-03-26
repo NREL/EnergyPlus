@@ -89,7 +89,7 @@ int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const 
 }
 
 void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state) {
-    int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(state, state.dataCoilCooingDX->coilCoolingDXObjectName);
+    int numCoolingCoilDXs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataCoilCooingDX->coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
         ShowFatalError(state, R"(No "Coil:Cooling:DX" objects in input file)");
     }
@@ -97,7 +97,7 @@ void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state) {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(state, state.dataCoilCooingDX->coilCoolingDXObjectName, coilNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state, state.dataCoilCooingDX->coilCoolingDXObjectName, coilNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
         CoilCoolingDXInputSpecification input_specs;
         input_specs.name = state.dataIPShortCut->cAlphaArgs(1);
         input_specs.evaporator_inlet_node_name = state.dataIPShortCut->cAlphaArgs(2);

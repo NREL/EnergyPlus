@@ -182,12 +182,12 @@ namespace EnergyPlus::MixerComponent {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
-        state.dataMixerComponent->NumMixers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataMixerComponent->NumMixers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (state.dataMixerComponent->NumMixers > 0) state.dataMixerComponent->MixerCond.allocate(state.dataMixerComponent->NumMixers);
         state.dataMixerComponent->CheckEquipName.dimension(state.dataMixerComponent->NumMixers, true);
 
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         lAlphaBlanks.dimension(NumAlphas, true);
@@ -196,7 +196,7 @@ namespace EnergyPlus::MixerComponent {
         NumArray.dimension(NumNums, 0.0);
 
         for (MixerNum = 1; MixerNum <= state.dataMixerComponent->NumMixers; ++MixerNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           MixerNum,
                                           AlphArray,

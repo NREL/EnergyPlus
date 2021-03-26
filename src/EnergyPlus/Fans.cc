@@ -273,40 +273,40 @@ namespace EnergyPlus::Fans {
 
         MaxAlphas = 0;
         MaxNumbers = 0;
-        NumSimpFan = inputProcessor->getNumObjectsFound(state, "Fan:ConstantVolume");
+        NumSimpFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:ConstantVolume");
         if (NumSimpFan > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, "Fan:ConstantVolume", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Fan:ConstantVolume", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
-        NumVarVolFan = inputProcessor->getNumObjectsFound(state, "Fan:VariableVolume");
+        NumVarVolFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:VariableVolume");
         if (NumVarVolFan > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, "Fan:VariableVolume", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Fan:VariableVolume", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
-        NumOnOff = inputProcessor->getNumObjectsFound(state, "Fan:OnOff");
+        NumOnOff = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:OnOff");
         if (NumOnOff > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, "Fan:OnOff", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Fan:OnOff", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
-        NumZoneExhFan = inputProcessor->getNumObjectsFound(state, "Fan:ZoneExhaust");
+        NumZoneExhFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:ZoneExhaust");
         if (NumZoneExhFan > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, "Fan:ZoneExhaust", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Fan:ZoneExhaust", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
-        state.dataFans->NumNightVentPerf = inputProcessor->getNumObjectsFound(state, "FanPerformance:NightVentilation");
+        state.dataFans->NumNightVentPerf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FanPerformance:NightVentilation");
         if (state.dataFans->NumNightVentPerf > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, "FanPerformance:NightVentilation", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FanPerformance:NightVentilation", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
 
-        NumCompModelFan = inputProcessor->getNumObjectsFound(state, "Fan:ComponentModel");
+        NumCompModelFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:ComponentModel");
         if (NumCompModelFan > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, "Fan:ComponentModel", NumParams, NumAlphas, NumNums);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Fan:ComponentModel", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
@@ -329,7 +329,7 @@ namespace EnergyPlus::Fans {
         for (SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum) {
             FanNum = SimpFanNum;
             cCurrentModuleObject = "Fan:ConstantVolume";
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SimpFanNum,
                                           cAlphaArgs,
@@ -392,7 +392,7 @@ namespace EnergyPlus::Fans {
         for (VarVolFanNum = 1; VarVolFanNum <= NumVarVolFan; ++VarVolFanNum) {
             FanNum = NumSimpFan + VarVolFanNum;
             cCurrentModuleObject = "Fan:VariableVolume";
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           VarVolFanNum,
                                           cAlphaArgs,
@@ -475,7 +475,7 @@ namespace EnergyPlus::Fans {
         for (ExhFanNum = 1; ExhFanNum <= NumZoneExhFan; ++ExhFanNum) {
             FanNum = NumSimpFan + NumVarVolFan + ExhFanNum;
             cCurrentModuleObject = "Fan:ZoneExhaust";
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ExhFanNum,
                                           cAlphaArgs,
@@ -623,7 +623,7 @@ namespace EnergyPlus::Fans {
         for (OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum) {
             FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
             cCurrentModuleObject = "Fan:OnOff";
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           OnOffFanNum,
                                           cAlphaArgs,
@@ -697,7 +697,7 @@ namespace EnergyPlus::Fans {
         } // end Number of Simple  ON-OFF FAN Loop
 
         cCurrentModuleObject = "FanPerformance:NightVentilation";
-        state.dataFans->NumNightVentPerf = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataFans->NumNightVentPerf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataFans->NumNightVentPerf > 0) {
             NightVentPerf.allocate(state.dataFans->NumNightVentPerf);
@@ -713,7 +713,7 @@ namespace EnergyPlus::Fans {
         }
         // input the night ventilation performance objects
         for (NVPerfNum = 1; NVPerfNum <= state.dataFans->NumNightVentPerf; ++NVPerfNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           NVPerfNum,
                                           cAlphaArgs,
@@ -751,7 +751,7 @@ namespace EnergyPlus::Fans {
             FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + CompModelFanNum;
 
             cCurrentModuleObject = "Fan:ComponentModel";
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           CompModelFanNum,
                                           cAlphaArgs,

@@ -204,31 +204,31 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         MaxAlpha = -100;
         MaxNumber = -100;
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         IHGNumbers.allocate(MaxNumber);
@@ -237,13 +237,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         AlphaName = "";
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenConstant = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenConstant = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericConstant.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenConstant);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenConstant; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Loop,
                                           AlphaName,
@@ -360,13 +360,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericPDriven.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Loop,
                                           AlphaName,
@@ -486,13 +486,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericCutoff.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Loop,
                                           AlphaName,
@@ -592,13 +592,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenDecay = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenDecay = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericDecay.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenDecay);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenDecay; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Loop,
                                           AlphaName,
@@ -704,13 +704,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-        state.dataZoneContaminantPredictorCorrector->TotGCBLDiff = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCBLDiff = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericBLDiff.allocate(state.dataZoneContaminantPredictorCorrector->TotGCBLDiff);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCBLDiff; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Loop,
                                           AlphaName,
@@ -817,13 +817,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-        state.dataZoneContaminantPredictorCorrector->TotGCDVS = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCDVS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericDVS.allocate(state.dataZoneContaminantPredictorCorrector->TotGCDVS);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDVS; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Loop,
                                           AlphaName,
@@ -915,13 +915,13 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-        state.dataZoneContaminantPredictorCorrector->TotGCDRS = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCDRS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericDRS.allocate(state.dataZoneContaminantPredictorCorrector->TotGCDRS);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDRS; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Loop,
                                           AlphaName,
@@ -1078,14 +1078,14 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
         };
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ZoneControl:ContaminantController";
-        state.dataContaminantBalance->NumContControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataContaminantBalance->NumContControlledZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataContaminantBalance->NumContControlledZones > 0) {
             state.dataContaminantBalance->ContaminantControlledZone.allocate(state.dataContaminantBalance->NumContControlledZones);
         }
 
         for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ContControlledZoneNum,
                                           state.dataIPShortCut->cAlphaArgs,

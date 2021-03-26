@@ -245,8 +245,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
 
         bool ErrorsFound(false);
 
-        NumCoolCoil = inputProcessor->getNumObjectsFound(state, HPEqFitCoolingUC);
-        NumHeatCoil = inputProcessor->getNumObjectsFound(state, HPEqFitHeatingUC);
+        NumCoolCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, HPEqFitCoolingUC);
+        NumHeatCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, HPEqFitHeatingUC);
         state.dataHPWaterToWaterSimple->NumGSHPs = NumCoolCoil + NumHeatCoil;
 
         if (state.dataHPWaterToWaterSimple->NumGSHPs <= 0) {
@@ -264,7 +264,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
 
             GSHPNum = HPNum;
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           HPEqFitCoolingUC,
                                           HPNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -423,7 +423,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
 
             GSHPNum = NumCoolCoil + HPNum;
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           HPEqFitHeatingUC,
                                           HPNum,
                                           state.dataIPShortCut->cAlphaArgs,

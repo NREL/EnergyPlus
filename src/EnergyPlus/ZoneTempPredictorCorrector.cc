@@ -337,13 +337,13 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
         auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TStat));
-        state.dataZoneCtrls->NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneCtrls->NumTStatStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataZoneCtrls->TStatObjects.allocate(state.dataZoneCtrls->NumTStatStatements);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
         state.dataZoneCtrls->NumTempControlledZones = 0;
         for (Item = 1; Item <= state.dataZoneCtrls->NumTStatStatements; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -394,7 +394,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             TempControlledZoneNum = 0;
             state.dataZoneTempPredictorCorrector->NumOnOffCtrZone = 0;
             for (Item = 1; Item <= state.dataZoneCtrls->NumTStatStatements; ++Item) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Item,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -528,12 +528,12 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         }     // Check on number of TempControlledZones
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::SglHeatSetPoint));
-        state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeating.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls);
 
         for (SingleTempHeatingControlNum = 1; SingleTempHeatingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls; ++SingleTempHeatingControlNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleTempHeatingControlNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -559,12 +559,12 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         } // SingleTempHeatingControlNum
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::SglCoolSetPoint));
-        state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleCooling.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls);
 
         for (SingleTempCoolingControlNum = 1; SingleTempCoolingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls; ++SingleTempCoolingControlNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleTempCoolingControlNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -590,12 +590,12 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         } // SingleTempCoolingControlNum
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::SglHCSetPoint));
-        state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls);
 
         for (SingleTempHeatCoolControlNum = 1; SingleTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls; ++SingleTempHeatCoolControlNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleTempHeatCoolControlNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -619,12 +619,12 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         } // SingleTempHeatCoolControlNum
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::DualSetPoint));
-        state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointDualHeatCool.allocate(state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls);
 
         for (DualTempHeatCoolControlNum = 1; DualTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls; ++DualTempHeatCoolControlNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           DualTempHeatCoolControlNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -877,7 +877,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         if (allocated(TStatControlTypes)) TStatControlTypes.deallocate();
         // This starts the Humidity Control Get Input section
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::HStat));
-        state.dataZoneCtrls->NumHumidityControlZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneCtrls->NumHumidityControlZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneCtrls->NumHumidityControlZones > 0) {
             state.dataZoneCtrls->HumidityControlZone.allocate(state.dataZoneCtrls->NumHumidityControlZones);
@@ -885,7 +885,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         }
 
         for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HumidControlledZoneNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           HumidControlledZoneNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -934,14 +934,14 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
         // Start to read Thermal comfort control objects
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TCTStat));
-        state.dataZoneCtrls->NumComfortTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneCtrls->NumComfortTStatStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataZoneCtrls->ComfortTStatObjects.allocate(state.dataZoneCtrls->NumComfortTStatStatements);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
         state.dataZoneCtrls->NumComfortControlledZones = 0;
         errFlag = false;
         for (Item = 1; Item <= state.dataZoneCtrls->NumComfortTStatStatements; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -992,7 +992,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
             ComfortControlledZoneNum = 0;
             for (Item = 1; Item <= state.dataZoneCtrls->NumComfortTStatStatements; ++Item) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Item,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -1230,12 +1230,12 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // End of Thermal comfort control reading and checking
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger));
-        state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger.allocate(state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls);
 
         for (SingleFangerHeatingControlNum = 1; SingleFangerHeatingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls; ++SingleFangerHeatingControlNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleFangerHeatingControlNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -1269,14 +1269,14 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         } // SingleFangerHeatingControlNum
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger));
-        state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls > 0) {
             state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger.allocate(state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls);
         }
 
         for (SingleFangerCoolingControlNum = 1; SingleFangerCoolingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls; ++SingleFangerCoolingControlNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleFangerCoolingControlNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -1311,13 +1311,13 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         } // SingleFangerCoolingControlNum
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger));
-        state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger.allocate(state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls);
 
         for (SingleFangerHeatCoolControlNum = 1; SingleFangerHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls;
              ++SingleFangerHeatCoolControlNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SingleFangerHeatCoolControlNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -1352,12 +1352,12 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         } // SingleFangerHeatCoolControlNum
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger));
-        state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger.allocate(state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls);
 
         for (DualFangerHeatCoolControlNum = 1; DualFangerHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls; ++DualFangerHeatCoolControlNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           DualFangerHeatCoolControlNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -1646,7 +1646,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
         // Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrector Procedure
         cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
-        int NumZoneCapaMultiplier = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // Number of ZonesCapacityMultiplier object
+        int NumZoneCapaMultiplier = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // Number of ZonesCapacityMultiplier object
         if (NumZoneCapaMultiplier == 0) {
             // Assign default multiplier values to all zones
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ZoneNum++) {
@@ -1662,7 +1662,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             // Added by S. Lee and R. Zhang in Oct. 2016.
             // Assign the user inputted multipliers to specified zones
             for (int ZoneCapNum = 1; ZoneCapNum <= NumZoneCapaMultiplier; ZoneCapNum++) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               ZoneCapNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -1749,13 +1749,13 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         print(state.files.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
 
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::OTTStat));
-        state.dataZoneCtrls->NumOpTempControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneCtrls->NumOpTempControlledZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneCtrls->NumOpTempControlledZones > 0) {
             state.dataZoneCtrls->AnyOpTempControl = true;
 
             for (OpTempContrlNum = 1; OpTempContrlNum <= state.dataZoneCtrls->NumOpTempControlledZones; ++OpTempContrlNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               OpTempContrlNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -1970,13 +1970,13 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
         // Overcool dehumidificaton GetInput starts here
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TandHStat));
-        state.dataZoneCtrls->NumTempAndHumidityControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneCtrls->NumTempAndHumidityControlledZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneCtrls->NumTempAndHumidityControlledZones > 0) {
             state.dataZoneCtrls->AnyZoneTempAndHumidityControl = true;
 
             for (TempHumidityCntrlNum = 1; TempHumidityCntrlNum <= state.dataZoneCtrls->NumTempAndHumidityControlledZones; ++TempHumidityCntrlNum) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               TempHumidityCntrlNum,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -2168,13 +2168,13 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
         // Staged thermostat control inputs start
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::StagedDual));
-        NumStageControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumStageControlledZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumStageControlledZones > 0) state.dataZoneCtrls->StagedTStatObjects.allocate(NumStageControlledZones);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
         state.dataZoneTempPredictorCorrector->NumStageCtrZone = 0;
         for (Item = 1; Item <= NumStageControlledZones; ++Item) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -2223,7 +2223,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
             StageControlledZoneNum = 0;
             for (Item = 1; Item <= NumStageControlledZones; ++Item) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Item,
                                               state.dataIPShortCut->cAlphaArgs,
@@ -2411,10 +2411,10 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                     }
                 }
             } // loop over NumStageControlledZones
-            if ((inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed") == 0) &&
-                (inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:UnitarySystem") == 0) &&
-                (inputProcessor->getNumObjectsFound(state, "SetpointManager:SingleZone:OneStageCooling") == 0) &&
-                (inputProcessor->getNumObjectsFound(state, "SetpointManager:SingleZone:OneStageHeating") == 0)) {
+            if ((state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed") == 0) &&
+                (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:UnitarySystem") == 0) &&
+                (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SetpointManager:SingleZone:OneStageCooling") == 0) &&
+                (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SetpointManager:SingleZone:OneStageHeating") == 0)) {
                 ShowWarningError(state, cCurrentModuleObject + " is applicable to only selected HVAC objects which are missing from input.");
                 ShowContinueError(state,"Model should include one or more of the following objects:  ");
                 ShowContinueError(state,"AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, AirLoopHVAC:UnitarySystem, ");

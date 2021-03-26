@@ -265,8 +265,8 @@ namespace UnitHeater {
 
         // Figure out how many unit heaters there are in the input file
         CurrentModuleObject = state.dataUnitHeaters->cMO_UnitHeater;
-        state.dataUnitHeaters->NumOfUnitHeats = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        state.dataUnitHeaters->NumOfUnitHeats = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
 
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
@@ -285,7 +285,7 @@ namespace UnitHeater {
 
         for (UnitHeatNum = 1; UnitHeatNum <= state.dataUnitHeaters->NumOfUnitHeats; ++UnitHeatNum) { // Begin looping over all of the unit heaters found in the input file...
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           UnitHeatNum,
                                           Alphas,

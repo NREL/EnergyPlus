@@ -287,8 +287,8 @@ std::vector<std::string> InputOutputFile::getLines()
 
 void IOFiles::OutputControl::getInput(EnergyPlusData &state)
 {
-    auto const instances = inputProcessor->epJSON.find("OutputControl:Files");
-    if (instances != inputProcessor->epJSON.end()) {
+    auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find("OutputControl:Files");
+    if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
 
         auto find_input = [=, &state](nlohmann::json const & fields, std::string const & field_name) -> std::string {
             std::string input;
@@ -297,7 +297,7 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
                 input = found.value().get<std::string>();
                 input = UtilityRoutines::MakeUPPERCase(input);
             } else {
-                inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
+                state.dataInputProcessing->inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
             }
             return input;
         };

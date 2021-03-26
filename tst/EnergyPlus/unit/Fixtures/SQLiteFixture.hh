@@ -62,10 +62,10 @@ class SQLiteFixture : public EnergyPlusFixture
 {
 
 protected:
-    static void SetUpTestCase()
-    {
-        EnergyPlusFixture::SetUpTestCase();
-    }
+//    static void SetUpTestCase()
+//    {
+//        EnergyPlusFixture::SetUpTestCase();
+//    }
     static void TearDownTestCase()
     {
     }

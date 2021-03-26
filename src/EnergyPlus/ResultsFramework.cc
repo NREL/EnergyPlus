@@ -893,7 +893,7 @@ namespace ResultsFramework {
             return;
         }
 
-        int numberOfOutputSchemaObjects = inputProcessor->getNumObjectsFound(state, "Output:JSON");
+        int numberOfOutputSchemaObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:JSON");
         if (numberOfOutputSchemaObjects == 0) {
             return;
         }
@@ -903,7 +903,7 @@ namespace ResultsFramework {
         Array1D<Real64> numbers(2);
         int numNumbers;
         int status;
-        inputProcessor->getObjectItem(state, "Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state, "Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status);
 
         if (numAlphas > 0) {
             std::string option = alphas(1);

@@ -132,10 +132,10 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
         std::string const sOutputVariable = "PythonPlugin:OutputVariable";
-        int outputVarInstances = inputProcessor->getNumObjectsFound(state, sOutputVariable);
+        int outputVarInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sOutputVariable);
         if (outputVarInstances > 0) {
-            auto const instances = inputProcessor->epJSON.find(sOutputVariable);
-            if (instances == inputProcessor->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(sOutputVariable);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 ShowSevereError(state, sOutputVariable + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
             auto &instancesValue = instances.value();
@@ -144,7 +144,7 @@ namespace EnergyPlus::PluginManagement {
                 auto const &thisObjectName = instance.key();
                 auto const objNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(thisObjectName);
                 // no need to validate name, the JSON will validate that.
-                inputProcessor->markObjectAsUsed(sOutputVariable, thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(sOutputVariable, thisObjectName);
                 std::string varName = fields.at("python_plugin_variable_name");
                 std::string avgOrSum = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("type_of_data_in_variable"));
                 std::string updateFreq = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("update_frequency"));
@@ -439,7 +439,7 @@ namespace EnergyPlus::PluginManagement {
 
         // Read all the additional search paths next
         std::string const sPaths = "PythonPlugin:SearchPaths";
-        int searchPaths = inputProcessor->getNumObjectsFound(state, sPaths);
+        int searchPaths = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPaths);
         if (searchPaths == 0) {
             // no search path objects in the IDF, just do the default behavior: add the current working dir and the input file dir
             PluginManager::addToPythonPath(state, ".", false);
@@ -447,8 +447,8 @@ namespace EnergyPlus::PluginManagement {
             PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
         }
         if (searchPaths > 0) {
-            auto const instances = inputProcessor->epJSON.find(sPaths);
-            if (instances == inputProcessor->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(sPaths);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 ShowSevereError(state,                                                                              // LCOV_EXCL_LINE
                     "PythonPlugin:SearchPaths: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
@@ -457,7 +457,7 @@ namespace EnergyPlus::PluginManagement {
                 // This is a unique object, so we should have one, but this is fine
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
                 std::string workingDirFlagUC = "YES";
                 try {
                     workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
@@ -496,10 +496,10 @@ namespace EnergyPlus::PluginManagement {
         // Now read all the actual plugins and interpret them
         // IMPORTANT -- DO NOT CALL setup() UNTIL ALL INSTANCES ARE DONE
         std::string const sPlugins = "PythonPlugin:Instance";
-        int pluginInstances = inputProcessor->getNumObjectsFound(state, sPlugins);
+        int pluginInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPlugins);
         if (pluginInstances > 0) {
-            auto const instances = inputProcessor->epJSON.find(sPlugins);
-            if (instances == inputProcessor->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(sPlugins);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 ShowSevereError(state,                                                                           // LCOV_EXCL_LINE
                     "PythonPlugin:Instance: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
@@ -507,7 +507,7 @@ namespace EnergyPlus::PluginManagement {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
                 std::string fileName = fields.at("python_module_name");
                 std::string className = fields.at("plugin_class_name");
                 std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days"));
@@ -525,17 +525,17 @@ namespace EnergyPlus::PluginManagement {
         }
 
         std::string const sGlobals = "PythonPlugin:Variables";
-        int globalVarInstances = inputProcessor->getNumObjectsFound(state, sGlobals);
+        int globalVarInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sGlobals);
         if (globalVarInstances > 0) {
-            auto const instances = inputProcessor->epJSON.find(sGlobals);
-            if (instances == inputProcessor->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(sGlobals);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 ShowSevereError(state, sGlobals + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
                 auto const vars = fields.at("global_py_vars");
                 for (const auto &var : vars) {
                     this->addGlobalVariable(state, var.at("variable_name"));
@@ -558,17 +558,17 @@ namespace EnergyPlus::PluginManagement {
         //       \type integer
         //       \minimum 1
         std::string const sTrends = "PythonPlugin:TrendVariable";
-        int trendInstances = inputProcessor->getNumObjectsFound(state, sTrends);
+        int trendInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sTrends);
         if (trendInstances > 0) {
-            auto const instances = inputProcessor->epJSON.find(sTrends);
-            if (instances == inputProcessor->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(sTrends);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 ShowSevereError(state, sTrends + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
-                inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
                 std::string variableName = fields.at("name_of_a_python_plugin_variable");
                 int variableIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(state, variableName);
                 int numValues = fields.at("number_of_timesteps_to_be_logged");
@@ -581,7 +581,7 @@ namespace EnergyPlus::PluginManagement {
 #else
         // need to alert only if a plugin instance is found
         std::string const sPlugins = "PythonPlugin:Instance";
-        int pluginInstances = inputProcessor->getNumObjectsFound(state, sPlugins);
+        int pluginInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPlugins);
         if (pluginInstances > 0) {
             EnergyPlus::ShowFatalError(state, "Python Plugin instance found, but this build of EnergyPlus is not compiled with Python.");
         }
@@ -1343,7 +1343,7 @@ namespace EnergyPlus::PluginManagement {
     {
         int numTotalThings = 0;
         for (auto const &objToFind : state.dataPluginManager->objectsToFind) {
-            int instances = inputProcessor->getNumObjectsFound(state, objToFind);
+            int instances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, objToFind);
             numTotalThings += instances;
             if (numTotalThings == 1) {
                 ShowSevereMessage(state, "Found PythonPlugin objects in an IDF that is running in an API/Library workflow...this is invalid");

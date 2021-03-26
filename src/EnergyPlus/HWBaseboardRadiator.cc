@@ -317,8 +317,8 @@ namespace HWBaseboardRadiator {
         auto & HWBaseboardDesignNumericFields = state.dataHWBaseboardRad->HWBaseboardDesignNumericFields;
         auto & HWBaseboardDesignNames = state.dataHWBaseboardRad->HWBaseboardDesignNames;
 
-        NumHWBaseboards = inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water);
-        NumHWBaseboardDesignObjs = inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water_Design);
+        NumHWBaseboards = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water);
+        NumHWBaseboardDesignObjs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water_Design);
 
         // Count total number of baseboard units
 
@@ -332,7 +332,7 @@ namespace HWBaseboardRadiator {
 
         // Get the data from the user input related to design data for baseboard heaters
         for (BaseboardDesignNum = 1; BaseboardDesignNum <= NumHWBaseboardDesignObjs; ++BaseboardDesignNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCMO_BBRadiator_Water_Design,
                                           BaseboardDesignNum,
                                           state.dataIPShortCut->cAlphaArgs,
@@ -449,7 +449,7 @@ namespace HWBaseboardRadiator {
         // Get the data from the user input related to baseboard heaters
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCMO_BBRadiator_Water,
                                           BaseboardNum,
                                           state.dataIPShortCut->cAlphaArgs,

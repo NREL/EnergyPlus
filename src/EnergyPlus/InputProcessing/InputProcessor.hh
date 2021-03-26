@@ -63,6 +63,7 @@
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/InputProcessing/DataStorage.hh>
@@ -187,7 +188,6 @@ public:
     const json &getObjectInstances(std::string const &ObjType);
 
     void clear_state();
-
 private:
     friend class EnergyPlusFixture;
     friend class InputProcessorFixture;
@@ -309,7 +309,13 @@ private:
 
 }; // InputProcessor
 
-extern std::unique_ptr<InputProcessor> inputProcessor;
+struct DataInputProcessing : BaseGlobalStruct {
+    std::unique_ptr<InputProcessor> inputProcessor;
+    void clear_state() override {
+        inputProcessor->clear_state();
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

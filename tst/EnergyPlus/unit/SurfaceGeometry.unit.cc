@@ -4356,7 +4356,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
     ASSERT_FALSE(ErrorsFound);
 
     // Read InternalMass Object Count
-    int TotIntMass = inputProcessor->getNumObjectsFound(*state, "InternalMass");
+    int TotIntMass = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "InternalMass");
     // check the three internal mass objects
     EXPECT_EQ(3, TotIntMass);
 
@@ -4694,7 +4694,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     ASSERT_FALSE(ErrorsFound);
 
     // Read InternalMass Object Count
-    int TotIntMass = inputProcessor->getNumObjectsFound(*state, "InternalMass");
+    int TotIntMass = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "InternalMass");
     EXPECT_EQ(3, TotIntMass);
 
     // Read InternalMass Surfaces Count

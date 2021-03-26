@@ -7181,8 +7181,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_EQ(1, inputProcessor->getNumObjectsFound(*state, "Output:Table:SummaryReports"));
-    EXPECT_EQ(0, inputProcessor->getNumObjectsFound(*state, "Output:Variable"));
+    EXPECT_EQ(1, state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Table:SummaryReports"));
+    EXPECT_EQ(0, state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Variable"));
 
     // InputProcessor::addVariablesForMonthlyReport should have requested 5 variables
     // for the SetpointsNotMetWithTemperatureMonthly report

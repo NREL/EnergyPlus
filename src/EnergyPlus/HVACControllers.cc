@@ -516,7 +516,7 @@ namespace EnergyPlus::HVACControllers {
         // be retrieved by name as they are needed.
 
         CurrentModuleObject = "Controller:WaterCoil";
-        NumSimpleControllers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumSimpleControllers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         NumControllers = NumSimpleControllers;
 
         // Allocate stats data structure for each air loop and controller if needed
@@ -539,7 +539,7 @@ namespace EnergyPlus::HVACControllers {
         RootFinders.allocate(NumControllers);
         CheckEquipName.dimension(NumControllers, true);
 
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         cNumericFields.allocate(NumNums);
@@ -550,7 +550,7 @@ namespace EnergyPlus::HVACControllers {
         // Now find and load all of the simple controllers.
         if (NumSimpleControllers > 0) {
             for (Num = 1; Num <= NumSimpleControllers; ++Num) {
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               Num,
                                               AlphArray,

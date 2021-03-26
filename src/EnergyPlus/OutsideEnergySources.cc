@@ -146,8 +146,8 @@ namespace EnergyPlus::OutsideEnergySources {
         // are initialized. Output variables are set up.
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
-        int const NumDistrictUnitsHeat = inputProcessor->getNumObjectsFound(state, "DistrictHeating");
-        int const NumDistrictUnitsCool = inputProcessor->getNumObjectsFound(state, "DistrictCooling");
+        int const NumDistrictUnitsHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictHeating");
+        int const NumDistrictUnitsCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictCooling");
         state.dataOutsideEnergySrcs->NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
 
         if (allocated(state.dataOutsideEnergySrcs->EnergySource)) return;
@@ -182,7 +182,7 @@ namespace EnergyPlus::OutsideEnergySources {
             }
 
             int NumAlphas = 0, NumNums = 0, IOStat = 0;
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           thisIndex,
                                           state.dataIPShortCut->cAlphaArgs,

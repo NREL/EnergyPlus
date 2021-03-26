@@ -535,20 +535,20 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         // find the number of each type of packaged terminal unit
         CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
-        state.dataPTHP->NumPTHP = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        state.dataPTHP->NumPTHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
-        state.dataPTHP->NumPTAC = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        state.dataPTHP->NumPTAC = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
-        state.dataPTHP->NumPTWSHP = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        state.dataPTHP->NumPTWSHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -585,7 +585,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             OANodeNums = 0;
 
             CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           PTUnitIndex,
                                           Alphas,
@@ -1481,7 +1481,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             OANodeNums = 0;
 
             CurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           PTUnitIndex,
                                           Alphas,
@@ -2286,7 +2286,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             OANodeNums = 0;
 
             CurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           PTUnitIndex,
                                           Alphas,

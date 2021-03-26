@@ -526,7 +526,7 @@ namespace HVACMultiSpeedHeatPump {
         state.dataHVACMultiSpdHP->CurrentModuleObject =
             "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed"; // Object type for getting and error messages
 
-        inputProcessor->getObjectDefMaxArgs(state, state.dataHVACMultiSpdHP->CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, state.dataHVACMultiSpdHP->CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -537,7 +537,7 @@ namespace HVACMultiSpeedHeatPump {
         lAlphaBlanks.dimension(MaxAlphas, true);
         lNumericBlanks.dimension(MaxNums, true);
 
-        state.dataHVACMultiSpdHP->NumMSHeatPumps = inputProcessor->getNumObjectsFound(state, state.dataHVACMultiSpdHP->CurrentModuleObject);
+        state.dataHVACMultiSpdHP->NumMSHeatPumps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHVACMultiSpdHP->CurrentModuleObject);
 
         if (state.dataHVACMultiSpdHP->NumMSHeatPumps <= 0) {
             ShowSevereError(state, "No " + state.dataHVACMultiSpdHP->CurrentModuleObject + " objects specified in input file.");
@@ -559,7 +559,7 @@ namespace HVACMultiSpeedHeatPump {
             SuppHeatCoilInletNode = 0;
             SuppHeatCoilOutletNode = 0;
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataHVACMultiSpdHP->CurrentModuleObject,
                                           MSHPNum,
                                           Alphas,
@@ -760,7 +760,7 @@ namespace HVACMultiSpeedHeatPump {
 
             if (UtilityRoutines::SameString(Alphas(10), "Coil:Heating:DX:MultiSpeed")) {
                 MSHeatPump(MSHPNum).HeatCoilType = MultiSpeedHeatingCoil;
-                MSHeatPump(MSHPNum).HeatCoilNum = inputProcessor->getObjectItemNum(state, "Coil:Heating:DX:MultiSpeed", Alphas(11));
+                MSHeatPump(MSHPNum).HeatCoilNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Coil:Heating:DX:MultiSpeed", Alphas(11));
                 MSHeatPump(MSHPNum).DXHeatCoilName = Alphas(11);
                 if (MSHeatPump(MSHPNum).HeatCoilNum <= 0) {
                     ShowSevereError(state, "Configuration error in " + state.dataHVACMultiSpdHP->CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -817,7 +817,7 @@ namespace HVACMultiSpeedHeatPump {
 
                 if (UtilityRoutines::SameString(Alphas(10), "Coil:Heating:Electric:MultiStage")) {
                     MSHeatPump(MSHPNum).HeatCoilType = Coil_HeatingElectric_MultiStage;
-                    MSHeatPump(MSHPNum).HeatCoilNum = inputProcessor->getObjectItemNum(state, "Coil:Heating:Electric:MultiStage", Alphas(11));
+                    MSHeatPump(MSHPNum).HeatCoilNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Coil:Heating:Electric:MultiStage", Alphas(11));
                     if (MSHeatPump(MSHPNum).HeatCoilNum <= 0) {
                         ShowSevereError(state, "Configuration error in " + state.dataHVACMultiSpdHP->CurrentModuleObject + " \"" + Alphas(1) + "\"");
                         ShowContinueError(state, cAlphaFields(11) + " \"" + Alphas(11) + "\" not found.");
@@ -829,7 +829,7 @@ namespace HVACMultiSpeedHeatPump {
                     }
                 } else {
                     MSHeatPump(MSHPNum).HeatCoilType = Coil_HeatingGas_MultiStage;
-                    MSHeatPump(MSHPNum).HeatCoilNum = inputProcessor->getObjectItemNum(state, "Coil:Heating:Gas:MultiStage", Alphas(11));
+                    MSHeatPump(MSHPNum).HeatCoilNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Coil:Heating:Gas:MultiStage", Alphas(11));
                     if (MSHeatPump(MSHPNum).HeatCoilNum <= 0) {
                         ShowSevereError(state, "Configuration error in " + state.dataHVACMultiSpdHP->CurrentModuleObject + " \"" + Alphas(1) + "\"");
                         ShowContinueError(state, cAlphaFields(11) + " \"" + Alphas(11) + "\" not found.");
@@ -1007,7 +1007,7 @@ namespace HVACMultiSpeedHeatPump {
             if (UtilityRoutines::SameString(Alphas(12), "Coil:Cooling:DX:MultiSpeed")) {
                 MSHeatPump(MSHPNum).CoolCoilType = MultiSpeedCoolingCoil;
                 MSHeatPump(MSHPNum).DXCoolCoilName = Alphas(13);
-                if (inputProcessor->getObjectItemNum(state, "Coil:Cooling:DX:MultiSpeed", Alphas(13)) <= 0) {
+                if (state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Coil:Cooling:DX:MultiSpeed", Alphas(13)) <= 0) {
                     ShowSevereError(state, "Configuration error in " + state.dataHVACMultiSpdHP->CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(state, cAlphaFields(13) + " \"" + Alphas(13) + "\" not found.");
                     ShowContinueError(state, cAlphaFields(12) + " must be Coil:Cooling:DX:MultiSpeed ");

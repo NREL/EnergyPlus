@@ -100,6 +100,7 @@ struct DataBranchAirLoopPlantData;
 struct DataDaylightingDevicesData;
 struct DataGlobal;
 struct DataGlobalConstantsData;
+struct DataInputProcessing;
 struct DataPlantData;
 struct DataStringGlobalsData;
 struct DataTimingsData;
@@ -356,6 +357,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<DataDaylightingDevicesData> dataDaylightingDevicesData;
     std::unique_ptr<DataGlobal> dataGlobal;
     std::unique_ptr<DataGlobalConstantsData> dataGlobalConst;
+    std::unique_ptr<DataInputProcessing> dataInputProcessing;
     std::unique_ptr<DataPlantData> dataPlnt;
     std::unique_ptr<DataStringGlobalsData> dataStrGlobals;
     std::unique_ptr<DataTimingsData> dataTimingsData;

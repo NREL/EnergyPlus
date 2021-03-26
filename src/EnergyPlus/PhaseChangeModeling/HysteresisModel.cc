@@ -319,7 +319,7 @@ namespace HysteresisPhaseChange {
 
         // convenience variables
         state.dataIPShortCut->cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-        state.dataHysteresisPhaseChange->numHysteresisModels = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataHysteresisPhaseChange->numHysteresisModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         // loop over all hysteresis input instances, if zero, this will simply not do anything
         for (int hmNum = 1; hmNum <= state.dataHysteresisPhaseChange->numHysteresisModels; ++hmNum) {
@@ -330,7 +330,7 @@ namespace HysteresisPhaseChange {
             int numNumbers;
 
             // get the input data and store it in the Shortcuts structures
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           hmNum,
                                           state.dataIPShortCut->cAlphaArgs,

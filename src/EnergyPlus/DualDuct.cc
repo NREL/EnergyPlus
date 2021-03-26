@@ -239,9 +239,9 @@ namespace DualDuct {
         int ADUNum;                                  // loop control to search Air Distribution Units
         Real64 DummyOAFlow(0.0);
 
-        state.dataDualDuct->NumDualDuctConstVolDampers = inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDConstantVolume);
-        state.dataDualDuct->NumDualDuctVarVolDampers = inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVariableVolume);
-        state.dataDualDuct->NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
+        state.dataDualDuct->NumDualDuctConstVolDampers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDConstantVolume);
+        state.dataDualDuct->NumDualDuctVarVolDampers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVariableVolume);
+        state.dataDualDuct->NumDualDuctVarVolOA = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
         state.dataDualDuct->NumDDAirTerminal =
             state.dataDualDuct->NumDualDuctConstVolDampers + state.dataDualDuct->NumDualDuctVarVolDampers + state.dataDualDuct->NumDualDuctVarVolOA;
         state.dataDualDuct->dd_airterminal.allocate(state.dataDualDuct->NumDDAirTerminal);
@@ -254,7 +254,7 @@ namespace DualDuct {
                 // Load the info from the damper
                 CurrentModuleObject = state.dataDualDuct->cCMO_DDConstantVolume;
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               DamperIndex,
                                               AlphArray,
@@ -411,7 +411,7 @@ namespace DualDuct {
                 // Load the info from the damper
                 CurrentModuleObject = state.dataDualDuct->cCMO_DDVariableVolume;
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               DamperIndex,
                                               AlphArray,
@@ -583,7 +583,7 @@ namespace DualDuct {
                 // Load the info from the damper
                 CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
 
-                inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               DamperIndex,
                                               AlphArray,
@@ -2291,7 +2291,7 @@ namespace DualDuct {
         //  END IF
 
         if (state.dataDualDuct->GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
-            state.dataDualDuct->NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
+            state.dataDualDuct->NumDualDuctVarVolOA = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
             state.dataDualDuct->RecircIsUsedARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
             state.dataDualDuct->DamperNamesARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
             if (state.dataDualDuct->NumDualDuctVarVolOA > 0) {
@@ -2305,7 +2305,7 @@ namespace DualDuct {
 
                     CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
 
-                    inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
                                                   DamperIndex,
                                                   AlphArray,

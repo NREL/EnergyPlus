@@ -157,7 +157,7 @@ namespace CTElectricGenerator {
         bool ErrorsFound(false); // error flag
 
         state.dataIPShortCut->cCurrentModuleObject = "Generator:CombustionTurbine";
-        state.dataCTElectricGenerator->NumCTGenerators = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataCTElectricGenerator->NumCTGenerators = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataCTElectricGenerator->NumCTGenerators <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -169,7 +169,7 @@ namespace CTElectricGenerator {
 
         // LOAD ARRAYS WITH CT CURVE FIT Generator DATA
         for (int genNum = 1; genNum <= state.dataCTElectricGenerator->NumCTGenerators; ++genNum) {
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           state.dataIPShortCut->cCurrentModuleObject,
                                           genNum,
                                           AlphArray,

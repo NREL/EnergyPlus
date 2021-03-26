@@ -88,7 +88,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     std::shared_ptr<SiteDeepGroundTemps> thisModel(new SiteDeepGroundTemps());
 
     std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_SiteDeepGroundTemp);
-    int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numCurrObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;
     thisModel->objectName = objectName;
@@ -96,7 +96,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
             ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");

@@ -229,7 +229,7 @@ void GetPurchasedAir(EnergyPlusData &state)
 
     auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
 
-    state.dataPurchasedAirMgr->NumPurchAir = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataPurchasedAirMgr->NumPurchAir = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     PurchAir.allocate(state.dataPurchasedAirMgr->NumPurchAir);
     state.dataPurchasedAirMgr->CheckEquipName.allocate(state.dataPurchasedAirMgr->NumPurchAir);
@@ -241,7 +241,7 @@ void GetPurchasedAir(EnergyPlusData &state)
         for (PurchAirNum = 1; PurchAirNum <= state.dataPurchasedAirMgr->NumPurchAir; ++PurchAirNum) {
             PurchAir(PurchAirNum).cObjectName = cCurrentModuleObject;
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           PurchAirNum,
                                           state.dataIPShortCut->cAlphaArgs,

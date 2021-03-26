@@ -114,7 +114,7 @@ namespace EnergyPlus::DataSurfaceColors {
         state.dataSurfColor->DXFcolorno = state.dataSurfColor->defaultcolorno;
 
         // first see if there is a scheme name
-        int numptr = inputProcessor->getObjectItemNum(state, CurrentModuleObject, SchemeName);
+        int numptr = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, CurrentModuleObject, SchemeName);
         if (numptr > 0) {
 
             int NumAlphas;
@@ -127,7 +127,7 @@ namespace EnergyPlus::DataSurfaceColors {
             Array1D_bool lAlphaBlanks;
             Array1D_bool lNumericBlanks;
             Array1D<Real64> rNumerics;
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, numargs, NumAlphas, numNumbers);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, numargs, NumAlphas, numNumbers);
 
             cAlphas.allocate(NumAlphas);
             cAlphaFields.allocate(NumAlphas);
@@ -139,7 +139,7 @@ namespace EnergyPlus::DataSurfaceColors {
             cAlphas({1, NumAlphas}) = "";
             rNumerics({1, numNumbers}) = 0.0;
 
-            inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           numptr,
                                           cAlphas,
