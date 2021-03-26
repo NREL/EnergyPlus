@@ -674,7 +674,7 @@ namespace HeatBalanceManager {
             state.dataHeatBal->TempConvergTol = BuildingNumbers(3);
             if (state.dataHeatBal->TempConvergTol <= 0.0) {
                 ShowSevereError(state,
-                                format("{}{}: {} value invalid, [{:.3R}]", RoutineName, state.dataHeatBalMgr->CurrentModuleObject, state.dataIPShortCut->cNumericFieldNames(2), state.dataHeatBal->TempConvergTol));
+                                format("{}{}: {} value invalid, [{:.3R}]", RoutineName, state.dataHeatBalMgr->CurrentModuleObject, state.dataIPShortCut->cNumericFieldNames(3), state.dataHeatBal->TempConvergTol));
                 ErrorsFound = true;
             }
             // Solar Distribution
