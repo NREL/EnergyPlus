@@ -1173,6 +1173,13 @@ struct OutputReportTabularData : BaseGlobalStruct {
     int iUnitGsui = 0;
     int foundGsum = 0;
     int iUnitGsum = 0;
+    std::string footnote;
+    std::string m_unitName;
+    std::string m2_unitName;
+    std::string m3_unitName;
+    std::string Wm2_unitName;
+    std::string curColHeadWithSI;
+    std::string curColHead;
 
     void clear_state() override
     {
@@ -1467,6 +1474,13 @@ struct OutputReportTabularData : BaseGlobalStruct {
         this->iUnitGsui = 0;
         this->foundGsum = 0;
         this->iUnitGsum = 0;
+        this->footnote.clear();
+        this->m_unitName.clear();
+        this->m2_unitName.clear();
+        this->m3_unitName.clear();
+        this->Wm2_unitName.clear();
+        this->curColHeadWithSI.clear();
+        this->curColHead.clear();
     }
 };
 

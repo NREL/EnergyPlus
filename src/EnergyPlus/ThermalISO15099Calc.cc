@@ -299,7 +299,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
         EP_SIZE_CHECK(Nu, maxlay);
         EP_SIZE_CHECK(Keff, maxlay);
         EP_SIZE_CHECK(ShadeGapKeffConv, MaxGap);
-        
+
         //  REAL(r64) :: grho(maxgas,3)
         Real64 shgct_NOSD;
         Real64 trmout;
@@ -1606,7 +1606,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
 
             LeftHandSide = a;
             RightHandSide = b;
-            EquationsSolver(LeftHandSide, RightHandSide, 4 * nlayer, nperr, ErrorMessage);
+            EquationsSolver(state, LeftHandSide, RightHandSide, 4 * nlayer, nperr, ErrorMessage);
 
             // Simon: This is much better, but also much slower convergence criteria.  Think of how to make this flexible and allow
             // user to change this from outside (through argument passing)
