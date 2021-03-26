@@ -2544,10 +2544,10 @@ namespace CurveManager {
     bool CheckCurveDims(EnergyPlusData &state,
                         int const CurveIndex,
                         std::vector<int> validDims,
-                        std::string routineName,
-                        std::string objectType,
-                        std::string objectName,
-                        std::string curveFieldText)
+                        std::string_view routineName,
+                        const std::string &objectType,
+                        const std::string &objectName,
+                        const std::string &curveFieldText)
     {
         // Returns true if errors found
         int curveDim = state.dataCurveManager->PerfCurve(CurveIndex).NumDims;
@@ -2556,7 +2556,7 @@ namespace CurveManager {
             return false;
         } else {
             // Not compatible
-            ShowSevereError(state, routineName + objectType + "=\"" + objectName + "\"");
+            ShowSevereError(state, fmt::format("{}{}=\"{}\"", routineName, objectType, objectName));
             ShowContinueError(state, "...Invalid curve for " + curveFieldText + ".");
             std::string validString = fmt::to_string(validDims[0]);
             for (std::size_t i = 1; i < validDims.size(); i++) {

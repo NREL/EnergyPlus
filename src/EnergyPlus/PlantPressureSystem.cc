@@ -368,7 +368,7 @@ namespace EnergyPlus::PlantPressureSystem {
         using FluidProperties::GetViscosityGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("CalcPlantPressureSystem");
+        static constexpr std::string_view RoutineName("CalcPlantPressureSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FluidIndex;               // Plant loop level Fluid Index
@@ -835,7 +835,7 @@ namespace EnergyPlus::PlantPressureSystem {
         Real64 ResolvedLoopMassFlowRate;
 
         // FUNCTION PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("ResolvedLoopMassFlowRate: ");
+        static constexpr std::string_view RoutineName("ResolvedLoopMassFlowRate: ");
         int const MaxIters(100);
         Real64 const PressureConvergeCriteria(0.1); // Pa
         Real64 const ZeroTolerance(0.0001);

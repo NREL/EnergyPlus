@@ -254,7 +254,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         using ScheduleManager::GetScheduleMinValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("GetZoneAirSetpoints: ");
+        static constexpr std::string_view RoutineName("GetZoneAirSetpoints: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TempControlledZoneNum; // The Splitter that you are currently loading input into
@@ -2626,7 +2626,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // Uses the status flags to trigger events.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("InitZoneAirSetpoints: ");
+        static constexpr std::string_view RoutineName("InitZoneAirSetpoints: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -4343,7 +4343,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("CalcPredictedHumidityRatio");
+        static constexpr std::string_view RoutineName("CalcPredictedHumidityRatio");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 LatentGain; // Zone latent load
@@ -4711,7 +4711,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         using ScheduleManager::GetScheduleMinValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("CorrectZoneAirTemp");
+        static constexpr std::string_view RoutineName("CorrectZoneAirTemp");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpAir;                              // specific heat of air
@@ -5378,7 +5378,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("CorrectZoneHumRat");
+        static constexpr std::string_view RoutineName("CorrectZoneHumRat");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;
@@ -5708,7 +5708,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                                                                  // the System Time Increment
             if (HybridModelZone(ZoneNum).InfiltrationCalc_T && UseZoneTimeStepHistory) {
 
-                constexpr auto RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
+                static constexpr std::string_view RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
 
                 if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature =
@@ -5913,7 +5913,7 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
         // This subroutine inversely solve infiltration airflow rate or people count with zone air humidity measurements.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("InverseModelHumidity");
+        static constexpr std::string_view RoutineName("InverseModelHumidity");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AA(0.0);

@@ -161,7 +161,7 @@ namespace EnergyPlus::Boilers {
         // standard EnergyPlus input retrieval using input Processor
 
         // Locals
-        constexpr auto RoutineName("GetBoilerInput: ");
+        static constexpr std::string_view RoutineName("GetBoilerInput: ");
 
         // LOCAL VARIABLES
         bool ErrorsFound(false); // Flag to show errors were found during GetInput
@@ -211,7 +211,8 @@ namespace EnergyPlus::Boilers {
             UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(
                 DataIPShortCuts::cAlphaArgs(2), thisBoiler.BoilerFuelTypeForOutputVariable, thisBoiler.FuelType, FuelTypeError);
             if (FuelTypeError) {
-                ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(state,
+                                fmt::format("{}{}=\"{}\",", RoutineName, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1)));
                 ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                 // Set to Electric to avoid errors when setting up output variables
                 thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
@@ -222,7 +223,8 @@ namespace EnergyPlus::Boilers {
 
             thisBoiler.NomCap = DataIPShortCuts::rNumericArgs(1);
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(state,
+                                fmt::format("{}{}=\"{}\",", RoutineName, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1)));
                 ShowContinueError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
                 ShowContinueError(state, "..." + DataIPShortCuts::cNumericFieldNames(1) + " must be greater than 0.0");
                 ErrorsFound = true;
@@ -233,7 +235,8 @@ namespace EnergyPlus::Boilers {
 
             thisBoiler.NomEffic = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(2) == 0.0) {
-                ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(state,
+                                fmt::format("{}{}=\"{}\",", RoutineName, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1)));
                 ShowContinueError(state, format("Invalid {}={:.3R}", DataIPShortCuts::cNumericFieldNames(2), DataIPShortCuts::rNumericArgs(2)));
                 ShowSevereError(state, "..." + DataIPShortCuts::cNumericFieldNames(2) + " must be greater than 0.0");
                 ErrorsFound = true;
@@ -261,14 +264,18 @@ namespace EnergyPlus::Boilers {
                 if (state.dataCurveManager->PerfCurve(thisBoiler.EfficiencyCurvePtr).NumDims == 2) { // curve uses water temperature
                     if (thisBoiler.CurveTempMode == TempMode::NOTSET) {                    // throw error
                         if (!DataIPShortCuts::lAlphaFieldBlanks(3)) {
-                            ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                            ShowSevereError(
+                                state,
+                                fmt::format("{}{}=\"{}\"", RoutineName, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1)));
                             ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
                             ShowContinueError(state, "boilers.Boiler using curve type of " +
                                               state.dataCurveManager->PerfCurve(thisBoiler.EfficiencyCurvePtr).ObjectType + " must specify " +
                                               DataIPShortCuts::cAlphaFieldNames(3));
                             ShowContinueError(state, "Available choices are EnteringBoiler or LeavingBoiler");
                         } else {
-                            ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                            ShowSevereError(
+                                state,
+                                fmt::format("{}{}=\"{}\"", RoutineName, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1)));
                             ShowContinueError(state, "Field " + DataIPShortCuts::cAlphaFieldNames(3) + " is blank");
                             ShowContinueError(state, "boilers.Boiler using curve type of " +
                                               state.dataCurveManager->PerfCurve(thisBoiler.EfficiencyCurvePtr).ObjectType +
@@ -279,7 +286,8 @@ namespace EnergyPlus::Boilers {
                 }
 
             } else if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(state,
+                                fmt::format("{}{}=\"{}\"", RoutineName, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1)));
                 ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + DataIPShortCuts::cAlphaArgs(4));
                 ShowSevereError(state, "..." + DataIPShortCuts::cAlphaFieldNames(4) + " not found.");
                 ErrorsFound = true;
@@ -333,7 +341,8 @@ namespace EnergyPlus::Boilers {
             } else if (DataIPShortCuts::cAlphaArgs(7) == "NOTMODULATED") {
                 thisBoiler.FlowMode = DataPlant::FlowMode::NotModulated;
             } else {
-                ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(state,
+                                fmt::format("{}{}=\"{}\"", RoutineName, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1)));
                 ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
                 ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -431,7 +440,7 @@ namespace EnergyPlus::Boilers {
     }
 
     void BoilerSpecs::initEachEnvironment(EnergyPlusData &state) {
-        constexpr auto RoutineName("BoilerSpecs::initEachEnvironment");
+        static constexpr std::string_view RoutineName("BoilerSpecs::initEachEnvironment");
         Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                              DataGlobalConstants::HWInitConvTemp,
@@ -544,7 +553,7 @@ namespace EnergyPlus::Boilers {
         // the hot water flow rate and the hot water loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("SizeBoiler");
+        static constexpr std::string_view RoutineName("SizeBoiler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
@@ -709,7 +718,7 @@ namespace EnergyPlus::Boilers {
         // load performance
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("CalcBoilerModel");
+        static constexpr std::string_view RoutineName("CalcBoilerModel");
 
         // clean up some operating conditions, may not be necessary
         this->BoilerLoad = 0.0;

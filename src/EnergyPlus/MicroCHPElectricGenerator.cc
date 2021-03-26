@@ -537,7 +537,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
 
     void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus::PlantLocation &)
     {
-        constexpr auto RoutineName("MicroCHPDataStruct::onInitLoopEquip");
+        static constexpr std::string_view RoutineName("MicroCHPDataStruct::onInitLoopEquip");
 
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
@@ -726,7 +726,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
         // IEA Annex 42 FC-COGEN-SIM "A Generic Model Specification for Combustion-based Residential CHP Devices"
         // Alex Ferguson, Nick Kelly, Version 3, June 26, 2006
 
-        constexpr auto RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
+        static constexpr std::string_view RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
 
         DataGenerators::OperatingMode CurrentOpMode = DataGenerators::OperatingMode::Unassigned;
         Real64 AllowedLoad = 0.0;
@@ -1282,7 +1282,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update plant loop interactions, do any calcs needed
 
-        constexpr auto RoutineName("CalcUpdateHeatRecovery");
+        static constexpr std::string_view RoutineName("CalcUpdateHeatRecovery");
 
         PlantUtilities::SafeCopyPlantNode(state, this->PlantInletNodeID, this->PlantOutletNodeID);
 
@@ -1314,7 +1314,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update variables in structures linked to output reports
 
-        constexpr auto RoutineName("UpdateMicroCHPGeneratorRecords");
+        static constexpr std::string_view RoutineName("UpdateMicroCHPGeneratorRecords");
 
         this->A42Model.ACPowerGen = this->A42Model.Pnet;                                                          // electrical power produced [W]
         this->A42Model.ACEnergyGen = this->A42Model.Pnet * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour; // energy produced (J)

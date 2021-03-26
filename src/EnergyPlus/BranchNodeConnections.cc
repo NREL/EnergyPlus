@@ -97,7 +97,7 @@ namespace EnergyPlus::BranchNodeConnections {
         // structure is intended to help with HVAC diagramming as well as validation of nodes.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName = "RegisterNodeConnection: ";
+        static constexpr std::string_view RoutineName = "RegisterNodeConnection: ";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFoundHere;
@@ -158,7 +158,7 @@ namespace EnergyPlus::BranchNodeConnections {
                 Found =
                     UtilityRoutines::FindItemInList(NodeName, state.dataBranchNodeConnections->AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
                 if (Found != 0) { // Nodename already used
-                    ShowSevereError(state, RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated.");
+                    ShowSevereError(state, fmt::format("{}{}=\"{}\" node name duplicated", RoutineName, ObjectType, ObjectName));
                     ShowContinueError(state, "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType);
                     ShowContinueError(state, "In Field=" + InputFieldName());
                     ShowContinueError(state, "Already used in " + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectType + "=\"" +
@@ -174,7 +174,7 @@ namespace EnergyPlus::BranchNodeConnections {
                     state.dataBranchNodeConnections->AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).InputFieldName = InputFieldName;
                 }
             } else {
-                ShowSevereError(state, RoutineName + ObjectType + ", Developer Error: Input Field Name not included.");
+                ShowSevereError(state, fmt::format("{}{} , Developer Error: Input Field Name not included.", RoutineName, ObjectType));
                 ShowContinueError(state, "Node names not checked for duplication.");
             }
         }
@@ -204,7 +204,7 @@ namespace EnergyPlus::BranchNodeConnections {
         // structure is intended to help with HVAC diagramming as well as validation of nodes. This function
         // is a based on RegisterNodeConnection.
 
-        constexpr auto RoutineName("ModifyNodeConnectionType: ");
+        static constexpr std::string_view RoutineName("ModifyNodeConnectionType: ");
 
         if (!IsValidConnectionType(ConnectionType)) {
             ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
