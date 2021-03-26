@@ -138,13 +138,6 @@ namespace FluidProperties {
         // Data Initializer Forward Declarations
     // See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
 
-void clear_state()
-{
-#ifdef EP_cache_GlycolSpecificHeat
-    cached_t_sh.deallocate();
-#endif
-}
-
     void DefaultEthGlyCpData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
 
     void DefaultEthGlyViscData_initializer(Array2D<Real64> &, Array1D<Real64> const &);

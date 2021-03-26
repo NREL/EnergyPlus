@@ -358,8 +358,6 @@ Int64 const t_sh_cache_mask = (t_sh_cache_size - 1);
 
     // Functions
 
-    void clear_state();
-
     void InitializeGlycRoutines();
 
     void GetFluidPropertiesData(EnergyPlusData &state);
