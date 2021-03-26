@@ -415,7 +415,7 @@ namespace ThermalISO15099Calc {
 
     void nusselt(Real64 tilt, Real64 ra, Real64 asp, Real64 &gnu, int &nperr, std::string &ErrorMessage);
 
-    void storeIterationResults(TARCOGOutput::Files &files,
+    void storeIterationResults(EnergyPlusData &state, TARCOGOutput::Files &files,
                                int nlayer,
                                int index,
                                const Array1D<Real64> &theta,
@@ -543,6 +543,7 @@ namespace ThermalISO15099Calc {
 
         int iFP = 0;
         int kFP = 0;
+        std::string dynFormat;
 
         void clear_state() override
         {
@@ -648,6 +649,7 @@ namespace ThermalISO15099Calc {
 
             this->iFP = 0;
             this->kFP = 0;
+            this.dynFormat = "";
 
         }
     };

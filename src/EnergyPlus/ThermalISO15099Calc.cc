@@ -1415,7 +1415,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
         // first store results before iterations begin
         if (saveIterationResults) {
             storeIterationResults(
-                files, nlayer, index, theta, trmout, tamb, trmin, troom, ebsky, ebroom, hcin, hcout, hrin, hrout, hin, hout, Ebb, Ebf, Rb, Rf, nperr);
+                state, files, nlayer, index, theta, trmout, tamb, trmin, troom, ebsky, ebroom, hcin, hcout, hrin, hrout, hin, hout, Ebb, Ebf, Rb, Rf, nperr);
         }
 
         state.dataThermalISO15099Calc->Tgap(1) = tout;
@@ -1674,7 +1674,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
 
             // and store results during iterations
             if (saveIterationResults) {
-                storeIterationResults(files,
+                storeIterationResults(state, files,
                                       nlayer,
                                       index + 1,
                                       theta,
@@ -2804,7 +2804,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
         }
     }
 
-    void storeIterationResults(Files &files,
+    void storeIterationResults(EnergyPlusData &state, Files &files,
                                int const nlayer,
                                int const index,
                                const Array1D<Real64> &theta,
@@ -2826,7 +2826,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                                const Array1D<Real64> &Rf,
                                int &)
     {
-        static std::string dynFormat;
+        auto & dynFormat = state.dataThermalISO15099Calc->dynFormat;
         int i;
 
         // write(a,1000) index
