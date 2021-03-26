@@ -1909,7 +1909,7 @@ bool ReportCoilSelection::isCompTypeCoil(std::string const &compType // string c
 {
     // if compType name is one of the coil objects, then return true
     bool found(false);
-    for (int loop = 1; loop < DataHVACGlobals::NumAllCoilTypes; ++loop) {
+    for (int loop = 1; loop <= DataHVACGlobals::NumAllCoilTypes; ++loop) {
         if (UtilityRoutines::SameString(compType, DataHVACGlobals::cAllCoilTypes(loop))) {
             found = true;
             break;

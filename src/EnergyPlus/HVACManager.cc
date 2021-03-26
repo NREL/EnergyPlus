@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -1787,6 +1788,12 @@ void SimHVAC(EnergyPlusData &state)
             DoSetPointTest = true;
         } else {
             DoSetPointTest = false;
+        }
+
+        if (stillNeedToReportStandardRatings) {
+            if (!state.dataGlobal->ZoneSizingCalc && !state.dataGlobal->SysSizingCalc && !state.dataGlobal->WarmupFlag) {
+                CoilCoolingDX::reportAllStandardRatings(state);
+            }
         }
     }
     if (SetPointErrorFlag) {
