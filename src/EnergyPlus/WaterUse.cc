@@ -289,207 +289,207 @@ namespace WaterUse {
         int NumNumbers;          // Number of Numbers for each GetObjectItem call
         int AlphaNum;
 
-        DataIPShortCuts::cCurrentModuleObject = "WaterUse:Equipment";
-        state.dataWaterUse->numWaterEquipment = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+        state.dataIPShortCut->cCurrentModuleObject = "WaterUse:Equipment";
+        state.dataWaterUse->numWaterEquipment = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataWaterUse->numWaterEquipment > 0) {
             state.dataWaterUse->WaterEquipment.allocate(state.dataWaterUse->numWaterEquipment);
 
             for (int WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
                 inputProcessor->getObjectItem(state,
-                                              DataIPShortCuts::cCurrentModuleObject,
+                                              state.dataIPShortCut->cCurrentModuleObject,
                                               WaterEquipNum,
-                                              DataIPShortCuts::cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
                                               _,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
-                state.dataWaterUse->WaterEquipment(WaterEquipNum).Name = DataIPShortCuts::cAlphaArgs(1);
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
+                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+                state.dataWaterUse->WaterEquipment(WaterEquipNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-                state.dataWaterUse->WaterEquipment(WaterEquipNum).EndUseSubcatName = DataIPShortCuts::cAlphaArgs(2);
+                state.dataWaterUse->WaterEquipment(WaterEquipNum).EndUseSubcatName = state.dataIPShortCut->cAlphaArgs(2);
 
-                state.dataWaterUse->WaterEquipment(WaterEquipNum).PeakVolFlowRate = DataIPShortCuts::rNumericArgs(1);
+                state.dataWaterUse->WaterEquipment(WaterEquipNum).PeakVolFlowRate = state.dataIPShortCut->rNumericArgs(1);
 
-                if ((NumAlphas > 2) && (!DataIPShortCuts::lAlphaFieldBlanks(3))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).FlowRateFracSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(3));
+                if ((NumAlphas > 2) && (!state.dataIPShortCut->lAlphaFieldBlanks(3))) {
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).FlowRateFracSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     // If no FlowRateFracSchedule, fraction defaults to 1.0
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).FlowRateFracSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
-                        ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
+                        ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
 
-                if ((NumAlphas > 3) && (!DataIPShortCuts::lAlphaFieldBlanks(4))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).TargetTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(4));
+                if ((NumAlphas > 3) && (!state.dataIPShortCut->lAlphaFieldBlanks(4))) {
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).TargetTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).TargetTempSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + DataIPShortCuts::cAlphaArgs(4));
-                        ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
+                        ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
 
-                if ((NumAlphas > 4) && (!DataIPShortCuts::lAlphaFieldBlanks(5))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).HotTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(5));
+                if ((NumAlphas > 4) && (!state.dataIPShortCut->lAlphaFieldBlanks(5))) {
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).HotTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
                     // If no HotTempSchedule, there is no hot water.
                     // HotTempSchedule is ignored if connected to a plant loop via WATER USE CONNECTIONS
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).HotTempSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + DataIPShortCuts::cAlphaArgs(5));
-                        ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
+                        ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
 
-                if ((NumAlphas > 5) && (!DataIPShortCuts::lAlphaFieldBlanks(6))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).ColdTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(6));
+                if ((NumAlphas > 5) && (!state.dataIPShortCut->lAlphaFieldBlanks(6))) {
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).ColdTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
                     // If no ColdTempSchedule, temperatures will be calculated by WATER MAINS TEMPERATURES object
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).ColdTempSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + DataIPShortCuts::cAlphaArgs(6));
-                        ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
+                        ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
 
-                if ((NumAlphas > 6) && (!DataIPShortCuts::lAlphaFieldBlanks(7))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).Zone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(7), state.dataHeatBal->Zone);
+                if ((NumAlphas > 6) && (!state.dataIPShortCut->lAlphaFieldBlanks(7))) {
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).Zone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(7), state.dataHeatBal->Zone);
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).Zone == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
-                        ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
+                        ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
 
-                if ((NumAlphas > 7) && (!DataIPShortCuts::lAlphaFieldBlanks(8))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).SensibleFracSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(8));
+                if ((NumAlphas > 7) && (!state.dataIPShortCut->lAlphaFieldBlanks(8))) {
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).SensibleFracSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).SensibleFracSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + DataIPShortCuts::cAlphaArgs(8));
-                        ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
+                        ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
 
-                if ((NumAlphas > 8) && (!DataIPShortCuts::lAlphaFieldBlanks(9))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).LatentFracSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(9));
+                if ((NumAlphas > 8) && (!state.dataIPShortCut->lAlphaFieldBlanks(9))) {
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).LatentFracSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).LatentFracSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + DataIPShortCuts::cAlphaArgs(9));
-                        ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
+                        ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
 
             } // WaterEquipNum
 
-            if (ErrorsFound) ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+            if (ErrorsFound) ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
         }
 
-        DataIPShortCuts::cCurrentModuleObject = "WaterUse:Connections";
-        state.dataWaterUse->numWaterConnections = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+        state.dataIPShortCut->cCurrentModuleObject = "WaterUse:Connections";
+        state.dataWaterUse->numWaterConnections = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataWaterUse->numWaterConnections > 0) {
             state.dataWaterUse->WaterConnections.allocate(state.dataWaterUse->numWaterConnections);
 
             for (int WaterConnNum = 1; WaterConnNum <= state.dataWaterUse->numWaterConnections; ++WaterConnNum) {
-                inputProcessor->getObjectItem(state, DataIPShortCuts::cCurrentModuleObject,
+                inputProcessor->getObjectItem(state, state.dataIPShortCut->cCurrentModuleObject,
                                               WaterConnNum,
-                                              DataIPShortCuts::cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
                                               _,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
-                state.dataWaterUse->WaterConnections(WaterConnNum).Name = DataIPShortCuts::cAlphaArgs(1);
+                                              state.dataIPShortCut->lAlphaFieldBlanks,
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
+                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+                state.dataWaterUse->WaterConnections(WaterConnNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-                if ((!DataIPShortCuts::lAlphaFieldBlanks(2)) || (!DataIPShortCuts::lAlphaFieldBlanks(3))) {
-                    state.dataWaterUse->WaterConnections(WaterConnNum).InletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(2),
+                if ((!state.dataIPShortCut->lAlphaFieldBlanks(2)) || (!state.dataIPShortCut->lAlphaFieldBlanks(3))) {
+                    state.dataWaterUse->WaterConnections(WaterConnNum).InletNode = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(2),
                                                                                                    ErrorsFound,
-                                                                                                   DataIPShortCuts::cCurrentModuleObject,
-                                                                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                                                                   DataLoopNode::NodeType_Water,
-                                                                                                   DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                                                                   DataLoopNode::NodeFluidType::Water,
+                                                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                                                    1,
                                                                                                    DataLoopNode::ObjectIsNotParent);
-                    state.dataWaterUse->WaterConnections(WaterConnNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
+                    state.dataWaterUse->WaterConnections(WaterConnNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(3),
                                                                                                     ErrorsFound,
-                                                                                                    DataIPShortCuts::cCurrentModuleObject,
-                                                                                                    DataIPShortCuts::cAlphaArgs(1),
-                                                                                                    DataLoopNode::NodeType_Water,
-                                                                                                    DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                                                                    DataLoopNode::NodeFluidType::Water,
+                                                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                                                     1,
                                                                                                     DataLoopNode::ObjectIsNotParent);
 
                     // Check plant connections
-                    BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                                       DataIPShortCuts::cAlphaArgs(1),
-                                                       DataIPShortCuts::cAlphaArgs(2),
-                                                       DataIPShortCuts::cAlphaArgs(3),
+                    BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataIPShortCut->cAlphaArgs(2),
+                                                       state.dataIPShortCut->cAlphaArgs(3),
                                                        "DHW Nodes");
                 } else {
                     // If no plant nodes are connected, simulate in stand-alone mode.
                     state.dataWaterUse->WaterConnections(WaterConnNum).StandAlone = true;
                 }
 
-                if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                     WaterManager::SetupTankDemandComponent(state, state.dataWaterUse->WaterConnections(WaterConnNum).Name,
-                                                           DataIPShortCuts::cCurrentModuleObject,
-                                                           DataIPShortCuts::cAlphaArgs(4),
+                                                           state.dataIPShortCut->cCurrentModuleObject,
+                                                           state.dataIPShortCut->cAlphaArgs(4),
                                                            ErrorsFound,
                                                            state.dataWaterUse->WaterConnections(WaterConnNum).SupplyTankNum,
                                                            state.dataWaterUse->WaterConnections(WaterConnNum).TankDemandID);
                 }
 
-                if (!DataIPShortCuts::lAlphaFieldBlanks(5)) {
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                     WaterManager::SetupTankSupplyComponent(state, state.dataWaterUse->WaterConnections(WaterConnNum).Name,
-                                                           DataIPShortCuts::cCurrentModuleObject,
-                                                           DataIPShortCuts::cAlphaArgs(5),
+                                                           state.dataIPShortCut->cCurrentModuleObject,
+                                                           state.dataIPShortCut->cAlphaArgs(5),
                                                            ErrorsFound,
                                                            state.dataWaterUse->WaterConnections(WaterConnNum).RecoveryTankNum,
                                                            state.dataWaterUse->WaterConnections(WaterConnNum).TankSupplyID);
                 }
 
-                if (!DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                    state.dataWaterUse->WaterConnections(WaterConnNum).HotTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(6));
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                    state.dataWaterUse->WaterConnections(WaterConnNum).HotTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
                     // If no HotTempSchedule, there is no hot water.
                     // HotTempSchedule is ignored if connected to a plant loop via WATER USE CONNECTIONS
 
                     if (state.dataWaterUse->WaterConnections(WaterConnNum).HotTempSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + DataIPShortCuts::cAlphaArgs(6));
-                        ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
+                        ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
 
-                if (!DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                    state.dataWaterUse->WaterConnections(WaterConnNum).ColdTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(7));
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                    state.dataWaterUse->WaterConnections(WaterConnNum).ColdTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7));
                     // If no ColdTempSchedule, temperatures will be calculated by WATER MAINS TEMPERATURES object
 
                     if (state.dataWaterUse->WaterConnections(WaterConnNum).ColdTempSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
-                        ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
+                        ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
 
-                if ((!DataIPShortCuts::lAlphaFieldBlanks(8)) && (DataIPShortCuts::cAlphaArgs(8) != "NONE")) {
+                if ((!state.dataIPShortCut->lAlphaFieldBlanks(8)) && (state.dataIPShortCut->cAlphaArgs(8) != "NONE")) {
                     state.dataWaterUse->WaterConnections(WaterConnNum).HeatRecovery = true;
 
                     {
-                        auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(8));
+                        auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(8));
                         if (SELECT_CASE_var == "IDEAL") {
                             state.dataWaterUse->WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHXEnum::Ideal;
                         } else if (SELECT_CASE_var == "COUNTERFLOW") {
@@ -497,14 +497,14 @@ namespace WaterUse {
                         } else if (SELECT_CASE_var == "CROSSFLOW") {
                             state.dataWaterUse->WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHXEnum::CrossFlow;
                         } else {
-                            ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + DataIPShortCuts::cAlphaArgs(8));
-                            ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
+                            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                             ErrorsFound = true;
                         }
                     }
 
                     {
-                        auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(9));
+                        auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(9));
                         if (SELECT_CASE_var == "PLANT") {
                             state.dataWaterUse->WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfigEnum::Plant;
                         } else if (SELECT_CASE_var == "EQUIPMENT") {
@@ -512,28 +512,28 @@ namespace WaterUse {
                         } else if (SELECT_CASE_var == "PLANTANDEQUIPMENT") {
                             state.dataWaterUse->WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfigEnum::PlantAndEquip;
                         } else {
-                            ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + DataIPShortCuts::cAlphaArgs(9));
-                            ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
+                            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                             ErrorsFound = true;
                         }
                     }
                 }
 
-                state.dataWaterUse->WaterConnections(WaterConnNum).HXUA = DataIPShortCuts::rNumericArgs(1);
+                state.dataWaterUse->WaterConnections(WaterConnNum).HXUA = state.dataIPShortCut->rNumericArgs(1);
 
                 state.dataWaterUse->WaterConnections(WaterConnNum).myWaterEquipArr.allocate(NumAlphas - 9);
 
                 for (AlphaNum = 10; AlphaNum <= NumAlphas; ++AlphaNum) {
-                    int WaterEquipNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(AlphaNum), state.dataWaterUse->WaterEquipment);
+                    int WaterEquipNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(AlphaNum), state.dataWaterUse->WaterEquipment);
 
                     if (WaterEquipNum == 0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(AlphaNum) + '=' + DataIPShortCuts::cAlphaArgs(AlphaNum));
-                        ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(AlphaNum) + '=' + state.dataIPShortCut->cAlphaArgs(AlphaNum));
+                        ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     } else {
                         if (state.dataWaterUse->WaterEquipment(WaterEquipNum).Connections > 0) {
-                            ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
-                                            ":  WaterUse:Equipment = " + DataIPShortCuts::cAlphaArgs(AlphaNum) +
+                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                            ":  WaterUse:Equipment = " + state.dataIPShortCut->cAlphaArgs(AlphaNum) +
                                             " is already referenced by another object.");
                             ErrorsFound = true;
                         } else {
@@ -550,7 +550,7 @@ namespace WaterUse {
 
             } // WaterConnNum
 
-            if (ErrorsFound) ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+            if (ErrorsFound) ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
 
             if (state.dataWaterUse->numWaterConnections > 0) {
                 state.dataWaterUse->CheckEquipName.allocate(state.dataWaterUse->numWaterConnections);
@@ -926,7 +926,7 @@ namespace WaterUse {
             } else {
                 this->SensibleRate = ScheduleManager::GetCurrentScheduleValue(state, this->SensibleFracSchedule) * this->TotalMassFlowRate *
                                      Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (this->MixedTemp - state.dataHeatBalFanSys->MAT(this->Zone));
-                this->SensibleEnergy = this->SensibleRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->SensibleEnergy = this->SensibleRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             }
 
             if (this->LatentFracSchedule == 0) {
@@ -939,14 +939,14 @@ namespace WaterUse {
                 Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(this->Zone), 0.0);
                 Real64 ZoneMassMax =
                     (ZoneHumRatSat - ZoneHumRat) * RhoAirDry * state.dataHeatBal->Zone(this->Zone).Volume; // Max water that can be evaporated to zone
-                Real64 FlowMassMax = this->TotalMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour; // Max water in flow
+                Real64 FlowMassMax = this->TotalMassFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // Max water in flow
                 Real64 MoistureMassMax = min(ZoneMassMax, FlowMassMax);
 
                 this->MoistureMass = ScheduleManager::GetCurrentScheduleValue(state, this->LatentFracSchedule) * MoistureMassMax;
-                this->MoistureRate = this->MoistureMass / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+                this->MoistureRate = this->MoistureMass / (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
 
                 this->LatentRate = this->MoistureRate * Psychrometrics::PsyHfgAirFnWTdb(ZoneHumRat, state.dataHeatBalFanSys->MAT(this->Zone));
-                this->LatentEnergy = this->LatentRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->LatentEnergy = this->LatentRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             }
 
             this->DrainMassFlowRate = this->TotalMassFlowRate - this->MoistureRate;
@@ -1024,7 +1024,8 @@ namespace WaterUse {
             if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
                 // Clear node initial conditions
                 if (this->InletNode > 0 && this->OutletNode > 0) {
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                                        this->PeakMassFlowRate,
                                                        this->InletNode,
                                                        this->OutletNode,
@@ -1033,7 +1034,7 @@ namespace WaterUse {
                                                        this->PlantLoopBranchNum,
                                                        this->PlantLoopCompNum);
 
-                    this->ReturnTemp = DataLoopNode::Node(this->InletNode).Temp;
+                    this->ReturnTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
                 }
 
                 this->Init = false;
@@ -1043,7 +1044,7 @@ namespace WaterUse {
 
             if (this->InletNode > 0) {
                 if (!state.dataGlobal->DoingSizing) {
-                    this->HotTemp = DataLoopNode::Node(this->InletNode).Temp;
+                    this->HotTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
                 } else {
                     // plant loop will not be running so need a value here.
                     // should change to use tank setpoint but water use connections don't have knowledge of the tank they are fed by
@@ -1287,7 +1288,7 @@ namespace WaterUse {
             PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode, this->PlantLoopNum);
 
             // Set outlet node variables that are possibly changed
-            DataLoopNode::Node(this->OutletNode).Temp = this->ReturnTemp;
+            state.dataLoopNodes->Node(this->OutletNode).Temp = this->ReturnTemp;
             // should add enthalpy update to return?
         }
     }
@@ -1310,9 +1311,9 @@ namespace WaterUse {
             thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
             thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
 
-            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            thisWEq.HotVolume = thisWEq.HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.HotVolume = thisWEq.HotVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
             if (thisWEq.Connections == 0) {
                 thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
@@ -1321,7 +1322,7 @@ namespace WaterUse {
                                 (thisWEq.HotTemp - state.dataWaterUse->WaterConnections(thisWEq.Connections).ReturnTemp);
             }
 
-            thisWEq.Energy = thisWEq.Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.Energy = thisWEq.Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         }
     }
 
@@ -1345,9 +1346,9 @@ namespace WaterUse {
             thisWEq.ColdVolFlowRate = thisWEq.ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
             thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
             thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
-            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            thisWEq.HotVolume = thisWEq.HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.HotVolume = thisWEq.HotVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
             if (thisWEq.Connections == 0) {
                 thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
@@ -1356,18 +1357,18 @@ namespace WaterUse {
                                 (thisWEq.HotTemp - state.dataWaterUse->WaterConnections(thisWEq.Connections).ReturnTemp);
             }
 
-            thisWEq.Energy = thisWEq.Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.Energy = thisWEq.Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         }
 
         this->ColdVolFlowRate = this->ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
         this->HotVolFlowRate = this->HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
         this->TotalVolFlowRate = this->ColdVolFlowRate + this->HotVolFlowRate;
-        this->ColdVolume = this->ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->HotVolume = this->HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->TotalVolume = this->TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ColdVolume = this->ColdVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->HotVolume = this->HotVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->TotalVolume = this->TotalVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->Power = this->HotMassFlowRate * Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (this->HotTemp - this->ReturnTemp);
-        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->RecoveryEnergy = this->RecoveryRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->RecoveryEnergy = this->RecoveryRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void CalcWaterUseZoneGains(EnergyPlusData &state)

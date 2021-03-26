@@ -142,8 +142,8 @@ namespace EnergyPlus::IntegratedHeatPump {
 
         InitializeIHP(state, DXCoilNum);
 
-        airMassFlowRate = Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum).MassFlowRate;
-        waterMassFlowRate = Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
+        airMassFlowRate = state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum).MassFlowRate;
+        waterMassFlowRate = state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirLoopFlowRate = airMassFlowRate;
 
         switch (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CurMode) {
@@ -487,7 +487,8 @@ namespace EnergyPlus::IntegratedHeatPump {
                 // VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).TotalHeatingEnergyRate;
             }
 
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate = Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
+            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate =
+                state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
             break;
         case IHPOperationMode::SCWHMatchSCMode:
             if (!IsCallbyWH) // process when called from air loop
@@ -602,7 +603,8 @@ namespace EnergyPlus::IntegratedHeatPump {
                 state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop = airMassFlowRate;
             }
 
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate = Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
+            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate =
+                state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
 
             break;
         case IHPOperationMode::SCWHMatchWHMode:
@@ -718,7 +720,8 @@ namespace EnergyPlus::IntegratedHeatPump {
                 state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirFlowSavInWaterLoop = airMassFlowRate;
             }
 
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate = Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
+            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate =
+                state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
             break;
         case IHPOperationMode::SCDWHMode:
             if (!IsCallbyWH) // process when called from air loop
@@ -833,7 +836,8 @@ namespace EnergyPlus::IntegratedHeatPump {
                 state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop = airMassFlowRate;
             }
 
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate = Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
+            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate =
+                state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
             break;
         case IHPOperationMode::SHDWHElecHeatOffMode:
         case IHPOperationMode::SHDWHElecHeatOnMode:
@@ -948,7 +952,8 @@ namespace EnergyPlus::IntegratedHeatPump {
                 state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop = airMassFlowRate;
             }
 
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate = Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
+            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate =
+                state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
             break;
         case IHPOperationMode::IdleMode:
         default: // clear up
@@ -1351,15 +1356,15 @@ namespace EnergyPlus::IntegratedHeatPump {
             ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilIndex;
             InNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirInletNodeNum;
             OutNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
-            InNodeName = NodeID(InNode);
-            OutNodeName = NodeID(OutNode);
+            InNodeName = state.dataLoopNodes->NodeID(InNode);
+            OutNodeName = state.dataLoopNodes->NodeID(OutNode);
 
             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum = InNode;
             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum = OutNode;
 
             TestCompSet(state, CurrentModuleObject, state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil", InNodeName, OutNodeName, "Cooling Air Nodes");
             RegisterNodeConnection(state, InNode,
-                                   NodeID(InNode),
+                                   state.dataLoopNodes->NodeID(InNode),
                                    CurrentModuleObject,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
                                    "Inlet",
@@ -1367,7 +1372,7 @@ namespace EnergyPlus::IntegratedHeatPump {
                                    ObjectIsNotParent,
                                    ErrorsFound);
             RegisterNodeConnection(state, OutNode,
-                                   NodeID(OutNode),
+                                   state.dataLoopNodes->NodeID(OutNode),
                                    CurrentModuleObject,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
                                    "Outlet",
@@ -1462,8 +1467,8 @@ namespace EnergyPlus::IntegratedHeatPump {
             InNode = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum;
             OutNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirOutletNodeNum = OutNode;
-            InNodeName = NodeID(InNode);
-            OutNodeName = NodeID(OutNode);
+            InNodeName = state.dataLoopNodes->NodeID(InNode);
+            OutNodeName = state.dataLoopNodes->NodeID(OutNode);
             if (state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirInletNodeNum != InNode) {
                 ShowContinueError(state, "Mistaken air node connection: " + CurrentModuleObject + "- cooling coil outlet mismatches heating coil inlet" +
                                   ".");
@@ -1471,7 +1476,7 @@ namespace EnergyPlus::IntegratedHeatPump {
             }
             TestCompSet(state, CurrentModuleObject, state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil", InNodeName, OutNodeName, "Heating Air Nodes");
             RegisterNodeConnection(state, InNode,
-                                   NodeID(InNode),
+                                   state.dataLoopNodes->NodeID(InNode),
                                    CurrentModuleObject,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil",
                                    "Inlet",
@@ -1479,7 +1484,7 @@ namespace EnergyPlus::IntegratedHeatPump {
                                    ObjectIsNotParent,
                                    ErrorsFound);
             RegisterNodeConnection(state, OutNode,
-                                   NodeID(OutNode),
+                                   state.dataLoopNodes->NodeID(OutNode),
                                    CurrentModuleObject,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil",
                                    "Outlet",
@@ -1544,8 +1549,8 @@ namespace EnergyPlus::IntegratedHeatPump {
 
             InNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).WaterInletNodeNum;
             OutNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).WaterOutletNodeNum;
-            InNodeName = NodeID(InNode);
-            OutNodeName = NodeID(OutNode);
+            InNodeName = state.dataLoopNodes->NodeID(InNode);
+            OutNodeName = state.dataLoopNodes->NodeID(OutNode);
             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum = InNode;
             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum = OutNode;
             if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).WaterInletNodeNum != InNode) ||
@@ -1557,7 +1562,7 @@ namespace EnergyPlus::IntegratedHeatPump {
 
             TestCompSet(state, CurrentModuleObject, state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil", InNodeName, OutNodeName, "Water Nodes");
             RegisterNodeConnection(state, InNode,
-                                   NodeID(InNode),
+                                   state.dataLoopNodes->NodeID(InNode),
                                    CurrentModuleObject,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
                                    "Inlet",
@@ -1565,7 +1570,7 @@ namespace EnergyPlus::IntegratedHeatPump {
                                    ObjectIsNotParent,
                                    ErrorsFound);
             RegisterNodeConnection(state, OutNode,
-                                   NodeID(InNode),
+                                   state.dataLoopNodes->NodeID(InNode),
                                    CurrentModuleObject,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
                                    "Outlet",
@@ -1678,15 +1683,15 @@ namespace EnergyPlus::IntegratedHeatPump {
                                        ErrorsFound);
 
             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterTankoutNod = GetOnlySingleNode(state,
-                AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Sensor, 2, ObjectIsNotParent);
+                AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Sensor, 2, ObjectIsNotParent);
 
             // outdoor air node connections for water heating coils
             // DWH, SCDWH, SHDWH coils have the same outdoor air nodes
             ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilIndex;
             InNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirInletNodeNum;
             OutNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
-            InNodeName = NodeID(InNode);
-            OutNodeName = NodeID(OutNode);
+            InNodeName = state.dataLoopNodes->NodeID(InNode);
+            OutNodeName = state.dataLoopNodes->NodeID(OutNode);
             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).ODAirInletNodeNum = InNode;
             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).ODAirOutletNodeNum = OutNode;
             if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).AirInletNodeNum != InNode) ||
@@ -1698,7 +1703,7 @@ namespace EnergyPlus::IntegratedHeatPump {
 
             TestCompSet(state, CurrentModuleObject, state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil", InNodeName, OutNodeName, "Outdoor Air Nodes");
             RegisterNodeConnection(state, InNode,
-                                   NodeID(InNode),
+                                   state.dataLoopNodes->NodeID(InNode),
                                    CurrentModuleObject,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil",
                                    "Inlet",
@@ -1706,7 +1711,7 @@ namespace EnergyPlus::IntegratedHeatPump {
                                    ObjectIsNotParent,
                                    ErrorsFound);
             RegisterNodeConnection(state, OutNode,
-                                   NodeID(InNode),
+                                   state.dataLoopNodes->NodeID(InNode),
                                    CurrentModuleObject,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil",
                                    "Outlet",
@@ -1911,7 +1916,7 @@ namespace EnergyPlus::IntegratedHeatPump {
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using VariableSpeedCoils::SizeVarSpeedCoil;
 
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         Real64 RatedCapacity(0.0);      // rated building cooling load
 
         // Obtains and Allocates AS-IHP related parameters from input file
@@ -2058,7 +2063,7 @@ namespace EnergyPlus::IntegratedHeatPump {
 
     void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
     {
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         int VSCoilIndex(0);
         Real64 ReportingConstant(0.0);
@@ -2181,7 +2186,7 @@ namespace EnergyPlus::IntegratedHeatPump {
 
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using WaterThermalTanks::GetWaterThermalTankInput;
 
         Real64 MyLoad(0.0);
@@ -2211,9 +2216,10 @@ namespace EnergyPlus::IntegratedHeatPump {
         {
             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).IsWHCallAvail = false;
         } else {
-            Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
+            state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
                 GetWaterVolFlowRateIHP(state, DXCoilNum, 1.0, 1.0, true) * 987.0; // 987.0 water density at 60 C.
-            Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum).Temp = Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).Temp;
+            state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum).Temp =
+                state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).Temp;
 
             int tankType = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankType;
 
@@ -2250,7 +2256,8 @@ namespace EnergyPlus::IntegratedHeatPump {
         // keep the water heating time and volume history
         WHHeatTimeSav = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHRunTime;
         if (IHPOperationMode::SCDWHMode == state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CurMode) {
-            WHHeatVolSave = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterFlowAccumVol + Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterTankoutNod).MassFlowRate /
+            WHHeatVolSave = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterFlowAccumVol +
+                            state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterTankoutNod).MassFlowRate /
                                                                                    983.0 * TimeStepSys * DataGlobalConstants::SecInHour; // 983 - water density at 60 C
         } else {
             WHHeatVolSave = 0.0;
@@ -3005,7 +3012,7 @@ namespace EnergyPlus::IntegratedHeatPump {
         case IHPOperationMode::SCWHMatchSCMode:
             IHPCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex;
             FlowScale = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CoolVolFlowScale;
-            Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
+            state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
                 GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
             if (IsCallbyWH) {
                 IsResultFlow = true;
@@ -3023,7 +3030,7 @@ namespace EnergyPlus::IntegratedHeatPump {
         case IHPOperationMode::SCDWHMode:
             IHPCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex;
             FlowScale = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CoolVolFlowScale;
-            Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
+            state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
                 GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
             if (IsCallbyWH) {
                 IsResultFlow = true;
@@ -3034,7 +3041,7 @@ namespace EnergyPlus::IntegratedHeatPump {
         case IHPOperationMode::SHDWHElecHeatOnMode:
             IHPCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex;
             FlowScale = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).HeatVolFlowScale;
-            Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
+            state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
                 GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
             if (IsCallbyWH) {
                 IsResultFlow = true;
@@ -3066,9 +3073,9 @@ namespace EnergyPlus::IntegratedHeatPump {
         }
 
         // set max air flow rate
-        Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum).MassFlowRateMax = AirMassFlowRate;
-        Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum).MassFlowRateMax = AirMassFlowRate;
-        Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirOutletNodeNum).MassFlowRateMax = AirMassFlowRate;
+        state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum).MassFlowRateMax = AirMassFlowRate;
+        state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum).MassFlowRateMax = AirMassFlowRate;
+        state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirOutletNodeNum).MassFlowRateMax = AirMassFlowRate;
 
         return AirMassFlowRate;
     }

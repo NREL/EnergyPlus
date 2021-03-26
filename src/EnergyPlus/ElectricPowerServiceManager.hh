@@ -291,6 +291,7 @@ public: // methods
 
 private:                            // methods
     void simulateSimpleBucketModel( // request charge discharge and
+        EnergyPlusData &state,
         Real64 &powerCharge,
         Real64 &powerDischarge,
         bool &charging,
@@ -725,10 +726,6 @@ public: // Creation
     }
 
 public: // Methods
-    // Destructor
-    ~ElectricPowerServiceManager()
-    {
-    }
 
     void manageElectricPowerService(EnergyPlusData &state,
                                     bool const FirstHVACIteration,
@@ -801,17 +798,15 @@ private:                      // data
 
 }; // class ElectricPowerServiceManager
 
-extern std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
-
-void createFacilityElectricPowerServiceObject();
-
-void clearFacilityElectricPowerServiceObject();
+void createFacilityElectricPowerServiceObject(EnergyPlusData &state);
 
 struct ElectPwrSvcMgrData : BaseGlobalStruct {
 
+    std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
+
     void clear_state() override
     {
-
+        this->facilityElectricServiceObj.release();
     }
 };
 

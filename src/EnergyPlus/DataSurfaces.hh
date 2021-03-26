@@ -68,35 +68,6 @@
 #define BITF(B) (1 << (int(B)))
 #define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
 
-// IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
-// original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
-#define NOT_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::NoShade) | BITF(WinShadingType::ShadeOff))
-
-// IS_SHADED is the flag to indicate window has shade on or temporarily off but may be triggered on later to control daylight glare
-// original expression: SHADE_FLAG > ShadeOff
-#define IS_SHADED(SHADE_FLAG) !NOT_SHADED(SHADE_FLAG)
-
-// IS_SHADED_NO_GLARE is the flag to indicate window has shade and no daylight glare control
-// original expression: IntShade <= SHADE_FLAG <= BGBlind
-#define IS_SHADED_NO_GLARE_CTRL(SHADE_FLAG)                                                                                                          \
-    BITF_TEST_ANY(BITF(SHADE_FLAG),                                                                                                                  \
-                  BITF(WinShadingType::IntShade) | BITF(WinShadingType::SwitchableGlazing) | BITF(WinShadingType::ExtShade) |                        \
-                      BITF(WinShadingType::ExtScreen) | BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) |                            \
-                      BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind))
-
-// ANY_SHADE: if SHADE_FLAG is any of the shading types including interior, exterior or between glass shades
-#define ANY_SHADE(SHADE_FLAG)                                                                                                                        \
-    BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade))
-#define ANY_SHADE_SCREEN(SHADE_FLAG)                                                                                                                 \
-    BITF_TEST_ANY(BITF(SHADE_FLAG),                                                                                                                  \
-                  BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade) | BITF(WinShadingType::ExtScreen))
-#define ANY_BLIND(SHADE_FLAG)                                                                                                                        \
-    BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::BGBlind))
-#define ANY_INTERIOR_SHADE_BLIND(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::IntBlind))
-#define ANY_EXTERIOR_SHADE_BLIND_SCREEN(SHADE_FLAG)                                                                                                  \
-    BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::ExtScreen))
-#define ANY_BETWEENGLASS_SHADE_BLIND(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind))
-
 namespace EnergyPlus {
 
 // Forward declarations
@@ -110,6 +81,7 @@ namespace DataSurfaces {
 
     // MODULE PARAMETER DEFINITIONS:
     constexpr int MaxSlatAngs(19);
+    constexpr int MaxProfAngs(37);
 
     // Parameters to indicate surface shape for use with the Surface
     // derived type (see below):
@@ -242,19 +214,100 @@ namespace DataSurfaces {
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential
 
-    // Parameters to indicate heat transfer model to use for surface
-    extern Array1D_string const HeatTransferModelNames;
-    constexpr int HeatTransferModel_NotSet(-1);
-    constexpr int HeatTransferModel_None(0); // shading surfaces
-    constexpr int HeatTransferModel_CTF(1);
-    constexpr int HeatTransferModel_EMPD(2);
-    constexpr int HeatTransferModel_CondFD(5);
-    constexpr int HeatTransferModel_HAMT(6);
-    constexpr int HeatTransferModel_Window5(7);             // original detailed layer-by-layer based on window 4 and window 5
-    constexpr int HeatTransferModel_ComplexFenestration(8); // BSDF
-    constexpr int HeatTransferModel_TDD(9);                 // tubular daylighting device
-    constexpr int HeatTransferModel_Kiva(10);               // Kiva ground calculations
-    constexpr int HeatTransferModel_AirBoundaryNoHT(11);    // Construction:AirBoundary - not IRT or interior window
+    enum class iHeatTransferModel
+    {
+        NotSet,
+        None, // shading surfaces
+        CTF,
+        EMPD,
+        CondFD,
+        HAMT,
+        Window5,             // original detailed layer-by-layer based on window 4 and window 5
+        ComplexFenestration, // BSDF
+        TDD,                 // tubular daylighting device
+        Kiva,                // Kiva ground calculations
+        AirBoundaryNoHT,     // Construction:AirBoundary - not IRT or interior window
+    };
+
+    inline std::string HeatTransferModelNames(iHeatTransferModel const &m)
+    {
+        switch(m){
+        case iHeatTransferModel::CTF:
+            return "CTF - ConductionTransferFunction";
+        case iHeatTransferModel::EMPD:
+            return "EMPD - MoisturePenetrationDepthConductionTransferFunction";
+        case iHeatTransferModel::CondFD:
+            return "CondFD - ConductionFiniteDifference";
+        case iHeatTransferModel::HAMT:
+            return "HAMT - CombinedHeatAndMoistureFiniteElement";
+        case iHeatTransferModel::Window5:
+            return "Window - Detailed layer-by-layer";
+        case iHeatTransferModel::ComplexFenestration:
+            return "Window - ComplexFenestration";
+        case iHeatTransferModel::TDD:
+            return "Tubular daylighting device";
+        case iHeatTransferModel::Kiva:
+            return "KivaFoundation - TwoDimensionalFiniteDifference";
+        case iHeatTransferModel::None:
+        case iHeatTransferModel::AirBoundaryNoHT:
+        case iHeatTransferModel::NotSet:
+        default:
+            return "";
+        }
+    }
+
+    // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
+    // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
+    constexpr bool NOT_SHADED(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag), BITF(WinShadingType::NoShade) | BITF(WinShadingType::ShadeOff));
+    }
+
+    // IS_SHADED is the flag to indicate window has shade on or temporarily off but may be triggered on later to control daylight glare
+    // original expression: SHADE_FLAG > ShadeOff
+    constexpr bool IS_SHADED(WinShadingType const ShadingFlag) {
+        return !NOT_SHADED(ShadingFlag);
+    }
+
+    // IS_SHADED_NO_GLARE is the flag to indicate window has shade and no daylight glare control
+    // original expression: IntShade <= SHADE_FLAG <= BGBlind
+    constexpr bool IS_SHADED_NO_GLARE_CTRL(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                         BITF(WinShadingType::IntShade) | BITF(WinShadingType::SwitchableGlazing) |
+                            BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtScreen) |
+                            BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) |
+                            BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind));
+    }
+
+    // ANY_SHADE: if SHADE_FLAG is any of the shading types including interior, exterior or between glass shades
+    constexpr bool ANY_SHADE(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                          BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade));
+    }
+
+    constexpr bool ANY_SHADE_SCREEN(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                          BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade) | BITF(WinShadingType::ExtScreen));
+    }
+
+    constexpr bool ANY_BLIND(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                          BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::BGBlind));
+    }
+
+    constexpr bool ANY_INTERIOR_SHADE_BLIND(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                             BITF(WinShadingType::IntShade) | BITF(WinShadingType::IntBlind));
+    }
+
+    constexpr bool ANY_EXTERIOR_SHADE_BLIND_SCREEN(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                             BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::ExtScreen));
+    }
+
+    constexpr bool ANY_BETWEENGLASS_SHADE_BLIND(WinShadingType const ShadingFlag) {
+        return BITF_TEST_ANY(BITF(ShadingFlag),
+                             BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind));
+    }
 
     // Parameters for classification of outside face of surfaces
     constexpr int OutConvClass_WindwardVertWall(101);
@@ -526,9 +579,9 @@ namespace DataSurfaces {
         int OutsideHeatSourceTermSchedule; // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
         int InsideHeatSourceTermSchedule;  // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
         // False if a (detached) shadowing (sub)surface
-        int HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
-        std::string BaseSurfName;  // Name of BaseSurf
-        int BaseSurf;              // "Base surface" for this surface.  Applies mainly to subsurfaces
+        iHeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
+        std::string BaseSurfName;                 // Name of BaseSurf
+        int BaseSurf;                             // "Base surface" for this surface.  Applies mainly to subsurfaces
         // in which case it points back to the base surface number.
         // Equals 0 for detached shading.
         // BaseSurf equals surface number for all other surfaces.
@@ -706,7 +759,7 @@ namespace DataSurfaces {
             : Construction(0), EMSConstructionOverrideON(false), EMSConstructionOverrideValue(0), ConstructionStoredInputValue(0),
               Class(SurfaceClass::None), Shape(SurfaceShape::None), Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0),
               Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0), Width(0.0), HeatTransSurf(false), OutsideHeatSourceTermSchedule(0),
-              InsideHeatSourceTermSchedule(0), HeatTransferAlgorithm(HeatTransferModel_NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0),
+              InsideHeatSourceTermSchedule(0), HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0),
               ExtBoundCond(0), LowTempErrCount(0), HighTempErrCount(0), ExtSolar(false), ExtWind(false), IntConvCoeff(0),
               EMSOverrideIntConvCoef(false), EMSValueForIntConvCoef(0.0), ExtConvCoeff(0), EMSOverrideExtConvCoef(false), EMSValueForExtConvCoef(0.0),
               ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),
@@ -1485,6 +1538,12 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfWinSlatAngThisTSDegEMSon;      // flag that indicate EMS system is actuating SlatAngThisTSDeg
     Array1D<Real64> SurfWinSlatAngThisTSDegEMSValue; // value that EMS sets for slat angle in degrees
     Array1D<bool> SurfWinSlatsBlockBeam;             // True if blind slats block incident beam solar
+    Array1D<int> SurfWinSlatsAngIndex;
+    Array1D<Real64> SurfWinSlatsAngInterpFac;
+    Array1D<Real64> SurfWinProfileAng;
+    Array1D<int> SurfWinProfAngIndex;
+    Array1D<Real64> SurfWinProfAngInterpFac;
+    Array1D<Real64> SurfWinBlindBmBmTrans;
     Array1D<Real64> SurfWinBlindAirFlowPermeability; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
     Array1D<Real64> SurfWinTotGlazingThickness;      // Total glazing thickness from outside of outer glass to inside of inner glass (m)
     Array1D<Real64> SurfWinTanProfileAngHor;         // Tangent of horizontal profile angle
@@ -1750,6 +1809,12 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinSlatAngThisTSDegEMSon.deallocate();
         this->SurfWinSlatAngThisTSDegEMSValue.deallocate();
         this->SurfWinSlatsBlockBeam.deallocate();
+        this->SurfWinSlatsAngIndex.deallocate();
+        this->SurfWinSlatsAngInterpFac.deallocate();
+        this->SurfWinProfileAng.deallocate();
+        this->SurfWinProfAngIndex.deallocate();
+        this->SurfWinProfAngInterpFac.deallocate();
+        this->SurfWinBlindBmBmTrans.deallocate();
         this->SurfWinBlindAirFlowPermeability.deallocate();
         this->SurfWinTotGlazingThickness.deallocate();
         this->SurfWinTanProfileAngHor.deallocate();

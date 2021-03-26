@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -2027,15 +2028,6 @@ namespace WindowManager {
 
         // Using/Aliasing
         using namespace DataBSDFWindow;
-        using DataHeatBalSurface::QConvOutReport;
-        using DataHeatBalSurface::QdotConvOutRep;
-        using DataHeatBalSurface::QdotConvOutRepPerArea;
-        using DataHeatBalSurface::QdotRadOutRep;
-        using DataHeatBalSurface::QdotRadOutRepPerArea;
-        using DataHeatBalSurface::SurfQRadLWOutSrdSurfs;
-        using DataHeatBalSurface::QRadOutReport;
-        using DataLoopNode::Node;
-        using General::InterpSlatAng; // Function for slat angle interpolation
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         // unused0909  USE DataEnvironment, ONLY: CurMnDyHr
@@ -2094,22 +2086,19 @@ namespace WindowManager {
         Real64 OutSrdIR;       // LWR from surrouding srfs
 
         // New variables for thermochromic windows calc
-        Real64 locTCSpecTemp;         // The temperature corresponding to the specified optical properties of the TC layer
-        Real64 locTCLayerTemp;        // TC layer temperature at each time step. C
-        static Array1D<Real64> deltaTemp(100, 0.0);
+        Real64 locTCSpecTemp;  // The temperature corresponding to the specified optical properties of the TC layer
+        Real64 locTCLayerTemp; // TC layer temperature at each time step. C
         int i;
-        static Array1D_int iMinDT(1, 0);
-        static Array1D_int IDConst(100, 0);
-        static Real64 dT0(0.0);
-        static Real64 dT1(0.0);
+        auto & deltaTemp = state.dataWindowManager->deltaTemp;
+        auto &iMinDT = state.dataWindowManager->iMinDT;
+        auto &IDConst = state.dataWindowManager->IDConst;
+        Real64 dT0(0.0);
+        Real64 dT1(0.0);
         Real64 SurfOutsideEmiss; // temporary for result of outside surface emissivity
         Real64 Tsout;            // temporary for result of outside surface temp in Kelvin
-        // integer :: CurrentThermalAlgorithm
         int temp;
 
-        // CurrentThermalAlgorithm = -1
-
-        // Shorthand refernces
+        // Shorthand references
         auto &window(state.dataSurface->SurfaceWindow(SurfNum));
         auto &surface(state.dataSurface->Surface(SurfNum));
 
@@ -2240,8 +2229,9 @@ namespace WindowManager {
                     SumSysMCp = 0.0;
                     SumSysMCpT = 0.0;
                     for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                        NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                        MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                        NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        MassFlowRate =
+                            state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -2385,10 +2375,28 @@ namespace WindowManager {
                         BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
                         state.dataWindowManager->thick(TotGlassLay + 1) = state.dataHeatBal->Blind(BlNum).SlatThickness;
                         state.dataWindowManager->scon(TotGlassLay + 1) = state.dataHeatBal->Blind(BlNum).SlatConductivity / state.dataHeatBal->Blind(BlNum).SlatThickness;
-                        state.dataWindowManager->emis(state.dataWindowManager->nglface + 1) = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), state.dataHeatBal->Blind(BlNum).IRFrontEmiss);
-                        state.dataWindowManager->emis(state.dataWindowManager->nglface + 2) = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), state.dataHeatBal->Blind(BlNum).IRBackEmiss);
-                        state.dataWindowManager->tir(state.dataWindowManager->nglface + 1) = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), state.dataHeatBal->Blind(BlNum).IRFrontTrans);
-                        state.dataWindowManager->tir(state.dataWindowManager->nglface + 2) = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), state.dataHeatBal->Blind(BlNum).IRBackTrans);
+
+                        if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
+                            int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
+                            Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
+                            state.dataWindowManager->emis(state.dataWindowManager->nglface + 1) = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRFrontEmiss(SurfWinSlatsAngIndex),
+                                                                                                                         state.dataHeatBal->Blind(BlNum).IRFrontEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                                                                                         SurfWinSlatsAngInterpFac);
+                            state.dataWindowManager->emis(state.dataWindowManager->nglface + 2) = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRBackEmiss(SurfWinSlatsAngIndex),
+                                                                                                                         state.dataHeatBal->Blind(BlNum).IRBackEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                                                                                         SurfWinSlatsAngInterpFac);
+                            state.dataWindowManager->tir(state.dataWindowManager->nglface + 1) = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRFrontTrans(SurfWinSlatsAngIndex),
+                                                                                                                        state.dataHeatBal->Blind(BlNum).IRFrontTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                                                                                        SurfWinSlatsAngInterpFac);
+                            state.dataWindowManager->tir(state.dataWindowManager->nglface + 2) = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRBackTrans(SurfWinSlatsAngIndex),
+                                                                                                                        state.dataHeatBal->Blind(BlNum).IRBackTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                                                                                        SurfWinSlatsAngInterpFac);
+                        } else {
+                            state.dataWindowManager->emis(state.dataWindowManager->nglface + 1) = state.dataHeatBal->Blind(BlNum).IRFrontEmiss(1);
+                            state.dataWindowManager->emis(state.dataWindowManager->nglface + 2) = state.dataHeatBal->Blind(BlNum).IRBackEmiss(1);
+                            state.dataWindowManager->tir(state.dataWindowManager->nglface + 1) = state.dataHeatBal->Blind(BlNum).IRFrontTrans(1);
+                            state.dataWindowManager->tir(state.dataWindowManager->nglface + 2) = state.dataHeatBal->Blind(BlNum).IRBackTrans(1);
+                        }
                     }
                 }
 
@@ -2459,8 +2467,9 @@ namespace WindowManager {
                         SumSysMCp = 0.0;
                         SumSysMCpT = 0.0;
                         for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                            NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                            MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                            NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                            MassFlowRate =
+                                state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                             CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNumAdj));
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -2562,8 +2571,17 @@ namespace WindowManager {
 
             if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 SurfInsideTemp = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer + 2) - state.dataWindowManager->TKelvin;
-                EffShBlEmiss = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), window.EffShBlindEmiss);
-                EffGlEmiss = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), window.EffGlassEmiss);
+                if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
+                    EffShBlEmiss = General::InterpGeneral(window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                                                          window.EffShBlindEmiss(std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                          state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    EffGlEmiss = General::InterpGeneral(window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                                                        window.EffGlassEmiss(std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                } else {
+                    EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
+                    EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1);
+                }
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->TKelvin)) / (EffShBlEmiss + EffGlEmiss);
             } else {
                 SurfInsideTemp = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->TKelvin;
@@ -2622,9 +2640,9 @@ namespace WindowManager {
         }
         // update exterior environment surface heat loss reporting
         Tsout = SurfOutsideTemp + state.dataWindowManager->TKelvin;
-        QdotConvOutRep(SurfNum) = -surface.Area * state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout);
-        QdotConvOutRepPerArea(SurfNum) = -state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout);
-        QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+        state.dataHeatBalSurf->QdotConvOutRep(SurfNum) = -surface.Area * state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout);
+        state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum) = -state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout);
+        state.dataHeatBalSurf->QConvOutReport(SurfNum) = state.dataHeatBalSurf->QdotConvOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
         Real64 const Tsout_4(pow_4(Tsout)); // Tuned To reduce pow calls and redundancies
         Real64 const Tout_4(pow_4(state.dataWindowManager->tout));
@@ -2648,14 +2666,15 @@ namespace WindowManager {
         Real64 const rad_out_sky_per_area = - emiss_sigma_product * state.dataSurface->AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(state.dataEnvrn->SkyTempKelvin));
         Real64 const rad_out_per_area = rad_out_air_per_area + rad_out_sky_per_area + rad_out_ground_per_area + rad_out_lw_srd_per_area;
 
-        SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
-        QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area;
-        QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
-        QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+        state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
+        state.dataHeatBalSurf->QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area;
+        state.dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
+        state.dataHeatBalSurf->QRadOutReport(SurfNum) = state.dataHeatBalSurf->QdotRadOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
         // Radiation emission to air rate
-        DataHeatBalSurface::QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
-        DataHeatBalSurface::QHeatEmiReport(SurfNum) = surface.Area * state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout) + DataHeatBalSurface::QAirExtReport(SurfNum);
+        state.dataHeatBalSurf->QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
+        state.dataHeatBalSurf->QHeatEmiReport(SurfNum) =
+            surface.Area * state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout) + state.dataHeatBalSurf->QAirExtReport(SurfNum);
 
     }
 
@@ -2824,51 +2843,50 @@ namespace WindowManager {
 
         // Using/Aliasing
         using ConvectionCoefficients::CalcISO15099WindowIntConvCoeff;
-        using General::InterpSlatAng;
         using General::InterpSw;
-
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyTdbFnHW;
 
-        int const MaxIterations(100); // Maximum allowed number of iterations (increased 9/01 from 15 to 50,
+        constexpr int MaxIterations(100); // Maximum allowed number of iterations (increased 9/01 from 15 to 50,
         //   increased 11/02 from 50 to 100)
-        Real64 const errtemptol(0.02); // Tolerance on errtemp for convergence (increased from 0.01, 3/4/03)
+        constexpr Real64 errtemptol(0.02); // Tolerance on errtemp for convergence (increased from 0.01, 3/4/03)
 
-        int ZoneNum;                    // Zone number corresponding to SurfNum
-        int i;                          // Counter
-        static Array1D<Real64> hgap(5); // Gap gas conductance (W/m2-K) //Tuned Made static
-        Real64 gr;                      // Grashof number of gas in a gap
-        Real64 con;                     // Gap gas conductivity
-        Real64 pr;                      // Gap gas Prandtl number
-        Real64 nu;                      // Gap gas Nusselt number
-        static Array1D<Real64> hr(10);  // Radiative conductance (W/m2-K) //Tuned Made static
-        Real64 d;                       // +1 if number of row interchanges is even,
+        int ZoneNum;             // Zone number corresponding to SurfNum
+        int i;                   // Counter
+        Real64 gr;               // Grashof number of gas in a gap
+        Real64 con;              // Gap gas conductivity
+        Real64 pr;               // Gap gas Prandtl number
+        Real64 nu;               // Gap gas Nusselt number
+        Real64 d;                // +1 if number of row interchanges is even,
         // -1 if odd (in LU decomposition)
-        static Array1D_int indx(10);          // Vector of row permutations in LU decomposition //Tuned Made static
-        static Array2D<Real64> Aface(10, 10); // Coefficient in equation Aface*thetas = Bface //Tuned Made static
-        static Array1D<Real64> Bface(10);     // Coefficient in equation Aface*thetas = Bface //Tuned Made static
-
-        int iter;                          // Iteration number
-        static Array1D<Real64> hrprev(10); // Value of hr from previous iteration //Tuned Made static
-        Real64 errtemp;                    // Absolute value of sum of face temperature differences
+        
+        auto &hgap = state.dataWindowManager->hgap;
+        auto &hr = state.dataWindowManager->hr;
+        auto &indx = state.dataWindowManager->indx;
+        auto &Aface = state.dataWindowManager->Aface;
+        auto &Bface = state.dataWindowManager->Bface;
+        auto &hrprev = state.dataWindowManager->hrprev;
+        auto &TGapNewBG = state.dataWindowManager->TGapNewBG;
+        auto &hcvBG = state.dataWindowManager->hcvBG;
+        auto &AbsRadShadeFace = state.dataWindowManager->AbsRadShadeFace;
+        auto &RhoIR = state.dataWindowManager->RhoIR;
+        
+        int iter;                   // Iteration number
+        Real64 errtemp;             // Absolute value of sum of face temperature differences
         //   between iterations, divided by number of faces
-        Real64 VGap;                         // Air velocity in gap between glass and shade/blind (m/s)
-        Real64 VAirflowGap;                  // Air velocity in airflow gap between glass panes (m/s)
-        Real64 VGapPrev;                     // Value of VGap from previous iteration
-        Real64 TGapNew;                      // Average air temp in gap between glass and shade/blind (K)
-        Real64 TAirflowGapNew;               // Average air temp in airflow gap between glass panes (K)
-        Real64 TGapOutlet;                   // Temperature of air leaving gap between glass and shade/blind (K)
-        Real64 TAirflowGapOutlet;            // Temperature of air leaving airflow gap between glass panes (K)
-        Real64 TAirflowGapOutletC;           // Temperature of air leaving airflow gap between glass panes (C)
-        static Array1D<Real64> TGapNewBG(2); // For between-glass shade/blind, average gas temp in gaps on either //Tuned Made static
-        //  side of shade/blind (K)
-        Real64 hcv;                      // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
-        Real64 hcvAirflowGap;            // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
-        Real64 hcvPrev;                  // Value of hcv from previous iteration
-        static Array1D<Real64> hcvBG(2); // For between-glass shade/blind, convection coefficient from gap glass or //Tuned Made static
-        //  shade/blind to gap gas on either side of shade/blind (W/m2-K)
+        Real64 VGap;                  // Air velocity in gap between glass and shade/blind (m/s)
+        Real64 VAirflowGap;           // Air velocity in airflow gap between glass panes (m/s)
+        Real64 VGapPrev;              // Value of VGap from previous iteration
+        Real64 TGapNew;               // Average air temp in gap between glass and shade/blind (K)
+        Real64 TAirflowGapNew;        // Average air temp in airflow gap between glass panes (K)
+        Real64 TGapOutlet;            // Temperature of air leaving gap between glass and shade/blind (K)
+        Real64 TAirflowGapOutlet;     // Temperature of air leaving airflow gap between glass panes (K)
+        Real64 TAirflowGapOutletC;    // Temperature of air leaving airflow gap between glass panes (C)
+        Real64 hcv;               // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
+        Real64 hcvAirflowGap;     // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
+        Real64 hcvPrev;           // Value of hcv from previous iteration
         Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
         Real64 ConvHeatFlowForced;  // Convective heat flow from forced airflow gap (W)
         Real64 ShGlReflFacIR;       // Factor for long-wave inter-reflection between shade/blind and adjacent glass
@@ -2881,12 +2899,9 @@ namespace WindowManager {
         Real64 EpsShIR1; // Long-wave emissivity of shade/blind surface facing glass; 1=interior shade/blind,
         Real64 EpsShIR2;
         //  2=exterior shade/blind
-        Real64 TauShIR; // Long-wave transmittance of isolated shade/blind
-        Real64 sconsh;  // shade/blind conductance (W/m2-K)
-        WinShadingType ShadeFlag;  // Shading flag
-        // Real64 ShadeAbsFac1; // Fractions for apportioning absorbed radiation to shade/blind faces
-        // Real64 ShadeAbsFac2;
-        static Array1D<Real64> AbsRadShadeFace(2); // Solar radiation, short-wave radiation from lights, and long-wave //Tuned Made static
+        Real64 TauShIR;                     // Long-wave transmittance of isolated shade/blind
+        Real64 sconsh;                      // shade/blind conductance (W/m2-K)
+        WinShadingType ShadeFlag;           // Shading flag
         //  radiation from lights and zone equipment absorbed by faces of shade/blind (W/m2)
         Real64 ShadeArea;          // shade/blind area (m2)
         Real64 CondHeatGainGlass;  // Conduction through inner glass layer, outside to inside (W)
@@ -2900,31 +2915,28 @@ namespace WindowManager {
         Real64 IncidentSolar; // Solar incident on outside of window (W)
         int ConstrNum;        // Construction number, bare and with shading device
         int ConstrNumSh;
-        Real64 TransDiff;                 // Diffuse shortwave transmittance
-        static Array1D<Real64> RhoIR(10); // Face IR reflectance //Tuned Made static
-        Real64 FacRhoIR25;                // Intermediate variable
-        Real64 FacRhoIR63;                // Intermediate variable
-        Real64 RhoIRfp;                   // Intermediate variable
-        Real64 RhoIRbp;                   // Intermediate variable
-        Real64 FacRhoIR2fp;               // Intermediate variable
-        Real64 FacRhoIR3bp;               // Intermediate variable
-        Real64 FacRhoIR2fpRhoIR63;        // Intermediate variable
-        Real64 FacRhoIR3bpRhoIR25;        // Intermediate variable
-        Real64 FacRhoIR47;                // Intermediate variable
-        Real64 FacRhoIR85;                // Intermediate variable
-        Real64 FacRhoIR4fp;               // Intermediate variable
-        Real64 FacRhoIR5bp;               // Intermediate variable
-        Real64 FacRhoIR4fpRhoIR85;        // Intermediate variable
-        Real64 FacRhoIR5bpRhoIR47;        // Intermediate variable
-        Real64 ConvHeatGainToZoneAir;     // Convective heat gain to zone air from window gap airflow (W)
-        Real64 TotAirflowGap;             // Total volumetric airflow through window gap (m3/s)
-        Real64 CpAirOutlet;               // Heat capacity of air from window gap (J/kg-K)
-        Real64 CpAirZone;                 // Heat capacity of zone air (J/kg-K)
-        Real64 InletAirHumRat;            // Humidity ratio of air from window gap entering fan
-        // unused REAL(r64)         :: RhoAir                ! Density of air from window gap entering fan (kg/m3)
-        // unused REAL(r64)         :: MassFlow              ! Mass flow of air from window gap entering fan (kg/s)
-        Real64 ZoneTemp;     // Zone air temperature (C)
-        int InsideFaceIndex; // intermediate variable for index of inside face in thetas
+        Real64 TransDiff;             // Diffuse shortwave transmittance
+        Real64 FacRhoIR25;            // Intermediate variable
+        Real64 FacRhoIR63;            // Intermediate variable
+        Real64 RhoIRfp;               // Intermediate variable
+        Real64 RhoIRbp;               // Intermediate variable
+        Real64 FacRhoIR2fp;           // Intermediate variable
+        Real64 FacRhoIR3bp;           // Intermediate variable
+        Real64 FacRhoIR2fpRhoIR63;    // Intermediate variable
+        Real64 FacRhoIR3bpRhoIR25;    // Intermediate variable
+        Real64 FacRhoIR47;            // Intermediate variable
+        Real64 FacRhoIR85;            // Intermediate variable
+        Real64 FacRhoIR4fp;           // Intermediate variable
+        Real64 FacRhoIR5bp;           // Intermediate variable
+        Real64 FacRhoIR4fpRhoIR85;    // Intermediate variable
+        Real64 FacRhoIR5bpRhoIR47;    // Intermediate variable
+        Real64 ConvHeatGainToZoneAir; // Convective heat gain to zone air from window gap airflow (W)
+        Real64 TotAirflowGap;         // Total volumetric airflow through window gap (m3/s)
+        Real64 CpAirOutlet;           // Heat capacity of air from window gap (J/kg-K)
+        Real64 CpAirZone;             // Heat capacity of zone air (J/kg-K)
+        Real64 InletAirHumRat;        // Humidity ratio of air from window gap entering fan
+        Real64 ZoneTemp;              // Zone air temperature (C)
+        int InsideFaceIndex;          // intermediate variable for index of inside face in thetas
 
         iter = 0;
         ConvHeatFlowNatural = 0.0;
@@ -3503,8 +3515,13 @@ namespace WindowManager {
             } else if (ANY_SHADE_SCREEN(ShadeFlag)) {
                 TransDiff = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
             } else if (ANY_BLIND(ShadeFlag)) {
-                TransDiff =
-                    InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), state.dataConstruction->Construct(ConstrNumSh).BlTransDiff);
+                if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
+                    TransDiff = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                                                       state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                       state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                } else {
+                    TransDiff = state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(1);
+                }
             } else if (ShadeFlag == WinShadingType::SwitchableGlazing) {
                 TransDiff = InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum), state.dataConstruction->Construct(ConstrNum).TransDiff, state.dataConstruction->Construct(ConstrNumSh).TransDiff);
             }
@@ -4218,7 +4235,7 @@ namespace WindowManager {
         int k;
         int imax; // Temporary variable
         //   as output: decomposed matrix
-        static Array1D<Real64> vv(10); // Stores the implicit scaling of each row //Tuned Made static
+        auto &vv = state.dataWindowManager->vv;
         Real64 aamax;                  // Absolute value of largest element of matrix
         Real64 dum;                    // Temporary variable
         Real64 sum;                    // Sum of products of matrix elements
@@ -4357,42 +4374,42 @@ namespace WindowManager {
         // REFERENCES:
         // Window5 source code; ISO 15099
 
-        Real64 const pres(1.0e5);     // Gap gas pressure (Pa)
-        Real64 const gaslaw(8314.51); // Molar gas constant (J/kMol-K)
-        static Real64 const two_sqrt_2(2.0 * std::sqrt(2.0));
+        constexpr Real64 pres(1.0e5);     // Gap gas pressure (Pa)
+        constexpr Real64 gaslaw(8314.51); // Molar gas constant (J/kMol-K)
+        Real64 const two_sqrt_2(2.0 * std::sqrt(2.0));
 
-        // Tuned Arrays made static
         int IMix; // Counters of gases in a mixture
         int i;
         int j;
-        int NMix;                           // Number of gases in a mixture
-        Real64 molmix;                      // Molecular weight of mixture
-        static Array1D<Real64> kprime(10);  // Monotonic thermal conductivity
-        static Array1D<Real64> kdblprm(10); // Conductivity term accounting for additional energy moved by
-        //  the diffusional transport of internal energy in polyatomic gases.
-        Real64 kpmix; // Monotonic thermal conductivity of mixture
-        Real64 kdpmix;
-        static Array1D<Real64> mukpdwn(10); // Denominator term
-        static Array1D<Real64> kpdown(10);  // Denominator terms
-        static Array1D<Real64> kdpdown(10);
-        Real64 kmix;                      // For accumulating conductance of gas mixture
-        Real64 mumix;                     // For accumulating viscosity of gas mixture
-        Real64 visc(0.0);                 // Dynamic viscosity of mixture at tmean (g/m-s)
-        Real64 cp(0.0);                   // Specific heat of mixture at tmean (J/m3-K)
-        Real64 dens(0.0);                 // Density of mixture at tmean (kg/m3)
-        Real64 cpmixm;                    // Gives cp when divided by molmix
-        Real64 phimup;                    // Numerator factor
-        Real64 downer;                    // Denominator factor
-        Real64 psiup;                     // Numerator factor
-        Real64 psiterm;                   // Factor
-        Real64 phikup;                    // Numerator factor
-        Real64 rhomix;                    // Density of gas mixture (kg/m3)
-        static Array1D<Real64> frct(10);  // Fraction of each gas in a mixture
-        static Array1D<Real64> fvis(10);  // Viscosity of each gas in a mixture (g/m-s)
-        static Array1D<Real64> fcon(10);  // Conductance of each gas in a mixture (W/m2-K)
-        static Array1D<Real64> fdens(10); // Density of each gas in a mixture (kg/m3)
-        static Array1D<Real64> fcp(10);   // Specific heat of each gas in a mixture (J/m3-K)
+        int NMix;                    // Number of gases in a mixture
+        Real64 molmix;               // Molecular weight of mixture
 
+        auto &kprime = state.dataWindowManager->kprime;
+        auto &kdblprm = state.dataWindowManager->kdblprm;
+        auto &mukpdwn = state.dataWindowManager->mukpdwn;
+        auto &kpdown = state.dataWindowManager->kpdown;
+        auto &kdpdown = state.dataWindowManager->kdpdown;
+        auto &frct = state.dataWindowManager->frct;
+        auto &fvis = state.dataWindowManager->fvis;
+        auto &fcon = state.dataWindowManager->fcon;
+        auto &fdens = state.dataWindowManager->fdens;
+        auto &fcp = state.dataWindowManager->fcp;
+
+        Real64 kpmix;              // Monotonic thermal conductivity of mixture
+        Real64 kdpmix;
+        Real64 kmix;               // For accumulating conductance of gas mixture
+        Real64 mumix;              // For accumulating viscosity of gas mixture
+        Real64 visc(0.0);          // Dynamic viscosity of mixture at tmean (g/m-s)
+        Real64 cp(0.0);            // Specific heat of mixture at tmean (J/m3-K)
+        Real64 dens(0.0);          // Density of mixture at tmean (kg/m3)
+        Real64 cpmixm;             // Gives cp when divided by molmix
+        Real64 phimup;             // Numerator factor
+        Real64 downer;             // Denominator factor
+        Real64 psiup;              // Numerator factor
+        Real64 psiterm;            // Factor
+        Real64 phikup;             // Numerator factor
+        Real64 rhomix;             // Density of gas mixture (kg/m3)
+        
         NMix = state.dataWindowManager->gnmix(IGap); // Autodesk:Logic Either assert NMix>0 or handle NMix<=0 in logic so that con and locals guar. initialized before use
 
         for (IMix = 1; IMix <= NMix; ++IMix) {
@@ -4513,7 +4530,7 @@ namespace WindowManager {
 
         Real64 const pres(1.0e5);     // Gap gas pressure (Pa)
         Real64 const gaslaw(8314.51); // Molar gas constant (J/kMol-K)
-        static Real64 const two_sqrt_2(2.0 * std::sqrt(2.0));
+        Real64 const two_sqrt_2(2.0 * std::sqrt(2.0));
 
         int IMix; // Counters of gases in a mixture
         int i;
@@ -4603,12 +4620,12 @@ namespace WindowManager {
         // Argument array dimensioning
         AbsRadShade.dim(2);
 
-        Real64 const hrad(5.3);    // Typical radiative conductance (W/m2-K)
-        Real64 const resgap(0.21); // Typical gap resistance (m2-K/W)
+        constexpr Real64 hrad(5.3);    // Typical radiative conductance (W/m2-K)
+        constexpr Real64 resgap(0.21); // Typical gap resistance (m2-K/W)
 
         int i;                             // Face counter
         WinShadingType ShadeFlag;                     // Shading flag
-        static Array1D<Real64> rguess(11); // Combined radiative/convective resistance (m2-K/W) of //Tuned Made static
+        Array1D<Real64> rguess(11); // Combined radiative/convective resistance (m2-K/W) of
         // inside or outside air film, or gap
         Real64 restot; // Total window resistance including outside
         //   and inside air films (m2-K/W)
@@ -5974,7 +5991,6 @@ namespace WindowManager {
 
         // Using/Aliasing
         using General::BlindBeamBeamTrans;
-        using General::InterpBlind;
         using General::InterpProfSlatAng;
         using General::InterpSlatAng;
         using General::POLYF;
@@ -6202,6 +6218,7 @@ namespace WindowManager {
                 TVisNorm = TScBmBmVis * (TBmBmVis + TDifVis * RGlFrontVis * RScBackVis / (1 - RGlDiffFrontVis * RScDifBackVis)) +
                            TScBmDifVis * TDifVis / (1 - RGlDiffFrontVis * RScDifBackVis);
             } else {
+                // TODO - NOT USING SurfWinSlatAngThisTS
                 VarSlats = false;
                 if (state.dataHeatBal->Blind(BlNum).SlatAngleType == VariableSlats) VarSlats = true;
                 SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
@@ -6758,14 +6775,13 @@ namespace WindowManager {
         using General::POLYF;
 
         using General::ScanForReports;
-        // InterpBlind ! Blind profile angle interpolation function
         using WindowComplexManager::CalcComplexWindowThermal;
         using WindowComplexManager::UpdateComplexWindows;
 
         static Array1D_string const Roughness(6, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
         static Array1D_string const GasTypeName({0, 4}, {"Custom", "Air", "Argon", "Krypton", "Xenon"});
 
-        static Real64 TempVar(0.0);       // just temporary usage for complex fenestration
+        Real64 TempVar(0.0);       // just temporary usage for complex fenestration
 
         int ThisNum;
         int Layer;
@@ -8491,17 +8507,17 @@ namespace WindowManager {
         rNumericArgs.dimension(NumNumbers, 0.0);
 
         if (NumSiteSpectrum == 1) {
-            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
 
             // use default spectrum data, done!
-            if (UtilityRoutines::SameString(cAlphaArgs(2), "Default")) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Default")) {
                 state.dataWindowManager->RunMeOnceFlag = true;
                 return;
             }
 
             // now read custom solar and visible spectrum data
-            cSolarSpectrum = cAlphaArgs(3);
-            cVisibleSpectrum = cAlphaArgs(4);
+            cSolarSpectrum = state.dataIPShortCut->cAlphaArgs(3);
+            cVisibleSpectrum = state.dataIPShortCut->cAlphaArgs(4);
 
             cCurrentModuleObject = "Site:SpectrumData";
             NumSiteSpectrum = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -8521,19 +8537,19 @@ namespace WindowManager {
             iVisibleSpectrum = 0;
             for (Loop = 1; Loop <= NumSiteSpectrum; ++Loop) {
                 // Step 2 - read user-defined spectrum data
-                inputProcessor->getObjectItem(state, cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-                if (UtilityRoutines::SameString(cAlphaArgs(1), cSolarSpectrum)) {
+                inputProcessor->getObjectItem(state, cCurrentModuleObject, Loop, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), cSolarSpectrum)) {
                     iSolarSpectrum = Loop;
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->nume) {
-                        ShowSevereError(state, "Solar spectrum data pair is more than 107 - " + cCurrentModuleObject + " - " + cAlphaArgs(1));
+                        ShowSevereError(state, "Solar spectrum data pair is more than 107 - " + cCurrentModuleObject + " - " + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     } else {
                         // Step 3 - overwrite default solar spectrum data
                         for (iTmp = 1; iTmp <= state.dataWindowManager->nume; ++iTmp) {
                             if (iTmp <= NumNumbers / 2) {
-                                state.dataWindowManager->wle(iTmp) = rNumericArgs(2 * iTmp - 1);
-                                state.dataWindowManager->e(iTmp) = rNumericArgs(2 * iTmp);
+                                state.dataWindowManager->wle(iTmp) = state.dataIPShortCut->rNumericArgs(2 * iTmp - 1);
+                                state.dataWindowManager->e(iTmp) = state.dataIPShortCut->rNumericArgs(2 * iTmp);
                             } else {
                                 state.dataWindowManager->wle(iTmp) = 0.0;
                                 state.dataWindowManager->e(iTmp) = 0.0;
@@ -8541,18 +8557,18 @@ namespace WindowManager {
                         }
                     }
                 }
-                if (UtilityRoutines::SameString(cAlphaArgs(1), cVisibleSpectrum)) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), cVisibleSpectrum)) {
                     iVisibleSpectrum = Loop;
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->numt3) {
-                        ShowSevereError(state, "Visible spectrum data pair is more than 81 - " + cCurrentModuleObject + " - " + cAlphaArgs(1));
+                        ShowSevereError(state, "Visible spectrum data pair is more than 81 - " + cCurrentModuleObject + " - " + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     } else {
                         // Step 3 - overwrite default visible spectrum data
                         for (iTmp = 1; iTmp <= state.dataWindowManager->numt3; ++iTmp) {
                             if (iTmp <= NumNumbers / 2) {
-                                state.dataWindowManager->wlt3(iTmp) = rNumericArgs(2 * iTmp - 1);
-                                state.dataWindowManager->y30(iTmp) = rNumericArgs(2 * iTmp);
+                                state.dataWindowManager->wlt3(iTmp) = state.dataIPShortCut->rNumericArgs(2 * iTmp - 1);
+                                state.dataWindowManager->y30(iTmp) = state.dataIPShortCut->rNumericArgs(2 * iTmp);
                             } else {
                                 state.dataWindowManager->wlt3(iTmp) = 0.0;
                                 state.dataWindowManager->y30(iTmp) = 0.0;

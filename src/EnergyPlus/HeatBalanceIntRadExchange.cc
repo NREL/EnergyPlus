@@ -109,29 +109,6 @@ namespace HeatBalanceIntRadExchange {
     using namespace DataSystemVariables;
     using namespace DataViewFactorInformation;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    int MaxNumOfRadEnclosureSurfs(0); // Max saved to get large enough space for SurfaceTempInKto4th
-
-    bool CarrollMethod(false);  // Use Carroll MRT method
-
-    namespace {
-        bool CalcInteriorRadExchangefirstTime(true); // Logical flag for one-time initializations
-    }
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
-
-    // Functions
-    void clear_state()
-    {
-        MaxNumOfRadEnclosureSurfs = 0;
-        CalcInteriorRadExchangefirstTime = true;
-    }
-
     void CalcInteriorRadExchange(EnergyPlusData &state,
                                  Array1S<Real64> const SurfaceTemp,   // Current surface temperatures
                                  int const SurfIterations,            // Number of iterations in calling subroutine
@@ -163,7 +140,6 @@ namespace HeatBalanceIntRadExchange {
         typedef Array1D<Real64>::size_type size_type;
 
         // Using/Aliasing
-        using General::InterpSlatAng; // Function for slat angle interpolation
         using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
         using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
 
@@ -174,23 +150,19 @@ namespace HeatBalanceIntRadExchange {
         WinShadingType ShadeFlag;     // Window shading status current time step
         WinShadingType ShadeFlagPrev; // Window shading status previous time step
 
-        // variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
-        static Array1D<Real64> SurfaceTempRad;
-        static Array1D<Real64> SurfaceTempInKto4th;
-        static Array1D<Real64> SurfaceEmiss;
-
-
-
+        auto &SurfaceTempRad(state.dataHeatBalIntRadExchg->SurfaceTempRad);
+        auto &SurfaceTempInKto4th(state.dataHeatBalIntRadExchg->SurfaceTempInKto4th);
+        auto &SurfaceEmiss(state.dataHeatBalIntRadExchg->SurfaceEmiss);
 
 #ifdef EP_Detailed_Timings
         epStartTime("CalcInteriorRadExchange=");
 #endif
-        if (CalcInteriorRadExchangefirstTime) {
-            SurfaceTempRad.allocate(MaxNumOfRadEnclosureSurfs);
-            SurfaceTempInKto4th.allocate(MaxNumOfRadEnclosureSurfs);
-            SurfaceEmiss.allocate(MaxNumOfRadEnclosureSurfs);
-            CalcInteriorRadExchangefirstTime = false;
-            if (DeveloperFlag) {
+        if (state.dataHeatBalIntRadExchg->CalcInteriorRadExchangefirstTime) {
+            SurfaceTempRad.allocate(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs);
+            SurfaceTempInKto4th.allocate(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs);
+            SurfaceEmiss.allocate(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs);
+            state.dataHeatBalIntRadExchg->CalcInteriorRadExchangefirstTime = false;
+            if (state.dataSysVars->DeveloperFlag) {
                 DisplayString(state, " OMP turned off, HBIRE loop executed in serial");
             }
         }
@@ -217,10 +189,10 @@ namespace HeatBalanceIntRadExchange {
 #endif
 
         int startEnclosure = 1;
-        int endEnclosure = DataViewFactorInformation::NumOfRadiantEnclosures;
+        int endEnclosure = state.dataViewFactor->NumOfRadiantEnclosures;
         if (PartialResimulate) {
             startEnclosure = endEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).RadiantEnclosureNum;
-            auto const &enclosure(ZoneRadiantInfo(startEnclosure));
+            auto const &enclosure(state.dataViewFactor->ZoneRadiantInfo(startEnclosure));
             for (int i : enclosure.SurfacePtr) {
                 NetLWRadToSurf(i) = 0.0;
                 state.dataSurface->SurfWinIRfromParentZone(i) = 0.0;
@@ -233,7 +205,7 @@ namespace HeatBalanceIntRadExchange {
 
         for (int enclosureNum = startEnclosure; enclosureNum <= endEnclosure; ++enclosureNum) {
 
-            auto &zone_info(ZoneRadiantInfo(enclosureNum));
+            auto &zone_info(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
             auto &zone_ScriptF(zone_info.ScriptF); // Tuned Transposed
             auto &zone_SurfacePtr(zone_info.SurfacePtr);
             int const n_zone_Surfaces(zone_info.NumOfSurfaces);
@@ -274,7 +246,7 @@ namespace HeatBalanceIntRadExchange {
                             if (ShadeFlagPrev != ShadeFlag && (ANY_INTERIOR_SHADE_BLIND(ShadeFlagPrev) || ANY_INTERIOR_SHADE_BLIND(ShadeFlag)))
                                 IntShadeOrBlindStatusChanged = true;
                             if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
-                                DataWindowEquivalentLayer::CFS(state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).EQLConsPtr).ISControlled) {
+                                state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).EQLConsPtr).ISControlled) {
                                 IntShadeOrBlindStatusChanged = true;
                             }
                         } else {
@@ -288,23 +260,20 @@ namespace HeatBalanceIntRadExchange {
                         int const SurfNum = zone_SurfacePtr(ZoneSurfNum);
                         int const ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                         zone_info.Emissivity(ZoneSurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
-                        auto const &surface_window(state.dataSurface->SurfaceWindow(SurfNum));
                         if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow && ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                            zone_info.Emissivity(ZoneSurfNum) =
-                                InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), surface_window.EffShBlindEmiss) +
-                                InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), surface_window.EffGlassEmiss);
+                            zone_info.Emissivity(ZoneSurfNum) = state.dataHeatBal->ITABSF(SurfNum);
                         }
                         if (state.dataSurface->Surface(SurfNum).MovInsulIntPresent) {
                             HeatBalanceMovableInsulation::EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
                             zone_info.Emissivity(ZoneSurfNum) = state.dataMaterial->Material(state.dataSurface->Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
                         }
                         if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
-                            DataWindowEquivalentLayer::CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
+                                state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
                             zone_info.Emissivity(ZoneSurfNum) = EQLWindowInsideEffectiveEmiss(state, ConstrNum);
                         }
                     }
 
-                    if (CarrollMethod) {
+                    if (state.dataHeatBalIntRadExchg->CarrollMethod) {
                         CalcFp(n_zone_Surfaces, zone_info.Emissivity, zone_info.FMRT, zone_info.Fp);
                     } else {
                         CalcScriptF(state, n_zone_Surfaces, zone_info.Area, zone_info.F, zone_info.Emissivity, zone_ScriptF);
@@ -345,8 +314,7 @@ namespace HeatBalanceIntRadExchange {
                         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
                     } else if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                         SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
-                        SurfaceEmiss[ZoneSurfNum] = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), surface_window.EffShBlindEmiss) +
-                            InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), surface_window.EffGlassEmiss);
+                        SurfaceEmiss[ZoneSurfNum] = state.dataHeatBal->ITABSF(SurfNum);
                     } else {
                         SurfaceTempRad[ZoneSurfNum] = SurfaceTemp(SurfNum);
                         SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
@@ -355,14 +323,14 @@ namespace HeatBalanceIntRadExchange {
                     SurfaceTempRad[ZoneSurfNum] = SurfaceTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
                 }
-                if (CarrollMethod) {
+                if (state.dataHeatBalIntRadExchg->CarrollMethod) {
                     CarrollMRTNumerator += SurfaceTempRad[ZoneSurfNum]*zone_info.Fp[ZoneSurfNum]*zone_info.Area[ZoneSurfNum];
                     CarrollMRTDenominator += zone_info.Fp[ZoneSurfNum]*zone_info.Area[ZoneSurfNum];
                 }
                 SurfaceTempInKto4th[ZoneSurfNum] = pow_4(SurfaceTempRad[ZoneSurfNum] + DataGlobalConstants::KelvinConv);
             }
 
-            if (CarrollMethod) {
+            if (state.dataHeatBalIntRadExchg->CarrollMethod) {
                 if (CarrollMRTDenominator > 0.0) {
                     CarrollMRTInKTo4th = pow_4(CarrollMRTNumerator/CarrollMRTDenominator + DataGlobalConstants::KelvinConv);
                 } else {
@@ -373,7 +341,7 @@ namespace HeatBalanceIntRadExchange {
 
             // These are the money loops
             size_type lSR(0u);
-            if (CarrollMethod) {
+            if (state.dataHeatBalIntRadExchg->CarrollMethod) {
                 for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
                     int const RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
                     int const ConstrNumRec = state.dataSurface->Surface(RecSurfNum).Construction;
@@ -499,7 +467,6 @@ namespace HeatBalanceIntRadExchange {
         // the grey interchange between surfaces in an enclosure.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         using General::ScanForReports;
 
@@ -507,8 +474,7 @@ namespace HeatBalanceIntRadExchange {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool NoUserInputF;            // Logical flag signifying no input F's for zone
-        static bool ViewFactorReport; // Flag to output view factor report in eio file
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         Real64 CheckValue1;
         Real64 CheckValue2;
         Real64 FinalCheckValue;
@@ -518,7 +484,7 @@ namespace HeatBalanceIntRadExchange {
         int NumIterations;
         std::string Option1; // view factor report option
 
-
+        auto &ViewFactorReport(state.dataHeatBalIntRadExchg->ViewFactorReport);
 
         ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
 
@@ -532,9 +498,9 @@ namespace HeatBalanceIntRadExchange {
             print(state.files.eio, "{}\n", "! <View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface");
         }
 
-        MaxNumOfRadEnclosureSurfs = 0;
-        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
-            auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+        state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs = 0;
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
+            auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
             if (enclosureNum == 1) {
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     print(state.files.eio,
@@ -550,7 +516,8 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
-            MaxNumOfRadEnclosureSurfs = max(MaxNumOfRadEnclosureSurfs, numEnclosureSurfaces);
+            state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs =
+                max(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs, numEnclosureSurfaces);
             if (numEnclosureSurfaces < 1) ShowFatalError(state, "No surfaces in an enclosure in InitInteriorRadExchange");
 
             // Allocate the parts of the derived type
@@ -603,7 +570,7 @@ namespace HeatBalanceIntRadExchange {
             }
 
 
-            if (CarrollMethod) {
+            if (state.dataHeatBalIntRadExchg->CarrollMethod) {
 
                 // User View Factors cannot be used with Carroll method.
                 if(inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName")) {
@@ -835,8 +802,8 @@ namespace HeatBalanceIntRadExchange {
         int NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumZonesWithUserFbyS > 0) AlignInputViewFactors(state, cCurrentModuleObject, ErrorsFound);
 
-        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
-            auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
             if (enclosureNum == 1) {
                 if (state.dataGlobal->DisplayAdvancedReportVariables)
                     print(state.files.eio, "{}\n", "! <Solar View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check "
@@ -1100,7 +1067,6 @@ namespace HeatBalanceIntRadExchange {
         // This routine gets the user view factor info.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // Argument array dimensioning
         F.dim(N, N);
@@ -1118,22 +1084,22 @@ namespace HeatBalanceIntRadExchange {
 
         NoUserInputF = true;
         UserFZoneIndex = inputProcessor->getObjectItemNum(state, "ZoneProperty:UserViewFactors", ZoneName);
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         if (UserFZoneIndex > 0) {
             NoUserInputF = false;
 
             inputProcessor->getObjectItem(state,
                                           "ZoneProperty:UserViewFactors",
                                           UserFZoneIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             if (NumNums < 3 * pow_2(N)) {
                 ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values.");
@@ -1143,9 +1109,9 @@ namespace HeatBalanceIntRadExchange {
             }
             F = 0.0;
             for (index = 1; index <= NumNums; index += 3) {
-                inx1 = rNumericArgs(index);
-                inx2 = rNumericArgs(index + 1);
-                F(inx2, inx1) = rNumericArgs(index + 2);
+                inx1 = state.dataIPShortCut->rNumericArgs(index);
+                inx2 = state.dataIPShortCut->rNumericArgs(index + 1);
+                F(inx2, inx1) = state.dataIPShortCut->rNumericArgs(index + 2);
             }
         }
     }
@@ -1164,8 +1130,8 @@ namespace HeatBalanceIntRadExchange {
 
             // Look for matching solar enclosure name
             bool enclMatchFound = false;
-            for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
-                auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+            for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
+                auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
                 if (UtilityRoutines::SameString(thisZoneOrZoneListName, thisEnclosure.Name)) {
                     // View factor zone name matches enclosure name
                     enclMatchFound = true;
@@ -1174,8 +1140,8 @@ namespace HeatBalanceIntRadExchange {
             }
             if (enclMatchFound) continue; // We're done with this instance
             // Look for matching solar enclosure name
-            for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
-                auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+            for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+                auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
                 if (UtilityRoutines::SameString(thisZoneOrZoneListName, thisEnclosure.Name)) {
                     // View factor zone name matches enclosure name
                     enclMatchFound = true;
@@ -1189,8 +1155,8 @@ namespace HeatBalanceIntRadExchange {
             if (zoneListNum > 0) {
                 // Look for radiant enclosure with same list of zones
                 auto &thisZoneList(state.dataHeatBal->ZoneList(zoneListNum));
-                for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
-                    auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+                for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
+                    auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
                     bool anyZoneNotFound = false;
                     // If the number of enclosure zones is not the same as the number of zonelist zone, go to the next enclosure
                     int zlistNumZones = thisEnclosure.ZoneNums.size();
@@ -1220,8 +1186,8 @@ namespace HeatBalanceIntRadExchange {
                 }
                 if (!enclMatchFound) {
                     // Look for solar enclosure with same list of zones
-                    for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
-                        auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+                    for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+                        auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
                         bool anyZoneNotFound = false;
                         // If the number of enclosure zones is not the same as the number of zonelist zone, go to the next enclosure
                         int zlistNumZones = thisEnclosure.ZoneNums.size();
@@ -1285,7 +1251,6 @@ namespace HeatBalanceIntRadExchange {
         // This routine gets the user view factor info for an enclosure which could be a zone or a group of zones
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // Argument array dimensioning
         F.dim(N, N);
@@ -1301,7 +1266,7 @@ namespace HeatBalanceIntRadExchange {
         int inx1;
         int inx2;
         Array1D_string enclosureSurfaceNames;
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         NoUserInputF = true;
         UserFZoneIndex = inputProcessor->getObjectItemNum(state, "ZoneProperty:UserViewFactors:BySurfaceName", "zone_or_zonelist_name", EnclosureName);
 
@@ -1315,15 +1280,15 @@ namespace HeatBalanceIntRadExchange {
             inputProcessor->getObjectItem(state,
                                           "ZoneProperty:UserViewFactors:BySurfaceName",
                                           UserFZoneIndex,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             if (NumNums < pow_2(N)) {
                 ShowWarningError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
@@ -1337,20 +1302,20 @@ namespace HeatBalanceIntRadExchange {
             numinx1 = 0;
 
             for (index = 2; index <= NumAlphas; index += 2) {
-                inx1 = UtilityRoutines::FindItemInList(cAlphaArgs(index), enclosureSurfaceNames, N);
-                inx2 = UtilityRoutines::FindItemInList(cAlphaArgs(index + 1), enclosureSurfaceNames, N);
+                inx1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), enclosureSurfaceNames, N);
+                inx2 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), enclosureSurfaceNames, N);
                 if (inx1 == 0) {
                     ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                    ShowContinueError(state, "...Surface name=\"" + cAlphaArgs(index) + "\", not in this zone or enclosure.");
+                    ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 if (inx2 == 0) {
                     ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                    ShowContinueError(state, "...Surface name=\"" + cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
+                    ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 ++numinx1;
-                if (inx1 > 0 && inx2 > 0) F(inx2, inx1) = rNumericArgs(numinx1);
+                if (inx1 > 0 && inx2 > 0) F(inx2, inx1) = state.dataIPShortCut->rNumericArgs(numinx1);
             }
             enclosureSurfaceNames.deallocate();
         }
@@ -2046,8 +2011,8 @@ namespace HeatBalanceIntRadExchange {
             ErrorsFound = true;                               // LCOV_EXCL_LINE
         } else if (surfRadEnclNum != radSysEnclNum) {
             ShowSevereError(state, routineName + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
-            ShowContinueError(state, "Surface zone or enclosure = " + DataViewFactorInformation::ZoneRadiantInfo(surfRadEnclNum).Name);
-            ShowContinueError(state, "Radiant equipment zone or enclosure = " + DataViewFactorInformation::ZoneRadiantInfo(radSysEnclNum).Name);
+            ShowContinueError(state, "Surface zone or enclosure = " + state.dataViewFactor->ZoneRadiantInfo(surfRadEnclNum).Name);
+            ShowContinueError(state, "Radiant equipment zone or enclosure = " + state.dataViewFactor->ZoneRadiantInfo(radSysEnclNum).Name);
             ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
         }

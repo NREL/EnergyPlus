@@ -128,7 +128,6 @@ namespace CostEstimateManager {
         // Get Cost Estimation object input.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item; // Item to be "gotten"
@@ -152,22 +151,22 @@ namespace CostEstimateManager {
         if (!allocated(state.dataCostEstimateManager->CostLineItem)) {
             state.dataCostEstimateManager->CostLineItem.allocate(state.dataCostEstimateManager->NumLineItems);
         }
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ComponentCost:LineItem";
 
         for (Item = 1; Item <= state.dataCostEstimateManager->NumLineItems; ++Item) {
-            inputProcessor->getObjectItem(state, cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-            state.dataCostEstimateManager->CostLineItem(Item).LineName = cAlphaArgs(1);
-            state.dataCostEstimateManager->CostLineItem(Item).ParentObjType = cAlphaArgs(3);
-            state.dataCostEstimateManager->CostLineItem(Item).ParentObjName = cAlphaArgs(4);
-            state.dataCostEstimateManager->CostLineItem(Item).PerEach = rNumericArgs(1);
-            state.dataCostEstimateManager->CostLineItem(Item).PerSquareMeter = rNumericArgs(2);
-            state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap = rNumericArgs(3);
-            state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP = rNumericArgs(4);
-            state.dataCostEstimateManager->CostLineItem(Item).PerCubicMeter = rNumericArgs(5);
-            state.dataCostEstimateManager->CostLineItem(Item).PerCubMeterPerSec = rNumericArgs(6);
-            state.dataCostEstimateManager->CostLineItem(Item).PerUAinWattperDelK = rNumericArgs(7);
-            state.dataCostEstimateManager->CostLineItem(Item).Qty = rNumericArgs(8);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, Item, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+            state.dataCostEstimateManager->CostLineItem(Item).LineName = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataCostEstimateManager->CostLineItem(Item).ParentObjType = state.dataIPShortCut->cAlphaArgs(3);
+            state.dataCostEstimateManager->CostLineItem(Item).ParentObjName = state.dataIPShortCut->cAlphaArgs(4);
+            state.dataCostEstimateManager->CostLineItem(Item).PerEach = state.dataIPShortCut->rNumericArgs(1);
+            state.dataCostEstimateManager->CostLineItem(Item).PerSquareMeter = state.dataIPShortCut->rNumericArgs(2);
+            state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap = state.dataIPShortCut->rNumericArgs(3);
+            state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP = state.dataIPShortCut->rNumericArgs(4);
+            state.dataCostEstimateManager->CostLineItem(Item).PerCubicMeter = state.dataIPShortCut->rNumericArgs(5);
+            state.dataCostEstimateManager->CostLineItem(Item).PerCubMeterPerSec = state.dataIPShortCut->rNumericArgs(6);
+            state.dataCostEstimateManager->CostLineItem(Item).PerUAinWattperDelK = state.dataIPShortCut->rNumericArgs(7);
+            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataIPShortCut->rNumericArgs(8);
         }
 
         // most input error checking to be performed later within Case construct in Calc routine.
@@ -175,14 +174,14 @@ namespace CostEstimateManager {
         cCurrentModuleObject = "ComponentCost:Adjustments";
         NumCostAdjust = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumCostAdjust == 1) {
-            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-            state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter = rNumericArgs(1);
-            state.dataCostEstimateManager->CurntBldg.DesignFeeFrac = rNumericArgs(2);
-            state.dataCostEstimateManager->CurntBldg.ContractorFeeFrac = rNumericArgs(3);
-            state.dataCostEstimateManager->CurntBldg.ContingencyFrac = rNumericArgs(4);
-            state.dataCostEstimateManager->CurntBldg.BondCostFrac = rNumericArgs(5);
-            state.dataCostEstimateManager->CurntBldg.CommissioningFrac = rNumericArgs(6);
-            state.dataCostEstimateManager->CurntBldg.RegionalModifier = rNumericArgs(7);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+            state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter = state.dataIPShortCut->rNumericArgs(1);
+            state.dataCostEstimateManager->CurntBldg.DesignFeeFrac = state.dataIPShortCut->rNumericArgs(2);
+            state.dataCostEstimateManager->CurntBldg.ContractorFeeFrac = state.dataIPShortCut->rNumericArgs(3);
+            state.dataCostEstimateManager->CurntBldg.ContingencyFrac = state.dataIPShortCut->rNumericArgs(4);
+            state.dataCostEstimateManager->CurntBldg.BondCostFrac = state.dataIPShortCut->rNumericArgs(5);
+            state.dataCostEstimateManager->CurntBldg.CommissioningFrac = state.dataIPShortCut->rNumericArgs(6);
+            state.dataCostEstimateManager->CurntBldg.RegionalModifier = state.dataIPShortCut->rNumericArgs(7);
 
         } else if (NumCostAdjust > 1) {
             ShowSevereError(state, cCurrentModuleObject + ": Only one instance of this object is allowed.");
@@ -192,15 +191,15 @@ namespace CostEstimateManager {
         cCurrentModuleObject = "ComponentCost:Reference";
         NumRefAdjust = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumRefAdjust == 1) {
-            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-            state.dataCostEstimateManager->RefrncBldg.LineItemTot = rNumericArgs(1);
-            state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter = rNumericArgs(2);
-            state.dataCostEstimateManager->RefrncBldg.DesignFeeFrac = rNumericArgs(3);
-            state.dataCostEstimateManager->RefrncBldg.ContractorFeeFrac = rNumericArgs(4);
-            state.dataCostEstimateManager->RefrncBldg.ContingencyFrac = rNumericArgs(5);
-            state.dataCostEstimateManager->RefrncBldg.BondCostFrac = rNumericArgs(6);
-            state.dataCostEstimateManager->RefrncBldg.CommissioningFrac = rNumericArgs(7);
-            state.dataCostEstimateManager->RefrncBldg.RegionalModifier = rNumericArgs(8);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+            state.dataCostEstimateManager->RefrncBldg.LineItemTot = state.dataIPShortCut->rNumericArgs(1);
+            state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter = state.dataIPShortCut->rNumericArgs(2);
+            state.dataCostEstimateManager->RefrncBldg.DesignFeeFrac = state.dataIPShortCut->rNumericArgs(3);
+            state.dataCostEstimateManager->RefrncBldg.ContractorFeeFrac = state.dataIPShortCut->rNumericArgs(4);
+            state.dataCostEstimateManager->RefrncBldg.ContingencyFrac = state.dataIPShortCut->rNumericArgs(5);
+            state.dataCostEstimateManager->RefrncBldg.BondCostFrac = state.dataIPShortCut->rNumericArgs(6);
+            state.dataCostEstimateManager->RefrncBldg.CommissioningFrac = state.dataIPShortCut->rNumericArgs(7);
+            state.dataCostEstimateManager->RefrncBldg.RegionalModifier = state.dataIPShortCut->rNumericArgs(8);
 
         } else if (NumRefAdjust > 1) {
             ShowSevereError(state, cCurrentModuleObject + " : Only one instance of this object is allowed.");
@@ -230,11 +229,6 @@ namespace CostEstimateManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the Cost Estimate based on inputs.
-
-        // Using/Aliasing
-        using DataPhotovoltaics::iSimplePVModel;
-        using DataPhotovoltaics::PVarray;
-        using HeatingCoils::HeatingCoil;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;            // do-loop counter for line items
@@ -341,7 +335,8 @@ namespace CostEstimateManager {
                         ErrorsFound = true;
 
                     } else { // assume name is probably useful
-                        thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, HeatingCoil);
+                        thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
+                                                             state.dataHeatingCoils->HeatingCoil);
                         if (thisCoil == 0) {
                             ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                              "\", Coil:Heating:Fuel, invalid coil specified");
@@ -441,9 +436,9 @@ namespace CostEstimateManager {
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
                         if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                            thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, PVarray);
+                            thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataPhotovoltaic->PVarray);
                             if (thisPV > 0) {
-                                if (PVarray(thisPV).PVModelType != iSimplePVModel) {
+                                if (state.dataPhotovoltaic->PVarray(thisPV).PVModelType != DataPhotovoltaics::PVModel::Simple) {
                                     ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                                     "\", Generator:Photovoltaic, only available for model type PhotovoltaicPerformance:Simple");
                                     ErrorsFound = true;
@@ -486,12 +481,6 @@ namespace CostEstimateManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the Cost Estimate based on inputs.
-
-        // Using/Aliasing
-        using DataPhotovoltaics::iSimplePVModel;
-        using DataPhotovoltaics::PVarray;
-        using HeatingCoils::HeatingCoil;
-        using HeatingCoils::NumHeatingCoils;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;            // do-loop counter for line items
@@ -620,13 +609,14 @@ namespace CostEstimateManager {
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                         WildcardObjNames = true;
                     } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                        thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, HeatingCoil);
+                        thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
+                                                             state.dataHeatingCoils->HeatingCoil);
                     }
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) {
                         if (WildcardObjNames) {
                             Real64 Qty(0.0);
-                            for (auto const &e : HeatingCoil)
+                            for (auto const &e : state.dataHeatingCoils->HeatingCoil)
                                 if (e.HCoilType_Num == 1) Qty += e.NominalCapacity;
                             state.dataCostEstimateManager->CostLineItem(Item).Qty = Qty / 1000.0;
                             state.dataCostEstimateManager->CostLineItem(Item).Units = "kW (tot heat cap.)";
@@ -634,7 +624,8 @@ namespace CostEstimateManager {
                             state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal = state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
                         }
                         if (thisCoil > 0) {
-                            state.dataCostEstimateManager->CostLineItem(Item).Qty = HeatingCoil(thisCoil).NominalCapacity / 1000.0;
+                            state.dataCostEstimateManager->CostLineItem(Item).Qty =
+                                state.dataHeatingCoils->HeatingCoil(thisCoil).NominalCapacity / 1000.0;
                             state.dataCostEstimateManager->CostLineItem(Item).Units = "kW (tot heat cap.)";
                             state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap;
                             state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal = state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
@@ -642,7 +633,7 @@ namespace CostEstimateManager {
                     }
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0) {
-                        if (WildcardObjNames) state.dataCostEstimateManager->CostLineItem(Item).Qty = NumHeatingCoils;
+                        if (WildcardObjNames) state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataHeatingCoils->NumHeatingCoils;
                         if (thisCoil > 0) state.dataCostEstimateManager->CostLineItem(Item).Qty = 1.0;
                         state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerEach;
                         state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal = state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
@@ -652,7 +643,7 @@ namespace CostEstimateManager {
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0) {
                         if (WildcardObjNames) {
                             Real64 Qty(0.0);
-                            for (auto const &e : HeatingCoil)
+                            for (auto const &e : state.dataHeatingCoils->HeatingCoil)
                                 if (e.HCoilType_Num == 1) Qty += e.Efficiency * e.NominalCapacity;
                             state.dataCostEstimateManager->CostLineItem(Item).Qty = Qty / 1000.0;
                             state.dataCostEstimateManager->CostLineItem(Item).Units = "kW*Eff (total, rated) ";
@@ -660,7 +651,9 @@ namespace CostEstimateManager {
                             state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal = state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
                         }
                         if (thisCoil > 0) {
-                            state.dataCostEstimateManager->CostLineItem(Item).Qty = HeatingCoil(thisCoil).Efficiency * HeatingCoil(thisCoil).NominalCapacity / 1000.0;
+                            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataHeatingCoils->HeatingCoil(thisCoil).Efficiency *
+                                                                                    state.dataHeatingCoils->HeatingCoil(thisCoil).NominalCapacity /
+                                                                                    1000.0;
                             state.dataCostEstimateManager->CostLineItem(Item).Units = "kW*Eff (total, rated) ";
                             state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP;
                             state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal = state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
@@ -753,17 +746,20 @@ namespace CostEstimateManager {
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
                         if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                            thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, PVarray);
+                            thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
+                                                               state.dataPhotovoltaic->PVarray);
                             if (thisPV > 0) {
-                                ThisZoneID = UtilityRoutines::FindItem(state.dataSurface->Surface(PVarray(thisPV).SurfacePtr).ZoneName, Zone);
+                                ThisZoneID = UtilityRoutines::FindItem(
+                                    state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(thisPV).SurfacePtr).ZoneName, Zone);
                                 if (ThisZoneID == 0) {
                                     Multipliers = 1.0;
                                 } else {
                                     Multipliers = Zone(ThisZoneID).Multiplier * Zone(ThisZoneID).ListMultiplier;
                                 }
-                                if (PVarray(thisPV).PVModelType == iSimplePVModel) {
-                                    state.dataCostEstimateManager->CostLineItem(Item).Qty = 1000.0 * PVarray(thisPV).SimplePVModule.AreaCol *
-                                                             PVarray(thisPV).SimplePVModule.PVEfficiency * Multipliers / 1000.0;
+                                if (state.dataPhotovoltaic->PVarray(thisPV).PVModelType == DataPhotovoltaics::PVModel::Simple) {
+                                    state.dataCostEstimateManager->CostLineItem(Item).Qty =
+                                        1000.0 * state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.AreaCol *
+                                        state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.PVEfficiency * Multipliers / 1000.0;
                                 }
                                 state.dataCostEstimateManager->CostLineItem(Item).Units = "kW (rated)";
                                 state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap;

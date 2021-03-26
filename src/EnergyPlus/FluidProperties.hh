@@ -759,9 +759,37 @@ namespace FluidProperties {
 
 struct FluidPropertiesData : BaseGlobalStruct {
 
+    int SatErrCountGetSupHeatEnthalpyRefrig = 0;
+    int SatErrCountGetSupHeatDensityRefrig = 0;
+    int HighTempLimitErrGetSpecificHeatGlycol_raw = 0;
+    int LowTempLimitErrGetSpecificHeatGlycol_raw = 0;
+    int HighTempLimitErrGetDensityGlycol = 0;
+    int LowTempLimitErrGetDensityGlycol = 0;
+    int HighTempLimitErrGetConductivityGlycol = 0;
+    int LowTempLimitErrGetConductivityGlycol = 0;
+    int HighTempLimitErrGetViscosityGlycol = 0;
+    int LowTempLimitErrGetViscosityGlycol = 0;
+    int TempLoRangeErrIndexGetQualityRefrig = 0;
+    int TempHiRangeErrIndexGetQualityRefrig = 0;
+    int TempRangeErrCountGetInterpolatedSatProp = 0;
+    int TempRangeErrIndexGetInterpolatedSatProp = 0;
+
     void clear_state() override
     {
-
+        this->SatErrCountGetSupHeatEnthalpyRefrig = 0;
+        this->SatErrCountGetSupHeatDensityRefrig = 0;
+        this->HighTempLimitErrGetSpecificHeatGlycol_raw = 0;
+        this->LowTempLimitErrGetSpecificHeatGlycol_raw = 0;
+        this->HighTempLimitErrGetDensityGlycol = 0;
+        this->LowTempLimitErrGetDensityGlycol = 0;
+        this->HighTempLimitErrGetConductivityGlycol = 0;
+        this->LowTempLimitErrGetConductivityGlycol = 0;
+        this->HighTempLimitErrGetViscosityGlycol = 0;
+        this->LowTempLimitErrGetViscosityGlycol = 0;
+        this->TempLoRangeErrIndexGetQualityRefrig = 0;
+        this->TempHiRangeErrIndexGetQualityRefrig = 0;
+        this->TempRangeErrCountGetInterpolatedSatProp = 0;
+        this->TempRangeErrIndexGetInterpolatedSatProp = 0;
     }
 };
 

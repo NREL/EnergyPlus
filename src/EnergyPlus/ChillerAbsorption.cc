@@ -237,12 +237,12 @@ namespace EnergyPlus::ChillerAbsorption {
         int IOStat = 0;      // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        DataIPShortCuts::cCurrentModuleObject = moduleObjectType;
+        state.dataIPShortCut->cCurrentModuleObject = moduleObjectType;
 
-        state.dataChillerAbsorber->numAbsorbers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerAbsorber->numAbsorbers = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataChillerAbsorber->numAbsorbers <= 0) {
-            ShowSevereError(state, "No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
             // See if load distribution manager has already gotten the input
             ErrorsFound = true;
         }
@@ -254,186 +254,186 @@ namespace EnergyPlus::ChillerAbsorption {
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
         for (int AbsorberNum = 1; AbsorberNum <= state.dataChillerAbsorber->numAbsorbers; ++AbsorberNum) {
             inputProcessor->getObjectItem(state,
-                                          DataIPShortCuts::cCurrentModuleObject,
+                                          state.dataIPShortCut->cCurrentModuleObject,
                                           AbsorberNum,
-                                          DataIPShortCuts::cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          DataIPShortCuts::rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
                                           _,
-                                          DataIPShortCuts::lAlphaFieldBlanks,
-                                          DataIPShortCuts::cAlphaFieldNames,
-                                          DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
-                DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
+                state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, state.dataIPShortCut->cCurrentModuleObject + " Name");
 
             auto &thisChiller = state.dataChillerAbsorber->absorptionChillers(AbsorberNum);
-            thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
-            thisChiller.NomCap = DataIPShortCuts::rNumericArgs(1);
+            thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
+            thisChiller.NomCap = state.dataIPShortCut->rNumericArgs(1);
             if (thisChiller.NomCap == DataSizing::AutoSize) {
                 thisChiller.NomCapWasAutoSized = true;
             }
-            thisChiller.NomPumpPower = DataIPShortCuts::rNumericArgs(2);
+            thisChiller.NomPumpPower = state.dataIPShortCut->rNumericArgs(2);
             if (thisChiller.NomPumpPower == DataSizing::AutoSize) {
                 thisChiller.NomPumpPowerWasAutoSized = true;
             }
-            if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+            if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
             // Assign Node Numbers to specified nodes
-            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(2),
+            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(2),
                                                                                               ErrorsFound,
-                                                                                              DataIPShortCuts::cCurrentModuleObject,
-                                                                                              DataIPShortCuts::cAlphaArgs(1),
-                                                                                              DataLoopNode::NodeType_Water,
-                                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                                              state.dataIPShortCut->cCurrentModuleObject,
+                                                                                              state.dataIPShortCut->cAlphaArgs(1),
+                                                                                              DataLoopNode::NodeFluidType::Water,
+                                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
-            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
+            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(3),
                                                                                                ErrorsFound,
-                                                                                               DataIPShortCuts::cCurrentModuleObject,
-                                                                                               DataIPShortCuts::cAlphaArgs(1),
-                                                                                               DataLoopNode::NodeType_Water,
-                                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                                               state.dataIPShortCut->cCurrentModuleObject,
+                                                                                               state.dataIPShortCut->cAlphaArgs(1),
+                                                                                               DataLoopNode::NodeFluidType::Water,
+                                                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                               DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cAlphaArgs(2),
-                                               DataIPShortCuts::cAlphaArgs(3),
+            BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(2),
+                                               state.dataIPShortCut->cAlphaArgs(3),
                                                "Chilled Water Nodes");
 
-            thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
+            thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(4),
                                                                                               ErrorsFound,
-                                                                                              DataIPShortCuts::cCurrentModuleObject,
-                                                                                              DataIPShortCuts::cAlphaArgs(1),
-                                                                                              DataLoopNode::NodeType_Water,
-                                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                                              state.dataIPShortCut->cCurrentModuleObject,
+                                                                                              state.dataIPShortCut->cAlphaArgs(1),
+                                                                                              DataLoopNode::NodeFluidType::Water,
+                                                                                              DataLoopNode::NodeConnectionType::Inlet,
                                                                                               2,
                                                                                               DataLoopNode::ObjectIsNotParent);
-            thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
+            thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(5),
                                                                                                ErrorsFound,
-                                                                                               DataIPShortCuts::cCurrentModuleObject,
-                                                                                               DataIPShortCuts::cAlphaArgs(1),
-                                                                                               DataLoopNode::NodeType_Water,
-                                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                                               state.dataIPShortCut->cCurrentModuleObject,
+                                                                                               state.dataIPShortCut->cAlphaArgs(1),
+                                                                                               DataLoopNode::NodeFluidType::Water,
+                                                                                               DataLoopNode::NodeConnectionType::Outlet,
                                                                                                2,
                                                                                                DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                               DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cAlphaArgs(4),
-                                               DataIPShortCuts::cAlphaArgs(5),
+            BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(4),
+                                               state.dataIPShortCut->cAlphaArgs(5),
                                                "Condenser (not tested) Nodes");
 
             if (NumAlphas > 8) {
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "HotWater") ||
-                    UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "HotWater")) {
-                    thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Water;
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), fluidNameSteam) || DataIPShortCuts::cAlphaArgs(9).empty()) {
-                    thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Steam;
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater") ||
+                    UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater")) {
+                    thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Water;
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), fluidNameSteam) || state.dataIPShortCut->cAlphaArgs(9).empty()) {
+                    thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
                 } else {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + DataIPShortCuts::cAlphaArgs(9));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "...Generator heat source type must be Steam or Hot Water.");
                     ErrorsFound = true;
                 }
             } else {
-                thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Steam;
+                thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
             }
 
-            if (!DataIPShortCuts::lAlphaFieldBlanks(6) && !DataIPShortCuts::lAlphaFieldBlanks(7)) {
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6) && !state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                 thisChiller.GenInputOutputNodesUsed = true;
-                if (thisChiller.GenHeatSourceType == DataLoopNode::NodeType_Water) {
-                    thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
+                if (thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
+                    thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(6),
                                                                                                            ErrorsFound,
-                                                                                                           DataIPShortCuts::cCurrentModuleObject,
-                                                                                                           DataIPShortCuts::cAlphaArgs(1),
-                                                                                                           DataLoopNode::NodeType_Water,
-                                                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                           state.dataIPShortCut->cCurrentModuleObject,
+                                                                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                                                                           DataLoopNode::NodeFluidType::Water,
+                                                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                                                            3,
                                                                                                            DataLoopNode::ObjectIsNotParent);
-                    thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
+                    thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(7),
                                                                                                             ErrorsFound,
-                                                                                                            DataIPShortCuts::cCurrentModuleObject,
-                                                                                                            DataIPShortCuts::cAlphaArgs(1),
-                                                                                                            DataLoopNode::NodeType_Water,
-                                                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                                                                            DataLoopNode::NodeFluidType::Water,
+                                                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                                                             3,
                                                                                                             DataLoopNode::ObjectIsNotParent);
-                    BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                                       DataIPShortCuts::cAlphaArgs(1),
-                                                       DataIPShortCuts::cAlphaArgs(6),
-                                                       DataIPShortCuts::cAlphaArgs(7),
+                    BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataIPShortCut->cAlphaArgs(6),
+                                                       state.dataIPShortCut->cAlphaArgs(7),
                                                        "Hot Water Nodes");
                 } else {
                     thisChiller.SteamFluidIndex = FluidProperties::FindRefrigerant(state, fluidNameSteam);
-                    thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
+                    thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(6),
                                                                                                            ErrorsFound,
-                                                                                                           DataIPShortCuts::cCurrentModuleObject,
-                                                                                                           DataIPShortCuts::cAlphaArgs(1),
-                                                                                                           DataLoopNode::NodeType_Steam,
-                                                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                           state.dataIPShortCut->cCurrentModuleObject,
+                                                                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                                                                           DataLoopNode::NodeFluidType::Steam,
+                                                                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                                                                            3,
                                                                                                            DataLoopNode::ObjectIsNotParent);
-                    thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
+                    thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(7),
                                                                                                             ErrorsFound,
-                                                                                                            DataIPShortCuts::cCurrentModuleObject,
-                                                                                                            DataIPShortCuts::cAlphaArgs(1),
-                                                                                                            DataLoopNode::NodeType_Steam,
-                                                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                                                                            DataLoopNode::NodeFluidType::Steam,
+                                                                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                                                                             3,
                                                                                                             DataLoopNode::ObjectIsNotParent);
-                    BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                                       DataIPShortCuts::cAlphaArgs(1),
-                                                       DataIPShortCuts::cAlphaArgs(6),
-                                                       DataIPShortCuts::cAlphaArgs(7),
+                    BranchNodeConnections::TestCompSet(state, state.dataIPShortCut->cCurrentModuleObject,
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataIPShortCut->cAlphaArgs(6),
+                                                       state.dataIPShortCut->cAlphaArgs(7),
                                                        "Steam Nodes");
                 }
-            } else if ((DataIPShortCuts::lAlphaFieldBlanks(6) && !DataIPShortCuts::lAlphaFieldBlanks(7)) ||
-                       (!DataIPShortCuts::lAlphaFieldBlanks(6) && DataIPShortCuts::lAlphaFieldBlanks(7))) {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
+            } else if ((state.dataIPShortCut->lAlphaFieldBlanks(6) && !state.dataIPShortCut->lAlphaFieldBlanks(7)) ||
+                       (!state.dataIPShortCut->lAlphaFieldBlanks(6) && state.dataIPShortCut->lAlphaFieldBlanks(7))) {
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + ", Name=" + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "...Generator fluid nodes must both be entered (or both left blank).");
-                ShowContinueError(state, "..." + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
-                ShowContinueError(state, "..." + DataIPShortCuts::cAlphaFieldNames(7) + " = " + DataIPShortCuts::cAlphaArgs(7));
+                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
                 ErrorsFound = true;
             } else {
-                if (thisChiller.GenHeatSourceType == DataLoopNode::NodeType_Water) {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
+                if (thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
+                    ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + ", Name=" + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "...Generator fluid type must be Steam if generator inlet/outlet nodes are blank.");
                     ShowContinueError(state, "...Generator fluid type is set to Steam and the simulation continues.");
-                    thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Steam;
+                    thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
                 }
             }
 
             // Get remaining data
-            thisChiller.MinPartLoadRat = DataIPShortCuts::rNumericArgs(3);
-            thisChiller.MaxPartLoadRat = DataIPShortCuts::rNumericArgs(4);
-            thisChiller.OptPartLoadRat = DataIPShortCuts::rNumericArgs(5);
-            thisChiller.TempDesCondIn = DataIPShortCuts::rNumericArgs(6);
-            thisChiller.EvapVolFlowRate = DataIPShortCuts::rNumericArgs(7);
+            thisChiller.MinPartLoadRat = state.dataIPShortCut->rNumericArgs(3);
+            thisChiller.MaxPartLoadRat = state.dataIPShortCut->rNumericArgs(4);
+            thisChiller.OptPartLoadRat = state.dataIPShortCut->rNumericArgs(5);
+            thisChiller.TempDesCondIn = state.dataIPShortCut->rNumericArgs(6);
+            thisChiller.EvapVolFlowRate = state.dataIPShortCut->rNumericArgs(7);
             if (thisChiller.EvapVolFlowRate == DataSizing::AutoSize) {
                 thisChiller.EvapVolFlowRateWasAutoSized = true;
             }
-            thisChiller.CondVolFlowRate = DataIPShortCuts::rNumericArgs(8);
+            thisChiller.CondVolFlowRate = state.dataIPShortCut->rNumericArgs(8);
             if (thisChiller.CondVolFlowRate == DataSizing::AutoSize) {
                 thisChiller.CondVolFlowRateWasAutoSized = true;
             }
-            thisChiller.SteamLoadCoef(1) = DataIPShortCuts::rNumericArgs(9);
-            thisChiller.SteamLoadCoef(2) = DataIPShortCuts::rNumericArgs(10);
-            thisChiller.SteamLoadCoef(3) = DataIPShortCuts::rNumericArgs(11);
-            thisChiller.PumpPowerCoef(1) = DataIPShortCuts::rNumericArgs(12);
-            thisChiller.PumpPowerCoef(2) = DataIPShortCuts::rNumericArgs(13);
-            thisChiller.PumpPowerCoef(3) = DataIPShortCuts::rNumericArgs(14);
-            thisChiller.TempLowLimitEvapOut = DataIPShortCuts::rNumericArgs(15);
+            thisChiller.SteamLoadCoef(1) = state.dataIPShortCut->rNumericArgs(9);
+            thisChiller.SteamLoadCoef(2) = state.dataIPShortCut->rNumericArgs(10);
+            thisChiller.SteamLoadCoef(3) = state.dataIPShortCut->rNumericArgs(11);
+            thisChiller.PumpPowerCoef(1) = state.dataIPShortCut->rNumericArgs(12);
+            thisChiller.PumpPowerCoef(2) = state.dataIPShortCut->rNumericArgs(13);
+            thisChiller.PumpPowerCoef(3) = state.dataIPShortCut->rNumericArgs(14);
+            thisChiller.TempLowLimitEvapOut = state.dataIPShortCut->rNumericArgs(15);
 
             {
-                auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(8));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(8));
                 if (SELECT_CASE_var == "CONSTANTFLOW") {
                     thisChiller.FlowMode = DataPlant::FlowMode::Constant;
                 } else if (SELECT_CASE_var == "LEAVINGSETPOINTMODULATED") {
@@ -441,8 +441,8 @@ namespace EnergyPlus::ChillerAbsorption {
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
                 } else {
-                    ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-                    ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + DataIPShortCuts::cAlphaArgs(8));
+                    ShowSevereError(state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
                     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
@@ -450,35 +450,35 @@ namespace EnergyPlus::ChillerAbsorption {
             }
 
             if (NumNums > 15) {
-                thisChiller.GeneratorVolFlowRate = DataIPShortCuts::rNumericArgs(16);
+                thisChiller.GeneratorVolFlowRate = state.dataIPShortCut->rNumericArgs(16);
                 if (thisChiller.GeneratorVolFlowRate == DataSizing::AutoSize) {
                     thisChiller.GeneratorVolFlowRateWasAutoSized = true;
                 }
             }
 
             if (thisChiller.GeneratorVolFlowRate == 0.0 &&
-                thisChiller.GenHeatSourceType == DataLoopNode::NodeType_Water) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(16), DataIPShortCuts::rNumericArgs(16)));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(16), state.dataIPShortCut->rNumericArgs(16)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "...Generator water flow rate must be greater than 0 when absorber generator fluid type is hot water.");
                 ErrorsFound = true;
             }
 
             if (NumNums > 16) {
-                thisChiller.GeneratorSubcool = DataIPShortCuts::rNumericArgs(17);
+                thisChiller.GeneratorSubcool = state.dataIPShortCut->rNumericArgs(17);
             } else {
                 thisChiller.GeneratorSubcool = 1.0;
             }
 
             if (NumNums > 17) {
-                thisChiller.SizFac = DataIPShortCuts::rNumericArgs(18);
+                thisChiller.SizFac = state.dataIPShortCut->rNumericArgs(18);
             } else {
                 thisChiller.SizFac = 1.0;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
         }
     }
 
@@ -532,7 +532,7 @@ namespace EnergyPlus::ChillerAbsorption {
             "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->Report.CondOutletTemp, "System", "Average", this->Name);
         SetupOutputVariable(state, "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.Condmdot, "System", "Average", this->Name);
 
-        if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+        if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
             SetupOutputVariable(state,
                 "Chiller Hot Water Consumption Rate", OutputProcessor::Unit::W, this->Report.QGenerator, "System", "Average", this->Name);
             SetupOutputVariable(state, "Chiller Source Hot Water Energy",
@@ -655,8 +655,8 @@ namespace EnergyPlus::ChillerAbsorption {
             state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
                     DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 
-            if ((DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-                (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
+            if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+                (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     if (!this->ModulatedFlowErrDone) {
                         ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
@@ -669,7 +669,7 @@ namespace EnergyPlus::ChillerAbsorption {
                     // need call to EMS to check node
                     bool FatalError = false; // but not really fatal yet, but should be.
                     EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
-                    DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
+                    state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                     if (FatalError) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
@@ -684,10 +684,10 @@ namespace EnergyPlus::ChillerAbsorption {
                 }
 
                 this->ModulatedFlowSetToLoop = true;
-                DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint =
-                        DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-                DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi =
-                        DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
             }
         }
     }
@@ -704,7 +704,8 @@ namespace EnergyPlus::ChillerAbsorption {
 
         this->EvapMassFlowRateMax = this->EvapVolFlowRate * rho;
 
-        PlantUtilities::InitComponentNodes(0.0,
+        PlantUtilities::InitComponentNodes(state,
+                                           0.0,
                                            this->EvapMassFlowRateMax,
                                            this->EvapInletNodeNum,
                                            this->EvapOutletNodeNum,
@@ -721,7 +722,8 @@ namespace EnergyPlus::ChillerAbsorption {
 
         this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
-        PlantUtilities::InitComponentNodes(0.0,
+        PlantUtilities::InitComponentNodes(state,
+                                           0.0,
                                            this->CondMassFlowRateMax,
                                            this->CondInletNodeNum,
                                            this->CondOutletNodeNum,
@@ -729,11 +731,11 @@ namespace EnergyPlus::ChillerAbsorption {
                                            this->CDLoopSideNum,
                                            this->CDBranchNum,
                                            this->CDCompNum);
-        DataLoopNode::Node(this->CondInletNodeNum).Temp = this->TempDesCondIn;
+        state.dataLoopNodes->Node(this->CondInletNodeNum).Temp = this->TempDesCondIn;
 
         if (this->GeneratorInletNodeNum > 0) {
 
-            if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+            if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                         DataGlobalConstants::HWInitConvTemp,
@@ -741,14 +743,14 @@ namespace EnergyPlus::ChillerAbsorption {
                                                         RoutineName);
 
                 this->GenMassFlowRateMax = rho * this->GeneratorVolFlowRate;
-            } else if (this->GenHeatSourceType == DataLoopNode::NodeType_Steam) {
+            } else if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Steam) {
 
                 this->QGenerator = (this->SteamLoadCoef(1) + this->SteamLoadCoef(2) + this->SteamLoadCoef(3)) * this->NomCap;
 
                 // dry enthalpy of steam (quality = 1)
                 Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                                fluidNameSteam,
-                                                                               DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                                               state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                                                1.0,
                                                                                this->SteamFluidIndex,
                                                                                calcChillerAbsorption + this->Name);
@@ -756,19 +758,20 @@ namespace EnergyPlus::ChillerAbsorption {
                 // wet enthalpy of steam (quality = 0)
                 Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                                fluidNameSteam,
-                                                                               DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                                               state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                                                0.0,
                                                                                this->SteamFluidIndex,
                                                                                calcChillerAbsorption + this->Name);
                 Real64 SteamDeltaT = this->GeneratorSubcool;
-                Real64 SteamOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
+                Real64 SteamOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
                 Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
                 Real64 CpWater = FluidProperties::GetDensityGlycol(
                         state, fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorption + this->Name);
                 this->GenMassFlowRateMax = this->QGenerator / (HfgSteam + CpWater * SteamDeltaT);
             }
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->GenMassFlowRateMax,
                                                this->GeneratorInletNodeNum,
                                                this->GeneratorOutletNodeNum,
@@ -815,10 +818,10 @@ namespace EnergyPlus::ChillerAbsorption {
         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) && this->ModulatedFlowSetToLoop) {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
-            DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint =
-                DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-            DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi =
-                DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+            state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+            state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
         }
 
         Real64 mdotEvap = 0.0; // local fluid mass flow rate thru evaporator
@@ -898,7 +901,7 @@ namespace EnergyPlus::ChillerAbsorption {
         int PltSizNum = state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum;
         int PltSizCondNum = state.dataPlnt->PlantLoop(this->CDLoopNum).PlantSizNum;
 
-        if (this->GenHeatSourceType == DataLoopNode::NodeType_Steam) {
+        if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Steam) {
             if (this->GeneratorInletNodeNum > 0 && this->GeneratorOutletNodeNum > 0) {
                 PltSizSteamNum = PlantUtilities::MyPlantSizingIndex(state,
                     moduleObjectType, this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
@@ -923,7 +926,7 @@ namespace EnergyPlus::ChillerAbsorption {
         }
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::TimeStepSys) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= state.dataHVACGlobal->TimeStepSys) {
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
@@ -1027,7 +1030,7 @@ namespace EnergyPlus::ChillerAbsorption {
         }
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::TimeStepSys) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= state.dataHVACGlobal->TimeStepSys) {
                 tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
                 if (!this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = this->EvapVolFlowRate;
             } else {
@@ -1088,7 +1091,7 @@ namespace EnergyPlus::ChillerAbsorption {
         PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
-            if (this->EvapVolFlowRate >= DataHVACGlobals::TimeStepSys && tmpNomCap > 0.0) {
+            if (this->EvapVolFlowRate >= state.dataHVACGlobal->TimeStepSys && tmpNomCap > 0.0) {
                 //       QCondenser = QEvaporator + QGenerator + PumpingPower
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1165,10 +1168,10 @@ namespace EnergyPlus::ChillerAbsorption {
         // save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
         PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
 
-        if ((PltSizSteamNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeType_Steam) ||
-            (PltSizHeatingNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeType_Water)) {
-            if (this->EvapVolFlowRate >= DataHVACGlobals::TimeStepSys && tmpNomCap > 0.0) {
-                if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+        if ((PltSizSteamNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeFluidType::Steam) ||
+            (PltSizHeatingNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water)) {
+            if (this->EvapVolFlowRate >= state.dataHVACGlobal->TimeStepSys && tmpNomCap > 0.0) {
+                if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                     Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                             state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                                             state.dataSize->PlantSizData(PltSizHeatingNum).ExitTemp,
@@ -1318,9 +1321,9 @@ namespace EnergyPlus::ChillerAbsorption {
         }
 
         if (this->GeneratorDeltaTempWasAutoSized) {
-            if (PltSizHeatingNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+            if (PltSizHeatingNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 this->GeneratorDeltaTemp = max(0.5, state.dataSize->PlantSizData(PltSizHeatingNum).DeltaT);
-            } else if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+            } else if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                        state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
@@ -1378,18 +1381,18 @@ namespace EnergyPlus::ChillerAbsorption {
         // If no loop demand or Absorber OFF, return
         if (MyLoad >= 0.0 || !RunFlag) { // off or heating
             if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive)
-                this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
+                this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             return;
         }
 
         // Set the condenser mass flow rates
-        this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
+        this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
 
-        Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+        Real64 TempEvapOut = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
 
         Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                                 state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
-                                                                DataLoopNode::Node(this->EvapInletNodeNum).Temp,
+                                                                state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp,
                                                                 state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                 RoutineName);
 
@@ -1399,10 +1402,10 @@ namespace EnergyPlus::ChillerAbsorption {
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyChillerSWTOffset = state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempEvapOut
             TempEvapOut = max(this->TempLowLimitEvapOut,
-                              min(DataLoopNode::Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));
+                              min(state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));
             this->FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
         }
 
@@ -1416,23 +1419,25 @@ namespace EnergyPlus::ChillerAbsorption {
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
-                this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
+                this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
 
                 if (this->EvapMassFlowRate != 0.0) {
                     EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpFluid;
                 } else {
                     EvapDeltaTemp = 0.0;
                 }
-                this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
+                this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
 
             } else if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
-                        EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
+                        EvapDeltaTemp =
+                            state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                     } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
-                        EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
+                        EvapDeltaTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp -
+                                        state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                     } else {
                         assert(false);
                     }
@@ -1454,15 +1459,15 @@ namespace EnergyPlus::ChillerAbsorption {
                     {
                         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                         if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
-                            this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
+                            this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                         } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
-                            this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
+                            this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                         }
                     }
                 } else {
                     this->EvapMassFlowRate = 0.0;
 
-                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+                    this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
 
                     ShowRecurringWarningErrorAtEnd(state, "CalcBLASTAbsorberModel: Name=\"" + this->Name +
                                                        "\" Evaporative Condenser Delta Temperature = 0 in mass flow calculation.",
@@ -1476,11 +1481,11 @@ namespace EnergyPlus::ChillerAbsorption {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated);
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         CpFluid,
-                                        DataLoopNode::Node(this->EvapInletNodeNum).Temp,
+                                        state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp,
                                         this->EvapOutletTemp,
                                         this->EvapMassFlowRate,
                                         this->QEvaporator);
@@ -1492,11 +1497,11 @@ namespace EnergyPlus::ChillerAbsorption {
 
         } else { // If FlowLock is True
 
-            this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
+            this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             if (this->PossibleSubcooling) {
                 this->QEvaporator = std::abs(MyLoad);
                 EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpFluid;
-                this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
+                this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
             } else {
                 Real64 TempEvapOutSetPoint{0}; // C - evaporator outlet temperature setpoint
 
@@ -1509,10 +1514,11 @@ namespace EnergyPlus::ChillerAbsorption {
                                  .Branch(this->CWBranchNum)
                                  .Comp(this->CWCompNum)
                                  .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
-                            (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
-                            TempEvapOutSetPoint = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
+                            (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
+                            TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                         } else {
-                            TempEvapOutSetPoint = DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                            TempEvapOutSetPoint =
+                                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                         }
                     } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
@@ -1521,40 +1527,41 @@ namespace EnergyPlus::ChillerAbsorption {
                                  .Branch(this->CWBranchNum)
                                  .Comp(this->CWCompNum)
                                  .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
-                            (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
-                            TempEvapOutSetPoint = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
+                            (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
+                            TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                         } else {
-                            TempEvapOutSetPoint = DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                            TempEvapOutSetPoint =
+                                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                         }
                     } else {
                         assert(false);
                     }
                 }
-                EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - TempEvapOutSetPoint;
+                EvapDeltaTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - TempEvapOutSetPoint;
                 this->QEvaporator = std::abs(this->EvapMassFlowRate * CpFluid * EvapDeltaTemp);
                 this->EvapOutletTemp = TempEvapOutSetPoint;
             }
             // Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
             if (this->EvapOutletTemp < this->TempLowLimitEvapOut) {
-                if ((DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->TempLowLimitEvapOut) > DataPlant::DeltaTempTol) {
+                if ((state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - this->TempLowLimitEvapOut) > DataPlant::DeltaTempTol) {
                     this->EvapOutletTemp = this->TempLowLimitEvapOut;
-                    EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                    EvapDeltaTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
                     this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 } else {
-                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
-                    EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                    this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
+                    EvapDeltaTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
                     this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 }
             }
-            if (this->EvapOutletTemp < DataLoopNode::Node(this->EvapOutletNodeNum).TempMin) {
-                if ((DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempMin) >
+            if (this->EvapOutletTemp < state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempMin) {
+                if ((state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempMin) >
                     DataPlant::DeltaTempTol) {
-                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempMin;
-                    EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                    this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempMin;
+                    EvapDeltaTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
                     this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 } else {
-                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
-                    EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                    this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
+                    EvapDeltaTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
                     this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 }
             }
@@ -1564,10 +1571,10 @@ namespace EnergyPlus::ChillerAbsorption {
                 if (this->EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                     this->QEvaporator = std::abs(MyLoad);
                     EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpFluid;
-                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
+                    this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
                 } else {
                     this->QEvaporator = 0.0;
-                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+                    this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
             }
 
@@ -1577,11 +1584,11 @@ namespace EnergyPlus::ChillerAbsorption {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         CpFluid,
-                                        DataLoopNode::Node(this->EvapInletNodeNum).Temp,
+                                        state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp,
                                         this->EvapOutletTemp,
                                         this->EvapMassFlowRate,
                                         this->QEvaporator);
@@ -1617,7 +1624,7 @@ namespace EnergyPlus::ChillerAbsorption {
 
         if (this->EvapMassFlowRate == 0.0) {
             this->QGenerator = 0.0;
-            this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+            this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
             this->PumpingPower = 0.0;
         }
 
@@ -1625,15 +1632,15 @@ namespace EnergyPlus::ChillerAbsorption {
 
         CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                          state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName,
-                                                         DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                                         state.dataLoopNodes->Node(this->CondInletNodeNum).Temp,
                                                          state.dataPlnt->PlantLoop(this->CDLoopNum).FluidIndex,
                                                          RoutineName);
 
         if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-            this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpFluid + DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpFluid + state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
         } else {
 
-            this->CondOutletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            this->CondOutletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
             this->CondMassFlowRate = 0.0;
             this->QCondenser = 0.0;
             return;
@@ -1641,12 +1648,12 @@ namespace EnergyPlus::ChillerAbsorption {
         }
 
         if (this->GeneratorInletNodeNum > 0) {
-            if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+            if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 Real64 GenMassFlowRate = 0.0;
                 //  Hot water plant is used for the generator
                 CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                                  state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
-                                                                 DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                                 state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                                  state.dataPlnt->PlantLoop(GenLoopSideNum).FluidIndex,
                                                                  RoutineName);
                 if (state.dataPlnt->PlantLoop(this->GenLoopNum).LoopSide(this->GenLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
@@ -1659,7 +1666,7 @@ namespace EnergyPlus::ChillerAbsorption {
                         GenMassFlowRate = min(this->GenMassFlowRateMax, GenFlowRatio * this->GenMassFlowRateMax);
                     }
                 } else { // If FlowLock is True
-                    GenMassFlowRate = DataLoopNode::Node(this->GeneratorInletNodeNum).MassFlowRate;
+                    GenMassFlowRate = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).MassFlowRate;
                 }
                 PlantUtilities::SetComponentFlowRate(state, GenMassFlowRate,
                                                      this->GeneratorInletNodeNum,
@@ -1670,22 +1677,23 @@ namespace EnergyPlus::ChillerAbsorption {
                                                      this->GenCompNum);
 
                 if (GenMassFlowRate <= 0.0) {
-                    this->GenOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp;
-                    this->SteamOutletEnthalpy = DataLoopNode::Node(this->GeneratorInletNodeNum).Enthalpy;
+                    this->GenOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp;
+                    this->SteamOutletEnthalpy = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Enthalpy;
                 } else {
-                    this->GenOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp - this->QGenerator / (CpFluid * GenMassFlowRate);
-                    this->SteamOutletEnthalpy = DataLoopNode::Node(this->GeneratorInletNodeNum).Enthalpy - this->QGenerator / GenMassFlowRate;
+                    this->GenOutletTemp =
+                        state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp - this->QGenerator / (CpFluid * GenMassFlowRate);
+                    this->SteamOutletEnthalpy = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Enthalpy - this->QGenerator / GenMassFlowRate;
                 }
-                DataLoopNode::Node(this->GeneratorOutletNodeNum).Temp = this->GenOutletTemp;
-                DataLoopNode::Node(this->GeneratorOutletNodeNum).Enthalpy = this->SteamOutletEnthalpy;
-                DataLoopNode::Node(this->GeneratorOutletNodeNum).MassFlowRate = GenMassFlowRate;
+                state.dataLoopNodes->Node(this->GeneratorOutletNodeNum).Temp = this->GenOutletTemp;
+                state.dataLoopNodes->Node(this->GeneratorOutletNodeNum).Enthalpy = this->SteamOutletEnthalpy;
+                state.dataLoopNodes->Node(this->GeneratorOutletNodeNum).MassFlowRate = GenMassFlowRate;
 
             } else { // using a steam plant for the generator
 
                 // enthalpy of dry steam at generator inlet
                 Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                                fluidNameSteam,
-                                                                               DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                                               state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                                                1.0,
                                                                                this->SteamFluidIndex,
                                                                                calcChillerAbsorption + this->Name);
@@ -1693,12 +1701,12 @@ namespace EnergyPlus::ChillerAbsorption {
                 // enthalpy of wet steam at generator inlet
                 Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                                fluidNameSteam,
-                                                                               DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                                               state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                                                0.0,
                                                                                this->SteamFluidIndex,
                                                                                calcChillerAbsorption + this->Name);
                 Real64 SteamDeltaT = this->GeneratorSubcool;
-                Real64 SteamOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
+                Real64 SteamOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
                 Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
                 CpFluid = FluidProperties::GetSpecificHeatGlycol(
                     state, fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorption + this->Name);
@@ -1712,10 +1720,10 @@ namespace EnergyPlus::ChillerAbsorption {
                                                      this->GenCompNum);
 
                 if (this->SteamMassFlowRate <= 0.0) {
-                    this->GenOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp;
-                    this->SteamOutletEnthalpy = DataLoopNode::Node(this->GeneratorInletNodeNum).Enthalpy;
+                    this->GenOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp;
+                    this->SteamOutletEnthalpy = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Enthalpy;
                 } else {
-                    this->GenOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
+                    this->GenOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
                     this->SteamOutletEnthalpy = FluidProperties::GetSatEnthalpyRefrig(
                         state, fluidNameSteam, this->GenOutletTemp, 0.0, this->SteamFluidIndex, moduleObjectType + this->Name);
                     this->SteamOutletEnthalpy -= CpFluid * SteamDeltaT;
@@ -1724,10 +1732,10 @@ namespace EnergyPlus::ChillerAbsorption {
         } // IF(GeneratorInletNode .GT. 0)THEN
 
         // convert power to energy
-        this->GeneratorEnergy = this->QGenerator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
-        this->PumpingEnergy = this->PumpingPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->GeneratorEnergy = this->QGenerator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->PumpingEnergy = this->PumpingPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void BLASTAbsorberSpecs::updateRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag)
@@ -1752,10 +1760,10 @@ namespace EnergyPlus::ChillerAbsorption {
             this->Report.EvapEnergy = 0.0;
             this->Report.CondEnergy = 0.0;
             this->Report.GeneratorEnergy = 0.0;
-            this->Report.EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
-            this->Report.CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
-            this->Report.CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
-            this->Report.EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+            this->Report.EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
+            this->Report.CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
+            this->Report.CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
+            this->Report.EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
             this->Report.Evapmdot = 0.0;
             this->Report.Condmdot = 0.0;
             this->Report.Genmdot = 0.0;
@@ -1769,8 +1777,8 @@ namespace EnergyPlus::ChillerAbsorption {
             // set node conditions
             PlantUtilities::SafeCopyPlantNode(state, this->EvapInletNodeNum, this->EvapOutletNodeNum);
             PlantUtilities::SafeCopyPlantNode(state, this->CondInletNodeNum, this->CondOutletNodeNum);
-            DataLoopNode::Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
-            DataLoopNode::Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
+            state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
+            state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
 
             this->Report.PumpingPower = this->PumpingPower;
             this->Report.QEvap = this->QEvaporator;
@@ -1780,10 +1788,10 @@ namespace EnergyPlus::ChillerAbsorption {
             this->Report.EvapEnergy = this->EvaporatorEnergy;
             this->Report.CondEnergy = this->CondenserEnergy;
             this->Report.GeneratorEnergy = this->GeneratorEnergy;
-            this->Report.EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
-            this->Report.CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
-            this->Report.CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
-            this->Report.EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+            this->Report.EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
+            this->Report.CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
+            this->Report.CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
+            this->Report.EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
             this->Report.Evapmdot = this->EvapMassFlowRate;
             this->Report.Condmdot = this->CondMassFlowRate;
             this->Report.Genmdot = this->SteamMassFlowRate;
@@ -1795,7 +1803,7 @@ namespace EnergyPlus::ChillerAbsorption {
 
             if (this->GeneratorInletNodeNum > 0) {
                 PlantUtilities::SafeCopyPlantNode(state, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum);
-                DataLoopNode::Node(this->GeneratorOutletNodeNum).Temp = this->GenOutletTemp;
+                state.dataLoopNodes->Node(this->GeneratorOutletNodeNum).Temp = this->GenOutletTemp;
             }
         }
     }

@@ -84,7 +84,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->curOASysNum = state.dataSize->CurOASysNum;
     this->curZoneEqNum = state.dataSize->CurZoneEqNum;
     this->curDuctType = state.dataSize->CurDuctType;
-    this->numPrimaryAirSys = DataHVACGlobals::NumPrimaryAirSys;
+    this->numPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     this->numSysSizInput = state.dataSize->NumSysSizInput;
     this->doSystemSizing = state.dataGlobal->DoSystemSizing;
     this->numZoneSizingInput = state.dataSize->NumZoneSizingInput;
@@ -325,18 +325,17 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
 
     // to do, make this a parameter. Unfortunately this function is used in MANY
     // places so it involves touching most of E+
-    auto &outputFiles = EnergyPlus::IOFiles::getSingleton();
     if (oneTimeCompRptHeaderFlag) {
-        print(outputFiles.eio, Format_990);
+        print(state.files.eio, Format_990);
         oneTimeCompRptHeaderFlag = false;
     }
 
-    print(outputFiles.eio, Format_991, CompType, CompName, VarDesc, VarValue);
+    print(state.files.eio, Format_991, CompType, CompName, VarDesc, VarValue);
     // add to tabular output reports
     OutputReportPredefined::AddCompSizeTableEntry(state, CompType, CompName, VarDesc, VarValue);
 
     if (present(UsrDesc) && present(UsrValue)) {
-        print(outputFiles.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
+        print(state.files.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
         OutputReportPredefined::AddCompSizeTableEntry(state, CompType, CompName, UsrDesc, UsrValue);
     } else if (present(UsrDesc) || present(UsrValue)) {
         ShowFatalError(state, "ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");

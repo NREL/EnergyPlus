@@ -416,6 +416,11 @@ namespace ZoneTempPredictorCorrector {
         bool ErrorsFound = false;
         bool ControlledZonesChecked = false;
 
+        int IterLimitExceededNum1 = 0;
+        int IterLimitErrIndex1 = 0;
+        int IterLimitExceededNum2 = 0;
+        int IterLimitErrIndex2 = 0;
+
         void clear_state() override
         {
             this->HumidityControlZoneUniqueNames.clear();
@@ -465,6 +470,10 @@ namespace ZoneTempPredictorCorrector {
             this->MyDayFlag = true;
             this->ErrorsFound = false;
             this->ControlledZonesChecked = false;
+            this->IterLimitExceededNum1 = 0;
+            this->IterLimitErrIndex1 = 0;
+            this->IterLimitExceededNum2 = 0;
+            this->IterLimitErrIndex2 = 0;
         }
 
         // Default Constructor

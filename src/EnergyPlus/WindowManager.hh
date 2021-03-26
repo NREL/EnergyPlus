@@ -575,6 +575,37 @@ namespace WindowManager {
 //        Array1D<Real64> DbgBkAbsDiff = Array1D<Real64>(5, 0.0);
         // EndDebug
 
+        Array1D<Real64> deltaTemp = Array1D<Real64>(100, 0.0);
+        Array1D_int iMinDT = Array1D_int(1, 0);
+        Array1D_int IDConst = Array1D_int(100, 0);
+        
+        Array1D<Real64> hgap = Array1D<Real64>(5);       // Gap gas conductance (W/m2-K)
+        Array1D<Real64> hr = Array1D<Real64>(10);  // Radiative conductance (W/m2-K)
+        Array1D_int indx = Array1D_int(10);          // Vector of row permutations in LU decomposition
+        Array2D<Real64> Aface = Array2D<Real64>(10, 10); // Coefficient in equation Aface*thetas = Bface
+        Array1D<Real64> Bface = Array1D<Real64>(10);     // Coefficient in equation Aface*thetas = Bface
+        Array1D<Real64> hrprev = Array1D<Real64>(10);    // Value of hr from previous iteration
+        Array1D<Real64> TGapNewBG = Array1D<Real64>(2);  // For between-glass shade/blind, average gas temp in gaps on either
+        //  side of shade/blind (K)
+        Array1D<Real64> hcvBG = Array1D<Real64>(2); // For between-glass shade/blind, convection coefficient from gap glass or
+        //  shade/blind to gap gas on either side of shade/blind (W/m2-K)
+        Array1D<Real64> AbsRadShadeFace = Array1D<Real64>(2); // Solar radiation, short-wave radiation from lights, and long-wave
+        Array1D<Real64> RhoIR = Array1D<Real64>(10);          // Face IR reflectance
+        
+        Array1D<Real64> vv = Array1D<Real64>(10); // Stores the implicit scaling of each row
+        
+        Array1D<Real64> kprime = Array1D<Real64>(10);  // Monotonic thermal conductivity
+        Array1D<Real64> kdblprm = Array1D<Real64>(10); // Conductivity term accounting for additional energy moved by
+        //  the diffusional transport of internal energy in polyatomic gases.
+        Array1D<Real64> mukpdwn = Array1D<Real64>(10); // Denominator term
+        Array1D<Real64> kpdown = Array1D<Real64>(10);  // Denominator terms
+        Array1D<Real64> kdpdown = Array1D<Real64>(10);
+        Array1D<Real64> frct = Array1D<Real64>(10); // Fraction of each gas in a mixture
+        Array1D<Real64> fvis = Array1D<Real64>(10); // Viscosity of each gas in a mixture (g/m-s)
+        Array1D<Real64> fcon = Array1D<Real64>(10); // Conductance of each gas in a mixture (W/m2-K)
+        Array1D<Real64> fdens = Array1D<Real64>(10); // Density of each gas in a mixture (kg/m3)
+        Array1D<Real64> fcp = Array1D<Real64>(10);   // Specific heat of each gas in a mixture (J/m3-K)
+
         void clear_state() override {
             this->wle = Array1D<Real64>(nume, {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
                 0.3900, 0.4000, 0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200,

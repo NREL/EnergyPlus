@@ -77,16 +77,6 @@ namespace DXFEarClipping {
     // Methodology employed:
     // Ear clipping has turned out to be the simplest, most robust technique.
 
-    // Using/Aliasing
-    using namespace DataVectorTypes;
-
-    bool trackit(false);
-    // Subroutine specifications for module <module_name>:
-
-    // rest of routines are private.
-
-    // Functions
-
     bool InPolygon(Vector const &point, Array1D<Vector> &poly, int const nsides)
     {
         // this routine is not used in the current scheme
@@ -219,7 +209,6 @@ namespace DXFEarClipping {
         int nrangles;
         int ncverts;
         std::string line;
-        static int errcount(0);
 
         // Object Data
         Array1D<Vector_2d> vertex(nsides);
@@ -271,8 +260,8 @@ namespace DXFEarClipping {
             if (!any_gt(ears, 0)) {
                 ShowWarningError(state, "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");
-                ++errcount;
-                if (errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                ++state.dataDXFEarClipping->errcount;
+                if (state.dataDXFEarClipping->errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
                 if (state.dataGlobal->DisplayExtraWarnings) {
@@ -578,7 +567,7 @@ namespace DXFEarClipping {
                     earvert(2) = mvert;
                     earvert(3) = evert;
                 }
-                if (trackit) {
+                if (state.dataDXFEarClipping->trackit) {
                     print(state.files.debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
                 }
             }

@@ -98,7 +98,6 @@ namespace WaterToAirHeatPump {
     using namespace DataLoopNode;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
-    using DataHVACGlobals::TimeStepSys;
     using DataPlant::TypeOf_CoilWAHPCoolingParamEst;
     using DataPlant::TypeOf_CoilWAHPHeatingParamEst;
 
@@ -232,10 +231,10 @@ namespace WaterToAirHeatPump {
         int NumAlphas;
         int NumParams;
         int NumNums;
-        static int MaxNums(0);   // Maximum number of numeric input fields
-        static int MaxAlphas(0); // Maximum number of alpha input fields
+        int MaxNums(0);   // Maximum number of numeric input fields
+        int MaxAlphas(0); // Maximum number of alpha input fields
         int IOStat;
-        bool ErrorsFound(false);  // If errors detected in input
+        bool ErrorsFound(false);         // If errors detected in input
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string AlphArray;        // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
@@ -243,8 +242,6 @@ namespace WaterToAirHeatPump {
         Array1D<Real64> NumArray;        // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-
-
 
         NumCool = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation");
         NumHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation");
@@ -311,13 +308,13 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressCutoff = NumArray(6);
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(state,
-                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum = GetOnlySingleNode(state,
-                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum = GetOnlySingleNode(state,
-                AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirOutletNodeNum = GetOnlySingleNode(state,
-                AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             // 2010-01-13 ESL: Jason Glazer noted that these were out of order previously, but they are good now
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff = NumArray(7);
@@ -461,13 +458,13 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressCutoff = NumArray(4);
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(state,
-                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 2, ObjectIsNotParent);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum = GetOnlySingleNode(state,
-                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 2, ObjectIsNotParent);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum = GetOnlySingleNode(state,
-                AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirOutletNodeNum = GetOnlySingleNode(state,
-                AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff = NumArray(5);
             if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue) {
@@ -816,25 +813,22 @@ namespace WaterToAirHeatPump {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  INTEGER             :: WatertoAirHPNum          ! heat pump number
         int AirInletNode;   // air inlet node number
         int WaterInletNode; // water inlet node number
         int PlantOutletNode;
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyEnvrnFlag;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
         bool errFlag;
 
         if (state.dataWaterToAirHeatPump->MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(state.dataWaterToAirHeatPump->NumWatertoAirHPs);
-            MyPlantScanFlag.allocate(state.dataWaterToAirHeatPump->NumWatertoAirHPs);
-            MyEnvrnFlag = true;
-            MyPlantScanFlag = true;
+            state.dataWaterToAirHeatPump->MyEnvrnFlag.allocate(state.dataWaterToAirHeatPump->NumWatertoAirHPs);
+            state.dataWaterToAirHeatPump->MyPlantScanFlag.allocate(state.dataWaterToAirHeatPump->NumWatertoAirHPs);
+            state.dataWaterToAirHeatPump->MyEnvrnFlag = true;
+            state.dataWaterToAirHeatPump->MyPlantScanFlag = true;
             state.dataWaterToAirHeatPump->MyOneTimeFlag = false;
         }
 
-        if (MyPlantScanFlag(HPNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (state.dataWaterToAirHeatPump->MyPlantScanFlag(HPNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
@@ -872,11 +866,11 @@ namespace WaterToAirHeatPump {
                 ShowFatalError(state, "InitWatertoAirHP: Program terminated for previous conditions.");
             }
 
-            MyPlantScanFlag(HPNum) = false;
+            state.dataWaterToAirHeatPump->MyPlantScanFlag(HPNum) = false;
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataWaterToAirHeatPump->MyEnvrnFlag(HPNum) && !state.dataWaterToAirHeatPump->MyPlantScanFlag(HPNum)) {
             // Do the initializations to start simulation
             // Set water and air inlet nodes
             AirInletNode = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum;
@@ -922,7 +916,8 @@ namespace WaterToAirHeatPump {
                                   .Branch(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum)
                                   .Comp(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum)
                                   .NodeNumOut;
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate,
                                WaterInletNode,
                                PlantOutletNode,
@@ -931,25 +926,25 @@ namespace WaterToAirHeatPump {
                                state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
                                state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum);
 
-            Node(WaterInletNode).Temp = 5.0;
-            Node(WaterInletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
-            Node(WaterInletNode).Quality = 0.0;
-            Node(WaterInletNode).Press = 0.0;
-            Node(WaterInletNode).HumRat = 0.0;
+            state.dataLoopNodes->Node(WaterInletNode).Temp = 5.0;
+            state.dataLoopNodes->Node(WaterInletNode).Enthalpy = Cp * state.dataLoopNodes->Node(WaterInletNode).Temp;
+            state.dataLoopNodes->Node(WaterInletNode).Quality = 0.0;
+            state.dataLoopNodes->Node(WaterInletNode).Press = 0.0;
+            state.dataLoopNodes->Node(WaterInletNode).HumRat = 0.0;
 
-            Node(PlantOutletNode).Temp = 5.0;
-            Node(PlantOutletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
-            Node(PlantOutletNode).Quality = 0.0;
-            Node(PlantOutletNode).Press = 0.0;
-            Node(PlantOutletNode).HumRat = 0.0;
+            state.dataLoopNodes->Node(PlantOutletNode).Temp = 5.0;
+            state.dataLoopNodes->Node(PlantOutletNode).Enthalpy = Cp * state.dataLoopNodes->Node(WaterInletNode).Temp;
+            state.dataLoopNodes->Node(PlantOutletNode).Quality = 0.0;
+            state.dataLoopNodes->Node(PlantOutletNode).Press = 0.0;
+            state.dataLoopNodes->Node(PlantOutletNode).HumRat = 0.0;
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = true;
 
-            MyEnvrnFlag(HPNum) = false;
+            state.dataWaterToAirHeatPump->MyEnvrnFlag(HPNum) = false;
         } // End If for the Begin Environment initializations
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(HPNum) = true;
+            state.dataWaterToAirHeatPump->MyEnvrnFlag(HPNum) = true;
         }
 
         // Do the following initializations (every time step): This should be the info from
@@ -979,7 +974,7 @@ namespace WaterToAirHeatPump {
         //    WatertoAirHP(HPNum)%SimFlag =.FALSE.
         //  ENDIF
 
-        if (((SensLoad != 0.0 || LatentLoad != 0.0) || (SensLoad == 0.0 && InitFlag)) && Node(AirInletNode).MassFlowRate > 0.0 &&
+        if (((SensLoad != 0.0 || LatentLoad != 0.0) || (SensLoad == 0.0 && InitFlag)) && state.dataLoopNodes->Node(AirInletNode).MassFlowRate > 0.0 &&
             PartLoadRatio > 0.0) {
             // set the water side flow rate to the design flow rate unless constrained by
             // the demand side manager (MIN/MAX available). now done by call to setcomponentFlowRate
@@ -1003,15 +998,15 @@ namespace WaterToAirHeatPump {
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum);
 
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterTemp = Node(WaterInletNode).Temp;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
         //  IF (WatertoAirHP(HPNum)%InletWaterTemp < 0.0) THEN  ! Debug trap
         //    Temptemp         = Node(WaterInletNode)%Temp
         //  ENDIF
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterEnthalpy = Node(WaterInletNode).Enthalpy;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;
 
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirDBTemp = Node(AirInletNode).Temp;
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirHumRat = Node(AirInletNode).HumRat;
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirEnthalpy = Node(AirInletNode).Enthalpy;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirDBTemp = state.dataLoopNodes->Node(AirInletNode).Temp;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirHumRat = state.dataLoopNodes->Node(AirInletNode).HumRat;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirEnthalpy = state.dataLoopNodes->Node(AirInletNode).Enthalpy;
 
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power = 0.0;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Energy = 0.0;
@@ -1063,15 +1058,15 @@ namespace WaterToAirHeatPump {
         using Psychrometrics::PsyWFnTdbH;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const CpWater(4210.0);         // Specific heat of water J/kg_C
-        Real64 const DegreeofSuperheat(80.0); // Initial guess of degree of superheat
-        Real64 const gamma(1.114);            // Expansion Coefficient
-        Real64 const ERR(0.01);               // Error Value
-        Real64 const PB(1.013e5);             // Barometric Pressure (Pa)
+        constexpr Real64 CpWater(4210.0);         // Specific heat of water J/kg_C
+        constexpr Real64 DegreeofSuperheat(80.0); // Initial guess of degree of superheat
+        constexpr Real64 gamma(1.114);            // Expansion Coefficient
+        constexpr Real64 ERR(0.01);               // Error Value
+        constexpr Real64 PB(1.013e5);             // Barometric Pressure (Pa)
 
-        int const STOP1(1000); // Iteration stopper1
-        int const STOP2(1000); // Iteration stopper2
-        int const STOP3(1000); // Iteration stopper3
+        constexpr int STOP1(1000); // Iteration stopper1
+        constexpr int STOP2(1000); // Iteration stopper2
+        constexpr int STOP3(1000); // Iteration stopper3
 
         static std::string const RoutineNameSourceSideInletTemp("CalcWatertoAirHPCooling:SourceSideInletTemp");
         static std::string const RoutineNameSourceSideTemp("CalcWatertoAirHPCooling:SourceSideTemp");
@@ -1084,16 +1079,13 @@ namespace WaterToAirHeatPump {
         static std::string const RoutineNameCompSuctionTemp("CalcWatertoAirHPCooling:CompSuctionTemp");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //      INTEGER                :: NumIteration1            ! Number of Iteration1
         int NumIteration2;        // Number of Iteration2
         int NumIteration3;        // Number of Iteration3
         int NumIteration4;        // Number of Iteration4 (use of latent degradation model ONLY)
         int SourceSideFluidIndex; // Source Side Fluid Index
-
         int CompressorType;              // Type of Compressor ie. Reciprocating,Rotary or Scroll
         std::string SourceSideFluidName; // Name of source side fluid
         std::string Refrigerant;         // Name of refrigerant
-        //      CHARACTER(len=25) :: CErrCount
         Real64 NominalCoolingCapacity; // Nominal Cooling Capacity (W)
         Real64 LoadSideTotalUA;        // Load Side Total Heat Transfer coefficient [W/C]
         Real64 LoadSideoutsideUA;      // Load Side Outside Heat Transfer coefficient [W/C]
@@ -1106,13 +1098,11 @@ namespace WaterToAirHeatPump {
         Real64 PowerLos;               // Constant Part of Power Losses [kW]
         Real64 RefVolFlowRate;         // Refrigerant Volume Flow rate at the beginning
         Real64 VolumeRatio;            // Built-in-volume ratio [~]
-        Real64 LeakRateCoeff;          // Coefficient for the relationship between
-        // Pressure Ratio and Leakage Rate [~]
+        Real64 LeakRateCoeff;          // Coefficient for the relationship between Pressure Ratio and Leakage Rate [~]
         Real64 SourceSideHTRes1; // Source Side Heat Transfer Resistance coefficient 1 [~]
         Real64 SourceSideHTRes2; // Source Side Heat Transfer Resistance coefficient 2 [K/kW]
         Real64 HighPressCutoff;  // High Pressure Cut-off [Pa]
         Real64 LowPressCutoff;   // Low Pressure Cut-off [Pa]
-
         Real64 Quality;                  // Quality of Refrigerant
         Real64 SourceSideMassFlowRate;   // Source Side Mass Flow Rate [kg/s]
         Real64 SourceSideInletTemp;      // Source Side Inlet Temperature [C]
@@ -1129,26 +1119,16 @@ namespace WaterToAirHeatPump {
         Real64 LoadSideOutletHumRat;     // Load Side Outlet Humidity Ratio [kg/kg]
         Real64 LoadSideAirInletEnth;     // Load Side Inlet Enthalpy [J/kg]
         Real64 LoadSideAirOutletEnth;    // Load Side Outlet Enthalpy [J/kg]
-        //      REAL(r64)        :: EffectiveSurfaceTemp1    ! Effective Surface Temperature Guess #1 [C]
-        //      REAL(r64)        :: EffectiveSurfaceTemp2    ! Effective Surface Temperature Guess #2 [C]
-        static Real64 EffectiveSurfaceTemp; // Effective Surface Temperature [C]
-        Real64 EffectiveSatEnth;            // Saturated Enthalpy of Air Corresponding to the Effective Surface
-        // Temperature [J/kg]
-        //      REAL(r64)        :: EffectiveSatEnth1        ! Guess of the Saturated Enthalpy of Air Corresponding to the
-        //                                                   ! Effective Surface Temperature [J/kg]
+        Real64 EffectiveSurfaceTemp; // Effective Surface Temperature [C]
+        Real64 EffectiveSatEnth;            // Saturated Enthalpy of Air Corresponding to the Effective Surface Temperature [J/kg]
         Real64 QSource;    // Source Side Heat Transfer Rate [W]
         Real64 QLoadTotal; // Load Side Total Heat Transfer Rate [W]
         Real64 QSensible;  // Load Side Sensible Heat Transfer Rate [W]
         Real64 Power;      // Power Consumption [W]
-        //      REAL(r64)        :: EvapTemp1                ! Evaporating Temperature Guess #1 [C]
-        //      REAL(r64)        :: EvapTemp2                ! Evaporating Temperature Guess #2 [C]
-        static Real64 EvapTemp; // Evaporating Temperature [C]
+        Real64 EvapTemp; // Evaporating Temperature [C]
         Real64 ANTUWET;         // Number of Transfer Unit for Wet Condition
         Real64 EffectWET;       // Load Side Heat Exchanger Effectiveness
-        Real64 EvapSatEnth;     // Saturated Enthalpy of Air Corresponding to the Evaporating
-        // Temperature [J/kg]
-        //      REAL(r64)        :: EvapSatEnth1             ! Guess of the Saturated Enthalpy of Air Corresponding to the
-        //                                                   ! Evaporating Temperature [J/kg]
+        Real64 EvapSatEnth;     // Saturated Enthalpy of Air Corresponding to the Evaporating Temperature [J/kg]
         Real64 SourceSideEffect;         // Source Side Heat Exchanger Effectiveness
         Real64 SourceSideTemp;           // Source Side Saturated Refrigerant Temperature [C]
         Real64 LoadSideTemp;             // Load Side Saturated Refrigerant Temperature [C]
@@ -1161,32 +1141,23 @@ namespace WaterToAirHeatPump {
         Real64 SourceSideOutletEnth;     // Enthalpy of Refrigerant leaving the Source Side Heat Exchanger [J/kg]
         Real64 LoadSideOutletEnth;       // Enthalpy of Refrigerant leaving the Load Side Heat Exchanger [J/kg]
         Real64 CpAir;                    // Specific Heat of Air [J/kg_C]
-        static Real64 initialQSource;    // Guess Source Side Heat Transfer Rate [W]
-        static Real64 initialQLoadTotal; // Guess Load Side Heat Transfer rate [W]
         Real64 SuperHeatEnth;            // Enthalpy of the Superheated Refrigerant [J/kg]
-        Real64 CompSuctionTemp1;         // Guess of the Temperature of the Refrigerant Entering the
-        // Compressor #1 [C]
-        Real64 CompSuctionTemp2; // Guess of the Temperature of the Refrigerant Entering the
-        // Compressor #2 [C]
-        static Real64 CompSuctionTemp; // Temperature of the Refrigerant Entering the Compressor [C]
+        Real64 CompSuctionTemp1;         // Guess of the Temperature of the Refrigerant Entering the Compressor #1 [C]
+        Real64 CompSuctionTemp2; // Guess of the Temperature of the Refrigerant Entering the Compressor #2 [C]
         Real64 CompSuctionEnth;        // Enthalpy of the Refrigerant Entering the Compressor [J/kg]
-        Real64 CompSuctionDensity;     // Density of the Refrigerant Entering the Compressorkg/m3
+        Real64 CompSuctionDensity;     // Density of the Refrigerant Entering the Compressor [kg/m3]
         Real64 CompSuctionSatTemp;     // Temperature of Saturated Refrigerant at Compressor Suction Pressure [C]
         Real64 Twet_Rated;             // Twet at rated conditions (coil air flow rate and air temperatures), sec
         Real64 Gamma_Rated;            // Gamma at rated conditions (coil air flow rate and air temperatures)
         bool LatDegradModelSimFlag;    // Latent degradation model simulation flag
         bool StillSimulatingFlag;      // Final Simulation Flag
         bool Converged;                // overall convergence Flag
-
         Real64 QLatRated;       // Qlatent at rated conditions of indoor(TDB,TWB)=(26.7C,19.4C)
         Real64 QLatActual;      // Qlatent at actual operating conditions
         Real64 SHRss;           // Sensible heat ratio at steady state
         Real64 SHReff;          // Effective sensible heat ratio at part-load condition
         Array1D<Real64> Par(4); // Parameter array passed to RegulaFalsi function
         int SolFlag;            // Solution flag returned from RegulaFalsi function
-        static Real64 LoadSideInletDBTemp_Init;  // rated conditions
-        static Real64 LoadSideInletHumRat_Init;  // rated conditions
-        static Real64 LoadSideAirInletEnth_Init; // rated conditions
         Real64 LoadSideInletDBTemp_Unit;         // calc conditions for unit
         Real64 LoadSideInletHumRat_Unit;         // calc conditions for unit
         Real64 LoadSideAirInletEnth_Unit;        // calc conditions for unit
@@ -1196,9 +1167,9 @@ namespace WaterToAirHeatPump {
 
         if (state.dataWaterToAirHeatPump->firstTime) {
             // Set indoor air conditions to the rated condition
-            LoadSideInletDBTemp_Init = 26.7;
-            LoadSideInletHumRat_Init = 0.0111;
-            LoadSideAirInletEnth_Init = PsyHFnTdbW(LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init);
+            state.dataWaterToAirHeatPump->LoadSideInletDBTemp_Init = 26.7;
+            state.dataWaterToAirHeatPump->LoadSideInletHumRat_Init = 0.0111;
+            state.dataWaterToAirHeatPump->LoadSideAirInletEnth_Init = PsyHFnTdbW(state.dataWaterToAirHeatPump->LoadSideInletDBTemp_Init, state.dataWaterToAirHeatPump->LoadSideInletHumRat_Init);
             state.dataWaterToAirHeatPump->firstTime = false;
         }
 
@@ -1257,12 +1228,12 @@ namespace WaterToAirHeatPump {
         }
 
         if (FirstHVACIteration) {
-            initialQSource = NominalCoolingCapacity;
-            initialQLoadTotal = NominalCoolingCapacity;
+            state.dataWaterToAirHeatPump->initialQSource_calc = NominalCoolingCapacity;
+            state.dataWaterToAirHeatPump->initialQLoadTotal_calc = NominalCoolingCapacity;
         }
 
-        if (initialQLoadTotal == 0.0) initialQLoadTotal = NominalCoolingCapacity;
-        if (initialQSource == 0.0) initialQSource = NominalCoolingCapacity;
+        if (state.dataWaterToAirHeatPump->initialQLoadTotal_calc == 0.0) state.dataWaterToAirHeatPump->initialQLoadTotal_calc = NominalCoolingCapacity;
+        if (state.dataWaterToAirHeatPump->initialQSource_calc == 0.0) state.dataWaterToAirHeatPump->initialQSource_calc = NominalCoolingCapacity;
 
         // Loop the calculation at least twice depending whether the latent degradation model
         // is enabled. 1st iteration to calculate the QLatent(rated) at (TDB,TWB)indoorair=(26.7C,19.4C)
@@ -1295,9 +1266,9 @@ namespace WaterToAirHeatPump {
             ++NumIteration4;
             if (NumIteration4 == 1) {
                 // Set indoor air conditions to the rated condition
-                LoadSideInletDBTemp = LoadSideInletDBTemp_Init;
-                LoadSideInletHumRat = LoadSideInletHumRat_Init;
-                LoadSideAirInletEnth = LoadSideAirInletEnth_Init;
+                LoadSideInletDBTemp = state.dataWaterToAirHeatPump->LoadSideInletDBTemp_Init;
+                LoadSideInletHumRat = state.dataWaterToAirHeatPump->LoadSideInletHumRat_Init;
+                LoadSideAirInletEnth = state.dataWaterToAirHeatPump->LoadSideAirInletEnth_Init;
             } else {
                 // Set indoor air conditions to the actual condition
                 LoadSideInletDBTemp = LoadSideInletDBTemp_Unit;
@@ -1345,10 +1316,10 @@ namespace WaterToAirHeatPump {
                     }
 
                     // Determine Source Side Tempertaure (Condensing Temp in this case)
-                    SourceSideTemp = SourceSideInletTemp + initialQSource / (SourceSideEffect * CpFluid * SourceSideMassFlowRate);
+                    SourceSideTemp = SourceSideInletTemp + state.dataWaterToAirHeatPump->initialQSource_calc / (SourceSideEffect * CpFluid * SourceSideMassFlowRate);
 
                     // Compute the Effective Surface Temperature
-                    EffectiveSatEnth = LoadSideAirInletEnth - initialQLoadTotal * LoadSideEffec_MassFlowRate_inv;
+                    EffectiveSatEnth = LoadSideAirInletEnth - state.dataWaterToAirHeatPump->initialQLoadTotal_calc * LoadSideEffec_MassFlowRate_inv;
 
                     //      ! Set up the Initial Range of Effective Surface Temperature
                     //      IF(.NOT. Converged)THEN
@@ -1379,31 +1350,7 @@ namespace WaterToAirHeatPump {
                     EffectiveSurfaceTemp = PsyTsatFnHPb(state, EffectiveSatEnth, PB, RoutineNameLoadSideSurfaceTemp);
 
                     QSensible = LoadSideMassFlowRate * CpAir * (LoadSideInletDBTemp - EffectiveSurfaceTemp) * LoadSideEffec;
-                    EvapSatEnth = LoadSideAirInletEnth - initialQLoadTotal / (EffectWET * LoadSideMassFlowRate);
-
-                    //      ! Iterate to compute Evaporating Temperature
-                    //      IF(.NOT. Converged)THEN
-                    //        EvapTemp1=-150
-                    //        EvapTemp2=100
-                    //      END IF
-                    //      NumIteration1=0
-                    //      LOOP2: DO
-                    //        NumIteration1=NumIteration1+1
-                    //        IF (NumIteration1.GT.STOP1) THEN
-                    //          WatertoAirHP(HPNum)%SimFlag = .FALSE.
-                    //          RETURN
-                    //        END IF
-                    //        EvapTemp=0.5d0*(EvapTemp1+EvapTemp2)
-                    //        EvapSatEnth1=PsyHFnTdbRhPb(EvapTemp,1.0,PB)
-                    //        IF(ABS((EvapSatEnth-EvapSatEnth1)/EvapSatEnth).LT.ERR1) THEN
-                    //         EXIT LOOP2
-                    //        END IF
-                    //        IF(EvapSatEnth1.LT.EvapSatEnth) THEN
-                    //         EvapTemp1=EvapTemp
-                    //        ELSE
-                    //         EvapTemp2=EvapTemp
-                    //        END IF
-                    //      END DO LOOP2
+                    EvapSatEnth = LoadSideAirInletEnth - state.dataWaterToAirHeatPump->initialQLoadTotal_calc / (EffectWET * LoadSideMassFlowRate);
 
                     EvapTemp = PsyTsatFnHPb(state, EvapSatEnth, PB, RoutineNameLoadSideEvapTemp);
 
@@ -1483,39 +1430,19 @@ namespace WaterToAirHeatPump {
                         // Shoot into the Superheated Region
                         CompSuctionTemp2 = CompSuctionSatTemp + DegreeofSuperheat;
                     }
-                    // Iterate to find the Suction State
-                    //      NumIteration1=0
-                    //       LOOP: DO
-                    //           NumIteration1=NumIteration1+1
-                    //           IF (NumIteration1.GT.STOP1) THEN
-                    //             WatertoAirHP(HPNum)%SimFlag = .FALSE.
-                    //             RETURN
-                    //           END IF
-                    //               CompSuctionTemp = 0.5d0 * ( CompSuctionTemp1 + CompSuctionTemp2 )
-                    //               CompSuctionEnth = GetSupHeatEnthalpyRefrig(Refrigerant, CompSuctionTemp, SuctionPr, RefrigIndex)
-                    //               CompSuctionDensity = GetSupHeatDensityRefrig(Refrigerant, CompSuctionTemp, SuctionPr, RefrigIndex)
-                    //               IF (ABS(CompsuctionEnth-SuperHeatEnth)/SuperHeatEnth < ERR)  THEN
-                    //                   EXIT LOOP
-                    //               END IF
-                    //               IF ( CompsuctionEnth < SuperHeatEnth ) THEN
-                    //                   CompSuctionTemp1 = CompSuctionTemp
-                    //               ELSE
-                    //                   CompSuctionTemp2 = CompSuctionTemp
-                    //               END IF
-                    //        END DO LOOP
 
                     //  Do not need the name of the refrigerant if we already have the index (from above CALLs)
                     Par(1) = SuctionPr;
                     Par(2) = double(state.dataWaterToAirHeatPump->RefrigIndex);
                     Par(3) = SuperHeatEnth;
 
-                    TempSolveRoot::SolveRoot(state, ERR, STOP1, SolFlag, CompSuctionTemp, CalcCompSuctionTempResidual, CompSuctionTemp1, CompSuctionTemp2, Par);
+                    TempSolveRoot::SolveRoot(state, ERR, STOP1, SolFlag, state.dataWaterToAirHeatPump->CompSuctionTemp, CalcCompSuctionTempResidual, CompSuctionTemp1, CompSuctionTemp2, Par);
                     if (SolFlag == -1) {
                         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
                         return;
                     }
-                    CompSuctionEnth = GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameCompSuctionTemp);
-                    CompSuctionDensity = GetSupHeatDensityRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameCompSuctionTemp);
+                    CompSuctionEnth = GetSupHeatEnthalpyRefrig(state, Refrigerant, state.dataWaterToAirHeatPump->CompSuctionTemp, SuctionPr, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameCompSuctionTemp);
+                    CompSuctionDensity = GetSupHeatDensityRefrig(state, Refrigerant, state.dataWaterToAirHeatPump->CompSuctionTemp, SuctionPr, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameCompSuctionTemp);
 
                     // Find Refrigerant Flow Rate
                     {
@@ -1533,8 +1460,8 @@ namespace WaterToAirHeatPump {
 
                     // Find the Load Side Heat Transfer
                     QLoadTotal = MassRef * (LoadSideOutletEnth - SourceSideOutletEnth);
-                    LoadResidual = std::abs(QLoadTotal - initialQLoadTotal) / initialQLoadTotal;
-                    initialQLoadTotal += RelaxParam * (QLoadTotal - initialQLoadTotal);
+                    LoadResidual = std::abs(QLoadTotal - state.dataWaterToAirHeatPump->initialQLoadTotal_calc) / state.dataWaterToAirHeatPump->initialQLoadTotal_calc;
+                    state.dataWaterToAirHeatPump->initialQLoadTotal_calc += RelaxParam * (QLoadTotal - state.dataWaterToAirHeatPump->initialQLoadTotal_calc);
                     if (NumIteration3 > 8) RelaxParam = 0.3;
                 }
 
@@ -1556,9 +1483,9 @@ namespace WaterToAirHeatPump {
 
                 // Determine the Sourceside Heat Rate
                 QSource = Power + QLoadTotal;
-                SourceResidual = std::abs(QSource - initialQSource) / initialQSource;
+                SourceResidual = std::abs(QSource - state.dataWaterToAirHeatPump->initialQSource_calc) / state.dataWaterToAirHeatPump->initialQSource_calc;
                 if (SourceResidual < ERR) Converged = true;
-                initialQSource += RelaxParam * (QSource - initialQSource);
+                state.dataWaterToAirHeatPump->initialQSource_calc += RelaxParam * (QSource - state.dataWaterToAirHeatPump->initialQSource_calc);
                 if (NumIteration2 > 8) RelaxParam = 0.2;
             }
 
@@ -1624,7 +1551,7 @@ namespace WaterToAirHeatPump {
         QSource *= PartLoadRatio;
 
         // Update heat pump data structure
-        DataHVACGlobals::DXElecCoolingPower = Power;
+        state.dataHVACGlobal->DXElecCoolingPower = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QLoadTotal = QLoadTotal;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSensible = QSensible;
@@ -1725,8 +1652,6 @@ namespace WaterToAirHeatPump {
         using Psychrometrics::PsyCpAirFnW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyWFnTdbH;
-        //  USE DataZoneEnergyDemands
-
         using General::SolveRoot;
 
         // Locals
@@ -1815,8 +1740,6 @@ namespace WaterToAirHeatPump {
         Real64 MassRef;               // Mass Flow Rate of Refrigerant [kg/s]
         Real64 SourceSideOutletEnth;  // Enthalpy of Refrigerant leaving the Source Side Heat Exchanger [J/kg]
         Real64 LoadSideOutletEnth;    // Enthalpy of Refrigerant leaving the Load Side Heat Exchanger [J/kg]
-        static Real64 initialQSource; // Guess Source Side Heat Transfer Rate [W]
-        static Real64 initialQLoad;   // Guess Load Side Heat Transfer rate [W]
         Real64 SuperHeatEnth;         // Enthalpy of the Superheated Refrigerant [J/kg]
         Real64 CompSuctionTemp1;      // Guess of the Temperature of the Refrigerant Entering the
         // Compressor #1 [C]
@@ -1885,12 +1808,12 @@ namespace WaterToAirHeatPump {
         }
 
         if (FirstHVACIteration) {
-            initialQLoad = NominalHeatingCapacity;
-            initialQSource = NominalHeatingCapacity;
+            state.dataWaterToAirHeatPump->initialQLoad = NominalHeatingCapacity;
+            state.dataWaterToAirHeatPump->initialQSource = NominalHeatingCapacity;
         }
 
-        if (initialQLoad == 0.0) initialQLoad = NominalHeatingCapacity;
-        if (initialQSource == 0.0) initialQSource = NominalHeatingCapacity;
+        if (state.dataWaterToAirHeatPump->initialQLoad == 0.0) state.dataWaterToAirHeatPump->initialQLoad = NominalHeatingCapacity;
+        if (state.dataWaterToAirHeatPump->initialQSource == 0.0) state.dataWaterToAirHeatPump->initialQSource = NominalHeatingCapacity;
 
         // Tuned Hoisted quantities out of nested loop that don't change
         Real64 const LoadSideMassFlowRate_CpAir_inv(1.0 / (LoadSideMassFlowRate * CpAir));
@@ -1938,10 +1861,10 @@ namespace WaterToAirHeatPump {
                 }
 
                 // Determine Source Side Tempertaure (Evap. Temp for this mode)
-                SourceSideTemp = SourceSideInletTemp - initialQSource / (SourceSideEffect * CpFluid * SourceSideMassFlowRate);
+                SourceSideTemp = SourceSideInletTemp - state.dataWaterToAirHeatPump->initialQSource / (SourceSideEffect * CpFluid * SourceSideMassFlowRate);
 
                 // Determine Load Side Tempertaure (Condensing Temp for this mode)
-                LoadSideTemp = LoadSideInletDBTemp + initialQLoad * LoadSideEffect_CpAir_MassFlowRate_inv;
+                LoadSideTemp = LoadSideInletDBTemp + state.dataWaterToAirHeatPump->initialQLoad * LoadSideEffect_CpAir_MassFlowRate_inv;
 
                 // Determine the Load Side and Source Side Saturated Temp (evaporating and condensing pressures)
                 SourceSidePressure = GetSatPressureRefrig(state, Refrigerant, SourceSideTemp, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameSourceSideTemp);
@@ -2078,8 +2001,8 @@ namespace WaterToAirHeatPump {
 
                 // Find the Source Side Heat Transfer
                 QSource = MassRef * (SourceSideOutletEnth - LoadSideOutletEnth);
-                SourceResidual = std::abs(QSource - initialQSource) / initialQSource;
-                initialQSource += RelaxParam * (QSource - initialQSource);
+                SourceResidual = std::abs(QSource - state.dataWaterToAirHeatPump->initialQSource) / state.dataWaterToAirHeatPump->initialQSource;
+                state.dataWaterToAirHeatPump->initialQSource += RelaxParam * (QSource - state.dataWaterToAirHeatPump->initialQSource);
                 if (NumIteration2 > 8) RelaxParam = 0.3;
             }
 
@@ -2101,9 +2024,9 @@ namespace WaterToAirHeatPump {
 
             // Determine the Load Side Heat Rate
             QLoadTotal = Power + QSource;
-            LoadResidual = std::abs(QLoadTotal - initialQLoad) / initialQLoad;
+            LoadResidual = std::abs(QLoadTotal - state.dataWaterToAirHeatPump->initialQLoad) / state.dataWaterToAirHeatPump->initialQLoad;
             if (LoadResidual < ERR) Converged = true;
-            initialQLoad += RelaxParam * (QLoadTotal - initialQLoad);
+            state.dataWaterToAirHeatPump->initialQLoad += RelaxParam * (QLoadTotal - state.dataWaterToAirHeatPump->initialQLoad);
             if (NumIteration3 > 8) RelaxParam = 0.2;
         }
 
@@ -2144,7 +2067,7 @@ namespace WaterToAirHeatPump {
         QSource *= PartLoadRatio;
 
         // Update heat pump data structure
-        DataHVACGlobals::DXElecHeatingPower = Power;
+        state.dataHVACGlobal->DXElecHeatingPower = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QLoadTotal = QLoadTotal;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSensible = QLoadTotal;
@@ -2188,7 +2111,7 @@ namespace WaterToAirHeatPump {
         // Data is moved from the HP data structure to the HP outlet nodes.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2230,27 +2153,27 @@ namespace WaterToAirHeatPump {
         WaterOutletNode = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum;
 
         // Set the outlet air nodes of the WatertoAirHP
-        Node(AirOutletNode).MassFlowRate = Node(AirInletNode).MassFlowRate;
-        Node(AirOutletNode).Temp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirDBTemp;
-        Node(AirOutletNode).HumRat = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirHumRat;
-        Node(AirOutletNode).Enthalpy = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirEnthalpy;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
+        state.dataLoopNodes->Node(AirOutletNode).Temp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirDBTemp;
+        state.dataLoopNodes->Node(AirOutletNode).HumRat = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(AirOutletNode).Enthalpy = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirEnthalpy;
 
         // Set the outlet nodes for properties that just pass through & not used
         SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
         // Set the outlet water nodes for the heat pump
-        Node(WaterOutletNode).Temp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterTemp;
-        Node(WaterOutletNode).Enthalpy = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterEnthalpy;
+        state.dataLoopNodes->Node(WaterOutletNode).Temp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterTemp;
+        state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterEnthalpy;
 
         // Set the outlet nodes for properties that just pass through & not used
-        Node(AirOutletNode).Quality = Node(AirInletNode).Quality;
-        Node(AirOutletNode).Press = Node(AirInletNode).Press;
-        Node(AirOutletNode).MassFlowRateMin = Node(AirInletNode).MassFlowRateMin;
-        Node(AirOutletNode).MassFlowRateMax = Node(AirInletNode).MassFlowRateMax;
-        Node(AirOutletNode).MassFlowRateMinAvail = Node(AirInletNode).MassFlowRateMinAvail;
-        Node(AirOutletNode).MassFlowRateMaxAvail = Node(AirInletNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
+        state.dataLoopNodes->Node(AirOutletNode).Press = state.dataLoopNodes->Node(AirInletNode).Press;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail;
 
         // Pass through the load side mass flow rates
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirMassFlowRate = Node(AirInletNode).MassFlowRate;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirMassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirMassFlowRate = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirMassFlowRate;
 
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Energy = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power * ReportingConstant;
@@ -2260,10 +2183,10 @@ namespace WaterToAirHeatPump {
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).EnergySource = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource * ReportingConstant;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
+            state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
+            state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
         }
     }
 

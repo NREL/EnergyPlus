@@ -55,72 +55,19 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataMoistureBalance.hh>
-#include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPhotovoltaics.hh>
-#include <EnergyPlus/DataReportingFlags.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataSurfaceLists.hh>
-#include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DisplacementVentMgr.hh>
-#include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/ElectricBaseboardRadiator.hh>
-#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
-#include <EnergyPlus/ExternalInterface.hh>
-#include <EnergyPlus/FanCoilUnits.hh>
-#include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Furnaces.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <EnergyPlus/HVACControllers.hh>
-#include <EnergyPlus/HVACCooledBeam.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
-#include <EnergyPlus/HVACDuct.hh>
-#include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
-#include <EnergyPlus/HVACManager.hh>
-#include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
-#include <EnergyPlus/HVACSingleDuctInduc.hh>
-#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
-#include <EnergyPlus/HeatBalanceAirManager.hh>
-#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/HeatRecovery.hh>
-#include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/HighTempRadiantSystem.hh>
-#include <EnergyPlus/Humidifiers.hh>
-#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
-#include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
-#include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
-#include <EnergyPlus/PVWatts.hh>
-#include <EnergyPlus/PackagedThermalStorageCoil.hh>
-#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
-#include <EnergyPlus/Photovoltaics.hh>
-#include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
-#include <EnergyPlus/RuntimeLanguageProcessor.hh>
-#include <EnergyPlus/ScheduleManager.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -132,66 +79,10 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
-    DataHeatBalSurface::clear_state();
-    DataHVACGlobals::clear_state();
-    DataIPShortCuts::clear_state();
-    DataLoopNode::clear_state();
-    DataMoistureBalance::clear_state();
-    DataMoistureBalanceEMPD::clear_state();
     DataOutputs::clear_state();
-    DataPhotovoltaics::clear_state();
-    DataReportingFlags::clear_state();
-    DataStringGlobals::clear_state();
-    DataSurfaceLists::clear_state();
-    DataSystemVariables::clear_state();
-    DataUCSDSharedData::clear_state();
-    DataViewFactorInformation::clear_state();
-    DesiccantDehumidifiers::clear_state();
-    DisplacementVentMgr::clear_state();
-    DualDuct::clear_state();
-    clearFacilityElectricPowerServiceObject();
-    ElectricBaseboardRadiator::clear_state();
-    EvaporativeFluidCoolers::clear_state();
-    ExternalInterface::clear_state();
-    FanCoilUnits::clear_state();
-    Fans::clear_state();
-    FaultsManager::clear_state();
     FluidProperties::clear_state();
-    Furnaces::clear_state();
-    General::clear_state();
-    GroundTemperatureManager::clear_state();
-    HeatBalanceAirManager::clear_state();
-    HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
-    HeatBalanceSurfaceManager::clear_state();
-    HeatBalFiniteDiffManager::clear_state();
-    HeatRecovery::clear_state();
-    HeatingCoils::clear_state();
-    HighTempRadiantSystem::clear_state();
-    Humidifiers::clear_state();
-    HVACControllers::clear_state();
-    HVACCooledBeam::clear_state();
-    HVACDuct::clear_state();
-    HVACDXSystem::clear_state();
-    HVACHXAssistedCoolingCoil::clear_state();
     HVACFan::clearHVACFanObjects();
-    HVACManager::clear_state();
-    HVACMultiSpeedHeatPump::clear_state();
-    HVACSingleDuctInduc::clear_state();
-    HybridModel::clear_state();
-    HysteresisPhaseChange::clear_state();
-    LowTempRadiantSystem::clear_state();
-    OutputReportTabular::clear_state(state);
-    OutputReportTabularAnnual::clear_state();
-    PackagedThermalStorageCoil::clear_state();
-    Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
-    PollutionModule::clear_state();
     Psychrometrics::clear_state();
-    PVWatts::clear_state();
-    clearCoilSelectionReportObj(); // ReportCoilSelection
-    RoomAirModelAirflowNetwork::clear_state();
-    RoomAirModelUserTempPattern::clear_state();
-    RuntimeLanguageProcessor::clear_state();
-    ScheduleManager::clear_state();
 }

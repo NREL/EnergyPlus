@@ -128,7 +128,7 @@ namespace EnergyPlus::FluidCoolers {
             this->calcTwoSpeed(state);
         }
         this->update(state);
-        this->report(RunFlag);
+        this->report(state, RunFlag);
     }
 
     void FluidCoolerspecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
@@ -166,9 +166,6 @@ namespace EnergyPlus::FluidCoolers {
         // REFERENCES:
         // Based on GetTowerInput subroutine from Don Shirey, Jan 2001 and Sept/Oct 2002;
 
-        // Using/Aliasing
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas = 0;                // Number of elements in the alpha array
         int NumNums = 0;                  // Number of elements in the numeric array
@@ -197,6 +194,7 @@ namespace EnergyPlus::FluidCoolers {
         int FluidCoolerNum = 0;
 
         // Load data structures with fluid cooler input data
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = cFluidCooler_SingleSpeed;
         for (int SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber) {
             FluidCoolerNum = SingleSpeedFluidCoolerNumber;
@@ -208,12 +206,12 @@ namespace EnergyPlus::FluidCoolers {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
-                state.dataFluidCoolers->UniqueSimpleFluidCoolerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                state.dataFluidCoolers->UniqueSimpleFluidCoolerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
 
             state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name = AlphArray(1);
             state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerType = cCurrentModuleObject;
@@ -224,16 +222,16 @@ namespace EnergyPlus::FluidCoolers {
                                                                                                       ErrorsFound,
                                                                                                       cCurrentModuleObject,
                                                                                                       AlphArray(1),
-                                                                                                      DataLoopNode::NodeType_Water,
-                                                                                                      DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                      DataLoopNode::NodeFluidType::Water,
+                                                                                                      DataLoopNode::NodeConnectionType::Inlet,
                                                                                                       1,
                                                                                                       DataLoopNode::ObjectIsNotParent);
             state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(3),
                                                                                                        ErrorsFound,
                                                                                                        cCurrentModuleObject,
                                                                                                        AlphArray(1),
-                                                                                                       DataLoopNode::NodeType_Water,
-                                                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                       DataLoopNode::NodeFluidType::Water,
+                                                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                                                        1,
                                                                                                        DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
@@ -267,12 +265,12 @@ namespace EnergyPlus::FluidCoolers {
                                                         ErrorsFound,
                                                         cCurrentModuleObject,
                                                         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name,
-                                                        DataLoopNode::NodeType_Air,
-                                                        DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                        DataLoopNode::NodeFluidType::Air,
+                                                        DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                         1,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum)) {
-                    ShowSevereError(state, cCurrentModuleObject + "= \"" + state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name + "\" " + cAlphaFieldNames(5) + "= \"" +
+                    ShowSevereError(state, cCurrentModuleObject + "= \"" + state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name + "\" " + state.dataIPShortCut->cAlphaFieldNames(5) + "= \"" +
                                     AlphArray(5) + "\" not valid.");
                     ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ErrorsFound = true;
@@ -280,7 +278,7 @@ namespace EnergyPlus::FluidCoolers {
             }
 
             ErrorsFound |=
-                state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).validateSingleSpeedInputs(state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+                state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).validateSingleSpeedInputs(state, cCurrentModuleObject, AlphArray, state.dataIPShortCut->cNumericFieldNames, state.dataIPShortCut->cAlphaFieldNames);
 
         } // End Single-Speed fluid cooler Loop
 
@@ -295,12 +293,12 @@ namespace EnergyPlus::FluidCoolers {
                                           NumArray,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
-                state.dataFluidCoolers->UniqueSimpleFluidCoolerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                state.dataFluidCoolers->UniqueSimpleFluidCoolerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
 
             state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name = AlphArray(1);
             state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerType = cCurrentModuleObject;
@@ -311,16 +309,16 @@ namespace EnergyPlus::FluidCoolers {
                                                                                                       ErrorsFound,
                                                                                                       cCurrentModuleObject,
                                                                                                       AlphArray(1),
-                                                                                                      DataLoopNode::NodeType_Water,
-                                                                                                      DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                      DataLoopNode::NodeFluidType::Water,
+                                                                                                      DataLoopNode::NodeConnectionType::Inlet,
                                                                                                       1,
                                                                                                       DataLoopNode::ObjectIsNotParent);
             state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(3),
                                                                                                        ErrorsFound,
                                                                                                        cCurrentModuleObject,
                                                                                                        AlphArray(1),
-                                                                                                       DataLoopNode::NodeType_Water,
-                                                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                       DataLoopNode::NodeFluidType::Water,
+                                                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                                                        1,
                                                                                                        DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
@@ -375,12 +373,12 @@ namespace EnergyPlus::FluidCoolers {
                                                         ErrorsFound,
                                                         cCurrentModuleObject,
                                                         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name,
-                                                        DataLoopNode::NodeType_Air,
-                                                        DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                        DataLoopNode::NodeFluidType::Air,
+                                                        DataLoopNode::NodeConnectionType::OutsideAirReference,
                                                         1,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum)) {
-                    ShowSevereError(state, cCurrentModuleObject + "= \"" + state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name + "\" " + cAlphaFieldNames(5) + "= \"" +
+                    ShowSevereError(state, cCurrentModuleObject + "= \"" + state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name + "\" " + state.dataIPShortCut->cAlphaFieldNames(5) + "= \"" +
                                     AlphArray(5) + "\" not valid.");
                     ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ErrorsFound = true;
@@ -388,7 +386,7 @@ namespace EnergyPlus::FluidCoolers {
             }
 
             ErrorsFound |=
-                state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).validateTwoSpeedInputs(state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+                state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).validateTwoSpeedInputs(state, cCurrentModuleObject, AlphArray, state.dataIPShortCut->cNumericFieldNames, state.dataIPShortCut->cAlphaFieldNames);
         }
 
         if (ErrorsFound) {
@@ -701,7 +699,8 @@ namespace EnergyPlus::FluidCoolers {
                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                              RoutineName);
         this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
-        PlantUtilities::InitComponentNodes(0.0,
+        PlantUtilities::InitComponentNodes(state,
+                                           0.0,
                                            this->DesWaterMassFlowRate,
                                            this->WaterInletNodeNum,
                                            this->WaterOutletNodeNum,
@@ -749,13 +748,13 @@ namespace EnergyPlus::FluidCoolers {
         }
 
         // Each time initializations
-        this->WaterTemp = DataLoopNode::Node(this->WaterInletNodeNum).Temp;
+        this->WaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
 
         if (this->OutdoorAirInletNodeNum != 0) {
-            this->AirTemp = DataLoopNode::Node(this->OutdoorAirInletNodeNum).Temp;
-            this->AirHumRat = DataLoopNode::Node(this->OutdoorAirInletNodeNum).HumRat;
-            this->AirPress = DataLoopNode::Node(this->OutdoorAirInletNodeNum).Press;
-            this->AirWetBulb = DataLoopNode::Node(this->OutdoorAirInletNodeNum).OutAirWetBulb;
+            this->AirTemp = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).Temp;
+            this->AirHumRat = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).HumRat;
+            this->AirPress = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).Press;
+            this->AirWetBulb = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).OutAirWetBulb;
         } else {
             this->AirTemp = state.dataEnvrn->OutDryBulbTemp;
             this->AirHumRat = state.dataEnvrn->OutHumRat;
@@ -797,8 +796,8 @@ namespace EnergyPlus::FluidCoolers {
         // Based on SizeTower by Don Shirey, Sept/Oct 2002; Richard Raustad, Feb 2005
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500);    // Maximum number of iterations
-        Real64 const Acc(0.0001); // Accuracy of result
+        constexpr int MaxIte(500);    // Maximum number of iterations
+        constexpr Real64 Acc(0.0001); // Accuracy of result
         static std::string const CalledFrom("SizeFluidCooler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1469,7 +1468,7 @@ namespace EnergyPlus::FluidCoolers {
         auto &waterInletNode = this->WaterInletNodeNum;
         this->Qactual = 0.0;
         this->FanPower = 0.0;
-        this->OutletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
+        this->OutletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
@@ -1487,7 +1486,7 @@ namespace EnergyPlus::FluidCoolers {
         }
 
         //   Initialize local variables
-        Real64 OutletWaterTempOFF = DataLoopNode::Node(waterInletNode).Temp;
+        Real64 OutletWaterTempOFF = state.dataLoopNodes->Node(waterInletNode).Temp;
         this->OutletWaterTemp = OutletWaterTempOFF;
 
         Real64 UAdesign = this->HighSpeedFluidCoolerUA;
@@ -1510,10 +1509,10 @@ namespace EnergyPlus::FluidCoolers {
         }
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                                                DataLoopNode::Node(waterInletNode).Temp,
+                                                                state.dataLoopNodes->Node(waterInletNode).Temp,
                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                 RoutineName);
-        this->Qactual = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(waterInletNode).Temp - this->OutletWaterTemp);
+        this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(waterInletNode).Temp - this->OutletWaterTemp);
     }
 
     void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
@@ -1575,7 +1574,7 @@ namespace EnergyPlus::FluidCoolers {
         auto &waterInletNode = this->WaterInletNodeNum;
         this->Qactual = 0.0;
         this->FanPower = 0.0;
-        this->OutletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
+        this->OutletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
@@ -1591,8 +1590,8 @@ namespace EnergyPlus::FluidCoolers {
             return;
 
         // set local variable for fluid cooler
-        this->WaterMassFlowRate = DataLoopNode::Node(waterInletNode).MassFlowRate;
-        Real64 OutletWaterTempOFF = DataLoopNode::Node(waterInletNode).Temp;
+        this->WaterMassFlowRate = state.dataLoopNodes->Node(waterInletNode).MassFlowRate;
+        Real64 OutletWaterTempOFF = state.dataLoopNodes->Node(waterInletNode).Temp;
         Real64 OutletWaterTemp1stStage = OutletWaterTempOFF;
         Real64 OutletWaterTemp2ndStage = OutletWaterTempOFF;
         Real64 FanModeFrac = 0.0;
@@ -1636,10 +1635,10 @@ namespace EnergyPlus::FluidCoolers {
         }
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                                                DataLoopNode::Node(waterInletNode).Temp,
+                                                                state.dataLoopNodes->Node(waterInletNode).Temp,
                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                 RoutineName);
-        this->Qactual = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(waterInletNode).Temp - this->OutletWaterTemp);
+        this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(waterInletNode).Temp - this->OutletWaterTemp);
     }
 
     void CalcFluidCoolerOutlet(EnergyPlusData &state, int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp)
@@ -1761,19 +1760,19 @@ namespace EnergyPlus::FluidCoolers {
         Real64 LoopMinTemp;
 
         auto &waterOutletNode = this->WaterOutletNodeNum;
-        DataLoopNode::Node(waterOutletNode).Temp = this->OutletWaterTemp;
+        state.dataLoopNodes->Node(waterOutletNode).Temp = this->OutletWaterTemp;
 
         if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked ||
             state.dataGlobal->WarmupFlag)
             return;
 
         // Check flow rate through fluid cooler and compare to design flow rate, show warning if greater than Design * Mulitplier
-        if (DataLoopNode::Node(waterOutletNode).MassFlowRate > this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier) {
+        if (state.dataLoopNodes->Node(waterOutletNode).MassFlowRate > this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier) {
             ++this->HighMassFlowErrorCount;
             if (this->HighMassFlowErrorCount < 2) {
                 ShowWarningError(state, this->FluidCoolerType + " \"" + this->Name + "\"");
                 ShowContinueError(state, " Condenser Loop Mass Flow Rate is much greater than the fluid coolers design mass flow rate.");
-                ShowContinueError(state, format(" Condenser Loop Mass Flow Rate = {:.6T}", DataLoopNode::Node(waterOutletNode).MassFlowRate));
+                ShowContinueError(state, format(" Condenser Loop Mass Flow Rate = {:.6T}", state.dataLoopNodes->Node(waterOutletNode).MassFlowRate));
                 ShowContinueError(state, format(" Fluid Cooler Design Mass Flow Rate   = {:.6T}", this->DesWaterMassFlowRate));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
@@ -1781,8 +1780,8 @@ namespace EnergyPlus::FluidCoolers {
                     this->FluidCoolerType + " \"" + this->Name +
                         "\"  Condenser Loop Mass Flow Rate is much greater than the fluid coolers design mass flow rate error continues...",
                     this->HighMassFlowErrorIndex,
-                    DataLoopNode::Node(waterOutletNode).MassFlowRate,
-                    DataLoopNode::Node(waterOutletNode).MassFlowRate);
+                    state.dataLoopNodes->Node(waterOutletNode).MassFlowRate,
+                    state.dataLoopNodes->Node(waterOutletNode).MassFlowRate);
             }
         }
 
@@ -1826,7 +1825,7 @@ namespace EnergyPlus::FluidCoolers {
         }
     }
 
-    void FluidCoolerspecs::report(bool const RunFlag)
+    void FluidCoolerspecs::report(EnergyPlusData &state, bool const RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1838,16 +1837,16 @@ namespace EnergyPlus::FluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the fluid cooler.
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         auto &waterInletNode = this->WaterInletNodeNum;
         if (!RunFlag) {
-            this->InletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
-            this->OutletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
+            this->InletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
+            this->OutletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
             this->Qactual = 0.0;
             this->FanPower = 0.0;
             this->FanEnergy = 0.0;
         } else {
-            this->InletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
+            this->InletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
             this->FanEnergy = this->FanPower * ReportingConstant;
         }
     }

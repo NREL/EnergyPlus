@@ -218,29 +218,19 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
 
     static std::string const vertexstring("X,Y,Z ==> Vertex");
 
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static bool optiondone(false);
-    static std::string lastoption;
-
     if (state.dataSurface->TotSurfaces > 0 && !allocated(state.dataSurface->Surface)) {
         // no error needed, probably in end processing, just return
         return;
     }
 
-    if (optiondone) {
-        ShowWarningError(state, "Report of Surfaces/Lines Option has already been completed with option=" + lastoption);
+    if (state.dataOutputReports->optiondone) {
+        ShowWarningError(state, "Report of Surfaces/Lines Option has already been completed with option=" + state.dataOutputReports->lastoption);
         ShowContinueError(state, "..option=\"" + option + "\" will not be done this time.");
         return;
     }
 
-    lastoption = option;
-    optiondone = true;
+    state.dataOutputReports->lastoption = option;
+    state.dataOutputReports->optiondone = true;
 
     auto slnfile = state.files.sln.open(state, "LinesOut", state.files.outputControl.sln);
 
@@ -374,6 +364,8 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
         NSide3Y(vert) += miny;
     }
 
+    auto & DXFcolorno = state.dataSurfColor->DXFcolorno;
+
     // This writes "True North" above the Arrow Head
     print(of, Format_710, "Text - True North");
     print(of, Format_800, DXFcolorno(ColorNo_Text), StemX(1) - 1.0, StemY(1), StemZ(1));
@@ -446,7 +438,7 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
             print(of,
                   Format_709,
                   normalizeName(state.dataHeatBal->Zone(zones).Name),
-                  DXFcolorno(curcolorno),
+                  state.dataSurfColor->DXFcolorno(curcolorno),
                   state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt),
                   state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt),
                   state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt),
@@ -565,7 +557,7 @@ void DXFOut(EnergyPlusData &state,
     }
 
     WriteDXFCommon(state, dxffile, ColorScheme);
-
+    auto & DXFcolorno = state.dataSurfColor->DXFcolorno;
     auto colorindex = ColorNo_ShdDetFix;
     //  Do all detached shading surfaces first
     for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
@@ -932,7 +924,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
             } else {
                 sptr = 1;
             }
-            print(dxffile, Format_711, ShadeType, DXFcolorno(colorindex)); //,minz ,TRIM(PolylineWidth),TRIM(PolylineWidth)
+            print(dxffile, Format_711, ShadeType, state.dataSurfColor->DXFcolorno(colorindex)); //,minz ,TRIM(PolylineWidth),TRIM(PolylineWidth)
             print(dxffile,
                   Format_712,
                   state.dataSurface->Surface(surf).Vertex(vert).x,
@@ -980,7 +972,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
                 } else {
                     sptr = 1;
                 }
-                print(dxffile, Format_711, TempZoneName, DXFcolorno(colorindex)); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
+                print(dxffile, Format_711, TempZoneName, state.dataSurfColor->DXFcolorno(colorindex)); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
                 print(dxffile,
                       Format_712,
                       state.dataSurface->Surface(surf).Vertex(vert).x,
@@ -1022,7 +1014,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
                 } else {
                     sptr = 1;
                 }
-                print(dxffile, Format_711, TempZoneName, DXFcolorno(colorindex)); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
+                print(dxffile, Format_711, TempZoneName, state.dataSurfColor->DXFcolorno(colorindex)); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
                 print(dxffile,
                       Format_712,
                       state.dataSurface->Surface(surf).Vertex(vert).x,
@@ -1133,7 +1125,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             minz = min(minz, state.dataSurface->Surface(surf).Vertex(vert).z);
         }
 
-        print(dxffile, Format_715, ShadeType, DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
+        print(dxffile, Format_715, ShadeType, state.dataSurfColor->DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
         for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
             print(dxffile, Format_716, ShadeType, state.dataSurface->Surface(surf).Vertex(vert).x, state.dataSurface->Surface(surf).Vertex(vert).y, state.dataSurface->Surface(surf).Vertex(vert).z);
         }
@@ -1168,7 +1160,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
                 minz = min(minz, state.dataSurface->Surface(surf).Vertex(vert).z);
             }
 
-            print(dxffile, Format_715, TempZoneName, DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
+            print(dxffile, Format_715, TempZoneName, state.dataSurfColor->DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
             for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                 print(dxffile, Format_716, TempZoneName, state.dataSurface->Surface(surf).Vertex(vert).x, state.dataSurface->Surface(surf).Vertex(vert).y, state.dataSurface->Surface(surf).Vertex(vert).z);
             }
@@ -1191,7 +1183,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
                 minz = min(minz, state.dataSurface->Surface(surf).Vertex(vert).z);
             }
 
-            print(dxffile, Format_715, TempZoneName, DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
+            print(dxffile, Format_715, TempZoneName, state.dataSurfColor->DXFcolorno(colorindex), minz, PolylineWidth, PolylineWidth);
             for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                 print(dxffile, Format_716, TempZoneName, state.dataSurface->Surface(surf).Vertex(vert).x, state.dataSurface->Surface(surf).Vertex(vert).y, state.dataSurface->Surface(surf).Vertex(vert).z);
             }
@@ -1403,25 +1395,25 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 }
                 {
                     auto const SELECT_CASE_var(state.dataSurface->Surface(surf).HeatTransferAlgorithm);
-                    if (SELECT_CASE_var == HeatTransferModel_None) {
+                    if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::None) {
                         AlgoName = "None";
-                    } else if (SELECT_CASE_var == HeatTransferModel_CTF) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CTF) {
                         AlgoName = "CTF - ConductionTransferFunction";
-                    } else if (SELECT_CASE_var == HeatTransferModel_CondFD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CondFD) {
                         AlgoName = "CondFD - ConductionFiniteDifference";
-                    } else if (SELECT_CASE_var == HeatTransferModel_EMPD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::EMPD) {
                         AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-                    } else if (SELECT_CASE_var == HeatTransferModel_HAMT) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::HAMT) {
                         AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
-                    } else if (SELECT_CASE_var == HeatTransferModel_Kiva) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Kiva) {
                         AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
-                    } else if (SELECT_CASE_var == HeatTransferModel_Window5) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Window5) {
                         AlgoName = "Window5 Detailed Fenestration";
-                    } else if (SELECT_CASE_var == HeatTransferModel_ComplexFenestration) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::ComplexFenestration) {
                         AlgoName = "Window7 Complex Fenestration";
-                    } else if (SELECT_CASE_var == HeatTransferModel_TDD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::TDD) {
                         AlgoName = "Tubular Daylighting Device";
-                    } else if (SELECT_CASE_var == HeatTransferModel_AirBoundaryNoHT) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::AirBoundaryNoHT) {
                         AlgoName = "Air Boundary - No Heat Transfer";
                     }
                 }
@@ -1601,23 +1593,23 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                     if (state.dataSurface->FrameDivider(fd).FrameWidth > 0.0) {
                         {
                             auto const SELECT_CASE_var(state.dataSurface->Surface(surf).HeatTransferAlgorithm);
-                            if (SELECT_CASE_var == HeatTransferModel_None) {
+                            if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::None) {
                                 AlgoName = "None";
-                            } else if (SELECT_CASE_var == HeatTransferModel_CTF) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CTF) {
                                 AlgoName = "CTF - ConductionTransferFunction";
-                            } else if (SELECT_CASE_var == HeatTransferModel_CondFD) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CondFD) {
                                 AlgoName = "CondFD - ConductionFiniteDifference";
-                            } else if (SELECT_CASE_var == HeatTransferModel_EMPD) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::EMPD) {
                                 AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-                            } else if (SELECT_CASE_var == HeatTransferModel_HAMT) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::HAMT) {
                                 AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
-                            } else if (SELECT_CASE_var == HeatTransferModel_Kiva) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Kiva) {
                                 AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
-                            } else if (SELECT_CASE_var == HeatTransferModel_Window5) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Window5) {
                                 AlgoName = "Window5 Detailed Fenestration";
-                            } else if (SELECT_CASE_var == HeatTransferModel_ComplexFenestration) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::ComplexFenestration) {
                                 AlgoName = "Window7 Complex Fenestration";
-                            } else if (SELECT_CASE_var == HeatTransferModel_TDD) {
+                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::TDD) {
                                 AlgoName = "Tubular Daylighting Device";
                             }
                         }
@@ -1650,25 +1642,25 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 }
                 {
                     auto const SELECT_CASE_var(state.dataSurface->Surface(surf).HeatTransferAlgorithm);
-                    if (SELECT_CASE_var == HeatTransferModel_None) {
+                    if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::None) {
                         AlgoName = "None";
-                    } else if (SELECT_CASE_var == HeatTransferModel_CTF) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CTF) {
                         AlgoName = "CTF - ConductionTransferFunction";
-                    } else if (SELECT_CASE_var == HeatTransferModel_CondFD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CondFD) {
                         AlgoName = "CondFD - ConductionFiniteDifference";
-                    } else if (SELECT_CASE_var == HeatTransferModel_EMPD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::EMPD) {
                         AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-                    } else if (SELECT_CASE_var == HeatTransferModel_HAMT) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::HAMT) {
                         AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
-                    } else if (SELECT_CASE_var == HeatTransferModel_Kiva) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Kiva) {
                         AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
-                    } else if (SELECT_CASE_var == HeatTransferModel_Window5) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Window5) {
                         AlgoName = "Window5 Detailed Fenestration";
-                    } else if (SELECT_CASE_var == HeatTransferModel_ComplexFenestration) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::ComplexFenestration) {
                         AlgoName = "Window7 Complex Fenestration";
-                    } else if (SELECT_CASE_var == HeatTransferModel_TDD) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::TDD) {
                         AlgoName = "Tubular Daylighting Device";
-                    } else if (SELECT_CASE_var == HeatTransferModel_AirBoundaryNoHT) {
+                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::AirBoundaryNoHT) {
                         AlgoName = "Air Boundary - No Heat Transfer";
                     }
                 }

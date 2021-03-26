@@ -51,6 +51,7 @@
 #include <EnergyPlus/NonZoneEquipmentManager.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterUse.hh>
+#include <EnergyPlus/DataGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -106,14 +107,10 @@ namespace NonZoneEquipmentManager {
         using WaterThermalTanks::SimulateWaterHeaterStandAlone;
         using WaterUse::SimulateWaterUse;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterHeaterNum; // Water heater object number
-        static int NumOfWaterHeater;
-        static bool CountNonZoneEquip(true);
-
+        auto & NumOfWaterHeater = state.dataGlobal->NumOfWaterHeater;
+        auto & CountNonZoneEquip = state.dataGlobal->CountNonZoneEquip;
 
         if (CountNonZoneEquip) {
             NumOfWaterHeater = inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") + inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");

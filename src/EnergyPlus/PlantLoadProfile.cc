@@ -155,8 +155,8 @@ namespace EnergyPlus::PlantLoadProfile {
 
         this->OutletTemp = this->InletTemp - DeltaTemp;
 
-        this->UpdatePlantProfile();
-        this->ReportPlantProfile();
+        this->UpdatePlantProfile(state);
+        this->ReportPlantProfile(state);
 
     } // simulate()
 
@@ -177,7 +177,6 @@ namespace EnergyPlus::PlantLoadProfile {
         // actual available flow is set.
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -209,14 +208,15 @@ namespace EnergyPlus::PlantLoadProfile {
 
         if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
             // Clear node initial conditions
-            Node(OutletNode).Temp = 0.0;
+            state.dataLoopNodes->Node(OutletNode).Temp = 0.0;
 
             FluidDensityInit =
                 GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, DataGlobalConstants::InitConvTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
             Real64 MaxFlowMultiplier = GetScheduleMaxValue(state, this->FlowRateFracSchedule);
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier,
                                this->InletNode,
                                this->OutletNode,
@@ -234,7 +234,7 @@ namespace EnergyPlus::PlantLoadProfile {
 
         if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
-        this->InletTemp = Node(InletNode).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(InletNode).Temp;
         this->Power = GetCurrentScheduleValue(state, this->LoadSchedule);
 
         if (this->EMSOverridePower) this->Power = this->EMSPowerValue;
@@ -255,7 +255,7 @@ namespace EnergyPlus::PlantLoadProfile {
 
     } // InitPlantProfile()
 
-    void PlantProfileData::UpdatePlantProfile() const
+    void PlantProfileData::UpdatePlantProfile(EnergyPlusData &state) const
     {
 
         // SUBROUTINE INFORMATION:
@@ -268,10 +268,10 @@ namespace EnergyPlus::PlantLoadProfile {
         // Updates the node variables with local variables.
 
         // Set outlet node variables that are possibly changed
-        DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
     }
 
-    void PlantProfileData::ReportPlantProfile()
+    void PlantProfileData::ReportPlantProfile(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -284,7 +284,7 @@ namespace EnergyPlus::PlantLoadProfile {
         // Calculates report variables.
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
 
         this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour;
@@ -316,7 +316,6 @@ namespace EnergyPlus::PlantLoadProfile {
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataLoopNode;
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
@@ -324,7 +323,7 @@ namespace EnergyPlus::PlantLoadProfile {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int ProfileNum;                 // PLANT LOAD PROFILE (PlantProfile) object number
-
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "LoadProfile:Plant";
         state.dataPlantLoadProfile->NumOfPlantProfile = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -336,46 +335,46 @@ namespace EnergyPlus::PlantLoadProfile {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               ProfileNum,
-                                              cAlphaArgs,
+                                              state.dataIPShortCut->cAlphaArgs,
                                               NumAlphas,
-                                              rNumericArgs,
+                                              state.dataIPShortCut->rNumericArgs,
                                               NumNumbers,
                                               IOStatus,
-                                              lNumericFieldBlanks,
+                                              state.dataIPShortCut->lNumericFieldBlanks,
                                               _,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                              state.dataIPShortCut->cAlphaFieldNames,
+                                              state.dataIPShortCut->cNumericFieldNames);
+                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name = cAlphaArgs(1);
+                state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant
 
                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(state,
-                    cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                    state.dataIPShortCut->cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(state,
-                    cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                    state.dataIPShortCut->cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
-                state.dataPlantLoadProfile->PlantProfile(ProfileNum).LoadSchedule = GetScheduleIndex(state, cAlphaArgs(4));
+                state.dataPlantLoadProfile->PlantProfile(ProfileNum).LoadSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
 
                 if (state.dataPlantLoadProfile->PlantProfile(ProfileNum).LoadSchedule == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(4) + " called " +
-                                    cAlphaArgs(4) + " was not found.");
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"  The Schedule for " + state.dataIPShortCut->cAlphaFieldNames(4) + " called " +
+                                    state.dataIPShortCut->cAlphaArgs(4) + " was not found.");
                     ErrorsFound = true;
                 }
 
-                state.dataPlantLoadProfile->PlantProfile(ProfileNum).PeakVolFlowRate = rNumericArgs(1);
+                state.dataPlantLoadProfile->PlantProfile(ProfileNum).PeakVolFlowRate = state.dataIPShortCut->rNumericArgs(1);
 
-                state.dataPlantLoadProfile->PlantProfile(ProfileNum).FlowRateFracSchedule = GetScheduleIndex(state, cAlphaArgs(5));
+                state.dataPlantLoadProfile->PlantProfile(ProfileNum).FlowRateFracSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
 
                 if (state.dataPlantLoadProfile->PlantProfile(ProfileNum).FlowRateFracSchedule == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(5) + " called " +
-                                    cAlphaArgs(5) + " was not found.");
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"  The Schedule for " + state.dataIPShortCut->cAlphaFieldNames(5) + " called " +
+                                    state.dataIPShortCut->cAlphaArgs(5) + " was not found.");
 
                     ErrorsFound = true;
                 }
 
                 // Check plant connections
-                TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), cCurrentModuleObject + " Nodes");
+                TestCompSet(state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(3), cCurrentModuleObject + " Nodes");
 
                 // Setup report variables
                 SetupOutputVariable(state, "Plant Load Profile Mass Flow Rate",

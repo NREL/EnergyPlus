@@ -71,7 +71,6 @@
 #include <EnergyPlus/Fans.hh>
 
 using namespace EnergyPlus;
-using namespace DataIPShortCuts;
 
 namespace EnergyPlus {
 
@@ -110,18 +109,18 @@ void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state) {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(state, coilCoolingDXObjectName, coilNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+        inputProcessor->getObjectItem(state, coilCoolingDXObjectName, coilNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
         CoilCoolingDXInputSpecification input_specs;
-        input_specs.name = cAlphaArgs(1);
-        input_specs.evaporator_inlet_node_name = cAlphaArgs(2);
-        input_specs.evaporator_outlet_node_name = cAlphaArgs(3);
-        input_specs.availability_schedule_name = cAlphaArgs(4);
-        input_specs.condenser_zone_name = cAlphaArgs(5);
-        input_specs.condenser_inlet_node_name = cAlphaArgs(6);
-        input_specs.condenser_outlet_node_name = cAlphaArgs(7);
-        input_specs.performance_object_name = cAlphaArgs(8);
-        input_specs.condensate_collection_water_storage_tank_name = cAlphaArgs(9);
-        input_specs.evaporative_condenser_supply_water_storage_tank_name = cAlphaArgs(10);
+        input_specs.name = state.dataIPShortCut->cAlphaArgs(1);
+        input_specs.evaporator_inlet_node_name = state.dataIPShortCut->cAlphaArgs(2);
+        input_specs.evaporator_outlet_node_name = state.dataIPShortCut->cAlphaArgs(3);
+        input_specs.availability_schedule_name = state.dataIPShortCut->cAlphaArgs(4);
+        input_specs.condenser_zone_name = state.dataIPShortCut->cAlphaArgs(5);
+        input_specs.condenser_inlet_node_name = state.dataIPShortCut->cAlphaArgs(6);
+        input_specs.condenser_outlet_node_name = state.dataIPShortCut->cAlphaArgs(7);
+        input_specs.performance_object_name = state.dataIPShortCut->cAlphaArgs(8);
+        input_specs.condensate_collection_water_storage_tank_name = state.dataIPShortCut->cAlphaArgs(9);
+        input_specs.evaporative_condenser_supply_water_storage_tank_name = state.dataIPShortCut->cAlphaArgs(10);
         CoilCoolingDX thisCoil;
         thisCoil.instantiateFromInputSpec(state, input_specs);
         coilCoolingDXs.push_back(thisCoil);
@@ -147,16 +146,16 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    errorsFound,
                                                                    coilCoolingDXObjectName,
                                                                    input_data.name,
-                                                                   DataLoopNode::NodeType_Air,
-                                                                   DataLoopNode::NodeConnectionType_Inlet,
+                                                                   DataLoopNode::NodeFluidType::Air,
+                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                    1,
                                                                    DataLoopNode::ObjectIsNotParent);
     this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state, input_data.evaporator_outlet_node_name,
                                                                     errorsFound,
                                                                     coilCoolingDXObjectName,
                                                                     input_data.name,
-                                                                    DataLoopNode::NodeType_Air,
-                                                                    DataLoopNode::NodeConnectionType_Outlet,
+                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                     1,
                                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -164,8 +163,8 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    errorsFound,
                                                                    coilCoolingDXObjectName,
                                                                    input_data.name,
-                                                                   DataLoopNode::NodeType_Air,
-                                                                   DataLoopNode::NodeConnectionType_Inlet,
+                                                                   DataLoopNode::NodeFluidType::Air,
+                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                    2,
                                                                    DataLoopNode::ObjectIsNotParent);
 
@@ -181,8 +180,8 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                         errorsFound,
                                                                         coilCoolingDXObjectName,
                                                                         input_data.name,
-                                                                        DataLoopNode::NodeType_Air,
-                                                                        DataLoopNode::NodeConnectionType_Outlet,
+                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                        DataLoopNode::NodeConnectionType::Outlet,
                                                                         2,
                                                                         DataLoopNode::ObjectIsNotParent);
 
@@ -461,10 +460,10 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
     }
 
     // get node references
-    auto &evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);
-    auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
-    auto &condInletNode = DataLoopNode::Node(this->condInletNodeIndex);
-    auto &condOutletNode = DataLoopNode::Node(this->condOutletNodeIndex);
+    auto &evapInletNode = state.dataLoopNodes->Node(this->evapInletNodeIndex);
+    auto &evapOutletNode = state.dataLoopNodes->Node(this->evapOutletNodeIndex);
+    auto &condInletNode = state.dataLoopNodes->Node(this->condInletNodeIndex);
+    auto &condOutletNode = state.dataLoopNodes->Node(this->condOutletNodeIndex);
 
     // call the simulation, which returns useful data
     // TODO: check the avail schedule and reset data/pass through data as needed
@@ -484,7 +483,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
     }
 
     // calculate energy conversion factor
-    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     // update condensate collection tank
     if (this->condensateTankIndex > 0) {
@@ -566,7 +565,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
     // This appears to be the only location where airLoopNum gets used
     //DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     state.dataAirLoop->LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
-    DataHVACGlobals::DXElecCoolingPower = this->elecCoolingPower;
+    state.dataHVACGlobal->DXElecCoolingPower = this->elecCoolingPower;
     if (this->airLoopNum > 0) {
         state.dataAirLoop->AirLoopAFNInfo(this->airLoopNum).AFNLoopDXCoilRTF = this->coolingCoilRuntimeFraction;
         // The original calculation is below, but no heating yet

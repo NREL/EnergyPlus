@@ -90,8 +90,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     // Read input and creates instance of finite difference ground temp model
 
     // USE STATEMENTS:
-    using namespace DataIPShortCuts;
-    using namespace GroundTemperatureManager;
+        using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -105,24 +104,24 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
     // Search through finite diff models here
-    std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_FiniteDiffGroundTemp);
+    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_FiniteDiffGroundTemp);
     int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
-        if (objectName == cAlphaArgs(1)) {
+        if (objectName == state.dataIPShortCut->cAlphaArgs(1)) {
             // Read input into object here
 
             thisModel->objectType = objectType;
-            thisModel->objectName = cAlphaArgs(1);
-            thisModel->baseConductivity = rNumericArgs(1);
-            thisModel->baseDensity = rNumericArgs(2);
-            thisModel->baseSpecificHeat = rNumericArgs(3);
-            thisModel->waterContent = rNumericArgs(4) / 100.0;
-            thisModel->saturatedWaterContent = rNumericArgs(5) / 100.0;
-            thisModel->evapotransCoeff = rNumericArgs(6);
+            thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
+            thisModel->baseConductivity = state.dataIPShortCut->rNumericArgs(1);
+            thisModel->baseDensity = state.dataIPShortCut->rNumericArgs(2);
+            thisModel->baseSpecificHeat = state.dataIPShortCut->rNumericArgs(3);
+            thisModel->waterContent = state.dataIPShortCut->rNumericArgs(4) / 100.0;
+            thisModel->saturatedWaterContent = state.dataIPShortCut->rNumericArgs(5) / 100.0;
+            thisModel->evapotransCoeff = state.dataIPShortCut->rNumericArgs(6);
 
             found = true;
             break;
@@ -130,7 +129,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     }
 
     if (found && !ErrorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
 
         // Simulate
         thisModel->initAndSim(state);
@@ -179,7 +178,6 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     // USE STATEMENTS:
     using namespace DataEnvironment;
-    using namespace DataReportingFlags;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -204,7 +202,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     bool WarmupFlag_reset = state.dataGlobal->WarmupFlag;
     int DayOfSim_reset = state.dataGlobal->DayOfSim;
     std::string DayOfSimChr_reset = state.dataGlobal->DayOfSimChr;
-    int NumOfWarmupDays_reset = NumOfWarmupDays;
+    int NumOfWarmupDays_reset = state.dataReportFlag->NumOfWarmupDays;
     bool BeginDayFlag_reset = state.dataGlobal->BeginDayFlag;
     bool EndDayFlag_reset = state.dataGlobal->EndDayFlag;
     bool BeginHourFlag_reset = state.dataGlobal->BeginHourFlag;
@@ -252,7 +250,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->DayOfSim = 0;
     state.dataGlobal->DayOfSimChr = "0";
-    NumOfWarmupDays = 0;
+    state.dataReportFlag->NumOfWarmupDays = 0;
 
     annualAveAirTemp_num = 0.0;
 
@@ -360,7 +358,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->WarmupFlag = WarmupFlag_reset;
     state.dataGlobal->DayOfSim = DayOfSim_reset;
     state.dataGlobal->DayOfSimChr = DayOfSimChr_reset;
-    NumOfWarmupDays = NumOfWarmupDays_reset;
+    state.dataReportFlag->NumOfWarmupDays = NumOfWarmupDays_reset;
     state.dataGlobal->BeginDayFlag = BeginDayFlag_reset;
     state.dataGlobal->EndDayFlag = EndDayFlag_reset;
     state.dataGlobal->BeginHourFlag = BeginHourFlag_reset;
@@ -1133,19 +1131,15 @@ void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(Optional<int const> cell, Opt
     // Evaluates the soil properties
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static Real64 Theta_ice;
-    static Real64 Theta_liq;
-    static Real64 Theta_sat;
-    static Real64 rho_ice;
-    static Real64 rho_liq;
-    static Real64 rhoCp_soil_liq_1;
-    static Real64 CP_liq;
-    static Real64 CP_ice;
-    static Real64 Lat_fus;
-    static Real64 Cp_transient;
-    static Real64 rhoCP_soil_liq;
-    static Real64 rhoCP_soil_transient;
-    static Real64 rhoCP_soil_ice;
+    Real64 Theta_ice;
+    Real64 Theta_liq;
+    Real64 Theta_sat;
+    Real64 rho_ice;
+    Real64 rho_liq;
+    Real64 CP_liq;
+    Real64 CP_ice;
+    Real64 Lat_fus;
+    Real64 Cp_transient;
     // other variables
     Real64 frzAllIce;
     Real64 frzIceTrans;

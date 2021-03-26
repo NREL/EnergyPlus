@@ -56,10 +56,9 @@
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
-namespace EnergyPlus {
-
-namespace PollutionModule {
+namespace EnergyPlus::PollutionModule {
     // Module containing the pollution calculation routines
 
     // MODULE INFORMATION:
@@ -84,19 +83,6 @@ namespace PollutionModule {
     //         STEP 3:  All energy numbers have been converted to units of MJ's or 1x10^6 Joules.
     //         STEP 4:  Environmental Impact Factors are calculated from Coefficients
 
-    // MODULE PARAMETER DEFINITIONS:
-    int const ElecPollFactor(1);
-    int const NatGasPollFactor(2);
-    int const FuelOil1PollFactor(3);
-    int const FuelOil2PollFactor(4);
-    int const CoalPollFactor(5);
-    int const GasolinePollFactor(6);
-    int const PropanePollFactor(7);
-    int const DieselPollFactor(8);
-    int const OtherFuel1PollFactor(9);
-    int const OtherFuel2PollFactor(10);
-    int const PollFactorNumTypes(10);
-
     // MODULE VARIABLE DECLARATIONS:
     // Total for all of the Pollutants
     // Total Carbon Equivalent Components
@@ -107,415 +93,6 @@ namespace PollutionModule {
     // Fuel Types used with the Pollution Factors
     // Facility Meter Indexes
     // Facility Meter Values used in Pollution Calcs
-
-    bool PollutionReportSetup(false);
-    bool GetInputFlagPollution(true);
-    int NumEnvImpactFactors(0);
-    int NumFuelFactors(0);
-
-    //         Subroutine Specifications for the Module
-
-    // Object Data
-    PollutionProps
-        Pollution(ComponentProps(ElecPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(ElecPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(ElecPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(NatGasPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(FuelOil1PollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(FuelOil2PollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(CoalPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(GasolinePollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(PropanePollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(DieselPollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(OtherFuel1PollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  ComponentProps(OtherFuel2PollFactor, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0,
-                  CoefficientProps(ElecPollFactor,
-                                   false,
-                                   3.167,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(NatGasPollFactor,
-                                   false,
-                                   1.084,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(FuelOil1PollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(FuelOil2PollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(CoalPollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(GasolinePollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(PropanePollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(DieselPollFactor,
-                                   false,
-                                   1.05,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(OtherFuel1PollFactor,
-                                   false,
-                                   1.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  CoefficientProps(OtherFuel2PollFactor,
-                                   false,
-                                   1.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0),
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0,
-                  0.0);
-    FuelTypeProps FuelType;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
-    // Clears the global data in Pollution module.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        PollutionReportSetup = false;
-        GetInputFlagPollution = true;
-        NumEnvImpactFactors = 0;
-        NumFuelFactors = 0;
-    }
 
     void CalculatePollution(EnergyPlusData &state)
     {
@@ -532,28 +109,7 @@ namespace PollutionModule {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (!PollutionReportSetup) return;
+        if (!state.dataPollutionModule->PollutionReportSetup) return;
 
         //   Call the Routine to Read the Energy Values from the EnergyPlus Meters
         ReadEnergyMeters(state);
@@ -582,8 +138,7 @@ namespace PollutionModule {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using ScheduleManager::GetScheduleIndex;
+                using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumPolluteRpt;
@@ -591,32 +146,33 @@ namespace PollutionModule {
         int NumNums;
         int Loop;
         int IOStat;
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         // First determine if the Pollution reporting has been triggered, and is not exit.
         cCurrentModuleObject = "Output:EnvironmentalImpactFactors";
         NumPolluteRpt = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        PollutionReportSetup = true;
+        state.dataPollutionModule->PollutionReportSetup = true;
 
         for (Loop = 1; Loop <= NumPolluteRpt; ++Loop) {
 
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
             // Call this routine in the Output Processor to setup the correct Facility energy meters that are
             //  necessary to make sure that the Meter file is opened and written to by the OP so that time stamps
             //  and the like are happening as expected.
-            if (!lAlphaFieldBlanks(1)) {
-                InitPollutionMeterReporting(state, cAlphaArgs(1));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
+                InitPollutionMeterReporting(state, state.dataIPShortCut->cAlphaArgs(1));
             } else {
                 InitPollutionMeterReporting(state, "RunPeriod");
             }
@@ -637,7 +193,6 @@ namespace PollutionModule {
         // in runs so have added this routine to allow central get for most inputs.
 
         // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -645,29 +200,30 @@ namespace PollutionModule {
         int Loop;
         int IOStat;
         bool ErrorsFound(false);
-
-        if (!GetInputFlagPollution) return; // Input already gotten
-
-        GetInputFlagPollution = false;
+        auto & Pollution = state.dataPollutionModule->Pollution;
+        auto & FuelType = state.dataPollutionModule->FuelType;
+        if (!state.dataPollutionModule->GetInputFlagPollution) return; // Input already gotten
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        state.dataPollutionModule->GetInputFlagPollution = false;
 
         cCurrentModuleObject = "EnvironmentalImpactFactors";
-        NumEnvImpactFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (NumEnvImpactFactors > 0) {
+        state.dataPollutionModule->NumEnvImpactFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        if (state.dataPollutionModule->NumEnvImpactFactors > 0) {
             // Now find and load all of the user inputs and factors.
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           1,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
         } else {
-            if (PollutionReportSetup) ShowWarningError(state, cCurrentModuleObject + ": not entered.  Values will be defaulted.");
+            if (state.dataPollutionModule->PollutionReportSetup) ShowWarningError(state, cCurrentModuleObject + ": not entered.  Values will be defaulted.");
         }
 
         Pollution.PurchHeatEffic = 0.3;
@@ -677,48 +233,48 @@ namespace PollutionModule {
         Pollution.CarbonEquivCH4 = 0.0;
         Pollution.CarbonEquivCO2 = 0.0;
 
-        if (NumEnvImpactFactors > 0) {
+        if (state.dataPollutionModule->NumEnvImpactFactors > 0) {
             // If Heating Efficiency defined by the User is negative or zero then a default of 30% will be assigned.
-            if (rNumericArgs(1) > 0.0) {
-                Pollution.PurchHeatEffic = rNumericArgs(1);
+            if (state.dataIPShortCut->rNumericArgs(1) > 0.0) {
+                Pollution.PurchHeatEffic = state.dataIPShortCut->rNumericArgs(1);
             }
 
             // If COP defined by the User is negative or zero then a default of 3.0 will be assigned.
-            if (rNumericArgs(2) > 0.0) {
-                Pollution.PurchCoolCOP = rNumericArgs(2);
+            if (state.dataIPShortCut->rNumericArgs(2) > 0.0) {
+                Pollution.PurchCoolCOP = state.dataIPShortCut->rNumericArgs(2);
             }
 
             // If Steam Conversion Efficiency defined by the User is negative or zero then a default of 25% will be assigned.
-            if (rNumericArgs(1) > 0.0) {
-                Pollution.SteamConvEffic = rNumericArgs(3);
+            if (state.dataIPShortCut->rNumericArgs(1) > 0.0) {
+                Pollution.SteamConvEffic = state.dataIPShortCut->rNumericArgs(3);
             }
 
             // Load the Total Carbon Equivalent Pollution Factor coefficients
-            Pollution.CarbonEquivN2O = rNumericArgs(4);
-            Pollution.CarbonEquivCH4 = rNumericArgs(5);
-            Pollution.CarbonEquivCO2 = rNumericArgs(6);
+            Pollution.CarbonEquivN2O = state.dataIPShortCut->rNumericArgs(4);
+            Pollution.CarbonEquivCH4 = state.dataIPShortCut->rNumericArgs(5);
+            Pollution.CarbonEquivCO2 = state.dataIPShortCut->rNumericArgs(6);
         }
 
         // Compare all of the Fuel Factors and compare to PollutionCalculationFactors List
         cCurrentModuleObject = "FuelFactors";
-        NumFuelFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataPollutionModule->NumFuelFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        for (Loop = 1; Loop <= NumFuelFactors; ++Loop) {
+        for (Loop = 1; Loop <= state.dataPollutionModule->NumFuelFactors; ++Loop) {
             // Now find and load all of the user inputs and factors.
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          state.dataIPShortCut->lNumericFieldBlanks,
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
 
-            FuelType.FuelTypeNames(Loop) = cAlphaArgs(1);
+            FuelType.FuelTypeNames(Loop) = state.dataIPShortCut->cAlphaArgs(1);
 
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
@@ -730,90 +286,90 @@ namespace PollutionModule {
                     }
                     Pollution.NatGasCoef.FuelFactorUsed = true;
                     // Natural Gas Coeffs
-                    Pollution.NatGasCoef.Source = rNumericArgs(2);
-                    if (!lAlphaFieldBlanks(3)) {
+                    Pollution.NatGasCoef.Source = state.dataIPShortCut->rNumericArgs(2);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(3), cAlphaArgs(3), Pollution.NatGasCoef.SourceSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3), Pollution.NatGasCoef.SourceSched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.CO2 = rNumericArgs(3);
-                    if (!lAlphaFieldBlanks(4)) {
+                    Pollution.NatGasCoef.CO2 = state.dataIPShortCut->rNumericArgs(3);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.NatGasCoef.CO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4), Pollution.NatGasCoef.CO2Sched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.CO = rNumericArgs(4);
-                    if (!lAlphaFieldBlanks(5)) {
+                    Pollution.NatGasCoef.CO = state.dataIPShortCut->rNumericArgs(4);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.NatGasCoef.COSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5), Pollution.NatGasCoef.COSched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.CH4 = rNumericArgs(5);
-                    if (!lAlphaFieldBlanks(6)) {
+                    Pollution.NatGasCoef.CH4 = state.dataIPShortCut->rNumericArgs(5);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.NatGasCoef.CH4Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), Pollution.NatGasCoef.CH4Sched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.NOx = rNumericArgs(6);
-                    if (!lAlphaFieldBlanks(7)) {
+                    Pollution.NatGasCoef.NOx = state.dataIPShortCut->rNumericArgs(6);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.NatGasCoef.NOxSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7), Pollution.NatGasCoef.NOxSched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.N2O = rNumericArgs(7);
-                    if (!lAlphaFieldBlanks(8)) {
+                    Pollution.NatGasCoef.N2O = state.dataIPShortCut->rNumericArgs(7);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.NatGasCoef.N2OSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), Pollution.NatGasCoef.N2OSched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.SO2 = rNumericArgs(8);
-                    if (!lAlphaFieldBlanks(9)) {
+                    Pollution.NatGasCoef.SO2 = state.dataIPShortCut->rNumericArgs(8);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.NatGasCoef.SO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9), Pollution.NatGasCoef.SO2Sched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.PM = rNumericArgs(9);
-                    if (!lAlphaFieldBlanks(10)) {
+                    Pollution.NatGasCoef.PM = state.dataIPShortCut->rNumericArgs(9);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.NatGasCoef.PMSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), Pollution.NatGasCoef.PMSched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.PM10 = rNumericArgs(10);
-                    if (!lAlphaFieldBlanks(11)) {
+                    Pollution.NatGasCoef.PM10 = state.dataIPShortCut->rNumericArgs(10);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(11), cAlphaArgs(11), Pollution.NatGasCoef.PM10Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11), Pollution.NatGasCoef.PM10Sched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.PM25 = rNumericArgs(11);
-                    if (!lAlphaFieldBlanks(12)) {
+                    Pollution.NatGasCoef.PM25 = state.dataIPShortCut->rNumericArgs(11);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(12), cAlphaArgs(12), Pollution.NatGasCoef.PM25Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12), Pollution.NatGasCoef.PM25Sched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.NH3 = rNumericArgs(12);
-                    if (!lAlphaFieldBlanks(13)) {
+                    Pollution.NatGasCoef.NH3 = state.dataIPShortCut->rNumericArgs(12);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.NatGasCoef.NH3Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13), Pollution.NatGasCoef.NH3Sched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.NMVOC = rNumericArgs(13);
-                    if (!lAlphaFieldBlanks(14)) {
+                    Pollution.NatGasCoef.NMVOC = state.dataIPShortCut->rNumericArgs(13);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(14), cAlphaArgs(14), Pollution.NatGasCoef.NMVOCSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14), Pollution.NatGasCoef.NMVOCSched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.Hg = rNumericArgs(14);
-                    if (!lAlphaFieldBlanks(15)) {
+                    Pollution.NatGasCoef.Hg = state.dataIPShortCut->rNumericArgs(14);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.NatGasCoef.HgSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15), Pollution.NatGasCoef.HgSched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.Pb = rNumericArgs(15);
-                    if (!lAlphaFieldBlanks(16)) {
+                    Pollution.NatGasCoef.Pb = state.dataIPShortCut->rNumericArgs(15);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.NatGasCoef.PbSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16), Pollution.NatGasCoef.PbSched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.Water = rNumericArgs(16);
-                    if (!lAlphaFieldBlanks(17)) {
+                    Pollution.NatGasCoef.Water = state.dataIPShortCut->rNumericArgs(16);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(17), cAlphaArgs(17), Pollution.NatGasCoef.WaterSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17), Pollution.NatGasCoef.WaterSched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.NucHi = rNumericArgs(17);
-                    if (!lAlphaFieldBlanks(18)) {
+                    Pollution.NatGasCoef.NucHi = state.dataIPShortCut->rNumericArgs(17);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(18), cAlphaArgs(18), Pollution.NatGasCoef.NucHiSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(18), state.dataIPShortCut->cAlphaArgs(18), Pollution.NatGasCoef.NucHiSched, ErrorsFound);
                     }
-                    Pollution.NatGasCoef.NucLo = rNumericArgs(18);
-                    if (!lAlphaFieldBlanks(19)) {
+                    Pollution.NatGasCoef.NucLo = state.dataIPShortCut->rNumericArgs(18);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.NatGasCoef.NucLoSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", state.dataIPShortCut->cAlphaFieldNames(19), state.dataIPShortCut->cAlphaArgs(19), Pollution.NatGasCoef.NucLoSched, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
@@ -824,90 +380,90 @@ namespace PollutionModule {
                     }
                     Pollution.FuelOil2Coef.FuelFactorUsed = true;
                     // FuelOilNo2 Coeffs
-                    Pollution.FuelOil2Coef.Source = rNumericArgs(2);
-                    if (!lAlphaFieldBlanks(3)) {
+                    Pollution.FuelOil2Coef.Source = state.dataIPShortCut->rNumericArgs(2);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(3), cAlphaArgs(3), Pollution.FuelOil2Coef.SourceSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3), Pollution.FuelOil2Coef.SourceSched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.CO2 = rNumericArgs(3);
-                    if (!lAlphaFieldBlanks(4)) {
+                    Pollution.FuelOil2Coef.CO2 = state.dataIPShortCut->rNumericArgs(3);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.FuelOil2Coef.CO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4), Pollution.FuelOil2Coef.CO2Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.CO = rNumericArgs(4);
-                    if (!lAlphaFieldBlanks(5)) {
+                    Pollution.FuelOil2Coef.CO = state.dataIPShortCut->rNumericArgs(4);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.FuelOil2Coef.COSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5), Pollution.FuelOil2Coef.COSched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.CH4 = rNumericArgs(5);
-                    if (!lAlphaFieldBlanks(6)) {
+                    Pollution.FuelOil2Coef.CH4 = state.dataIPShortCut->rNumericArgs(5);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.FuelOil2Coef.CH4Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), Pollution.FuelOil2Coef.CH4Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.NOx = rNumericArgs(6);
-                    if (!lAlphaFieldBlanks(7)) {
+                    Pollution.FuelOil2Coef.NOx = state.dataIPShortCut->rNumericArgs(6);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.FuelOil2Coef.NOxSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7), Pollution.FuelOil2Coef.NOxSched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.N2O = rNumericArgs(7);
-                    if (!lAlphaFieldBlanks(8)) {
+                    Pollution.FuelOil2Coef.N2O = state.dataIPShortCut->rNumericArgs(7);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.FuelOil2Coef.N2OSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), Pollution.FuelOil2Coef.N2OSched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.SO2 = rNumericArgs(8);
-                    if (!lAlphaFieldBlanks(9)) {
+                    Pollution.FuelOil2Coef.SO2 = state.dataIPShortCut->rNumericArgs(8);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.FuelOil2Coef.SO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9), Pollution.FuelOil2Coef.SO2Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.PM = rNumericArgs(9);
-                    if (!lAlphaFieldBlanks(10)) {
+                    Pollution.FuelOil2Coef.PM = state.dataIPShortCut->rNumericArgs(9);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.FuelOil2Coef.PMSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), Pollution.FuelOil2Coef.PMSched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.PM10 = rNumericArgs(10);
-                    if (!lAlphaFieldBlanks(11)) {
+                    Pollution.FuelOil2Coef.PM10 = state.dataIPShortCut->rNumericArgs(10);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(11), cAlphaArgs(11), Pollution.FuelOil2Coef.PM10Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11), Pollution.FuelOil2Coef.PM10Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.PM25 = rNumericArgs(11);
-                    if (!lAlphaFieldBlanks(12)) {
+                    Pollution.FuelOil2Coef.PM25 = state.dataIPShortCut->rNumericArgs(11);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(12), cAlphaArgs(12), Pollution.FuelOil2Coef.PM25Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12), Pollution.FuelOil2Coef.PM25Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.NH3 = rNumericArgs(12);
-                    if (!lAlphaFieldBlanks(13)) {
+                    Pollution.FuelOil2Coef.NH3 = state.dataIPShortCut->rNumericArgs(12);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.FuelOil2Coef.NH3Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13), Pollution.FuelOil2Coef.NH3Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.NMVOC = rNumericArgs(13);
-                    if (!lAlphaFieldBlanks(14)) {
+                    Pollution.FuelOil2Coef.NMVOC = state.dataIPShortCut->rNumericArgs(13);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(14), cAlphaArgs(14), Pollution.FuelOil2Coef.NMVOCSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14), Pollution.FuelOil2Coef.NMVOCSched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.Hg = rNumericArgs(14);
-                    if (!lAlphaFieldBlanks(15)) {
+                    Pollution.FuelOil2Coef.Hg = state.dataIPShortCut->rNumericArgs(14);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.FuelOil2Coef.HgSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15), Pollution.FuelOil2Coef.HgSched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.Pb = rNumericArgs(15);
-                    if (!lAlphaFieldBlanks(16)) {
+                    Pollution.FuelOil2Coef.Pb = state.dataIPShortCut->rNumericArgs(15);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.FuelOil2Coef.PbSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16), Pollution.FuelOil2Coef.PbSched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.Water = rNumericArgs(16);
-                    if (!lAlphaFieldBlanks(17)) {
+                    Pollution.FuelOil2Coef.Water = state.dataIPShortCut->rNumericArgs(16);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(17), cAlphaArgs(17), Pollution.FuelOil2Coef.WaterSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17), Pollution.FuelOil2Coef.WaterSched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.NucHi = rNumericArgs(17);
-                    if (!lAlphaFieldBlanks(18)) {
+                    Pollution.FuelOil2Coef.NucHi = state.dataIPShortCut->rNumericArgs(17);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(18), cAlphaArgs(18), Pollution.FuelOil2Coef.NucHiSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(18), state.dataIPShortCut->cAlphaArgs(18), Pollution.FuelOil2Coef.NucHiSched, ErrorsFound);
                     }
-                    Pollution.FuelOil2Coef.NucLo = rNumericArgs(18);
-                    if (!lAlphaFieldBlanks(19)) {
+                    Pollution.FuelOil2Coef.NucLo = state.dataIPShortCut->rNumericArgs(18);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.FuelOil2Coef.NucLoSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#2", state.dataIPShortCut->cAlphaFieldNames(19), state.dataIPShortCut->cAlphaArgs(19), Pollution.FuelOil2Coef.NucLoSched, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
@@ -918,90 +474,90 @@ namespace PollutionModule {
                     }
                     Pollution.FuelOil1Coef.FuelFactorUsed = true;
                     // FuelOilNo1 Coeffs
-                    Pollution.FuelOil1Coef.Source = rNumericArgs(2);
-                    if (!lAlphaFieldBlanks(3)) {
+                    Pollution.FuelOil1Coef.Source = state.dataIPShortCut->rNumericArgs(2);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(3), cAlphaArgs(3), Pollution.FuelOil1Coef.SourceSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3), Pollution.FuelOil1Coef.SourceSched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.CO2 = rNumericArgs(3);
-                    if (!lAlphaFieldBlanks(4)) {
+                    Pollution.FuelOil1Coef.CO2 = state.dataIPShortCut->rNumericArgs(3);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.FuelOil1Coef.CO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4), Pollution.FuelOil1Coef.CO2Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.CO = rNumericArgs(4);
-                    if (!lAlphaFieldBlanks(5)) {
+                    Pollution.FuelOil1Coef.CO = state.dataIPShortCut->rNumericArgs(4);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.FuelOil1Coef.COSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5), Pollution.FuelOil1Coef.COSched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.CH4 = rNumericArgs(5);
-                    if (!lAlphaFieldBlanks(6)) {
+                    Pollution.FuelOil1Coef.CH4 = state.dataIPShortCut->rNumericArgs(5);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.FuelOil1Coef.CH4Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), Pollution.FuelOil1Coef.CH4Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.NOx = rNumericArgs(6);
-                    if (!lAlphaFieldBlanks(7)) {
+                    Pollution.FuelOil1Coef.NOx = state.dataIPShortCut->rNumericArgs(6);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.FuelOil1Coef.NOxSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7), Pollution.FuelOil1Coef.NOxSched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.N2O = rNumericArgs(7);
-                    if (!lAlphaFieldBlanks(8)) {
+                    Pollution.FuelOil1Coef.N2O = state.dataIPShortCut->rNumericArgs(7);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.FuelOil1Coef.N2OSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), Pollution.FuelOil1Coef.N2OSched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.SO2 = rNumericArgs(8);
-                    if (!lAlphaFieldBlanks(9)) {
+                    Pollution.FuelOil1Coef.SO2 = state.dataIPShortCut->rNumericArgs(8);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.FuelOil1Coef.SO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9), Pollution.FuelOil1Coef.SO2Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.PM = rNumericArgs(9);
-                    if (!lAlphaFieldBlanks(10)) {
+                    Pollution.FuelOil1Coef.PM = state.dataIPShortCut->rNumericArgs(9);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.FuelOil1Coef.PMSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), Pollution.FuelOil1Coef.PMSched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.PM10 = rNumericArgs(10);
-                    if (!lAlphaFieldBlanks(11)) {
+                    Pollution.FuelOil1Coef.PM10 = state.dataIPShortCut->rNumericArgs(10);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(11), cAlphaArgs(11), Pollution.FuelOil1Coef.PM10Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11), Pollution.FuelOil1Coef.PM10Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.PM25 = rNumericArgs(11);
-                    if (!lAlphaFieldBlanks(12)) {
+                    Pollution.FuelOil1Coef.PM25 = state.dataIPShortCut->rNumericArgs(11);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(12), cAlphaArgs(12), Pollution.FuelOil1Coef.PM25Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12), Pollution.FuelOil1Coef.PM25Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.NH3 = rNumericArgs(12);
-                    if (!lAlphaFieldBlanks(13)) {
+                    Pollution.FuelOil1Coef.NH3 = state.dataIPShortCut->rNumericArgs(12);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.FuelOil1Coef.NH3Sched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13), Pollution.FuelOil1Coef.NH3Sched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.NMVOC = rNumericArgs(13);
-                    if (!lAlphaFieldBlanks(14)) {
+                    Pollution.FuelOil1Coef.NMVOC = state.dataIPShortCut->rNumericArgs(13);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(14), cAlphaArgs(14), Pollution.FuelOil1Coef.NMVOCSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14), Pollution.FuelOil1Coef.NMVOCSched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.Hg = rNumericArgs(14);
-                    if (!lAlphaFieldBlanks(15)) {
+                    Pollution.FuelOil1Coef.Hg = state.dataIPShortCut->rNumericArgs(14);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.FuelOil1Coef.HgSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15), Pollution.FuelOil1Coef.HgSched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.Pb = rNumericArgs(15);
-                    if (!lAlphaFieldBlanks(16)) {
+                    Pollution.FuelOil1Coef.Pb = state.dataIPShortCut->rNumericArgs(15);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.FuelOil1Coef.PbSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16), Pollution.FuelOil1Coef.PbSched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.Water = rNumericArgs(16);
-                    if (!lAlphaFieldBlanks(17)) {
+                    Pollution.FuelOil1Coef.Water = state.dataIPShortCut->rNumericArgs(16);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(17), cAlphaArgs(17), Pollution.FuelOil1Coef.WaterSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17), Pollution.FuelOil1Coef.WaterSched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.NucHi = rNumericArgs(17);
-                    if (!lAlphaFieldBlanks(18)) {
+                    Pollution.FuelOil1Coef.NucHi = state.dataIPShortCut->rNumericArgs(17);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(18), cAlphaArgs(18), Pollution.FuelOil1Coef.NucHiSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(18), state.dataIPShortCut->cAlphaArgs(18), Pollution.FuelOil1Coef.NucHiSched, ErrorsFound);
                     }
-                    Pollution.FuelOil1Coef.NucLo = rNumericArgs(18);
-                    if (!lAlphaFieldBlanks(19)) {
+                    Pollution.FuelOil1Coef.NucLo = state.dataIPShortCut->rNumericArgs(18);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Fuel Oil#1", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.FuelOil1Coef.NucLoSched, ErrorsFound);
+                            cCurrentModuleObject, "Fuel Oil#1", state.dataIPShortCut->cAlphaFieldNames(19), state.dataIPShortCut->cAlphaArgs(19), Pollution.FuelOil1Coef.NucLoSched, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "COAL") {
@@ -1012,80 +568,80 @@ namespace PollutionModule {
                     }
                     Pollution.CoalCoef.FuelFactorUsed = true;
                     // Coal
-                    Pollution.CoalCoef.Source = rNumericArgs(2);
-                    if (!lAlphaFieldBlanks(3)) {
+                    Pollution.CoalCoef.Source = state.dataIPShortCut->rNumericArgs(2);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Coal", cAlphaFieldNames(3), cAlphaArgs(3), Pollution.CoalCoef.SourceSched, ErrorsFound);
+                            cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3), Pollution.CoalCoef.SourceSched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.CO2 = rNumericArgs(3);
-                    if (!lAlphaFieldBlanks(4)) {
-                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.CoalCoef.CO2Sched, ErrorsFound);
+                    Pollution.CoalCoef.CO2 = state.dataIPShortCut->rNumericArgs(3);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4), Pollution.CoalCoef.CO2Sched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.CO = rNumericArgs(4);
-                    if (!lAlphaFieldBlanks(5)) {
-                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.CoalCoef.COSched, ErrorsFound);
+                    Pollution.CoalCoef.CO = state.dataIPShortCut->rNumericArgs(4);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5), Pollution.CoalCoef.COSched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.CH4 = rNumericArgs(5);
-                    if (!lAlphaFieldBlanks(6)) {
-                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.CoalCoef.CH4Sched, ErrorsFound);
+                    Pollution.CoalCoef.CH4 = state.dataIPShortCut->rNumericArgs(5);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), Pollution.CoalCoef.CH4Sched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.NOx = rNumericArgs(6);
-                    if (!lAlphaFieldBlanks(7)) {
-                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.CoalCoef.NOxSched, ErrorsFound);
+                    Pollution.CoalCoef.NOx = state.dataIPShortCut->rNumericArgs(6);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7), Pollution.CoalCoef.NOxSched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.N2O = rNumericArgs(7);
-                    if (!lAlphaFieldBlanks(8)) {
-                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.CoalCoef.N2OSched, ErrorsFound);
+                    Pollution.CoalCoef.N2O = state.dataIPShortCut->rNumericArgs(7);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), Pollution.CoalCoef.N2OSched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.SO2 = rNumericArgs(8);
-                    if (!lAlphaFieldBlanks(9)) {
-                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.CoalCoef.SO2Sched, ErrorsFound);
+                    Pollution.CoalCoef.SO2 = state.dataIPShortCut->rNumericArgs(8);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9), Pollution.CoalCoef.SO2Sched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.PM = rNumericArgs(9);
-                    if (!lAlphaFieldBlanks(10)) {
-                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.CoalCoef.PMSched, ErrorsFound);
+                    Pollution.CoalCoef.PM = state.dataIPShortCut->rNumericArgs(9);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), Pollution.CoalCoef.PMSched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.PM10 = rNumericArgs(10);
-                    if (!lAlphaFieldBlanks(11)) {
+                    Pollution.CoalCoef.PM10 = state.dataIPShortCut->rNumericArgs(10);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Coal", cAlphaFieldNames(11), cAlphaArgs(11), Pollution.CoalCoef.PM10Sched, ErrorsFound);
+                            cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11), Pollution.CoalCoef.PM10Sched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.PM25 = rNumericArgs(11);
-                    if (!lAlphaFieldBlanks(12)) {
+                    Pollution.CoalCoef.PM25 = state.dataIPShortCut->rNumericArgs(11);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Coal", cAlphaFieldNames(12), cAlphaArgs(12), Pollution.CoalCoef.PM25Sched, ErrorsFound);
+                            cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12), Pollution.CoalCoef.PM25Sched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.NH3 = rNumericArgs(12);
-                    if (!lAlphaFieldBlanks(13)) {
-                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.CoalCoef.NH3Sched, ErrorsFound);
+                    Pollution.CoalCoef.NH3 = state.dataIPShortCut->rNumericArgs(12);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13), Pollution.CoalCoef.NH3Sched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.NMVOC = rNumericArgs(13);
-                    if (!lAlphaFieldBlanks(14)) {
+                    Pollution.CoalCoef.NMVOC = state.dataIPShortCut->rNumericArgs(13);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Coal", cAlphaFieldNames(14), cAlphaArgs(14), Pollution.CoalCoef.NMVOCSched, ErrorsFound);
+                            cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14), Pollution.CoalCoef.NMVOCSched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.Hg = rNumericArgs(14);
-                    if (!lAlphaFieldBlanks(15)) {
-                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.CoalCoef.HgSched, ErrorsFound);
+                    Pollution.CoalCoef.Hg = state.dataIPShortCut->rNumericArgs(14);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15), Pollution.CoalCoef.HgSched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.Pb = rNumericArgs(15);
-                    if (!lAlphaFieldBlanks(16)) {
-                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.CoalCoef.PbSched, ErrorsFound);
+                    Pollution.CoalCoef.Pb = state.dataIPShortCut->rNumericArgs(15);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                        CheckFFSchedule(state, cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16), Pollution.CoalCoef.PbSched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.Water = rNumericArgs(16);
-                    if (!lAlphaFieldBlanks(17)) {
+                    Pollution.CoalCoef.Water = state.dataIPShortCut->rNumericArgs(16);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Coal", cAlphaFieldNames(17), cAlphaArgs(17), Pollution.CoalCoef.WaterSched, ErrorsFound);
+                            cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17), Pollution.CoalCoef.WaterSched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.NucHi = rNumericArgs(17);
-                    if (!lAlphaFieldBlanks(18)) {
+                    Pollution.CoalCoef.NucHi = state.dataIPShortCut->rNumericArgs(17);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Coal", cAlphaFieldNames(18), cAlphaArgs(18), Pollution.CoalCoef.NucHiSched, ErrorsFound);
+                            cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(18), state.dataIPShortCut->cAlphaArgs(18), Pollution.CoalCoef.NucHiSched, ErrorsFound);
                     }
-                    Pollution.CoalCoef.NucLo = rNumericArgs(18);
-                    if (!lAlphaFieldBlanks(19)) {
+                    Pollution.CoalCoef.NucLo = state.dataIPShortCut->rNumericArgs(18);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Coal", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.CoalCoef.NucLoSched, ErrorsFound);
+                            cCurrentModuleObject, "Coal", state.dataIPShortCut->cAlphaFieldNames(19), state.dataIPShortCut->cAlphaArgs(19), Pollution.CoalCoef.NucLoSched, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "ELECTRICITY") {
@@ -1096,90 +652,90 @@ namespace PollutionModule {
                     }
                     Pollution.ElecCoef.FuelFactorUsed = true;
                     // Electric Coeffs
-                    Pollution.ElecCoef.Source = rNumericArgs(2);
-                    if (!lAlphaFieldBlanks(3)) {
+                    Pollution.ElecCoef.Source = state.dataIPShortCut->rNumericArgs(2);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(3), cAlphaArgs(3), Pollution.ElecCoef.SourceSched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3), Pollution.ElecCoef.SourceSched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.CO2 = rNumericArgs(3);
-                    if (!lAlphaFieldBlanks(4)) {
+                    Pollution.ElecCoef.CO2 = state.dataIPShortCut->rNumericArgs(3);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.ElecCoef.CO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4), Pollution.ElecCoef.CO2Sched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.CO = rNumericArgs(4);
-                    if (!lAlphaFieldBlanks(5)) {
+                    Pollution.ElecCoef.CO = state.dataIPShortCut->rNumericArgs(4);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.ElecCoef.COSched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5), Pollution.ElecCoef.COSched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.CH4 = rNumericArgs(5);
-                    if (!lAlphaFieldBlanks(6)) {
+                    Pollution.ElecCoef.CH4 = state.dataIPShortCut->rNumericArgs(5);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.ElecCoef.CH4Sched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), Pollution.ElecCoef.CH4Sched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.NOx = rNumericArgs(6);
-                    if (!lAlphaFieldBlanks(7)) {
+                    Pollution.ElecCoef.NOx = state.dataIPShortCut->rNumericArgs(6);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.ElecCoef.NOxSched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7), Pollution.ElecCoef.NOxSched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.N2O = rNumericArgs(7);
-                    if (!lAlphaFieldBlanks(8)) {
+                    Pollution.ElecCoef.N2O = state.dataIPShortCut->rNumericArgs(7);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.ElecCoef.N2OSched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), Pollution.ElecCoef.N2OSched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.SO2 = rNumericArgs(8);
-                    if (!lAlphaFieldBlanks(9)) {
+                    Pollution.ElecCoef.SO2 = state.dataIPShortCut->rNumericArgs(8);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.ElecCoef.SO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9), Pollution.ElecCoef.SO2Sched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.PM = rNumericArgs(9);
-                    if (!lAlphaFieldBlanks(10)) {
+                    Pollution.ElecCoef.PM = state.dataIPShortCut->rNumericArgs(9);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.ElecCoef.PMSched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), Pollution.ElecCoef.PMSched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.PM10 = rNumericArgs(10);
-                    if (!lAlphaFieldBlanks(11)) {
+                    Pollution.ElecCoef.PM10 = state.dataIPShortCut->rNumericArgs(10);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(11), cAlphaArgs(11), Pollution.ElecCoef.PM10Sched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11), Pollution.ElecCoef.PM10Sched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.PM25 = rNumericArgs(11);
-                    if (!lAlphaFieldBlanks(12)) {
+                    Pollution.ElecCoef.PM25 = state.dataIPShortCut->rNumericArgs(11);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(12), cAlphaArgs(12), Pollution.ElecCoef.PM25Sched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12), Pollution.ElecCoef.PM25Sched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.NH3 = rNumericArgs(12);
-                    if (!lAlphaFieldBlanks(13)) {
+                    Pollution.ElecCoef.NH3 = state.dataIPShortCut->rNumericArgs(12);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.ElecCoef.NH3Sched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13), Pollution.ElecCoef.NH3Sched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.NMVOC = rNumericArgs(13);
-                    if (!lAlphaFieldBlanks(14)) {
+                    Pollution.ElecCoef.NMVOC = state.dataIPShortCut->rNumericArgs(13);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(14), cAlphaArgs(14), Pollution.ElecCoef.NMVOCSched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14), Pollution.ElecCoef.NMVOCSched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.Hg = rNumericArgs(14);
-                    if (!lAlphaFieldBlanks(15)) {
+                    Pollution.ElecCoef.Hg = state.dataIPShortCut->rNumericArgs(14);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.ElecCoef.HgSched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15), Pollution.ElecCoef.HgSched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.Pb = rNumericArgs(15);
-                    if (!lAlphaFieldBlanks(16)) {
+                    Pollution.ElecCoef.Pb = state.dataIPShortCut->rNumericArgs(15);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.ElecCoef.PbSched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16), Pollution.ElecCoef.PbSched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.Water = rNumericArgs(16);
-                    if (!lAlphaFieldBlanks(17)) {
+                    Pollution.ElecCoef.Water = state.dataIPShortCut->rNumericArgs(16);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(17), cAlphaArgs(17), Pollution.ElecCoef.WaterSched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17), Pollution.ElecCoef.WaterSched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.NucHi = rNumericArgs(17);
-                    if (!lAlphaFieldBlanks(18)) {
+                    Pollution.ElecCoef.NucHi = state.dataIPShortCut->rNumericArgs(17);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(18), cAlphaArgs(18), Pollution.ElecCoef.NucHiSched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(18), state.dataIPShortCut->cAlphaArgs(18), Pollution.ElecCoef.NucHiSched, ErrorsFound);
                     }
-                    Pollution.ElecCoef.NucLo = rNumericArgs(18);
-                    if (!lAlphaFieldBlanks(19)) {
+                    Pollution.ElecCoef.NucLo = state.dataIPShortCut->rNumericArgs(18);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Electricity", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.ElecCoef.NucLoSched, ErrorsFound);
+                            cCurrentModuleObject, "Electricity", state.dataIPShortCut->cAlphaFieldNames(19), state.dataIPShortCut->cAlphaArgs(19), Pollution.ElecCoef.NucLoSched, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "GASOLINE") {
@@ -1190,90 +746,90 @@ namespace PollutionModule {
                     }
                     Pollution.GasolineCoef.FuelFactorUsed = true;
                     // Gasoline Coeffs
-                    Pollution.GasolineCoef.Source = rNumericArgs(2);
-                    if (!lAlphaFieldBlanks(3)) {
+                    Pollution.GasolineCoef.Source = state.dataIPShortCut->rNumericArgs(2);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(3), cAlphaArgs(3), Pollution.GasolineCoef.SourceSched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3), Pollution.GasolineCoef.SourceSched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.CO2 = rNumericArgs(3);
-                    if (!lAlphaFieldBlanks(4)) {
+                    Pollution.GasolineCoef.CO2 = state.dataIPShortCut->rNumericArgs(3);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.GasolineCoef.CO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4), Pollution.GasolineCoef.CO2Sched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.CO = rNumericArgs(4);
-                    if (!lAlphaFieldBlanks(5)) {
+                    Pollution.GasolineCoef.CO = state.dataIPShortCut->rNumericArgs(4);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.GasolineCoef.COSched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5), Pollution.GasolineCoef.COSched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.CH4 = rNumericArgs(5);
-                    if (!lAlphaFieldBlanks(6)) {
+                    Pollution.GasolineCoef.CH4 = state.dataIPShortCut->rNumericArgs(5);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.GasolineCoef.CH4Sched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), Pollution.GasolineCoef.CH4Sched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.NOx = rNumericArgs(6);
-                    if (!lAlphaFieldBlanks(7)) {
+                    Pollution.GasolineCoef.NOx = state.dataIPShortCut->rNumericArgs(6);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.GasolineCoef.NOxSched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7), Pollution.GasolineCoef.NOxSched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.N2O = rNumericArgs(7);
-                    if (!lAlphaFieldBlanks(8)) {
+                    Pollution.GasolineCoef.N2O = state.dataIPShortCut->rNumericArgs(7);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.GasolineCoef.N2OSched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), Pollution.GasolineCoef.N2OSched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.SO2 = rNumericArgs(8);
-                    if (!lAlphaFieldBlanks(9)) {
+                    Pollution.GasolineCoef.SO2 = state.dataIPShortCut->rNumericArgs(8);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.GasolineCoef.SO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9), Pollution.GasolineCoef.SO2Sched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.PM = rNumericArgs(9);
-                    if (!lAlphaFieldBlanks(10)) {
+                    Pollution.GasolineCoef.PM = state.dataIPShortCut->rNumericArgs(9);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.GasolineCoef.PMSched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), Pollution.GasolineCoef.PMSched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.PM10 = rNumericArgs(10);
-                    if (!lAlphaFieldBlanks(11)) {
+                    Pollution.GasolineCoef.PM10 = state.dataIPShortCut->rNumericArgs(10);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(11), cAlphaArgs(11), Pollution.GasolineCoef.PM10Sched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11), Pollution.GasolineCoef.PM10Sched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.PM25 = rNumericArgs(11);
-                    if (!lAlphaFieldBlanks(12)) {
+                    Pollution.GasolineCoef.PM25 = state.dataIPShortCut->rNumericArgs(11);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(12), cAlphaArgs(12), Pollution.GasolineCoef.PM25Sched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12), Pollution.GasolineCoef.PM25Sched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.NH3 = rNumericArgs(12);
-                    if (!lAlphaFieldBlanks(13)) {
+                    Pollution.GasolineCoef.NH3 = state.dataIPShortCut->rNumericArgs(12);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.GasolineCoef.NH3Sched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13), Pollution.GasolineCoef.NH3Sched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.NMVOC = rNumericArgs(13);
-                    if (!lAlphaFieldBlanks(14)) {
+                    Pollution.GasolineCoef.NMVOC = state.dataIPShortCut->rNumericArgs(13);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(14), cAlphaArgs(14), Pollution.GasolineCoef.NMVOCSched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14), Pollution.GasolineCoef.NMVOCSched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.Hg = rNumericArgs(14);
-                    if (!lAlphaFieldBlanks(15)) {
+                    Pollution.GasolineCoef.Hg = state.dataIPShortCut->rNumericArgs(14);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.GasolineCoef.HgSched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15), Pollution.GasolineCoef.HgSched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.Pb = rNumericArgs(15);
-                    if (!lAlphaFieldBlanks(16)) {
+                    Pollution.GasolineCoef.Pb = state.dataIPShortCut->rNumericArgs(15);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.GasolineCoef.PbSched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16), Pollution.GasolineCoef.PbSched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.Water = rNumericArgs(16);
-                    if (!lAlphaFieldBlanks(17)) {
+                    Pollution.GasolineCoef.Water = state.dataIPShortCut->rNumericArgs(16);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(17), cAlphaArgs(17), Pollution.GasolineCoef.WaterSched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17), Pollution.GasolineCoef.WaterSched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.NucHi = rNumericArgs(17);
-                    if (!lAlphaFieldBlanks(18)) {
+                    Pollution.GasolineCoef.NucHi = state.dataIPShortCut->rNumericArgs(17);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(18), cAlphaArgs(18), Pollution.GasolineCoef.NucHiSched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(18), state.dataIPShortCut->cAlphaArgs(18), Pollution.GasolineCoef.NucHiSched, ErrorsFound);
                     }
-                    Pollution.GasolineCoef.NucLo = rNumericArgs(18);
-                    if (!lAlphaFieldBlanks(19)) {
+                    Pollution.GasolineCoef.NucLo = state.dataIPShortCut->rNumericArgs(18);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Gasoline", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.GasolineCoef.NucLoSched, ErrorsFound);
+                            cCurrentModuleObject, "Gasoline", state.dataIPShortCut->cAlphaFieldNames(19), state.dataIPShortCut->cAlphaArgs(19), Pollution.GasolineCoef.NucLoSched, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "PROPANE") {
@@ -1284,90 +840,90 @@ namespace PollutionModule {
                     }
                     Pollution.PropaneCoef.FuelFactorUsed = true;
                     // Propane Coeffs
-                    Pollution.PropaneCoef.Source = rNumericArgs(2);
-                    if (!lAlphaFieldBlanks(3)) {
+                    Pollution.PropaneCoef.Source = state.dataIPShortCut->rNumericArgs(2);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(3), cAlphaArgs(3), Pollution.PropaneCoef.SourceSched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3), Pollution.PropaneCoef.SourceSched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.CO2 = rNumericArgs(3);
-                    if (!lAlphaFieldBlanks(4)) {
+                    Pollution.PropaneCoef.CO2 = state.dataIPShortCut->rNumericArgs(3);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.PropaneCoef.CO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4), Pollution.PropaneCoef.CO2Sched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.CO = rNumericArgs(4);
-                    if (!lAlphaFieldBlanks(5)) {
+                    Pollution.PropaneCoef.CO = state.dataIPShortCut->rNumericArgs(4);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.PropaneCoef.COSched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5), Pollution.PropaneCoef.COSched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.CH4 = rNumericArgs(5);
-                    if (!lAlphaFieldBlanks(6)) {
+                    Pollution.PropaneCoef.CH4 = state.dataIPShortCut->rNumericArgs(5);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.PropaneCoef.CH4Sched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), Pollution.PropaneCoef.CH4Sched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.NOx = rNumericArgs(6);
-                    if (!lAlphaFieldBlanks(7)) {
+                    Pollution.PropaneCoef.NOx = state.dataIPShortCut->rNumericArgs(6);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.PropaneCoef.NOxSched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7), Pollution.PropaneCoef.NOxSched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.N2O = rNumericArgs(7);
-                    if (!lAlphaFieldBlanks(8)) {
+                    Pollution.PropaneCoef.N2O = state.dataIPShortCut->rNumericArgs(7);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.PropaneCoef.N2OSched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), Pollution.PropaneCoef.N2OSched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.SO2 = rNumericArgs(8);
-                    if (!lAlphaFieldBlanks(9)) {
+                    Pollution.PropaneCoef.SO2 = state.dataIPShortCut->rNumericArgs(8);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.PropaneCoef.SO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9), Pollution.PropaneCoef.SO2Sched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.PM = rNumericArgs(9);
-                    if (!lAlphaFieldBlanks(10)) {
+                    Pollution.PropaneCoef.PM = state.dataIPShortCut->rNumericArgs(9);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.PropaneCoef.PMSched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), Pollution.PropaneCoef.PMSched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.PM10 = rNumericArgs(10);
-                    if (!lAlphaFieldBlanks(11)) {
+                    Pollution.PropaneCoef.PM10 = state.dataIPShortCut->rNumericArgs(10);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(11), cAlphaArgs(11), Pollution.PropaneCoef.PM10Sched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11), Pollution.PropaneCoef.PM10Sched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.PM25 = rNumericArgs(11);
-                    if (!lAlphaFieldBlanks(12)) {
+                    Pollution.PropaneCoef.PM25 = state.dataIPShortCut->rNumericArgs(11);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(12), cAlphaArgs(12), Pollution.PropaneCoef.PM25Sched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12), Pollution.PropaneCoef.PM25Sched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.NH3 = rNumericArgs(12);
-                    if (!lAlphaFieldBlanks(13)) {
+                    Pollution.PropaneCoef.NH3 = state.dataIPShortCut->rNumericArgs(12);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.PropaneCoef.NH3Sched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13), Pollution.PropaneCoef.NH3Sched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.NMVOC = rNumericArgs(13);
-                    if (!lAlphaFieldBlanks(14)) {
+                    Pollution.PropaneCoef.NMVOC = state.dataIPShortCut->rNumericArgs(13);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(14), cAlphaArgs(14), Pollution.PropaneCoef.NMVOCSched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14), Pollution.PropaneCoef.NMVOCSched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.Hg = rNumericArgs(14);
-                    if (!lAlphaFieldBlanks(15)) {
+                    Pollution.PropaneCoef.Hg = state.dataIPShortCut->rNumericArgs(14);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.PropaneCoef.HgSched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15), Pollution.PropaneCoef.HgSched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.Pb = rNumericArgs(15);
-                    if (!lAlphaFieldBlanks(16)) {
+                    Pollution.PropaneCoef.Pb = state.dataIPShortCut->rNumericArgs(15);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.PropaneCoef.PbSched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16), Pollution.PropaneCoef.PbSched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.Water = rNumericArgs(16);
-                    if (!lAlphaFieldBlanks(17)) {
+                    Pollution.PropaneCoef.Water = state.dataIPShortCut->rNumericArgs(16);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(17), cAlphaArgs(17), Pollution.PropaneCoef.WaterSched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17), Pollution.PropaneCoef.WaterSched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.NucHi = rNumericArgs(17);
-                    if (!lAlphaFieldBlanks(18)) {
+                    Pollution.PropaneCoef.NucHi = state.dataIPShortCut->rNumericArgs(17);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(18), cAlphaArgs(18), Pollution.PropaneCoef.NucHiSched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(18), state.dataIPShortCut->cAlphaArgs(18), Pollution.PropaneCoef.NucHiSched, ErrorsFound);
                     }
-                    Pollution.PropaneCoef.NucLo = rNumericArgs(18);
-                    if (!lAlphaFieldBlanks(19)) {
+                    Pollution.PropaneCoef.NucLo = state.dataIPShortCut->rNumericArgs(18);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Propane", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.PropaneCoef.NucLoSched, ErrorsFound);
+                            cCurrentModuleObject, "Propane", state.dataIPShortCut->cAlphaFieldNames(19), state.dataIPShortCut->cAlphaArgs(19), Pollution.PropaneCoef.NucLoSched, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "DIESEL") {
@@ -1378,90 +934,90 @@ namespace PollutionModule {
                     }
                     Pollution.DieselCoef.FuelFactorUsed = true;
                     // Diesel Coeffs
-                    Pollution.DieselCoef.Source = rNumericArgs(2);
-                    if (!lAlphaFieldBlanks(3)) {
+                    Pollution.DieselCoef.Source = state.dataIPShortCut->rNumericArgs(2);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(3), cAlphaArgs(3), Pollution.DieselCoef.SourceSched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3), Pollution.DieselCoef.SourceSched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.CO2 = rNumericArgs(3);
-                    if (!lAlphaFieldBlanks(4)) {
+                    Pollution.DieselCoef.CO2 = state.dataIPShortCut->rNumericArgs(3);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.DieselCoef.CO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4), Pollution.DieselCoef.CO2Sched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.CO = rNumericArgs(4);
-                    if (!lAlphaFieldBlanks(5)) {
+                    Pollution.DieselCoef.CO = state.dataIPShortCut->rNumericArgs(4);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.DieselCoef.COSched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5), Pollution.DieselCoef.COSched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.CH4 = rNumericArgs(5);
-                    if (!lAlphaFieldBlanks(6)) {
+                    Pollution.DieselCoef.CH4 = state.dataIPShortCut->rNumericArgs(5);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.DieselCoef.CH4Sched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), Pollution.DieselCoef.CH4Sched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.NOx = rNumericArgs(6);
-                    if (!lAlphaFieldBlanks(7)) {
+                    Pollution.DieselCoef.NOx = state.dataIPShortCut->rNumericArgs(6);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.DieselCoef.NOxSched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7), Pollution.DieselCoef.NOxSched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.N2O = rNumericArgs(7);
-                    if (!lAlphaFieldBlanks(8)) {
+                    Pollution.DieselCoef.N2O = state.dataIPShortCut->rNumericArgs(7);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.DieselCoef.N2OSched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), Pollution.DieselCoef.N2OSched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.SO2 = rNumericArgs(8);
-                    if (!lAlphaFieldBlanks(9)) {
+                    Pollution.DieselCoef.SO2 = state.dataIPShortCut->rNumericArgs(8);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.DieselCoef.SO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9), Pollution.DieselCoef.SO2Sched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.PM = rNumericArgs(9);
-                    if (!lAlphaFieldBlanks(10)) {
+                    Pollution.DieselCoef.PM = state.dataIPShortCut->rNumericArgs(9);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.DieselCoef.PMSched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), Pollution.DieselCoef.PMSched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.PM10 = rNumericArgs(10);
-                    if (!lAlphaFieldBlanks(11)) {
+                    Pollution.DieselCoef.PM10 = state.dataIPShortCut->rNumericArgs(10);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(11), cAlphaArgs(11), Pollution.DieselCoef.PM10Sched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11), Pollution.DieselCoef.PM10Sched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.PM25 = rNumericArgs(11);
-                    if (!lAlphaFieldBlanks(12)) {
+                    Pollution.DieselCoef.PM25 = state.dataIPShortCut->rNumericArgs(11);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(12), cAlphaArgs(12), Pollution.DieselCoef.PM25Sched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12), Pollution.DieselCoef.PM25Sched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.NH3 = rNumericArgs(12);
-                    if (!lAlphaFieldBlanks(13)) {
+                    Pollution.DieselCoef.NH3 = state.dataIPShortCut->rNumericArgs(12);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.DieselCoef.NH3Sched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13), Pollution.DieselCoef.NH3Sched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.NMVOC = rNumericArgs(13);
-                    if (!lAlphaFieldBlanks(14)) {
+                    Pollution.DieselCoef.NMVOC = state.dataIPShortCut->rNumericArgs(13);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(14), cAlphaArgs(14), Pollution.DieselCoef.NMVOCSched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14), Pollution.DieselCoef.NMVOCSched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.Hg = rNumericArgs(14);
-                    if (!lAlphaFieldBlanks(15)) {
+                    Pollution.DieselCoef.Hg = state.dataIPShortCut->rNumericArgs(14);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.DieselCoef.HgSched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15), Pollution.DieselCoef.HgSched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.Pb = rNumericArgs(15);
-                    if (!lAlphaFieldBlanks(16)) {
+                    Pollution.DieselCoef.Pb = state.dataIPShortCut->rNumericArgs(15);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.DieselCoef.PbSched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16), Pollution.DieselCoef.PbSched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.Water = rNumericArgs(16);
-                    if (!lAlphaFieldBlanks(17)) {
+                    Pollution.DieselCoef.Water = state.dataIPShortCut->rNumericArgs(16);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(17), cAlphaArgs(17), Pollution.DieselCoef.WaterSched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17), Pollution.DieselCoef.WaterSched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.NucHi = rNumericArgs(17);
-                    if (!lAlphaFieldBlanks(18)) {
+                    Pollution.DieselCoef.NucHi = state.dataIPShortCut->rNumericArgs(17);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(18), cAlphaArgs(18), Pollution.DieselCoef.NucHiSched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(18), state.dataIPShortCut->cAlphaArgs(18), Pollution.DieselCoef.NucHiSched, ErrorsFound);
                     }
-                    Pollution.DieselCoef.NucLo = rNumericArgs(18);
-                    if (!lAlphaFieldBlanks(19)) {
+                    Pollution.DieselCoef.NucLo = state.dataIPShortCut->rNumericArgs(18);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "Diesel", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.DieselCoef.NucLoSched, ErrorsFound);
+                            cCurrentModuleObject, "Diesel", state.dataIPShortCut->cAlphaFieldNames(19), state.dataIPShortCut->cAlphaArgs(19), Pollution.DieselCoef.NucLoSched, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
@@ -1472,116 +1028,116 @@ namespace PollutionModule {
                     }
                     Pollution.OtherFuel1Coef.FuelFactorUsed = true;
                     // OtherFuel1 Coeffs
-                    Pollution.OtherFuel1Coef.Source = rNumericArgs(2);
-                    if (!lAlphaFieldBlanks(3)) {
+                    Pollution.OtherFuel1Coef.Source = state.dataIPShortCut->rNumericArgs(2);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel1",
-                                        cAlphaFieldNames(3),
-                                        cAlphaArgs(3),
+                                        state.dataIPShortCut->cAlphaFieldNames(3),
+                                        state.dataIPShortCut->cAlphaArgs(3),
                                         Pollution.OtherFuel1Coef.SourceSched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.CO2 = rNumericArgs(3);
-                    if (!lAlphaFieldBlanks(4)) {
+                    Pollution.OtherFuel1Coef.CO2 = state.dataIPShortCut->rNumericArgs(3);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.OtherFuel1Coef.CO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel1", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4), Pollution.OtherFuel1Coef.CO2Sched, ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.CO = rNumericArgs(4);
-                    if (!lAlphaFieldBlanks(5)) {
+                    Pollution.OtherFuel1Coef.CO = state.dataIPShortCut->rNumericArgs(4);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.OtherFuel1Coef.COSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel1", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5), Pollution.OtherFuel1Coef.COSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.CH4 = rNumericArgs(5);
-                    if (!lAlphaFieldBlanks(6)) {
+                    Pollution.OtherFuel1Coef.CH4 = state.dataIPShortCut->rNumericArgs(5);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.OtherFuel1Coef.CH4Sched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel1", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), Pollution.OtherFuel1Coef.CH4Sched, ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.NOx = rNumericArgs(6);
-                    if (!lAlphaFieldBlanks(7)) {
+                    Pollution.OtherFuel1Coef.NOx = state.dataIPShortCut->rNumericArgs(6);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.OtherFuel1Coef.NOxSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel1", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7), Pollution.OtherFuel1Coef.NOxSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.N2O = rNumericArgs(7);
-                    if (!lAlphaFieldBlanks(8)) {
+                    Pollution.OtherFuel1Coef.N2O = state.dataIPShortCut->rNumericArgs(7);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.OtherFuel1Coef.N2OSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel1", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), Pollution.OtherFuel1Coef.N2OSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.SO2 = rNumericArgs(8);
-                    if (!lAlphaFieldBlanks(9)) {
+                    Pollution.OtherFuel1Coef.SO2 = state.dataIPShortCut->rNumericArgs(8);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.OtherFuel1Coef.SO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel1", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9), Pollution.OtherFuel1Coef.SO2Sched, ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.PM = rNumericArgs(9);
-                    if (!lAlphaFieldBlanks(10)) {
+                    Pollution.OtherFuel1Coef.PM = state.dataIPShortCut->rNumericArgs(9);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.OtherFuel1Coef.PMSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel1", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), Pollution.OtherFuel1Coef.PMSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.PM10 = rNumericArgs(10);
-                    if (!lAlphaFieldBlanks(11)) {
+                    Pollution.OtherFuel1Coef.PM10 = state.dataIPShortCut->rNumericArgs(10);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel1",
-                                        cAlphaFieldNames(11),
-                                        cAlphaArgs(11),
+                                        state.dataIPShortCut->cAlphaFieldNames(11),
+                                        state.dataIPShortCut->cAlphaArgs(11),
                                         Pollution.OtherFuel1Coef.PM10Sched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.PM25 = rNumericArgs(11);
-                    if (!lAlphaFieldBlanks(12)) {
+                    Pollution.OtherFuel1Coef.PM25 = state.dataIPShortCut->rNumericArgs(11);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel1",
-                                        cAlphaFieldNames(12),
-                                        cAlphaArgs(12),
+                                        state.dataIPShortCut->cAlphaFieldNames(12),
+                                        state.dataIPShortCut->cAlphaArgs(12),
                                         Pollution.OtherFuel1Coef.PM25Sched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.NH3 = rNumericArgs(12);
-                    if (!lAlphaFieldBlanks(13)) {
+                    Pollution.OtherFuel1Coef.NH3 = state.dataIPShortCut->rNumericArgs(12);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.OtherFuel1Coef.NH3Sched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel1", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13), Pollution.OtherFuel1Coef.NH3Sched, ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.NMVOC = rNumericArgs(13);
-                    if (!lAlphaFieldBlanks(14)) {
+                    Pollution.OtherFuel1Coef.NMVOC = state.dataIPShortCut->rNumericArgs(13);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel1",
-                                        cAlphaFieldNames(14),
-                                        cAlphaArgs(14),
+                                        state.dataIPShortCut->cAlphaFieldNames(14),
+                                        state.dataIPShortCut->cAlphaArgs(14),
                                         Pollution.OtherFuel1Coef.NMVOCSched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.Hg = rNumericArgs(14);
-                    if (!lAlphaFieldBlanks(15)) {
+                    Pollution.OtherFuel1Coef.Hg = state.dataIPShortCut->rNumericArgs(14);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.OtherFuel1Coef.HgSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel1", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15), Pollution.OtherFuel1Coef.HgSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.Pb = rNumericArgs(15);
-                    if (!lAlphaFieldBlanks(16)) {
+                    Pollution.OtherFuel1Coef.Pb = state.dataIPShortCut->rNumericArgs(15);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel1", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.OtherFuel1Coef.PbSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel1", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16), Pollution.OtherFuel1Coef.PbSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.Water = rNumericArgs(16);
-                    if (!lAlphaFieldBlanks(17)) {
+                    Pollution.OtherFuel1Coef.Water = state.dataIPShortCut->rNumericArgs(16);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel1",
-                                        cAlphaFieldNames(17),
-                                        cAlphaArgs(17),
+                                        state.dataIPShortCut->cAlphaFieldNames(17),
+                                        state.dataIPShortCut->cAlphaArgs(17),
                                         Pollution.OtherFuel1Coef.WaterSched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.NucHi = rNumericArgs(17);
-                    if (!lAlphaFieldBlanks(18)) {
+                    Pollution.OtherFuel1Coef.NucHi = state.dataIPShortCut->rNumericArgs(17);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel1",
-                                        cAlphaFieldNames(18),
-                                        cAlphaArgs(18),
+                                        state.dataIPShortCut->cAlphaFieldNames(18),
+                                        state.dataIPShortCut->cAlphaArgs(18),
                                         Pollution.OtherFuel1Coef.NucHiSched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel1Coef.NucLo = rNumericArgs(18);
-                    if (!lAlphaFieldBlanks(19)) {
+                    Pollution.OtherFuel1Coef.NucLo = state.dataIPShortCut->rNumericArgs(18);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel1",
-                                        cAlphaFieldNames(19),
-                                        cAlphaArgs(19),
+                                        state.dataIPShortCut->cAlphaFieldNames(19),
+                                        state.dataIPShortCut->cAlphaArgs(19),
                                         Pollution.OtherFuel1Coef.NucLoSched,
                                         ErrorsFound);
                     }
@@ -1594,116 +1150,116 @@ namespace PollutionModule {
                     }
                     Pollution.OtherFuel2Coef.FuelFactorUsed = true;
                     // OtherFuel2 Coeffs
-                    Pollution.OtherFuel2Coef.Source = rNumericArgs(2);
-                    if (!lAlphaFieldBlanks(3)) {
+                    Pollution.OtherFuel2Coef.Source = state.dataIPShortCut->rNumericArgs(2);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel2",
-                                        cAlphaFieldNames(3),
-                                        cAlphaArgs(3),
+                                        state.dataIPShortCut->cAlphaFieldNames(3),
+                                        state.dataIPShortCut->cAlphaArgs(3),
                                         Pollution.OtherFuel2Coef.SourceSched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.CO2 = rNumericArgs(3);
-                    if (!lAlphaFieldBlanks(4)) {
+                    Pollution.OtherFuel2Coef.CO2 = state.dataIPShortCut->rNumericArgs(3);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.OtherFuel2Coef.CO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel2", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4), Pollution.OtherFuel2Coef.CO2Sched, ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.CO = rNumericArgs(4);
-                    if (!lAlphaFieldBlanks(5)) {
+                    Pollution.OtherFuel2Coef.CO = state.dataIPShortCut->rNumericArgs(4);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.OtherFuel2Coef.COSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel2", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5), Pollution.OtherFuel2Coef.COSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.CH4 = rNumericArgs(5);
-                    if (!lAlphaFieldBlanks(6)) {
+                    Pollution.OtherFuel2Coef.CH4 = state.dataIPShortCut->rNumericArgs(5);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.OtherFuel2Coef.CH4Sched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel2", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6), Pollution.OtherFuel2Coef.CH4Sched, ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.NOx = rNumericArgs(6);
-                    if (!lAlphaFieldBlanks(7)) {
+                    Pollution.OtherFuel2Coef.NOx = state.dataIPShortCut->rNumericArgs(6);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.OtherFuel2Coef.NOxSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel2", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7), Pollution.OtherFuel2Coef.NOxSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.N2O = rNumericArgs(7);
-                    if (!lAlphaFieldBlanks(8)) {
+                    Pollution.OtherFuel2Coef.N2O = state.dataIPShortCut->rNumericArgs(7);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.OtherFuel2Coef.N2OSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel2", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8), Pollution.OtherFuel2Coef.N2OSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.SO2 = rNumericArgs(8);
-                    if (!lAlphaFieldBlanks(9)) {
+                    Pollution.OtherFuel2Coef.SO2 = state.dataIPShortCut->rNumericArgs(8);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.OtherFuel2Coef.SO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel2", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9), Pollution.OtherFuel2Coef.SO2Sched, ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.PM = rNumericArgs(9);
-                    if (!lAlphaFieldBlanks(10)) {
+                    Pollution.OtherFuel2Coef.PM = state.dataIPShortCut->rNumericArgs(9);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.OtherFuel2Coef.PMSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel2", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10), Pollution.OtherFuel2Coef.PMSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.PM10 = rNumericArgs(10);
-                    if (!lAlphaFieldBlanks(11)) {
+                    Pollution.OtherFuel2Coef.PM10 = state.dataIPShortCut->rNumericArgs(10);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel2",
-                                        cAlphaFieldNames(11),
-                                        cAlphaArgs(11),
+                                        state.dataIPShortCut->cAlphaFieldNames(11),
+                                        state.dataIPShortCut->cAlphaArgs(11),
                                         Pollution.OtherFuel2Coef.PM10Sched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.PM25 = rNumericArgs(11);
-                    if (!lAlphaFieldBlanks(12)) {
+                    Pollution.OtherFuel2Coef.PM25 = state.dataIPShortCut->rNumericArgs(11);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel2",
-                                        cAlphaFieldNames(12),
-                                        cAlphaArgs(12),
+                                        state.dataIPShortCut->cAlphaFieldNames(12),
+                                        state.dataIPShortCut->cAlphaArgs(12),
                                         Pollution.OtherFuel2Coef.PM25Sched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.NH3 = rNumericArgs(12);
-                    if (!lAlphaFieldBlanks(13)) {
+                    Pollution.OtherFuel2Coef.NH3 = state.dataIPShortCut->rNumericArgs(12);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.OtherFuel2Coef.NH3Sched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel2", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13), Pollution.OtherFuel2Coef.NH3Sched, ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.NMVOC = rNumericArgs(13);
-                    if (!lAlphaFieldBlanks(14)) {
+                    Pollution.OtherFuel2Coef.NMVOC = state.dataIPShortCut->rNumericArgs(13);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel2",
-                                        cAlphaFieldNames(14),
-                                        cAlphaArgs(14),
+                                        state.dataIPShortCut->cAlphaFieldNames(14),
+                                        state.dataIPShortCut->cAlphaArgs(14),
                                         Pollution.OtherFuel2Coef.NMVOCSched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.Hg = rNumericArgs(14);
-                    if (!lAlphaFieldBlanks(15)) {
+                    Pollution.OtherFuel2Coef.Hg = state.dataIPShortCut->rNumericArgs(14);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.OtherFuel2Coef.HgSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel2", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15), Pollution.OtherFuel2Coef.HgSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.Pb = rNumericArgs(15);
-                    if (!lAlphaFieldBlanks(16)) {
+                    Pollution.OtherFuel2Coef.Pb = state.dataIPShortCut->rNumericArgs(15);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
                         CheckFFSchedule(state,
-                            cCurrentModuleObject, "OtherFuel2", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.OtherFuel2Coef.PbSched, ErrorsFound);
+                            cCurrentModuleObject, "OtherFuel2", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16), Pollution.OtherFuel2Coef.PbSched, ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.Water = rNumericArgs(16);
-                    if (!lAlphaFieldBlanks(17)) {
+                    Pollution.OtherFuel2Coef.Water = state.dataIPShortCut->rNumericArgs(16);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel2",
-                                        cAlphaFieldNames(17),
-                                        cAlphaArgs(17),
+                                        state.dataIPShortCut->cAlphaFieldNames(17),
+                                        state.dataIPShortCut->cAlphaArgs(17),
                                         Pollution.OtherFuel2Coef.WaterSched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.NucHi = rNumericArgs(17);
-                    if (!lAlphaFieldBlanks(18)) {
+                    Pollution.OtherFuel2Coef.NucHi = state.dataIPShortCut->rNumericArgs(17);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel2",
-                                        cAlphaFieldNames(18),
-                                        cAlphaArgs(18),
+                                        state.dataIPShortCut->cAlphaFieldNames(18),
+                                        state.dataIPShortCut->cAlphaArgs(18),
                                         Pollution.OtherFuel2Coef.NucHiSched,
                                         ErrorsFound);
                     }
-                    Pollution.OtherFuel2Coef.NucLo = rNumericArgs(18);
-                    if (!lAlphaFieldBlanks(19)) {
+                    Pollution.OtherFuel2Coef.NucLo = state.dataIPShortCut->rNumericArgs(18);
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                         CheckFFSchedule(state, cCurrentModuleObject,
                                         "OtherFuel2",
-                                        cAlphaFieldNames(19),
-                                        cAlphaArgs(19),
+                                        state.dataIPShortCut->cAlphaFieldNames(19),
+                                        state.dataIPShortCut->cAlphaArgs(19),
                                         Pollution.OtherFuel2Coef.NucLoSched,
                                         ErrorsFound);
                     }
@@ -1733,7 +1289,7 @@ namespace PollutionModule {
         FuelType.ElecPurchasedFacilityIndex = GetMeterIndex(state, "ElectricityPurchased:Facility");
         FuelType.ElecSurplusSoldFacilityIndex = GetMeterIndex(state, "ElectricitySurplusSold:Facility");
 
-        if (PollutionReportSetup) { // only do this if reporting on the pollution
+        if (state.dataPollutionModule->PollutionReportSetup) { // only do this if reporting on the pollution
             // Need to go through all of the Fuel Types and make sure a Fuel Factor was found for each type of energy being simulated
             // Check for Electricity
             if (!Pollution.ElecCoef.FuelFactorUsed &&
@@ -1812,11 +1368,12 @@ namespace PollutionModule {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
 
-        if (GetInputFlagPollution) {
+        if (state.dataPollutionModule->GetInputFlagPollution) {
             GetPollutionFactorInput(state);
-            GetInputFlagPollution = false;
+            state.dataPollutionModule->GetInputFlagPollution = false;
         }
-
+        auto & Pollution = state.dataPollutionModule->Pollution;
+        auto & FuelType = state.dataPollutionModule->FuelType;
         for (Loop = 1; Loop <= PollFactorNumTypes; ++Loop) {
 
             if (FuelType.FuelTypeNames(Loop).empty()) continue;
@@ -3797,7 +3354,7 @@ namespace PollutionModule {
         // <description>
 
         // in progress
-        if (NumFuelFactors == 0 || NumEnvImpactFactors == 0) {
+        if (state.dataPollutionModule->NumFuelFactors == 0 || state.dataPollutionModule->NumEnvImpactFactors == 0) {
             if (ReportingThisVariable(state, "Environmental Impact Total N2O Emissions Carbon Equivalent Mass") ||
                 ReportingThisVariable(state, "Environmental Impact Total CH4 Emissions Carbon Equivalent Mass") ||
                 ReportingThisVariable(state, "Environmental Impact Total CO2 Emissions Carbon Equivalent Mass") ||
@@ -3805,7 +3362,7 @@ namespace PollutionModule {
                 ShowWarningError(state,
                     "GetPollutionFactorInput: Requested reporting for Carbon Equivalent Pollution, but insufficient information is entered.");
                 ShowContinueError(state,
-                    "Both \"FuelFactors\" and \"EnvironmentalImpactFactors\" must be entered or the displayed carbon pollution will all be zero.");
+                    R"(Both "FuelFactors" and "EnvironmentalImpactFactors" must be entered or the displayed carbon pollution will all be zero.)");
             }
         }
     }
@@ -3830,30 +3387,9 @@ namespace PollutionModule {
         // This support routine performs the "obtain schedule pointer" and checks Fuel Factor
         // schedules for validity (values must be >= 0).
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         SchedulePtr = GetScheduleIndex(state, ScheduleName);
         if (SchedulePtr == 0) {
@@ -3932,6 +3468,8 @@ namespace PollutionModule {
         DieselValue = 0.0;
         OtherFuel1Value = 0.0;
         OtherFuel2Value = 0.0;
+        auto & Pollution = state.dataPollutionModule->Pollution;
+        auto & FuelType = state.dataPollutionModule->FuelType;
 
         if (Pollution.ElecCoef.FuelFactorUsed) {
             Pollution.ElecComp.CO2Pollution = 0.0;
@@ -5663,29 +5201,12 @@ namespace PollutionModule {
         //       Read Energy Results from the meters
         // This routine reads the meters for the energy used
 
-        // METHODOLOGY EMPLOYED:
-        // NA
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHVACGlobals::FracTimeStepZone;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
+        auto & FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        auto & Pollution = state.dataPollutionModule->Pollution;
+        auto & FuelType = state.dataPollutionModule->FuelType;
 
         FuelType.ElecFacility =
             GetInstantMeterValue(state, FuelType.ElecFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
@@ -5822,10 +5343,11 @@ namespace PollutionModule {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (GetInputFlagPollution) {
+        if (state.dataPollutionModule->GetInputFlagPollution) {
             GetPollutionFactorInput(state);
-            GetInputFlagPollution = false;
+            state.dataPollutionModule->GetInputFlagPollution = false;
         }
+        auto & Pollution = state.dataPollutionModule->Pollution;
 
         fuelFactorUsed = false;
         fuelSourceFactor = 0.0;
@@ -5833,7 +5355,7 @@ namespace PollutionModule {
         ffScheduleIndex = 0;
 
         {
-            auto const SELECT_CASE_var(fuelName);
+            auto const& SELECT_CASE_var(fuelName);
 
             if ((SELECT_CASE_var == "NaturalGas") || (SELECT_CASE_var == "Gas")) {
                 if (Pollution.NatGasCoef.FuelFactorUsed) {
@@ -6041,18 +5563,16 @@ namespace PollutionModule {
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // Each of the arguments must be entered in the EnvironmentalImpactFactors object
 
-        if (GetInputFlagPollution) {
+        if (state.dataPollutionModule->GetInputFlagPollution) {
             GetPollutionFactorInput(state);
-            GetInputFlagPollution = false;
+            state.dataPollutionModule->GetInputFlagPollution = false;
         }
 
-        if (NumEnvImpactFactors > 0) {
-            efficiencyDistrictHeating = Pollution.PurchHeatEffic;
-            efficiencyDistrictCooling = Pollution.PurchCoolCOP;
-            sourceFactorSteam = Pollution.SteamConvEffic;
+        if (state.dataPollutionModule->NumEnvImpactFactors > 0) {
+            efficiencyDistrictHeating = state.dataPollutionModule->Pollution.PurchHeatEffic;
+            efficiencyDistrictCooling = state.dataPollutionModule->Pollution.PurchCoolCOP;
+            sourceFactorSteam = state.dataPollutionModule->Pollution.SteamConvEffic;
         }
     }
-
-} // namespace PollutionModule
 
 } // namespace EnergyPlus

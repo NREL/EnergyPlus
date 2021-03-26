@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -74,8 +75,6 @@
 namespace EnergyPlus {
 
 namespace PVWatts {
-
-    std::map<int, PVWattsGenerator> PVWattsGenerators;
 
     PVWattsGenerator::PVWattsGenerator(EnergyPlusData &state,
                                        const std::string &name,
@@ -339,7 +338,7 @@ namespace PVWatts {
         return m_groundCoverageRatio;
     }
 
-    Real64 PVWattsGenerator::getCellTempearture()
+    Real64 PVWattsGenerator::getCellTemperature()
     {
         return m_cellTemperature;
     }
@@ -371,7 +370,7 @@ namespace PVWatts {
 
     void PVWattsGenerator::calc(EnergyPlusData& state)
     {
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // We only run this once for each zone time step.
         if (!state.dataGlobal->BeginTimeStepFlag) {
@@ -458,6 +457,9 @@ namespace PVWatts {
         if (ObjNum == 0) {
             ShowFatalError(state, "Cannot find Generator:PVWatts " + GeneratorName);
         }
+
+        auto & PVWattsGenerators(state.dataPVWatts->PVWattsGenerators);
+
         auto it = PVWattsGenerators.find(ObjNum);
         if (it == PVWattsGenerators.end()) {
             // It's not in the map, add it.
@@ -468,11 +470,6 @@ namespace PVWatts {
         } else {
             return it->second;
         }
-    }
-
-    void clear_state()
-    {
-        PVWattsGenerators.clear();
     }
 
 } // namespace PVWatts

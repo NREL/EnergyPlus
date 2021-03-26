@@ -153,8 +153,8 @@ namespace HVACFan {
             m_objTurnFansOff = zoneCompTurnFansOff;
         } else {
             // Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
-            m_objTurnFansOn = DataHVACGlobals::TurnFansOn;
-            m_objTurnFansOff = DataHVACGlobals::TurnFansOff;
+            m_objTurnFansOn = state.dataHVACGlobal->TurnFansOn;
+            m_objTurnFansOff = state.dataHVACGlobal->TurnFansOff;
         }
         if (present(pressureRise) && present(massFlowRate1) && present(runTimeFraction1) && present(massFlowRate2) && present(runTimeFraction2) &&
             present(pressureRise2)) {
@@ -178,7 +178,7 @@ namespace HVACFan {
 
         update(state);
 
-        report();
+        report(state);
     }
 
     void FanSystem::init(EnergyPlusData &state)
@@ -195,7 +195,7 @@ namespace HVACFan {
             // m_minAirMassFlowRate = m_minAirFlowRate * m_rhoAirStdInit;
 
             // Init the Node Control variables
-            DataLoopNode::Node(outletNodeNum).MassFlowRateMax = m_maxAirMassFlowRate;
+            state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMax = m_maxAirMassFlowRate;
             // Currently, fan does not force minimum mass flow, only used for power calculation
             // DataLoopNode::Node( outletNodeNum ).MassFlowRateMin = m_minAirMassFlowRate;
 
@@ -214,19 +214,19 @@ namespace HVACFan {
             m_objEnvrnFlag = true;
         }
 
-        m_massFlowRateMaxAvail = min(DataLoopNode::Node(outletNodeNum).MassFlowRateMax, DataLoopNode::Node(inletNodeNum).MassFlowRateMaxAvail);
-        m_massFlowRateMinAvail = min(max(DataLoopNode::Node(outletNodeNum).MassFlowRateMin, DataLoopNode::Node(inletNodeNum).MassFlowRateMinAvail),
-                                     DataLoopNode::Node(inletNodeNum).MassFlowRateMaxAvail);
+        m_massFlowRateMaxAvail = min(state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMax, state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMaxAvail);
+        m_massFlowRateMinAvail = min(max(state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMin, state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMinAvail),
+                                     state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMaxAvail);
 
         // Load the node data in this section for the component simulation
         // First need to make sure that the MassFlowRate is between the max and min avail.
-        m_inletAirMassFlowRate = min(DataLoopNode::Node(inletNodeNum).MassFlowRate, m_massFlowRateMaxAvail);
+        m_inletAirMassFlowRate = min(state.dataLoopNodes->Node(inletNodeNum).MassFlowRate, m_massFlowRateMaxAvail);
         m_inletAirMassFlowRate = max(m_inletAirMassFlowRate, m_massFlowRateMinAvail);
 
         // Then set the other conditions
-        m_inletAirTemp = DataLoopNode::Node(inletNodeNum).Temp;
-        m_inletAirHumRat = DataLoopNode::Node(inletNodeNum).HumRat;
-        m_inletAirEnthalpy = DataLoopNode::Node(inletNodeNum).Enthalpy;
+        m_inletAirTemp = state.dataLoopNodes->Node(inletNodeNum).Temp;
+        m_inletAirHumRat = state.dataLoopNodes->Node(inletNodeNum).HumRat;
+        m_inletAirEnthalpy = state.dataLoopNodes->Node(inletNodeNum).Enthalpy;
     }
 
     void FanSystem::set_size(EnergyPlusData &state)
@@ -306,7 +306,7 @@ namespace HVACFan {
                 }
             }
         }
-        Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataLoopNode::Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
+        Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataLoopNodes->Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
         m_designPointFEI = report_fei(state, designAirVolFlowRate, designElecPower, deltaPress, rhoAir);
 
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, name, m_fanType);
@@ -440,16 +440,16 @@ namespace HVACFan {
                                                            errorsFound,
                                                            locCurrentModuleObject,
                                                            alphaArgs(1),
-                                                           DataLoopNode::NodeType_Air,
-                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::NodeConnectionType::Inlet,
                                                            1,
                                                            DataLoopNode::ObjectIsNotParent);
         outletNodeNum = NodeInputManager::GetOnlySingleNode(state, alphaArgs(4),
                                                             errorsFound,
                                                             locCurrentModuleObject,
                                                             alphaArgs(1),
-                                                            DataLoopNode::NodeType_Air,
-                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                            DataLoopNode::NodeFluidType::Air,
+                                                            DataLoopNode::NodeConnectionType::Outlet,
                                                             1,
                                                             DataLoopNode::ObjectIsNotParent);
 
@@ -685,7 +685,7 @@ namespace HVACFan {
         localFlowRatio.resize(2, 0.0);
         localRunTimeFrac.resize(2, 1.0);
 
-        if (DataHVACGlobals::NightVentOn) {
+        if (state.dataHVACGlobal->NightVentOn) {
             // assume if non-zero inputs for night data then this fan is to be used with that data
             if (m_nightVentPressureDelta > 0.0) {
                 localPressureRise[0] = m_nightVentPressureDelta;
@@ -738,9 +738,9 @@ namespace HVACFan {
         Real64 localFaultMaxAirMassFlow = 0.0;
         bool faultActive = false;
         Real64 localFaultPressureRise = 0.0;
-        if (m_faultyFilterFlag && (FaultsManager::NumFaultyAirFilter > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
+        if (m_faultyFilterFlag && (state.dataFaultsMgr->NumFaultyAirFilter > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
             state.dataGlobal->DoWeathSim && (!m_eMSMaxMassFlowOverrideOn) && (!m_eMSFanPressureOverrideOn)) {
-            if (ScheduleManager::GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).AvaiSchedPtr) > 0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).AvaiSchedPtr) > 0) {
                 faultActive = true;
                 Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
                 FanDesignFlowRateDec = Fans::CalFaultyFanAirFlowReduction(state,
@@ -748,15 +748,15 @@ namespace HVACFan {
                     designAirVolFlowRate,
                     deltaPress,
                     (ScheduleManager::GetCurrentScheduleValue(state,
-                         FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) -
+                         state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) -
                      1) *
                         deltaPress,
-                    FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterFanCurvePtr);
+                    state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterFanCurvePtr);
 
                 localFaultMaxAirMassFlow = m_maxAirMassFlowRate - FanDesignFlowRateDec * m_rhoAirStdInit;
 
                 localFaultPressureRise = ScheduleManager::GetCurrentScheduleValue(state,
-                                             FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) *
+                                             state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) *
                                          deltaPress;
             }
         }
@@ -806,19 +806,19 @@ namespace HVACFan {
 
                 case SpeedControlMethod::Discrete: {
                     //
-                    if (DataHVACGlobals::OnOffFanPartLoadFraction <= 0.0) {
-                        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+                    if (state.dataHVACGlobal->OnOffFanPartLoadFraction <= 0.0) {
+                        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
                     }
-                    if (DataHVACGlobals::OnOffFanPartLoadFraction < 0.7) {
-                        DataHVACGlobals::OnOffFanPartLoadFraction = 0.7; // a warning message is already issued from the DX coils or gas heating coil
+                    if (state.dataHVACGlobal->OnOffFanPartLoadFraction < 0.7) {
+                        state.dataHVACGlobal->OnOffFanPartLoadFraction = 0.7; // a warning message is already issued from the DX coils or gas heating coil
                     }
                     if (localUseFlowRatiosAndRunTimeFracs) {
                         // Use flow ratios and runtimefractions pass from parent (allows fan to cycle at a specified speed)
                         Real64 locRunTimeFraction(0.0);
-                        if (DataHVACGlobals::OnOffFanPartLoadFraction >= 1.0) {
+                        if (state.dataHVACGlobal->OnOffFanPartLoadFraction >= 1.0) {
                             locRunTimeFraction = localRunTimeFrac[mode];
                         } else {
-                            locRunTimeFraction = max(0.0, min(1.0, localRunTimeFrac[mode] / DataHVACGlobals::OnOffFanPartLoadFraction));
+                            locRunTimeFraction = max(0.0, min(1.0, localRunTimeFrac[mode] / state.dataHVACGlobal->OnOffFanPartLoadFraction));
                         }
                         Real64 locFlowRatio = localFlowRatio[mode]; // Current mode flow rate / max flow rate
                         Real64 locLowSpeedFanRunTimeFrac = 0.0;
@@ -874,10 +874,10 @@ namespace HVACFan {
                         Real64 locFanRunTimeFraction(0.0);
                         Real64 locLowSpeedFanRunTimeFrac = 0.0;
                         Real64 locHiSpeedFanRunTimeFrac = 0.0;
-                        if (DataHVACGlobals::OnOffFanPartLoadFraction >= 1.0) {
+                        if (state.dataHVACGlobal->OnOffFanPartLoadFraction >= 1.0) {
                             locFanRunTimeFraction = localFlowFraction;
                         } else {
-                            locFanRunTimeFraction = max(0.0, min(1.0, localFlowFraction / DataHVACGlobals::OnOffFanPartLoadFraction));
+                            locFanRunTimeFraction = max(0.0, min(1.0, localFlowFraction / state.dataHVACGlobal->OnOffFanPartLoadFraction));
                         }
                         if (m_numSpeeds == 1) { // CV or OnOff
                             localFanTotEff = m_fanTotalEff;
@@ -943,7 +943,7 @@ namespace HVACFan {
 
                     Real64 localFlowFractionForPower = max(m_minPowerFlowFrac, locFlowRatio);
                     Real64 localPowerFraction(0.0);
-                    if (DataHVACGlobals::NightVentOn) {
+                    if (state.dataHVACGlobal->NightVentOn) {
                         localPowerFraction = 1.0; // not sure why, but legacy fan had this for night ventilation
                     } else {
                         localPowerFraction = CurveManager::CurveValue(state, powerModFuncFlowFractionCurveIndex, localFlowFractionForPower);
@@ -1032,32 +1032,32 @@ namespace HVACFan {
             m_qdotConvZone = powerLossToZone * (1.0 - m_zoneRadFract);
             m_qdotRadZone = powerLossToZone * m_zoneRadFract;
         }
-        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0; // reset to 1
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // reset to 1
     }
 
     void FanSystem::update(EnergyPlusData &state) const // does not change state of object, only update elsewhere
     {
         // Set the outlet air node of the fan
-        DataLoopNode::Node(outletNodeNum).MassFlowRate = m_outletAirMassFlowRate;
-        DataLoopNode::Node(outletNodeNum).Temp = m_outletAirTemp;
-        DataLoopNode::Node(outletNodeNum).HumRat = m_outletAirHumRat;
-        DataLoopNode::Node(outletNodeNum).Enthalpy = m_outletAirEnthalpy;
+        state.dataLoopNodes->Node(outletNodeNum).MassFlowRate = m_outletAirMassFlowRate;
+        state.dataLoopNodes->Node(outletNodeNum).Temp = m_outletAirTemp;
+        state.dataLoopNodes->Node(outletNodeNum).HumRat = m_outletAirHumRat;
+        state.dataLoopNodes->Node(outletNodeNum).Enthalpy = m_outletAirEnthalpy;
         // Set the outlet nodes for properties that just pass through & not used
-        DataLoopNode::Node(outletNodeNum).Quality = DataLoopNode::Node(inletNodeNum).Quality;
-        DataLoopNode::Node(outletNodeNum).Press = DataLoopNode::Node(inletNodeNum).Press;
+        state.dataLoopNodes->Node(outletNodeNum).Quality = state.dataLoopNodes->Node(inletNodeNum).Quality;
+        state.dataLoopNodes->Node(outletNodeNum).Press = state.dataLoopNodes->Node(inletNodeNum).Press;
 
         // Set the Node Flow Control Variables from the Fan Control Variables
-        DataLoopNode::Node(outletNodeNum).MassFlowRateMaxAvail = m_massFlowRateMaxAvail;
-        DataLoopNode::Node(outletNodeNum).MassFlowRateMinAvail = m_massFlowRateMinAvail;
+        state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMaxAvail = m_massFlowRateMaxAvail;
+        state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMinAvail = m_massFlowRateMinAvail;
 
         // make sure inlet has the same mass flow
-        DataLoopNode::Node(inletNodeNum).MassFlowRate = m_outletAirMassFlowRate;
+        state.dataLoopNodes->Node(inletNodeNum).MassFlowRate = m_outletAirMassFlowRate;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            DataLoopNode::Node(outletNodeNum).CO2 = DataLoopNode::Node(inletNodeNum).CO2;
+            state.dataLoopNodes->Node(outletNodeNum).CO2 = state.dataLoopNodes->Node(inletNodeNum).CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            DataLoopNode::Node(outletNodeNum).GenContam = DataLoopNode::Node(inletNodeNum).GenContam;
+            state.dataLoopNodes->Node(outletNodeNum).GenContam = state.dataLoopNodes->Node(inletNodeNum).GenContam;
         }
 
         if (speedControl == SpeedControlMethod::Continuous) {
@@ -1079,9 +1079,9 @@ namespace HVACFan {
         }
     }
 
-    void FanSystem::report()
+    void FanSystem::report(EnergyPlusData &state)
     {
-        m_fanEnergy = m_fanPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        m_fanEnergy = m_fanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         m_deltaTemp = m_outletAirTemp - m_inletAirTemp;
     }
 

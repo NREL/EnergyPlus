@@ -64,51 +64,19 @@ struct EnergyPlusData;
 
 namespace HeatingCoils {
 
-    // Using/Aliasing
-
-    // Data
     // MODULE PARAMETER DEFINITIONS
-    extern Real64 const MinAirMassFlow;
-    extern int NumDesuperheaterCoil; // Total number of desuperheater heating coil objects in input
-    extern int NumElecCoil;
-    extern int NumElecCoilMultiStage;
-    extern int NumFuelCoil;
-    extern int NumGasCoilMultiStage;
+    Real64 constexpr MinAirMassFlow(0.001);
 
-    // reclaim heat object types
-    extern int const COMPRESSORRACK_REFRIGERATEDCASE;
-    extern int const COIL_DX_COOLING;
-    extern int const COIL_DX_MULTISPEED;
-    extern int const COIL_DX_MULTIMODE;
-    extern int const CONDENSER_REFRIGERATION;
-    extern int const COIL_DX_VARIABLE_COOLING;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumHeatingCoils; // The Number of HeatingCoils found in the Input
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
-    extern bool GetCoilsInputFlag;       // Flag set to make sure you get input once
-    extern bool CoilIsSuppHeater;        // Flag set to indicate the heating coil is a supplemental heater
-    extern Array1D_bool CheckEquipName;
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Utility routines for module
-
-    // Types
+    enum class HeatObjTypes   // reclaim heat object types
+    {
+        Unassigned,
+        COMPRESSORRACK_REFRIGERATEDCASE,
+        COIL_DX_COOLING,// single speed DX
+        COIL_DX_MULTISPEED,
+        COIL_DX_MULTIMODE,
+        CONDENSER_REFRIGERATION,
+        COIL_DX_VARIABLE_COOLING
+    };
 
     struct HeatingCoilEquipConditions
     {
@@ -158,7 +126,7 @@ namespace HeatingCoils {
         int PLFErrorCount;                  // used in recurring error warnings
         std::string ReclaimHeatingCoilName; // Name of reclaim heating coil
         int ReclaimHeatingSourceIndexNum;   // Index to reclaim heating source (condenser) of a specific type
-        int ReclaimHeatingSource;           // The source for the Reclaim Heating Coil
+        HeatObjTypes ReclaimHeatingSource;  // The source for the Reclaim Heating Coil
         //                                                            COMPRESSOR RACK:REFRIGERATED CASE    = 1
         //                                                            COIL:DX:COOLINGBYPASSFACTOREMPIRICAL = 2
         //                                                            COIL:DX:MULTISPEED:COOLINGEMPIRICAL  = 3
@@ -183,8 +151,8 @@ namespace HeatingCoils {
               HeatingCoilLoad(0.0), HeatingCoilRate(0.0), FuelUseLoad(0.0), ElecUseLoad(0.0), FuelUseRate(0.0), ElecUseRate(0.0), Efficiency(0.0),
               NominalCapacity(0.0), DesiredOutletTemp(0.0), DesiredOutletHumRat(0.0), AvailTemperature(0.0), AirInletNodeNum(0), AirOutletNodeNum(0),
               TempSetPointNodeNum(0), Control(0), PLFCurveIndex(0), ParasiticElecLoad(0.0), ParasiticFuelLoad(0.0), ParasiticFuelRate(0.0),
-              ParasiticFuelCapacity(0.0), RTF(0.0), RTFErrorIndex(0), RTFErrorCount(0), PLFErrorIndex(0), PLFErrorCount(0),
-              ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(0), NumOfStages(0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0),
+              ParasiticFuelCapacity(0.0), RTF(0.0), RTFErrorIndex(0), RTFErrorCount(0), PLFErrorIndex(0), PLFErrorCount(0), ReclaimHeatingSourceIndexNum(0),
+              ReclaimHeatingSource(HeatObjTypes::Unassigned), NumOfStages(0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0),
               FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true), AirLoopNum(0)
         {
         }
@@ -200,11 +168,6 @@ namespace HeatingCoils {
         }
     };
 
-    // Object Data
-    extern Array1D<HeatingCoilEquipConditions> HeatingCoil;
-    extern Array1D<HeatingCoilNumericFieldData> HeatingCoilNumericFields;
-
-    // Functions
 
     void SimulateHeatingCoilComponents(EnergyPlusData &state, std::string const &CompName,
                                        bool const FirstHVACIteration,
@@ -351,10 +314,6 @@ namespace HeatingCoils {
                                      bool &ErrorsFound            // set to true if problem
     );
 
-    // Clears the global data in HeatingCoils.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
     // sets data to a coil that is used as a regeneration air heating coil in
     // desiccant dehumidification system
     void SetHeatingCoilData(EnergyPlusData &state, int const CoilNum,                           // Number of electric or gas heating Coil
@@ -371,9 +330,56 @@ namespace HeatingCoils {
 
 struct HeatingCoilsData : BaseGlobalStruct {
 
+    int NumDesuperheaterCoil = 0; // Total number of desuperheater heating coil objects in input
+    int NumElecCoil = 0;
+    int NumElecCoilMultiStage = 0;
+    int NumFuelCoil = 0;
+    int NumGasCoilMultiStage = 0;
+    int NumHeatingCoils = 0; // The Number of HeatingCoils found in the Input
+    Array1D_bool MySizeFlag;
+    Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
+    bool GetCoilsInputFlag = true; // Flag set to make sure you get input once
+    bool CoilIsSuppHeater = false; // Flag set to indicate the heating coil is a supplemental heater
+    Array1D_bool CheckEquipName;
+    Array1D<HeatingCoils::HeatingCoilEquipConditions> HeatingCoil;
+    Array1D<HeatingCoils::HeatingCoilNumericFieldData> HeatingCoilNumericFields;
+    bool MyOneTimeFlag = true; // one time initialization flag
+    bool InputErrorsFound = false;
+
+    int MaxNums = 0;        // Maximum number of numeric input fields
+    int MaxAlphas = 0;      // Maximum number of alpha input fields
+    int TotalArgs = 0;      // Total number of alpha and numeric arguments (max) for a certain object in the input file
+    int ValidSourceTypeCounter = 0;     // Counter used to determine if desuperheater source name is valid
+    bool HeatingCoilFatalError = false; // used for error checking
+    Array1D_bool MySPTestFlag;         // used for error checking
+    Array1D_bool ShowSingleWarning;    // Used for single warning message for desuperheater coil
+    Array1D_bool MyEnvrnFlag;          // one time environment flag
+
     void clear_state() override
     {
-
+        this->NumDesuperheaterCoil = 0;
+        this->NumElecCoil = 0;
+        this->NumElecCoilMultiStage = 0;
+        this->NumFuelCoil = 0;
+        this->NumGasCoilMultiStage = 0;
+        this->NumHeatingCoils = 0;
+        this->MySizeFlag.deallocate();
+        this->ValidSourceType.deallocate();
+        this->GetCoilsInputFlag = true;
+        this->CoilIsSuppHeater = false;
+        this->CheckEquipName.deallocate();
+        this->HeatingCoil.deallocate();
+        this->HeatingCoilNumericFields.deallocate();
+        this->MyOneTimeFlag = true;
+        this->InputErrorsFound = false;
+        this->MaxNums = 0;
+        this->MaxAlphas = 0;
+        this->TotalArgs = 0;
+        this->ValidSourceTypeCounter = 0;
+        this->HeatingCoilFatalError = false;
+        this->MySPTestFlag.clear();
+        this->ShowSingleWarning.clear();
+        this->MyEnvrnFlag.clear();          
     }
 };
 

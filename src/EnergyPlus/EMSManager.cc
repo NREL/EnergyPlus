@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -492,7 +493,7 @@ namespace EMSManager {
         int NumNums;     // Number of elements in the numeric array
         int AlphaNum;
         int IOStat; // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;
@@ -511,9 +512,9 @@ namespace EMSManager {
         int InternVarNum;              // do loop counter for internal variables used (outer)
         int InternalVarAvailNum;       // do loop counter for internal variables available (inner)
         int Loop;                      // do loop counter
-        static int MaxNumAlphas(0);    // argument for call to GetObjectDefMaxArgs
-        static int MaxNumNumbers(0);   // argument for call to GetObjectDefMaxArgs
-        static int TotalArgs(0);       // argument for call to GetObjectDefMaxArgs
+        int MaxNumAlphas(0);    // argument for call to GetObjectDefMaxArgs
+        int MaxNumNumbers(0);   // argument for call to GetObjectDefMaxArgs
+        int TotalArgs(0);       // argument for call to GetObjectDefMaxArgs
         bool errFlag;
 
 
@@ -1418,58 +1419,79 @@ namespace EMSManager {
         // affect the node variables, rather than using separate logical override flag and ems values
 
         // Using/Aliasing
-        using DataLoopNode::Node;
-        using DataLoopNode::NodeID;
-        using DataLoopNode::NumOfNodes;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int LoopNode;       // local do loop index
-        static bool lDummy; // not going to setup a pointer to logical control //Fix Changed to static: Passed to SetupEMSActuator as source of
-                            // persistent Reference
         // (could this ever cause a fault?) // It caused illegal memory access/corruption
         // make it optional in Setup call?
         int OutsideAirNodeNum; // local do loop index
         int NodeNum;           // local index.
 
-        lDummy = false;
+        state.dataEMSMgr->lDummy = false;
 
-        if (NumOfNodes > 0) {
+        if (state.dataLoopNodes->NumOfNodes > 0) {
 
-            for (LoopNode = 1; LoopNode <= NumOfNodes; ++LoopNode) {
+            for (LoopNode = 1; LoopNode <= state.dataLoopNodes->NumOfNodes; ++LoopNode) {
                 // setup the setpoint for each type of variable that can be controlled
-                SetupEMSActuator(state, "System Node Setpoint", NodeID(LoopNode), "Temperature Setpoint", "[C]", lDummy, Node(LoopNode).TempSetPoint);
                 SetupEMSActuator(state,
-                    "System Node Setpoint", NodeID(LoopNode), "Temperature Minimum Setpoint", "[C]", lDummy, Node(LoopNode).TempSetPointLo);
+                                 "System Node Setpoint",
+                                 state.dataLoopNodes->NodeID(LoopNode),
+                                 "Temperature Setpoint",
+                                 "[C]",
+                                 state.dataEMSMgr->lDummy,
+                                 state.dataLoopNodes->Node(LoopNode).TempSetPoint);
                 SetupEMSActuator(state,
-                    "System Node Setpoint", NodeID(LoopNode), "Temperature Maximum Setpoint", "[C]", lDummy, Node(LoopNode).TempSetPointHi);
+                                 "System Node Setpoint",
+                                 state.dataLoopNodes->NodeID(LoopNode),
+                                 "Temperature Minimum Setpoint",
+                                 "[C]",
+                                 state.dataEMSMgr->lDummy,
+                                 state.dataLoopNodes->Node(LoopNode).TempSetPointLo);
                 SetupEMSActuator(state,
-                    "System Node Setpoint", NodeID(LoopNode), "Humidity Ratio Setpoint", "[kgWater/kgDryAir]", lDummy, Node(LoopNode).HumRatSetPoint);
+                                 "System Node Setpoint",
+                                 state.dataLoopNodes->NodeID(LoopNode),
+                                 "Temperature Maximum Setpoint",
+                                 "[C]",
+                                 state.dataEMSMgr->lDummy,
+                                 state.dataLoopNodes->Node(LoopNode).TempSetPointHi);
+                SetupEMSActuator(state,
+                                 "System Node Setpoint",
+                                 state.dataLoopNodes->NodeID(LoopNode),
+                                 "Humidity Ratio Setpoint",
+                                 "[kgWater/kgDryAir]",
+                                 state.dataEMSMgr->lDummy,
+                                 state.dataLoopNodes->Node(LoopNode).HumRatSetPoint);
                 SetupEMSActuator(state, "System Node Setpoint",
-                                 NodeID(LoopNode),
+                                 state.dataLoopNodes->NodeID(LoopNode),
                                  "Humidity Ratio Maximum Setpoint",
                                  "[kgWater/kgDryAir]",
-                                 lDummy,
-                                 Node(LoopNode).HumRatMax);
+                                 state.dataEMSMgr->lDummy,
+                                 state.dataLoopNodes->Node(LoopNode).HumRatMax);
                 SetupEMSActuator(state, "System Node Setpoint",
-                                 NodeID(LoopNode),
+                                 state.dataLoopNodes->NodeID(LoopNode),
                                  "Humidity Ratio Minimum Setpoint",
                                  "[kgWater/kgDryAir]",
-                                 lDummy,
-                                 Node(LoopNode).HumRatMin);
+                                 state.dataEMSMgr->lDummy,
+                                 state.dataLoopNodes->Node(LoopNode).HumRatMin);
                 SetupEMSActuator(state,
-                    "System Node Setpoint", NodeID(LoopNode), "Mass Flow Rate Setpoint", "[kg/s]", lDummy, Node(LoopNode).MassFlowRateSetPoint);
+                                 "System Node Setpoint",
+                                 state.dataLoopNodes->NodeID(LoopNode),
+                                 "Mass Flow Rate Setpoint",
+                                 "[kg/s]",
+                                 state.dataEMSMgr->lDummy,
+                                 state.dataLoopNodes->Node(LoopNode).MassFlowRateSetPoint);
                 SetupEMSActuator(state, "System Node Setpoint",
-                                 NodeID(LoopNode),
+                                 state.dataLoopNodes->NodeID(LoopNode),
                                  "Mass Flow Rate Maximum Available Setpoint",
                                  "[kg/s]",
-                                 lDummy,
-                                 Node(LoopNode).MassFlowRateMaxAvail);
+                                 state.dataEMSMgr->lDummy,
+                                 state.dataLoopNodes->Node(LoopNode).MassFlowRateMaxAvail);
                 SetupEMSActuator(state, "System Node Setpoint",
-                                 NodeID(LoopNode),
+                                 state.dataLoopNodes->NodeID(LoopNode),
                                  "Mass Flow Rate Minimum Available Setpoint",
                                  "[kg/s]",
-                                 lDummy,
-                                 Node(LoopNode).MassFlowRateMinAvail);
+                                 state.dataEMSMgr->lDummy,
+                                 state.dataLoopNodes->Node(LoopNode).MassFlowRateMinAvail);
             }
 
         } // NumOfNodes > 0
@@ -1478,33 +1500,34 @@ namespace EMSManager {
             for (OutsideAirNodeNum = 1; OutsideAirNodeNum <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++OutsideAirNodeNum) {
                 NodeNum = state.dataOutAirNodeMgr->OutsideAirNodeList(OutsideAirNodeNum);
                 SetupEMSActuator(state, "Outdoor Air System Node",
-                                 NodeID(NodeNum),
+                                 state.dataLoopNodes->NodeID(NodeNum),
                                  "Drybulb Temperature",
                                  "[C]",
-                                 Node(NodeNum).EMSOverrideOutAirDryBulb,
-                                 Node(NodeNum).EMSValueForOutAirDryBulb);
+                                 state.dataLoopNodes->Node(NodeNum).EMSOverrideOutAirDryBulb,
+                                 state.dataLoopNodes->Node(NodeNum).EMSValueForOutAirDryBulb);
                 SetupEMSActuator(state, "Outdoor Air System Node",
-                                 NodeID(NodeNum),
+                                 state.dataLoopNodes->NodeID(NodeNum),
                                  "Wetbulb Temperature",
                                  "[C]",
-                                 Node(NodeNum).EMSOverrideOutAirWetBulb,
-                                 Node(NodeNum).EMSValueForOutAirWetBulb);
+                                 state.dataLoopNodes->Node(NodeNum).EMSOverrideOutAirWetBulb,
+                                 state.dataLoopNodes->Node(NodeNum).EMSValueForOutAirWetBulb);
                 SetupEMSActuator(state, "Outdoor Air System Node",
-                                 NodeID(NodeNum),
+                                 state.dataLoopNodes->NodeID(NodeNum),
                                  "Wind Speed",
                                  "[m/s]",
-                                 Node(NodeNum).EMSOverrideOutAirWindSpeed,
-                                 Node(NodeNum).EMSValueForOutAirWindSpeed);
+                                 state.dataLoopNodes->Node(NodeNum).EMSOverrideOutAirWindSpeed,
+                                 state.dataLoopNodes->Node(NodeNum).EMSValueForOutAirWindSpeed);
                 SetupEMSActuator(state, "Outdoor Air System Node",
-                                 NodeID(NodeNum),
+                                 state.dataLoopNodes->NodeID(NodeNum),
                                  "Wind Direction",
                                  "[degree]",
-                                 Node(NodeNum).EMSOverrideOutAirWindDir,
-                                 Node(NodeNum).EMSValueForOutAirWindDir);
+                                 state.dataLoopNodes->Node(NodeNum).EMSOverrideOutAirWindDir,
+                                 state.dataLoopNodes->Node(NodeNum).EMSValueForOutAirWindDir);
                 for (int ActuatorUsedLoop = 1; ActuatorUsedLoop <= state.dataRuntimeLang->numActuatorsUsed; ActuatorUsedLoop++) {
                     if (UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ComponentTypeName, "Outdoor Air System Node") &&
-                        UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).UniqueIDName,NodeID(NodeNum))) {
-                        Node(NodeNum).IsLocalNode = true;
+                        UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).UniqueIDName,
+                                                    state.dataLoopNodes->NodeID(NodeNum))) {
+                        state.dataLoopNodes->Node(NodeNum).IsLocalNode = true;
                         break;
                     }
                 }
@@ -1529,10 +1552,10 @@ namespace EMSManager {
         // Trend arrays are pushed so that the latest value is
         //  always at index 1.  old values get lost.
 
-        static int TrendNum(0); // local loop counter
-        static int ErlVarNum(0);
-        static int TrendDepth(0);
-        static Real64 currentVal(0.0);
+        int TrendNum(0); // local loop counter
+        int ErlVarNum(0);
+        int TrendDepth(0);
+        Real64 currentVal(0.0);
 
         // checks with quick return if no updates needed.
         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) return;
@@ -1591,13 +1614,10 @@ namespace EMSManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Provide method to verify that a specific node is (probably) managed by EMS
 
-        // Using/Aliasing
-        using DataLoopNode::NodeID;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool FoundControl(false);
 
-        std::string cNodeName = NodeID(NodeNum);
+        std::string cNodeName = state.dataLoopNodes->NodeID(NodeNum);
         std::string cComponentTypeName = "System Node Setpoint";
         std::string cControlTypeName = controlTypeName(SetPointType);
 
@@ -1614,7 +1634,8 @@ namespace EMSManager {
                 }
             }
             if (!FoundControl) {
-                ShowWarningError(state, "Missing '" + controlTypeName(SetPointType) + "' for node named named '" + NodeID(NodeNum) + "'.");
+                ShowWarningError(
+                    state, "Missing '" + controlTypeName(SetPointType) + "' for node named named '" + state.dataLoopNodes->NodeID(NodeNum) + "'.");
             }
         } else {
             for (int Loop = 1; Loop <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed; ++Loop) {
@@ -1645,9 +1666,6 @@ namespace EMSManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Provide method to verify that a specific node is (probably) managed by EMS
 
-        // Using/Aliasing
-        using DataLoopNode::NodeID;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string cControlTypeName;
         std::string cComponentTypeName;
@@ -1661,7 +1679,7 @@ namespace EMSManager {
                 ErrorFlag = true;
             } else {
                 // We'll defer to checking at the end whether a Plugin / API called getActuatorHandle on it
-                auto &nodeSetpointCheck = DataLoopNode::NodeSetpointCheck(NodeNum);
+                auto &nodeSetpointCheck = state.dataLoopNodes->NodeSetpointCheck(NodeNum);
                 nodeSetpointCheck.needsSetpointChecking = true;
 
                 auto const SELECT_CASE_var(SetPointType);
@@ -1706,8 +1724,8 @@ namespace EMSManager {
 
         bool FatalErrorFlag = false;
 
-        for (int NodeNum = 1; NodeNum <= DataLoopNode::NumOfNodes; ++NodeNum) {
-            auto & nodeSetpointCheck = DataLoopNode::NodeSetpointCheck(NodeNum);
+        for (int NodeNum = 1; NodeNum <= state.dataLoopNodes->NumOfNodes; ++NodeNum) {
+            auto &nodeSetpointCheck = state.dataLoopNodes->NodeSetpointCheck(NodeNum);
 
             if (nodeSetpointCheck.needsSetpointChecking) {
                 // Start by setting it to false (assume matched)
@@ -1762,7 +1780,8 @@ namespace EMSManager {
 
         returnValue = false;
         for (auto loop = 1; loop <= state.dataRuntimeLang->NumSensors; ++loop) {
-            if (state.dataRuntimeLang->Sensor(loop).UniqueKeyName == DataLoopNode::NodeID(nodeNum) && UtilityRoutines::SameString(state.dataRuntimeLang->Sensor(loop).OutputVarName, varName)) {
+            if (state.dataRuntimeLang->Sensor(loop).UniqueKeyName == state.dataLoopNodes->NodeID(nodeNum) &&
+                UtilityRoutines::SameString(state.dataRuntimeLang->Sensor(loop).OutputVarName, varName)) {
                 returnValue = true;
             }
         }
@@ -1803,17 +1822,16 @@ namespace EMSManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int numAirLoops(0);
-        static int Loop(0);
-        static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
+        int numAirLoops(0);
+        int Loop(0);
 
-        lDummy = false;
+        state.dataEMSMgr->lDummy2 = false;
 
         if (allocated(state.dataAirLoop->PriAirSysAvailMgr)) {
             numAirLoops = isize(state.dataAirLoop->PriAirSysAvailMgr);
             for (Loop = 1; Loop <= numAirLoops; ++Loop) {
                 SetupEMSActuator(state,
-                    "AirLoopHVAC", state.dataAirSystemsData->PrimaryAirSystems(Loop).Name, "Availability Status", "[ ]", lDummy, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
+                                 "AirLoopHVAC", state.dataAirSystemsData->PrimaryAirSystems(Loop).Name, "Availability Status", "[ ]", state.dataEMSMgr->lDummy2, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
             }
 
         } else {
@@ -1840,7 +1858,7 @@ namespace EMSManager {
         using DataSurfaces::WinShadingType;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int loopSurfNum(0); // local do loop index
+        int loopSurfNum(0); // local do loop index
 
         for (loopSurfNum = 1; loopSurfNum <= state.dataSurface->TotSurfaces; ++loopSurfNum) {
 
@@ -1918,7 +1936,7 @@ namespace EMSManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int Loop(0); // local do loop index
+        int Loop(0); // local do loop index
 
         for (Loop = 1; Loop <= state.dataZoneCtrls->NumTempControlledZones; ++Loop) {
             SetupEMSActuator(state, "Zone Temperature Control",

@@ -119,7 +119,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
             this->initialize(state);
             this->calculate(state, CurLoad);
-            this->update();
+            this->update(state);
         } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
             PlantUtilities::UpdateChillerComponentCondenserSide(state, this->SourceLoopNum,
                                                 this->SourceLoopSideNum,
@@ -331,8 +331,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                                                      ErrorsFound,
                                                                      "HeatPump:WaterToWater Cooling",
                                                                      AlphArray(1),
-                                                                     NodeType_Water,
-                                                                     NodeConnectionType_Inlet,
+                                                                     DataLoopNode::NodeFluidType::Water,
+                                                                     DataLoopNode::NodeConnectionType::Inlet,
                                                                      1,
                                                                      ObjectIsNotParent);
 
@@ -340,8 +340,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                                                       ErrorsFound,
                                                                       "HeatPump:WaterToWater Cooling",
                                                                       AlphArray(1),
-                                                                      NodeType_Water,
-                                                                      NodeConnectionType_Outlet,
+                                                                      DataLoopNode::NodeFluidType::Water,
+                                                                      DataLoopNode::NodeConnectionType::Outlet,
                                                                       1,
                                                                       ObjectIsNotParent);
 
@@ -349,8 +349,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                                                    ErrorsFound,
                                                                    "HeatPump:WaterToWater Cooling",
                                                                    AlphArray(1),
-                                                                   NodeType_Water,
-                                                                   NodeConnectionType_Inlet,
+                                                                   DataLoopNode::NodeFluidType::Water,
+                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                    2,
                                                                    ObjectIsNotParent);
 
@@ -358,8 +358,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                                                     ErrorsFound,
                                                                     "HeatPump:WaterToWater Cooling",
                                                                     AlphArray(1),
-                                                                    NodeType_Water,
-                                                                    NodeConnectionType_Outlet,
+                                                                    DataLoopNode::NodeFluidType::Water,
+                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                     2,
                                                                     ObjectIsNotParent);
 
@@ -516,7 +516,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                                            RoutineName);
             this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                this->LoadSideDesignMassFlow,
                                this->LoadSideInletNodeNum,
                                this->LoadSideOutletNodeNum,
@@ -532,7 +533,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                                     RoutineName);
             this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                this->SourceSideDesignMassFlow,
                                this->SourceSideInletNodeNum,
                                this->SourceSideOutletNodeNum,
@@ -541,7 +543,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                this->SourceBranchNum,
                                this->SourceCompNum);
 
-            Node(this->SourceSideInletNodeNum).Temp = 35.0;
+            state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp = 35.0;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) this->beginEnvironFlag = true;
@@ -609,8 +611,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
         Real64 DutyFactor;
         int IterationCount;
 
-        static Real64 CurrentSimTime(0.0);
-        static Real64 PrevSimTime(0.0);
+        auto & CurrentSimTime = state.dataHPWaterToWaterClg->CurrentSimTime;
+        auto & PrevSimTime = state.dataHPWaterToWaterClg->PrevSimTime;
 
         Real64 CpSourceSide; // local temporary for fluid specific heat
         Real64 CpLoadSide;   // local temporary for fluid specific heat
@@ -620,7 +622,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
         }
 
         // CALCULATE THE SIMULATION TIME
-        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
 
         if (MyLoad < 0.0) {
             this->MustRun = true;
@@ -662,9 +664,9 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
             this->QLoad = 0.0;
             this->QSource = 0.0;
             this->Power = 0.0;
-            this->LoadSideWaterInletTemp = Node(this->LoadSideInletNodeNum).Temp;
+            this->LoadSideWaterInletTemp = state.dataLoopNodes->Node(this->LoadSideInletNodeNum).Temp;
             this->LoadSideWaterOutletTemp = LoadSideWaterInletTemp;
-            this->SourceSideWaterInletTemp = Node(this->SourceSideInletNodeNum).Temp;
+            this->SourceSideWaterInletTemp = state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp;
             this->SourceSideWaterOutletTemp = SourceSideWaterInletTemp;
             return; // if heat pump is not running return without simulation
 
@@ -688,8 +690,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                  this->SourceBranchNum,
                                  this->SourceCompNum);
             // get inlet temps
-            this->LoadSideWaterInletTemp = Node(this->LoadSideInletNodeNum).Temp;
-            this->SourceSideWaterInletTemp = Node(this->SourceSideInletNodeNum).Temp;
+            this->LoadSideWaterInletTemp = state.dataLoopNodes->Node(this->LoadSideInletNodeNum).Temp;
+            this->SourceSideWaterInletTemp = state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp;
             // if there's no flow, turn the "heat pump off"
             if (this->LoadSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance || this->SourceSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
                 this->LoadSideWaterMassFlowRate = 0.0;
@@ -720,9 +722,9 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                 this->QLoad = 0.0;
                 this->QSource = 0.0;
                 this->Power = 0.0;
-                this->LoadSideWaterInletTemp = Node(this->LoadSideInletNodeNum).Temp;
+                this->LoadSideWaterInletTemp = state.dataLoopNodes->Node(this->LoadSideInletNodeNum).Temp;
                 this->LoadSideWaterOutletTemp = LoadSideWaterInletTemp;
-                this->SourceSideWaterInletTemp = Node(this->SourceSideInletNodeNum).Temp;
+                this->SourceSideWaterInletTemp = state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp;
                 this->SourceSideWaterOutletTemp = SourceSideWaterInletTemp;
                 return;
             }
@@ -915,7 +917,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
         this->Running = 1;
     }
 
-    void GshpPeCoolingSpecs::update()
+    void GshpPeCoolingSpecs::update(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -923,34 +925,34 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
 
         if (!this->MustRun) {
             // set node temperatures
-            Node(this->SourceSideOutletNodeNum).Temp = Node(this->SourceSideInletNodeNum).Temp;
-            Node(this->LoadSideOutletNodeNum).Temp = Node(this->LoadSideInletNodeNum).Temp;
+            state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).Temp = state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp;
+            state.dataLoopNodes->Node(this->LoadSideOutletNodeNum).Temp = state.dataLoopNodes->Node(this->LoadSideInletNodeNum).Temp;
             this->Power = 0.0;
             this->Energy = 0.0;
             this->QSource = 0.0;
             this->QLoad = 0.0;
             this->QSourceEnergy = 0.0;
             this->QLoadEnergy = 0.0;
-            this->SourceSideWaterInletTemp = Node(this->SourceSideInletNodeNum).Temp;
-            this->SourceSideWaterOutletTemp = Node(this->SourceSideOutletNodeNum).Temp;
-            this->LoadSideWaterInletTemp = Node(this->LoadSideInletNodeNum).Temp;
-            this->LoadSideWaterOutletTemp = Node(this->LoadSideOutletNodeNum).Temp;
+            this->SourceSideWaterInletTemp = state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp;
+            this->SourceSideWaterOutletTemp = state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).Temp;
+            this->LoadSideWaterInletTemp = state.dataLoopNodes->Node(this->LoadSideInletNodeNum).Temp;
+            this->LoadSideWaterOutletTemp = state.dataLoopNodes->Node(this->LoadSideOutletNodeNum).Temp;
 
         } else {
             // set node temperatures
-            Node(this->LoadSideOutletNodeNum).Temp = this->LoadSideWaterOutletTemp;
-            Node(this->SourceSideOutletNodeNum).Temp = this->SourceSideWaterOutletTemp;
+            state.dataLoopNodes->Node(this->LoadSideOutletNodeNum).Temp = this->LoadSideWaterOutletTemp;
+            state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).Temp = this->SourceSideWaterOutletTemp;
 
             // set node flow rates;  for these load based models
             // assume that the sufficient Source Side flow rate available
 
-            Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
             this->Energy = this->Power * ReportingConstant;
             this->QSourceEnergy = QSource * ReportingConstant;
             this->QLoadEnergy = QLoad * ReportingConstant;
-            this->SourceSideWaterInletTemp = Node(this->SourceSideInletNodeNum).Temp;
-            this->LoadSideWaterInletTemp = Node(this->LoadSideInletNodeNum).Temp;
+            this->SourceSideWaterInletTemp = state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp;
+            this->LoadSideWaterInletTemp = state.dataLoopNodes->Node(this->LoadSideInletNodeNum).Temp;
         }
 
     }

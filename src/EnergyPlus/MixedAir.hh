@@ -142,6 +142,18 @@ namespace MixedAir {
     constexpr int CMO_MechVentilation(7);
     constexpr int CMO_OAMixer(8);
 
+    // OA Controller Limiting Factor (used for integer output variable values for OAControllerProps::OALimitingFactor
+    constexpr int limitFactorNone = 0;        // No limit other than fixed OA amount
+    constexpr int limitFactorLimits = 1;      // Limits and scheduled limits
+    constexpr int limitFactorEconomizer = 2;  // Economizer operation
+    constexpr int limitFactorExhaust = 3;     // Exhaust flow
+    constexpr int limitFactorMixedAir = 4;    // Mixed air flow rate
+    constexpr int limitFactorHighHum = 5;     // High humidity economizer control
+    constexpr int limitFactorDCV = 6;         // Demand-controlled ventilation
+    constexpr int limitFactorNightVent = 7;   // Night ventilation
+    constexpr int limitFactorDemandLimit = 8; // Demand-limiting
+    constexpr int limitFactorEMS = 9;         // EMS override
+
     extern Array1D_string const CurrentModuleObjects;
 
     struct ControllerListProps
@@ -250,6 +262,8 @@ namespace MixedAir {
         int NumFaultyEconomizer;           // total number of economizer faults
         int CountMechVentFrac;             // Count when OA min fraction > mech vent fraction
         int IndexMechVentFrac;             // Index when OA min fraction > mech vent fraction
+        int OALimitingFactor; // OA controller limiting factor: 0=none, 1=limits, 2=exhaust flow, 3=economizer, 4=DCV, 5=high hum, 6=night vent,
+                              // 7=demand limiting, 8=EMS
 
         // Default Constructor
         OAControllerProps()
@@ -264,7 +278,7 @@ namespace MixedAir {
               HighHumCtrlStatus(0), OAFractionRpt(0.0), MinOAFracLimit(0.0), MechVentOAMassFlowRequest(0.0), EMSOverrideOARate(false),
               EMSOARateValue(0.0), HeatRecoveryBypassControlType(BypassWhenWithinEconomizerLimits), ManageDemand(false), DemandLimitFlowRate(0.0),
               MaxOAFracBySetPoint(0), MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false),
-              EconmizerFaultNum(0), NumFaultyEconomizer(0), CountMechVentFrac(0), IndexMechVentFrac(0)
+              EconmizerFaultNum(0), NumFaultyEconomizer(0), CountMechVentFrac(0), IndexMechVentFrac(0), OALimitingFactor(0)
         {
         }
 
@@ -322,6 +336,13 @@ namespace MixedAir {
         Array1D_int ZoneOAFlowMethod;               // OA flow method for each zone
         Array1D_int ZoneOASchPtr;               // Index to the outdoor air schedule for each zone (from DesignSpecification:OutdoorAir or default)
         Array1D<Real64> OAPropCtlMinRateSchPtr; // Outdoor design OA flow rate schedule from DesignSpecification:OutdoorAir
+        Real64 Ep = 1.0; // zone primary air fraction
+        Real64 Er = 0.0; // zone secondary recirculation fraction
+        Real64 Fa = 1.0; // temporary variable used in multi-path VRP calc
+        Real64 Fb = 1.0;
+        Real64 Fc = 1.0;
+        Real64 Xs = 1.0;  // uncorrected system outdoor air fraction
+        Real64 Evz = 1.0; // zone ventilation efficiency
 
         // Default Constructor
         VentilationMechanicalProps()
@@ -478,7 +499,8 @@ namespace MixedAir {
     // Beginning Utility Section of the Module
     //******************************************************************************
 
-    Real64 MixedAirControlTempResidual(Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+    Real64 MixedAirControlTempResidual(EnergyPlusData &state,
+                                       Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
                                        Array1D<Real64> const &Par // par(1) = mixed node number
     );
 
@@ -578,6 +600,14 @@ struct MixedAirData : BaseGlobalStruct {
     Array1D<MixedAir::VentilationMechanicalProps> VentilationMechanical;
     std::unordered_set<std::string> ControllerListUniqueNames;
     std::unordered_map<std::string, std::string> OAControllerUniqueNames;
+    std::string CompType;
+    std::string CompName;
+    std::string CtrlName;
+    Array1D_bool OAControllerMyOneTimeFlag;
+    Array1D_bool OAControllerMyEnvrnFlag;
+    Array1D_bool OAControllerMySizeFlag;
+    Array1D_bool MechVentCheckFlag;
+    Array1D<Real64> Par = Array1D<Real64>(6);
 
     void clear_state() override
     {
@@ -607,6 +637,10 @@ struct MixedAirData : BaseGlobalStruct {
         this->VentilationMechanical.deallocate();
         this->ControllerListUniqueNames.clear();
         this->OAControllerUniqueNames.clear();
+        this->OAControllerMyOneTimeFlag.clear();
+        this->OAControllerMyEnvrnFlag.clear();
+        this->OAControllerMySizeFlag.clear();
+        this->MechVentCheckFlag.clear();
     }
 };
 

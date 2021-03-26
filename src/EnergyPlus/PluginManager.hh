@@ -80,6 +80,8 @@ struct EnergyPlusData;
 
 namespace PluginManagement {
 
+    constexpr const char * programName = "python";
+
     void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
     void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment(EnergyPlusData &state);
@@ -236,7 +238,11 @@ struct PluginManagerData : BaseGlobalStruct {
     std::vector<Real64> globalVariableValues;
     bool fullyReady = false;
     bool apiErrorFlag = false;
-
+    std::vector<std::string> const objectsToFind = {"PythonPlugin:OutputVariable",
+                                                         "PythonPlugin:SearchPaths",
+                                                         "PythonPlugin:Instance",
+                                                         "PythonPlugin:Variables",
+                                                         "PythonPlugin:TrendVariable"};
     void clear_state() override {
         callbacks.clear();
 #if LINK_WITH_PYTHON == 1

@@ -3585,26 +3585,26 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
+    EXPECT_EQ(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
+    EXPECT_EQ(extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
+    EXPECT_EQ(extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     ResetBEPSGathering(*state);
 
-    EXPECT_EQ(0., state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
+    EXPECT_EQ(0., state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
+    EXPECT_EQ(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
@@ -3716,7 +3716,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 
     state->dataOutRptTab->displayHeatEmissionsSummary = true;
     state->dataGlobal->DoWeathSim = true;
-    DataHVACGlobals::TimeStepSys = 10.0;
+    state->dataHVACGlobal->TimeStepSys = 10.0;
     state->dataEnvrn->OutHumRat = 0.005;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
 
@@ -3729,7 +3729,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataCondenserLoopTowers->towers(1).Qactual = 1.0;
     state->dataCondenserLoopTowers->towers(1).FanEnergy = 50.0;
 
-    Real64 TimeStepSysSec = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     Real64 reliefEnergy = 2.0 * TimeStepSysSec;
     Real64 condenserReject = 1.0 * TimeStepSysSec + 50.0;
 
@@ -6447,7 +6447,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test)
 {
     Psychrometrics::InitializePsychRoutines();
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
 
     CompLoadTablesType compLoad;
     int timeOfMax = 63;
@@ -6885,19 +6885,19 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     sqlite->sqliteBegin();
     sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
-    state->dataSize->SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataSize->FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataSize->CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataSize->SysSizPeakDDNum.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataSize->FinalSysSizing.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     int numDesDays = 2;
-    state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataAirLoop->AirToZoneNodeInfo.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     state->dataGlobal->NumOfZones = 0;
     state->dataOutRptTab->displayAirLoopComponentLoadSummary = true;
     state->dataGlobal->CompLoadReportIsReq = true;
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
 
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
 
     WriteLoadComponentSummaryTables(*state);
 
@@ -6932,7 +6932,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     Psychrometrics::InitializePsychRoutines();
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
 
     // Two design days
     int numDesDays = 2;
@@ -6995,10 +6995,10 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
     // One airloop, that serves this zone.
-    DataHVACGlobals::NumPrimaryAirSys = 1;
-    state->dataSize->SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataSize->FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    state->dataSize->CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataSize->SysSizPeakDDNum.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataSize->FinalSysSizing.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
@@ -7019,7 +7019,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataSize->CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
     state->dataSize->CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
 
-    state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataAirLoop->AirToZoneNodeInfo.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;
     state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(1);
     state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
@@ -7031,12 +7031,12 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test
     state->dataSize->FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
 
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = heatDDNum;
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = coolTimeOfMax;
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
-    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk(2) = heatTimeOfMax;
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).HeatPeakDD = heatDDNum;
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = coolTimeOfMax;
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtHeatPk(2) = heatTimeOfMax;
 
 
     // Set up Facility to peak like the zone too
@@ -7746,8 +7746,8 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
 
 
     // Assume that we only have electricity with a value of 3.6e6 * 1e4 J =10.000 kWh.
-    // And that this only comes for a single end use DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)=1
-    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) = 3.6e10;
+    // And that this only comes for a single end use state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)=1
+    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) = 3.6e10;
     state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;
     Real64 eleckWh = 1e4;
 
@@ -7816,7 +7816,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
 
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
 
     SetPredefinedTables(*state);
 
@@ -7907,31 +7907,31 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 1, state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 1, state->dataOutRptTab->gatherEndUseSubBEPS(2, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 4, state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 4, state->dataOutRptTab->gatherEndUseSubBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(2, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_NEAR(extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+    EXPECT_NEAR(extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseSubBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseSubBEPS(2, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
 
     OutputReportTabular::WriteBEPSTable(*state);
     OutputReportTabular::WriteDemandEndUseSummary(*state);
@@ -8294,14 +8294,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
 
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 {
-    OutputReportTabular::clear_state(*state);
     state->dataGlobal->DoWeathSim = true;
 
     state->dataOutRptPredefined->pdrSensibleGain = 1;
     state->dataOutRptPredefined->reportName.allocate(1);
     state->dataOutRptPredefined->reportName(state->dataOutRptPredefined->pdrSensibleGain).show = true;
 
-    DataHVACGlobals::TimeStepSys = 10.0;
+    state->dataHVACGlobal->TimeStepSys = 10.0;
     state->dataGlobal->TimeStepZone = 20.0;
     state->dataDefineEquipment->NumAirDistUnits = 1;
 
@@ -8326,8 +8325,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 
     GatherHeatGainReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
 
-    EXPECT_EQ(1.0*(DataHVACGlobals::TimeStepSys)*DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqHt);
-    EXPECT_EQ(0.0*(DataHVACGlobals::TimeStepSys)*DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqCl);
+    EXPECT_EQ(1.0*(state->dataHVACGlobal->TimeStepSys)*DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqHt);
+    EXPECT_EQ(0.0*(state->dataHVACGlobal->TimeStepSys)*DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqCl);
     EXPECT_EQ(1000.0, state->dataHeatBal->ZonePreDefRep(1).SHGSAnHvacATUHt);
     EXPECT_EQ(-2000.0, state->dataHeatBal->ZonePreDefRep(1).SHGSAnHvacATUCl);
 }
@@ -8438,8 +8437,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->files.outputControl.sqlite = true;
-    DataStringGlobals::outputSqlFileName = "eplussqlite1.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout1.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite1.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout1.sql";
 
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
@@ -8448,8 +8447,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
@@ -8463,8 +8462,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite2.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout2.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite2.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout2.sql";
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound);
@@ -8472,8 +8471,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
@@ -8487,8 +8486,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite3.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout3.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite3.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout3.sql";
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None);
@@ -8496,8 +8495,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
@@ -8512,8 +8511,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite4.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout4.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite4.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout4.sql";
 
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
@@ -8522,8 +8521,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
@@ -8539,8 +8538,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite5.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout5.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite5.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout5.sql";
 
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
@@ -8549,8 +8548,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
@@ -8859,8 +8858,8 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     Real64 expectedBuildingConditionedFloorArea = state->dataHeatBal->Zone(1).FloorArea;
 
     // Assume that we only have electricity with a value of 3.6e6 * 1e4 J =10.000 kWh.
-    // And that this only comes for a single end use DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)=1
-    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) = 3.6e10;
+    // And that this only comes for a single end use state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)=1
+    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) = 3.6e10;
     state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;
     Real64 eleckWh = 1e4;
 
@@ -9343,7 +9342,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     EXPECT_NEAR(1.0/enerConv, 948.0, 0.5);
 
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
 
     SetPredefinedTables(*state);
 
@@ -9414,14 +9413,14 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(
-        extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+        extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
     EXPECT_NEAR(extLitUse * 2,
-                state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
                 1.);
     // AnotherEndUseSubCat
     EXPECT_NEAR(extLitUse * 1,
-                state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                state->dataOutRptTab->gatherEndUseSubBEPS(2, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
                 1.);
 
     UpdateMeterReporting(*state);
@@ -9429,14 +9428,14 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(
-        extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+        extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
     EXPECT_NEAR(extLitUse * 4,
-                state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
                 1.);
     // AnotherEndUseSubCat
     EXPECT_NEAR(extLitUse * 2,
-                state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                state->dataOutRptTab->gatherEndUseSubBEPS(2, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
                 1.);
 
     UpdateMeterReporting(*state);
@@ -9444,14 +9443,14 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(
-        extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+        extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
     EXPECT_NEAR(extLitUse * 6,
-                state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
                 1.);
     // AnotherEndUseSubCat
     EXPECT_NEAR(extLitUse * 3,
-                state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                state->dataOutRptTab->gatherEndUseSubBEPS(2, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
                 1.);
 
     OutputReportTabular::WriteBEPSTable(*state);
@@ -9642,7 +9641,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
 
     OutputReportTabular::CloseOutputTabularFile(*state);
 
-    std::vector<std::string> lines = read_lines_in_file(DataStringGlobals::outputTblHtmFileName);
+    std::vector<std::string> lines = read_lines_in_file(state->dataStrGlobals->outputTblHtmFileName);
 
     // Lambda helper to locate a line in the html file, and compare that line with the expected html after trimming
     auto compare_html_output = [this, &lines](const std::string& lookup, const std::string& expectedHTMLString) {
@@ -9655,7 +9654,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
         }
         EXPECT_FALSE(found_cell.empty())
             << "Did not find the lookup string '" << lookup
-            << "' string in the html output at '" << DataStringGlobals::outputTblHtmFileName
+            << "' string in the html output at '" << state->dataStrGlobals->outputTblHtmFileName
             << "'..." << '\n' << delimited_string(lines);
 
         // Trim leading and trailing spaces
@@ -9698,6 +9697,6 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
     }
 
     // Clean up
-    FileSystem::removeFile(DataStringGlobals::outputTblHtmFileName);
+    FileSystem::removeFile(state->dataStrGlobals->outputTblHtmFileName);
 
 }

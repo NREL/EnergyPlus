@@ -56,6 +56,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -4895,7 +4896,7 @@ CurrentModuleObject,
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const ConcToler(0.0001); // Some reasonable value for comparisons
+        constexpr Real64 ConcToler(0.0001); // Some reasonable value for comparisons
         static std::string const RoutineName("InterpDefValuesForGlycolConc: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4903,7 +4904,6 @@ CurrentModuleObject,
         Real64 InterpFrac; // intermediate value for interpolations
         int LoopC;         // loop counter for concentration
         int LoopT;         // loop counter for temperature
-
 
         // First, find where the actual concentration falls between the concentration data.
         // Then, interpolate if necessary.
@@ -5000,7 +5000,7 @@ CurrentModuleObject,
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const ConcToler(0.0001); // Some reasonable value for comparisons
+        constexpr Real64 ConcToler(0.0001); // Some reasonable value for comparisons
         static std::string const RoutineName("InterpValuesForGlycolConc: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5008,7 +5008,6 @@ CurrentModuleObject,
         Real64 InterpFrac; // intermediate value for interpolations
         int LoopC;         // loop counter for concentration
         int LoopT;         // loop counter for temperature
-
 
         // First, find where the actual concentration falls between the concentration data.
         // Then, interpolate if necessary.
@@ -5377,7 +5376,7 @@ CurrentModuleObject,
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const incr(10.0);
+        constexpr Real64 incr(10.0);
         static std::string const RoutineName("ReportAndTestGlycols");
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -5646,8 +5645,8 @@ CurrentModuleObject,
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const incr(10.0);
-        Real64 const Quality(1.0);
+        constexpr Real64 incr(10.0);
+        constexpr Real64 Quality(1.0);
         static std::string const RoutineName("ReportAndTestRefrigerants");
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -5659,7 +5658,6 @@ CurrentModuleObject,
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RefrigNum;      // Loop Counter
         Real64 Temperature; // Temperature to drive values
-        //  REAL(r64) :: Pressure       ! Pressure to drive values
         Real64 ReturnValue; // Values returned from refrigerant functions
         int Loop;           // Loop Counter
         int Loop1;          // Loop Counter
@@ -6635,7 +6633,6 @@ CurrentModuleObject,
         int ErrCount;             // error counter for current call
         int CurTempRangeErrCount; // error counter for current call
         int CurPresRangeErrCount; // error counter for current call
-        static int SatErrCount(0);
 
         // see if data is there
         if (GetInput) {
@@ -6739,12 +6736,12 @@ CurrentModuleObject,
         // inside the saturation dome. Best thing we can do is return saturation value
         if ((refrig.HshValues(LoPressIndex, TempIndex) <= 0.0) && (refrig.HshValues(HiPressIndex, TempIndex) <= 0.0) &&
             (refrig.HshValues(LoPressIndex, HiTempIndex) <= 0.0) && (refrig.HshValues(HiPressIndex, HiTempIndex) <= 0.0)) {
-            ++SatErrCount;
+            ++state.dataFluidProps->SatErrCountGetSupHeatEnthalpyRefrig;
             // set return value
             ReturnValue = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
             // send warning
             if (!state.dataGlobal->WarmupFlag) {
-                RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrCount += SatErrCount;
+                RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrCount += state.dataFluidProps->SatErrCountGetSupHeatEnthalpyRefrig;
                 // send warning
                 if (RefrigErrorTracking(RefrigNum).SatTempDensityErrCount <= RefrigerantErrorLimitTest) {
                     ShowWarningMessage(state, RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
@@ -7373,7 +7370,6 @@ CurrentModuleObject,
         int RefrigNum;    // index for refrigerant under consideration
         int TempIndex;    // low index value of Temperature from table
         // error counters and dummy string
-        static int SatErrCount(0);
         int ErrCount;             // error counter for current call
         int CurTempRangeErrCount; // error counter for current call
         int CurPresRangeErrCount; // error counter for current call
@@ -7487,9 +7483,9 @@ CurrentModuleObject,
             // interpolate w.r.t. temperature
             ReturnValue = TempInterpRatio * DensityHigh + (1.0 - TempInterpRatio) * DensityLow;
         } else { // All data is at zero: we are completely inside the saturation dome. Best thing we can do is return saturation value
-            ++SatErrCount;
+            ++state.dataFluidProps->SatErrCountGetSupHeatDensityRefrig;
             // send warning
-            RefrigErrorTracking(RefrigNum).SatSupDensityErrCount += SatErrCount;
+            RefrigErrorTracking(RefrigNum).SatSupDensityErrCount += state.dataFluidProps->SatErrCountGetSupHeatDensityRefrig;
             // send warning
             if (RefrigErrorTracking(RefrigNum).SatSupDensityErrCount <= RefrigerantErrorLimitTest) {
                 ShowWarningMessage(state, RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
@@ -7500,7 +7496,7 @@ CurrentModuleObject,
                 ShowContinueError(state, format("Returned Density value = {:.3R}", saturated_density));
                 ShowContinueErrorTimeStamp(state, "");
             }
-            if (SatErrCount > 0) {
+            if (state.dataFluidProps->SatErrCountGetSupHeatDensityRefrig > 0) {
                 ShowRecurringWarningErrorAtEnd(state, RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                    "] saturated at the given conditions **",
                                                RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrIndex,
@@ -7608,16 +7604,6 @@ CurrentModuleObject,
         // FUNCTION PARAMETERS:
         static std::string const RoutineName("GetSpecificHeatGlycol: ");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static int HighTempLimitErr(0);
-        static int LowTempLimitErr(0);
-
         // Get the input if we haven't already
         if (GetInput) {
             GetFluidPropertiesData(state);
@@ -7648,8 +7634,8 @@ CurrentModuleObject,
         // Now determine the value of specific heat using interpolation
         if (Temperature < glycol_data.CpLowTempValue) { // Temperature too low
             if (!state.dataGlobal->WarmupFlag) {
-                LowTempLimitErr = ++GlycolErrorTracking(GlycolIndex).SpecHeatLowErrCount;
-                if (LowTempLimitErr <= GlycolErrorLimitTest) {
+                state.dataFluidProps->LowTempLimitErrGetSpecificHeatGlycol_raw = ++GlycolErrorTracking(GlycolIndex).SpecHeatLowErrCount;
+                if (state.dataFluidProps->LowTempLimitErrGetSpecificHeatGlycol_raw <= GlycolErrorLimitTest) {
                     ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + glycol_data.Name +
                                        "] specific heat supplied values **");
                     ShowContinueError(state,
@@ -7672,8 +7658,8 @@ CurrentModuleObject,
             return glycol_data.CpValues(glycol_data.CpLowTempIndex);
         } else if (Temperature > glycol_data.CpHighTempValue) { // Temperature too high
             if (!state.dataGlobal->WarmupFlag) {
-                HighTempLimitErr = ++GlycolErrorTracking(GlycolIndex).SpecHeatHighErrCount;
-                if (HighTempLimitErr <= GlycolErrorLimitTest) {
+                state.dataFluidProps->HighTempLimitErrGetSpecificHeatGlycol_raw = ++GlycolErrorTracking(GlycolIndex).SpecHeatHighErrCount;
+                if (state.dataFluidProps->HighTempLimitErrGetSpecificHeatGlycol_raw <= GlycolErrorLimitTest) {
                     ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + glycol_data.Name + "] specific heat **");
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
@@ -7765,12 +7751,9 @@ CurrentModuleObject,
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop; // DO loop counter
-        static int HighTempLimitErr(0);
-        static int LowTempLimitErr(0);
         int GlycolNum;
         bool LowErrorThisTime;
         bool HighErrorThisTime;
-
 
         LowErrorThisTime = false;
         HighErrorThisTime = false;
@@ -7827,18 +7810,16 @@ CurrentModuleObject,
         // Error handling
         if (!state.dataGlobal->WarmupFlag) {
 
-            //    IF (LowErrorThisTime)  LowTempLimitErr = LowTempLimitErr + 1
-            //    IF (HighErrorThisTime) HighTempLimitErr = HighTempLimitErr + 1
             if (LowErrorThisTime) {
                 ++GlycolErrorTracking(GlycolIndex).DensityLowErrCount;
-                LowTempLimitErr = GlycolErrorTracking(GlycolIndex).DensityLowErrCount;
+                state.dataFluidProps->LowTempLimitErrGetDensityGlycol = GlycolErrorTracking(GlycolIndex).DensityLowErrCount;
             }
             if (HighErrorThisTime) {
                 ++GlycolErrorTracking(GlycolIndex).DensityHighErrCount;
-                HighTempLimitErr = GlycolErrorTracking(GlycolIndex).DensityHighErrCount;
+                state.dataFluidProps->HighTempLimitErrGetDensityGlycol = GlycolErrorTracking(GlycolIndex).DensityHighErrCount;
             }
 
-            if ((LowErrorThisTime) && (LowTempLimitErr <= GlycolErrorLimitTest)) {
+            if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetDensityGlycol <= GlycolErrorLimitTest)) {
                 ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name + "] density **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
@@ -7859,7 +7840,7 @@ CurrentModuleObject,
                                                "{C}");
             }
 
-            if ((HighErrorThisTime) && (HighTempLimitErr <= GlycolErrorLimitTest)) {
+            if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetDensityGlycol <= GlycolErrorLimitTest)) {
                 ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
                                    "] density **");
                 ShowContinueError(state,
@@ -7935,12 +7916,9 @@ CurrentModuleObject,
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop; // DO loop counter
-        static int HighTempLimitErr(0);
-        static int LowTempLimitErr(0);
         int GlycolNum;
         bool LowErrorThisTime;
         bool HighErrorThisTime;
-
 
         LowErrorThisTime = false;
         HighErrorThisTime = false;
@@ -7997,18 +7975,16 @@ CurrentModuleObject,
         // Error handling
         if (!state.dataGlobal->WarmupFlag) {
 
-            //    IF (LowErrorThisTime)  LowTempLimitErr = LowTempLimitErr + 1
-            //    IF (HighErrorThisTime) HighTempLimitErr = HighTempLimitErr + 1
             if (LowErrorThisTime) {
                 ++GlycolErrorTracking(GlycolIndex).ConductivityLowErrCount;
-                LowTempLimitErr = GlycolErrorTracking(GlycolIndex).ConductivityLowErrCount;
+                state.dataFluidProps->LowTempLimitErrGetConductivityGlycol = GlycolErrorTracking(GlycolIndex).ConductivityLowErrCount;
             }
             if (HighErrorThisTime) {
                 ++GlycolErrorTracking(GlycolIndex).ConductivityHighErrCount;
-                HighTempLimitErr = GlycolErrorTracking(GlycolIndex).ConductivityHighErrCount;
+                state.dataFluidProps->HighTempLimitErrGetConductivityGlycol = GlycolErrorTracking(GlycolIndex).ConductivityHighErrCount;
             }
 
-            if ((LowErrorThisTime) && (LowTempLimitErr <= GlycolErrorLimitTest)) {
+            if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetConductivityGlycol <= GlycolErrorLimitTest)) {
                 ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
                                    "] conductivity **");
                 ShowContinueError(state,
@@ -8030,7 +8006,7 @@ CurrentModuleObject,
                                                "{C}");
             }
 
-            if ((HighErrorThisTime) && (HighTempLimitErr <= GlycolErrorLimitTest)) {
+            if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetConductivityGlycol <= GlycolErrorLimitTest)) {
                 ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
                                    "] conductivity **");
                 ShowContinueError(state,
@@ -8106,12 +8082,9 @@ CurrentModuleObject,
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop; // DO loop counter
-        static int HighTempLimitErr(0);
-        static int LowTempLimitErr(0);
         int GlycolNum;
         bool LowErrorThisTime;
         bool HighErrorThisTime;
-
 
         LowErrorThisTime = false;
         HighErrorThisTime = false;
@@ -8168,18 +8141,16 @@ CurrentModuleObject,
         // Error handling
         if (!state.dataGlobal->WarmupFlag) {
 
-            //    IF (LowErrorThisTime)  LowTempLimitErr = LowTempLimitErr + 1
-            //    IF (HighErrorThisTime) HighTempLimitErr = HighTempLimitErr + 1
             if (LowErrorThisTime) {
                 ++GlycolErrorTracking(GlycolIndex).ViscosityLowErrCount;
-                LowTempLimitErr = GlycolErrorTracking(GlycolIndex).ViscosityLowErrCount;
+                state.dataFluidProps->LowTempLimitErrGetViscosityGlycol = GlycolErrorTracking(GlycolIndex).ViscosityLowErrCount;
             }
             if (HighErrorThisTime) {
                 ++GlycolErrorTracking(GlycolIndex).ViscosityHighErrCount;
-                HighTempLimitErr = GlycolErrorTracking(GlycolIndex).ViscosityHighErrCount;
+                state.dataFluidProps->HighTempLimitErrGetViscosityGlycol = GlycolErrorTracking(GlycolIndex).ViscosityHighErrCount;
             }
 
-            if ((LowErrorThisTime) && (LowTempLimitErr <= GlycolErrorLimitTest)) {
+            if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetViscosityGlycol <= GlycolErrorLimitTest)) {
                 ShowWarningMessage(state, RoutineName + "Temperature is out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
                                    "] viscosity **");
                 ShowContinueError(state,
@@ -8201,7 +8172,7 @@ CurrentModuleObject,
                                                "{C}");
             }
 
-            if ((HighErrorThisTime) && (HighTempLimitErr <= GlycolErrorLimitTest)) {
+            if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetViscosityGlycol <= GlycolErrorLimitTest)) {
                 ShowWarningMessage(state, RoutineName + "Temperature is out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
                                    "] viscosity **");
                 ShowContinueError(state,
@@ -8285,9 +8256,6 @@ CurrentModuleObject,
         int HiTempIndex;        // array index for temp above input temp
         int LoTempIndex;        // array index for temp below input temp
         Real64 TempInterpRatio; // ratio to interpolate in temperature domain
-        static int TempLoRangeErrIndex(0);
-        static int TempHiRangeErrIndex(0);
-
 
         if (GetInput) {
             GetFluidPropertiesData(state);
@@ -8323,7 +8291,7 @@ CurrentModuleObject,
             // Temperature supplied is out of bounds--produce an error message...
             if (!state.dataGlobal->WarmupFlag)
                 ShowRecurringWarningErrorAtEnd(state, "GetQualityRefrig: ** Temperature for requested quality is below the range of data supplied **",
-                                               TempLoRangeErrIndex,
+                                               state.dataFluidProps->TempLoRangeErrIndexGetQualityRefrig,
                                                Temperature,
                                                Temperature,
                                                _,
@@ -8336,7 +8304,7 @@ CurrentModuleObject,
             // Temperature supplied is out of bounds--produce an error message...
             if (!state.dataGlobal->WarmupFlag)
                 ShowRecurringWarningErrorAtEnd(state, "GetQualityRefrig: ** Temperature requested quality is above the range of data supplied **",
-                                               TempHiRangeErrIndex,
+                                               state.dataFluidProps->TempHiRangeErrIndexGetQualityRefrig,
                                                Temperature,
                                                Temperature,
                                                _,
@@ -8682,8 +8650,6 @@ CurrentModuleObject,
 
         // error counters and dummy string
         bool ErrorFlag(false);           // error flag for current call
-        static int TempRangeErrCount(0); // cumulative error counter
-        static int TempRangeErrIndex(0);
 
         int const LoTempIndex = FindArrayIndex(Temperature, PropTemps, LowBound, UpperBound); // array index for temp above input temp
 
@@ -8712,16 +8678,16 @@ CurrentModuleObject,
         }
 
         if (ErrorFlag && (CalledFrom != "ReportAndTestRefrigerants")) {
-            ++TempRangeErrCount;
+            ++state.dataFluidProps->TempRangeErrCountGetInterpolatedSatProp;
             // send warning
-            if (TempRangeErrCount <= RefrigerantErrorLimitTest) {
+            if (state.dataFluidProps->TempRangeErrCountGetInterpolatedSatProp <= RefrigerantErrorLimitTest) {
                 ShowWarningError(state, "GetInterpolatedSatProp: Saturation temperature for interpolation is out of range of data supplied: **");
                 ShowContinueErrorTimeStamp(state, fmt::format(" Called from:{}", CalledFrom));
                 ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                 ShowContinueError(state, format("Returned saturated property value = {:.3R}", ReturnValue));
             } else {
                 ShowRecurringWarningErrorAtEnd(state, "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error",
-                                               TempRangeErrIndex,
+                                               state.dataFluidProps->TempRangeErrIndexGetInterpolatedSatProp,
                                                Temperature,
                                                Temperature,
                                                _,

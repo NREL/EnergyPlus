@@ -59,7 +59,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 
 using namespace EnergyPlus;
-using namespace DataIPShortCuts;
 
 void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
 {
@@ -116,31 +115,31 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         inputProcessor->getObjectItem(
-            state, CoilCoolingDXCurveFitOperatingMode::object_name, modeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-        if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
+            state, CoilCoolingDXCurveFitOperatingMode::object_name, modeNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStatus);
+        if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }
         found_it = true;
 
         CoilCoolingDXCurveFitOperatingModeInputSpecification input_specs;
 
-        input_specs.name = cAlphaArgs(1);
-        input_specs.gross_rated_total_cooling_capacity = rNumericArgs(1);
-        input_specs.rated_evaporator_air_flow_rate = rNumericArgs(2);
-        input_specs.rated_condenser_air_flow_rate = rNumericArgs(3);
-        input_specs.maximum_cycling_rate = rNumericArgs(4);
-        input_specs.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity = rNumericArgs(5);
-        input_specs.latent_capacity_time_constant = rNumericArgs(6);
-        input_specs.nominal_time_for_condensate_removal_to_begin = rNumericArgs(7);
-        input_specs.apply_latent_degradation_to_speeds_greater_than_1 = cAlphaArgs(2);
-        input_specs.condenser_type = cAlphaArgs(3);
-        input_specs.nominal_evap_condenser_pump_power = rNumericArgs(8);
-        input_specs.nominal_speed_number = rNumericArgs(9);
+        input_specs.name = state.dataIPShortCut->cAlphaArgs(1);
+        input_specs.gross_rated_total_cooling_capacity = state.dataIPShortCut->rNumericArgs(1);
+        input_specs.rated_evaporator_air_flow_rate = state.dataIPShortCut->rNumericArgs(2);
+        input_specs.rated_condenser_air_flow_rate = state.dataIPShortCut->rNumericArgs(3);
+        input_specs.maximum_cycling_rate = state.dataIPShortCut->rNumericArgs(4);
+        input_specs.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity = state.dataIPShortCut->rNumericArgs(5);
+        input_specs.latent_capacity_time_constant = state.dataIPShortCut->rNumericArgs(6);
+        input_specs.nominal_time_for_condensate_removal_to_begin = state.dataIPShortCut->rNumericArgs(7);
+        input_specs.apply_latent_degradation_to_speeds_greater_than_1 = state.dataIPShortCut->cAlphaArgs(2);
+        input_specs.condenser_type = state.dataIPShortCut->cAlphaArgs(3);
+        input_specs.nominal_evap_condenser_pump_power = state.dataIPShortCut->rNumericArgs(8);
+        input_specs.nominal_speed_number = state.dataIPShortCut->rNumericArgs(9);
         for (int fieldNum = 4; fieldNum <= NumAlphas; fieldNum++) {
-            if (cAlphaArgs(fieldNum).empty()) {
+            if (state.dataIPShortCut->cAlphaArgs(fieldNum).empty()) {
                 break;
             }
-            input_specs.speed_data_names.push_back(cAlphaArgs(fieldNum));
+            input_specs.speed_data_names.push_back(state.dataIPShortCut->cAlphaArgs(fieldNum));
         }
 
         this->instantiateFromInputSpec(state, input_specs);
@@ -246,7 +245,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
             thisspeed.AirMassFlow = 0.0;
         }
     } else if (speedNum > 1) {
-        thisspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateHigh;
+        thisspeed.AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateHigh;
     }
     if (thisspeed.RatedAirMassFlowRate > 0.0) {
         // TODO: The original two-speed just grabbed the RatedAirMassFlowRate(mode1), not for a specific speed, so that's what I'll do too
@@ -280,7 +279,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
 
         // If multispeed, evaluate next lower speed using PLR, then combine with high speed for final outlet conditions
         auto &lowerspeed(this->speeds[max(speedNum - 2, 0)]);
-        lowerspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateLow;
+        lowerspeed.AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateLow;
 
         lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
 

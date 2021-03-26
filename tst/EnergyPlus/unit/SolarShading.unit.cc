@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
         }
     }
 
-    DetailedSolarTimestepIntegration = false;
+    state->dataSysVars->DetailedSolarTimestepIntegration = false;
     CalcPerSolarBeam(*state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
         }
     }
 
-    DetailedSolarTimestepIntegration = true;
+    state->dataSysVars->DetailedSolarTimestepIntegration = true;
     state->dataGlobal->HourOfDay = 23;
     CalcPerSolarBeam(*state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
@@ -658,7 +658,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     //	compare_err_stream( "" ); // just for debugging
 
     state->dataSurface->ShadingTransmittanceVaries = true;
-    DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
+    state->dataSysVars->DetailedSkyDiffuseAlgorithm = true;
     state->dataHeatBal->SolarDistribution = FullExterior;
 
     state->dataSolarShading->CalcSkyDifShading = true;
@@ -1054,8 +1054,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     compare_err_stream(""); // just for debugging
 
     state->dataSurface->ShadingTransmittanceVaries = true;
-    DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
-    DataSystemVariables::shadingMethod = DataSystemVariables::ShadingMethod::Scheduled;
+    state->dataSysVars->DetailedSkyDiffuseAlgorithm = true;
+    state->dataSysVars->shadingMethod = DataSystemVariables::ShadingMethod::Scheduled;
     state->dataHeatBal->SolarDistribution = FullExterior;
 
     state->dataSolarShading->CalcSkyDifShading = true;
@@ -1069,7 +1069,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     state->dataBSDFWindow->SUNCOSTS(4, 9, 3) = 0.1;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
-    EXPECT_TRUE(DataSystemVariables::shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
+    EXPECT_TRUE(state->dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
     EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(*state, 2, 9, 4));
     EXPECT_FALSE(state->dataSolarShading->SUNCOS(3) < 0.00001);
     EXPECT_DOUBLE_EQ(0.00001, DataEnvironment::SunIsUpValue);
@@ -1832,12 +1832,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     state->dataGlobal->HourOfDay = 9;
 
     //	compare_err_stream( "" ); // just for debugging
-    EXPECT_FALSE(DataSystemVariables::SlaterBarsky);
+    EXPECT_FALSE(state->dataSysVars->SlaterBarsky);
+
 
     state->dataSurface->ShadingTransmittanceVaries = true;
-    DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
+    state->dataSysVars->DetailedSkyDiffuseAlgorithm = true;
     state->dataHeatBal->SolarDistribution = FullExterior;
-    DataSystemVariables::SlaterBarsky = true;
+    state->dataSysVars->SlaterBarsky = true;
 
     state->dataSolarShading->CalcSkyDifShading = true;
     SolarShading::InitSolarCalculations(*state);
@@ -1849,7 +1850,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     EXPECT_NEAR(0.6504, state->dataHeatBal->DifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
     EXPECT_NEAR(0.9152, state->dataHeatBal->DifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
 
-    DataSystemVariables::SlaterBarsky = false;
+    state->dataSysVars->SlaterBarsky = false;
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS) {
@@ -2627,5 +2628,5 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ShadingFlagTest)
     EXPECT_TRUE(ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadingFlag));
 
     ShadingFlag = WinShadingType::GlassConditionallyLightened;
-    IS_SHADED_NO_GLARE_CTRL(ANY_BETWEENGLASS_SHADE_BLIND(ShadingFlag));
+    EXPECT_FALSE(IS_SHADED_NO_GLARE_CTRL(ShadingFlag));
 }

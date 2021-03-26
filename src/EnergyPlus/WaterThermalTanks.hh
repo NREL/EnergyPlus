@@ -674,9 +674,9 @@ namespace WaterThermalTanks {
 
         void SizeStandAloneWaterHeater(EnergyPlusData &state);
 
-        void UpdateWaterThermalTank();
+        void UpdateWaterThermalTank(EnergyPlusData &state);
 
-        void ReportWaterThermalTank();
+        void ReportWaterThermalTank(EnergyPlusData &state);
 
         void CalcWaterThermalTankStratified(EnergyPlusData &state); // Water Heater being simulated
 

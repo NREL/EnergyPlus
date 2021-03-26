@@ -96,13 +96,6 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
     using namespace DataRoomAirModel;
 
     // Functions
-    bool MyOneTimeFlag(true); // one time setup flag
-    bool MyOneTimeFlag2(true);
-
-    void clear_state() {
-        MyOneTimeFlag = true;
-        MyOneTimeFlag2 = true;
-    }
 
     void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
@@ -142,38 +135,14 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
         int SurfNum;                     // do loop counter
 
-        if (MyOneTimeFlag) {
-            MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
-            MyOneTimeFlag = false;
+        if (state.dataRoomAirModelTempPattern->MyOneTimeFlag) {
+            state.dataRoomAirModelTempPattern->MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
+            state.dataRoomAirModelTempPattern->MyOneTimeFlag = false;
         }
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataRoomAirModelTempPattern->MyEnvrnFlag(ZoneNum)) {
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean = 23.0;
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = 23.0;
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = 23.0;
@@ -182,10 +151,10 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
             for (SurfNum = 1; SurfNum <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++SurfNum) {
                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(SurfNum).TadjacentAir = 23.0;
             }
-            MyEnvrnFlag(ZoneNum) = false;
+            state.dataRoomAirModelTempPattern->MyEnvrnFlag(ZoneNum) = false;
         }
 
-        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(ZoneNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) state.dataRoomAirModelTempPattern->MyEnvrnFlag(ZoneNum) = true;
 
         // init report variable
         state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient = 0.0;
@@ -438,14 +407,13 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         Real64 thisZeta;                     // non-dimensional height
         Real64 DeltaHeight;                  // height difference in m
         Real64 tempDeltaTai;                 // temporary temperature difference
-        static Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
 
-        if (MyOneTimeFlag2) {
-            SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init
-            MyOneTimeFlag2 = false;
+        if (state.dataRoomAirModelTempPattern->MyOneTimeFlag2) {
+            state.dataRoomAirModelTempPattern->SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init
+            state.dataRoomAirModelTempPattern->MyOneTimeFlag2 = false;
         }
 
-        if (SetupOutputFlag(ZoneNum)) {
+        if (state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum)) {
             SetupOutputVariable(state, "Room Air Zone Vertical Temperature Gradient",
                                 OutputProcessor::Unit::K_m,
                                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient,
@@ -453,7 +421,7 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
                                 "State",
                                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneName);
 
-            SetupOutputFlag(ZoneNum) = false;
+            state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum) = false;
         }
 
         Tmean = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
@@ -789,7 +757,6 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         // Using/Aliasing
         using DataHVACGlobals::RetTempMax;
         using DataHVACGlobals::RetTempMin;
-        using DataLoopNode::Node;
         using DataSurfaces::AdjacentAirTemp;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
         using DataSurfaces::ZoneMeanAirTemp;
@@ -832,7 +799,8 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
 
         if (state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneNodeID != 0) {
             // the zone system node should get the conditions leaving the zone (but before return air heat gains are added).
-            Node(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneNodeID).Temp = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving;
+            state.dataLoopNodes->Node(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneNodeID).Temp =
+                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving;
         }
 
         int zoneEquipNum = state.dataHeatBal->Zone(ZoneNum).ZoneEqNum;
@@ -845,14 +813,14 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
             // Add sensible heat gain from refrigerated cases with under case returns
             SumAllReturnAirConvectionGains(state, ZoneNum, QRetAir, ReturnNode);
 
-            CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
+            CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
 
             // Need to add the energy to the return air from lights and from airflow windows. Where the heat
             // is added depends on if there is system flow or not.  If there is system flow the heat is added
             // to the Zone Return Node.  If there is no system flow then the heat is added back to the zone in the
             // Correct step through the SysDepZoneLoads variable.
 
-            MassFlowRA = Node(ReturnNode).MassFlowRate / ZoneMult;
+            MassFlowRA = state.dataLoopNodes->Node(ReturnNode).MassFlowRate / ZoneMult;
             TempZoneAir = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving; // key difference from
             TempRetAir = TempZoneAir;
             WinGapFlowToRA = 0.0;
@@ -863,7 +831,10 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
                 for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                     if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                         state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                        FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
+                        FlowThisTS = PsyRhoAirFnPbTdbW(state,
+                                                       state.dataEnvrn->OutBaroPress,
+                                                       state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
+                                                       state.dataLoopNodes->Node(ZoneNode).HumRat) *
                             state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
                         WinGapFlowToRA += FlowThisTS;
                         WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
@@ -888,58 +859,61 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
                     // Add heat-to-return from lights
                     TempRetAir += QRetAir / (MassFlowRA * CpAir);
                     if (TempRetAir > RetTempMax) {
-                        Node(ReturnNode).Temp = RetTempMax;
+                        state.dataLoopNodes->Node(ReturnNode).Temp = RetTempMax;
                         if (!state.dataGlobal->ZoneSizingCalc) {
                             state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMax);
                         }
                     } else if (TempRetAir < RetTempMin) {
-                        Node(ReturnNode).Temp = RetTempMin;
+                        state.dataLoopNodes->Node(ReturnNode).Temp = RetTempMin;
                         if (!state.dataGlobal->ZoneSizingCalc) {
                             state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
                         }
                     } else {
-                        Node(ReturnNode).Temp = TempRetAir;
+                        state.dataLoopNodes->Node(ReturnNode).Temp = TempRetAir;
                     }
                 } else { // No return air flow
                     // Assign all heat-to-return from window gap airflow to zone air
                     if (WinGapFlowToRA > 0.0) state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += WinGapFlowToRA * CpAir * (WinGapTtoRA - TempZoneAir);
                     // Assign all heat-to-return from lights to zone air
                     if (QRetAir > 0.0) state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += QRetAir;
-                    Node(ReturnNode).Temp = Node(ZoneNode).Temp;
+                    state.dataLoopNodes->Node(ReturnNode).Temp = state.dataLoopNodes->Node(ZoneNode).Temp;
                 }
             } else {
-                Node(ReturnNode).Temp = Node(ZoneNode).Temp;
+                state.dataLoopNodes->Node(ReturnNode).Temp = state.dataLoopNodes->Node(ZoneNode).Temp;
             }
 
             // Update the rest of the Return Air Node conditions, if the return air system exists!
-            Node(ReturnNode).Press = Node(ZoneNode).Press;
+            state.dataLoopNodes->Node(ReturnNode).Press = state.dataLoopNodes->Node(ZoneNode).Press;
 
-            H2OHtOfVap = PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ReturnNode).Temp);
-            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
+            H2OHtOfVap = PsyHgAirFnWTdb(state.dataLoopNodes->Node(ZoneNode).HumRat, state.dataLoopNodes->Node(ReturnNode).Temp);
+            RhoAir = PsyRhoAirFnPbTdbW(
+                state, state.dataEnvrn->OutBaroPress, state.dataLoopNodes->Node(ReturnNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat);
 
             // Include impact of under case returns for refrigerated display cases when updateing return node
             // humidity ratio
             if (!state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
                 if (MassFlowRA > 0) {
                     SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
-                    Node(ReturnNode).HumRat = Node(ZoneNode).HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
+                    state.dataLoopNodes->Node(ReturnNode).HumRat =
+                        state.dataLoopNodes->Node(ZoneNode).HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
                 } else {
                     // If no mass flow rate exists, include the latent HVAC case credit with the latent Zone case credit
-                    Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
+                    state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
                     state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
                     SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, 0);
                     state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
                 }
             } else {
-                Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
+                state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
                 state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
                 SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
                 state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
             }
 
-            Node(ReturnNode).Enthalpy = PsyHFnTdbW(Node(ReturnNode).Temp, Node(ReturnNode).HumRat);
+            state.dataLoopNodes->Node(ReturnNode).Enthalpy =
+                PsyHFnTdbW(state.dataLoopNodes->Node(ReturnNode).Temp, state.dataLoopNodes->Node(ReturnNode).HumRat);
 
             // END BLOCK of code from CalcZoneLeavingConditions*********************************
         }
@@ -950,7 +924,7 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
             auto const &EANodeID(APZoneInfo.ExhaustAirNodeID);
             Real64 const Texhaust(APZoneInfo.Texhaust);
             for (int i = 1, ie = EANodeID.u(); i <= ie; ++i) {
-                Node(EANodeID(i)).Temp = Texhaust;
+                state.dataLoopNodes->Node(EANodeID(i)).Temp = Texhaust;
             }
         }
 

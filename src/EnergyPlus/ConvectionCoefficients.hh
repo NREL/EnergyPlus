@@ -415,6 +415,42 @@ namespace ConvectionCoefficients {
         }
     };
 
+    struct FacadeGeoCharactisticsStruct
+    {
+        // Members
+        Real64 AzimuthRangeLow;
+        Real64 AzimuthRangeHi;
+        Real64 Zmax;
+        Real64 Zmin;
+        Real64 Ymax;
+        Real64 Ymin;
+        Real64 Xmax;
+        Real64 Xmin;
+        Real64 Area;
+        Real64 Perimeter;
+        Real64 Height;
+
+        // Default Constructor
+        FacadeGeoCharactisticsStruct() = default;
+
+        // Member Constructor
+        FacadeGeoCharactisticsStruct(Real64 const AzimuthRangeLow,
+                                     Real64 const AzimuthRangeHi,
+                                     Real64 const Zmax,
+                                     Real64 const Zmin,
+                                     Real64 const Ymax,
+                                     Real64 const Ymin,
+                                     Real64 const Xmax,
+                                     Real64 const Xmin,
+                                     Real64 const Area,
+                                     Real64 const Perimeter,
+                                     Real64 const Height)
+                : AzimuthRangeLow(AzimuthRangeLow), AzimuthRangeHi(AzimuthRangeHi), Zmax(Zmax), Zmin(Zmin), Ymax(Ymax), Ymin(Ymin), Xmax(Xmax),
+                  Xmin(Xmin), Area(Area), Perimeter(Perimeter), Height(Height)
+        {
+        }
+    };
+
     // Functions
 
     void InitInteriorConvectionCoeffs(EnergyPlusData &state,
@@ -755,7 +791,7 @@ namespace ConvectionCoefficients {
                                            Real64 QdotConv   // [W/m2] heat flux rate for rayleigh #
     );
 
-    Real64 CalcFohannoPolidoriVerticalWall(EnergyPlusData &state,
+    Real64 CallCalcFohannoPolidoriVerticalWall(EnergyPlusData &state,
                                            Real64 DeltaTemp, // [C] temperature difference between surface and air
                                            Real64 Height,    // [m] characteristic size, height of zone
                                            Real64 SurfTemp,  // [C] surface temperature
@@ -927,6 +963,15 @@ namespace ConvectionCoefficients {
         Array1D<ConvectionCoefficients::HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
         ConvectionCoefficients::RoofGeoCharactisticsStruct RoofGeo;
 
+        ConvectionCoefficients::FacadeGeoCharactisticsStruct NorthFacade = {332.5, 22.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        ConvectionCoefficients::FacadeGeoCharactisticsStruct NorthEastFacade = {22.5, 67.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        ConvectionCoefficients::FacadeGeoCharactisticsStruct EastFacade = {67.5, 112.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        ConvectionCoefficients::FacadeGeoCharactisticsStruct SouthEastFacade = {112.5, 157.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        ConvectionCoefficients::FacadeGeoCharactisticsStruct SouthFacade = {157.5, 202.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        ConvectionCoefficients::FacadeGeoCharactisticsStruct SouthWestFacade = {202.5, 247.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        ConvectionCoefficients::FacadeGeoCharactisticsStruct WestFacade = {247.5, 287.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        ConvectionCoefficients::FacadeGeoCharactisticsStruct NorthWestFacade = {287.5, 332.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
         void clear_state() override
         {
             this->GetUserSuppliedConvectionCoeffs = true;
@@ -980,6 +1025,15 @@ namespace ConvectionCoefficients {
             this->HcInsideUserCurve.deallocate();
             this->HcOutsideUserCurve.deallocate();
             this->RoofGeo = {};
+
+            this->NorthFacade = {332.5, 22.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+            this->NorthEastFacade = {22.5, 67.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+            this->EastFacade = {67.5, 112.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+            this->SouthEastFacade = {112.5, 157.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+            this->SouthFacade = {157.5, 202.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+            this->SouthWestFacade = {202.5, 247.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+            this->WestFacade = {247.5, 287.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+            this->NorthWestFacade = {287.5, 332.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         }
     };
 

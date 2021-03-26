@@ -159,7 +159,8 @@ namespace PlantComponentTemperatureSources {
                                                            state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
                                                            RoutineName);
             this->MassFlowRateMax = this->DesVolFlowRate * rho;
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->MassFlowRateMax,
                                                this->InletNodeNum,
                                                this->OutletNodeNum,
@@ -176,7 +177,7 @@ namespace PlantComponentTemperatureSources {
         }
 
         // OK, so we can set up the inlet and boundary temperatures now
-        this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
         if (this->TempSpecType == iTempSpecType::Schedule) {
             this->BoundaryTemp = ScheduleManager::GetCurrentScheduleValue(state, this->TempSpecScheduleNum);
         }
@@ -367,7 +368,7 @@ namespace PlantComponentTemperatureSources {
                                                                state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
                                                                RoutineName);
             this->HeatRate = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
-            this->HeatEnergy = this->HeatRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            this->HeatEnergy = this->HeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         } else {
             this->OutletTemp = this->BoundaryTemp;
             this->HeatRate = 0.0;
@@ -375,9 +376,9 @@ namespace PlantComponentTemperatureSources {
         }
     }
 
-    void WaterSourceSpecs::update()
+    void WaterSourceSpecs::update(EnergyPlusData &state)
     {
-        DataLoopNode::Node(this->OutletNodeNum).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNodeNum).Temp = this->OutletTemp;
     }
 
     void WaterSourceSpecs::simulate(EnergyPlusData &state,
@@ -388,7 +389,7 @@ namespace PlantComponentTemperatureSources {
     {
         this->initialize(state, CurLoad);
         this->calculate(state);
-        this->update();
+        this->update(state);
     }
 
     void WaterSourceSpecs::getDesignCapacities(
@@ -435,14 +436,12 @@ namespace PlantComponentTemperatureSources {
         //  N2 , \field Boundary Temperature
         //  A5 ; \field Source Temperature Schedule Name
 
-        // Using/Aliasing
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
-
         // LOCAL VARIABLES:
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
+        auto & cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
         cCurrentModuleObject = "PlantComponent:TemperatureSource";
@@ -462,58 +461,58 @@ namespace PlantComponentTemperatureSources {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SourceNum,
-                                          cAlphaArgs,
+                                          state.dataIPShortCut->cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          state.dataIPShortCut->rNumericArgs,
                                           NumNums,
                                           IOStat,
                                           _,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                                          state.dataIPShortCut->lAlphaFieldBlanks,
+                                          state.dataIPShortCut->cAlphaFieldNames,
+                                          state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataPlantCompTempSrc->WaterSource(SourceNum).Name = cAlphaArgs(1);
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-            state.dataPlantCompTempSrc->WaterSource(SourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(2),
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(2),
                                                                                       ErrorsFound,
                                                                                       cCurrentModuleObject,
-                                                                                      cAlphaArgs(1),
-                                                                                      DataLoopNode::NodeType_Water,
-                                                                                      DataLoopNode::NodeConnectionType_Inlet,
+                                                                                      state.dataIPShortCut->cAlphaArgs(1),
+                                                                                      DataLoopNode::NodeFluidType::Water,
+                                                                                      DataLoopNode::NodeConnectionType::Inlet,
                                                                                       1,
                                                                                       DataLoopNode::ObjectIsNotParent);
-            state.dataPlantCompTempSrc->WaterSource(SourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(3),
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(3),
                                                                                        ErrorsFound,
                                                                                        cCurrentModuleObject,
-                                                                                       cAlphaArgs(1),
-                                                                                       DataLoopNode::NodeType_Water,
-                                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                                                       DataLoopNode::NodeFluidType::Water,
+                                                                                       DataLoopNode::NodeConnectionType::Outlet,
                                                                                        1,
                                                                                        DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");
+            BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(3), "Chilled Water Nodes");
 
-            state.dataPlantCompTempSrc->WaterSource(SourceNum).DesVolFlowRate = rNumericArgs(1);
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).DesVolFlowRate = state.dataIPShortCut->rNumericArgs(1);
             if (state.dataPlantCompTempSrc->WaterSource(SourceNum).DesVolFlowRate == DataSizing::AutoSize) {
                 state.dataPlantCompTempSrc->WaterSource(SourceNum).DesVolFlowRateWasAutoSized = true;
             }
 
-            if (cAlphaArgs(4) == "CONSTANT") {
+            if (state.dataIPShortCut->cAlphaArgs(4) == "CONSTANT") {
                 state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecType = iTempSpecType::Constant;
-                state.dataPlantCompTempSrc->WaterSource(SourceNum).BoundaryTemp = rNumericArgs(2);
-            } else if (cAlphaArgs(4) == "SCHEDULED") {
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).BoundaryTemp = state.dataIPShortCut->rNumericArgs(2);
+            } else if (state.dataIPShortCut->cAlphaArgs(4) == "SCHEDULED") {
                 state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecType = iTempSpecType::Schedule;
-                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleName = cAlphaArgs(5);
-                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5));
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleName = state.dataIPShortCut->cAlphaArgs(5);
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
                 if (state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum == 0) {
-                    ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ShowContinueError(state, "Invalid schedule name in field " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                    ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state, "Invalid schedule name in field " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")" +
-                                  cAlphaArgs(4) + "\"");
+                                  state.dataIPShortCut->cAlphaArgs(4) + "\"");
                 ErrorsFound = true;
             }
         }

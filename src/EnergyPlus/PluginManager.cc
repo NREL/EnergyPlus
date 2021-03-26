@@ -53,6 +53,7 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <algorithm>
 #include <nlohmann/json.hpp>
 
 namespace EnergyPlus::PluginManagement {
@@ -114,6 +115,9 @@ namespace EnergyPlus::PluginManagement {
             return "Python Version not accessible during API calls";
         }
         std::string sVersion = Py_GetVersion();
+        // 3.8.3 (default, Jun  2 2020, 15:25:16) \n[GCC 7.5.0]
+        // Remove the '\n'
+        sVersion.erase(std::remove(sVersion.begin(), sVersion.end(), '\n'), sVersion.end());
         return "Linked to Python Version: \"" + sVersion + "\"";
     }
 #else
@@ -406,6 +410,11 @@ namespace EnergyPlus::PluginManagement {
         Py_SetPath(a);
         Py_SetPythonHome(a);
 
+        // must be called before Py_Initialize
+        // tells the interpreter the value of argv[0] to the main() function
+        // used by some functions to find run-time libraries relative to the interpreter executable
+        Py_SetProgramName((wchar_t*)programName);
+
         // now that we have set the path, we can initialize python
         // from https://docs.python.org/3/c-api/init.html
         // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
@@ -434,7 +443,7 @@ namespace EnergyPlus::PluginManagement {
         if (searchPaths == 0) {
             // no search path objects in the IDF, just do the default behavior: add the current working dir and the input file dir
             PluginManager::addToPythonPath(state, ".", false);
-            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(state.dataStrGlobals->inputDirPathName);
             PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
         }
         if (searchPaths > 0) {
@@ -465,7 +474,7 @@ namespace EnergyPlus::PluginManagement {
                     // defaulted to YES
                 }
                 if (inputFileDirFlagUC == "YES") {
-                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(state.dataStrGlobals->inputDirPathName);
                     PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
                 }
                 try {
@@ -1332,13 +1341,8 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     bool PluginManager::anyUnexpectedPluginObjects(EnergyPlusData &state)
     {
-        static std::vector<std::string> objectsToFind = {"PythonPlugin:OutputVariable",
-                                                         "PythonPlugin:SearchPaths",
-                                                         "PythonPlugin:Instance",
-                                                         "PythonPlugin:Variables",
-                                                         "PythonPlugin:TrendVariable"};
         int numTotalThings = 0;
-        for (auto const &objToFind : objectsToFind) {
+        for (auto const &objToFind : state.dataPluginManager->objectsToFind) {
             int instances = inputProcessor->getNumObjectsFound(state, objToFind);
             numTotalThings += instances;
             if (numTotalThings == 1) {

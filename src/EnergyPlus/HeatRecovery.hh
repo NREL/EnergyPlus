@@ -68,41 +68,29 @@ namespace HeatRecovery {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    extern Real64 const KELVZERO;
-    extern Real64 const SMALL;
+    Real64 constexpr KELVZERO = 273.16;
+    Real64 constexpr SMALL = 1.e-10;
 
     // Heat exchanger performance data type
-    extern int const BALANCEDHX_PERFDATATYPE1;
+    int constexpr BALANCEDHX_PERFDATATYPE1 = 1;
 
     // Heat exchanger configurations
-    extern int const Counter_Flow;
-    extern int const Parallel_Flow;
-    extern int const Cross_Flow_Both_Unmixed;
-    extern int const Cross_Flow_Other;
+    int constexpr Counter_Flow = 1;
+    int constexpr Parallel_Flow = 2;
+    int constexpr Cross_Flow_Both_Unmixed = 3;
+    int constexpr Cross_Flow_Other = 4;
 
     // Heat exchanger configuration types
-    extern int const Plate;
-    extern int const Rotary;
+    int constexpr Plate = 1;
+    int constexpr Rotary = 2;
 
     // Economizer lockout operation
-    extern int const EconoLockOut_No;
-    extern int const EconoLockOut_Yes;
+    int constexpr EconoLockOut_No = 0;
+    int constexpr EconoLockOut_Yes = 1;
 
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumHeatExchangers;           // number of heat exchangers
-    extern int NumAirToAirPlateExchs;       // number of air to air plate heat exchangers
-    extern int NumAirToAirGenericExchs;     // number of air to air generic heat exchangers
-    extern int NumDesiccantBalancedExchs;   // number of desiccant balanced heat exchangers
-    extern int NumDesBalExchsPerfDataType1; // number of desiccant balanced heat exchanger performance data maps
-    extern Real64 FullLoadOutAirTemp;       // Used with desiccant HX empirical model, water coils use inlet node condition
-    // DX coils use DXCoilFullLoadOutAirTemp when coil is ON otherwise inlet node
-    extern Real64 FullLoadOutAirHumRat; // Used with desiccant HX empirical model, water coils use inlet node condition
-    // DX coils use DXCoilFullLoadOutAirHumRat when coil is ON otherwise inlet node
-    extern bool GetInputFlag;           // First time, input is "gotten"
-    extern bool CalledFromParentObject; // Indicates that HX is called from parent object (this object is not on a branch)
-    extern Array1D_bool CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -517,15 +505,7 @@ namespace HeatRecovery {
         }
     };
 
-    // Object Data
-    extern Array1D<HeatExchCond> ExchCond;
-    extern Array1D<BalancedDesDehumPerfData> BalDesDehumPerfData;
-    extern Array1D<HeatExchCondNumericFieldData> HeatExchCondNumericFields;
-    extern Array1D<HeatExchCondNumericFieldData> BalDesDehumPerfNumericFields;
-
     // Functions
-
-    void clear_state();
 
     void SimHeatRecovery(EnergyPlusData &state, std::string const &CompName,                 // name of the heat exchanger unit
                          bool const FirstHVACIteration,               // TRUE if 1st HVAC simulation of system timestep
@@ -581,7 +561,7 @@ namespace HeatRecovery {
 
     void UpdateHeatRecovery(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
 
-    void ReportHeatRecovery(int const ExNum); // number of the current heat exchanger being simulated
+    void ReportHeatRecovery(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
 
     Real64 SafeDiv(Real64 const a, Real64 const b);
 
@@ -710,9 +690,124 @@ namespace HeatRecovery {
 
 struct HeatRecoveryData : BaseGlobalStruct {
 
+    bool MyOneTimeAllocate = true;
+    // Object Data
+    int NumHeatExchangers = 0;         // number of heat exchangers
+    int NumAirToAirPlateExchs = 0;     // number of air to air plate heat exchangers
+    int NumAirToAirGenericExchs = 0;   // number of air to air generic heat exchangers
+    int NumDesiccantBalancedExchs = 0; // number of desiccant balanced heat exchangers
+    int NumDesBalExchsPerfDataType1 = 0;   // number of desiccant balanced heat exchanger performance data maps
+    Real64 FullLoadOutAirTemp = 0.0;   // Used with desiccant HX empirical model, water coils use inlet node condition
+    // DX coils use DXCoilFullLoadOutAirTemp when coil is ON otherwise inlet node
+    Real64 FullLoadOutAirHumRat = 0.0; // Used with desiccant HX empirical model, water coils use inlet node condition
+    // DX coils use DXCoilFullLoadOutAirHumRat when coil is ON otherwise inlet node
+    bool GetInputFlag = true;           // First time, input is "gotten"
+    bool CalledFromParentObject = true; // Indicates that HX is called from parent object (this object is not on a branch)
+    Array1D_bool CheckEquipName;
+    std::string OutputChar;         // character string for warning messages
+    std::string OutputCharLo;       // character string for warning messages
+    std::string OutputCharHi;       // character string for warning messages
+    std::string CharValue;          // character string for warning messages
+    Real64 TimeStepSysLast = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar2;         // character string for warning messages
+    std::string OutputCharLo2;       // character string for warning messages
+    std::string OutputCharHi2;       // character string for warning messages
+    std::string CharValue2;          // character string for warning messages
+    Real64 TimeStepSysLast2 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime2 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast2 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar3;         // character string for warning messages
+    std::string OutputCharLo3;       // character string for warning messages
+    std::string OutputCharHi3;       // character string for warning messages
+    std::string CharValue3;          // character string for warning messages
+    Real64 TimeStepSysLast3 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime3 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast3 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar4;         // character string for warning messages
+    std::string OutputCharLo4;       // character string for warning messages
+    std::string OutputCharHi4;       // character string for warning messages
+    std::string CharValue4;          // character string for warning messages
+    Real64 TimeStepSysLast4 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime4 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast4 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar5;         // character string for warning messages
+    std::string OutputCharLo5;       // character string for warning messages
+    std::string OutputCharHi5;       // character string for warning messages
+    Real64 TimeStepSysLast5 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime5 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast5 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar6;         // character string for warning messages
+    std::string OutputCharLo6;       // character string for warning messages
+    std::string OutputCharHi6;       // character string for warning messages
+    Real64 TimeStepSysLast6 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime6 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast6 = 0.0; // end time of time step for last simulation time step
+    std::string OutputCharProc;     // character string for warning messages
+    std::string OutputCharRegen;    // character string for warning messages
+    Real64 TimeStepSysLast7 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime7 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast7 = 0.0; // end time of time step for last simulation time step
+    Real64 RegenInletRH = 0.0;       // Regeneration inlet air relative humidity
+    Real64 ProcInletRH = 0.0;        // Process inlet air relative humidity
+    Real64 RegenInletRH2 = 0.0;       // Regeneration inlet air relative humidity
+    Real64 ProcInletRH2 = 0.0;        // Process inlet air relative humidity
+
+    std::unordered_map<std::string, std::string> HeatExchangerUniqueNames;
+
+    // static variables
+    Array1D_bool MySetPointTest;
+    Array1D_bool MySizeFlag;
+
+    Array1D<HeatRecovery::HeatExchCond> ExchCond;
+    Array1D<HeatRecovery::BalancedDesDehumPerfData> BalDesDehumPerfData;
+    Array1D<HeatRecovery::HeatExchCondNumericFieldData> HeatExchCondNumericFields;
+    Array1D<HeatRecovery::HeatExchCondNumericFieldData> BalDesDehumPerfNumericFields;
+
     void clear_state() override
     {
-
+        MyOneTimeAllocate = true;
+        HeatExchangerUniqueNames.clear();
+        NumHeatExchangers = 0;
+        NumAirToAirPlateExchs = 0;
+        NumAirToAirGenericExchs = 0;
+        NumDesiccantBalancedExchs = 0;
+        NumDesBalExchsPerfDataType1 = 0;
+        FullLoadOutAirTemp = 0.0;
+        FullLoadOutAirHumRat = 0.0;
+        GetInputFlag = true;
+        CalledFromParentObject = true;
+        CheckEquipName.clear();
+        ExchCond.clear();
+        BalDesDehumPerfData.clear();
+        HeatExchCondNumericFields.clear();
+        BalDesDehumPerfNumericFields.clear();
+        TimeStepSysLast = 0.0;
+        CurrentEndTime = 0.0;
+        CurrentEndTimeLast = 0.0;
+        TimeStepSysLast2 = 0.0;
+        CurrentEndTime2 = 0.0;
+        CurrentEndTimeLast2 = 0.0;
+        TimeStepSysLast3 = 0.0;
+        CurrentEndTime3 = 0.0;
+        CurrentEndTimeLast3 = 0.0;
+        TimeStepSysLast4 = 0.0;
+        CurrentEndTime4 = 0.0;
+        CurrentEndTimeLast4 = 0.0;
+        TimeStepSysLast5 = 0.0;
+        CurrentEndTime5 = 0.0;
+        CurrentEndTimeLast5 = 0.0;
+        TimeStepSysLast6 = 0.0;
+        CurrentEndTime6 = 0.0;
+        CurrentEndTimeLast6 = 0.0;
+        RegenInletRH = 0.0;
+        ProcInletRH = 0.0;
+        RegenInletRH2 = 0.0;
+        ProcInletRH2 = 0.0;
+        // static variables
+        MySetPointTest.clear();
+        MySizeFlag.clear();
     }
 };
 

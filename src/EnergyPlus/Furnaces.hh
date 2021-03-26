@@ -93,29 +93,6 @@ namespace Furnaces {
         DehumidControl_CoolReheat,
     };
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // used for Coil:Gas:Heating and Coil:Electric:Heating coils only.
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Calculate routines to check convergence
-
-    // Supporting routines for module
-
-    // modules for variable speed heat pump
-
-    // Reporting routines for module
-
-    // Types
-
     struct FurnaceEquipConditions
     {
         // Members
@@ -310,8 +287,6 @@ namespace Furnaces {
     };
 
     // Functions
-
-    void clear_state();
 
     void SimFurnace(EnergyPlusData &state, std::string const &FurnaceName,
                     bool const FirstHVACIteration,
@@ -530,6 +505,12 @@ namespace Furnaces {
 struct FurnacesData : BaseGlobalStruct {
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    bool GetFurnaceInputFlag = true; // Logical to allow "GetInput" only once per simulation
+    std::unordered_map<std::string, std::string> UniqueFurnaceNames;
+    bool InitFurnaceMyOneTimeFlag = true; // one time allocation flag
+    bool FlowFracFlagReady = true;        // one time flag for calculating flow fraction through controlled zone
+    bool MyAirLoopPass = true;            // one time allocation flag
+
     int NumFurnaces = 0; // The number of furnaces found in the input data file
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
@@ -554,6 +535,9 @@ struct FurnacesData : BaseGlobalStruct {
     std::string CurrentModuleObject; // Object type for getting and error messages
     int Iter = 0;    // Iteration counter for CalcNewZoneHeatOnlyFlowRates
 
+    std::string HeatingCoilName; // name of heating coil
+    std::string HeatingCoilType; // type of heating coil
+
     // Object Data
     Array1D<Furnaces::FurnaceEquipConditions> Furnace;
 
@@ -565,8 +549,26 @@ struct FurnacesData : BaseGlobalStruct {
     Array1D_bool MyPlantScanFlag;         // used to initializa plant comp for water and steam heating coils
     Array1D_bool MySuppCoilPlantScanFlag; // used to initialize plant comp for water and steam heating coils
 
+    // used to be statics
+    Real64 CoolCoilLoad;       // Negative value means cooling required
+    Real64 SystemSensibleLoad; // Positive value means heating required
+    bool HumControl = false; // Logical flag signaling when dehumidification is required
+    Real64 TotalZoneLatentLoad; // Total ZONE latent load (not including outside air) to be removed by furnace/unitary system
+    Real64 TotalZoneSensLoad; // Total ZONE heating load (not including outside air) to be removed by furnace/unitary system
+    Real64 CoolPartLoadRatio; // Part load ratio (greater of sensible or latent part load ratio for cooling)
+    Real64 HeatPartLoadRatio; // Part load ratio (greater of sensible or latent part load ratio for cooling)
+    Real64 Dummy2 = 0.0;        // Dummy var. for generic calc. furnace output arg. (n/a for heat pump)
+    int SpeedNum = 1;              // Speed number
+    Real64 SupHeaterLoad = 0.0;    // supplement heater load
+
     void clear_state() override
     {
+        GetFurnaceInputFlag = true;
+        UniqueFurnaceNames.clear();
+        InitFurnaceMyOneTimeFlag = true;
+        FlowFracFlagReady = true; // one time flag for calculating flow fraction through controlled zone
+        MyAirLoopPass = true;
+
         NumFurnaces = 0;
         MySizeFlag.clear();
         CheckEquipName.clear();
@@ -588,6 +590,8 @@ struct FurnacesData : BaseGlobalStruct {
         SaveCompressorPLR = 0.0;
         CurrentModuleObject = "";
         Iter = 0;
+        HeatingCoilName.clear();
+        HeatingCoilType.clear();
         Furnace.clear();
 
         MyEnvrnFlag.clear();
@@ -597,6 +601,11 @@ struct FurnacesData : BaseGlobalStruct {
         MyFlowFracFlag.clear();
         MyPlantScanFlag.clear();
         MySuppCoilPlantScanFlag.clear();
+
+        HumControl = false;
+        Dummy2 = 0.0;
+        SpeedNum = 1;
+        SupHeaterLoad = 0.0;
     }
 };
 

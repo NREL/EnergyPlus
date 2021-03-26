@@ -69,8 +69,6 @@ using namespace EnergyPlus;
 TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
 {
 
-    using namespace DataIPShortCuts;
-
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
     thisModel->objectType = GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
@@ -282,7 +280,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     EXPECT_EQ(state->dataGlobal->NumOfTimeStepInHour, 4);
 
     // Needed to avoid crash in SetupSimulation (from ElectricPowerServiceManager.hh)
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
 
     bool ErrorsFound(false);
     SimulationManager::SetupSimulation(*state, ErrorsFound);

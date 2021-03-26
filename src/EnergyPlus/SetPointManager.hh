@@ -734,7 +734,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineGroundTempSetPointManager : SPBase
@@ -968,8 +968,6 @@ namespace SetPointManager {
         void calculate(EnergyPlusData &state);
     };
 
-    void clear_state();
-
     void ManageSetPoints(EnergyPlusData &state);
 
     void GetSetPointManagerInputs(EnergyPlusData &state); // wrapper for GetInput to accomodate unit testing
@@ -1048,6 +1046,15 @@ struct SetPointManagerData : BaseGlobalStruct {
     int NumReturnWaterResetHWSetPtMgrs = 0;  // number of hot-water return water reset setpoint managers
     int NumSchTESSetPtMgrs = 0;              // number of TES scheduled setpoint managers (created internally, not by user input)
 
+    Real64 TSupNoHC = 0.0; // supply temperature with no heating or cooling
+    Real64 ExtrRateNoHC = 0.0; // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
+
+    int GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
+    int GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
+    int InitSetPointManagerTypeNum = 0;
+    int InitSetPointManagerNumChiller = 0;
+    int InitSetPointManagerTypeOf_Num = 0;
+
     bool ManagerOn = false;
     bool GetInputFlag = true; // First time, input is "gotten"
 
@@ -1113,6 +1120,13 @@ struct SetPointManagerData : BaseGlobalStruct {
     Array1D<SetPointManager::DefineReturnWaterHWSetPointManager> ReturnWaterResetHWSetPtMgr;      // hot-water return water reset
     Array1D<SetPointManager::DefineScheduledTESSetPointManager> SchTESSetPtMgr;                   // Array for TES Scheduled Setpoint Manager data
 
+    Real64 CondWaterSetPoint = 0; // Condenser entering water temperature setpoint this timestep, C
+    Real64 EvapOutletTemp = 0;    // Evaporator water outlet temperature (C)
+    Real64 CondTempLimit = 0;     // Condenser entering water temperature setpoint lower limit
+    Real64 CurLoad = 0;           // Current cooling load, W
+    Real64 TotEnergy = 0;         // Total energy consumptions at this time step
+    Real64 TotEnergyPre = 0;      // Total energy consumptions at the previous time step
+    
     void clear_state() override
     {
 
@@ -1164,6 +1178,15 @@ struct SetPointManagerData : BaseGlobalStruct {
         DCESPMCondInletTemp = 0.0;
         DCESPMEvapOutletTemp = 0.0;
 
+        TSupNoHC = 0.0; // supply temperature with no heating or cooling
+        ExtrRateNoHC = 0.0; // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
+
+        GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
+        GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
+        InitSetPointManagerTypeNum = 0;
+        InitSetPointManagerNumChiller = 0;
+        InitSetPointManagerTypeOf_Num = 0;
+
         ManagerOn = false;
         GetInputFlag = true; // First time, input is "gotten"
         // Object Data
@@ -1208,6 +1231,12 @@ struct SetPointManagerData : BaseGlobalStruct {
         InitSetPointManagersMyEnvrnFlag = true;
         RunSubOptCondEntTemp = false;
         RunFinalOptCondEntTemp = false;
+        CondWaterSetPoint = 0;
+        EvapOutletTemp = 0;
+        CondTempLimit = 0;
+        CurLoad = 0;
+        TotEnergy = 0;
+        TotEnergyPre = 0;
     }
 
 };

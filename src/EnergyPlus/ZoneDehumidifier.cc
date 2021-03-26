@@ -209,19 +209,19 @@ namespace ZoneDehumidifier {
         Real64 const RatedInletAirRH(60.0);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneDehumidIndex;           // Loop index
-        static int NumAlphas(0);        // Number of Alphas to allocate arrays, then used for each GetObjectItem call
-        static int NumNumbers(0);       // Number of Numbers to allocate arrays, then used for each GetObjectItem call
-        int IOStatus;                   // Used in GetObjectItem
-        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        Array1D_string Alphas;          // Alpha input items for object
-        Array1D_string cAlphaFields;    // Alpha field names
-        Array1D_string cNumericFields;  // Numeric field names
-        Array1D<Real64> Numbers;        // Numeric input items for object
-        Array1D_bool lAlphaBlanks;      // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;    // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);        // Total number of alpha and numeric arguments (max)
-        Real64 CurveVal;                // Output from curve object (water removal or energy factor curves)
+        int ZoneDehumidIndex;          // Loop index
+        int NumAlphas(0);              // Number of Alphas to allocate arrays, then used for each GetObjectItem call
+        int NumNumbers(0);             // Number of Numbers to allocate arrays, then used for each GetObjectItem call
+        int IOStatus;                  // Used in GetObjectItem
+        bool ErrorsFound(false);       // Set to true if errors in input, fatal at end of routine
+        Array1D_string Alphas;         // Alpha input items for object
+        Array1D_string cAlphaFields;   // Alpha field names
+        Array1D_string cNumericFields; // Numeric field names
+        Array1D<Real64> Numbers;       // Numeric input items for object
+        Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
+        Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
+        int TotalArgs(0);              // Total number of alpha and numeric arguments (max)
+        Real64 CurveVal;               // Output from curve object (water removal or energy factor curves)
 
         state.dataZoneDehumidifier->NumDehumidifiers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
@@ -272,11 +272,11 @@ namespace ZoneDehumidifier {
 
             // A3 , \field Air Inlet Node Name
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirInletNodeNum = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
             // A4 , \field Air Outlet Node Name
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirOutletNodeNum = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
             // N1,  \field Rated Water Removal
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).RatedWaterRemoval = Numbers(1);
@@ -568,20 +568,16 @@ namespace ZoneDehumidifier {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-        //  LOGICAL, ALLOCATABLE, SAVE, DIMENSION(:) :: MySizeFlag  ! Used for sizing zone dehumidifier inputs one time
-        int LoopIndex;                               // DO loop index
-        int AirInletNode;                            // Inlet air node number
-        Real64 RatedAirHumrat;                       // Humidity ratio (kg/kg) at rated inlet air conditions of 26.6667C, 60% RH
-        Real64 RatedAirDBTemp;                       // Dry-bulb air temperature at rated conditions 26.6667C
-        Real64 RatedAirRH;                           // Relative humidity of air (0.6 --> 60%) at rated conditions
+        int LoopIndex;         // DO loop index
+        int AirInletNode;      // Inlet air node number
+        Real64 RatedAirHumrat; // Humidity ratio (kg/kg) at rated inlet air conditions of 26.6667C, 60% RH
+        Real64 RatedAirDBTemp; // Dry-bulb air temperature at rated conditions 26.6667C
+        Real64 RatedAirRH;     // Relative humidity of air (0.6 --> 60%) at rated conditions
 
         // Do the one time initializations
         if (state.dataZoneDehumidifier->MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(state.dataZoneDehumidifier->NumDehumidifiers);
-            //    ALLOCATE(MySizeFlag(NumDehumidifiers))
-            MyEnvrnFlag = true;
-            //    MySizeFlag = .TRUE.
+            state.dataZoneDehumidifier->MyEnvrnFlag.allocate(state.dataZoneDehumidifier->NumDehumidifiers);
+            state.dataZoneDehumidifier->MyEnvrnFlag = true;
             state.dataZoneDehumidifier->MyOneTimeFlag = false;
         }
 
@@ -597,7 +593,7 @@ namespace ZoneDehumidifier {
 
         AirInletNode = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).AirInletNodeNum;
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneDehumNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataZoneDehumidifier->MyEnvrnFlag(ZoneDehumNum)) {
 
             // Set the mass flow rates from the input volume flow rates, at rated conditions of 26.6667C, 60% RH
             // Might default back to STP later after discussion with M. Witte, use StdRhoAir instead of calc'd RhoAir at rated conditions
@@ -608,20 +604,20 @@ namespace ZoneDehumidifier {
                 PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, RatedAirDBTemp, RatedAirHumrat, RoutineName) * state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirVolFlow;
 
             // Set the node max and min mass flow rates on inlet node... outlet node gets updated in UPDATE subroutine
-            Node(AirInletNode).MassFlowRateMax = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirMassFlow;
-            Node(AirInletNode).MassFlowRateMaxAvail = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirMassFlow;
-            Node(AirInletNode).MassFlowRateMinAvail = 0.0;
-            Node(AirInletNode).MassFlowRateMin = 0.0;
+            state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirMassFlow;
+            state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirMassFlow;
+            state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail = 0.0;
+            state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin = 0.0;
 
-            MyEnvrnFlag(ZoneDehumNum) = false;
+            state.dataZoneDehumidifier->MyEnvrnFlag(ZoneDehumNum) = false;
         } // End one time inits
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(ZoneDehumNum) = true;
+            state.dataZoneDehumidifier->MyEnvrnFlag(ZoneDehumNum) = true;
         }
 
         // These initializations are done every iteration
-        Node(AirInletNode).MassFlowRate = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirMassFlow;
+        state.dataLoopNodes->Node(AirInletNode).MassFlowRate = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirMassFlow;
 
         // Zero out the report variables
         state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).SensHeatingRate = 0.0;                   // Zone Dehumidifier Sensible Heating Rate [W]
@@ -636,7 +632,7 @@ namespace ZoneDehumidifier {
         state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).OffCycleParasiticElecCons = 0.0;         // Zone Dehumidifier Off-Cycle Parasitic Electric Consumption [J]
         state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).DehumidCondVolFlowRate = 0.0;            // Zone Dehumidifier Condensate Volumetric Flow Rate [m3/s]
         state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).DehumidCondVol = 0.0;                    // Zone Dehumidifier Condensate Volume [m3]
-        state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).OutletAirTemp = Node(AirInletNode).Temp; // Zone Dehumidifier Outlet Air Temperature [C]
+        state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).OutletAirTemp = state.dataLoopNodes->Node(AirInletNode).Temp; // Zone Dehumidifier Outlet Air Temperature [C]
     }
 
     void SizeZoneDehumidifier()
@@ -741,8 +737,8 @@ namespace ZoneDehumidifier {
         Real64 hfg;                     // Enthalpy of evaporation of inlet air (J/kg)
         Real64 AirMassFlowRate;         // Air mass flow rate through this dehumidifier (kg/s)
         Real64 Cp;                      // Heat capacity of inlet air (J/kg-C)
-        static int AirInletNodeNum(0);  // Node number for the inlet air to the dehumidifier
-        static int AirOutletNodeNum(0); // Node number for the outlet air from the dehumidifier
+        int AirInletNodeNum(0);         // Node number for the inlet air to the dehumidifier
+        int AirOutletNodeNum(0);        // Node number for the outlet air from the dehumidifier
 
         SensibleOutput = 0.0;
         LatentOutput = 0.0;
@@ -758,8 +754,8 @@ namespace ZoneDehumidifier {
         AirInletNodeNum = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).AirInletNodeNum;
         AirOutletNodeNum = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).AirOutletNodeNum;
 
-        InletAirTemp = Node(AirInletNodeNum).Temp;
-        InletAirHumRat = Node(AirInletNodeNum).HumRat;
+        InletAirTemp = state.dataLoopNodes->Node(AirInletNodeNum).Temp;
+        InletAirHumRat = state.dataLoopNodes->Node(AirInletNodeNum).HumRat;
         InletAirRH = 100.0 * PsyRhFnTdbWPb(state, InletAirTemp, InletAirHumRat, state.dataEnvrn->OutBaroPress, RoutineName); // RH in percent (%)
 
         if (QZnDehumidReq < 0.0 && GetCurrentScheduleValue(state, state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).SchedPtr) > 0.0 &&
@@ -923,8 +919,8 @@ namespace ZoneDehumidifier {
             SensibleOutput = (LatentOutput * hfg) + ElectricPowerAvg; // Average sensible output, Watts
             // Send SensibleOutput to zone air heat balance via SysDepZoneLoads in ZoneEquipmentManager
 
-            Node(AirInletNodeNum).MassFlowRate = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirMassFlow * PLR;
-            AirMassFlowRate = Node(AirInletNodeNum).MassFlowRate; // Average air mass flow for this timestep
+            state.dataLoopNodes->Node(AirInletNodeNum).MassFlowRate = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirMassFlow * PLR;
+            AirMassFlowRate = state.dataLoopNodes->Node(AirInletNodeNum).MassFlowRate; // Average air mass flow for this timestep
             Cp = PsyCpAirFnW(InletAirHumRat);                     // Heat capacity of air
             if (AirMassFlowRate > 0.0 && Cp > 0.0) {
                 OutletAirTemp =
@@ -943,7 +939,7 @@ namespace ZoneDehumidifier {
             OutletAirHumRat = InletAirHumRat;
             PLR = 0.0;
             RunTimeFraction = 0.0;
-            Node(AirInletNodeNum).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(AirInletNodeNum).MassFlowRate = 0.0;
             // If available but didn't operate, then set electric power = off cycle parasitic load.
             // Else, electric power = 0.0
             if (GetCurrentScheduleValue(state, state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).SchedPtr) > 0.0) {
@@ -1010,26 +1006,26 @@ namespace ZoneDehumidifier {
         AirOutletNodeNum = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).AirOutletNodeNum;
 
         // Changed outlet node properties
-        Node(AirOutletNodeNum).Enthalpy = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).OutletAirEnthalpy;
-        Node(AirOutletNodeNum).HumRat = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(AirOutletNodeNum).Enthalpy = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).OutletAirEnthalpy;
+        state.dataLoopNodes->Node(AirOutletNodeNum).HumRat = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).OutletAirHumRat;
         // Set outlet temp = inlet temp; send excess sensible heat directly to air heat balance
         // (via SensibleOutput and QSensOut) for the next hvac simulation time step.
-        Node(AirOutletNodeNum).Temp = Node(AirInletNodeNum).Temp;
+        state.dataLoopNodes->Node(AirOutletNodeNum).Temp = state.dataLoopNodes->Node(AirInletNodeNum).Temp;
 
         // Pass through output node properties
-        Node(AirOutletNodeNum).Quality = Node(AirInletNodeNum).Quality;
-        Node(AirOutletNodeNum).Press = Node(AirInletNodeNum).Press;
-        Node(AirOutletNodeNum).MassFlowRate = Node(AirInletNodeNum).MassFlowRate;
-        Node(AirOutletNodeNum).MassFlowRateMin = Node(AirInletNodeNum).MassFlowRateMin;
-        Node(AirOutletNodeNum).MassFlowRateMax = Node(AirInletNodeNum).MassFlowRateMax;
-        Node(AirOutletNodeNum).MassFlowRateMinAvail = Node(AirInletNodeNum).MassFlowRateMinAvail;
-        Node(AirOutletNodeNum).MassFlowRateMaxAvail = Node(AirInletNodeNum).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(AirOutletNodeNum).Quality = state.dataLoopNodes->Node(AirInletNodeNum).Quality;
+        state.dataLoopNodes->Node(AirOutletNodeNum).Press = state.dataLoopNodes->Node(AirInletNodeNum).Press;
+        state.dataLoopNodes->Node(AirOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(AirInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(AirOutletNodeNum).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNodeNum).MassFlowRateMin;
+        state.dataLoopNodes->Node(AirOutletNodeNum).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNodeNum).MassFlowRateMax;
+        state.dataLoopNodes->Node(AirOutletNodeNum).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNodeNum).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(AirOutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNodeNum).MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(AirOutletNodeNum).CO2 = Node(AirInletNodeNum).CO2;
+            state.dataLoopNodes->Node(AirOutletNodeNum).CO2 = state.dataLoopNodes->Node(AirInletNodeNum).CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(AirOutletNodeNum).GenContam = Node(AirInletNodeNum).GenContam;
+            state.dataLoopNodes->Node(AirOutletNodeNum).GenContam = state.dataLoopNodes->Node(AirInletNodeNum).GenContam;
         }
     }
 
@@ -1052,7 +1048,7 @@ namespace ZoneDehumidifier {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::TimeStepSys;
+        auto & TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using Psychrometrics::RhoH2O;
 
         // Locals
@@ -1087,7 +1083,7 @@ namespace ZoneDehumidifier {
             // Volumetric flow of water in m3/s for water system interactions
 
             AirInletNodeNum = state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).AirInletNodeNum;
-            InletAirTemp = Node(AirInletNodeNum).Temp;
+            InletAirTemp = state.dataLoopNodes->Node(AirInletNodeNum).Temp;
             OutletAirTemp = max((InletAirTemp - 11.0), 1.0); // Assume coil outlet air is 11C (20F) lower than inlet air temp
             RhoWater = RhoH2O(OutletAirTemp);                // Density of water, minimum temp = 1.0 C
 

@@ -64,44 +64,9 @@ struct EnergyPlusData;
 
 namespace HVACHXAssistedCoolingCoil {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     // Compressor operation
     constexpr int On(1);  // normal compressor operation
     constexpr int Off(0); // signal DXCoil that compressor shouldn't run
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int TotalNumHXAssistedCoils;                // The total number of HXAssistedCoolingCoil compound objects
-    extern Array1D<Real64> HXAssistedCoilOutletTemp;   // Outlet temperature from this compound object
-    extern Array1D<Real64> HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
-    // PUBLIC so others can access this information
-    extern bool GetCoilsInputFlag; // Flag to allow input data to be retrieved from idf on first call to this subroutine
-    extern Array1D_bool CheckEquipName;
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Calculation algorithms for the module
-    // Update routine to update output node information
-    // PRIVATE UpdateHXAssistedCoolingCoil
-    // Not required.  All updates done by the individual components
-    // (cooling coil and air-to-air heat exchanger)
-
-    // Reporting routines for module
-    // PRIVATE ReportHXAssistedCoolingCoil
-    // No reporting variables for this compound component
-
-    // Utility routines for module
-
-    // Types
 
     struct HXAssistedCoilParameters
     {
@@ -139,13 +104,6 @@ namespace HVACHXAssistedCoolingCoil {
         }
     };
 
-    // Object Data
-    extern Array1D<HXAssistedCoilParameters> HXAssistedCoil;
-
-    // Functions
-
-    void clear_state();
-
     void SimHXAssistedCoolingCoil(EnergyPlusData &state, std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,         // FirstHVACIteration flag
                                   int const CompOp,                      // compressor operation; 1=on, 0=off
@@ -158,21 +116,9 @@ namespace HVACHXAssistedCoolingCoil {
                                   Optional<Real64> QTotOut = _            // the total cooling output of unit
     );
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetHXAssistedCoolingCoilInput(EnergyPlusData &state);
 
-    // End of Get Input subroutines for this Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
     void InitHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum); // index for HXAssistedCoolingCoil
-
-    // End Initialization Section of the Module
-    //******************************************************************************
 
     void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
                                    int const HXAssistedCoilNum,             // Index number for HXAssistedCoolingCoil
@@ -184,9 +130,6 @@ namespace HVACHXAssistedCoolingCoil {
                                    Optional<Real64 const> OnOffAirFlow = _, // Ratio of compressor ON air mass flow to AVERAGE over time step
                                    Optional_bool_const EconomizerFlag = _   // OA (or airloop) econommizer status
     );
-
-    //        End of Reporting subroutines for the HXAssistedCoil Module
-    // *****************************************************************************
 
     void GetHXDXCoilIndex(EnergyPlusData &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
 
@@ -268,16 +211,31 @@ namespace HVACHXAssistedCoolingCoil {
                                    std::string const &HXName  // must match coil names for the coil type
     );
 
-    //        End of Utility subroutines for the HXAssistedCoil Module
-    // *****************************************************************************
-
 } // namespace HVACHXAssistedCoolingCoil
 
 struct HVACHXAssistedCoolingCoilData : BaseGlobalStruct {
+    int TotalNumHXAssistedCoils = 0;                // The total number of HXAssistedCoolingCoil compound objects
+    Array1D<Real64> HXAssistedCoilOutletTemp;   // Outlet temperature from this compound object
+    Array1D<Real64> HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
+    bool GetCoilsInputFlag = true; // Flag to allow input data to be retrieved from idf on first call to this subroutine
+    Array1D_bool CheckEquipName;
+    Array1D<HVACHXAssistedCoolingCoil::HXAssistedCoilParameters> HXAssistedCoil;
+    std::unordered_map<std::string, std::string> UniqueHXAssistedCoilNames;
+    Real64 CoilOutputTempLast; // Exiting cooling coil temperature from last iteration
+    int ErrCount = 0;
+    int ErrCount2 = 0;
 
     void clear_state() override
     {
-
+        this->TotalNumHXAssistedCoils = 0;
+        this->HXAssistedCoilOutletTemp.clear();
+        this->HXAssistedCoilOutletHumRat.clear();
+        this->GetCoilsInputFlag = true;
+        this->CheckEquipName.clear();
+        this->HXAssistedCoil.clear();
+        this->UniqueHXAssistedCoilNames.clear();
+        this->ErrCount = 0;
+        this->ErrCount2 = 0;
     }
 };
 

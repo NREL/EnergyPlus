@@ -159,7 +159,7 @@ namespace CoolingPanelSimple {
 
         bool SizeCoolingPanelUA(EnergyPlusData &state);
 
-        void ReportCoolingPanel();
+        void ReportCoolingPanel(EnergyPlusData &state);
     };
 
     struct CoolingPanelSysNumericFieldData
@@ -221,7 +221,7 @@ namespace CoolingPanelSimple {
         Array1D<CoolingPanelSimple::CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
 
         bool ZoneEquipmentListChecked = false;
-
+        Array1D_bool MyEnvrnFlag;
         void clear_state() override
         {
             this->GetInputFlag = true;
@@ -239,6 +239,7 @@ namespace CoolingPanelSimple {
             this->CoolingPanel.deallocate();
             this->CoolingPanelSysNumericFields.deallocate();
             this->ZoneEquipmentListChecked = false;
+            this->MyEnvrnFlag.clear();
         }
     };
 

@@ -112,8 +112,6 @@ namespace EnergyPlus::GroundHeatExchangers {
     //   Ground Heat Exchanger.' Applied Energy. Vol 114, 57-69.
 
     // Using/Aliasing
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
     using namespace DataLoopNode;
 
     using namespace GroundTemperatureManager;
@@ -142,11 +140,11 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // get inlet node num
         this->inletNodeNum = NodeInputManager::GetOnlySingleNode(
-            state, inletNodeName, errorsFound, this->moduleName, this->name, NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            state, inletNodeName, errorsFound, this->moduleName, this->name, DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Inlet, 1, ObjectIsNotParent);
 
         // get outlet node num
         this->outletNodeNum = NodeInputManager::GetOnlySingleNode(
-            state, outletNodeName, errorsFound, this->moduleName, this->name, NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            state, outletNodeName, errorsFound, this->moduleName, this->name, DataLoopNode::NodeFluidType::Water, DataLoopNode::NodeConnectionType::Outlet, 1, ObjectIsNotParent);
 
         this->available = true;
         this->on = true;
@@ -271,8 +269,8 @@ namespace EnergyPlus::GroundHeatExchangers {
                                                                  errorsFound,
                                                                  this->moduleName,
                                                                  objName,
-                                                                 NodeType_Water,
-                                                                 NodeConnectionType_Inlet,
+                                                                 DataLoopNode::NodeFluidType::Water,
+                                                                 DataLoopNode::NodeConnectionType::Inlet,
                                                                  1,
                                                                  ObjectIsNotParent);
 
@@ -283,8 +281,8 @@ namespace EnergyPlus::GroundHeatExchangers {
                                                                   errorsFound,
                                                                   this->moduleName,
                                                                   objName,
-                                                                  NodeType_Water,
-                                                                  NodeConnectionType_Outlet,
+                                                                  DataLoopNode::NodeFluidType::Water,
+                                                                  DataLoopNode::NodeConnectionType::Outlet,
                                                                   1,
                                                                   ObjectIsNotParent);
         this->available = true;
@@ -948,7 +946,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         combineShortAndLongTimestepGFunctions();
 
         // save data for later
-        if (!DataSystemVariables::DisableGLHECaching) {
+        if (!state.dataSysVars->DisableGLHECaching) {
             myCacheData["Response Factors"]["time"] = std::vector<Real64>(this->myRespFactors->time.begin(), this->myRespFactors->time.end());
             myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(this->myRespFactors->LNTTS.begin(), this->myRespFactors->LNTTS.end());
             myCacheData["Response Factors"]["GFNC"] = std::vector<Real64>(this->myRespFactors->GFNC.begin(), this->myRespFactors->GFNC.end());
@@ -1358,7 +1356,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     void GLHEBase::makeThisGLHECacheAndCompareWithFileCache(EnergyPlusData &state)
     {
-        if (!DataSystemVariables::DisableGLHECaching) {
+        if (!state.dataSysVars->DisableGLHECaching) {
             makeThisGLHECacheStruct();
             readCacheFileAndCompareWithThisGLHECache(state);
         }
@@ -1402,14 +1400,14 @@ namespace EnergyPlus::GroundHeatExchangers {
         // For convenience
         using json = nlohmann::json;
 
-        if (!FileSystem::fileExists(DataStringGlobals::outputGLHEFileName)) {
+        if (!FileSystem::fileExists(state.dataStrGlobals->outputGLHEFileName)) {
             // if the file doesn't exist, there are no data to read
             return;
         } else {
             // file exists -- read data and load if possible
 
             // open file
-            std::ifstream ifs(DataStringGlobals::outputGLHEFileName);
+            std::ifstream ifs(state.dataStrGlobals->outputGLHEFileName);
 
             // create empty json object
             json json_in;
@@ -1421,7 +1419,7 @@ namespace EnergyPlus::GroundHeatExchangers {
             } catch (...) {
                 if (!json_in.empty()) {
                     // file exists, is not empty, but failed for some other reason
-                    ShowWarningError(state, DataStringGlobals::outputGLHEFileName + " contains invalid file format");
+                    ShowWarningError(state, state.dataStrGlobals->outputGLHEFileName + " contains invalid file format");
                 }
                 ifs.close();
                 return;
@@ -1479,11 +1477,11 @@ namespace EnergyPlus::GroundHeatExchangers {
         // For convenience
         using json = nlohmann::json;
 
-        if (FileSystem::fileExists(DataStringGlobals::outputGLHEFileName)) {
+        if (FileSystem::fileExists(state.dataStrGlobals->outputGLHEFileName)) {
             // file exists -- add data
 
             // open file
-            std::ifstream ifs(DataStringGlobals::outputGLHEFileName);
+            std::ifstream ifs(state.dataStrGlobals->outputGLHEFileName);
 
             // create empty json object
             json json_in;
@@ -1495,8 +1493,8 @@ namespace EnergyPlus::GroundHeatExchangers {
             } catch (...) {
                 if (!json_in.empty()) {
                     // file exists, is not empty, but failed for some other reason
-                    ShowWarningError(state, "Error reading from " + DataStringGlobals::outputGLHEFileName);
-                    ShowWarningError(state, "Data from previous " + DataStringGlobals::outputGLHEFileName + " not saved");
+                    ShowWarningError(state, "Error reading from " + state.dataStrGlobals->outputGLHEFileName);
+                    ShowWarningError(state, "Data from previous " + state.dataStrGlobals->outputGLHEFileName + " not saved");
                 }
                 ifs.close();
             }
@@ -1519,7 +1517,7 @@ namespace EnergyPlus::GroundHeatExchangers {
             if (state.files.outputControl.glhe) {
                 // open output file
                 std::ofstream ofs;
-                ofs.open(DataStringGlobals::outputGLHEFileName);
+                ofs.open(state.dataStrGlobals->outputGLHEFileName);
                 // write data to file, set spacing at 2
                 ofs << std::setw(2) << json_out;
                 // don't forget to close
@@ -1539,7 +1537,7 @@ namespace EnergyPlus::GroundHeatExchangers {
             if (state.files.outputControl.glhe) {
                 // open output file
                 std::ofstream ofs;
-                ofs.open(DataStringGlobals::outputGLHEFileName);
+                ofs.open(state.dataStrGlobals->outputGLHEFileName);
                 // write data to file, set spacing at 2
                 ofs << std::setw(2) << json_out;
                 // don't forget to close
@@ -2089,7 +2087,7 @@ namespace EnergyPlus::GroundHeatExchangers {
             this->firstTime = false;
         }
 
-        this->inletTemp = Node(this->inletNodeNum).Temp;
+        this->inletTemp = state.dataLoopNodes->Node(this->inletNodeNum).Temp;
 
         Real64 cpFluid = GetSpecificHeatGlycol(state,
                                                state.dataPlnt->PlantLoop(this->loopNum).FluidName,
@@ -2117,7 +2115,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         state.dataGroundHeatExchanger->currentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 +
                                                         (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
-                                                        SysTimeElapsed; //+ TimeStepsys
+                                                        state.dataHVACGlobal->SysTimeElapsed; //+ TimeStepsys
         state.dataGroundHeatExchanger->locHourOfDay =
             static_cast<int>(mod(state.dataGroundHeatExchanger->currentSimTime, DataGlobalConstants::HoursInDay) + 1);
         state.dataGroundHeatExchanger->locDayOfSim = static_cast<int>(state.dataGroundHeatExchanger->currentSimTime / 24 + 1);
@@ -2368,8 +2366,9 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         SafeCopyPlantNode(state, this->inletNodeNum, this->outletNodeNum);
 
-        Node(this->outletNodeNum).Temp = this->outletTemp;
-        Node(this->outletNodeNum).Enthalpy = this->outletTemp * GetSpecificHeatGlycol(state,
+        state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->outletTemp;
+        state.dataLoopNodes->Node(this->outletNodeNum).Enthalpy =
+            this->outletTemp * GetSpecificHeatGlycol(state,
                                                                                       state.dataPlnt->PlantLoop(this->loopNum).FluidName,
                                                                                       this->outletTemp,
                                                                                       state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
@@ -2789,7 +2788,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         constexpr const char * RoutineName("calcPipeConvectionResistance");
 
         // Get fluid props
-        this->inletTemp = Node(this->inletNodeNum).Temp;
+        this->inletTemp = state.dataLoopNodes->Node(this->inletNodeNum).Temp;
 
         Real64 const cpFluid = GetSpecificHeatGlycol(state,
                                                      state.dataPlnt->PlantLoop(this->loopNum).FluidName,
@@ -3120,7 +3119,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
-                           (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) *
+                           (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
                           DataGlobalConstants::SecInHour;
 
         // Init more variables
@@ -3189,12 +3188,12 @@ namespace EnergyPlus::GroundHeatExchangers {
         Real64 fluidDensity = FluidProperties::GetDensityGlycol(
             state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
         this->designMassFlow = this->designFlow * fluidDensity;
-        PlantUtilities::InitComponentNodes(
+        PlantUtilities::InitComponentNodes(state, 
             0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
         this->lastQnSubHr = 0.0;
-        Node(this->inletNodeNum).Temp = this->tempGround;
-        Node(this->outletNodeNum).Temp = this->tempGround;
+        state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->tempGround;
+        state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->tempGround;
 
         // zero out all history arrays
         this->QnHr = 0.0;
@@ -3225,7 +3224,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         using namespace GroundTemperatureManager;
 
         Real64 CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
-                          (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) *
+                          (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
                          DataGlobalConstants::SecInHour;
 
         // Init more variables
@@ -3279,12 +3278,12 @@ namespace EnergyPlus::GroundHeatExchangers {
         Real64 fluidDensity = FluidProperties::GetDensityGlycol(
             state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
         this->designMassFlow = this->designFlow * fluidDensity;
-        PlantUtilities::InitComponentNodes(
+        PlantUtilities::InitComponentNodes(state, 
             0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
         this->lastQnSubHr = 0.0;
-        Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
-        Node(this->outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+        state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+        state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
 
         // zero out all history arrays
         this->QnHr = 0.0;

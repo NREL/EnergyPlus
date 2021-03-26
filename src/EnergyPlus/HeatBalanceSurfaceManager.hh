@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
 
 namespace EnergyPlus {
 
@@ -81,7 +82,6 @@ namespace HeatBalanceSurfaceManager {
     // Reporting routines for module
 
     // Functions
-    void clear_state();
 
     void ManageSurfaceHeatBalance(EnergyPlusData &state);
 
@@ -191,9 +191,94 @@ namespace HeatBalanceSurfaceManager {
 
 struct HeatBalSurfMgr : BaseGlobalStruct {
 
+    Array1D<Real64> QExt1;    // Heat flux at the exterior surface during first time step/series
+    Array1D<Real64> QInt1;    // Heat flux at the interior surface during first time step/series
+    Array1D<Real64> TempInt1; // Temperature of interior surface during first time step/series
+    Array1D<Real64> TempExt1; // Temperature of exterior surface during first time step/series
+    Array1D<Real64> Qsrc1;    // Heat source/sink (during first time step/series)
+    Array1D<Real64> Tsrc1;    // Temperature at source/sink (during first time step/series)
+    Array1D<Real64> Tuser1;   // Temperature at the user specified location (during first time step/series)
+    Array1D<Real64> SumTime;  // Amount of time that has elapsed from start of master history to
+
+    Array1D<Real64> SurfaceAE; // Product of area and emissivity for each surface
+    Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
+
+    Array2D<Real64> DiffuseArray;
+    Array1D_bool FirstCalcZone; // for error message
+
+    Real64 curQL = 0.0; // radiant value prior to adjustment for pulse for load component report
+    Real64 adjQL = 0.0; // radiant value including adjustment for pulse for load component report
+
+    bool ManageSurfaceHeatBalancefirstTime = true;
+    bool InitSurfaceHeatBalancefirstTime = true;
+    bool ComputeIntSWAbsorpFactorsfirstTime = true; // First time through routine
+    bool UpdateThermalHistoriesFirstTimeFlag = true;
+    bool CalculateZoneMRTfirstTime = true; // Flag for first time calculations
+    bool reportThermalResilienceFirstTime = true;
+    bool reportVarHeatIndex = false;
+    bool reportVarHumidex = false;
+    bool hasPierceSET = true;
+    bool reportCO2ResilienceFirstTime = true;
+    bool reportVisualResilienceFirstTime = true;
+    std::vector<Real64> lowSETLongestHours;
+    std::vector<Real64> highSETLongestHours;
+    std::vector<int> lowSETLongestStart;
+    std::vector<int> highSETLongestStart;
+    bool calcHeatBalInsideSurfFirstTime = true;
+    bool calcHeatBalInsideSurfCTFOnlyFirstTime = true;
+    int calcHeatBalInsideSurfErrCount = 0;
+    int calcHeatBalInsideSurfErrPointer = 0;
+    int calcHeatBalInsideSurfWarmupErrCount = 0;
+    bool calcHeatBalInsideSurEnvrnFlag = true;
+    Array1D<Real64> RefAirTemp; // inside surface convection reference air temperatures
+    Array1D<Real64> AbsDiffWin = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);    // Diffuse solar absorptance of glass layers //Tuned Made static
+    Array1D<Real64> AbsDiffWinGnd = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
+    Array1D<Real64> AbsDiffWinSky = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
+
     void clear_state() override
     {
+        QExt1.clear();
+        QInt1.clear();
+        TempInt1.clear();
+        TempExt1.clear();
+        Qsrc1.clear();
+        Tsrc1.clear();
+        Tuser1.clear();
+        SumTime.clear();
 
+        SurfaceAE.clear();
+        ZoneAESum.clear();
+
+        DiffuseArray.clear();
+        FirstCalcZone.clear();
+        curQL = 0.0;
+        adjQL = 0.0;
+
+        ManageSurfaceHeatBalancefirstTime = true;
+        InitSurfaceHeatBalancefirstTime = true;
+        ComputeIntSWAbsorpFactorsfirstTime = true;
+        UpdateThermalHistoriesFirstTimeFlag = true;
+        CalculateZoneMRTfirstTime = true;
+        reportThermalResilienceFirstTime = true;
+        reportVarHeatIndex = false;
+        reportVarHumidex = false;
+        hasPierceSET = true;
+        reportCO2ResilienceFirstTime = true;
+        reportVisualResilienceFirstTime = true;
+        lowSETLongestHours.clear();
+        highSETLongestHours.clear();
+        lowSETLongestStart.clear();
+        highSETLongestStart.clear();
+        calcHeatBalInsideSurfFirstTime = true;
+        calcHeatBalInsideSurfCTFOnlyFirstTime = true;
+        calcHeatBalInsideSurfErrCount = 0;
+        calcHeatBalInsideSurfErrPointer = 0;
+        calcHeatBalInsideSurfWarmupErrCount = 0;
+        calcHeatBalInsideSurEnvrnFlag = true;
+        RefAirTemp.clear();
+        AbsDiffWin = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
+        AbsDiffWinGnd = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
+        AbsDiffWinSky = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
     }
 };
 
