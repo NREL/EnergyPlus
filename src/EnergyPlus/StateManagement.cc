@@ -49,7 +49,6 @@
 
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -76,7 +75,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     // then clear any other remaining global state, the number of these here will reduce over time
     using namespace EnergyPlus;
     // A to Z order
-    autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
     DataOutputs::clear_state();

@@ -315,18 +315,6 @@ public:
                                                  DataSizing::ZoneSizingData const &finalZoneSizing);
 };
 
-void autosizing_clear_state();
-
-extern bool oneTimeCompRptHeaderFlag;
-
-struct AutoSizingBaseData : BaseGlobalStruct {
-
-    void clear_state() override
-    {
-
-    }
-};
-
 } // namespace EnergyPlus
 
 #endif
