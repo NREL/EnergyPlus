@@ -520,7 +520,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
 
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
                                                          c->coilObjName,
-                                                         HVACFan::fanObjs[state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex]->name,
+                                                         state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex]->name,
                                                          DataAirSystems::objectVectorOOFanSystemModel,
                                                          state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex);
             break;
@@ -782,8 +782,8 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             if (c->supFanVecIndex < 0) {
                 c->supFanVecIndex = HVACFan::getFanObjectVectorIndex(state, c->fanAssociatedWithCoilName);
             }
-            c->fanSizeMaxAirVolumeFlow = HVACFan::fanObjs[c->supFanVecIndex]->designAirVolFlowRate;
-            c->fanSizeMaxAirMassFlow = HVACFan::fanObjs[c->supFanVecIndex]->maxAirMassFlowRate();
+            c->fanSizeMaxAirVolumeFlow = state.dataHVACFan->fanObjs[c->supFanVecIndex]->designAirVolFlowRate;
+            c->fanSizeMaxAirMassFlow = state.dataHVACFan->fanObjs[c->supFanVecIndex]->maxAirMassFlowRate();
             break;
         }
         case DataAirSystems::fanModelTypeNotYetSet: {

@@ -5131,24 +5131,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 3);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(3).Name, "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(3).ZoneNames[0], "Zone 3"));
+    EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 3);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(3).Name, "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(3).ZoneNames[0], "Zone 3"));
     EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 2);
     EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 3);
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 3);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(3).Name, "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(3).ZoneNames[0], "Zone 3"));
+    EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 3);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(3).Name, "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(3).ZoneNames[0], "Zone 3"));
     EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 2);
     EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 3);
@@ -5315,20 +5315,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[2], "Zone 3"));
+    EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[2], "Zone 3"));
     EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[2], "Zone 3"));
+    EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[2], "Zone 3"));
     EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);
@@ -5506,22 +5506,22 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
 
     // For this test case, Zones 1 and 3 share radiant and solar enclosures
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 2);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 2);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[1], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
     EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 2);
     EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 2);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 2);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[1], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
     EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 2);
     EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);
@@ -5861,26 +5861,26 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // Between Zones 1 and 5
     // This should trigger the enclosure merging and all five zones should share a radiant and solar enclosure
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[2], "Zone 5"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[3], "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[4], "Zone 4"));
+    EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[2], "Zone 5"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[3], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[4], "Zone 4"));
     EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(4).RadiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(5).RadiantEnclosureNum, 1);
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[2], "Zone 5"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[3], "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[4], "Zone 4"));
+    EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[2], "Zone 5"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[3], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[4], "Zone 4"));
     EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);

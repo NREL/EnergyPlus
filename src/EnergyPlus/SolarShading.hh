@@ -434,78 +434,155 @@ struct SolarShadingData : BaseGlobalStruct {
     Array1D<SolarShading::SurfaceErrorTracking> TrackTooManyVertices;
     Array1D<SolarShading::SurfaceErrorTracking> TrackBaseSubSurround;
 
+    Real64 TolValue = 0.0003;
+    Array1D<Real64> XVT; // X Vertices of
+    Array1D<Real64> YVT; // Y vertices of
+    Array1D<Real64> ZVT; // Z vertices of
+    Array1D<Real64> SLOPE; // Slopes from left-most vertex to others.
+    int MaxGSS = 50; // Current Max for GSS array
+    int MaxBKS = 50; // Current Max for BKS array
+    int MaxSBS = 50; // Current Max for SBS array
+    int MaxDim = 0;
+    Array1D<Real64> XVrt; // X Vertices of Shadows
+    Array1D<Real64> YVrt; // Y vertices of Shadows
+    Array1D<Real64> ZVrt; // Z vertices of Shadows
+    Array1D<Real64> XVrtx; // X,Y,Z coordinates of vertices of
+    Array1D<Real64> YVrtx; // back surfaces projected into system
+    Array1D<Real64> ZVrtx; // relative to receiving surface
+    Array1D<Real64> XVert;
+    Array1D<Real64> YVert;
+    Array1D<Real64> ZVert;
+    Array1D<Real64> AbsBeamWin;                  // Glass layer beam solar absorptance of a window
+    Array1D<Real64> AbsBeamWinEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1); // layers beam solar absorptance of a window
+    Array1D<Real64> ExtBeamAbsByShadFac; // Factor for exterior beam radiation absorbed by shade (1/m2) (absorbed radation = beam incident * ExtBeamAbsByShad
+    Array1D<Real64> IntBeamAbsByShadFac; // Like ExtBeamAbsByShadFac, but for interior beam radiation.
+    Array1D<Real64> WinTransBmSolar;     // Factor for exterior beam solar transmitted through window, or window plus shade, into zone at current time (m2)
+    Array1D<Real64> WinTransDifSolar; // Factor for exterior diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
+    Array1D<Real64> WinTransDifSolarGnd; // Factor for exterior ground diffuse solar transmitted through window with horizontally-slatted blind into zone at current time (m2)
+    Array1D<Real64> WinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through window with horizontally-slatted blind into zone at current time (m2)
+    Array2D<Real64> AbsSolBeamEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed exterior beam radiation by layers fraction
+    Array2D<Real64> AbsSolDiffEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed exterior diffuse radiation by layers fraction
+    Array2D<Real64> AbsSolBeamBackEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed interior beam radiation by layers fraction from back
+    Array1D<Real64> WinTransBmBmSolar; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
+    Array1D<Real64> WinTransBmDifSolar; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
+    Real64 ThetaBig = 0.0;        // Larger of ThetaBlock1 and ThetaBlock2     //Autodesk Used uninitialized in some runs
+    Real64 ThetaSmall = 0.0;      // Smaller of ThetaBlock1 and ThetaBlock2 //Autodesk Used uninitialized in some runs
+    Real64 ThetaMin = 0.0;        // Minimum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
+    Real64 ThetaMax = 0.0;        // Maximum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
+    Array1D<Real64> XVertex; // X,Y,Z coordinates of vertices of
+    Array1D<Real64> YVertex; // back surfaces projected into system
+    Array1D<Real64> ZVertex; // relative to receiving surface
+
     void clear_state() override
     {
-        MaxHCV = 15;
-        MaxHCS = 1500;
-        MAXHCArrayBounds = 0;
-        MAXHCArrayIncrement = 0;
-        NVS = 0;
-        NumVertInShadowOrClippedSurface = 0;
-        CurrentSurfaceBeingShadowed = 0;
-        CurrentShadowingSurface = 0;
-        OverlapStatus = 0;
-        CTHETA.deallocate();
-        FBKSHC = 0;
-        FGSSHC = 0;
-        FINSHC = 0;
-        FRVLHC = 0;
-        FSBSHC = 0;
-        LOCHCA = 0;
-        NBKSHC = 0;
-        NGSSHC = 0;
-        NINSHC = 0;
-        NRVLHC = 0;
-        NSBSHC = 0;
-        CalcSkyDifShading = false;
-        ShadowingCalcFrequency = 0; // Frequency for Shadowing Calculations
-        ShadowingDaysLeft = 0;      // Days left in current shadowing period
-        debugging = false;
-        MustAllocSolarShading = true;
-        GetInputFlag = true;
-        firstTime = true;
-        HCNS.deallocate();
-        HCNV.deallocate();
-        HCA.deallocate();
-        HCB.deallocate();
-        HCC.deallocate();
-        HCX.deallocate();
-        HCY.deallocate();
-        WindowRevealStatus.deallocate();
-        HCAREA.deallocate();
-        HCT.deallocate();
-        ISABSF.deallocate();
-        SAREA.deallocate();
-        NumTooManyFigures = 0;
-        NumTooManyVertices = 0;
-        NumBaseSubSurround = 0;
-        XShadowProjection = 0.0;
-        YShadowProjection = 0.0;
-        XTEMP.deallocate();
-        XVC.deallocate();
-        XVS.deallocate();
-        YTEMP.deallocate();
-        YVC.deallocate();
-        YVS.deallocate();
-        ZVC.deallocate();
-        ATEMP.deallocate();
-        BTEMP.deallocate();
-        CTEMP.deallocate();
-        XTEMP1.deallocate();
-        YTEMP1.deallocate();
-        maxNumberOfFigures = 0;
-        TrackTooManyFigures.deallocate();
-        TrackTooManyVertices.deallocate();
-        TrackBaseSubSurround.deallocate();
-        ISABSF.deallocate();
-        InitComplexOnce = true;
-        ShadowOneTimeFlag = true;
-        CHKSBSOneTimeFlag = true;
-        ORDERFirstTimeFlag = true;
-        TooManyFiguresMessage = false;
-        TooManyVerticesMessage = false;
-        SHDBKSOneTimeFlag = true;
-        SHDGSSOneTimeFlag = true;
+        this->MaxHCV = 15;
+        this->MaxHCS = 1500;
+        this->MAXHCArrayBounds = 0;
+        this->MAXHCArrayIncrement = 0;
+        this->NVS = 0;
+        this->NumVertInShadowOrClippedSurface = 0;
+        this->CurrentSurfaceBeingShadowed = 0;
+        this->CurrentShadowingSurface = 0;
+        this->OverlapStatus = 0;
+        this->CTHETA.deallocate();
+        this->FBKSHC = 0;
+        this->FGSSHC = 0;
+        this->FINSHC = 0;
+        this->FRVLHC = 0;
+        this->FSBSHC = 0;
+        this->LOCHCA = 0;
+        this->NBKSHC = 0;
+        this->NGSSHC = 0;
+        this->NINSHC = 0;
+        this->NRVLHC = 0;
+        this->NSBSHC = 0;
+        this->CalcSkyDifShading = false;
+        this->ShadowingCalcFrequency = 0; // Frequency for Shadowing Calculations
+        this->ShadowingDaysLeft = 0;      // Days left in current shadowing period
+        this->debugging = false;
+        this->MustAllocSolarShading = true;
+        this->GetInputFlag = true;
+        this->firstTime = true;
+        this->HCNS.deallocate();
+        this->HCNV.deallocate();
+        this->HCA.deallocate();
+        this->HCB.deallocate();
+        this->HCC.deallocate();
+        this->HCX.deallocate();
+        this->HCY.deallocate();
+        this->WindowRevealStatus.deallocate();
+        this->HCAREA.deallocate();
+        this->HCT.deallocate();
+        this->ISABSF.deallocate();
+        this->SAREA.deallocate();
+        this->NumTooManyFigures = 0;
+        this->NumTooManyVertices = 0;
+        this->NumBaseSubSurround = 0;
+        this->XShadowProjection = 0.0;
+        this->YShadowProjection = 0.0;
+        this->XTEMP.deallocate();
+        this->XVC.deallocate();
+        this->XVS.deallocate();
+        this->YTEMP.deallocate();
+        this->YVC.deallocate();
+        this->YVS.deallocate();
+        this->ZVC.deallocate();
+        this->ATEMP.deallocate();
+        this->BTEMP.deallocate();
+        this->CTEMP.deallocate();
+        this->XTEMP1.deallocate();
+        this->YTEMP1.deallocate();
+        this->maxNumberOfFigures = 0;
+        this->TrackTooManyFigures.deallocate();
+        this->TrackTooManyVertices.deallocate();
+        this->TrackBaseSubSurround.deallocate();
+        this->ISABSF.deallocate();
+        this->InitComplexOnce = true;
+        this->ShadowOneTimeFlag = true;
+        this->CHKSBSOneTimeFlag = true;
+        this->ORDERFirstTimeFlag = true;
+        this->TooManyFiguresMessage = false;
+        this->TooManyVerticesMessage = false;
+        this->SHDBKSOneTimeFlag = true;
+        this->SHDGSSOneTimeFlag = true;
+        this->TolValue = 0.0003;
+        this->XVT.deallocate();
+        this->YVT.deallocate();
+        this->ZVT.deallocate();
+        this->SLOPE.deallocate();
+        this->MaxGSS = 50;
+        this->MaxBKS = 50;
+        this->MaxSBS = 50;
+        this->MaxDim = 0;
+        this->XVrt.deallocate();
+        this->YVrt.deallocate();
+        this->ZVrt.deallocate();
+        this->XVrtx.deallocate();
+        this->YVrtx.deallocate();
+        this->ZVrtx.deallocate();
+        this->XVert.deallocate();
+        this->YVert.deallocate();
+        this->ZVert.deallocate();
+        this->AbsBeamWin.deallocate();
+        this->AbsBeamWinEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1);
+        this->ExtBeamAbsByShadFac.deallocate();
+        this->IntBeamAbsByShadFac.deallocate();
+        this->WinTransBmSolar.deallocate();
+        this->WinTransDifSolar.deallocate();
+        this->WinTransDifSolarGnd.deallocate();
+        this->WinTransDifSolarSky.deallocate();
+        this->AbsSolBeamEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
+        this->AbsSolDiffEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
+        this->AbsSolBeamBackEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
+        this->WinTransBmBmSolar.deallocate();
+        this->WinTransBmDifSolar.deallocate();
+        this->ThetaBig = 0.0;
+        this->ThetaSmall = 0.0;
+        this->ThetaMin = 0.0;
+        this->ThetaMax = 0.0;
+        this->XVertex.deallocate();
+        this->YVertex.deallocate();
+        this->ZVertex.deallocate();
     }
 
     // Default Constructor

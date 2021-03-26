@@ -216,7 +216,7 @@ namespace DElightManagerF {
         auto delightInFile = state.files.delightIn.open(state, "DElightInputGenerator", state.files.outputControl.delightin);
 
         // Start of DElight input file
-        print(delightInFile, Format_901, CurrentDateTime);
+        print(delightInFile, Format_901, state.dataStrGlobals->CurrentDateTime);
 
         // Building Data Section retrieved from DataHeatBalance and DataEnvironment modules
         // Remove any blanks from the Building Name for ease of input to DElight

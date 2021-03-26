@@ -1156,13 +1156,13 @@ namespace EnergyPlus::SimAirServingZones {
                             PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Fan_System_Object;
                             // Construct fan object
                             if (HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
-                                HVACFan::fanObjs.emplace_back(
+                                state.dataHVACFan->fanObjs.emplace_back(
                                     new HVACFan::FanSystem(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
                             }
                             PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =
                                 HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
                                 1; // + 1 for shift from zero-based vector to 1-based compIndex
-                            HVACFan::fanObjs[HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)]
+                            state.dataHVACFan->fanObjs[HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)]
                                 ->AirPathFlag = true;
                         } else if (componentType == "FAN:COMPONENTMODEL") {
                             PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Fan_ComponentModel;
@@ -2404,9 +2404,6 @@ namespace EnergyPlus::SimAirServingZones {
         // TRUE if Zone Equipment needs to be resimulated.
 
         // SUBROUTINE LOCAL VARIABLE DEFINITIONS
-        // Last saved HVAC time stamp at beginning of step in seconds.
-        // Used to control when to reset the statistic counters for each new HVAC step.
-        static Real64 SavedPreviousHVACTime(0.0);
         Real64 rxTime;
         // Primary Air Sys DO loop index
         int AirLoopNum;
@@ -2446,8 +2443,8 @@ namespace EnergyPlus::SimAirServingZones {
         // based on the time stamp at the beginning of the current HVAC step (expressed in seconds).
         if (FirstHVACIteration) {
             rxTime = GetPreviousHVACTime(state);
-            if (SavedPreviousHVACTime != rxTime) {
-                SavedPreviousHVACTime = rxTime;
+            if (state.dataSimAirServingZones->SavedPreviousHVACTime != rxTime) {
+                state.dataSimAirServingZones->SavedPreviousHVACTime = rxTime;
                 state.dataSimAirServingZones->salIterTot = 0;
                 state.dataSimAirServingZones->NumCallsTot = 0;
             }
@@ -2786,8 +2783,7 @@ namespace EnergyPlus::SimAirServingZones {
         bool ControllerConvergedFlag;
         // TRUE when air loop has been evaluated with latest actuated variables
         bool IsUpToDateFlag;
-        // Placeholder for environment name used in error reporting
-        static std::string ErrEnvironmentName;
+
         auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
         auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
 
@@ -2888,16 +2884,16 @@ namespace EnergyPlus::SimAirServingZones {
                         if (!state.dataGlobal->WarmupFlag) {
                             ++state.dataSimAirServingZones->ErrCountSALC;
                             if (state.dataSimAirServingZones->ErrCountSALC < 15) {
-                                ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
+                                state.dataSimAirServingZones->ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                                 const auto CharErrOut = fmt::to_string(MaxIter);
                                 ShowWarningError(state, "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
                                                  PrimaryAirSystems(AirLoopNum).Name + ", " +
                                                  PrimaryAirSystems(AirLoopNum).ControllerName(AirLoopControlNum) + ", at " + state.dataEnvrn->EnvironmentName + ", " +
                                                  state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state));
                             } else {
-                                if (state.dataEnvrn->EnvironmentName != ErrEnvironmentName) {
+                                if (state.dataEnvrn->EnvironmentName != state.dataSimAirServingZones->ErrEnvironmentName) {
                                     state.dataSimAirServingZones->MaxErrCountSALC = 0;
-                                    ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
+                                    state.dataSimAirServingZones->ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                                 }
                                 ShowRecurringWarningErrorAtEnd(state, "SolveAirLoopControllers: Exceeding Maximum iterations for " +
                                                                    PrimaryAirSystems(AirLoopNum).Name + " during " + state.dataEnvrn->EnvironmentName + " continues",
@@ -3008,7 +3004,7 @@ namespace EnergyPlus::SimAirServingZones {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // Maximum iterations of an air system/controllers simulation sequence
-        int const MaxIter(50);
+        constexpr int MaxIter(50);
 
         // SUBROUTINE LOCAL VARIABLE DEFINITIONS
         // TRUE if controller supports speculative warm restart
@@ -3017,8 +3013,7 @@ namespace EnergyPlus::SimAirServingZones {
         bool ControllerConvergedFlag;
         // TRUE when air loop has been evaluated with latest actuated variables
         bool IsUpToDateFlag;
-        // Placeholder for environment name used in error reporting
-        static std::string ErrEnvironmentName;
+
         // A character string equivalent of ErrCount
 
         auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
@@ -3110,15 +3105,15 @@ namespace EnergyPlus::SimAirServingZones {
                     if (!state.dataGlobal->WarmupFlag) {
                         ++state.dataSimAirServingZones->ErrCountSWCC;
                         if (state.dataSimAirServingZones->ErrCountSWCC < 15) {
-                            ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
+                            state.dataSimAirServingZones->ErrEnvironmentNameSolveWaterCoilController = state.dataEnvrn->EnvironmentName;
                             const auto CharErrOut = fmt::to_string(MaxIter);
                             ShowWarningError(state, "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
                                              PrimaryAirSystems(AirLoopNum).Name + ":" + ControllerName + ", at " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy +
                                              ' ' + CreateSysTimeIntervalString(state));
                         } else {
-                            if (state.dataEnvrn->EnvironmentName != ErrEnvironmentName) {
+                            if (state.dataEnvrn->EnvironmentName != state.dataSimAirServingZones->ErrEnvironmentNameSolveWaterCoilController) {
                                 state.dataSimAirServingZones->MaxErrCountSWCC = 0;
-                                ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
+                                state.dataSimAirServingZones->ErrEnvironmentNameSolveWaterCoilController = state.dataEnvrn->EnvironmentName;
                             }
                             ShowRecurringWarningErrorAtEnd(state, "SolveAirLoopControllers: Exceeding Maximum iterations for " +
                                                                PrimaryAirSystems(AirLoopNum).Name + " during " + state.dataEnvrn->EnvironmentName + " continues",
@@ -3420,7 +3415,7 @@ namespace EnergyPlus::SimAirServingZones {
                 // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
                 // involved but the fan should really run like constant volume and not cycle with compressor
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-                HVACFan::fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
+                state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
 
             } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
                 Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);

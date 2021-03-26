@@ -73,10 +73,6 @@ namespace Photovoltaics {
     // DERIVED TYPE DEFINITIONS:
     //   see DataPhotovoltaics.cc
 
-    extern Array1D_bool CheckEquipName;
-
-    void clear_state();
-
     void SimPVGenerator(EnergyPlusData &state,
                         GeneratorType const GeneratorType,          // type of Generator
                         std::string const &GeneratorName, // user specified name of Generator
@@ -318,11 +314,21 @@ namespace Photovoltaics {
 } // namespace Photovoltaics
 
 struct PhotovoltaicStateData : BaseGlobalStruct {
-    Array1D_bool MyEnvrnFlag;
+
+    Array1D_bool CheckEquipName;
+    bool GetInputFlag = true; // one time get input flag
+    bool MyOneTimeFlag = true;
+    bool firstTime = true;
     Real64 PVTimeStep; // internal timestep (in seconds) for cell temperature mode 3
+    Array1D_bool MyEnvrnFlag;
+
     void clear_state() override
     {
-        this->MyEnvrnFlag.clear();
+        CheckEquipName.clear();
+        GetInputFlag = true;
+        MyOneTimeFlag = true;
+        firstTime = true;
+        MyEnvrnFlag.clear();
     }
 };
 

@@ -798,7 +798,7 @@ namespace VentilatedSlab {
 
             if (HVACFan::checkIfFanNameIsAFanSystem(state, state.dataVentilatedSlab->VentSlab(Item).FanName)) {
                 state.dataVentilatedSlab->VentSlab(Item).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataVentilatedSlab->VentSlab(Item).FanName));
+                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataVentilatedSlab->VentSlab(Item).FanName));
                 state.dataVentilatedSlab->VentSlab(Item).Fan_Index = HVACFan::getFanObjectVectorIndex(state, state.dataVentilatedSlab->VentSlab(Item).FanName);
             } else {
                 bool isNotOkay(false);
@@ -2850,7 +2850,7 @@ namespace VentilatedSlab {
                     SimVentSlabOAMixer(state, Item);
 
                     if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                        state.dataHVACFan->fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                     } else if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                         Fans::SimulateFanComponents(
                             state, state.dataVentilatedSlab->VentSlab(Item).FanName, FirstHVACIteration, state.dataVentilatedSlab->VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
@@ -3104,7 +3104,7 @@ namespace VentilatedSlab {
 
                     SimVentSlabOAMixer(state, Item);
                     if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                        state.dataHVACFan->fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                     } else if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                         Fans::SimulateFanComponents(
                             state, state.dataVentilatedSlab->VentSlab(Item).FanName, FirstHVACIteration, state.dataVentilatedSlab->VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
@@ -3146,7 +3146,7 @@ namespace VentilatedSlab {
         AirMassFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
         Real64 locFanElecPower = 0.0;
         if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            locFanElecPower = HVACFan::fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->fanPower();
+            locFanElecPower = state.dataHVACFan->fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->fanPower();
         } else {
             locFanElecPower = Fans::GetFanPower(state, state.dataVentilatedSlab->VentSlab(Item).Fan_Index);
         }
@@ -3158,7 +3158,7 @@ namespace VentilatedSlab {
             state.dataLoopNodes->Node(FanOutletNode).MassFlowRateMaxAvail = 0.0;
             state.dataLoopNodes->Node(FanOutletNode).MassFlowRateMinAvail = 0.0;
             if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                 Fans::SimulateFanComponents(
                     state, state.dataVentilatedSlab->VentSlab(Item).FanName, FirstHVACIteration, state.dataVentilatedSlab->VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
@@ -3215,7 +3215,7 @@ namespace VentilatedSlab {
 
         SimVentSlabOAMixer(state, Item);
         if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            HVACFan::fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+            state.dataHVACFan->fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
         } else if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
             Fans::SimulateFanComponents(
                 state, state.dataVentilatedSlab->VentSlab(Item).FanName, FirstHVACIteration, state.dataVentilatedSlab->VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
@@ -3324,7 +3324,7 @@ namespace VentilatedSlab {
         state.dataVentilatedSlab->VentSlab(Item).TotCoolCoilPower = std::abs(min(0.0, QTotUnitOut));
         state.dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower = state.dataVentilatedSlab->VentSlab(Item).TotCoolCoilPower - state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower;
         if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataVentilatedSlab->VentSlab(Item).ElecFanPower = HVACFan::fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->fanPower();
+            state.dataVentilatedSlab->VentSlab(Item).ElecFanPower = state.dataHVACFan->fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->fanPower();
         } else {
             state.dataVentilatedSlab->VentSlab(Item).ElecFanPower = Fans::GetFanPower(state, state.dataVentilatedSlab->VentSlab(Item).Fan_Index);
         }

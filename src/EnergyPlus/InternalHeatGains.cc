@@ -5653,14 +5653,14 @@ namespace InternalHeatGains {
 
             SumAllInternalLatentGains(state, NZ, state.dataHeatBalFanSys->ZoneLatentGain(NZ));
             // Added for hybrid model
-            if (HybridModel::FlagHybridModel_PC) {
+            if (state.dataHybridModel->FlagHybridModel_PC) {
                 SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
             }
         }
 
         // QL is per radiant enclosure (one or more zones if grouped by air boundaries)
-        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
-            auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
+            auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
             state.dataHeatBal->QL(enclosureNum) = 0.0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 Real64 zoneQL;
@@ -5689,7 +5689,7 @@ namespace InternalHeatGains {
                     // a small amount to create a "pulse" of heat that is used for the delayed loads
                     state.dataInternalHeatGains->adjQL =
                         state.dataInternalHeatGains->curQL +
-                            DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
+                            state.dataViewFactor->ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
                     // ITABSF is the Inside Thermal Absorptance
                     // TMULT is a multiplier for each zone
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
@@ -6148,7 +6148,7 @@ namespace InternalHeatGains {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int ZoneLoop; // Counter for the # of zones (nz)
-        static Array1D_int TradIntGainTypes(8,
+        static const Array1D_int TradIntGainTypes(8,
                                             {IntGainTypeOf_People,
                                              IntGainTypeOf_Lights,
                                              IntGainTypeOf_ElectricEquipment,
@@ -6533,7 +6533,7 @@ namespace InternalHeatGains {
             if (ReSumLatentGains) {
                 SumAllInternalLatentGains(state, NZ, state.dataHeatBalFanSys->ZoneLatentGain(NZ));
                 // Added for the hybrid model
-                if (HybridModel::FlagHybridModel_PC) {
+                if (state.dataHybridModel->FlagHybridModel_PC) {
                     SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
                 }
             }
@@ -7055,18 +7055,16 @@ namespace InternalHeatGains {
         using namespace DataHeatBalance;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int iZone(0);
-        static int TimeStepInDay(0);
-        static Array1D_int IntGainTypesPeople(1, {IntGainTypeOf_People});
-        static Array1D_int IntGainTypesLight(1, {IntGainTypeOf_Lights});
-        static Array1D_int IntGainTypesEquip(6,
+        static const Array1D_int IntGainTypesPeople(1, {IntGainTypeOf_People});
+        static const Array1D_int IntGainTypesLight(1, {IntGainTypeOf_Lights});
+        static const Array1D_int IntGainTypesEquip(6,
                                              {IntGainTypeOf_ElectricEquipment,
                                               IntGainTypeOf_ElectricEquipmentITEAirCooled,
                                               IntGainTypeOf_GasEquipment,
                                               IntGainTypeOf_HotWaterEquipment,
                                               IntGainTypeOf_SteamEquipment,
                                               IntGainTypeOf_OtherEquipment});
-        static Array1D_int IntGainTypesRefrig(10,
+        static const Array1D_int IntGainTypesRefrig(10,
                                               {IntGainTypeOf_RefrigerationCase,
                                                IntGainTypeOf_RefrigerationCompressorRack,
                                                IntGainTypeOf_RefrigerationSystemAirCooledCondenser,
@@ -7077,9 +7075,9 @@ namespace InternalHeatGains {
                                                IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler,
                                                IntGainTypeOf_RefrigerationTransSysSuctionPipeMT,
                                                IntGainTypeOf_RefrigerationTransSysSuctionPipeLT});
-        static Array1D_int IntGainTypesWaterUse(
+        static const Array1D_int IntGainTypesWaterUse(
             3, {IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified});
-        static Array1D_int IntGainTypesHvacLoss(20,
+        static const Array1D_int IntGainTypesHvacLoss(20,
                                                 {IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
                                                  IntGainTypeOf_ThermalStorageChilledWaterMixed,
                                                  IntGainTypeOf_ThermalStorageChilledWaterStratified,
@@ -7100,7 +7098,7 @@ namespace InternalHeatGains {
                                                  IntGainTypeOf_SecCoolingDXCoilTwoSpeed,
                                                  IntGainTypeOf_SecCoolingDXCoilMultiSpeed,
                                                  IntGainTypeOf_SecHeatingDXCoilMultiSpeed});
-        static Array1D_int IntGainTypesPowerGen(10,
+        static const Array1D_int IntGainTypesPowerGen(10,
                                                 {IntGainTypeOf_GeneratorFuelCell,
                                                  IntGainTypeOf_GeneratorMicroCHP,
                                                  IntGainTypeOf_ElectricLoadCenterTransformer,
@@ -7113,8 +7111,8 @@ namespace InternalHeatGains {
                                                  IntGainTypeOf_ElectricLoadCenterConverter});
 
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
-            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-            for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesPeople, state.dataOutRptTab->peopleInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
                 SumInternalLatentGainsByTypes(state, iZone, IntGainTypesPeople, state.dataOutRptTab->peopleLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
                 SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesPeople, state.dataOutRptTab->peopleRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));

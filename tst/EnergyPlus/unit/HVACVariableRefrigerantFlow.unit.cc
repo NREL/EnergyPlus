@@ -2271,7 +2271,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     // #6218 Fan:SystemModel is used and DX coil RatedVolAirFlowRate was not set equal to system fan designAirVolFlowRate
     EXPECT_EQ(state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1), 1.0);
     EXPECT_EQ(state->dataDXCoils->DXCoil(2).RatedAirVolFlowRate(1), 1.0);
-    EXPECT_EQ(HVACFan::fanObjs[state->dataHVACVarRefFlow->VRFTU(1).FanIndex]->designAirVolFlowRate, 1.0);
+    EXPECT_EQ(state->dataHVACFan->fanObjs[state->dataHVACVarRefFlow->VRFTU(1).FanIndex]->designAirVolFlowRate, 1.0);
 
     // Run and Check: GetSupHeatTempRefrig
     {
@@ -10596,11 +10596,11 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     EXPECT_EQ(QZnReq, -5000.0);
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check fan operation for cooling mode
-    Real64 Result_AirMassFlowRateDesign = HVACFan::fanObjs[0]->maxAirMassFlowRate();
+    Real64 Result_AirMassFlowRateDesign = state->dataHVACFan->fanObjs[0]->maxAirMassFlowRate();
     EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347052, 0.000001);
-    Real64 Result_AirMassFlowRate = state->dataLoopNodes->Node(HVACFan::fanObjs[0]->outletNodeNum).MassFlowRate;
+    Real64 Result_AirMassFlowRate = state->dataLoopNodes->Node(state->dataHVACFan->fanObjs[0]->outletNodeNum).MassFlowRate;
     EXPECT_NEAR(Result_AirMassFlowRate, state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1), 0.000001);
-    Real64 Result_FanPower = HVACFan::fanObjs[0]->fanPower();
+    Real64 Result_FanPower = state->dataHVACFan->fanObjs[0]->fanPower();
     EXPECT_NEAR(Result_FanPower, 39.593, 0.001);
 
     // test no load mode fan operation
@@ -10614,11 +10614,11 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     EXPECT_EQ(QZnReq, 0.0);
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check no load fan operation
-    Result_AirMassFlowRateDesign = HVACFan::fanObjs[0]->maxAirMassFlowRate();
+    Result_AirMassFlowRateDesign = state->dataHVACFan->fanObjs[0]->maxAirMassFlowRate();
     EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.34706, 0.00001);
-    Result_AirMassFlowRate = state->dataLoopNodes->Node(HVACFan::fanObjs[0]->outletNodeNum).MassFlowRate;
+    Result_AirMassFlowRate = state->dataLoopNodes->Node(state->dataHVACFan->fanObjs[0]->outletNodeNum).MassFlowRate;
     EXPECT_EQ(Result_AirMassFlowRate, 0.0);
-    Result_FanPower = HVACFan::fanObjs[0]->fanPower();
+    Result_FanPower = state->dataHVACFan->fanObjs[0]->fanPower();
     EXPECT_EQ(Result_FanPower, 0.0);
 }
 

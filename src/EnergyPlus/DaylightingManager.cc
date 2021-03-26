@@ -192,7 +192,7 @@ namespace EnergyPlus::DaylightingManager {
         state.dataDaylightingManager->AR = 0.0;
         state.dataDaylightingManager->ARH = 0.0;
         // Loop over surfaces in the zone's enclosure
-        auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum));
+        auto & thisEnclosure(state.dataViewFactor->ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum));
         for (int ISurf : thisEnclosure.SurfacePtr) {
             IType = state.dataSurface->Surface(ISurf).Class;
             // Error if window has multiplier > 1 since this causes incorrect illuminance calc
@@ -4028,13 +4028,13 @@ namespace EnergyPlus::DaylightingManager {
             // Loop through all zones in the same enclosure to find total reference points
             int numEnclRefPoints = 0;
             int surfEnclNum = state.dataSurface->Surface(SurfNum).SolarEnclIndex;
-            for (int const zoneNum : DataViewFactorInformation::ZoneSolarInfo(surfEnclNum).ZoneNums) {
+            for (int const zoneNum : state.dataViewFactor->ZoneSolarInfo(surfEnclNum).ZoneNums) {
                 int numRefPoints = state.dataDaylightingData->ZoneDaylight(zoneNum).TotalDaylRefPoints;
                 numEnclRefPoints += numRefPoints;
                 state.dataDaylightingManager->maxNumRefPtInAnyZone = max(numRefPoints, state.dataDaylightingManager->maxNumRefPtInAnyZone);
             }
             state.dataDaylightingManager->maxNumRefPtInAnyEncl = max(numEnclRefPoints, state.dataDaylightingManager->maxNumRefPtInAnyEncl);
-            DataViewFactorInformation::ZoneSolarInfo(surfEnclNum).TotalEnclosureDaylRefPoints = numEnclRefPoints;
+            state.dataViewFactor->ZoneSolarInfo(surfEnclNum).TotalEnclosureDaylRefPoints = numEnclRefPoints;
             if (numEnclRefPoints > 0) {
                 if (!state.dataSurface->SurfWinSurfDayLightInit(SurfNum)) {
                     state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numEnclRefPoints);
@@ -4059,10 +4059,10 @@ namespace EnergyPlus::DaylightingManager {
                     // Loop through all zones in the adjacent enclosure to find total reference points
                     int numAdjEnclRefPoints = 0;
                     int adjSurfEnclNum = state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex;
-                    for (int const adjZoneNum : DataViewFactorInformation::ZoneSolarInfo(adjSurfEnclNum).ZoneNums) {
+                    for (int const adjZoneNum : state.dataViewFactor->ZoneSolarInfo(adjSurfEnclNum).ZoneNums) {
                         numAdjEnclRefPoints += state.dataDaylightingData->ZoneDaylight(adjZoneNum).TotalDaylRefPoints;
                     }
-                    DataViewFactorInformation::ZoneSolarInfo(adjSurfEnclNum).TotalEnclosureDaylRefPoints = numAdjEnclRefPoints;
+                    state.dataViewFactor->ZoneSolarInfo(adjSurfEnclNum).TotalEnclosureDaylRefPoints = numAdjEnclRefPoints;
                     if (numAdjEnclRefPoints > 0) {
                         if (!state.dataSurface->SurfWinSurfDayLightInit(SurfNum)) {
                             state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numAdjEnclRefPoints);
@@ -4088,13 +4088,13 @@ namespace EnergyPlus::DaylightingManager {
             if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
 
                 if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
-                    auto & thisSurfEnclosure(DataViewFactorInformation::ZoneSolarInfo(state.dataSurface->Surface(SurfNum).SolarEnclIndex));
+                    auto & thisSurfEnclosure(state.dataViewFactor->ZoneSolarInfo(state.dataSurface->Surface(SurfNum).SolarEnclIndex));
                     if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).GlareControlIsActive) {
                         // Error if GlareControlIsActive but window is not in a Daylighting:Detailed zone
                         if (thisSurfEnclosure.TotalEnclosureDaylRefPoints == 0) {
                             ShowSevereError(state, "Window=" + state.dataSurface->Surface(SurfNum).Name + " has Window Shading Control with");
                             ShowContinueError(state, "GlareControlIsActive = Yes but it is not in a Daylighting zone or enclosure.");
-                            ShowContinueError(state, "Zone or enclosure indicated=" + DataViewFactorInformation::ZoneSolarInfo(state.dataSurface->Surface(SurfNum).SolarEnclIndex).Name);
+                            ShowContinueError(state, "Zone or enclosure indicated=" + state.dataViewFactor->ZoneSolarInfo(state.dataSurface->Surface(SurfNum).SolarEnclIndex).Name);
                             ErrorsFound = true;
                         }
                         // Error if GlareControlIsActive and window is in a Daylighting:Detailed zone/enclosure with
@@ -4103,7 +4103,7 @@ namespace EnergyPlus::DaylightingManager {
                             for (int const intWin : thisSurfEnclosure.SurfacePtr) {
                                 int const SurfNumAdj = state.dataSurface->Surface(intWin).ExtBoundCond;
                                 if (state.dataSurface->Surface(intWin).Class == SurfaceClass::Window && SurfNumAdj > 0) {
-                                    auto & adjSurfEnclosure(DataViewFactorInformation::ZoneSolarInfo(state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex));
+                                    auto & adjSurfEnclosure(state.dataViewFactor->ZoneSolarInfo(state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex));
                                     if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
                                         ShowSevereError(state, "Window=" + state.dataSurface->Surface(SurfNum).Name + " has Window Shading Control with");
                                         ShowContinueError(state, "GlareControlIsActive = Yes and is in a Daylighting zone or enclosure");
@@ -4131,7 +4131,7 @@ namespace EnergyPlus::DaylightingManager {
                             for (int const intWin : thisSurfEnclosure.SurfacePtr) {
                                 int const SurfNumAdj = state.dataSurface->Surface(intWin).ExtBoundCond;
                                 if (state.dataSurface->Surface(intWin).Class == SurfaceClass::Window && SurfNumAdj > 0) {
-                                    auto & adjSurfEnclosure(DataViewFactorInformation::ZoneSolarInfo(state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex));
+                                    auto & adjSurfEnclosure(state.dataViewFactor->ZoneSolarInfo(state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex));
                                     if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
                                         ShowSevereError(state, "Window=" + state.dataSurface->Surface(SurfNum).Name + " has Window Shading Control with");
                                         ShowContinueError(state, "MeetDaylightIlluminanceSetpoint and is in a Daylighting zone or enclosure");
@@ -4173,12 +4173,12 @@ namespace EnergyPlus::DaylightingManager {
                 }
             }
         } else {
-            for (int enclNum = 1; enclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclNum) {
-                for (int const enclSurfNum : DataViewFactorInformation::ZoneSolarInfo(enclNum).SurfacePtr) {
+            for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+                for (int const enclSurfNum : state.dataViewFactor->ZoneSolarInfo(enclNum).SurfacePtr) {
                     if (state.dataSurface->Surface(enclSurfNum).Class == SurfaceClass::Window && state.dataSurface->Surface(enclSurfNum).ExtSolar) {
                         int refPtCount = 0;
-                        for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(enclNum).ZoneNums) {
-                            if (DataViewFactorInformation::ZoneSolarInfo(enclNum).TotalEnclosureDaylRefPoints > 0 &&
+                        for (int const enclZoneNum : state.dataViewFactor->ZoneSolarInfo(enclNum).ZoneNums) {
+                            if (state.dataViewFactor->ZoneSolarInfo(enclNum).TotalEnclosureDaylRefPoints > 0 &&
                                 !Zone(enclZoneNum).HasInterZoneWindow && state.dataDaylightingData->ZoneDaylight(enclZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
                                 for (int refPtNum = 1; refPtNum <= state.dataDaylightingData->ZoneDaylight(enclZoneNum).TotalDaylRefPoints; ++refPtNum) {
                                     ++refPtCount; // Count reference points across each zone in the same enclosure
@@ -5180,7 +5180,7 @@ namespace EnergyPlus::DaylightingManager {
             if (SurfNum > 0) {
                 bool daylightControlFound = false;
                 int const pipeEnclNum = state.dataHeatBal->Zone(state.dataSurface->Surface(SurfNum).Zone).SolarEnclosureNum;
-                for (int const zoneNum : DataViewFactorInformation::ZoneSolarInfo(pipeEnclNum).ZoneNums) {
+                for (int const zoneNum : state.dataViewFactor->ZoneSolarInfo(pipeEnclNum).ZoneNums) {
                     if (state.dataDaylightingData->ZoneDaylight(zoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::NoDaylighting) {
                         daylightControlFound = true;
                     }
@@ -6725,7 +6725,7 @@ namespace EnergyPlus::DaylightingManager {
                 if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel && (IS_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) || state.dataSurface->SurfWinSolarDiffusing(IWin))) IS = 2;
                 if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
                     int refPtCount = 0;
-                    for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).ZoneNums) {
+                    for (int const enclZoneNum : state.dataViewFactor->ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).ZoneNums) {
                         for (int refPtNum = 1; refPtNum <= state.dataDaylightingData->ZoneDaylight(enclZoneNum).TotalDaylRefPoints; ++refPtNum) {
                             ++refPtCount; // Count reference points across each zone in the same enclosure
                             state.dataSurface->SurfaceWindow(IWin).IllumFromWinAtRefPtRep(refPtCount) = state.dataDaylightingData->ZoneDaylight(enclZoneNum).IllumFromWinAtRefPt(loop, IS, refPtNum);
@@ -9491,7 +9491,7 @@ namespace EnergyPlus::DaylightingManager {
         // Count number of exterior Windows (use to allocate arrays)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // Count exterior windows in this zone or shared solar enclosure
-            for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+            for (int const surfNum : state.dataViewFactor->ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                 if ((state.dataSurface->Surface(surfNum).Class == SurfaceClass::Window && state.dataSurface->Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                     state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                     ++state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows;
@@ -9505,9 +9505,9 @@ namespace EnergyPlus::DaylightingManager {
             // This is a Daylighting:Detailed zone
             // Find adjacent zones/enclosures
             int const thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
-            for (int adjEnclNum = 1; adjEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++adjEnclNum) {
+            for (int adjEnclNum = 1; adjEnclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++adjEnclNum) {
                 if (adjEnclNum == thisZoneEnclNum) continue;
-                for (int ZoneNumAdj : DataViewFactorInformation::ZoneSolarInfo(adjEnclNum).ZoneNums) {
+                for (int ZoneNumAdj : state.dataViewFactor->ZoneSolarInfo(adjEnclNum).ZoneNums) {
                     // Require that ZoneNumAdj have a least one exterior window
                     bool AdjZoneHasExtWins = false;
                     for (int SurfNumAdj = Zone(ZoneNumAdj).WindowSurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).WindowSurfaceLast; ++SurfNumAdj) {
@@ -9540,9 +9540,9 @@ namespace EnergyPlus::DaylightingManager {
             // This is a Daylighting:Detailed zone
             // Find adjacent zones
             int const thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
-            for (int adjEnclNum = 1; adjEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++adjEnclNum) {
+            for (int adjEnclNum = 1; adjEnclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++adjEnclNum) {
                 if (adjEnclNum == thisZoneEnclNum) continue;
-                for (int ZoneNumAdj : DataViewFactorInformation::ZoneSolarInfo(adjEnclNum).ZoneNums) {
+                for (int ZoneNumAdj : state.dataViewFactor->ZoneSolarInfo(adjEnclNum).ZoneNums) {
                     if (ZoneNumAdj == ZoneNum) continue;
                     // Require that ZoneNumAdj have a least one exterior window
                     bool AdjZoneHasExtWins = false;
@@ -9636,7 +9636,7 @@ namespace EnergyPlus::DaylightingManager {
                 // This is a Daylighting:Detailed zone
 
                 // Get exterior windows in this zone or shared solar enclosure
-                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+                for (int const surfNum : state.dataViewFactor->ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                     if ((state.dataSurface->Surface(surfNum).Class == SurfaceClass::Window && state.dataSurface->Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                         state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                         ++ZoneExtWin(ZoneNum);
@@ -9703,7 +9703,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 int ZoneExtWinCtr = 0;
 
-                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+                for (int const surfNum : state.dataViewFactor->ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                     if ((state.dataSurface->Surface(surfNum).Class == SurfaceClass::Window && state.dataSurface->Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                         state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                         ++ZoneExtWinCtr;
@@ -9898,7 +9898,7 @@ namespace EnergyPlus::DaylightingManager {
 
         state.dataDaylightingData->ZoneDaylight(ZoneNum).InterReflIllFrIntWins = 0.0;
 
-        auto &thisEnclSurfaces(DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr);
+        auto &thisEnclSurfaces(state.dataViewFactor->ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr);
         for (int const IWin : thisEnclSurfaces) {
             if (state.dataSurface->Surface(IWin).Class == SurfaceClass::Window && state.dataSurface->Surface(IWin).ExtBoundCond >= 1) {
                 // This is an interior window in ZoneNum

@@ -345,6 +345,7 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct {
     Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
     Real64 RhoAirStdInit = 0.0;
     Real64 QRegen = 0.0; // required coil load passed to sim heating coil routine (W)
+    Real64 RhoAirStdInitCGDD = 0.0; // standard air density (kg/m3)
 
     void clear_state() override
     {
@@ -367,6 +368,7 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct {
         this->MyPlantScanFlag.deallocate();
         this->RhoAirStdInit = 0.0;
         this->QRegen = 0.0;
+        this->RhoAirStdInitCGDD = 0.0;
     }
 };
 

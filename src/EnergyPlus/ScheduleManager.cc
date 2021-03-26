@@ -134,12 +134,6 @@ namespace ScheduleManager {
 
     // MODULE VARIABLE DECLARATIONS:
 
-
-    // Derived Types Variables
-
-    // Object Data
-
-
     // MODULE SUBROUTINES:
     //*************************************************************************
 
@@ -248,9 +242,9 @@ namespace ScheduleManager {
         int UntilFld;
         int xxcount;
         //  REAL(r64) tempval
-        static std::string CurrentThrough;
-        static std::string LastFor;
-        static std::string errmsg;
+        std::string CurrentThrough;
+        std::string LastFor;
+        std::string errmsg;
         int kdy;
         bool FileExists;
         // for SCHEDULE:FILE
@@ -642,7 +636,6 @@ namespace ScheduleManager {
         state.dataScheduleMgr->UniqueWeekScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumWeekSchedules));
 
         state.dataScheduleMgr->Schedule.allocate({-1, state.dataScheduleMgr->NumSchedules});
-        //		UniqueScheduleNames.clear();
         state.dataScheduleMgr->UniqueScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumSchedules));
         state.dataScheduleMgr->Schedule(-1).ScheduleTypePtr = -1;
         state.dataScheduleMgr->Schedule(-1).WeekSchedulePointer = 1;
