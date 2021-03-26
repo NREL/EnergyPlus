@@ -183,6 +183,7 @@ namespace EnergyPlus {
         this->dataMoistureBalEMPD = std::make_unique<MoistureBalanceEMPDManagerData>();
         this->dataMstBal = std::make_unique<MoistureBalanceData>();
         this->dataMstBalEMPD = std::make_unique<MoistureBalanceEMPDData>();
+        this->dataMundtSimMgr = std::make_unique<MundtSimMgrData>();
         this->dataNodeInputMgr = std::make_unique<NodeInputManagerData>();
         this->dataOutAirNodeMgr = std::make_unique<OutAirNodeManagerData>();
         this->dataOutRptPredefined = std::make_unique<OutputReportPredefinedData>();
@@ -434,6 +435,7 @@ namespace EnergyPlus {
         this->dataMoistureBalEMPD->clear_state();
         this->dataMstBal->clear_state();
         this->dataMstBalEMPD->clear_state();
+        this->dataMundtSimMgr->clear_state();
         this->dataNodeInputMgr->clear_state();
         this->dataOutAirNodeMgr->clear_state();
         this->dataOutRptPredefined->clear_state();

@@ -198,6 +198,7 @@ struct MixerComponentData;
 struct MoistureBalanceData;
 struct MoistureBalanceEMPDData;
 struct MoistureBalanceEMPDManagerData;
+struct MundtSimMgrData;
 struct NodeInputManagerData;
 struct OutAirNodeManagerData;
 struct OutdoorAirUnitData;
@@ -452,6 +453,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<MoistureBalanceData> dataMstBal;
     std::unique_ptr<MoistureBalanceEMPDData> dataMstBalEMPD;
     std::unique_ptr<MoistureBalanceEMPDManagerData> dataMoistureBalEMPD;
+    std::unique_ptr<MundtSimMgrData> dataMundtSimMgr;
     std::unique_ptr<NodeInputManagerData> dataNodeInputMgr;
     std::unique_ptr<OutAirNodeManagerData> dataOutAirNodeMgr;
     std::unique_ptr<OutdoorAirUnitData> dataOutdoorAirUnit;
